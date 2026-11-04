@@ -1,0 +1,50 @@
+{
+  "timeUtc": "2026-10-18T09:46:36.784997+00:00",
+  "signal": "SIGINT",
+  "reason": "Apply user-authorized catalog patch-version change after focused guard detected duplicate catalog@0.1.0; preserve old measured checks and rerun against final source. No full suite ran in this runner.",
+  "sourceHead": "3eaa98d0856299f53beb4d0659058f7d9c36be46",
+  "members": [
+    {
+      "pid": 8341,
+      "ppid": 84828,
+      "pgid": 84828,
+      "args": "npm run check:clean-source    "
+    },
+    {
+      "pid": 8447,
+      "ppid": 8341,
+      "pgid": 84828,
+      "args": "node scripts/clean-source-check.mjs"
+    },
+    {
+      "pid": 12918,
+      "ppid": 8447,
+      "pgid": 84828,
+      "args": "node /opt/homebrew/bin/pnpm run build"
+    },
+    {
+      "pid": 12977,
+      "ppid": 12918,
+      "pgid": 84828,
+      "args": "sh -c tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build && npm run build:verifier"
+    },
+    {
+      "pid": 12978,
+      "ppid": 12977,
+      "pgid": 84828,
+      "args": "node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-clean-source-Y7EeDr/checkout/node_modules/.bin/tsc -p tsconfig.json"
+    },
+    {
+      "pid": 84828,
+      "ppid": 48635,
+      "pgid": 84828,
+      "args": "node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/run-post-governance-checks.mjs 3eaa98d0856299f53beb4d0659058f7d9c36be46"
+    },
+    {
+      "pid": 84839,
+      "ppid": 84828,
+      "pgid": 84828,
+      "args": "caffeinate -i node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/run-post-governance-checks.mjs 3eaa98d0856299f53beb4d0659058f7d9c36be46"
+    }
+  ]
+}

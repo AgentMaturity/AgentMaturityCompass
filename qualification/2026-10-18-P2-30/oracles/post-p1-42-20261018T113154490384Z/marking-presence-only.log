@@ -1,0 +1,30 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts (135 tests | 1 failed | 134 skipped) 10ms
+     × rejects stripped published bytes even when their marking wrapper is present (mutation target) 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > rejects stripped published bytes even when their marking wrapper is present (mutation target)
+AssertionError: expected 'allow' to be 'deny' // Object.is equality
+
+Expected: "deny"
+Received: "allow"
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:240:106
+    238|     });
+    239|     expect(fixture).toBeDefined();
+    240|     expect(runTechnologyOracle(fixture!.envelope.setup.technologyOracl…
+       |                                                                                                          ^
+    241|   });
+    242|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 134 skipped (135)
+   Start at  17:01:55
+   Duration  3.69s (transform 2.56s, setup 59ms, import 3.46s, tests 10ms, environment 0ms)
+

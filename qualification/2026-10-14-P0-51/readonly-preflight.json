@@ -1,0 +1,912 @@
+{
+  "issue": "P0-51",
+  "kind": "Read-only preflight; execution and source changes deferred until bounded P0-23 closes",
+  "createdAt": "2026-10-14T17:39:02.508340+00:00",
+  "activeP051Implementation": false,
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "routing": {
+    "path": "/private/tmp/amc-next-after-p0-23-20261014.json",
+    "sha256": "925a27b566d9311fe6da4efe59e32e558b58edd9fe9468fcd9b9121d623679f8",
+    "selection": "P0-51 dependency-first tie recommendation; P0-46 remains equally High/due7-Oct ready alternative. No numeric tie rule or Done claim."
+  },
+  "graphNavigation": {
+    "sourcePath": "/Users/sid/AgentMaturityCompass/graphify-out/navigation/trust-and-publication/graph.json",
+    "sourceSha256": "a7a024a5245943bf6e5c90225ff296f1022a9615c2cd2af3ea2fa6f32da07f2f",
+    "queryTokens": [
+      "trust",
+      "verify",
+      "bundle",
+      "notary"
+    ],
+    "command": "graphify query \"trust verify bundle notary\" --budget 800",
+    "ownedCopy": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/p0-51-graph-navigation-ifl34s9t",
+    "queryLogPath": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/p0-51-graph-navigation-ifl34s9t/query.log",
+    "queryLogSha256": "fbb8a123ea9f5a0f3c4e5cc5cc289da3d005209ae853ea244288fa9f4616182c",
+    "nodesFound": 25,
+    "nodesShown": 24,
+    "graphGeneratedAt": "2026-09-08T21:14:45.370785+00:00",
+    "mapSourceRevision": "d69d7037c20161ae65c1030efa4e39598c1beb21",
+    "mapVersion": "0.9.56",
+    "installedVersion": "0.9.74",
+    "projectRefreshPin": "0.9.56",
+    "modelTokens": 0,
+    "limit": "Existing30-file static slice predates P0-51. Used only to navigate bundle/verifyAll/trustConfig/notary relationships; original graph bytes unchanged, no refresh/watch/server/reflection or save-result write."
+  },
+  "acceptance": {
+    "primaryOrigin": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/55",
+    "normativeSpec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-09.md",
+      "sha256": "196a3dcbbcbb3b8d3f49aae88c7559c390c5224c5096a574b835266a7a58e8fd",
+      "lines": [
+        234,
+        236,
+        240,
+        263,
+        272
+      ]
+    },
+    "standaloneSpec": "P0-51.md absent in durable specs; PR55 proposed follow-up + parent steps and later authored source form the scoped contract.",
+    "explicitUnfinished": "Full ci.yml, coverage floors and release:gate on merged integration remain unchecked. New owned qualification cannot transfer an old full P0-50 report or pass an inherited failing P0-22 corpus.",
+    "rules": [
+      "Pins come from operator context, not artifacts or API bodies. Every verifier report retains scope/freshness/completeness/satisfaction limits.",
+      "0 trusted;1 failed;2 only integrity passes with an actual explicit unpinned/unanchored override; no allow flag creates trust.",
+      "Every current portable command has the existing step10flags; help registration alone is not runtime proof.",
+      "No new CLI path/freeze key, waived floor, baseline, archive mutation or public deployment."
+    ]
+  },
+  "sourcePins": [
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "linesRatchet": 24431,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/cli-trust-flags.ts",
+      "sha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081",
+      "linesRatchet": 118,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/cli-domain-product-commands.ts",
+      "sha256": "a52646b18c640000b621f83868d1a2be0b04b8c3e7edfe3e3e96a633e7c768e6",
+      "linesRatchet": 714,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/cli-import-commands.ts",
+      "sha256": "5d79d48e1e6389687f137c52372642aea576e9b852eada833186d98159944641",
+      "linesRatchet": 213,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/cli-session-commands.ts",
+      "sha256": "c640189b30cecb2539e59cb2f088d3a4a8277f3431cc2a145c88706694e015ae",
+      "linesRatchet": 340,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/trust/admission.ts",
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "linesRatchet": 147,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/trust/trustContext.ts",
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "linesRatchet": 130,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/trust/verifierReport.ts",
+      "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2",
+      "linesRatchet": 125,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/trust/requestTrust.ts",
+      "sha256": "edb39ed6dcc47c27c6e871dbb9e2c1b3225e3e9b0f0c3933183c148608dff7ee",
+      "linesRatchet": 16,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/bench/benchCli.ts",
+      "sha256": "3406eceed13869bbfba455677bd5d7276798ad7fa580777aba45526b160cda71",
+      "linesRatchet": 201,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/bench/benchRegistryServer.ts",
+      "sha256": "f4dc8a0e4eb7bde592df88603250f6cc34ef15b620d115f8b54a1d95557e635b",
+      "linesRatchet": 365,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/bom/bomVerifier.ts",
+      "sha256": "a795c4f7213a4633ed1a13eb15eb76ad3370ff268713c3e742a22d7b5d9520a5",
+      "linesRatchet": 139,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/notary/notaryAttestation.ts",
+      "sha256": "587ca09319f54d410f19bea10349279aa763ac1de4fe359cc08cdd8e8dca2b67",
+      "linesRatchet": 169,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/notary/notaryCli.ts",
+      "sha256": "e3f22041a93d3c6d492fe3a75c12ed3d464857ad05123695fcba0df76b288fce",
+      "linesRatchet": 283,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/transparency/logChain.ts",
+      "sha256": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff",
+      "linesRatchet": 417,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/transparency/merkleIndexStore.ts",
+      "sha256": "960e039cc8a458ed90f1b18e8842f4042fd7c2a620a660666416de2d9ef21508",
+      "linesRatchet": 787,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/transparency/transparencyMerkleCli.ts",
+      "sha256": "1e61ee12406c00f7ea2e14095334f4f5950a174e2492791640622b1b5e129433",
+      "linesRatchet": 64,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/transparency/workspaceProofBundle.ts",
+      "sha256": "5b7abd142efee734871f20c1f4718dcb5cf03b8dc5f2965adc248cd3576cb21b",
+      "linesRatchet": 60,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/transparency/sessionAnchorVerify.ts",
+      "sha256": "b0925fb77901172d7bb524521b147d61a043e076093452319787be213e6d5871",
+      "linesRatchet": 288,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/domains/industryPackEntitlement.ts",
+      "sha256": "095572a719fe570a2c3207aa51c32470140b861655ba803846c4b61564e9f5f0",
+      "linesRatchet": 546,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/standard/externalEvidenceFiles.ts",
+      "sha256": "8884260742d322c82fe73aea2aa22aa9962635dce8991d568ed8a7fb2d2c08c9",
+      "linesRatchet": 66,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/standard/externalEvidenceProfile.ts",
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5",
+      "linesRatchet": 235,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/enforce/formalVerification.ts",
+      "sha256": "1dd97466d0e72617f7e3c8218c29af5dd6ef09ac3103c0f4d8be9cc027afcecb",
+      "linesRatchet": 995,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/passport/trustInterchange.ts",
+      "sha256": "c949b0793c90b1f95806f0cc269bac814ab31c0525657f4c04cccfd64afebcac",
+      "linesRatchet": 300,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/api/bomRouter.ts",
+      "sha256": "25e4d16d382fb3d60c98ed00bbfdffc06736e3bae20829d494263f09643c61ac",
+      "linesRatchet": 258,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/api/cryptoRouter.ts",
+      "sha256": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0",
+      "linesRatchet": 346,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/api/exportRouter.ts",
+      "sha256": "09be15319e600ef9b233e2a94c2cfc1a321f8cf9f4dd3fcf44402ea19510634b",
+      "linesRatchet": 188,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/api/enforceRouter.ts",
+      "sha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+      "linesRatchet": 478,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/api/passportRouter.ts",
+      "sha256": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405",
+      "linesRatchet": 197,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/studio/studioServer.ts",
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+      "linesRatchet": 8858,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/studio/nativeTaskService.ts",
+      "sha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+      "linesRatchet": 598,
+      "matchesAcceptedMain": true
+    },
+    {
+      "path": "src/setup/nativeInteractiveSession.ts",
+      "sha256": "10716b5f4f02d15299ab5edfc6f5ef6a3756a73641448e684eee6bf43389c245",
+      "linesRatchet": 436,
+      "matchesAcceptedMain": true
+    }
+  ],
+  "testPins": [
+    {
+      "path": "tests/cliTrustFlags.test.ts",
+      "sha256": "9f896ee1c26fad50bc519aac39e7a108099038c26f9323aa00fe3a333fef9f21"
+    },
+    {
+      "path": "tests/trust/verifySurfaces.test.ts",
+      "sha256": "851b7f5918d553560ad037a7f7d163eb48c2cbd991baba17c0e8bf927cea0812"
+    },
+    {
+      "path": "tests/trust/admission.test.ts",
+      "sha256": "592b18d0d54dec607d110dc30ecd933e452be549f380c1e0da97ab70902a9653"
+    },
+    {
+      "path": "tests/trust/verifierReport.test.ts",
+      "sha256": "fb0a60cf941af3c124923f91d114aa80a2355a8c44eeb37f27e61b6ed6e05ad7"
+    },
+    {
+      "path": "tests/trust/trustContext.test.ts",
+      "sha256": "c7dfd3e4acf4a23de4494802ec33a451eec889014c1c26072b976ea377811368"
+    },
+    {
+      "path": "tests/trust/embeddedKeyForgery.test.ts",
+      "sha256": "3e09d7eab2ab91f4fff44abef83f85e1c278709041db8a2fc837e30c699ded94"
+    },
+    {
+      "path": "tests/trust/trustFixtures.ts",
+      "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d"
+    },
+    {
+      "path": "tests/publicBenchmarkRegistry.test.ts",
+      "sha256": "8a956e2f6ce52983dbf36b782cc56cf0509663af4b744b7f9f8f4df1a717efc2"
+    },
+    {
+      "path": "tests/zeroKeyLeaseBudgetDriftBom.test.ts",
+      "sha256": "b8859eba5840f544486c75f5f82f965ecbc9700fdabcadf7d711cd6b2a586bc6"
+    },
+    {
+      "path": "tests/notaryTrust.test.ts",
+      "sha256": "677bcbc70a77bfac1d5f749cf7d60c145d4f826da393c2c11613287635a44525"
+    },
+    {
+      "path": "tests/federationComplianceIntegrationMerkle.test.ts",
+      "sha256": "42c4dcf89049504439394f549f27a703ecbe495978e2af01a7e83486d3554add"
+    },
+    {
+      "path": "tests/transparencyMerkleIncremental.test.ts",
+      "sha256": "aa5ef81844a0cf8e72b6484b57a061171b3889cdc750952711b9f3b73dd6da14"
+    },
+    {
+      "path": "tests/sessionAnchorOfflineProof.test.ts",
+      "sha256": "b14a6a44d4f6aef9cd7f6241cb23655e94c01cbb8a5b93f74ffedbef9f089dde"
+    },
+    {
+      "path": "tests/industryPackEntitlement.test.ts",
+      "sha256": "16637250e792e20705b51f106b3efc087dc2ea1dab8f79eeafe13e456d32e779"
+    },
+    {
+      "path": "tests/externalEvidenceProfile.test.ts",
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+    },
+    {
+      "path": "tests/formalVerification.test.ts",
+      "sha256": "0335fd4923e97a079f3743f673a14140a14bc7e82c55b96c77b23e11a2f2a99a"
+    },
+    {
+      "path": "tests/trustInterchange.test.ts",
+      "sha256": "7e4d737f5f432ec047bf3e6b917cc66c3643dd7e7339b74acc610304a4149bec"
+    },
+    {
+      "path": "tests/studioNativeTaskService.test.ts",
+      "sha256": "745b411a2a57fd4f1663e2b6e6517dbf46dd363f73cdf0e2d664bc73564d62af"
+    },
+    {
+      "path": "tests/nativeValidationOutcomeSurfaces.test.ts",
+      "sha256": "786a09a6bc84d78593cacd25443e6ae77efe77b3a320b7e318bce9c45adb340c"
+    },
+    {
+      "path": "tests/publicTaskTransport.test.ts",
+      "sha256": "d823a956813d12ce88e8ade9ec1380db42062e3c8f84a30915dad676c8c84bfd"
+    },
+    {
+      "path": "tests/apiRouters.test.ts",
+      "sha256": "64fe33c9b184db17c8abc522cd7435a3c53af4e4672b82c3550dda551a27b748"
+    },
+    {
+      "path": "tests/helpers/trustContext.ts",
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+    }
+  ],
+  "activeP023SourceCorrespondence": {
+    "meaning": "Read-only byte comparison only, not passing qualification or final-source assumption.",
+    "inputs": [
+      {
+        "path": "src/cli.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+      },
+      {
+        "path": "src/cli-trust-flags.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081"
+      },
+      {
+        "path": "src/cli-domain-product-commands.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "a52646b18c640000b621f83868d1a2be0b04b8c3e7edfe3e3e96a633e7c768e6"
+      },
+      {
+        "path": "src/cli-import-commands.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "5d79d48e1e6389687f137c52372642aea576e9b852eada833186d98159944641"
+      },
+      {
+        "path": "src/cli-session-commands.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "c640189b30cecb2539e59cb2f088d3a4a8277f3431cc2a145c88706694e015ae"
+      },
+      {
+        "path": "src/trust/admission.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989"
+      },
+      {
+        "path": "src/trust/trustContext.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991"
+      },
+      {
+        "path": "src/trust/verifierReport.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2"
+      },
+      {
+        "path": "src/trust/requestTrust.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "edb39ed6dcc47c27c6e871dbb9e2c1b3225e3e9b0f0c3933183c148608dff7ee"
+      },
+      {
+        "path": "src/bench/benchCli.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "3406eceed13869bbfba455677bd5d7276798ad7fa580777aba45526b160cda71"
+      },
+      {
+        "path": "src/bench/benchRegistryServer.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "f4dc8a0e4eb7bde592df88603250f6cc34ef15b620d115f8b54a1d95557e635b"
+      },
+      {
+        "path": "src/bom/bomVerifier.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "a795c4f7213a4633ed1a13eb15eb76ad3370ff268713c3e742a22d7b5d9520a5"
+      },
+      {
+        "path": "src/notary/notaryAttestation.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "587ca09319f54d410f19bea10349279aa763ac1de4fe359cc08cdd8e8dca2b67"
+      },
+      {
+        "path": "src/notary/notaryCli.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "e3f22041a93d3c6d492fe3a75c12ed3d464857ad05123695fcba0df76b288fce"
+      },
+      {
+        "path": "src/transparency/logChain.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "0c24f07dc888e382e4388bf89c06ac355a8ce67f2f2627ae5a7c87aa4f588fff"
+      },
+      {
+        "path": "src/transparency/merkleIndexStore.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "960e039cc8a458ed90f1b18e8842f4042fd7c2a620a660666416de2d9ef21508"
+      },
+      {
+        "path": "src/transparency/transparencyMerkleCli.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "1e61ee12406c00f7ea2e14095334f4f5950a174e2492791640622b1b5e129433"
+      },
+      {
+        "path": "src/transparency/workspaceProofBundle.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "5b7abd142efee734871f20c1f4718dcb5cf03b8dc5f2965adc248cd3576cb21b"
+      },
+      {
+        "path": "src/transparency/sessionAnchorVerify.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "b0925fb77901172d7bb524521b147d61a043e076093452319787be213e6d5871"
+      },
+      {
+        "path": "src/domains/industryPackEntitlement.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "095572a719fe570a2c3207aa51c32470140b861655ba803846c4b61564e9f5f0"
+      },
+      {
+        "path": "src/standard/externalEvidenceFiles.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "8884260742d322c82fe73aea2aa22aa9962635dce8991d568ed8a7fb2d2c08c9"
+      },
+      {
+        "path": "src/standard/externalEvidenceProfile.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+      },
+      {
+        "path": "src/enforce/formalVerification.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "1dd97466d0e72617f7e3c8218c29af5dd6ef09ac3103c0f4d8be9cc027afcecb"
+      },
+      {
+        "path": "src/passport/trustInterchange.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "c949b0793c90b1f95806f0cc269bac814ab31c0525657f4c04cccfd64afebcac"
+      },
+      {
+        "path": "src/api/bomRouter.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "25e4d16d382fb3d60c98ed00bbfdffc06736e3bae20829d494263f09643c61ac"
+      },
+      {
+        "path": "src/api/cryptoRouter.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "1f2abcca570d95a2b918e807d46ff568a8337b108f456119c1b911c870a297d0"
+      },
+      {
+        "path": "src/api/exportRouter.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "09be15319e600ef9b233e2a94c2cfc1a321f8cf9f4dd3fcf44402ea19510634b"
+      },
+      {
+        "path": "src/api/enforceRouter.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10"
+      },
+      {
+        "path": "src/api/passportRouter.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405"
+      },
+      {
+        "path": "src/studio/studioServer.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf"
+      },
+      {
+        "path": "src/studio/nativeTaskService.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6"
+      },
+      {
+        "path": "src/setup/nativeInteractiveSession.ts",
+        "sameAsAcceptedMain": true,
+        "candidateSha256": "10716b5f4f02d15299ab5edfc6f5ef6a3756a73641448e684eee6bf43389c245"
+      }
+    ],
+    "formalCertificateAuthoredFollowupAlreadyPresentInP023Tests": true,
+    "testSha256": "5724a984520a581a14c21d8f8ab835b54a88400c15fd31580dacb240d2efd6a9"
+  },
+  "authoredFollowups": [
+    {
+      "commit": "9c0ab015550f9507a3dc2bcecac3436fce9e1645",
+      "scope": "Bench-registry/BOM/notary/transparency trust and request routes."
+    },
+    {
+      "commit": "a02912e518bc67e7ef2c37c5064d9f8bba682635",
+      "scope": "Last five portable commands, cli-trust-flags and license/profile/session proof contexts."
+    },
+    {
+      "commit": "ab600164d2d1b1b611d80ba818e5bc0aa6ae255c",
+      "scope": "Studio operator context and in-chat refusal labels."
+    },
+    {
+      "commit": "de08f4aa04afdeb13e10a1a4ad564fd264bef4c0",
+      "scope": "Formal and passport API never return unsigned verdict valid."
+    },
+    {
+      "commits": [
+        "19a73e3a0dfd7401f40ac5eb45872caae3cbc2b6",
+        "a07437c748af94ffaacdf46f17f20899b04ad9f4",
+        "9b96fea4248a2783b8bab3585742d4b4376a5bc0",
+        "c296badcdb50347d6cb987acae1a72c847a00845"
+      ],
+      "scope": "Confined/bounded verify reads, Linux opened-path check, workspace-relative paths and lexical API prove output."
+    },
+    {
+      "commit": "a87f20d7cec8f75ed38f68c97e99adbff10a2737",
+      "scope": "Held authored formal mock issues shape and UNTRUSTED assertion; both hunks already present in active P0-23 test bytes from the reviewed predecessor slice. Preserve originals; do not overlay."
+    }
+  ],
+  "realCommandFixtures": [
+    {
+      "command": "bench registry verify",
+      "argv": [
+        "bench",
+        "registry",
+        "verify",
+        "--dir",
+        "{registryDir}",
+        "--json"
+      ],
+      "binding": "src/cli.ts:17573-17579",
+      "implementation": [
+        "src/bench/benchCli.ts",
+        "src/bench/benchRegistryServer.ts:146"
+      ],
+      "fixtures": [
+        "tests/publicBenchmarkRegistry.test.ts:168",
+        "initBenchRegistry + publishBenchToRegistry; capture registry public key separately before altering carried registry.pub"
+      ],
+      "purpose": "artifact-seal",
+      "checks": "Genuine pinned0, unknown embedded issuer1, integrity-valid explicitly allowed issuer2, tampered/resigned-wrong-key1, distrust/revocation/wrong-purpose1."
+    },
+    {
+      "command": "bom verify",
+      "argv": [
+        "bom",
+        "verify",
+        "--in",
+        "{bomFile}",
+        "--sig",
+        "{signatureFile}",
+        "--json"
+      ],
+      "binding": "src/cli.ts:16488-16495",
+      "implementation": [
+        "src/bom/bomVerifier.ts:91"
+      ],
+      "fixtures": [
+        "tests/zeroKeyLeaseBudgetDriftBom.test.ts:594-632",
+        "generateBom + signBomFile; export auditor pin independently"
+      ],
+      "purpose": "artifact-seal",
+      "checks": "Pinned0, same bytes with carried-only/absent pin1, allow-unpinned2 only if integrity passes, changed BOM1."
+    },
+    {
+      "command": "enforce verify-certificate",
+      "argv": [
+        "enforce",
+        "verify-certificate",
+        "{certificateJsonLiteralArg}",
+        "--json"
+      ],
+      "binding": "src/cli.ts:21420-21432",
+      "implementation": [
+        "src/enforce/formalVerification.ts",
+        "src/trust/verifierReport.ts:116-123"
+      ],
+      "fixtures": [
+        "tests/formalVerification.test.ts",
+        "A genuine boundedModelCheck certificate with valid unkeyed hash; serialize as one execFile argv, not shell substitution"
+      ],
+      "purpose": "No issuer exists",
+      "checks": "Always exit1/report.trustedfalse/not-pinned, including both allow flags. Preserve hash-integrity valid result; do not relabel that library valid field as issuer trust or force a0/2 accept control."
+    },
+    {
+      "command": "notary verify-attest",
+      "argv": [
+        "notary",
+        "verify-attest",
+        "{attestationBundle}",
+        "--json"
+      ],
+      "binding": "src/cli.ts:11738-11745",
+      "implementation": [
+        "src/notary/notaryCli.ts:195",
+        "src/notary/notaryAttestation.ts"
+      ],
+      "fixtures": [
+        "tests/notaryTrust.test.ts:129-170",
+        "Actual file-sealed local notary bundle; record public key from operator/notary before the bundle, never infer a pin from carried notary.pub"
+      ],
+      "purpose": "notary",
+      "checks": "Pinned0, missing pin1, allow-unpinned2 with no trust promotion, wrong-purpose/distrust/revocation1; fabricated freshly re-signed embedded key1 under genuine pin. Local software signer only; no HSM claim."
+    },
+    {
+      "command": "passport verify-token",
+      "argv": [
+        "passport",
+        "verify-token",
+        "{tokenJsonLiteralArg}",
+        "--json"
+      ],
+      "binding": "src/cli.ts:22176-22188",
+      "implementation": [
+        "src/passport/trustInterchange.ts",
+        "src/trust/verifierReport.ts:116-123"
+      ],
+      "fixtures": [
+        "tests/trustInterchange.test.ts",
+        "Actual HMAC token created with the current CLI demo-secret contract"
+      ],
+      "purpose": "No portable issuer exists",
+      "checks": "Always exit1/report.trustedfalse under every allow combination, even when HMAC integrity is valid. Do not manufacture a trusted token."
+    },
+    {
+      "command": "transparency merkle verify-proof",
+      "argv": [
+        "transparency",
+        "merkle",
+        "verify-proof",
+        "{proofBundle}",
+        "--json"
+      ],
+      "binding": "src/cli.ts:12537-12544",
+      "implementation": [
+        "src/transparency/merkleIndexStore.ts",
+        "src/transparency/transparencyMerkleCli.ts"
+      ],
+      "fixtures": [
+        "tests/federationComplianceIntegrationMerkle.test.ts:165-211",
+        "initWorkspace + appendTransparencyEntry + exportTransparencyProofBundle; record auditor public key before export"
+      ],
+      "purpose": "artifact-seal",
+      "checks": "Pinned signed root/proof0, embedded-only signer1, explicit integrity-only allowance2 where all integrity checks pass, spliced proof/root or changed path/signature1."
+    },
+    {
+      "command": "transparency verify-bundle",
+      "argv": [
+        "transparency",
+        "verify-bundle",
+        "{transparencyBundle}",
+        "--json"
+      ],
+      "binding": "src/cli.ts:12475-12483",
+      "implementation": [
+        "src/transparency/logChain.ts:309"
+      ],
+      "fixtures": [
+        "tests/publicBenchmarkRegistry.test.ts",
+        "Existing initTransparencyLog/appendTransparencyEntry fixtures plus actual exportTransparencyBundle; preserve signed log bytes and independently held auditor key"
+      ],
+      "purpose": "artifact-seal",
+      "checks": "Signed pinned0, unknown carried signer1, allow-unpinned2 only with intact content, edited log/signature1."
+    },
+    {
+      "command": "domain pack verify",
+      "argv": [
+        "domain",
+        "pack",
+        "verify",
+        "--key",
+        "{ed25519LicenseKey}",
+        "--json"
+      ],
+      "binding": "src/cli-domain-product-commands.ts:99-109",
+      "implementation": [
+        "src/domains/industryPackEntitlement.ts:298-315"
+      ],
+      "fixtures": [
+        "tests/industryPackEntitlement.test.ts:26-35,125-158",
+        "generateKeyPairSync(ed25519) + createIndustryPackLicenseKey; operator-held public PEM explicit. Existing activation/verifyLicenseKey tests do not cover the new portable report by themselves."
+      ],
+      "purpose": "artifact-seal",
+      "checks": "Correct explicit/operator PEM pinned0; tampered/expired/wrong-key1; HMAC or legacy allowlisted license always1 in portable verify despite intentionally unchanged activation semantics. Add signed-list-only witness below; do not presume it passes."
+    },
+    {
+      "command": "imports verify-profile",
+      "argv": [
+        "imports",
+        "verify-profile",
+        "{profileFile}",
+        "--authorities",
+        "{operatorAuthorityFile}",
+        "--original",
+        "{originalBytesFile}",
+        "--expected-digest",
+        "{semanticDigest}",
+        "--json"
+      ],
+      "binding": "src/cli-import-commands.ts:98-126",
+      "implementation": [
+        "src/standard/externalEvidenceFiles.ts:33",
+        "src/standard/externalEvidenceProfile.ts"
+      ],
+      "fixtures": [
+        "tests/externalEvidenceProfile.test.ts:6-24,59-70",
+        "Existing fixture()/seal() creates actual Ed25519 signature; authority producer/capture scope must match. Capture authority file/root outside profile, original source bytes/digest retained."
+      ],
+      "purpose": "evidence-authority",
+      "checks": "Valid admitted producer-callback/governed-capture profile0; wrong producer/capture/digest/signature1; unsigned imported SELF_REPORTED profile1 whatever allow flags. Missing authority/key lookup may be an integrity refusal rather than an eligible exit2."
+    },
+    {
+      "command": "session verify-proof",
+      "argv": [
+        "session",
+        "verify-proof",
+        "{sessionProof}",
+        "--expect-auditor-key",
+        "{fingerprintRecordedBeforeExport}",
+        "--json"
+      ],
+      "binding": "src/cli-session-commands.ts:317-337",
+      "implementation": [
+        "src/transparency/sessionAnchorVerify.ts:265"
+      ],
+      "fixtures": [
+        "tests/sessionAnchorOfflineProof.test.ts:109-151,211-344",
+        "anchorAndDetach produces actual proof outside workspace; exact independently captured auditor fingerprint required"
+      ],
+      "purpose": "artifact-seal",
+      "checks": "Genuine correct fingerprint0; wrong well-formed fingerprint1, malformed/changed descriptor/path/root1, matching fingerprint but distrusted/revoked issuer1 even under allow flags. Omitting the required flag is only parser failure, not an issuer witness; wrong-pin integrity failure cannot become2."
+    }
+  ],
+  "smallestQualificationPlan": {
+    "state": "Planned only; no P0-51 runtime/import/build/test executed.",
+    "runtime": "Node22.23.3 /opt/homebrew/opt/node@22/bin/node; task-scoped PATH starts/opt/homebrew/opt/node@22/bin. Own fresh HOME/AMC home outside workspace, no inherited provider creds, correct owned SQLite ABI.",
+    "phase0": "After P0-23 receipt, pin its actual measured source and relevant input hashes; normal build/normalfreeze in owned tree. Never select held Claude source as accepted base.",
+    "phase1ExistingContracts": {
+      "files": [
+        "tests/cliTrustFlags.test.ts",
+        "tests/trust/verifySurfaces.test.ts",
+        "tests/trust/admission.test.ts",
+        "tests/trust/verifierReport.test.ts",
+        "tests/trust/trustContext.test.ts"
+      ],
+      "argv": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/cliTrustFlags.test.ts",
+        "tests/trust/verifySurfaces.test.ts",
+        "tests/trust/admission.test.ts",
+        "tests/trust/verifierReport.test.ts",
+        "tests/trust/trustContext.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=tmp/p0-51-qualification/contracts.json"
+      ],
+      "limit": "cliTrustFlags captures function outputs/exits and verifySurfaces testshelp registration; neither replaces actual verifier subprocesses."
+    },
+    "phase2ExistingRealCrypto": {
+      "files": [
+        "tests/publicBenchmarkRegistry.test.ts",
+        "tests/zeroKeyLeaseBudgetDriftBom.test.ts",
+        "tests/notaryTrust.test.ts",
+        "tests/federationComplianceIntegrationMerkle.test.ts",
+        "tests/sessionAnchorOfflineProof.test.ts",
+        "tests/industryPackEntitlement.test.ts",
+        "tests/externalEvidenceProfile.test.ts",
+        "tests/formalVerification.test.ts",
+        "tests/trustInterchange.test.ts"
+      ],
+      "argv": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/publicBenchmarkRegistry.test.ts",
+        "tests/zeroKeyLeaseBudgetDriftBom.test.ts",
+        "tests/notaryTrust.test.ts",
+        "tests/federationComplianceIntegrationMerkle.test.ts",
+        "tests/sessionAnchorOfflineProof.test.ts",
+        "tests/industryPackEntitlement.test.ts",
+        "tests/externalEvidenceProfile.test.ts",
+        "tests/formalVerification.test.ts",
+        "tests/trustInterchange.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=tmp/p0-51-qualification/crypto-families.json"
+      ],
+      "limit": "Reuse genuine signatures/artifact constructors; these broad family tests contain unrelated fixture paths and activation semantics. Claim only actual registered case results."
+    },
+    "phase3ActualCli": "Use one new owned private fixture and execFile/spawn argv arrays for all10command recipes above. Record source/build/CLI/input/public-pin hashes before mutation, full stdout/stderr/exit/report statuses and exact allow usage. JSON literals remain single argv; no shell substitution. Real failure must be report/crypto refusal, not missing syntax/empty fixture.",
+    "phase4ServerTrustAndNative": {
+      "files": [
+        "tests/studioNativeTaskService.test.ts",
+        "tests/nativeValidationOutcomeSurfaces.test.ts",
+        "tests/publicTaskTransport.test.ts"
+      ],
+      "minimalCases": [
+        "API signedartifact under server-held operator pin accepts; identical body cannot add any REQUEST_TRUST_FIELDS value, evenfalse/null; assert400 and no pin mutation.",
+        "Formal certificate API keepsvalidfalse,integrityValidtrue,statusUNTRUSTED; passport token API keepsnot_evaluated/validfalse and rejects body.secret400.",
+        "Native task with genuine internally valid evidence but empty operator trust yieldsfailed/UNTRUSTED; captured preexecution monitor pin admits it without workspace-self promotion; later loss/distrust retainsfailed.",
+        "In-chat/verify delegates actualagent-loopverify with operator environment; refused report meansNotverified and never successful native task verification."
+      ],
+      "limit": "Existing mocks/route-response fixtures do not alone prove actual server cryptography. Actual handler/loopback witness uses current modules in a private fixture; no shared source/test edits. Preserve reserved existing Studio operator-home fixture, do not relocate it."
+    },
+    "scopeGuard": "Record filtered pending counts honestly if an exploratory -t witness is used; choose full existing files for final bounded receipts. No Node24/Linux/hosted/full-gate implication."
+  },
+  "F4WriteDebt": {
+    "classification": "Current source-derived unguarded write; no fresh runtime reproduction in this preflight.",
+    "currentFlow": [
+      "src/api/cryptoRouter.ts:287-296 lexically confines outFile belowproofs, then dispatches transparencyMerkleProofCli.",
+      "src/studio/studioServer.ts:8178-8190 builds ownproofs destination and calls same exporter.",
+      "src/transparency/merkleIndexStore.ts:544-546 resolves destination,ensureDir(dirname),then tarCreate;tarCreate:228-229 invokes tar-czf without physical-path/nonfollow write admission.",
+      "src/transparency/workspaceProofBundle.ts:16-34 is read-side regular-file/single-link/bounded/nonfollow check; it does not repairprove writes. Linux proc-fd recheck exists, macOS parent-race refusal is explicitlybest-effort."
+    ],
+    "datedAuthority": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+      "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870",
+      "lines": [
+        271,
+        275
+      ]
+    },
+    "futureWitness": "Fresh signed transparent entry and valid root from existing federation Merkle fixture. First prove to a regular owned proofs directory must succeed. Plant proofs-directory symlink to an owned sibling outside dir with known sentinel, then invoke same valid common writer and request-facing path. Desired guard refuses and keeps sentinel/hash/outside artifacts unchanged; current source should be recorded asRED if it writes. Include leaf-file link and linkedancestor variants plus a regular positive control; never target user/system files.",
+    "acceptanceBoundary": "Do not globally confine generic CLI/library exportdestinations toproofs without checkingtheir publiccontract; CLI/library allow caller-chosen output, while this bug is the request-facing containment promise. A source fix must preserve validexport/signature/subject semantics and shared API/Studio holds.",
+    "budget": {
+      "source": "src/transparency/merkleIndexStore.ts",
+      "ratchetLines": 787,
+      "genericCap": 800,
+      "headroom": 13,
+      "explicitBudget": null,
+      "budgetChanged": false
+    },
+    "D15": "This path is absent from accepted-main plan-edits manifest. Absence is not ownership/snapshot clearance: inspect original restorationinventory/needs-snapshot before any future edit. No registration or archive change was made."
+  },
+  "additionalSourceConcern": {
+    "title": "Signed-trust-list-only license key lookup",
+    "source": "src/domains/industryPackEntitlement.ts:300-310",
+    "fact": "Verifying candidate PEMs are only pubkeyPem and operator environment PEM; no trust-list entry PEM is added. When both are absent keys=[] immediately fails integrity, even when an operator-signed list has the issuer.",
+    "qualificationWitness": "Generate a valid Ed25519 license and independently root-pinned signed list with artifact-seal issuer; clear license public-keyenv and omitpubkeyflag, invoke domainpackverify withtrust-list/trust-root. Recordactualexpectedtrustedpath vs observed report. Controlsame key with explicitpubkey mustpass, then wrongpurpose/revoked/distrusted list cases mustrefuse in theiractualadmissioncontexts.",
+    "status": "Static concern; runtime not executed and no defect closure/approved change inferred.",
+    "limit": "The library can receive a PEM locator separately with trust-list context, but the CLI --pubkey also pins it. Do not pretend a wrong-purpose list denies a separate valid explicitpin unless distrust/revocation applies; use the exact admissioncontext."
+  },
+  "mutationWitnesses": [
+    {
+      "id": "issuer-admission",
+      "fault": "In an owned compiled-module copy only, bypass the actualnot-pinned admission branch for a real embedded Ed25519 signer; keep signatureintegrity checks.",
+      "mustGoRed": "No-pin/forgedembedded-issuer refusals become incorrecttrusted/exit0; genuinepinned control stillvalid. Exacthunk/hash/runtimeclosure retained."
+    },
+    {
+      "id": "override-is-not-trust",
+      "fault": "In owned compiled verifierReport copy, allow unpinned-allowed signature status to satisfy trusted computation.",
+      "mustGoRed": "Real allow-unpinned case must retainreport.trustedfalse,exit2,stderrUNTRUSTED; mutantincorrect0/trustedtrue isdetected."
+    },
+    {
+      "id": "distrust-and-purpose",
+      "fault": "In owned copy only, omit exactpurpose/distrust guard being challenged, one fault pervariant.",
+      "mustGoRed": "Authenticsignature with wrongpurpose or correctpin+distrust/revocation remainsrefused even with allowflags. Do not use invalidsignature to hide missingadmission."
+    },
+    {
+      "id": "server-request-pins",
+      "fault": "In private compiled handler copy, bypass requestTrustOverride for exactlyone acceptedbodyfield, leavingactualserver trust fixture unchanged.",
+      "mustGoRed": "Body-suppliedpubkey/allowflag must400; mutantacceptance/fallthrough mustfail. Current sharedAPI/Studio source staysbyte-identical."
+    },
+    {
+      "id": "unsigned-never-portable",
+      "fault": "In owned compiled copy, omit unsignedArtifactReport/missing-issuer refusal or finishVerify nonzero exit path, each separately.",
+      "mustGoRed": "Genuinehash/HMAC result cannot yieldtrusted or exit0/2; preserveintegrity assertions in librarytests."
+    },
+    {
+      "id": "proof-root-binding",
+      "fault": "In privatecompiled copy, bypass the actual signed-root/proof-root comparison, keep hash/signature fixtures consistent for chosenfault.",
+      "mustGoRed": "Spliced genuine signedroots or proofpaths mustrefuse; do not count merelymalformed JSON as causalguard evidence."
+    },
+    {
+      "id": "F4-first-red",
+      "fault": "Current source already lacks physical write containment; this is a positivecontrol plus failing debt witness first, not a passingmutationclaim.",
+      "mustGoRed": "Regular valid export proves setup, linked parent mustrefuse/nooutsidechange. Only after authorizedactualrepair would removingthat guard be a meaningfulRED mutant."
+    }
+  ],
+  "ownership": {
+    "reservationPath": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "originalRelease": "RESERVATIONS.md:342 releases originalmerged verify-proof paths; sourcepresence isnotqualification.",
+    "currentHolds": "Parentholds P0-23 API/Studio; RESERVATIONS1582-1588 CLI/registry/parser and A4 overlap staysprotected; Studio testoperator-home fixture at1577 belongs7fccbbfa. NoClaude messaging or implicitownership transfer.",
+    "sourceEditPolicy": "No source/test edits in this preflight. Later owned tests/private compiled fault copies mayqualify existing behavior; sharedsource defects stayblocked until ownership isresolved.",
+    "preserved": "P0-22twoempty failures, skippedP0-29debt, all originalClaude/archives/candidates and normalfreeze/floors remain."
+  },
+  "operations": "Graph navigation ran only on an owned staticcopy, plus file/Git-object reads and hashes. No AMC moduleimports, builds, tests, servers, hosted calls, tracker/reservation writes or Claude messages."
+}

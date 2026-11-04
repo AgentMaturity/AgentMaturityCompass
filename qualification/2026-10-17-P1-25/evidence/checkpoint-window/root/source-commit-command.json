@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-16T23:38:08.031497+00:00",
+  "argv": [
+    "git",
+    "commit",
+    "-m",
+    "test(time): qualify signed checkpoint completion and required refusal"
+  ],
+  "exit": 0,
+  "stdout": "[codex/p1-25-checkpoint-qualification e49e21348] test(time): qualify signed checkpoint completion and required refusal\n 13 files changed, 732 insertions(+), 404 deletions(-)\n create mode 100644 tests/time/checkpointWindow.test.ts\n create mode 100644 tests/time/tsaTestFixture.ts\n",
+  "stderr": "",
+  "ordinary": true,
+  "noForceNoVerifyOrIgnoreChanges": true
+}

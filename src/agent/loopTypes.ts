@@ -18,6 +18,7 @@ import type { TurnCancelCause } from "../session/sessionTypes.js";
 import type { QueuedNativeImage } from "../attachments/nativeImageInput.js";
 import type { QueuedNativeInputPart } from "../attachments/nativeOrderedInput.js";
 import type { QueuedNativeAudioPart } from "../attachments/nativeAudioInput.js";
+import type { EvidenceEvent } from "../types.js";
 
 export type { InboxOrigin, InboxSpliceOp, InboxTarget } from "../session/loopEventMeta.js";
 
@@ -33,6 +34,8 @@ export interface InboxMessage {
   readonly audioParts?: readonly QueuedNativeAudioPart[];
   /** Exact signed loop/inbox row whose image bundle this message carries. */
   readonly inputEventId?: string;
+  /** Synthesized by the context pre-step; the driver commits delivered-byte provenance after any redaction. */
+  readonly contextSnapshot?: true;
 }
 
 /**
@@ -87,6 +90,14 @@ export function toTurnEndParams(ending: TurnEnding): TurnEndParams {
     : { reason: ending.reason };
 }
 
+/** The current writer's context capability. Inherited pre-steps use the child that is executing, never their parent. */
+export interface NativeContextSession {
+  readonly sessionId: string;
+  readonly workspace: string;
+  readEvents(): readonly EvidenceEvent[];
+  recordProjectedEvidence(row: { readonly eventType: "audit"; readonly payload: string; readonly meta: Record<string, unknown> }): unknown;
+}
+
 export interface PreStepInput {
   readonly turn: number;
   readonly step: number;
@@ -95,6 +106,7 @@ export interface PreStepInput {
   /** The batch this step boundary claimed — already durably spliced out. */
   readonly messages: readonly InboxMessage[];
   readonly signal: AbortSignal;
+  readonly contextSession?: NativeContextSession;
 }
 
 /**
@@ -208,6 +220,25 @@ export interface LoopHooks {
  */
 export type LoopHookControl = Pick<LoopHooks, "preStep" | "turnStopping">;
 
+/**
+ * An observer that cannot change what the loop does (DXA-16). `notify` is emit-style: a listener that throws is
+ * reported on stderr and otherwise ignored, so it can never skip a `step/end`, a turn seal or a wake that follows it.
+ */
+export function isolatedNotify(notify: (notification: LoopNotification) => void): (notification: LoopNotification) => void {
+  return (notification) => {
+    try {
+      notify(notification);
+    } catch (error: unknown) {
+      try {
+        const message = error instanceof Error ? error.message : String(error);
+        process.stderr.write(`[amc] loop observer threw on ${notification.kind}: ${message.slice(0, 500)}\n`);
+      } catch {
+        // Reporting is best-effort; the loop's own evidence does not depend on it.
+      }
+    }
+  };
+}
+
 /** The hooks a driver runs under when nothing is registered. */
 export const NO_HOOKS: LoopHooks = Object.freeze({
   preStep: (_input: PreStepInput, next: () => Promise<PreStepDecision>): Promise<PreStepDecision> => next(),
@@ -251,16 +282,20 @@ export interface AgentLoopConfig {
    * Zero is legal and means "do not wait at all".
    */
   readonly toolAbandonGraceMs: number;
-  /** Automatic context compaction between steps; absent or a null window means off. */
-  readonly compaction?: CompactionConfig;
+  /** Automatic compaction defaults to the selected route metadata; an explicit null window disables it. */
+  readonly compaction?: Partial<CompactionConfig>;
 }
 
 /** See ./compaction/promptPressure.ts for the defaults and the bounds each field is checked against. */
 export interface CompactionConfig {
-  /** Operator-declared. Never inferred from a model name; null disables automatic compaction. */
+  /** Reviewed route metadata or an explicit operator declaration; null disables automatic compaction. */
   readonly contextWindowTokens: number | null;
   /** Fraction of the window, 0.5 to 0.95, at which a boundary compacts. */
   readonly threshold: number;
+  /** Tokens left available before compaction; null uses the legacy ratio threshold. */
+  readonly reserveTokens?: number | null;
+  /** Exact provider/model settings, resolved independently for each field. */
+  readonly modelOverrides?: readonly CompactionModelOverride[];
   /** Tool output from this many most recent steps is never pruned. */
   readonly keepRecentSteps: number;
   /** Only tool results at least this many payload bytes are pruned. */
@@ -270,6 +305,9 @@ export interface CompactionConfig {
   /** Boundaries per turn that may compact. */
   readonly maxPerTurn: number;
 }
+
+type CompactionModelOverride = { readonly providerId: string; readonly model: string }
+  & Partial<Omit<CompactionConfig, "modelOverrides">>;
 
 export const DEFAULT_AGENT_LOOP_CONFIG: AgentLoopConfig = Object.freeze({
   maxStepsPerTurn: 64,

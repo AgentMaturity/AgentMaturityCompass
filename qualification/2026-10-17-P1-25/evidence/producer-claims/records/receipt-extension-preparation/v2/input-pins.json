@@ -1,0 +1,145 @@
+{
+  "schema": "p125pc-receipt-extension-preparation-input-pins/2",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/assemble-extension.py",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/assemble-extension.py",
+      "bytes": 36929,
+      "sha256": "45fa2d76363c9c96da03ab857418049b141f2a18cb9979f18ba242601ea82468",
+      "dev": 16777231,
+      "inode": 543909596,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac",
+      "dev": 16777231,
+      "inode": 543919520,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+      "bytes": 7899,
+      "sha256": "40618cf6cd152f4a56319124eb44aa967ae939b1dbdb454f2277634c30cf7431",
+      "dev": 16777231,
+      "inode": 543919580,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control.py.source.txt",
+      "bytes": 28698,
+      "sha256": "44f1f8e540f111b8dd3a72202930a1a21fcbbf191096424e38cc6a8443c2d2a5",
+      "dev": 16777231,
+      "inode": 543919790,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/seal.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/seal.json",
+      "bytes": 4870,
+      "sha256": "f3e9c73239e5671f8f115ed8dd3810a8deeb4aa7dd3d07bf431e6dd5238fb771",
+      "dev": 16777231,
+      "inode": 543919794,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/controls.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/controls.json",
+      "bytes": 7181,
+      "sha256": "02db629a3438a38970aabdda2d612a2a216a5d245c2e3b24d6142bea169ede06",
+      "dev": 16777231,
+      "inode": 543919671,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48",
+      "dev": 16777231,
+      "inode": 542458540,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "dev": 16777231,
+      "inode": 542458537,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "bytes": 525598,
+      "sha256": "63877e73c81c7888b702d47acf3777279e3002ba26db2a38dfbf0d68e50e51df",
+      "dev": 16777231,
+      "inode": 543134235,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "bytes": 39139,
+      "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b",
+      "dev": 16777231,
+      "inode": 543134232,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "bytes": 877972,
+      "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0",
+      "dev": 16777231,
+      "inode": 543134234,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f",
+      "dev": 16777231,
+      "inode": 543926767,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59",
+      "dev": 16777231,
+      "inode": 543919887,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/seal.json",
+      "bytes": 3738,
+      "sha256": "b07c99c51f32703d8cb67bc1c11ada4d051f86935bd1b5a6fac1f86e1ad8ce72",
+      "dev": 16777231,
+      "inode": 543990360,
+      "nlink": 1
+    }
+  ],
+  "knownOldCounts": {
+    "files": 2378,
+    "artifacts": 2377,
+    "nonIndexPayloads": 2375,
+    "commands": 259,
+    "orderedAssemblyInputs": 3864
+  },
+  "priorSemanticSource": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "previousMetadata": "8889784782c8f7413e1cccab579ae4b8b6f21cc1",
+  "futureSemanticSourceCommit": null,
+  "futureInputManifest": null,
+  "noFutureResultsOrDynamicOutputCounts": true,
+  "actualSemanticSourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "boundary": "Actual source checkpoint and post-source runtime pinset are known. Fresh binding, controls, public outputs, assembly manifest and every dynamic output remain unfilled/uncredited."
+}

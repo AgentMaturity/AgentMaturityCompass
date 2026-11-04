@@ -1,0 +1,321 @@
+{
+  "schema": "p111-decisive-unit-v2-input-pins/1",
+  "sourceCommit": "315bac6aa7fe55596bc9d89ddb32755c9436ceb9",
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/types.ts",
+      "bytes": 4787,
+      "sha256": "29dac8ffaece05b415bbf2d8d2bcf70792ffd357abff6c6b94b029d660042201",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/types.ts",
+      "dev": 16777231,
+      "inode": 542459314,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/admission.ts",
+      "bytes": 6419,
+      "sha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/admission.ts",
+      "dev": 16777231,
+      "inode": 542459309,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/dimensions.ts",
+      "bytes": 6684,
+      "sha256": "68e1c78a8ae69afda00af4f5f12d94af4cbae6570125d621463639f92117b326",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/dimensions.ts",
+      "dev": 16777231,
+      "inode": 542459310,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/evaluate.ts",
+      "bytes": 5232,
+      "sha256": "4162b553ec55044f64bfe5b39f32bf7b19f94880577eeae8b90717b197a080a4",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/evaluate.ts",
+      "dev": 16777231,
+      "inode": 542459311,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/mappingAdapter.ts",
+      "bytes": 13302,
+      "sha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/mappingAdapter.ts",
+      "dev": 16777231,
+      "inode": 542459312,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/signedResults.ts",
+      "bytes": 5028,
+      "sha256": "53238a8fa04748d2d6b2f3cfa717d4262ebc410358b7675752aed7344ab03030",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/evidence/signedResults.ts",
+      "dev": 16777231,
+      "inode": 542459313,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/types.ts",
+      "bytes": 7755,
+      "sha256": "f40e2faf3691870990e4a882b903b770fec5444c90263faf58b212e83ca8aa32",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/types.ts",
+      "dev": 16777231,
+      "inode": 542459320,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/schema.ts",
+      "bytes": 18576,
+      "sha256": "f732924cb9e730be512162d2ecf6e065807af0999d4305dda097559dc9081f58",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/schema.ts",
+      "dev": 16777231,
+      "inode": 542459319,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/digest.ts",
+      "bytes": 2446,
+      "sha256": "fa5c0c2563faaf67480eb78fcfc08d55142c5d0bb2959ae21f93d9143c9dcde0",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/digest.ts",
+      "dev": 16777231,
+      "inode": 542459307,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "dev": 16777231,
+      "inode": 542459361,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+      "bytes": 5777,
+      "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+      "dev": 16777231,
+      "inode": 542459355,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/eligibility/types.ts",
+      "bytes": 3418,
+      "sha256": "4cfc64f7c7ad43b13f16ebae4c68c0ced2e652aa3cf2d9942e826067351c4eb6",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/eligibility/types.ts",
+      "dev": 16777231,
+      "inode": 542459360,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "dev": 16777231,
+      "inode": 542461173,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/hash.ts",
+      "bytes": 259,
+      "sha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/hash.ts",
+      "dev": 16777231,
+      "inode": 542461172,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/version.ts",
+      "bytes": 337,
+      "sha256": "2e16763d1764e9426b7850201ac5e65ec93cd4a2e66ed70faebb25b2093e0593",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/version.ts",
+      "dev": 16777231,
+      "inode": 542461232,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/catalog/producers.yaml",
+      "bytes": 2701,
+      "sha256": "592c640cfe12e0e843b98ec3c8035bb096011a965303a2f6fc175cfae6af6bd4",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/catalog/producers.yaml",
+      "dev": 16777231,
+      "inode": 542454965,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/catalog/CONTROL_RECORD.md",
+      "bytes": 18696,
+      "sha256": "f6792b31f00ca3f1163a7f22df972cfe7815b734e1a728291fb4ccb2876cc7d9",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/catalog/CONTROL_RECORD.md",
+      "dev": 16777231,
+      "inode": 542455410,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/catalog/controlRecordSchema.test.ts",
+      "bytes": 7444,
+      "sha256": "2ed9f89524e62aade2446798a0ac7ec62a724153626106b24211acef770a0f9a",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/catalog/controlRecordSchema.test.ts",
+      "dev": 16777231,
+      "inode": 542461500,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/catalog/compiler/unknown.test.ts",
+      "bytes": 4348,
+      "sha256": "dd1a134cbbdcb3be429815e46536945da9ab1af1018a853ffde2349403a637be",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/catalog/compiler/unknown.test.ts",
+      "dev": 16777231,
+      "inode": 542461499,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+      "bytes": 11569,
+      "sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+      "dev": 16777231,
+      "inode": 542461561,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "dev": 16777231,
+      "inode": 542456404,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "dev": 16777231,
+      "inode": 542456844,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "dev": 16777231,
+      "inode": 542463391,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "dev": 16777231,
+      "inode": 542463392,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "dev": 16777231,
+      "inode": 542464352,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/README.md",
+      "bytes": 2823,
+      "sha256": "4ce418c156fdb08b90588bef8c1f253d88117b84065efdd7a0ae448961cd59cc",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/README.md",
+      "dev": 16777231,
+      "inode": 543131811,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/review.json",
+      "bytes": 8907,
+      "sha256": "77185bd18223bc003f541816aa4c97371736e8f7b36c72e2f058bccebbd8caba",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/review.json",
+      "dev": 16777231,
+      "inode": 543131810,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/graph-navigation.json",
+      "bytes": 899,
+      "sha256": "f9f0955e12a820aadf71be9f603f0168875214fdb5371fc7b46a7b2345a24e35",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/graph-navigation.json",
+      "dev": 16777231,
+      "inode": 543131808,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/seal.json",
+      "bytes": 2190,
+      "sha256": "bfaba211afd019057257f0486a8654b852e8d1db7b7adb547bb8aff8cd8712db",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/seal.json",
+      "dev": 16777231,
+      "inode": 543131813,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-11.md",
+      "bytes": 16438,
+      "sha256": "410ddda0cdd3731fdc7ea3d6edb542bedf6ed3e7402a9ac5708178048266e7c5",
+      "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-11.md",
+      "dev": 16777231,
+      "inode": 473795984,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/branch-adoption.json",
+      "bytes": 479,
+      "sha256": "f1ed7386c399af4406d2f500385143d98f52017246d58fb993b2fbc8654e44c2",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/branch-adoption.json",
+      "dev": 16777231,
+      "inode": 543135100,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/decisive.test.ts",
+      "bytes": 19051,
+      "sha256": "f8a19dbba9a636a3e9e0fd40063939b1ecd5130811f133307fb74a0fc6047a9b",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/decisive.test.ts",
+      "dev": 16777231,
+      "inode": 543139566,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/README.md",
+      "bytes": 2701,
+      "sha256": "3b07e3d5d637cdeb63eb3a8b586d8ffc1cc9907b2b3e8912852448fafe57e42c",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/README.md",
+      "dev": 16777231,
+      "inode": 543139824,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/input-pins.json",
+      "bytes": 13264,
+      "sha256": "490b23fcf6fee3f7441f20c041cdaf7fef44081dbac7a4932ba8882f1d886f08",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/input-pins.json",
+      "dev": 16777231,
+      "inode": 543139823,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/seal.json",
+      "bytes": 2993,
+      "sha256": "af4aed4f6e0bf5350f5595c9b8cbc7599103e7e19ccc86b8fe2b5457e3d91f96",
+      "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/seal.json",
+      "dev": 16777231,
+      "inode": 543139826,
+      "nlink": 1
+    }
+  ]
+}

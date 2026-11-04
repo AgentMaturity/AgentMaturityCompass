@@ -1,0 +1,3759 @@
+{
+  "schema": "amc.p104.bounded-evidence.v1",
+  "capturedUtc": "2026-10-15T21:55:05.007262+00:00",
+  "sourceCommit": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+  "formalAcceptance": false,
+  "completePlanGoal": "Active. Next: P1-19 service qualification under its explicit early-service allowance.",
+  "commands": [
+    {
+      "phase": "p104-helper-test-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 50039,
+      "startedUtc": "2026-10-15T21:30:50.478461+00:00",
+      "endedUtc": "2026-10-15T21:31:40.537449+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-helper-test-typecheck/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 91711,
+        "ownedPgid": 91711,
+        "observedPgidAfterLaunch": 91711,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.tests.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T21:30:50.478461+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-idempotency-original",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions/idempotency.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-idempotency-original.producer.json",
+      "exit": 1,
+      "durationMs": 4890,
+      "startedUtc": "2026-10-15T21:35:36.769907+00:00",
+      "endedUtc": "2026-10-15T21:35:41.672874+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-idempotency-original/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 92433,
+        "ownedPgid": 92433,
+        "observedPgidAfterLaunch": 92433,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/actions/idempotency.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-idempotency-original.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:35:36.769907+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-idempotency-original.producer.json",
+          "bytes": 4422,
+          "sha256": "a0052acf924d8fac82ce6bf4ce00c291efddc3ec13a896fcae3143c6dd5d55b4"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-idempotency-original/raw.json",
+          "bytes": 4422,
+          "sha256": "a0052acf924d8fac82ce6bf4ce00c291efddc3ec13a896fcae3143c6dd5d55b4"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-idempotency-original/observer.json",
+          "bytes": 7652,
+          "sha256": "53ded6b4a035237f922209b9c6a268614f3b816007719bbae485beab4056cfef"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-fault-matrix-original",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions/faultMatrix.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-fault-matrix-original.producer.json",
+      "exit": 0,
+      "durationMs": 10718,
+      "startedUtc": "2026-10-15T21:36:26.733822+00:00",
+      "endedUtc": "2026-10-15T21:36:37.464256+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fault-matrix-original/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 92566,
+        "ownedPgid": 92566,
+        "observedPgidAfterLaunch": 92566,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/actions/faultMatrix.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-fault-matrix-original.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:36:26.733822+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-fault-matrix-original.producer.json",
+          "bytes": 5188,
+          "sha256": "0746a3dab5dcc9a3e8fd2195a3e9271b6e69bd3ced48bb5bf9e7b67ab95a2a85"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fault-matrix-original/raw.json",
+          "bytes": 5188,
+          "sha256": "0746a3dab5dcc9a3e8fd2195a3e9271b6e69bd3ced48bb5bf9e7b67ab95a2a85"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fault-matrix-original/observer.json",
+          "bytes": 7341,
+          "sha256": "1e1144fde34c289dfcc2b418dd029724075f53c2727f393e1e35130b1607ae58"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-reconcile-original",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions/reconcile.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-reconcile-original.producer.json",
+      "exit": 1,
+      "durationMs": 15011,
+      "startedUtc": "2026-10-15T21:37:04.873672+00:00",
+      "endedUtc": "2026-10-15T21:37:19.898179+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-reconcile-original/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 92684,
+        "ownedPgid": 92684,
+        "observedPgidAfterLaunch": 92684,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/actions/reconcile.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-reconcile-original.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:37:04.873672+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-reconcile-original.producer.json",
+          "bytes": 23446,
+          "sha256": "07c9b1e6be0309b374104c9262047ebfa27fcaf21f0313ba7762fd0d4799e9a9"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-reconcile-original/raw.json",
+          "bytes": 23446,
+          "sha256": "07c9b1e6be0309b374104c9262047ebfa27fcaf21f0313ba7762fd0d4799e9a9"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-reconcile-original/observer.json",
+          "bytes": 39487,
+          "sha256": "95c9a617a79dff0815e7c73f9a1e3d72b6de60975be7e41f32af8a419bcf1c93"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-three-suites-followup",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions/faultMatrix.test.ts tests/actions/reconcile.test.ts tests/actions/idempotency.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-three-suites-followup.producer.json",
+      "exit": 0,
+      "durationMs": 15379,
+      "startedUtc": "2026-10-15T21:39:21.549195+00:00",
+      "endedUtc": "2026-10-15T21:39:36.940822+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-three-suites-followup/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 93071,
+        "ownedPgid": 93071,
+        "observedPgidAfterLaunch": 93071,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/actions/faultMatrix.test.ts",
+          "tests/actions/reconcile.test.ts",
+          "tests/actions/idempotency.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-three-suites-followup.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:39:21.549195+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-three-suites-followup.producer.json",
+          "bytes": 27108,
+          "sha256": "7374080376b07965eafa7c99a2e558bc5193f4904dcf333f01c7365d9d1dc919"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-three-suites-followup/raw.json",
+          "bytes": 27108,
+          "sha256": "7374080376b07965eafa7c99a2e558bc5193f4904dcf333f01c7365d9d1dc919"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-three-suites-followup/observer.json",
+          "bytes": 37584,
+          "sha256": "7f9164760c73fba138b96f559266b9fb390516882c83b90f8c4376f73bc28b1f"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-test-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40737,
+      "startedUtc": "2026-10-15T21:39:43.999837+00:00",
+      "endedUtc": "2026-10-15T21:40:24.749474+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-test-typecheck/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 93171,
+        "ownedPgid": 93171,
+        "observedPgidAfterLaunch": 93171,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.tests.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T21:39:43.999837+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-related-actions",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-related-actions.producer.json",
+      "exit": 1,
+      "durationMs": 19610,
+      "startedUtc": "2026-10-15T21:40:43.982004+00:00",
+      "endedUtc": "2026-10-15T21:41:03.580312+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-related-actions/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 93320,
+        "ownedPgid": 93320,
+        "observedPgidAfterLaunch": 93320,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/actions",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-related-actions.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:40:43.982004+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-related-actions.producer.json",
+          "bytes": 84766,
+          "sha256": "f8f829bbb2f8fe810c549dd14a8b447051226f2c24c48fe1233be86229709641"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-related-actions/raw.json",
+          "bytes": 84766,
+          "sha256": "f8f829bbb2f8fe810c549dd14a8b447051226f2c24c48fe1233be86229709641"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-related-actions/observer.json",
+          "bytes": 122087,
+          "sha256": "10f1baef2f0743ca8cb9f61c511585a86710cebf6f04e0ed3b543c95539c9d74"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-mutations-baseline-cwd-fixed",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/baseline --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/baseline/vitest.config.ts tests/actions/idempotency.test.ts tests/actions/receiptStates.test.ts tests/actions/reconcileRedispatchMutation.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-mutations-baseline-cwd-fixed.producer.json",
+      "exit": 0,
+      "durationMs": 20225,
+      "startedUtc": "2026-10-15T21:42:24.463938+00:00",
+      "endedUtc": "2026-10-15T21:42:44.700347+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-baseline-cwd-fixed/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 93576,
+        "ownedPgid": 93576,
+        "observedPgidAfterLaunch": 93576,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/baseline",
+          "--config",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/baseline/vitest.config.ts",
+          "tests/actions/idempotency.test.ts",
+          "tests/actions/receiptStates.test.ts",
+          "tests/actions/reconcileRedispatchMutation.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-mutations-baseline-cwd-fixed.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:42:24.463938+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-mutations-baseline-cwd-fixed.producer.json",
+          "bytes": 29811,
+          "sha256": "e7e4e9fe23baef63fcde86ef1e50afda805670b704aa943ea4ab1049bf4d1b2e"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-baseline-cwd-fixed/raw.json",
+          "bytes": 29811,
+          "sha256": "e7e4e9fe23baef63fcde86ef1e50afda805670b704aa943ea4ab1049bf4d1b2e"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-baseline-cwd-fixed/observer.json",
+          "bytes": 41170,
+          "sha256": "6dcb209466698eb3042ca18617b5fdb5c5a5fe5097f05cc108a734e326d90353"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-m1-redispatch-mutant",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/reconcile-redispatch --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/reconcile-redispatch/vitest.config.ts tests/actions/reconcileRedispatchMutation.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-m1-redispatch-mutant.producer.json",
+      "exit": 1,
+      "durationMs": 3509,
+      "startedUtc": "2026-10-15T21:42:55.593921+00:00",
+      "endedUtc": "2026-10-15T21:42:59.114799+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m1-redispatch-mutant/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 93667,
+        "ownedPgid": 93667,
+        "observedPgidAfterLaunch": 93667,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/reconcile-redispatch",
+          "--config",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/reconcile-redispatch/vitest.config.ts",
+          "tests/actions/reconcileRedispatchMutation.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-m1-redispatch-mutant.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:42:55.593921+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-m1-redispatch-mutant.producer.json",
+          "bytes": 1948,
+          "sha256": "2d2cda925bea7fd6169036ab0a4c0804df418c8da85b46cee57ad11011d0f2bc"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m1-redispatch-mutant/raw.json",
+          "bytes": 1948,
+          "sha256": "2d2cda925bea7fd6169036ab0a4c0804df418c8da85b46cee57ad11011d0f2bc"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m1-redispatch-mutant/observer.json",
+          "bytes": 2971,
+          "sha256": "354282678a68e94dba01ff5cbce2a83ac1e8f772dc82f0434210f0efb3d3a8a6"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-m2-header-mutant",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/header-dropped --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/header-dropped/vitest.config.ts tests/actions/idempotency.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-m2-header-mutant.producer.json",
+      "exit": 1,
+      "durationMs": 4625,
+      "startedUtc": "2026-10-15T21:43:24.126897+00:00",
+      "endedUtc": "2026-10-15T21:43:28.764450+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m2-header-mutant/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 93722,
+        "ownedPgid": 93722,
+        "observedPgidAfterLaunch": 93722,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/header-dropped",
+          "--config",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/header-dropped/vitest.config.ts",
+          "tests/actions/idempotency.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-m2-header-mutant.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:43:24.126897+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-m2-header-mutant.producer.json",
+          "bytes": 7183,
+          "sha256": "cf3a3121c1189303a043ff1445561af75c38bd4dcab17d3611a9ba929494989b"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m2-header-mutant/raw.json",
+          "bytes": 7183,
+          "sha256": "cf3a3121c1189303a043ff1445561af75c38bd4dcab17d3611a9ba929494989b"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m2-header-mutant/observer.json",
+          "bytes": 13951,
+          "sha256": "499e38f8a0a8406719c4b4032fcb316061dbae57b6aa79a67c64cae5a6329c9d"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-m3-unknown-restart-mutant",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/unknown-restart --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/unknown-restart/vitest.config.ts tests/actions/receiptStates.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-m3-unknown-restart-mutant.producer.json",
+      "exit": 1,
+      "durationMs": 16933,
+      "startedUtc": "2026-10-15T21:44:08.578479+00:00",
+      "endedUtc": "2026-10-15T21:44:25.524343+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m3-unknown-restart-mutant/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 93785,
+        "ownedPgid": 93785,
+        "observedPgidAfterLaunch": 93785,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/unknown-restart",
+          "--config",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/unknown-restart/vitest.config.ts",
+          "tests/actions/receiptStates.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-m3-unknown-restart-mutant.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:44:08.578479+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-m3-unknown-restart-mutant.producer.json",
+          "bytes": 29209,
+          "sha256": "dbf6a38451b18f1992221da41fd39e99d1b8e5feae6ebc344b2181b39ae67181"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m3-unknown-restart-mutant/raw.json",
+          "bytes": 29209,
+          "sha256": "dbf6a38451b18f1992221da41fd39e99d1b8e5feae6ebc344b2181b39ae67181"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m3-unknown-restart-mutant/observer.json",
+          "bytes": 41284,
+          "sha256": "62b7f889e9e7fbe706e333dce947bb37e1ef5b84a4bab9c15e1a42600940cb31"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-mutations-restored",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/restored --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/restored/vitest.config.ts tests/actions/idempotency.test.ts tests/actions/receiptStates.test.ts tests/actions/reconcileRedispatchMutation.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-mutations-restored.producer.json",
+      "exit": 0,
+      "durationMs": 20653,
+      "startedUtc": "2026-10-15T21:44:50.514783+00:00",
+      "endedUtc": "2026-10-15T21:45:11.179921+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-restored/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 93898,
+        "ownedPgid": 93898,
+        "observedPgidAfterLaunch": 93898,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/restored",
+          "--config",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/restored/vitest.config.ts",
+          "tests/actions/idempotency.test.ts",
+          "tests/actions/receiptStates.test.ts",
+          "tests/actions/reconcileRedispatchMutation.test.ts",
+          "--maxWorkers=1",
+          "--no-file-parallelism",
+          "--cache=false",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-mutations-restored.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:44:50.514783+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-mutations-restored.producer.json",
+          "bytes": 29823,
+          "sha256": "fdb6d125bea5580d87de031af2459459feffe099f841033eb82810fe6e1deeb1"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-restored/raw.json",
+          "bytes": 29823,
+          "sha256": "fdb6d125bea5580d87de031af2459459feffe099f841033eb82810fe6e1deeb1"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-restored/observer.json",
+          "bytes": 41170,
+          "sha256": "b39895cb7e4344b8f3e6a136ba8e543a80a091fad209b6c4ec544de78c7f5fa7"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-source-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+      "exit": 0,
+      "durationMs": 28301,
+      "startedUtc": "2026-10-15T21:45:45.054104+00:00",
+      "endedUtc": "2026-10-15T21:46:13.369641+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-source-typecheck/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94015,
+        "ownedPgid": 94015,
+        "observedPgidAfterLaunch": 94015,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T21:45:45.054104+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-counts-before-generation",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 260,
+      "startedUtc": "2026-10-15T21:46:38.270058+00:00",
+      "endedUtc": "2026-10-15T21:46:38.542140+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts-before-generation/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94135,
+        "ownedPgid": 94135,
+        "observedPgidAfterLaunch": 94135,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-15T21:46:38.270058+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-count-generation",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 224,
+      "startedUtc": "2026-10-15T21:46:46.201787+00:00",
+      "endedUtc": "2026-10-15T21:46:46.436952+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-count-generation/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94163,
+        "ownedPgid": 94163,
+        "observedPgidAfterLaunch": 94163,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--write"
+        ],
+        "startedUtc": "2026-10-15T21:46:46.201787+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-lint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3103,
+      "startedUtc": "2026-10-15T21:46:56.329544+00:00",
+      "endedUtc": "2026-10-15T21:46:59.445549+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-lint/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94193,
+        "ownedPgid": 94193,
+        "observedPgidAfterLaunch": 94193,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "lint"
+        ],
+        "startedUtc": "2026-10-15T21:46:56.329544+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1374,
+      "startedUtc": "2026-10-15T21:46:59.566674+00:00",
+      "endedUtc": "2026-10-15T21:47:00.952385+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-freeze/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94222,
+        "ownedPgid": 94222,
+        "observedPgidAfterLaunch": 94222,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-freeze.mjs"
+        ],
+        "startedUtc": "2026-10-15T21:46:59.566674+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-counts",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 223,
+      "startedUtc": "2026-10-15T21:47:01.066565+00:00",
+      "endedUtc": "2026-10-15T21:47:01.301215+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94246,
+        "ownedPgid": 94246,
+        "observedPgidAfterLaunch": 94246,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-15T21:47:01.066565+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-docs-drift",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 133,
+      "startedUtc": "2026-10-15T21:47:01.412450+00:00",
+      "endedUtc": "2026-10-15T21:47:01.557072+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-docs-drift/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94253,
+        "ownedPgid": 94253,
+        "observedPgidAfterLaunch": 94253,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/docs-drift-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T21:47:01.412450+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-architecture",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1560,
+      "startedUtc": "2026-10-15T21:47:01.671450+00:00",
+      "endedUtc": "2026-10-15T21:47:03.242795+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-architecture/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94259,
+        "ownedPgid": 94259,
+        "observedPgidAfterLaunch": 94259,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/architecture-boundaries-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T21:47:01.671450+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-duplicates",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 481,
+      "startedUtc": "2026-10-15T21:47:09.601854+00:00",
+      "endedUtc": "2026-10-15T21:47:10.094850+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-duplicates/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94281,
+        "ownedPgid": 94281,
+        "observedPgidAfterLaunch": 94281,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "duplicates"
+        ],
+        "startedUtc": "2026-10-15T21:47:09.601854+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-dead-code",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2936,
+      "startedUtc": "2026-10-15T21:47:10.210327+00:00",
+      "endedUtc": "2026-10-15T21:47:13.159275+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-dead-code/stdout-stderr.log",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "headAfter": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "ownedProcess": {
+        "pid": 94289,
+        "ownedPgid": 94289,
+        "observedPgidAfterLaunch": 94289,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "dead-code"
+        ],
+        "startedUtc": "2026-10-15T21:47:10.210327+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-clean-source",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 52212,
+      "startedUtc": "2026-10-15T21:47:51.771818+00:00",
+      "endedUtc": "2026-10-15T21:48:43.998320+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-clean-source/stdout-stderr.log",
+      "head": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "headAfter": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "ownedProcess": {
+        "pid": 94411,
+        "ownedPgid": 94411,
+        "observedPgidAfterLaunch": 94411,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/clean-source-check.mjs",
+          "--keep"
+        ],
+        "startedUtc": "2026-10-15T21:47:51.771818+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-fresh-clone-tests",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-JoyZOQ/checkout --config /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-JoyZOQ/checkout/vitest.config.ts tests/actions/faultMatrix.test.ts tests/actions/reconcile.test.ts tests/actions/idempotency.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-fresh-clone-tests.producer.json",
+      "exit": 0,
+      "durationMs": 16883,
+      "startedUtc": "2026-10-15T21:49:05.320994+00:00",
+      "endedUtc": "2026-10-15T21:49:22.216731+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fresh-clone-tests/stdout-stderr.log",
+      "head": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "headAfter": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "ownedProcess": {
+        "pid": 94828,
+        "ownedPgid": 94828,
+        "observedPgidAfterLaunch": 94828,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-JoyZOQ/checkout",
+          "--config",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-JoyZOQ/checkout/vitest.config.ts",
+          "tests/actions/faultMatrix.test.ts",
+          "tests/actions/reconcile.test.ts",
+          "tests/actions/idempotency.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-fresh-clone-tests.producer.json"
+        ],
+        "startedUtc": "2026-10-15T21:49:05.320994+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p104-fresh-clone-tests.producer.json",
+          "bytes": 27157,
+          "sha256": "4f7e268e0eacc3487f7b522c646c723f2a65c73194345da26543217ade06f0d1"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fresh-clone-tests/raw.json",
+          "bytes": 27157,
+          "sha256": "4f7e268e0eacc3487f7b522c646c723f2a65c73194345da26543217ade06f0d1"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fresh-clone-tests/observer.json",
+          "bytes": 37704,
+          "sha256": "1e10e2d6291f3c1ebf04a64b6d2f4dd8f307b139c0fa57a46735813af3c7e993"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p104-host-fingerprint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-04-idempotency-qualification-20261016/host-fingerprint.mjs",
+      "exit": 0,
+      "durationMs": 260,
+      "startedUtc": "2026-10-15T21:49:33.386238+00:00",
+      "endedUtc": "2026-10-15T21:49:33.658515+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-host-fingerprint/stdout-stderr.log",
+      "head": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "headAfter": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "ownedProcess": {
+        "pid": 94910,
+        "ownedPgid": 94910,
+        "observedPgidAfterLaunch": 94910,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/private/tmp/p1-04-idempotency-qualification-20261016/host-fingerprint.mjs"
+        ],
+        "startedUtc": "2026-10-15T21:49:33.386238+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    }
+  ],
+  "commandArtifactPins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-helper-test-typecheck/owned-process.json",
+      "bytes": 488,
+      "sha256": "893232ea0b41b7c56ea8855de3b99d1e24b9c8c0a8f9fe91d1050f374e36ebe1"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-helper-test-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-helper-test-typecheck/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "1a834b25948e68df9fcecdf7dbec3e2669c40bae9223ae607ad75a41ebb61758"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-helper-test-typecheck/command.json",
+      "bytes": 1332,
+      "sha256": "8f91af17e526596cc955b431d1a18b9a324ce276e5102395524598839ab4a5a5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-idempotency-original/observer.json",
+      "bytes": 7652,
+      "sha256": "53ded6b4a035237f922209b9c6a268614f3b816007719bbae485beab4056cfef"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-idempotency-original/owned-process.json",
+      "bytes": 812,
+      "sha256": "ef71092b4626d6ab9c23e470656d28218604ba156e7eefa16eb6b2e7a170eb96"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-idempotency-original/raw.json",
+      "bytes": 4422,
+      "sha256": "a0052acf924d8fac82ce6bf4ce00c291efddc3ec13a896fcae3143c6dd5d55b4"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-idempotency-original/stdout-stderr.log",
+      "bytes": 3097,
+      "sha256": "aaedecced490255a80e7468a4453446f306ea88465ab577ad2a1d8326430cf81"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-idempotency-original/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "a158fbe666f2f06db6e1c54e0c6f031f1c3a13f8956d93892329ec47fc72d9ff"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-idempotency-original/command.json",
+      "bytes": 2733,
+      "sha256": "650f5148f04a06ae70e6894b152f13fd416b14305c2dd6334ba38c5ceefeb38b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fault-matrix-original/observer.json",
+      "bytes": 7341,
+      "sha256": "1e1144fde34c289dfcc2b418dd029724075f53c2727f393e1e35130b1607ae58"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fault-matrix-original/owned-process.json",
+      "bytes": 813,
+      "sha256": "c07a90593e30d78c9721ffbf4398d880450342668a61153b020d76a99d47852d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fault-matrix-original/raw.json",
+      "bytes": 5188,
+      "sha256": "0746a3dab5dcc9a3e8fd2195a3e9271b6e69bd3ced48bb5bf9e7b67ab95a2a85"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fault-matrix-original/stdout-stderr.log",
+      "bytes": 798,
+      "sha256": "3152bfcab67c47cce0b50da4ad19e9fb95145adf33cf260f6acfaeb1bd077da5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fault-matrix-original/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "b63fe57e08c8c262e635d0d92eb3c83b89b4077d1fa1c58e33b7b313d090d4a7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fault-matrix-original/command.json",
+      "bytes": 2741,
+      "sha256": "3ec0a4f238f19b74fb69da98a3184ef675d76f74cd1b9ccc0437aef0ba43b81b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-reconcile-original/observer.json",
+      "bytes": 39487,
+      "sha256": "95c9a617a79dff0815e7c73f9a1e3d72b6de60975be7e41f32af8a419bcf1c93"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-reconcile-original/owned-process.json",
+      "bytes": 808,
+      "sha256": "b4a03a4742212d52bf76717536eee12c30cb615d4e3b9e5da5a16cf62b52a391"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-reconcile-original/raw.json",
+      "bytes": 23446,
+      "sha256": "07c9b1e6be0309b374104c9262047ebfa27fcaf21f0313ba7762fd0d4799e9a9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-reconcile-original/stdout-stderr.log",
+      "bytes": 11773,
+      "sha256": "345c3de7f7b83e7b95929d3541f71962955a656eeb88d23613a8ca8810d13832"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-reconcile-original/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "7a341ad6713bfdb8b07970f5ac85511ed57ea867be1671adca90234d59c0b5fa"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-reconcile-original/command.json",
+      "bytes": 2719,
+      "sha256": "ba9079b15c4a8a869576ffc0c44d8a1db4dd38df050c88dfc3952ad496aa985e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-three-suites-followup/observer.json",
+      "bytes": 37584,
+      "sha256": "7f9164760c73fba138b96f559266b9fb390516882c83b90f8c4376f73bc28b1f"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-three-suites-followup/owned-process.json",
+      "bytes": 885,
+      "sha256": "a6e1ce8aa6c6400fe26e0a101d84754ca22bcd7f1c000b64beb3e8c38297262b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-three-suites-followup/raw.json",
+      "bytes": 27108,
+      "sha256": "7374080376b07965eafa7c99a2e558bc5193f4904dcf333f01c7365d9d1dc919"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-three-suites-followup/stdout-stderr.log",
+      "bytes": 1545,
+      "sha256": "445ad55f11913dc0ef1ce53d31ceb6b214eba02bc771a297fbb0e6d8d39f5bde"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-three-suites-followup/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "5fb5498de8fda851389f0b1200c1618e0154c47f39cf5d815aa0b6a8ccd1f46c"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-three-suites-followup/command.json",
+      "bytes": 2882,
+      "sha256": "163f9eaff2dd5c05ee09a3449e001e4ad256930daa2b456ca46da2c3f4fa828a"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-test-typecheck/owned-process.json",
+      "bytes": 558,
+      "sha256": "d474af1d608c9acb413c9a35fad32987e3956bd3051f9aaa2a34221ffa97210f"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-test-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-test-typecheck/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "1bb87406ec7a329c3baa085d7b41d51978dbc351f9a9262066329032eb90b1b8"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-test-typecheck/command.json",
+      "bytes": 1458,
+      "sha256": "99e0d701065597e0ec716c384059c7952dfe2d10fc7da4d9234048cd1bf0cc3a"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-related-actions/observer.json",
+      "bytes": 122087,
+      "sha256": "10f1baef2f0743ca8cb9f61c511585a86710cebf6f04e0ed3b543c95539c9d74"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-related-actions/owned-process.json",
+      "bytes": 787,
+      "sha256": "d86a9fa5b6175d7fdec74e898899fada3db31e5f9bf5332b1cac71e2ed6d8738"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-related-actions/raw.json",
+      "bytes": 84766,
+      "sha256": "f8f829bbb2f8fe810c549dd14a8b447051226f2c24c48fe1233be86229709641"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-related-actions/stdout-stderr.log",
+      "bytes": 8519,
+      "sha256": "a3caf9b51c1098927e647a262c335fa78e0aa8904244184e9c44e7b5eb9ba0c1"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-related-actions/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "7c396bc7bfc5c887c8af797173ebd4b3be7631d5c49fda3feb9b68e1263669cf"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-related-actions/command.json",
+      "bytes": 2663,
+      "sha256": "c7d73f94e2cefb1eab2005018c7429225af25a88bdd21921c9e57bf1c0d79b68"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-baseline-cwd-fixed/observer.json",
+      "bytes": 41170,
+      "sha256": "6dcb209466698eb3042ca18617b5fdb5c5a5fe5097f05cc108a734e326d90353"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-baseline-cwd-fixed/owned-process.json",
+      "bytes": 1175,
+      "sha256": "6e9cfeb49115055b578581735514353b4b2fcc51a14b09dee5cc9530a0503016"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-baseline-cwd-fixed/raw.json",
+      "bytes": 29811,
+      "sha256": "e7e4e9fe23baef63fcde86ef1e50afda805670b704aa943ea4ab1049bf4d1b2e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-baseline-cwd-fixed/stdout-stderr.log",
+      "bytes": 875,
+      "sha256": "021201840362b69d0115aa9866216a44490d5ee6050140fa8a1d3935c9c5a1b0"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-baseline-cwd-fixed/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "3bcee8840969139d8a0c2dba0917b9306b2b9d7cd2b8e925e0915867570421aa"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-baseline-cwd-fixed/command.json",
+      "bytes": 3476,
+      "sha256": "3b2181e7b3d51a7721eb235c8fc1b889ca083988ea0acaf7f9d38fb3943fb943"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m1-redispatch-mutant/observer.json",
+      "bytes": 2971,
+      "sha256": "354282678a68e94dba01ff5cbce2a83ac1e8f772dc82f0434210f0efb3d3a8a6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m1-redispatch-mutant/owned-process.json",
+      "bytes": 1115,
+      "sha256": "66256a915962509d63a7298e83054f8692b311483b2295dc19cdb65f8c396211"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m1-redispatch-mutant/raw.json",
+      "bytes": 1948,
+      "sha256": "2d2cda925bea7fd6169036ab0a4c0804df418c8da85b46cee57ad11011d0f2bc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m1-redispatch-mutant/stdout-stderr.log",
+      "bytes": 2118,
+      "sha256": "0a33fcb91e633d21cfddf9f350e854555525df87d3680ab53355b3ebfa49ca08"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m1-redispatch-mutant/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "7b43a1ea93a794ea95a4f3e531cbe115e5e4fe127c6baeadfea5d034789e6347"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m1-redispatch-mutant/command.json",
+      "bytes": 3318,
+      "sha256": "0c8aed17e11863d1449bf67262095a76f607b76f9d08b7bb2f4f8fb26ca0d99b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m2-header-mutant/observer.json",
+      "bytes": 13951,
+      "sha256": "499e38f8a0a8406719c4b4032fcb316061dbae57b6aa79a67c64cae5a6329c9d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m2-header-mutant/owned-process.json",
+      "bytes": 1083,
+      "sha256": "39a4f32e014db457760264a630aa814df18c1b23a97173194a5a5adce635c7da"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m2-header-mutant/raw.json",
+      "bytes": 7183,
+      "sha256": "cf3a3121c1189303a043ff1445561af75c38bd4dcab17d3611a9ba929494989b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m2-header-mutant/stdout-stderr.log",
+      "bytes": 6098,
+      "sha256": "cc319d0cd66ce63f69e18d4c88a387cf12aa89d5f16e30343d5f3c289e4b9c11"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m2-header-mutant/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "95cdad16dc3432d9c43329a2405390b9844b65e881303247e8e2461607e9fa7d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m2-header-mutant/command.json",
+      "bytes": 3235,
+      "sha256": "4d8f8c743c98b0af3af85a2a9e8a983ece9b7a85db63664ee803cf0d1a51c04f"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m3-unknown-restart-mutant/observer.json",
+      "bytes": 41284,
+      "sha256": "62b7f889e9e7fbe706e333dce947bb37e1ef5b84a4bab9c15e1a42600940cb31"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m3-unknown-restart-mutant/owned-process.json",
+      "bytes": 1096,
+      "sha256": "3faf5b271f2cddc3f891d17e1dde4c08f121e1dd33a71c6e52cc95d3bea4289a"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m3-unknown-restart-mutant/raw.json",
+      "bytes": 29209,
+      "sha256": "dbf6a38451b18f1992221da41fd39e99d1b8e5feae6ebc344b2181b39ae67181"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m3-unknown-restart-mutant/stdout-stderr.log",
+      "bytes": 8962,
+      "sha256": "bc5b2a3c128518b5e022324ff11bfbec853a47c30c0cf1ae9c4b392cd3e6d5d7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m3-unknown-restart-mutant/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "1eed2258d8bd105fc717a62780ccb46ff31a9148c8554202b0bcf33aa95bc852"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-m3-unknown-restart-mutant/command.json",
+      "bytes": 3309,
+      "sha256": "662e5c0339fc4b10f0d71104c4c7fa721d1ba988df435e02750d4a8fcaadd184"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-restored/observer.json",
+      "bytes": 41170,
+      "sha256": "b39895cb7e4344b8f3e6a136ba8e543a80a091fad209b6c4ec544de78c7f5fa7"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-restored/owned-process.json",
+      "bytes": 1165,
+      "sha256": "c07d709f96f2409be08eb0e20ad1c4ea7afc960be13bfa6c5ab42ff46e3d714d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-restored/raw.json",
+      "bytes": 29823,
+      "sha256": "fdb6d125bea5580d87de031af2459459feffe099f841033eb82810fe6e1deeb1"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-restored/stdout-stderr.log",
+      "bytes": 1162,
+      "sha256": "d1a4f2852b164e0f70b6d1a0733c9d0afb9992fd6471439be0fc6196379f3877"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-restored/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "4a829d1ec57f5a16d661039f86597764d166fb9847d48f58414bdaf73b496f0a"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-mutations-restored/command.json",
+      "bytes": 3406,
+      "sha256": "1608fe507bb2886afcec9ca238f7aa75827028f7de45cc1618b7ec0017236448"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-source-typecheck/owned-process.json",
+      "bytes": 552,
+      "sha256": "6498795f1b77fdb379cb5df0ce7686d0a5b13ff0e08b52092c1502c214427de6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-source-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-source-typecheck/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "a4cb465e862a2323ade1ebcfc47eb7f5542344c21d9cb25454df1bd9a60c638b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-source-typecheck/command.json",
+      "bytes": 1450,
+      "sha256": "904f29a5c033a0904faeb31cdbeedf50ade81b3ffca4865375764056a7ab889f"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts-before-generation/owned-process.json",
+      "bytes": 449,
+      "sha256": "a4be70a4a2f708eaf8ada5bd0489667685df69583a8c3c58aacb90a1f959f9dc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts-before-generation/stdout-stderr.log",
+      "bytes": 1228,
+      "sha256": "da93a03982d73654edb898f4e9a70aead573a7ff1ca217df4b11dda69af28dbe"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts-before-generation/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "4c9595ea619a03e1c0679ce54f2d3aa11818db9f5de1f446206ff980331cdab5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts-before-generation/command.json",
+      "bytes": 1264,
+      "sha256": "cbf6c0ab84921e6b48a34ed29db081d2b9d5255a8ed008bac8fe871e1aa96829"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-count-generation/owned-process.json",
+      "bytes": 449,
+      "sha256": "a6843c5c31fccd41bf92118bfd923fb652eaf4d78cb4a296071a8456eef43fb0"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-count-generation/stdout-stderr.log",
+      "bytes": 20,
+      "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-count-generation/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "ebf97ac1d023551d709ba40acb21932d809d72ca8a60f51d1b59b7a8c05cc0fc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-count-generation/command.json",
+      "bytes": 1248,
+      "sha256": "d896cb15de760eca457f0b09493a920676d79f1d6ccd383e33d99587c30a348a"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-lint/owned-process.json",
+      "bytes": 397,
+      "sha256": "60439d11fb83f61cd09696dc349b2eddca248a472680ff727650f63deba957ee"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-lint/stdout-stderr.log",
+      "bytes": 443,
+      "sha256": "d08987d08f71a61edb2971955d0b863717bb9862df09fb5e1d629ddec3d48dec"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-lint/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "b00f36fef33a811bc589fb7b5c8ab431367763b7498e38ec7ed489592d1b300b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-lint/command.json",
+      "bytes": 1121,
+      "sha256": "318a14d6951a0a23d07365a5bd69e144e77a59e5d0b2f927ebee0d1d832ee751"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-freeze/owned-process.json",
+      "bytes": 440,
+      "sha256": "18c7166ddb8ffe8a3608f31f95f2d52e1075e393b6b44d3729b92cbdb528df06"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-freeze/stdout-stderr.log",
+      "bytes": 116,
+      "sha256": "bf2c6aa2a9a9bc0f0d1679f94040946347d7e819a28bc7e33bc7235806bb6253"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-freeze/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "aae0d7acccd1c52fa2614f39ef0108c037f2f92c453dbf48bfad656232392397"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-freeze/command.json",
+      "bytes": 1214,
+      "sha256": "348f7193e16489c2f80191364a041aa5e70b2a1bf30c0b5ca5fbb45ac4c633a5"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts/owned-process.json",
+      "bytes": 449,
+      "sha256": "ddd15f6b93971abee4a1869e453bb841cff147bd51c56e90981ae1ca7ba39c57"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts/stdout-stderr.log",
+      "bytes": 81,
+      "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "3f98c3322ed1e574535ed8afdb3717aaa53224897c4d75a525303587e04386f9"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-counts/command.json",
+      "bytes": 1228,
+      "sha256": "657a7a80f9b51428a275159ee42d01ac0be96e0234a4fdc435556f669cac0bf1"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-docs-drift/owned-process.json",
+      "bytes": 444,
+      "sha256": "efb0e1e1d0edce0b882c177fd6042d1935b4a72b6e120fe941690f7157fbcd4d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-docs-drift/stdout-stderr.log",
+      "bytes": 45,
+      "sha256": "5407ecd8d6d4e86e27cada4e5cfb641626af7a5f0c2e7c6ac879cd34ecbd8d92"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-docs-drift/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "ff231125a9cb495c805465655776758a989ca29efc9cffd442a2dd913f83b2df"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-docs-drift/command.json",
+      "bytes": 1229,
+      "sha256": "9f757ac5a2671b9625df58f1bc1cf952d82c9b90b4843b5280f72e953a0357e3"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-architecture/owned-process.json",
+      "bytes": 457,
+      "sha256": "00f7207ef90b6e36b6ffa1183a57a4392ef6114dbafe83b46de105f42e4430cf"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-architecture/stdout-stderr.log",
+      "bytes": 95563,
+      "sha256": "c2d57b00d67df0fba869ba197d74f690ff00c1e2720d4ecc27300a4276cb3c51"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-architecture/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "0bc238c482158e1c2b5b71cfa0a7e70292c68fdebbd70262c550f1d4fd14b713"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-architecture/command.json",
+      "bytes": 1260,
+      "sha256": "711145293a962f3270bf2de8e82ab09381a1c4d344a7fbff7e439a5c47161b47"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-duplicates/owned-process.json",
+      "bytes": 456,
+      "sha256": "b12fc16247d85336eee06c00d0aa9625083f5e69a79bd470ac0a2db31cba1700"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-duplicates/stdout-stderr.log",
+      "bytes": 1844,
+      "sha256": "1e533c61c0976a56b4ba6363da60d2a930e9d92b0706673d2566a83e81f7b385"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-duplicates/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "82126e2cc6f5e350fb6dd9603ff182fca2cdb3d1aa2c8cd2a148687acdd511e1"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-duplicates/command.json",
+      "bytes": 1250,
+      "sha256": "aa7297bc95d4a163c82c4e8bb62c2dd0b31d3ee5af07685379bbe9d5aa0a965e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-dead-code/owned-process.json",
+      "bytes": 455,
+      "sha256": "15b847ae54954a4239af3500cd585ed79ffa6caf64d6a369c132eba34c9c148b"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-dead-code/stdout-stderr.log",
+      "bytes": 962,
+      "sha256": "217cc29b28709add3a42b9b2c9332908cab47c61258d028ae6d81572265d61a2"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-dead-code/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "6399cd01a4ec2afd2452f5d189b24ae4f53abde79c15457098e677b2589bca30"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-dead-code/command.json",
+      "bytes": 1247,
+      "sha256": "5528578349ae415815845d850b58fe26222d406db845385d074486071ce5c02c"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-clean-source/owned-process.json",
+      "bytes": 456,
+      "sha256": "ea562acd9a335d0df0d98a89e4709b31955bf6082f5a45f5f81491ca8d8933c4"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "8a7552ec6e9c8988fdf4d1b5e4263728b16e17a2ebb17fe60b3da0952cd9f4ee"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-clean-source/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "34c4040111d244cc69fc1bef7575f71035a55b001b1a199fbe0d8fc651945800"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-clean-source/command.json",
+      "bytes": 1256,
+      "sha256": "957ca1e2edafcbe3447e5cab9499adb308b0886369c479aec20754328aa08ae8"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fresh-clone-tests/observer.json",
+      "bytes": 37704,
+      "sha256": "1e10e2d6291f3c1ebf04a64b6d2f4dd8f307b139c0fa57a46735813af3c7e993"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fresh-clone-tests/owned-process.json",
+      "bytes": 1106,
+      "sha256": "0c6e070e2b084a8fe303ece0191f4098c524e250830f9b18025e32920d92ec8e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fresh-clone-tests/raw.json",
+      "bytes": 27157,
+      "sha256": "4f7e268e0eacc3487f7b522c646c723f2a65c73194345da26543217ade06f0d1"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fresh-clone-tests/stdout-stderr.log",
+      "bytes": 1424,
+      "sha256": "c47b2e2e4babbf967d0c30fb61ae6a1b98ada132e69ea7d5a6a7015cdd59d904"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fresh-clone-tests/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "966ff760aab65bf05cfee7ee77bc447b4e30257687bbdf0125d8b481deebe995"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-fresh-clone-tests/command.json",
+      "bytes": 3292,
+      "sha256": "8aa7806b26e2b623ad201cd9a2c373965a2f44d00a7eb06051784b88b73b9833"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-host-fingerprint/owned-process.json",
+      "bytes": 490,
+      "sha256": "8ac6ca3c89e7ee0824b75800d3bc2adf23b07c8b7c04b52c19ea7d705c890ba6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-host-fingerprint/stdout-stderr.log",
+      "bytes": 307,
+      "sha256": "ab924acf2e04beecfa402a922998b19d3d29b246eeb41cccfaf2ebfd582f3593"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-host-fingerprint/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "579e9663228569fd2ae8b7537ba9427872903255d001f28859a22a21534a8425"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p104-host-fingerprint/command.json",
+      "bytes": 1333,
+      "sha256": "226cdb6487055660d307d50c26fe2c2cf155ca9cd6024818fe0a19162438c4e8"
+    }
+  ],
+  "separateInvocationTestCounts": [
+    {
+      "phase": "p104-idempotency-original",
+      "total": 7,
+      "passed": 6,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-fault-matrix-original",
+      "total": 16,
+      "passed": 16,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-reconcile-original",
+      "total": 51,
+      "passed": 50,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-three-suites-followup",
+      "total": 74,
+      "passed": 74,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-related-actions",
+      "total": 226,
+      "passed": 223,
+      "failed": 3,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-mutations-baseline-cwd-fixed",
+      "total": 79,
+      "passed": 79,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-m1-redispatch-mutant",
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-m2-header-mutant",
+      "total": 7,
+      "passed": 3,
+      "failed": 4,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-m3-unknown-restart-mutant",
+      "total": 71,
+      "passed": 69,
+      "failed": 2,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-mutations-restored",
+      "total": 79,
+      "passed": 79,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "phase": "p104-fresh-clone-tests",
+      "total": 74,
+      "passed": 74,
+      "failed": 0,
+      "skipped": 0
+    }
+  ],
+  "auditArtifactPins": [
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/checks-and-fresh-clone-audit/README.md",
+      "bytes": 2772,
+      "sha256": "457c189a1d693646be79fb56e7b9d72b2e631e38011cf2bc4358edb0e5a1bbe6"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/checks-and-fresh-clone-audit/audit.json",
+      "bytes": 86651,
+      "sha256": "5920c8280ba35a5ce58135f65c39e4339dadb399548dfb5a117a66d95864f27d"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/checks-and-fresh-clone-audit/pins.json",
+      "bytes": 32645,
+      "sha256": "74d8a75495082f50e87ba8cee9b3c6a7dedca44873b8ebcec35ccef99285eb62"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/fault-matrix-original-audit/README.md",
+      "bytes": 1318,
+      "sha256": "8a2013085b57cf3db864218a662bd5f418ab2dbe9bc439b3b406c33836ee6b9e"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/fault-matrix-original-audit/audit.json",
+      "bytes": 16605,
+      "sha256": "bac4f54aadc1b2f611884ef2963236b05f72c65f47ff17a2310ca9e98375b0da"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/fault-matrix-original-audit/pins.json",
+      "bytes": 4723,
+      "sha256": "757c1b2a4b54aecd974878352085aa841b620308a844239549e7502c76103bb0"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/followup-three-suites-audit/README.md",
+      "bytes": 1435,
+      "sha256": "ce6fb695a456f2d2fe5885c53ca608eb9f912baa3a3efbd47ae6f910c289c042"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/followup-three-suites-audit/audit.json",
+      "bytes": 39977,
+      "sha256": "6df704408e58ed4d05d3350e882191143f36d9b41290ec134de64af5e416d3b3"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/followup-three-suites-audit/pins.json",
+      "bytes": 4965,
+      "sha256": "2952c1f2df39509ae534b388c2b4996d537f4edc492832a90e4deafd635f69bb"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/idempotency-original-audit/README.md",
+      "bytes": 1819,
+      "sha256": "8558bef8e0749ca8aaab0822ca006e0547b6f9003ff61fc28fc7efaaad86ce08"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/idempotency-original-audit/audit.json",
+      "bytes": 7723,
+      "sha256": "f1b98c9108f089e18f75148774edbf3a485f6c08e7ab1f4f80b22ede4c25e2ed"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/idempotency-original-audit/input-pins.json",
+      "bytes": 4143,
+      "sha256": "31978dbc4fad354873d01a635559c027a42b2a65ef3913b2b8e4648eb3fc1545"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-baseline-audit/README.md",
+      "bytes": 1549,
+      "sha256": "55916e89a739ed467ee3d31bee90ccbd0c384add8aa3b92da66453340ad0d644"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-baseline-audit/audit.json",
+      "bytes": 3737,
+      "sha256": "ff155e21e513dc99d9234ea0ba234ff80489897624bd3b3c8fe6c72716ee9146"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-baseline-audit/input-pins.json",
+      "bytes": 3045,
+      "sha256": "8c7de84e26a74f0e9598078b463acb4d79689a007a1076be09cacfd9ffc6af2f"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-baseline-membership-addendum/README.md",
+      "bytes": 1003,
+      "sha256": "aa5d90ef8e219395650c1a4a778ca2588d47afc5f9ab8de924d93a4953ba56d4"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-baseline-membership-addendum/addendum.json",
+      "bytes": 7293,
+      "sha256": "cc6195cffeb6dbe1cf1c17f9720cc03bc2af16a7895abc2c09f48557d1575d57"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m1-audit/README.md",
+      "bytes": 1220,
+      "sha256": "6558c3ecf25507b93a53730fc3b307857073b971b0d07787335be2d0097b40a4"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m1-audit/audit.json",
+      "bytes": 7924,
+      "sha256": "19f17587c477d97c93c57a961806630f99cbd79ffed9289f2ffe27f11d1a5cff"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m1-audit/input-pins.json",
+      "bytes": 3409,
+      "sha256": "1ded590690b7e89f6bde92bfdf1c60b0721225ef3757a7d088cbad0c9117f783"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m1-audit/retained-member-index.json",
+      "bytes": 32062,
+      "sha256": "0d4106e3f05b8ecb9ad5015bb695086213ca5060cd9235f25d6a4a09f0f89727"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m2-audit/README.md",
+      "bytes": 1179,
+      "sha256": "dcf4c27f03648c00e338ad6e581fa8b53f844ea964322630d44db910efe41a58"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m2-audit/audit.json",
+      "bytes": 22278,
+      "sha256": "99a2ad1705fd60a03411ed03f27f814b664aa390b3d10855bbad854a99a9e107"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m2-audit/input-pins.json",
+      "bytes": 5313,
+      "sha256": "f7de14434a3d7800bcf4223d586905db120e7eaddfe42e562e7810ee9dba15d4"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m2-audit/retained-member-index.json",
+      "bytes": 132711,
+      "sha256": "4ec5517cf8396f0450fe93589a72cb52454bd37d04d0988734e774948b9018db"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m3-audit/README.md",
+      "bytes": 1064,
+      "sha256": "4a9859360ff3142dff805928b9c573238e61e74a2929c7c14328a3f146a5e592"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m3-audit/audit.json",
+      "bytes": 10818,
+      "sha256": "54d868d967a3a4a25939b4509e2bf42d7383e0c38d1bf828a282fc89a3c16a35"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-m3-audit/input-pins.json",
+      "bytes": 2515,
+      "sha256": "c0628bf20b0e4ded9b9a41e1d4ec1a70b3c4c00d9a03ab419950c93a7a0940a2"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-restored-audit/README.md",
+      "bytes": 1062,
+      "sha256": "b7c44183fa6c6bd7351156d7837d90a58d8441b7cd6a4ecd4d93ecf17bfca4dc"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-restored-audit/audit.json",
+      "bytes": 2253,
+      "sha256": "58d2ddc756b7c2141ced0330837adeca98c4213c5fd6330d4520e24935caf0da"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-restored-audit/input-pins.json",
+      "bytes": 2694,
+      "sha256": "8a1c0452d831d9a9d571c368e927b64a5e9fd16390255e0a36159707bee047df"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/reconcile-original-audit/README.md",
+      "bytes": 1390,
+      "sha256": "61ac9edef220220d8a684e755ccc37c0a77ff89aa606c1f46a298c9f4b8cdb49"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/reconcile-original-audit/audit.json",
+      "bytes": 44417,
+      "sha256": "dbb0b0f626986db0c681909f76f9e9b66033f9fc6bd5b75ea4ddf86bbb84145c"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/reconcile-original-audit/pins.json",
+      "bytes": 3758,
+      "sha256": "7e9745774536504c77393bb9eea0cb32c229ed1a5054b34541e0b501693937d8"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/related-actions-followup-audit/README.md",
+      "bytes": 1283,
+      "sha256": "0967b7284e0b1ea06e2031c2d8b6839d452529169eb583e49bed12bb0e1afe96"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/related-actions-followup-audit/audit.json",
+      "bytes": 98021,
+      "sha256": "bf04efe55f5742815d631dac9c0f486b822f4b455683a372e11c5a46912215b2"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/related-actions-followup-audit/pins.json",
+      "bytes": 4997,
+      "sha256": "af77520a59c1824ed3c36c496893e42c0f29b7cd44406511185be55f62145e03"
+    }
+  ],
+  "admissionAndPreservation": {
+    "admission.json": {
+      "capturedUtc": "2026-10-15T21:26:52.511323+00:00",
+      "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "head": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "branch": "codex/p1-04-qualification",
+      "scope": "P1-04 tests first against unchanged current product source",
+      "newPaths": [
+        "tests/actions/faultMatrix.test.ts",
+        "tests/actions/reconcile.test.ts",
+        "tests/actions/idempotency.test.ts",
+        "tests/helpers/p104Qualification.ts"
+      ],
+      "helperConditional": true,
+      "sourceEditsAdmitted": false,
+      "formalAcceptanceClosed": false,
+      "selection": "G1/Urgent2027-01-08 dependent depth4 after bounded P105; earlier P106Claude-held",
+      "scanner": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+        "sha256": "3bfbe4c68e4860ad6f344433eae4f39e864462798f75ff2c58d8cef488bae1b3",
+        "paths": [
+          "tests/actions/faultMatrix.test.ts",
+          "tests/actions/reconcile.test.ts",
+          "tests/actions/idempotency.test.ts",
+          "tests/helpers/p104Qualification.ts"
+        ],
+        "exit": 0,
+        "stdout": "none\n"
+      },
+      "closedInputChecks": [
+        {
+          "prior": {
+            "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+            "bytes": 157127,
+            "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+          },
+          "current": {
+            "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+            "bytes": 157127,
+            "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/Downloads/Issues.md",
+            "bytes": 38227,
+            "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+          },
+          "current": {
+            "path": "/Users/sid/Downloads/Issues.md",
+            "bytes": 38227,
+            "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-04.md",
+            "bytes": 14022,
+            "sha256": "4582eb271b4589d20ab241b243e2567f83efddeb5ca1abcc5d6aa7aa5c70dd8c"
+          },
+          "current": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-04.md",
+            "bytes": 14022,
+            "sha256": "4582eb271b4589d20ab241b243e2567f83efddeb5ca1abcc5d6aa7aa5c70dd8c"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+            "bytes": 275376,
+            "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+          },
+          "current": {
+            "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+            "bytes": 275376,
+            "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+            "bytes": 4859,
+            "sha256": "3bfbe4c68e4860ad6f344433eae4f39e864462798f75ff2c58d8cef488bae1b3"
+          },
+          "current": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+            "bytes": 4859,
+            "sha256": "3bfbe4c68e4860ad6f344433eae4f39e864462798f75ff2c58d8cef488bae1b3"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s442cd919/scratchpad-backup/pending-checks.md",
+            "bytes": 196468,
+            "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870"
+          },
+          "current": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s442cd919/scratchpad-backup/pending-checks.md",
+            "bytes": 196468,
+            "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/private/tmp/p1-03-journal-qualification-20261016/final-p1-03-checkpoint.json",
+            "bytes": 19997,
+            "sha256": "cd8a6d20d2dea19986cf2f43664d3e4664d100fcb9a47abbdd7075e6ac7469b9"
+          },
+          "current": {
+            "path": "/private/tmp/p1-03-journal-qualification-20261016/final-p1-03-checkpoint.json",
+            "bytes": 19997,
+            "sha256": "cd8a6d20d2dea19986cf2f43664d3e4664d100fcb9a47abbdd7075e6ac7469b9"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/private/tmp/p1-03-journal-qualification-20261016/final-related-audit.json",
+            "bytes": 14951,
+            "sha256": "c8b058cd25f43317abfa1fd1fc01f2d87b5366f2dd030a2ab1881ea6e88a6480"
+          },
+          "current": {
+            "path": "/private/tmp/p1-03-journal-qualification-20261016/final-related-audit.json",
+            "bytes": 14951,
+            "sha256": "c8b058cd25f43317abfa1fd1fc01f2d87b5366f2dd030a2ab1881ea6e88a6480"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/private/tmp/p1-04-qualification-preflight-20261016.json",
+            "bytes": 26816,
+            "sha256": "cdf31b1f35dfb03ac116d8b35402dc0757f08a649940fa784d43ab4e02c2aab0"
+          },
+          "current": {
+            "path": "/private/tmp/p1-04-qualification-preflight-20261016.json",
+            "bytes": 26816,
+            "sha256": "cdf31b1f35dfb03ac116d8b35402dc0757f08a649940fa784d43ab4e02c2aab0"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-10/README.md",
+            "bytes": 5548,
+            "sha256": "9a30e4e10a3d76a9d936daf22ebb3a9fc4bcb71c353fc69b7b4083b0b37d17cc"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-10/README.md",
+            "bytes": 6765,
+            "sha256": "79d679b00f20fd2b04c6905ca885e07cc72847d06411b76c7e0f2937ac2ca507"
+          },
+          "unchanged": false,
+          "explainedDelta": "Root-owned P110 format-repair note appended after closed preflight; all original5548bytes preserved, oldJSON unchanged in evidence.json, commit25cd228. No product/source ownership drift."
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/idempotency.ts",
+            "bytes": 896,
+            "sha256": "c24a7e664fe60a078f40570654db5de9600c45bfbd62a752419b3dcfbc52a4de"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/idempotency.ts",
+            "bytes": 896,
+            "sha256": "c24a7e664fe60a078f40570654db5de9600c45bfbd62a752419b3dcfbc52a4de"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/reconcile.ts",
+            "bytes": 19987,
+            "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/reconcile.ts",
+            "bytes": 19987,
+            "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionJournal.ts",
+            "bytes": 33320,
+            "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionJournal.ts",
+            "bytes": 33320,
+            "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/receiptStates.ts",
+            "bytes": 7612,
+            "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/receiptStates.ts",
+            "bytes": 7612,
+            "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionEvidenceCoverage.ts",
+            "bytes": 6783,
+            "sha256": "39c134292122bdc3b8f56489755e02d16d0002109896c1ffdd66117a45bebb15"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionEvidenceCoverage.ts",
+            "bytes": 6783,
+            "sha256": "39c134292122bdc3b8f56489755e02d16d0002109896c1ffdd66117a45bebb15"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionCliCommands.ts",
+            "bytes": 3337,
+            "sha256": "5e15ae02eb3168ea11a46df76fdaac3ebc966185240a77bd7815bfd0c97d609d"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionCliCommands.ts",
+            "bytes": 3337,
+            "sha256": "5e15ae02eb3168ea11a46df76fdaac3ebc966185240a77bd7815bfd0c97d609d"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+            "bytes": 32498,
+            "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+            "bytes": 32498,
+            "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubExecutors/http.ts",
+            "bytes": 3944,
+            "sha256": "d564944540e52c7661bba56b4c73725a9af7b95db44a7db5b5180860ad534970"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubExecutors/http.ts",
+            "bytes": 3944,
+            "sha256": "d564944540e52c7661bba56b4c73725a9af7b95db44a7db5b5180860ad534970"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/sessionRecovery.ts",
+            "bytes": 30627,
+            "sha256": "01df1193bc877123c170b98b791bdd33c6239fbebc8072e8e367dd080e98452d"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/sessionRecovery.ts",
+            "bytes": 30627,
+            "sha256": "01df1193bc877123c170b98b791bdd33c6239fbebc8072e8e367dd080e98452d"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/index.ts",
+            "bytes": 74550,
+            "sha256": "7a0b8f1731643900d1da3b2bf6415828bf3c91c25f1ffcfbb37dc1102b156929"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/index.ts",
+            "bytes": 74550,
+            "sha256": "7a0b8f1731643900d1da3b2bf6415828bf3c91c25f1ffcfbb37dc1102b156929"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/actionFaults.ts",
+            "bytes": 9185,
+            "sha256": "746301fe823c0b162061acb58a0cfa9d18b64c1b25fe7c3a870181efd95d7b2f"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/actionFaults.ts",
+            "bytes": 9185,
+            "sha256": "746301fe823c0b162061acb58a0cfa9d18b64c1b25fe7c3a870181efd95d7b2f"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/fixtures/actions/fakeSystemOfRecord.ts",
+            "bytes": 5037,
+            "sha256": "0f5c31e57c457120db7d37703aef10354e20dab0b5f3123974e5c2b5157c44bb"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/fixtures/actions/fakeSystemOfRecord.ts",
+            "bytes": 5037,
+            "sha256": "0f5c31e57c457120db7d37703aef10354e20dab0b5f3123974e5c2b5157c44bb"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/fixtures/actions/crashingCall.ts",
+            "bytes": 1495,
+            "sha256": "99f3bdedd38079af70553cb4dc31a849407a21f2e6b5042cec72dd542c31bea3"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/fixtures/actions/crashingCall.ts",
+            "bytes": 1495,
+            "sha256": "99f3bdedd38079af70553cb4dc31a849407a21f2e6b5042cec72dd542c31bea3"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/actions/failureBehaviour.test.ts",
+            "bytes": 52187,
+            "sha256": "4daa2fc0730853dcc93f42a0638fcb555fbc49d3ce3203cd6be4fe270a134b2a"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/actions/failureBehaviour.test.ts",
+            "bytes": 52187,
+            "sha256": "4daa2fc0730853dcc93f42a0638fcb555fbc49d3ce3203cd6be4fe270a134b2a"
+          },
+          "unchanged": true
+        },
+        {
+          "prior": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/actions/receiptStates.test.ts",
+            "bytes": 32043,
+            "sha256": "7d16cae5841be5599d82dd8aff5231fd7d5b38a94239da35ed8c7d319d7f87c2"
+          },
+          "current": {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/actions/receiptStates.test.ts",
+            "bytes": 32043,
+            "sha256": "7d16cae5841be5599d82dd8aff5231fd7d5b38a94239da35ed8c7d319d7f87c2"
+          },
+          "unchanged": true
+        }
+      ],
+      "preflightRefresh": "Initial strict check stopped on the known appended P110README.24inputs are unchanged;1exact prefix-preserving metadata append is accounted for. No closed preflight evidence was edited.",
+      "wip": {
+        "capturedUtc": "2026-10-15T21:23:27.300581+00:00",
+        "argv": [
+          "gh",
+          "pr",
+          "list",
+          "--state",
+          "open",
+          "--limit",
+          "1000",
+          "--json",
+          "number,title,author,isDraft,headRefName,baseRefName,url,updatedAt"
+        ],
+        "open": 13,
+        "dependabotExcluded": 13,
+        "wip": 0,
+        "nonDependabot": [],
+        "allOpenPrs": [
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/npm_and_yarn/dev-dependencies-3ecedad193",
+            "isDraft": false,
+            "number": 33,
+            "title": "deps: bump the dev-dependencies group across 1 directory with 3 updates",
+            "updatedAt": "2026-07-10T20:35:08Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/33"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/npm_and_yarn/better-sqlite3-12.11.1",
+            "isDraft": false,
+            "number": 28,
+            "title": "deps: bump better-sqlite3 from 12.8.0 to 12.11.1",
+            "updatedAt": "2026-06-22T06:27:11Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/28"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/npm_and_yarn/semver-7.8.5",
+            "isDraft": false,
+            "number": 27,
+            "title": "deps: bump semver from 7.7.4 to 7.8.5",
+            "updatedAt": "2026-06-22T06:25:16Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/27"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/npm_and_yarn/commander-15.0.0",
+            "isDraft": false,
+            "number": 21,
+            "title": "deps: bump commander from 14.0.3 to 15.0.0",
+            "updatedAt": "2026-07-09T20:50:37Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/21"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/npm_and_yarn/inquirer-14.0.2",
+            "isDraft": false,
+            "number": 20,
+            "title": "deps: bump inquirer from 13.3.2 to 14.0.2",
+            "updatedAt": "2026-07-09T20:50:36Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/20"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/npm_and_yarn/yaml-2.9.0",
+            "isDraft": false,
+            "number": 19,
+            "title": "deps: bump yaml from 2.8.3 to 2.9.0",
+            "updatedAt": "2026-06-26T16:05:36Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/19"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/npm_and_yarn/zod-4.4.3",
+            "isDraft": false,
+            "number": 17,
+            "title": "deps: bump zod from 4.3.6 to 4.4.3",
+            "updatedAt": "2026-06-26T16:05:35Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/17"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/github_actions/actions/setup-node-6",
+            "isDraft": false,
+            "number": 8,
+            "title": "ci: bump actions/setup-node from 4 to 6",
+            "updatedAt": "2026-05-22T07:31:27Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/8"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/github_actions/azure/setup-helm-5",
+            "isDraft": false,
+            "number": 7,
+            "title": "ci: bump azure/setup-helm from 4 to 5",
+            "updatedAt": "2026-05-22T07:31:26Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/7"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/github_actions/docker/setup-buildx-action-4",
+            "isDraft": false,
+            "number": 6,
+            "title": "ci: bump docker/setup-buildx-action from 3 to 4",
+            "updatedAt": "2026-05-22T07:31:25Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/6"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/github_actions/actions/deploy-pages-5",
+            "isDraft": false,
+            "number": 5,
+            "title": "ci: bump actions/deploy-pages from 4 to 5",
+            "updatedAt": "2026-05-22T07:31:24Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/5"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/github_actions/actions/upload-artifact-7",
+            "isDraft": false,
+            "number": 4,
+            "title": "ci: bump actions/upload-artifact from 4 to 7",
+            "updatedAt": "2026-05-22T07:31:23Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/4"
+          },
+          {
+            "author": {
+              "is_bot": true,
+              "login": "app/dependabot"
+            },
+            "baseRefName": "main",
+            "headRefName": "dependabot/npm_and_yarn/modelcontextprotocol/sdk-1.29.0",
+            "isDraft": false,
+            "number": 3,
+            "title": "deps: bump @modelcontextprotocol/sdk from 1.27.1 to 1.29.0",
+            "updatedAt": "2026-05-22T07:31:22Z",
+            "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/3"
+          }
+        ],
+        "readOnly": true
+      },
+      "sourceFlowCorrection": "Existing helper exports prepareFaultWorkspace; preserve it read-only rather than using preflight initFaultWorkspace typo",
+      "navigation": {
+        "query": "graphify query \"Idempotency reconcile ActionJournal HTTP executor\" --budget700",
+        "primaryGraphStale": true,
+        "matchedLegacyInMemoryAndMigrationSymbols": true,
+        "nodes": 36459,
+        "found": 64,
+        "shown": 23,
+        "currentSourceVerifiedDirectly": [
+          "src/actions/reconcile.ts",
+          "tests/helpers/actionFaults.ts",
+          "tests/fixtures/actions/fakeSystemOfRecord.ts"
+        ],
+        "noRefreshWatcherOrServer": true
+      },
+      "runtimeHarness": "/private/tmp/p1-03-journal-qualification-20261016/post-typecheck-halt-run-prepared.py",
+      "holds": [
+        "All existing deferred contracts and P101gaps",
+        "P106Claude,P202paused",
+        "authorize/approval/session/native/CLI/shared source reservations",
+        "SessionRecovery to reconcile integration not admitted"
+      ],
+      "previousCheckpoint": "/private/tmp/p1-05-containment-qualification-20261016/final-p1-05-checkpoint.json",
+      "allExistingTestsFixturesPreserved": true
+    },
+    "helper-application.json": {
+      "capturedUtc": "2026-10-15T21:30:50.287310+00:00",
+      "source": "/private/tmp/p1-04-idempotency-qualification-20261016/fault-matrix-proposal/p104Qualification.ts",
+      "target": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/p104Qualification.ts",
+      "bytes": 14304,
+      "sha256": "e69ba1bc721db1534205679c8403a9ce26d0ca35a2e25fdfffffa1c4ab31a0d3",
+      "review": "Actual signed-policy/default authorization/journal, chain+signature payload checks, independent JSON oracle effects, real distinct manual approvals, owned env/checkpoint/pool/vault lifecycle. No test execution or independent event preimage proof yet. Existing helpers untouched.",
+      "qualifyingCases": 0
+    },
+    "idempotency-application.json": {
+      "capturedUtc": "2026-10-15T21:35:36.713338+00:00",
+      "source": "/private/tmp/p1-04-idempotency-qualification-20261016/idempotency-proposal/idempotency.test.ts",
+      "destination": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/actions/idempotency.test.ts",
+      "sha256": "6b6c8594f195a9305bb110fa7967b0f3f44f08634f7b47a66ebaef1c1814fe0c",
+      "rootReviewedFullTestAndREADME": true,
+      "allPinsVerified": 35,
+      "sourceEdits": []
+    },
+    "fault-matrix-application.json": {
+      "capturedUtc": "2026-10-15T21:36:26.674901+00:00",
+      "source": "/private/tmp/p1-04-idempotency-qualification-20261016/fault-matrix-cleanup-status-proposal/faultMatrix.test.ts",
+      "destination": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/actions/faultMatrix.test.ts",
+      "sha256": "5c34b74f7915d4e1bbfa089696601ba704b339a132e030ede597098ba7660a11",
+      "rootReviewedV1AndV2ExactDiff": true,
+      "sourceEdits": []
+    },
+    "reconcile-application.json": {
+      "capturedUtc": "2026-10-15T21:37:04.815383+00:00",
+      "source": "/private/tmp/p1-04-idempotency-qualification-20261016/reconcile-proposal/reconcile.test.ts",
+      "destination": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/actions/reconcile.test.ts",
+      "sha256": "cf54992d81241906f46e1431c361b3302cde129c176be1409d0421948520d6cd",
+      "rootReviewedCompleteCodeAndREADME": true,
+      "sourceEdits": []
+    },
+    "idempotency-followup-application.json": {
+      "capturedUtc": "2026-10-15T21:39:21.495850+00:00",
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/actions/idempotency.test.ts",
+      "before": "6b6c8594f195a9305bb110fa7967b0f3f44f08634f7b47a66ebaef1c1814fe0c",
+      "after": "f7d0e4ea8f478f36c23b6e1471e860e3f641babdb5677352314dae056b4a8176",
+      "rootReviewedExactDiffAndREADME": true,
+      "soleDelta": "Complete code/executionID/:space prefix matching permits existing explanatory diagnostic text; independent effect and chain assertions preserved"
+    },
+    "changeset-application.json": {
+      "capturedUtc": "2026-10-15T21:39:00.674199+00:00",
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/reconcile-abort-before-lookup.md",
+      "sha256": "0e15baec9a0f64cdffec9b7a931bf3815c1048e2c9138c6dc708d27cdc7c918a",
+      "D15": "fixed exact path scanner returned none",
+      "admittedWith": "abort-fix-proposal",
+      "rootAuthored": true
+    },
+    "closed-runtime-case-counts.json": {
+      "capturedUtc": "2026-10-15T21:53:02.034227+00:00",
+      "countsAreDistinctInvocationsNotSummed": true,
+      "rows": [
+        {
+          "phase": "p104-idempotency-original",
+          "total": 7,
+          "passed": 6,
+          "failed": 1,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-fault-matrix-original",
+          "total": 16,
+          "passed": 16,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-reconcile-original",
+          "total": 51,
+          "passed": 50,
+          "failed": 1,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-three-suites-followup",
+          "total": 74,
+          "passed": 74,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-related-actions",
+          "total": 226,
+          "passed": 223,
+          "failed": 3,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-mutations-baseline-cwd-fixed",
+          "total": 79,
+          "passed": 79,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-m1-redispatch-mutant",
+          "total": 1,
+          "passed": 0,
+          "failed": 1,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-m2-header-mutant",
+          "total": 7,
+          "passed": 3,
+          "failed": 4,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-m3-unknown-restart-mutant",
+          "total": 71,
+          "passed": 69,
+          "failed": 2,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-mutations-restored",
+          "total": 79,
+          "passed": 79,
+          "failed": 0,
+          "skipped": 0
+        },
+        {
+          "phase": "p104-fresh-clone-tests",
+          "total": 74,
+          "passed": 74,
+          "failed": 0,
+          "skipped": 0
+        }
+      ]
+    },
+    "count-generation-admission.json": {
+      "capturedUtc": "2026-10-15T21:46:46.148853+00:00",
+      "scope": "Only exact generated test-file count1661 to1664 on10 currentcount surfaces, including plain/comma/URL-encoded form; everyotherbyteunchanged",
+      "D15": "fixed exact10paths scanner returned none",
+      "pins": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/README.md",
+          "bytes": 59828,
+          "sha256": "09010298b327e9db49b4ae861aee004e784e572a14af12a9d1c5bfd3ef6cf332"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "b920792b85d4e426c0077ea112ab9e9cf2642900bc01631cd093cfc6e1cb555f"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/website/index.html",
+          "bytes": 43520,
+          "sha256": "79bdeca6e453f946595c9b718477e750949b9fbd202a4b4fb10bdb1ef274b014"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/website/lite.html",
+          "bytes": 11197,
+          "sha256": "d34563eeb2e47d2db3304ab27044855671233926f33d296e66cb85de518d1676"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/website/i18n.js",
+          "bytes": 44169,
+          "sha256": "182b11485d97a90311f4a980d471cb251e81a29ba51a88531fec8aeb36767cf3"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "3bb431265645f8383ae090337b69f99116af7557af8feb4391b05d9fde497655"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "004897b34ccc93eec163b3895971f0d19987ae26512d0aa59c79a08711452c2a"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "4f8aaa6cb612067147f1b4f39891565981da30b695b0d21a01a4da082f93a990"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "a1fd9aff279a45b8072f39d871b3e097f8c1d62e4aa6011d08200a87ff8d63db"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+          "beforeCopy": "/private/tmp/p1-04-idempotency-qualification-20261016/pre-count-surfaces/whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "604d27c7f88e5fbdd6a2d02699e668d3777be5dc346ee67ff9ece45e30421d1a"
+        }
+      ],
+      "noFreezeBaselineChange": true
+    },
+    "count-generation-delta.json": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+        "before": "09010298b327e9db49b4ae861aee004e784e572a14af12a9d1c5bfd3ef6cf332",
+        "after": "fde6be8f63f17611683452beace462b136a0965bb0fef55a6c957d756bebad48",
+        "onlyExpectedCountDelta": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+        "before": "b920792b85d4e426c0077ea112ab9e9cf2642900bc01631cd093cfc6e1cb555f",
+        "after": "b877d72c48056bbc7973cf3da99b2f5c5c95977af417ad0d171bd7a6ab0c519c",
+        "onlyExpectedCountDelta": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+        "before": "79bdeca6e453f946595c9b718477e750949b9fbd202a4b4fb10bdb1ef274b014",
+        "after": "c0d840686c439a92dfb0cc8c3e87abeb78cb8cc8bbc1cbcefd0ae3343636903d",
+        "onlyExpectedCountDelta": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+        "before": "d34563eeb2e47d2db3304ab27044855671233926f33d296e66cb85de518d1676",
+        "after": "89b57f427af1c2a91da7119dda98e652221c2fa79d00cecb99d9e7ca2b2f457e",
+        "onlyExpectedCountDelta": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+        "before": "182b11485d97a90311f4a980d471cb251e81a29ba51a88531fec8aeb36767cf3",
+        "after": "d9f17d7b7163c1423bfad5b58702eb98aa2a47b795ae65efe7ccfb4ec54e8670",
+        "onlyExpectedCountDelta": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+        "before": "3bb431265645f8383ae090337b69f99116af7557af8feb4391b05d9fde497655",
+        "after": "90e92b4f36c62fbefc3c9eb5cc5ea357fbde0ff126061301da0925f0e2557d21",
+        "onlyExpectedCountDelta": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+        "before": "004897b34ccc93eec163b3895971f0d19987ae26512d0aa59c79a08711452c2a",
+        "after": "f239904c88b2e92a47dcda34be1e9bad904bc976cd9ccb8bdd888bd7c3e43e35",
+        "onlyExpectedCountDelta": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+        "before": "4f8aaa6cb612067147f1b4f39891565981da30b695b0d21a01a4da082f93a990",
+        "after": "2324cf62948a6ebbe2bf82e73a0d4ae7d1718ab27cabccca77613fe63a208608",
+        "onlyExpectedCountDelta": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+        "before": "a1fd9aff279a45b8072f39d871b3e097f8c1d62e4aa6011d08200a87ff8d63db",
+        "after": "4c2a089ec050386c5add00c6f604d3ddd42a950c229321493d9fb0463d6d0bec",
+        "onlyExpectedCountDelta": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+        "before": "604d27c7f88e5fbdd6a2d02699e668d3777be5dc346ee67ff9ece45e30421d1a",
+        "after": "ad8edea0a15b4e42cf3f237efaed846b3d6acfec5cedc7ae77813d47a725a055",
+        "onlyExpectedCountDelta": true
+      }
+    ],
+    "source-candidate-admission.json": {
+      "capturedUtc": "2026-10-15T21:47:43.014251+00:00",
+      "parent": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "branch": "codex/p1-04-qualification",
+      "files": [
+        {
+          "path": "README.md",
+          "bytes": 59828,
+          "sha256": "fde6be8f63f17611683452beace462b136a0965bb0fef55a6c957d756bebad48"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "b877d72c48056bbc7973cf3da99b2f5c5c95977af417ad0d171bd7a6ab0c519c"
+        },
+        {
+          "path": "website/index.html",
+          "bytes": 43520,
+          "sha256": "c0d840686c439a92dfb0cc8c3e87abeb78cb8cc8bbc1cbcefd0ae3343636903d"
+        },
+        {
+          "path": "website/lite.html",
+          "bytes": 11197,
+          "sha256": "89b57f427af1c2a91da7119dda98e652221c2fa79d00cecb99d9e7ca2b2f457e"
+        },
+        {
+          "path": "website/i18n.js",
+          "bytes": 44169,
+          "sha256": "d9f17d7b7163c1423bfad5b58702eb98aa2a47b795ae65efe7ccfb4ec54e8670"
+        },
+        {
+          "path": "docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "90e92b4f36c62fbefc3c9eb5cc5ea357fbde0ff126061301da0925f0e2557d21"
+        },
+        {
+          "path": "docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "f239904c88b2e92a47dcda34be1e9bad904bc976cd9ccb8bdd888bd7c3e43e35"
+        },
+        {
+          "path": "docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "2324cf62948a6ebbe2bf82e73a0d4ae7d1718ab27cabccca77613fe63a208608"
+        },
+        {
+          "path": "docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "4c2a089ec050386c5add00c6f604d3ddd42a950c229321493d9fb0463d6d0bec"
+        },
+        {
+          "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "ad8edea0a15b4e42cf3f237efaed846b3d6acfec5cedc7ae77813d47a725a055"
+        },
+        {
+          "path": "src/actions/reconcile.ts",
+          "bytes": 20018,
+          "sha256": "5f5b44479db7311b44db502515bfd25fe0d8097f431c06351f6f25074036ad7e"
+        },
+        {
+          "path": ".changeset/reconcile-abort-before-lookup.md",
+          "bytes": 321,
+          "sha256": "0e15baec9a0f64cdffec9b7a931bf3815c1048e2c9138c6dc708d27cdc7c918a"
+        },
+        {
+          "path": "tests/actions/faultMatrix.test.ts",
+          "bytes": 14578,
+          "sha256": "5c34b74f7915d4e1bbfa089696601ba704b339a132e030ede597098ba7660a11"
+        },
+        {
+          "path": "tests/actions/idempotency.test.ts",
+          "bytes": 18330,
+          "sha256": "f7d0e4ea8f478f36c23b6e1471e860e3f641babdb5677352314dae056b4a8176"
+        },
+        {
+          "path": "tests/actions/reconcile.test.ts",
+          "bytes": 37542,
+          "sha256": "cf54992d81241906f46e1431c361b3302cde129c176be1409d0421948520d6cd"
+        },
+        {
+          "path": "tests/helpers/p104Qualification.ts",
+          "bytes": 14304,
+          "sha256": "e69ba1bc721db1534205679c8403a9ce26d0ca35a2e25fdfffffa1c4ab31a0d3"
+        }
+      ],
+      "productSourceDelta": "One prelookup abort guard; all other product source unchanged",
+      "quality": "1268duplicates and2731deadcode red/unwaived;3heldP102failures;formalacceptanceopen",
+      "protectedPinsUnchanged": [
+        [
+          "scripts/freeze-baseline.json",
+          "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+        ],
+        [
+          "scripts/quality/coverage-baseline.json",
+          "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+        ],
+        [
+          "vitest.config.ts",
+          "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+        ],
+        [
+          "node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+          "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+        ]
+      ],
+      "nativeStat": {
+        "ino": 539175547,
+        "nlink": 1
+      },
+      "sourceFreezeCounts": {
+        "cli": 1236,
+        "packs": 41,
+        "questions": 632
+      }
+    },
+    "source-candidate-commit.json": {
+      "capturedUtc": "2026-10-15T21:47:51.720244+00:00",
+      "commit": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "parent": "25cd228fec6ae693bdf4f88f86a29ff001dc01fb",
+      "branch": "codex/p1-04-qualification",
+      "files": [
+        {
+          "path": "README.md",
+          "bytes": 59828,
+          "sha256": "fde6be8f63f17611683452beace462b136a0965bb0fef55a6c957d756bebad48"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "b877d72c48056bbc7973cf3da99b2f5c5c95977af417ad0d171bd7a6ab0c519c"
+        },
+        {
+          "path": "website/index.html",
+          "bytes": 43520,
+          "sha256": "c0d840686c439a92dfb0cc8c3e87abeb78cb8cc8bbc1cbcefd0ae3343636903d"
+        },
+        {
+          "path": "website/lite.html",
+          "bytes": 11197,
+          "sha256": "89b57f427af1c2a91da7119dda98e652221c2fa79d00cecb99d9e7ca2b2f457e"
+        },
+        {
+          "path": "website/i18n.js",
+          "bytes": 44169,
+          "sha256": "d9f17d7b7163c1423bfad5b58702eb98aa2a47b795ae65efe7ccfb4ec54e8670"
+        },
+        {
+          "path": "docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "90e92b4f36c62fbefc3c9eb5cc5ea357fbde0ff126061301da0925f0e2557d21"
+        },
+        {
+          "path": "docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "f239904c88b2e92a47dcda34be1e9bad904bc976cd9ccb8bdd888bd7c3e43e35"
+        },
+        {
+          "path": "docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "2324cf62948a6ebbe2bf82e73a0d4ae7d1718ab27cabccca77613fe63a208608"
+        },
+        {
+          "path": "docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "4c2a089ec050386c5add00c6f604d3ddd42a950c229321493d9fb0463d6d0bec"
+        },
+        {
+          "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "ad8edea0a15b4e42cf3f237efaed846b3d6acfec5cedc7ae77813d47a725a055"
+        },
+        {
+          "path": "src/actions/reconcile.ts",
+          "bytes": 20018,
+          "sha256": "5f5b44479db7311b44db502515bfd25fe0d8097f431c06351f6f25074036ad7e"
+        },
+        {
+          "path": ".changeset/reconcile-abort-before-lookup.md",
+          "bytes": 321,
+          "sha256": "0e15baec9a0f64cdffec9b7a931bf3815c1048e2c9138c6dc708d27cdc7c918a"
+        },
+        {
+          "path": "tests/actions/faultMatrix.test.ts",
+          "bytes": 14578,
+          "sha256": "5c34b74f7915d4e1bbfa089696601ba704b339a132e030ede597098ba7660a11"
+        },
+        {
+          "path": "tests/actions/idempotency.test.ts",
+          "bytes": 18330,
+          "sha256": "f7d0e4ea8f478f36c23b6e1471e860e3f641babdb5677352314dae056b4a8176"
+        },
+        {
+          "path": "tests/actions/reconcile.test.ts",
+          "bytes": 37542,
+          "sha256": "cf54992d81241906f46e1431c361b3302cde129c176be1409d0421948520d6cd"
+        },
+        {
+          "path": "tests/helpers/p104Qualification.ts",
+          "bytes": 14304,
+          "sha256": "e69ba1bc721db1534205679c8403a9ce26d0ca35a2e25fdfffffa1c4ab31a0d3"
+        }
+      ],
+      "cleanAfterCommit": true,
+      "ordinaryCommitNoPushMergeOrHookBypass": true,
+      "formalAcceptance": false
+    },
+    "final-preservation.json": {
+      "capturedUtc": "2026-10-15T21:50:42.436499+00:00",
+      "protectedFilePins": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/seatbeltNativeShell.ts",
+          "bytes": 12224,
+          "sha256": "087961b03749d3d8c2c5af9428573f670e6d17f2f24f0a23ced159bb6220844f"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/nativeSandboxBinding.ts",
+          "bytes": 7003,
+          "sha256": "316f08828ae1c68d540ab11935f01629db99236d03fa030bb01530da6caf466d"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/nativeSandboxPolicy.ts",
+          "bytes": 4221,
+          "sha256": "57ee432a15576f8d62c795acfd06776e49b7f3b019fed7f8bf35cca69573559e"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/egress/shellEgressProxy.ts",
+          "bytes": 6819,
+          "sha256": "78927f47b6f98ac04a68d862e78f72ac238a1cab0e4ce97bebbd12c5d2abe550"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/bwrapBackend.ts",
+          "bytes": 14615,
+          "sha256": "dadcb2049afa2d8e5fcae366c2db4fb26e0c1503971b975e7a87cbc0bc35aa21"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/processCap.ts",
+          "bytes": 2402,
+          "sha256": "c7b3cc7f51d51bc240c5aabc1172b18b6452356edb90e285bb1f7877ecf1bdfb"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/enforce/egressAllowlist.ts",
+          "bytes": 8093,
+          "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolsSchema.ts",
+          "bytes": 8719,
+          "sha256": "20b0bb72942c67d7ca36a9070edc30cba11eab0693ddf6077e6ed98bea63bc05"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+          "bytes": 14760,
+          "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/builtin/bashTool.ts",
+          "bytes": 6113,
+          "sha256": "1c6277340a2cc336186485ed6b15fb4a014d3082924ca644134513196df9f7df"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+          "bytes": 32498,
+          "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/guards/policyGuards.ts",
+          "bytes": 10949,
+          "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/enforce/shellCommandPlan.ts",
+          "bytes": 6259,
+          "sha256": "e1e465e1c195db9330ea728663276553e5e021f6d50dfbf07344cc0a6110df46"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/exec/runProcess.ts",
+          "bytes": 6066,
+          "sha256": "6b935b66b4daf959551a63da5b7a9d24f88a48abcf834235f9e375a8e45caf96"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+          "bytes": 1324,
+          "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+          "bytes": 636550,
+          "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/freeze-baseline.json",
+          "bytes": 554,
+          "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+        },
+        {
+          "path": "/private/tmp/p1-03-journal-qualification-20261016/post-typecheck-halt-run-prepared.py",
+          "bytes": 12312,
+          "sha256": "90501440d5e16ff4584faa673e5c02bbae6a306a2052421fd2243dce062044fd"
+        },
+        {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        },
+        {
+          "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+          "bytes": 275376,
+          "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+        }
+      ],
+      "native": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "inode": 539175547,
+        "nlink": 1
+      },
+      "refs": [
+        {
+          "root": "/Users/sid/AgentMaturityCompass",
+          "ref": "HEAD",
+          "value": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+        },
+        {
+          "root": "/Users/sid/AgentMaturityCompass",
+          "ref": "pending-main-442cd919",
+          "value": "3b4a673c8f6fc11a947279054979e977f95b34d1"
+        },
+        {
+          "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+          "ref": "HEAD",
+          "value": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4"
+        }
+      ],
+      "candidateHead": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "candidateClean": true,
+      "runtimeActive": false,
+      "runtimeHalted": false,
+      "baselineAdopted": false,
+      "noExternalMessagesExceptPreviouslyAuthorizedP020": true
+    },
+    "final-reconcile-worktree-overlap-scan.json": {
+      "capturedUtc": "2026-10-15T21:46:17.758592+00:00",
+      "registeredRoots": 132,
+      "rows": [
+        {
+          "root": "/Users/sid/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/a4-bottom-up/AgentMaturityCompass",
+          "bytes": 19769,
+          "sha256": "e759ec1c8d5944964e81a486b2982cf7f5ee11f0e9d58032b3c92733529e3d53",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/finance-fixture/AgentMaturityCompass",
+          "bytes": 19769,
+          "sha256": "e759ec1c8d5944964e81a486b2982cf7f5ee11f0e9d58032b3c92733529e3d53",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/oidc-hardening/AgentMaturityCompass",
+          "bytes": 19769,
+          "sha256": "e759ec1c8d5944964e81a486b2982cf7f5ee11f0e9d58032b3c92733529e3d53",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-49-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+          "bytes": 19987,
+          "sha256": "d02ad55e5dfb7942a7391d6524cbf8a0dbfa558975ee7a655c9084ed803499c4",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "bytes": 20018,
+          "sha256": "5f5b44479db7311b44db502515bfd25fe0d8097f431c06351f6f25074036ad7e",
+          "scopedStatus": "M src/actions/reconcile.ts",
+          "prelookupAbortCheck": true
+        },
+        {
+          "root": "/Users/sid/.codex/worktrees/toolhub-journal/AgentMaturityCompass",
+          "bytes": 19769,
+          "sha256": "e759ec1c8d5944964e81a486b2982cf7f5ee11f0e9d58032b3c92733529e3d53",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        },
+        {
+          "root": "/Users/sid/AgentMaturityCompass/.claude/worktrees/loving-germain-ac9c7f",
+          "bytes": 19769,
+          "sha256": "e759ec1c8d5944964e81a486b2982cf7f5ee11f0e9d58032b3c92733529e3d53",
+          "scopedStatus": "",
+          "prelookupAbortCheck": false
+        }
+      ],
+      "errors": [],
+      "heldRefSource": {
+        "bytes": 20142,
+        "sha256": "23664666ec938a9df4029f39ab4d0bc0e89b8e48ee27207c6c2c4160cb95281a",
+        "prelookupAbortCheck": false
+      },
+      "readOnly": true,
+      "noResetsMergesOrSourceCopy": true
+    },
+    "clean-source-checkpoint.json": {
+      "capturedUtc": "2026-10-15T21:49:05.268294+00:00",
+      "clone": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-JoyZOQ/checkout",
+      "head": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "all16CandidatePinsMatch": true,
+      "trackedClean": true,
+      "phase": "p104-clean-source",
+      "childExit": 0,
+      "durationMs": 52212,
+      "ownedPgid": 94411,
+      "groupAbsentByESRCH": true,
+      "native": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-JoyZOQ/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "resolved": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-JoyZOQ/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "inode": 541684362,
+        "nlink": 1
+      },
+      "freshTests": "pendingdistinctphase; pinnedRrunner withphysicalclone root/config"
+    },
+    "session-integration-gap.json": {
+      "capturedUtc": "2026-10-15T21:50:42.488910+00:00",
+      "sourceCommit": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+      "pins": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/sessionRecovery.ts",
+          "bytes": 30627,
+          "sha256": "01df1193bc877123c170b98b791bdd33c6239fbebc8072e8e367dd080e98452d"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/sessionResume.ts",
+          "bytes": 15864,
+          "sha256": "e3e8816d4eff762eb38712d8a9aad2bd1b959188aa29912c3398690ed634e131"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-session-commands.ts",
+          "bytes": 17552,
+          "sha256": "c640189b30cecb2539e59cb2f088d3a4a8277f3431cc2a145c88706694e015ae"
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/reconcile.ts",
+          "bytes": 20018,
+          "sha256": "5f5b44479db7311b44db502515bfd25fe0d8097f431c06351f6f25074036ad7e"
+        }
+      ],
+      "verifiedFacts": [
+        "recoverSession synchronously returns RecoveryReport and accepts no reconcile adapter map",
+        "Current recovery calls recoverActionJournal and executionIdsForCalls, not reconcile",
+        "sessionResume and CLI recovery consume the synchronous report",
+        "No core reconcile adapter registry/caller found in current agent/kernel/session/actions/toolhub search"
+      ],
+      "gap": "P104 step7 production session recovery-to-reconcile integration remains unimplemented",
+      "preservedBoundary": "No fire-and-forget or empty-adapter no-op wiring; shared session/resume and held native composition/public contract changes need their own verified coordination/admission. No newsourcepath admitted here.",
+      "qualificationLimit": "Candidate/source tests do not close this gap; formalP104open. P119 service-only qualification explicitly allowed early byspec194."
+    }
+  },
+  "metadataPins": [
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/admission.json",
+      "bytes": 22152,
+      "sha256": "ca5795125976cd325fb3ae6a53cc2f4aa5182562f2fcf0feffd900cf93c62949"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/helper-application.json",
+      "bytes": 704,
+      "sha256": "49f1052ab7fd65b1ff9daed4ed4a61051e402c87c8309bb31102b721fd23b9a0"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/idempotency-application.json",
+      "bytes": 456,
+      "sha256": "ee1118465d7472ee42abc8f49d99e566dc7393b5140ef6d867de1eeb173ac756"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/fault-matrix-application.json",
+      "bytes": 446,
+      "sha256": "e466c8211f0128c9b9b93ec1bf42cfbc074e91b92718de9f0b719ddd904be354"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/reconcile-application.json",
+      "bytes": 429,
+      "sha256": "3188d2d8054a73242ce6250d79487f56552eac3bcc51e1e639fba62398d57e1d"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/idempotency-followup-application.json",
+      "bytes": 536,
+      "sha256": "8f6248dcc8ef328f662c512370c8626c1dfbae90ac29dae2454583643e70a475"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/changeset-application.json",
+      "bytes": 377,
+      "sha256": "3c09773dfabeb79041c2b0d6565fb5fa2306a11ab993b883818d151922312df4"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/closed-runtime-case-counts.json",
+      "bytes": 1589,
+      "sha256": "eb66a67f89c5deb2f2316d225c1afed0944078d13d0cfc9c843be1f6b232f51f"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/count-generation-admission.json",
+      "bytes": 3843,
+      "sha256": "ad8a7030b0de323768c105404e8493016d7be0f7bd21473e9010dac39ad2c9db"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/count-generation-delta.json",
+      "bytes": 3184,
+      "sha256": "730ec96449a0d25a3c065c7d280840ce59f9c36deb6e46a4f54e7c2e6edec724"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/source-candidate-admission.json",
+      "bytes": 3685,
+      "sha256": "a32c72a3532bfd15e1e193482041da4e4263c6a56dacdb9e0019712a5b51dcaa"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/source-candidate-commit.json",
+      "bytes": 2952,
+      "sha256": "15ca946732ee738d839398c7f406cb84de0f2f5a98290a1649d6bccf5e70e9e7"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/final-preservation.json",
+      "bytes": 5772,
+      "sha256": "fadc9ec13b1557d1c30b308f15aa01e057de81c62aa1562b5c57c5a26e0f14dc"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/final-reconcile-worktree-overlap-scan.json",
+      "bytes": 8831,
+      "sha256": "ce9729033673ff4733fd6f1df307034c16cee924c5a9b1ca7cc3389e660eda8b"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/clean-source-checkpoint.json",
+      "bytes": 982,
+      "sha256": "28cdb9a1a5e264d3998b1a5744091ca4b8be61ef42c79aecbea7a429dc6172c8"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/session-integration-gap.json",
+      "bytes": 1942,
+      "sha256": "2adee257239af7e1c75646988ce4e1e280575bdbc41af0465ca8967891ffd6ca"
+    }
+  ],
+  "host": {
+    "node": "22.23.3",
+    "nodeAbi": "127",
+    "nodeExec": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "pnpm": "10.33.0",
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t26.6.2\nBuildVersion:\t\t25G83",
+    "kernel": "Darwin 25.6.0",
+    "arch": "arm64",
+    "capturedUtc": "2026-10-15T21:49:33.643Z"
+  },
+  "publishedFaultMatrix": {
+    "source": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p104-fault-matrix-HW32Rg/fault-matrix.json",
+      "bytes": 506561,
+      "sha256": "9042a55e022d9e8f556da1f243e54395d2b2bafce3f059e1f5f6ed2fc552b342"
+    },
+    "localCopy": {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/qualification-proposal/2026-10-16-P1-04/fault-matrix.json",
+      "bytes": 506561,
+      "sha256": "9042a55e022d9e8f556da1f243e54395d2b2bafce3f059e1f5f6ed2fc552b342"
+    },
+    "provenance": "Actual fresh-clone74case invocation; public crypto/oracle audit252signature checks at checks-and-fresh-clone-audit",
+    "effects": 8
+  },
+  "prelaunchRejection": {
+    "capturedUtc": "2026-10-15T21:42:24.403130+00:00",
+    "phase": "p104-mutations-baseline",
+    "wrapperExit": 70,
+    "reason": "Passed physical private copy as harness CWD; frozen wrapper requires R. Must use physical --root/--config with R CWD.",
+    "beforePopen": true,
+    "commandDirectoryExists": false,
+    "activeOrHaltedExists": false,
+    "productExecuted": false,
+    "correction": "New unique phase with required R CWD; all private paths and test argv retained; harness unchanged"
+  },
+  "copyManifestPins": [
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/baseline-inputs.json",
+      "bytes": 1772995,
+      "sha256": "615a6516fba8ef85b871dd7239a24e45228fe288bd0102a738cd03929b67e01a"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/header-dropped-inputs.json",
+      "bytes": 1773001,
+      "sha256": "15093ea7c66708df03102d060bd1cc80b4bd2f9e58bc84565b15d6c543cf2812"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/unknown-restart-inputs.json",
+      "bytes": 1773002,
+      "sha256": "337f28f54e0225a79a5f723f9405d0965b28f962e5d5232b6599a88cc17f7b20"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/mutation-admission.json",
+      "bytes": 2187,
+      "sha256": "1bb616811e39af259e4a754e7a9384d4d444be47befdd456a3cebdf20aee1d98"
+    },
+    {
+      "path": "/private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/restored-inputs.json",
+      "bytes": 1773241,
+      "sha256": "5ca8617f1d2e41a0fb616a998a943a72246dcfe1ec00113f797b492a016d63f0"
+    }
+  ],
+  "limits": [
+    "The canonical test total refers only to related-actions: 226 total, 223 passed and three failed. Invocations overlap and are not summed.",
+    "Original red runs and the prelaunch wrapper rejection are retained. Masked assertions receive no credit.",
+    "Quality remains red: 1,268 duplicate findings, 2,731 dead-code findings and three held P1-02 failures. The whole suite and global coverage were not rerun.",
+    "Session-recovery integration, actual native 30-second timeout expiry, Linux/hosted qualification and formal acceptance remain open.",
+    "Local signed SOFTWARE fixtures and a single-writer JSON oracle do not establish external-provider, authenticated-person or power-loss guarantees.",
+    "Private controls use 307 borrowed dependency-entry links with owned caches. Fresh-clone tests explicitly use the pinned checkout Vitest entry. No whole-node_modules link or universal isolation claim is made.",
+    "Claude work and all user holds, paused P2-02, held P1-06 and P1-01 gaps remain preserved. No PR, push, merge, release, Done claim or baseline adoption occurred."
+  ]
+}

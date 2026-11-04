@@ -1,0 +1,277 @@
+[
+  {
+    "name": "build",
+    "cmd": "npm run -s build",
+    "exit": 0,
+    "durationMs": 66309,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/build.log",
+    "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+    "rawLogBytes": 375
+  },
+  {
+    "name": "focused",
+    "cmd": "npx vitest run --maxWorkers=2 tests/catalog/stations/technology tests/catalog/governance tests/catalog/l0 tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts",
+    "exit": 0,
+    "durationMs": 155853,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/focused.log",
+    "rawLogSha256": "e20f30b9192a5f73a92a6d5e8ee2fff8df8c58669d47f5cc184d975b7b6dfd96",
+    "rawLogBytes": 257
+  },
+  {
+    "name": "typecheck",
+    "cmd": "npm run -s typecheck",
+    "exit": 0,
+    "durationMs": 32920,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck.log",
+    "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rawLogBytes": 0
+  },
+  {
+    "name": "typecheck-tests",
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0,
+    "durationMs": 58247,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck-tests.log",
+    "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rawLogBytes": 0
+  },
+  {
+    "name": "lint",
+    "cmd": "npm run -s lint",
+    "exit": 0,
+    "durationMs": 3775,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/lint.log",
+    "rawLogSha256": "5d3469c1a4b451052f9a639aee3ce8873200f81c167b482841c2591fe909a3a7",
+    "rawLogBytes": 200
+  },
+  {
+    "name": "counts-before-regeneration",
+    "cmd": "npm run -s check:counts",
+    "exit": 1,
+    "durationMs": 1339,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts-before-regeneration.log",
+    "rawLogSha256": "51d3d0bdeaec21cfff43bf9c0840f15f1568823ad60e154648b31bc10327dc6a",
+    "rawLogBytes": 1228
+  },
+  {
+    "name": "gen-counts",
+    "cmd": "node scripts/gen-counts.mjs --write",
+    "exit": 0,
+    "durationMs": 512,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gen-counts.log",
+    "rawLogSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d",
+    "rawLogBytes": 20
+  },
+  {
+    "name": "counts",
+    "cmd": "npm run -s check:counts",
+    "exit": 0,
+    "durationMs": 617,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts.log",
+    "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+    "rawLogBytes": 81
+  },
+  {
+    "name": "docs-drift",
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0,
+    "durationMs": 569,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/docs-drift.log",
+    "rawLogSha256": "e710c18256d5eaaaa99c36d0cccdd671b66287f31affedb127a3e41f5ce3f151",
+    "rawLogBytes": 121
+  },
+  {
+    "name": "industry-guides",
+    "cmd": "npm run -s check:industry-guides",
+    "exit": 0,
+    "durationMs": 598,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/industry-guides.log",
+    "rawLogSha256": "b16dd6d03fd61ab36e7c740d6f27d2f2f9855baf72d88e8fd66a4a86fa49f5a8",
+    "rawLogBytes": 116
+  },
+  {
+    "name": "regulatory-calendar",
+    "cmd": "npm run -s check:regulatory-calendar",
+    "exit": 0,
+    "durationMs": 256,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/regulatory-calendar.log",
+    "rawLogSha256": "644c707ce37eb5bb9d1e8ba2137c4f249ce306f40e373a10b146c75833e16477",
+    "rawLogBytes": 129
+  },
+  {
+    "name": "freeze",
+    "cmd": "pnpm check:freeze -- --base-ref int",
+    "exit": 0,
+    "durationMs": 2567,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/freeze.log",
+    "rawLogSha256": "3442543e9e2f7d6d1fb67318859dc1b47ba17b088d5e565aae2be8f55ff83ae8",
+    "rawLogBytes": 269
+  },
+  {
+    "name": "architecture-boundaries",
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 1871,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/architecture-boundaries.log",
+    "rawLogSha256": "f6f6e7d75450b25128ad7e2048e7ceaaa0282fc8b318ed20d3dc71c3a14dbfc1",
+    "rawLogBytes": 99610
+  },
+  {
+    "name": "gates",
+    "cmd": "npm run -s check:gates",
+    "exit": 0,
+    "durationMs": 324,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gates.log",
+    "rawLogSha256": "33b1524c497f2dc75568122e323116f8e83b882ac9cdd6cc8eefddbc8efbaaa5",
+    "rawLogBytes": 659
+  },
+  {
+    "name": "schemas",
+    "cmd": "npm run -s check:schemas",
+    "exit": 0,
+    "durationMs": 744,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/schemas.log",
+    "rawLogSha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431",
+    "rawLogBytes": 65
+  },
+  {
+    "name": "api-ref",
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0,
+    "durationMs": 224,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/api-ref.log",
+    "rawLogSha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+    "rawLogBytes": 42
+  },
+  {
+    "name": "threat-model",
+    "cmd": "npm run -s check:threat-model",
+    "exit": 0,
+    "durationMs": 263,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/threat-model.log",
+    "rawLogSha256": "7725d3acddc571c57f01d4fb9aa7de921d9055cd621828093e80ba416790f6d4",
+    "rawLogBytes": 113
+  },
+  {
+    "name": "citations",
+    "cmd": "npm run -s check:citations",
+    "exit": 0,
+    "durationMs": 417,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/citations.log",
+    "rawLogSha256": "81f675216150883385813ad7802c2768d1c1f0f6b7f1c24356bddc993fef8fdb",
+    "rawLogBytes": 373
+  },
+  {
+    "name": "qualification",
+    "cmd": "npm run -s check:qualification",
+    "exit": 0,
+    "durationMs": 479,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/qualification.log",
+    "rawLogSha256": "936bfa0dcdc0d073bd3cbd657d72b877df71c8e40b076ddb2f497149299135a5",
+    "rawLogBytes": 65
+  },
+  {
+    "name": "release-notes",
+    "cmd": "npm run -s release:notes -- --check",
+    "exit": 0,
+    "durationMs": 226,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/release-notes.log",
+    "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rawLogBytes": 0
+  },
+  {
+    "name": "catalog-currency",
+    "cmd": "npm run -s check:catalog-currency",
+    "exit": 0,
+    "durationMs": 426,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-currency.log",
+    "rawLogSha256": "a6563dbac4458bd80e8501d462db8933ae2dff86c0adbceec2eddf9dec3a7e9f",
+    "rawLogBytes": 161
+  },
+  {
+    "name": "catalog-changelog",
+    "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+    "exit": 0,
+    "durationMs": 1756,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog.log",
+    "rawLogSha256": "4c67296e329de17150f3bebfae70062890cec219736829735065ec694167e54e",
+    "rawLogBytes": 146
+  },
+  {
+    "name": "catalog-changelog-main",
+    "cmd": "node scripts/check-catalog-changelog.mjs",
+    "exit": 1,
+    "durationMs": 661,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog-main-authoritative-ref.log",
+    "rawLogSha256": "4e2d124fb2714e23e44e7704785020c5ba76be7417eaa36923cdef52d0ca5cd9",
+    "rawLogBytes": 6921,
+    "baseRefAtExecution": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "priorAttempts": [
+      {
+        "name": "catalog-changelog-main",
+        "cmd": "node scripts/check-catalog-changelog.mjs",
+        "exit": 1,
+        "durationMs": 509,
+        "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog-main.log",
+        "rawLogSha256": "4e2d124fb2714e23e44e7704785020c5ba76be7417eaa36923cdef52d0ca5cd9",
+        "rawLogBytes": 6921,
+        "baseRefAtExecution": "ebfa106dc45a853fc15f36e8d5312b499fc01806"
+      }
+    ],
+    "refCorrection": "Mirrors Claude clone refs/remotes/origin/main; no product bytes or HEAD changed."
+  },
+  {
+    "name": "duplicates",
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0,
+    "durationMs": 786,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/duplicates.log",
+    "rawLogSha256": "28e2d0a990960444589213e32c4bacac4bedaf3e4a99528b4056150b51b6c413",
+    "rawLogBytes": 193
+  },
+  {
+    "name": "dead-code",
+    "cmd": "npm run -s check:dead-code",
+    "exit": 0,
+    "durationMs": 3967,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/dead-code.log",
+    "rawLogSha256": "62eca6905fd2f3ea53a92c2c219301b579da81e38dd504f87565e50cbbef4fea",
+    "rawLogBytes": 192
+  },
+  {
+    "name": "clean-source",
+    "cmd": "npm run -s check:clean-source",
+    "exit": 0,
+    "durationMs": 134333,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/clean-source.log",
+    "rawLogSha256": "625f105b746407a8a370952e016771ec9cc83f909bff74135947cf94cf7beddc",
+    "rawLogBytes": 791
+  }
+]

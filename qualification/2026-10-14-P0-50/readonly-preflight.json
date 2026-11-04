@@ -1,0 +1,291 @@
+{
+  "task": "P0-50 read-only queue preparation",
+  "createdAt": "2026-10-14T13:57:24.473869+00:00",
+  "activeImplementation": "P0-47 remains active; this preparation does not start P0-50 implementation",
+  "primarySource": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "p047CommittedSource": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "p047Workspace": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass",
+  "p047StatusObserved": "?? qualification/2026-10-14-P0-47/",
+  "comparedFiles": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "bytes": 14111,
+      "acceptedMainSha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "acceptedMainBlob": "faf724e45b4ff26e8a931924cd9efce23e01d9e0",
+      "candidateCommitSha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "candidateWorkingSha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "candidateCommitEqualsAcceptedMain": true,
+      "candidateWorkingEqualsAcceptedMain": true
+    },
+    {
+      "path": "scripts/release-gate.mjs",
+      "bytes": 17338,
+      "acceptedMainSha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+      "acceptedMainBlob": "63a0cecf10156a3b5d22a56a1cad8742494fafa0",
+      "candidateCommitSha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+      "candidateWorkingSha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+      "candidateCommitEqualsAcceptedMain": true,
+      "candidateWorkingEqualsAcceptedMain": true
+    },
+    {
+      "path": "package.json",
+      "bytes": 8631,
+      "acceptedMainSha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "acceptedMainBlob": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+      "candidateCommitSha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "candidateWorkingSha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "candidateCommitEqualsAcceptedMain": true,
+      "candidateWorkingEqualsAcceptedMain": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "bytes": 155432,
+      "acceptedMainSha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "acceptedMainBlob": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+      "candidateCommitSha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "candidateWorkingSha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "candidateCommitEqualsAcceptedMain": true,
+      "candidateWorkingEqualsAcceptedMain": true
+    },
+    {
+      "path": "docs/NATIVE_MCP.md",
+      "bytes": 14137,
+      "acceptedMainSha256": "253a2fad4f35f1229f5c59eea3bb1f47d7b6c0def3c77cfca454d0a586187587",
+      "acceptedMainBlob": "5a4119ae7ec529896bbb5b25d8d24d79beb08b5d",
+      "candidateCommitSha256": "253a2fad4f35f1229f5c59eea3bb1f47d7b6c0def3c77cfca454d0a586187587",
+      "candidateWorkingSha256": "253a2fad4f35f1229f5c59eea3bb1f47d7b6c0def3c77cfca454d0a586187587",
+      "candidateCommitEqualsAcceptedMain": true,
+      "candidateWorkingEqualsAcceptedMain": true
+    },
+    {
+      "path": ".changeset/mcp-sdk-oauth-advisory.md",
+      "bytes": 375,
+      "acceptedMainSha256": "8d510ed5b9f29ab0ba60c8fceb677648dbaae413389c6f14caecf0b3df4d4a9b",
+      "acceptedMainBlob": "862b8d2f103571ddbfa4c7f120b28abf73c217d6",
+      "candidateCommitSha256": "8d510ed5b9f29ab0ba60c8fceb677648dbaae413389c6f14caecf0b3df4d4a9b",
+      "candidateWorkingSha256": "8d510ed5b9f29ab0ba60c8fceb677648dbaae413389c6f14caecf0b3df4d4a9b",
+      "candidateCommitEqualsAcceptedMain": true,
+      "candidateWorkingEqualsAcceptedMain": true
+    }
+  ],
+  "mergedAcceptance": {
+    "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/50",
+    "number": 50,
+    "title": "[P0-50] Move @modelcontextprotocol/sdk past GHSA-6qxp-vccf-f47h (high)",
+    "mergedAt": "2026-10-06T19:04:37Z",
+    "mergeCommit": "e680f2a6098b53c665b7f2ee7e738c2f05f24984",
+    "issueCommit": "561f97f2c10b56a653260ad84df5881cfbcd4e78",
+    "stackedIntegrationHead": "9c0835b7",
+    "historicalChecked": [
+      "audit:runtime reported no known vulnerabilities",
+      "typecheck, build, check:package, check:third-party-notices, check:vendor-links, check:freeze, check:docs-drift",
+      "Parity and MCP tests: 7,209 tests across 33 files",
+      "Four focused MCP files: 47/47 tests"
+    ],
+    "explicitUnchecked": [
+      "Full ci.yml plus release:gate on the merged integration (orchestrator)"
+    ],
+    "historicalCheckedAreFreshQualification": false
+  },
+  "currentDependency": {
+    "range": "^1.31.0",
+    "resolved": "1.32.1(zod@4.4.3)",
+    "installedVersionFromEarlierOwnedFixture": "1.32.1",
+    "samePackageAndLockAsAudit": true,
+    "d15Rows": [
+      {
+        "path": "package.json",
+        "issue": "P0-09",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-09/package.json.landed",
+        "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc"
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "issue": "P0-49",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+        "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
+      }
+    ],
+    "note": "Previously verified P0-09 package and P0-49 lock archives preserve the first D-15 registration; no snapshot replacement is implied."
+  },
+  "advisoryPrimarySource": {
+    "url": "https://github.com/advisories/GHSA-6qxp-vccf-f47h",
+    "retrievedDate": "2026-10-14",
+    "id": "GHSA-6qxp-vccf-f47h",
+    "cve": "CVE-2026-104850",
+    "severity": "high",
+    "sdkAffected": ">=1.12.0 <1.31.0",
+    "sdkPatched": "1.31.0",
+    "firstPublished": "2026-09-30",
+    "githubDatabasePublished": "2026-10-06",
+    "currentMetadataCaveat": "Official advisory describes extra expectedIssuer and persisted-issuer requirements for SDK OAuth providers. A patched dependency and passing audit alone do not prove application credential routing. AMC native HTTP source explicitly omits SDK authProvider; documentation describes AMC-owned OAuth, not exercised here."
+  },
+  "releaseCiSource": {
+    "allComparedFilesEqual": true,
+    "ciJobs": [
+      "changeset",
+      "build-test",
+      "e2e-smoke-local",
+      "clean-source",
+      "packed-install",
+      "docker-smoke",
+      "helm-lint-template",
+      "security-scan-lite"
+    ],
+    "nodeMatrix": [
+      "22",
+      "24"
+    ],
+    "fullSuiteWithCoveragePresent": true,
+    "ciDirectReleaseGateInvocationPresent": false,
+    "runtimeAuditStepPresent": true,
+    "fullSuiteTimeoutMs": 900000,
+    "runtimeAuditTimeoutMs": 120000,
+    "auditCommand": "pnpm audit --prod --audit-level moderate",
+    "note": "CI and release gate require independent receipts; unchanged source does not supply their outcomes."
+  },
+  "historicalInstalledReceipts": [
+    {
+      "directory": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance",
+      "readme": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/README.md",
+      "summary": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/final-summary.json",
+      "summarySha256": "87054695c25515d42a44096fd422ea149a22fb76d0a1f06adab416dbba8944b7",
+      "receipt": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-mcp-acceptance/attempt2/receipt.json",
+      "receiptSha256": "79886a3a26bb3b489a8c9ea4139290fa3557c78cf1a42d8862b037b784fa4532",
+      "matchesRecordedReceiptHash": true,
+      "ok": true,
+      "sourceRevision": "90855cf7324ccaa710e7b82f3ab75036e89cf0b8",
+      "artifactSha256": "9cff98d81cf38225b2ca3e148ba02d17578969501aefd3adcfabe84b78f33578",
+      "node": "v22.22.0",
+      "platform": "darwin",
+      "date": "2026-09-08T15:25:44.091Z",
+      "checkCount": 10,
+      "commands": 29,
+      "limits": [
+        "Scripted local provider and stdio fixture; no live model, external service or OS confinement claim.",
+        "Pinned catalog proves the advertised contract; the local program remains operator-trusted.",
+        "Only stdio and macOS ARM64 Node22 qualified; other transport/platform combinations remain separate."
+      ],
+      "label": "Historical installed conformance for earlier source; not current dependency qualification"
+    },
+    {
+      "directory": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance",
+      "readme": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/README.md",
+      "summary": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/final-summary.json",
+      "summarySha256": "4d5f5d23375e428888e42b55a31d311318688e9b4e523643e4d02b41be56be25",
+      "receipt": "/Users/sid/AgentMaturityCompass/AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/attempt3/artifacts/receipt.json",
+      "receiptSha256": "4d6f3bdfa02a621003049ea69337ab688f9457149b77a89e4794afaff7060104",
+      "matchesRecordedReceiptHash": true,
+      "ok": true,
+      "sourceRevision": "0af82e28572b325bae9389275b4904f2fca5b087",
+      "artifactSha256": "ef091fc5af4be28ff7ae274d9a49dc411c97290cd88dd9c960777ad3a7c624fa",
+      "node": "v22.22.0",
+      "platform": "Darwin ARM64",
+      "date": "2026-09-08",
+      "checkCount": 15,
+      "commands": 36,
+      "limits": [
+        "Scripted local Responses provider and real loopback Streamable HTTP/SSE fixture; no live model or external vendor.",
+        "HTTPS validation is source-tested; this installed lane uses explicitly permitted loopback HTTP, not live TLS or OAuth.",
+        "Pinned catalog is a reviewed advertised contract, not proof of remote implementation behavior.",
+        "Cancellation proves local disposal and fixture DELETE, not reversal of a remote committed side effect.",
+        "macOS ARM64 Node22; other platforms and HTTP server implementations remain separate."
+      ],
+      "label": "Historical installed conformance for earlier source; not current dependency qualification"
+    }
+  ],
+  "trackedDedicatedP050Receipts": [],
+  "currentNarrowEvidence": {
+    "priorAuditReceipt": "/private/tmp/p0-49-audit-command-20261014.json",
+    "rawAudit": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-readonly-preflight-20261014/production-audit.json",
+    "auditSource": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+    "startedAt": "2026-10-14T13:47:05.919652+00:00",
+    "elapsedSeconds": 0.915,
+    "exitCode": 0,
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0
+      },
+      "dependencies": 192,
+      "devDependencies": 0,
+      "optionalDependencies": 0,
+      "totalDependencies": 192
+    },
+    "auditSourceInputsEqualAcceptedMain": true,
+    "scope": "Existing same-input production audit reused; no fresh command run for P0-50",
+    "priorLinkedParity": {
+      "sourceSHA": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+      "receipt": "/private/tmp/p0-47-node24-repaired-results-20261014.json",
+      "success": true,
+      "files": 26,
+      "counts": {
+        "numTotalTestSuites": 382,
+        "numPassedTestSuites": 382,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 7118,
+        "numPassedTests": 7118,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "helperManifest": [
+        {
+          "file": "tests/planEditsManifest.test.ts",
+          "status": "passed",
+          "assertionCounts": {
+            "passed": 16,
+            "failed": 0,
+            "pending": 0,
+            "skipped": 0,
+            "todo": 0
+          }
+        }
+      ],
+      "label": "Earlier P0-47 Node24 scoped parity evidence includes current D-15/archive tests; this preflight did not rerun tests and it is not full P0-49 qualification."
+    },
+    "focusedMcpFilesInEarlier26Corpus": {
+      "tests/nativeMcpHttp.test.ts": false,
+      "tests/nativeMcpClient.test.ts": false,
+      "tests/reconciliationDefectsMcp.test.ts": false,
+      "tests/reconciliationDefectsMcpHttp.test.ts": false
+    }
+  },
+  "sourceScopeEvidence": [
+    {
+      "path": "src/mcp/nativeMcpHttpTransport.ts",
+      "lines": "175-180",
+      "observation": "SDK transport constructed with pinned fetch and no authProvider; no SDK OAuth enrollment through this wrapper"
+    },
+    {
+      "path": "docs/NATIVE_MCP.md",
+      "lines": "docs text verified at committed source",
+      "observation": "Documentation explicitly identifies installed HTTP acceptance on SDK1.30.0 and limits it to loopback HTTP/SSE. That receipt predates the current protocol and OAuth implementations; no new installed qualification was performed here."
+    }
+  ],
+  "acceptanceDebt": [
+    "Explicit full ci.yml + release:gate checkbox is unchecked in merged PR50 and cannot be closed from its checked historical claims.",
+    "No tracked qualification/P0-50 receipt was found. Earlier installed MCP receipt hashes validate, but both sources predate this dependency edit; HTTP acceptance ran on SDK1.30.0 and excludes OAuth/live TLS.",
+    "P0-47 broad current-source qualification remains active; no final passing receipt is asserted here. Its eventual evidence must name exact source and report actual gate outcomes.",
+    "The earlier 26-file P0-47 Node24 corpus did not contain the four explicitly named MCP test files; historical 47/47 cannot substitute for a fresh current-source outcome.",
+    "Same-input current production audit verifies the dependency catalog narrowly; OAuth application behavior, installed transport and complete release/CI qualification remain separate proof."
+  ],
+  "dependencies": [
+    "P0-47 D-15/provenance tooling and passing acceptance boundary",
+    "P0-49 proxy-addr override remains required so production audit is clean",
+    "PR50 was historically stacked on integration #46/#47/#49; current source already contains the merged dependency fix"
+  ],
+  "limitations": [
+    "Read-only preparation only",
+    "No commands in Node24 fixture",
+    "No edits, tests, build, installs, workflow triggers, publication or tracker changes",
+    "Historical original files and all earlier receipts preserved"
+  ],
+  "primaryStatusAfter": ""
+}

@@ -149,6 +149,11 @@ function latestTypedMultiAgentGraphPath(workspace: string): string {
   return join(graphRoot(workspace), "latest.json");
 }
 
+/** The newest graph naming this agent on a node: what the agent's Enforce manifest records (latest.json is the fleet's view). */
+export function agentTypedMultiAgentGraphPath(workspace: string, agentId: string): string {
+  return join(graphRoot(workspace), agentId, "latest.json");
+}
+
 function typedMultiAgentGraphPath(workspace: string, graphId: string): string {
   return join(graphRoot(workspace), `${graphId}.json`);
 }
@@ -381,6 +386,11 @@ export function writeTypedMultiAgentGraph(input: {
   const latestPath = latestTypedMultiAgentGraphPath(input.workspace);
   const payload = `${JSON.stringify(graph, null, 2)}\n`;
   writeFileAtomic(graphPath, payload, 0o644);
+  // Only the agents the graph names: another agent's manifest keeps its own graph (fleet agent ids are [a-z0-9_-]).
+  for (const agentId of new Set(graph.nodes.flatMap((node) => node.agentId !== undefined && /^[a-z0-9_-]+$/.test(node.agentId) ? [node.agentId] : []))) {
+    ensureDir(join(graphRoot(input.workspace), agentId));
+    writeFileAtomic(agentTypedMultiAgentGraphPath(input.workspace, agentId), payload, 0o644);
+  }
   writeFileAtomic(latestPath, payload, 0o644);
   return {
     graph,

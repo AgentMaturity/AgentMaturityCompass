@@ -1,0 +1,15 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-MON-02",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "incident_clocks",
+    "station": "wealth",
+    "events": []
+  },
+  "expected": {
+    "result": "pass",
+    "reasonCode": null
+  }
+}

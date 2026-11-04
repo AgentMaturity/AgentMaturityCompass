@@ -6,7 +6,8 @@
  * frameworks, with each framework's claim kind and five status dimensions.
  */
 
-import { complianceFrameworkFamilies, type ComplianceFramework, type ComplianceFrameworkFamily } from "./frameworks.js";
+import { complianceFrameworkFamilies, familyReview, type ComplianceFramework, type ComplianceFrameworkFamily, type FamilyReview } from "./frameworks.js";
+import { EXPERIMENTAL_LINE } from "./complianceReport.js";
 import { generateComplianceReport } from "./complianceEngine.js";
 import type { ComplianceCategoryResult, ComplianceReportJson } from "./mappingSchema.js";
 import { envelopeForAggregate, envelopeForComplianceReport, envelopeForUnverifiedResult } from "../claims/eligibility/adapters/results.js";
@@ -31,6 +32,8 @@ export interface FrameworkCoverage {
   categories: ComplianceCategoryResult[];
   /** The framework report's claim: no more than its weakest category. */
   claim: ClaimEnvelope;
+  /** Experimental until a named expert signs off, with the family's currency flags (P1-45). */
+  familyReview: FamilyReview;
 }
 
 export interface ComplianceCoverageMatrix {
@@ -103,9 +106,11 @@ export function generateCoverageMatrix(params: {
         missing: report.coverage.missing,
         unknown: report.coverage.unknown,
         notEvaluated: report.coverage.notEvaluated,
-        total: report.categories.length,
+        // A descoped category is listed but not counted (P1-45).
+        total: report.categories.filter((cat) => cat.descoped === undefined).length,
         categories: report.categories,
         claim: envelopeForComplianceReport(report, report.ts),
+        familyReview: familyReview(fw),
       });
 
       for (const cat of report.categories) {
@@ -134,6 +139,7 @@ export function generateCoverageMatrix(params: {
         total: 0,
         categories: [],
         claim: envelopeForUnverifiedResult({ producer: `compliance:${fw}`, recordCount: 0, regulated: true, now: Date.now() }),
+        familyReview: familyReview(fw),
       });
     }
   }
@@ -188,6 +194,13 @@ export function renderCoverageMatrixMarkdown(matrix: ComplianceCoverageMatrix): 
   lines.push("|-----------|-------|--------|--------|---------------|-------|-------|");
   for (const fw of matrix.frameworks) {
     lines.push(`| ${fw.displayName} | ${pctText(fw.score)} | ${fw.satisfied} | ${fw.missing} | ${fw.notEvaluated} | ${fw.total} | ${fw.claim.claimKind} |`);
+  }
+  lines.push("");
+  lines.push("## Mapping status");
+  lines.push("");
+  for (const fw of matrix.frameworks) {
+    lines.push(`- ${fw.displayName}: ${fw.familyReview.status === "experimental" ? EXPERIMENTAL_LINE : fw.familyReview.status}`);
+    for (const flag of fw.familyReview.flags) lines.push(`  - Flag: ${flag}`);
   }
   lines.push("");
   lines.push("## Framework Claims");

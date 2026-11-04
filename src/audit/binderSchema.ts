@@ -1,4 +1,6 @@
+import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
+import { evidenceCoverageSchema } from "../bench/benchSchema.js";
 import { auditFamilyResultSchema } from "./auditMapSchema.js";
 import { conformanceStatusSchema } from "../domains/conformance/conformanceSchema.js";
 
@@ -9,15 +11,12 @@ export const binderScopeSchema = z.object({
 
 export const binderSectionStatusSchema = z.enum(["OK", "INSUFFICIENT_EVIDENCE"]);
 
+/** A trust signal AMC did not measure (no trusted run or scorecard, no receipted trace) is null, never 0. */
 export const binderTrustSchema = z.object({
-  integrityIndex: z.number().min(0).max(1),
-  correlationRatio: z.number().min(0).max(1),
+  integrityIndex: z.number().min(0).max(1).nullable(),
+  correlationRatio: z.number().min(0).max(1).nullable(),
   trustLabel: z.enum(["LOW", "MEDIUM", "HIGH"]),
-  evidenceCoverage: z.object({
-    observedShare: z.number().min(0).max(1),
-    attestedShare: z.number().min(0).max(1),
-    selfReportedShare: z.number().min(0).max(1)
-  }),
+  evidenceCoverage: evidenceCoverageSchema,
   notary: z.object({
     enabled: z.boolean(),
     fingerprint: z.string().nullable().optional(),
@@ -124,21 +123,7 @@ export const binderSignatureSchema = z.object({
   signature: z.string().min(1),
   signedTs: z.number().int(),
   signer: z.literal("auditor"),
-  envelope: z
-    .object({
-      v: z.literal(1),
-      alg: z.literal("ed25519"),
-      pubkeyB64: z.string().min(1),
-      fingerprint: z.string().length(64),
-      sigB64: z.string().min(1),
-      signedTs: z.number().int(),
-      signer: z.object({
-        type: z.enum(["VAULT", "NOTARY"]),
-        attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-        notaryFingerprint: z.string().length(64).optional()
-      })
-    })
-    .optional()
+  envelope: signatureEnvelopeSchema.optional()
 });
 
 export const binderPiiFindingSchema = z.object({

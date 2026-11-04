@@ -11,14 +11,14 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { randomBytes } from "node:crypto";
 import { join } from "node:path";
-import { z, ZodError } from "zod";
+import { z } from "zod";
 import { approvalDecisionSchema, approvalRequestBindingDigest } from "../approvals/approvalChainStore.js";
 import { loadApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
-import { apiError, apiSuccess, isRequestBodyError } from "../api/apiHelpers.js";
+import { apiSuccess } from "../api/apiHelpers.js";
 import type { NativeTaskApiContext } from "../api/nativeTasksRouter.js";
 import { envelopeForUnboundResult } from "../claims/eligibility/adapters.js";
-import { eventMeta } from "../claims/evidenceProvenance.js";
+import type { ClaimEnvelope } from "../claims/eligibility/types.js";
 import { signingRoute } from "../crypto/signing/signer.js";
 import { getAgentPaths } from "../fleet/paths.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
@@ -29,24 +29,34 @@ import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
 import { conformanceView } from "./a4Conformance.js";
 import { A4BlobError, getPrivate } from "./a4Blobs.js";
+import { eraseProjectPrivate } from "./a4Erasure.js";
+import { liveLedgerRowAgent } from "./a4Evidence.js";
+import { LEDGER_BACKEND_INCOMPLETE_MESSAGE, ledgerBackendGap } from "./a4LedgerBackend.js";
 import { A4_EVENT_WINDOW, a4Events } from "./a4Events.js";
 import {
-  acknowledgeItem, assertAllowed, autoHold, changeGatePolicy, evaluateFor, holdProject, loadA4State, reopenStage, requestGate, resumeProject, retireProject,
-  tuneProject, type A4Call
+  acknowledgeItem, assertAllowed, autoHold, changeGatePolicy, evaluateFor, holdProject, loadA4State, reopenStage, requestGateAsync, resumeProject, retireProject,
+  resolvedRevisionOf, signedA4Floor, storedSpecOf, tuneProject, type A4Call
 } from "./a4Gates.js";
+import { captureA4RequestActor, gateRequestActor } from "./a4TransitionSigning.js";
 import { memberCandidates, resolveA4Principal } from "./a4Identity.js";
 import { A4_PRESENCE_TTL_MS, presenceOf, touchPresence } from "./a4Presence.js";
-import { gateStatus, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
+import { gateStatus, isRegulated, type A4Action, type A4ReadinessState } from "./a4Readiness.js";
+import { monitorView } from "./a4Monitor.js";
+import { valueView } from "./a4Value.js";
 import { handleA4ReleaseRoute } from "./a4RouterReleases.js";
+import { assertTuneMechanicPlan } from "./a4Mechanic.js";
 import { handleA4StageRoute, STAGE_QUESTIONS } from "./a4RouterStages.js";
 import {
-  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, type A4Member, type A4Principal,
-  type A4ProjectRow, type A4Stage
+  A4_GATES, A4_PROJECT_ROLES, A4_REF_KINDS, A4_STAGES, A4_STEPS, a4GatePolicyV1Schema, a4PreviewEnabled, clientRequestIdSchema, headSeqSchema, reasonSchema,
+  type A4Member, type A4Principal, type A4ProjectRow, type A4ProjectV1, type A4Stage
 } from "./a4Schema.js";
 import { A4_REQUEST_WINDOW_MS, A4StoreError, openA4Store, refreshVolatileFacts, type A4RequestKey, type A4Store, type A4TransitionResult } from "./a4Store.js";
 import { verifyA4Chain } from "./a4Verify.js";
+export { A4_API_PREFIX, A4_UNPARSED_RECORD, sendA4Error } from "./a4RouterError.js";
+import { A4_API_PREFIX, sendA4Error } from "./a4RouterError.js";
+import { currentRelease } from "./spec/activate.js";
+import { witnessA4Project } from "../transparency/configWitness.js";
 
-export const A4_API_PREFIX = "/api/v1/a4";
 const BODY_LIMIT = 1024 * 1024;
 const SPEC_LIMIT = 256 * 1024;
 const PROJECT_PATH = /^\/projects\/(a4p_[0-9a-f]{32})(\/.*)?$/;
@@ -54,11 +64,16 @@ const PROJECT_PATH = /^\/projects\/(a4p_[0-9a-f]{32})(\/.*)?$/;
 const IDENTITY_FIELDS = ["userId", "roles", "approver", "author", "approved", "approvalId", "token"];
 
 
-/** One admitted request. `principal` is null for the bootstrap admin token, which reads and does nothing else. */
+/**
+ * One admitted request. `principal` is null for the bootstrap admin token, which reads and does nothing else. `native`
+ * is Studio's native task service; an in-process caller (the CLI, P1-65) has none, so Assemble's build sessions refuse there.
+ */
 export interface A4Route {
   readonly workspace: string;
+  readonly assertAuthority?: () => void;
+  readonly assertGateRequestCurrent?: () => void;
   readonly store: A4Store;
-  readonly native: NativeTaskApiContext;
+  readonly native?: NativeTaskApiContext;
   readonly principal: A4Principal | null;
   readonly pathname: string;
   readonly method: "GET" | "POST";
@@ -71,10 +86,6 @@ export function a4Fail(status: number, code: string, message: string, detail?: u
   return new A4StoreError(status, code, message, detail);
 }
 
-const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
-const headSeqSchema = z.number().int().min(0);
-const reasonSchema = z.string().trim().min(1).max(2000);
-
 /** Every supported query parameter, once; anything else is 400 (proxies and the server must read one URL alike). */
 export function assertQuery(params: URLSearchParams, allowed: readonly string[]): void {
   if ([...params.keys()].some((key) => !allowed.includes(key) || params.getAll(key).length !== 1)) {
@@ -84,9 +95,9 @@ export function assertQuery(params: URLSearchParams, allowed: readonly string[])
 
 /**
  * A client value (body, path segment, query parameter) parsed against `schema`: 400 INPUT_INVALID on a mismatch. Any
- * other ZodError is a stored row that no longer parses, which sendError reports as an integrity failure.
+ * other ZodError is a stored row that no longer parses, which sendA4Error reports as an integrity failure.
  */
-export function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
+function parseInput<S extends z.ZodType>(schema: S, value: unknown, what = "body"): z.output<S> {
   const parsed = schema.safeParse(value);
   if (parsed.success) return parsed.data;
   const issue = parsed.error.issues[0];
@@ -227,40 +238,13 @@ export function precheck(route: A4Route, projectId: string, action: A4Action, ex
   return state;
 }
 
-function sendError(res: ServerResponse, error: unknown, projectId: string | null): void {
-  if (isRequestBodyError(error)) return apiError(res, error.statusCode, error.message);
-  const send = (status: number, code: string, message: string, extra: Record<string, unknown> = {}): void => {
-    if (res.headersSent) return;
-    res.writeHead(status, { "Content-Type": "application/json", "cache-control": "no-store" });
-    res.end(JSON.stringify({ ok: false, error: message, code, ...extra }));
-  };
-  if (error instanceof ZodError) {
-    // Client input is parsed through parseInput (400); a ZodError here is a stored row or record that does not parse.
-    const issue = error.issues[0];
-    return send(409, "A4_INTEGRITY_FAILED", `A stored A4 record does not parse${issue ? ` (${issue.path.join(".") || "row"}: ${issue.message})` : ""}.`);
-  }
-  if (error instanceof A4StoreError) {
-    const stale = error.code === "A4_STALE_HEAD" && projectId !== null
-      ? { head: error.detail ?? null, diff: `${A4_API_PREFIX}/projects/${projectId}/transitions` } : {};
-    return send(error.status, error.code, error.message, { ...(error.detail === undefined ? {} : { detail: error.detail }), ...stale });
-  }
-  if (error instanceof A4BlobError) {
-    return send(error.code === "VAULT_LOCKED" ? 423 : error.code === "SECRET_SCAN_REFUSED" ? 400 : 409, error.code, error.message);
-  }
-  const text = error instanceof Error ? error.message : String(error);
-  const tagged = error as { status?: unknown; code?: unknown };
-  if (typeof tagged.status === "number" && typeof tagged.code === "string") return send(tagged.status, tagged.code, text);
-  if (/blocked in agent mode/.test(text)) return send(403, "AGENT_MODE", text);
-  if (/vault locked/i.test(text)) return send(423, "A4_VAULT_LOCKED", "Unlock the vault to record this.");
-  send(500, "A4_INTERNAL", "The A4 request could not be completed; reload the project before retrying.");
-}
-
 /** A result body that claims nothing: its own unbound envelope, so the wrapper repeats it (one claim per result). */
 export function unboundClaim(projectId: string, what: string, regulated: boolean) {
   return envelopeForUnboundResult({ producer: `a4:${projectId}:${what}`, method: "human_review", regulated, now: Date.now() });
 }
 
-const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness: { status: string; bindingDigest: string } | null) => ({
+/** `amc.a4-project/v1`: the head, the current members and the readiness summary (this router's and the MCP tools' project view). */
+export const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness: A4ProjectV1["readiness"]): A4ProjectV1 => ({
   schema: "amc.a4-project/v1", projectId: row.project_id, workspaceId: row.workspace_id, agentId: row.agent_id, name: row.name, stage: row.stage,
   step: row.step, hold: row.hold === 1, holdReason: row.hold_reason, revisionNo: row.revision_no, headSeq: row.head_seq, headDigest: row.head_digest,
   deployedReleaseId: row.deployed_release_id, baseReleaseId: row.base_release_id, createdByKey: row.created_by_key, createdTs: row.created_ts,
@@ -269,7 +253,7 @@ const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness:
 
 const createSchema = z.strictObject({
   clientRequestId: clientRequestIdSchema,
-  name: z.string().trim().min(1).max(200),
+  name: z.string().trim().min(1).max(200).refine((value) => !/[\x00-\x1f\x7f-\x9f]/.test(value), "The project name cannot contain control characters."),
   agentId: z.string().regex(/^[a-z0-9][a-z0-9_-]{0,127}$/, "Choose a valid agent ID.").optional(),
   archetype: z.string().trim().min(1).max(128).optional(),
   expertise: z.enum(["novice", "practitioner", "expert"])
@@ -284,7 +268,11 @@ async function createProject(route: A4Route): Promise<void> {
   const principal = requirePrincipal(route);
   const { body, request } = await readJson(route, createSchema);
   const replay = priorReplay(route.store, request, null);
-  if (replay) return apiSuccess(route.res, replay);
+  // A replay completes the creation witness a crash after the commit left unwritten (idempotent per project).
+  if (replay) {
+    witnessA4Project(route.workspace, replay.agentId, replay.projectId, replay.bodyDigest);
+    return apiSuccess(route.res, replay);
+  }
   assertNoSecrets({ name: body.name, archetype: body.archetype ?? null }, "The project name");
   const slug = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 40) || "agent";
   const agentId = body.agentId ?? `${slug}-${randomBytes(3).toString("hex")}`;
@@ -319,9 +307,10 @@ function options(route: A4Route): void {
     schema: "amc.a4-options/v1", previewEnabled: true, stages: A4_STAGES, steps: A4_STEPS, gates: A4_GATES, projectRoles: A4_PROJECT_ROLES,
     refKinds: A4_REF_KINDS, expertise: ["novice", "practitioner", "expert"], questions: STAGE_QUESTIONS,
     limits: { eventWindow: A4_EVENT_WINDOW, presenceTtlMs: A4_PRESENCE_TTL_MS, requestWindowMs: A4_REQUEST_WINDOW_MS, bodyBytes: BODY_LIMIT },
-    workspace: { signingRoute: route_, readOnly: !route.native.executionAllowed() },
-    // Supported integration paths arrive with Assemble (P1-60); the running image digest with the bootstrap report.
-    integrationClaims: [], imageDigest: null
+    workspace: { signingRoute: route_, readOnly: route.native?.executionAllowed() !== true },
+    // Supported integration paths arrive with Assemble (P1-60). The running image digest would come from the bootstrap
+    // report (never studioServer.ts); runBootstrap records none, so it is null with its reason (P1-62).
+    integrationClaims: [], imageDigest: null, imageDigestReason: "the bootstrap report records no image digest, so A4's prepared files pin the image by tag (IMAGE_TAG_ONLY)"
   });
 }
 
@@ -361,7 +350,9 @@ const membersSchema = z.strictObject({
 });
 const commentSchema = z.strictObject({
   body: z.string().trim().min(1).max(16_384), cardId: z.string().regex(/^[A-Za-z0-9_.:-]{1,128}$/),
-  inReplyTo: z.string().regex(/^a4c_[0-9a-f]{32}$/).nullable().optional(), clientRequestId: clientRequestIdSchema
+  inReplyTo: z.string().regex(/^a4c_[0-9a-f]{32}$/).nullable().optional(), clientRequestId: clientRequestIdSchema,
+  // The surface the comment came through, as its sender states it (self-reported): the console sends none, amc_a4_comment "mcp".
+  via: z.enum(["studio", "mcp"]).default("studio")
 });
 const evidenceSchema = z.strictObject({
   refKind: z.enum(A4_REF_KINDS), refId: z.string().min(1).max(512), sha256: z.string().regex(/^[0-9a-f]{64}$/),
@@ -374,6 +365,7 @@ const OWNER_SCHEMAS = {
   reopen: z.strictObject({ ...ownerBase, toStage: z.enum(A4_STAGES) }),
   tune: z.strictObject({ ...ownerBase, capabilityChange: z.boolean(), mechanicPlanId: z.string().min(1).max(200).optional() }),
   retire: z.strictObject({ ...ownerBase, acceptanceNote: z.string().trim().min(1).max(2000).optional() }),
+  erase: z.strictObject(ownerBase),
   acknowledge: z.strictObject({ ...ownerBase, itemId: z.string().min(1).max(128), stage: z.enum(A4_STAGES).optional() })
 } as const;
 const gatePolicySchema = z.union([
@@ -383,11 +375,11 @@ const gatePolicySchema = z.union([
 
 /** Answers a recorded request, or runs `write` and answers its result. */
 async function mutate<S extends z.ZodType>(route: A4Route, projectId: string, schema: S,
-  write: (body: z.output<S>, request: A4RequestKey | undefined) => A4TransitionResult, status = 200): Promise<true> {
+  write: (body: z.output<S>, request: A4RequestKey | undefined) => A4TransitionResult | Promise<A4TransitionResult>, status = 200): Promise<true> {
   const { body, request } = await readJson(route, schema);
   const replay = priorReplay(route.store, request, projectId);
   if (replay) apiSuccess(route.res, replay);
-  else apiSuccess(route.res, mutationResult(write(body, request)), status);
+  else apiSuccess(route.res, mutationResult(await write(body, request)), status);
   return true;
 }
 
@@ -415,7 +407,7 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
       // Read roles plus membership: an APPROVER-only or AUDITOR member can discuss without being granted OPERATOR.
       return mutate(route, projectId, commentSchema, (body, request) => {
         assertVisible(route, store.membersOf(projectId));
-        return store.addComment(projectId, { actor: principal, body: body.body, cardId: body.cardId, inReplyTo: body.inReplyTo ?? null, request });
+        return store.addComment(projectId, { actor: principal, body: body.body, cardId: body.cardId, inReplyTo: body.inReplyTo ?? null, via: body.via, request });
       }, 201);
     case "/members":
       return mutate(route, projectId, membersSchema, (body, request) => {
@@ -429,9 +421,8 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
       return mutate(route, projectId, evidenceSchema, (body, request) => {
         const state = precheck(route, projectId, "build", body.expectedHeadSeq);
         const event = body.refKind === "ledger_event" ? store.ledger.getEventById(body.refId) : undefined;
-        const meta = event ? eventMeta(event) : null;
         // The store refuses it again under the project lock; refusing here first means nothing is planned on another agent's row.
-        if (meta !== null && (meta.agentId ?? meta.agent_id) !== state.project.agent_id) {
+        if (event && liveLedgerRowAgent(store.ledger, event) !== state.project.agent_id) {
           throw a4Fail(409, "EVIDENCE_REF_FOREIGN_AGENT", `ledger row ${body.refId} is not a row of agent ${state.project.agent_id}`);
         }
         // A ledger row earns the observed lane only through its recomputed tier (the runtime wrote it); the rest is self_reported.
@@ -441,17 +432,26 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
           column: "implementation", expectedHeadSeq: body.expectedHeadSeq, request });
       }, 201);
     case "/gate-policy":
-      // A proposal opens the `policy` gate (always a distinct approver); a gate id applies the decided proposal.
-      return mutate(route, projectId, gatePolicySchema, (body, request) => {
+      {
+        // A proposal opens the policy gate; the existing decided-policy apply branch stays synchronous.
+        const { body, request } = await readJson(route, gatePolicySchema);
+        const replay = priorReplay(store, request, projectId);
+        if (replay) { apiSuccess(route.res, replay); return true; }
         const call = callOf(route, request);
-        if (!("proposedGatePolicy" in body)) return changeGatePolicy(store, projectId, { ...call, gateId: body.gateId, expectedHeadSeq: body.expectedHeadSeq });
+        if (!("proposedGatePolicy" in body)) {
+          apiSuccess(route.res, mutationResult(changeGatePolicy(store, projectId, { ...call, gateId: body.gateId, expectedHeadSeq: body.expectedHeadSeq })));
+          return true;
+        }
         const head = headOf();
-        const result = requestGate(store, projectId, { ...call, stage: headStage(head), gate: "policy", proposedGatePolicy: body.proposedGatePolicy,
-          expectedHeadSeq: body.expectedHeadSeq });
+        const attempt = await requestGateAsync(store, projectId, { ...call, stage: headStage(head), gate: "policy", proposedGatePolicy: body.proposedGatePolicy,
+          expectedHeadSeq: body.expectedHeadSeq }, gateRequestActor(route));
+        const result = attempt.result;
+        attempt.assertCurrent();
         if (!result.replay) auditA4(route.workspace, { type: "A4_GATE_OPENED", agentId: head.agent_id, projectId, username: principal.username,
           summary: `A4 policy gate opened on ${head.name}`, details: { gate: "policy", seq: result.seq } });
-        return result;
-      });
+        attempt.assertCurrent();
+        apiSuccess(route.res, mutationResult(result)); return true;
+      }
     case "/hold":
       return mutate(route, projectId, OWNER_SCHEMAS.hold, (body, request) => {
         const head = headOf();
@@ -465,9 +465,12 @@ async function projectMutation(route: A4Route, projectId: string, rest: string):
     case "/reopen":
       return mutate(route, projectId, OWNER_SCHEMAS.reopen, (body, request) => reopenStage(store, projectId, { ...callOf(route, request), ...body }));
     case "/tune":
-      return mutate(route, projectId, OWNER_SCHEMAS.tune, (body, request) => tuneProject(store, projectId, { ...callOf(route, request), ...body }));
+      return mutate(route, projectId, OWNER_SCHEMAS.tune, (body, request) => {
+        assertTuneMechanicPlan(route.workspace, body.mechanicPlanId, headOf().agent_id); return tuneProject(store, projectId, { ...callOf(route, request), ...body }); });
     case "/retire":
       return mutate(route, projectId, OWNER_SCHEMAS.retire, (body, request) => retireProject(store, projectId, { ...callOf(route, request), ...body }));
+    case "/private/erase":
+      return mutate(route, projectId, OWNER_SCHEMAS.erase, (body, request) => eraseProjectPrivate(store, projectId, { ...callOf(route, request), ...body }));
     case "/acknowledge":
       return mutate(route, projectId, OWNER_SCHEMAS.acknowledge, (body, request) =>
         acknowledgeItem(store, projectId, { ...callOf(route, request), ...body, stage: body.stage ?? headStage(headOf()) }));
@@ -562,13 +565,13 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
       .filter((key) => a[key] !== b[key]).map((key) => ({ path: key, from: a[key] ?? null, to: b[key] ?? null })) });
     return true;
   }
-  const revisionNo = /^\/revisions\/([1-9][0-9]{0,8})$/.exec(rest)?.[1];
+  const [, revisionNo, resolved] = /^\/revisions\/([1-9][0-9]{0,8})(\/resolved)?$/.exec(rest) ?? [];
   if (revisionNo !== undefined) {
     assertQuery(params, []);
     const row = state.revisions.find((candidate) => candidate.revision_no === Number(revisionNo));
     if (!row) throw a4Fail(404, "A4_REVISION_NOT_FOUND", `no revision ${revisionNo}`);
-    apiSuccess(route.res, { schema: "amc.a4-revision/v1", projectId, revisionNo: row.revision_no, stage: row.stage, parentRevisionNo: row.parent_revision_no,
-      spec: JSON.parse(row.spec_json) as unknown, specDigest: row.spec_digest, resourceDigests: JSON.parse(row.resource_digests_json) as unknown,
+    apiSuccess(route.res, resolved !== undefined ? resolvedRevisionOf(projectId, row) : { schema: "amc.a4-revision/v1", projectId, revisionNo: row.revision_no, stage: row.stage, parentRevisionNo: row.parent_revision_no,
+      spec: storedSpecOf(row), specDigest: row.spec_digest, resourceDigests: JSON.parse(row.resource_digests_json) as unknown,
       resourceDigestsSha256: row.resource_digests_sha256, operatingScope: row.operating_scope_json === null ? null : JSON.parse(row.operating_scope_json) as unknown,
       createdByKey: row.created_by_key, evidenceEventId: row.evidence_event_id, ts: row.ts });
     return true;
@@ -599,7 +602,10 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   if (rest === "/comments") {
     assertQuery(params, params.has("card") ? ["card"] : []);
     const card = params.get("card");
-    const rows = store.snapshot(projectId).rows.a4_comments.filter((row) => card === null || row.card_id === card);
+    const snapshot = store.snapshot(projectId);
+    const rows = snapshot.rows.a4_comments.filter((row) => card === null || row.card_id === card);
+    // `via` lives in the signed COMMENT body; a comment recorded before it existed answers null (not recorded).
+    const via = new Map(snapshot.links.filter((link) => link.kind === "COMMENT").map((link) => [link.body.commentId, link.body.via ?? null]));
     apiSuccess(route.res, { comments: rows.map((row) => {
       let body: string | null = null;
       let reasonCode: string | null = null;
@@ -609,7 +615,7 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
         reasonCode = error instanceof A4BlobError ? error.code : "BLOB_UNREADABLE";
       }
       return { commentId: row.comment_id, cardId: row.card_id, revisionNo: row.revision_no, stage: row.stage, authorKey: row.author_key,
-        inReplyTo: row.in_reply_to, body, reasonCode, ts: row.ts };
+        inReplyTo: row.in_reply_to, via: via.get(row.comment_id) ?? null, body, reasonCode, ts: row.ts };
     }) });
     return true;
   }
@@ -624,17 +630,30 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
   if (rest === "/conformance") {
     assertQuery(params, params.has("stage") ? ["stage"] : []);
     const stage = params.has("stage") ? stageInput(params.get("stage")) : headStage(state.project);
-    // Adapt's acknowledgements as readiness counts them, evaluated only when the statement reads them live.
-    const statement = conformanceView(route.workspace, state, stage, now, () => readinessAt("adapt").items);
+    // Adapt's (or Activate's D-21) acknowledgements as readiness counts them, evaluated only when the statement reads them live.
+    const statement = conformanceView(route.workspace, state, stage, now, () => readinessAt(stage === "activate" ? "activate" : "adapt").items);
     apiSuccess(route.res, { projectId, view: "conformance", stage, statement, claim: statement.claim });
     return true;
   }
-  const unproduced = /^\/(value|monitor)$/.exec(rest)?.[1];
-  if (unproduced !== undefined) {
-    // The producers land with Activate (P1-62, value and monitor); until then nothing is evaluated.
+  if (rest === "/value") {
+    // Reads only: the value report ran once, at Review; GET never runs it and never appends a value event (C-30).
     assertQuery(params, []);
-    apiSuccess(route.res, { projectId, view: unproduced, status: "not_evaluated", reasonCodes: ["NO_PRODUCER_REGISTERED"], items: [],
-      claim: unboundClaim(projectId, unproduced, unproduced !== "monitor") });
+    let regulated = true;
+    try {
+      regulated = isRegulated(state, signedA4Floor(route.workspace));
+    } catch {
+      // An unverified approval policy reads regulated (fail closed).
+    }
+    apiSuccess(route.res, valueView(store, state, regulated, now));
+    return true;
+  }
+  if (rest === "/monitor") {
+    assertQuery(params, []);
+    const release = currentRelease(state.chain);
+    const view = monitorView(route.workspace, state, typeof release?.body.releaseId === "string" ? release.body.releaseId : null);
+    // The record's own aggregate when it resolves (one envelope per source, weakest member); otherwise nothing is evaluated.
+    const recorded = (view.monitor as { claim?: ClaimEnvelope } | null)?.claim;
+    apiSuccess(route.res, { projectId, view: "monitor", ...view, claim: recorded ?? unboundClaim(projectId, "monitor", false) });
     return true;
   }
   return false;
@@ -643,8 +662,8 @@ function projectRead(route: A4Route, projectId: string, rest: string): boolean {
 /**
  * GET …/verify, before any verified snapshot: it exists to show a failing chain. No query parameters at all (trust
  * comes from the server operator's trust list only; `?trustList=` is 400). Workspace OWNERs, AUDITORs and the admin
- * token read every project; anyone else proves membership through the verified chain, so a chain that fails to verify
- * is 403 for them rather than a report hidden from privileged readers.
+ * token read every project; anyone else proves membership through the verified member rows, so member rows that fail
+ * to verify refuse them with the integrity verdict rather than hide the report from privileged readers.
  */
 function verifyRead(route: A4Route, projectId: string): true {
   const { store, principal } = route;
@@ -666,11 +685,11 @@ function verifyRead(route: A4Route, projectId: string): true {
     try {
       members = store.membersOf(projectId);
     } catch {
-      throw a4Fail(403, "A4_NOT_A_MEMBER", "Membership cannot be read from a chain that fails verification; a workspace OWNER or AUDITOR can read the report.");
+      throw a4Fail(409, "A4_INTEGRITY_FAILED", "Membership cannot be read from records that fail verification; a workspace OWNER or AUDITOR can read the report.");
     }
     assertVisible(route, members);
   }
-  apiSuccess(route.res, { schema: "amc.a4-verify/v1", projectId, section: "integrity", report: verifyA4Chain(store.ledger, projectId),
+  apiSuccess(route.res, { schema: "amc.a4-verify/v1", projectId, section: "integrity", report: verifyA4Chain(store.ledger, projectId, undefined, undefined, { mirror: true }),
     boundary: "Integrity of bytes under this workspace's keys and the operator's trust list; not evidence about the agent.",
     claim: unboundClaim(projectId, "verify", false) });
   return true;
@@ -712,9 +731,9 @@ function refuse(res: ServerResponse, status: number, code: string, message: stri
 }
 
 export async function handleA4Route(pathname: string, method: string, req: IncomingMessage, res: ServerResponse,
-  context: { workspace: string; nativeTasks?: NativeTaskApiContext }): Promise<boolean> {
+  context: { workspace: string; nativeTasks?: NativeTaskApiContext; revalidateAuthority?: () => boolean }): Promise<boolean> {
   if (pathname !== A4_API_PREFIX && !pathname.startsWith(`${A4_API_PREFIX}/`)) return false;
-  const nativeTasks = context.nativeTasks;
+  const nativeTasks = context.nativeTasks, revalidateAuthority = context.revalidateAuthority;
   if (!nativeTasks) return refuse(res, 401, "A4_AUTH_REQUIRED", "A4 routes are served only through authenticated Studio sessions.");
   if (nativeTasks.demo) return refuse(res, 403, "DEMO_REFUSED", "The demo session cannot reach A4 projects.");
   if (!a4PreviewEnabled()) return refuse(res, 404, "A4_PREVIEW_DISABLED", "A4 Forge is not enabled in this workspace.");
@@ -723,20 +742,36 @@ export async function handleA4Route(pathname: string, method: string, req: Incom
   const verb = method.toUpperCase();
   if (verb !== "GET" && verb !== "POST") return refuse(res, 405, "METHOD_NOT_ALLOWED", "A4 routes take GET or POST.");
   res.setHeader("cache-control", "no-store");
+  await serveA4({ workspace: context.workspace, native: nativeTasks, principal: resolved.principal, pathname, method: verb,
+    params: new URL(req.url ?? "/", "http://a4.invalid").searchParams, req, res, assertAuthority: () => {
+      if (revalidateAuthority?.() !== true) throw a4Fail(401, "A4_AUTH_REQUIRED", "The original Studio admission is no longer current.");
+    } });
+  return true;
+}
+
+/**
+ * The router behind admission: one store, the dispatch, and errors as the API answers them. The HTTP entry above calls
+ * it after its refusals; the CLI (P1-65, src/cli-a4-commands.ts) calls it with the principal its login token resolved
+ * to (admission native_login_token), so both run the same routes, gate functions and refusals.
+ */
+export async function serveA4(route: Omit<A4Route, "store" | "assertGateRequestCurrent">): Promise<void> {
   let store: A4Store;
   try {
-    store = openA4Store(context.workspace);
+    store = openA4Store(route.workspace);
   } catch (error) {
-    sendError(res, error, null);
-    return true;
+    sendA4Error(route.res, error, null);
+    return;
   }
   try {
-    await dispatch({ workspace: context.workspace, store, native: nativeTasks, principal: resolved.principal, pathname, method: verb,
-      params: new URL(req.url ?? "/", "http://a4.invalid").searchParams, req, res });
+    // One refusal for every write before anything runs (a probe, a blob), not only at the store's commit (P2-36).
+    if (route.method === "POST" && ledgerBackendGap(route.workspace, store.ledger.db).length > 0) throw a4Fail(503, "LEDGER_BACKEND_INCOMPLETE", LEDGER_BACKEND_INCOMPLETE_MESSAGE);
+    const tail = PROJECT_PATH.exec(route.pathname.slice(A4_API_PREFIX.length))?.[2];
+    const original = route.method === "POST" && (tail === "/gate-policy" || /^\/stages\/[a-z]+\/gates\/(direction|completion)\/request$/.test(tail ?? ""))
+      ? captureA4RequestActor(route) : undefined;
+    await dispatch({ ...route, store, assertGateRequestCurrent: original });
   } catch (error) {
-    sendError(res, error, PROJECT_PATH.exec(pathname.slice(A4_API_PREFIX.length))?.[1] ?? null);
+    sendA4Error(route.res, error, PROJECT_PATH.exec(route.pathname.slice(A4_API_PREFIX.length))?.[1] ?? null);
   } finally {
     store.close();
   }
-  return true;
 }

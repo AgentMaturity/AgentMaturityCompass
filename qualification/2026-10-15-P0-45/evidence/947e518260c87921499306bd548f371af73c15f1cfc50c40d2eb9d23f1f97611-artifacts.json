@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/classification.json",
+    "bytes": 229,
+    "sha256": "10fa3a90cf586f652b033ccd51c73df87be05930f1047bda50893fb016d2b83d"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/command.json",
+    "bytes": 1722,
+    "sha256": "27a9cd4693ff03f97a9df72d6907f7fa2af27e89bb38315d8f7ce79046922f98"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/inputs-after.json",
+    "bytes": 830,
+    "sha256": "9cf9b357edadff04b89427938852bcfcb1f5ff8700b185864f9bed0d2dc1e064"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/inputs-before.json",
+    "bytes": 830,
+    "sha256": "86653c6a090f6697130a6b5bbd6b1c300e35e744eace7b3573d6778f316a657a"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/observer.json",
+    "bytes": 6178,
+    "sha256": "e81953ddb5fef406d3d33f63c89475e227374f5122e25ea41b2c4b91824917ee"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "e92664507ca2e7faa8ba69b022dfdfaa83d701a19c9531ff10874b9f826c7cff"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/owned-process.json",
+    "bytes": 1347,
+    "sha256": "ddce97d21e8481e9f65e90666014fc7bb0d795afe0f360d0d2f4f19d6ff55ce2"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/raw.json",
+    "bytes": 4164,
+    "sha256": "e4060c150e0ca8acaeda27fbb0d8522cdb07ff97467a3572188bdc3342a5fd2c"
+  },
+  {
+    "path": "/private/tmp/p0-45-causal-qualification-20261015/phases/P045-C2-forward-copy-then-unlink--baseline/stdout-stderr.log",
+    "bytes": 425,
+    "sha256": "e264afe39aedd971fecdcc47bdac9316a83ff029d71e35ada6927c6b259ed4d3"
+  }
+]

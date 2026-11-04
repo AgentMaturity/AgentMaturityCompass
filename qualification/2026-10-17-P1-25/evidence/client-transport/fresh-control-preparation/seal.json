@@ -1,0 +1,73 @@
+{
+  "schema": "p125c-control-preparation-seal/1",
+  "at": "2026-10-16T21:43:46.056923+00:00",
+  "allInputsRehashed": true,
+  "allOutputsRehashed": true,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/README.md",
+      "bytes": 3737,
+      "sha256": "23574d33c5145071c4fdfcc60f518211818fff330d3a7b757fefe69ff29c497d",
+      "readScope": "sealed private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/author-static-review.json",
+      "bytes": 2599,
+      "sha256": "5205d987f5bbd69848d99df6dd6472222a88ed7e3867394e4811fc9f50be5d77",
+      "readScope": "sealed private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/check-preservation.py",
+      "bytes": 1458,
+      "sha256": "f1ddbbf52151861d9a6c03417bba79b0e90b4713315030912641cc89d39076bb",
+      "readScope": "sealed private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/check-preservation.py.adaptation.patch",
+      "bytes": 4399,
+      "sha256": "af0a15f71dfdd619ecbe9b1969278f22c37be0dd08c39ea951f3900fb0cd0870",
+      "readScope": "sealed private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/controls.json",
+      "bytes": 4060,
+      "sha256": "469352701add22df95ffd784157decc215cc85a41e37491e2243f63fbe71b316",
+      "readScope": "sealed private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/input-pins.json",
+      "bytes": 49879,
+      "sha256": "9639eaca3b6633a7981a37e4a942903358e4d8356bd7d4d8d87c84a9890657a0",
+      "readScope": "sealed private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/plan.json",
+      "bytes": 7017,
+      "sha256": "49d1c3f7503e211cb309a45ee70510ac0bf64f521d07d8f59f057e4d1c5336b9",
+      "readScope": "sealed private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/source-control.py",
+      "bytes": 15679,
+      "sha256": "cbd9282bad0a3154e36c6ce39649caced7b826d258a0344dfa92b7f0f2c3d579",
+      "readScope": "sealed private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/source-control.py.adaptation.patch",
+      "bytes": 21030,
+      "sha256": "f914310b49b54e6480cb18e9bffed504c8881544c84513a93d0411889be1f0d9",
+      "readScope": "sealed private proposal output"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7130,
+      "sha256": "913440f79d62e944daaa154c269402c60af8d492fe3346bfafaad75e09a9626e",
+      "readScope": "sealed private proposal output"
+    }
+  ],
+  "sourceCommit": null,
+  "freshRoot": null,
+  "executed": false,
+  "checkoutWrites": false,
+  "boundary": "Private static proposal only. Root owns actual future binding, complete evidence read, admission, helper execution, product runs and restoration."
+}

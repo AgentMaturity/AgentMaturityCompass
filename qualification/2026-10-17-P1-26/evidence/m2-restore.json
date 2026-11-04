@@ -1,0 +1,17 @@
+{
+  "operator": "M2-inclusion-terminal-size",
+  "restored": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35",
+  "byteExact": true,
+  "checkoutClean": true,
+  "at": "2026-10-16T20:55:12.284792+00:00",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/src/transparency/rfc9162.ts",
+  "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "mode": "restore",
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false,
+  "targetPhysicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/src/transparency/rfc9162.ts",
+  "targetInode": 543356676,
+  "targetNlink": 1,
+  "regularSingleLinkCheckedBeforeWrite": true
+}

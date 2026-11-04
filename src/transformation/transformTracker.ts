@@ -1,12 +1,19 @@
+import { assertOwnerMode } from "../mode/mode.js";
+import { captureOrgPairs, assertOrgPairsCurrent } from "../org/preparedOrgPairs.js";
+import { TransformInputCapture } from "./transformInputs.js";
+import { prepareTransformOutputsAsync, transformLatestPath } from "./transformTasks.js";
+import { finishTransformPublication, type TransformPublicationChecks } from "./transformPublication.js";
 import { readdirSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { readVerified } from "../crypto/signing/verifiedArtifacts.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { openLedger } from "../ledger/ledger.js";
 import { latestRunForAgent } from "../governor/actionPolicyEngine.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { loadLatestTransformPlan, transformPlanSchema, type TransformPlan, type TransformTask, writeSignedTransformPlan, writeSignedTransformSnapshot, summarizeBy4C } from "./transformTasks.js";
 import { percentDone, topBlockers, nextTasks } from "./transformScoring.js";
-import { findLatestAttestationForTask } from "./transformAttestations.js";
+import { attestationPathById, type TransformAttestation } from "./transformAttestations.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { readUtf8, pathExists } from "../utils/fs.js";
 import { computeOrgScorecard } from "../org/orgEngine.js";
@@ -36,7 +43,7 @@ function inferTrustTierFromRun(run: ReturnType<typeof latestRunForAgent>): "SELF
   }
   const observed = run.evidenceTrustCoverage?.observed ?? 0;
   const attested = run.evidenceTrustCoverage?.attested ?? 0;
-  if (observed >= 0.85 && run.correlationRatio >= 0.95 && (run.invalidReceiptsCount ?? 0) === 0) {
+  if (observed >= 0.85 && run.correlationRatio !== null && run.correlationRatio >= 0.95 && (run.invalidReceiptsCount ?? 0) === 0) {
     return "OBSERVED_HARDENED";
   }
   if (observed >= 0.5) {
@@ -55,6 +62,7 @@ function evaluateCheckpoint(params: {
   run: ReturnType<typeof latestRunForAgent>;
   events: ReturnType<ReturnType<typeof openLedger>["getEventsBetween"]>;
   assurance: Map<string, { score0to100: number }>;
+  reads?: TransformInputCapture;
 }): CheckResult {
   const kind = String(params.checkpoint.kind ?? "");
   if (kind === "audit_absent") {
@@ -118,6 +126,7 @@ function evaluateCheckpoint(params: {
   if (kind === "config_signature_valid") {
     const rawPath = String(params.checkpoint.path ?? "");
     const abs = rawPath.startsWith(".amc/") ? join(params.workspace, rawPath) : join(params.workspace, rawPath);
+    params.reads?.pair(abs);
     const verify = verifySignedFileWithAuditor(params.workspace, abs);
     return {
       ok: verify.valid,
@@ -137,6 +146,7 @@ function evaluateCheckpoint(params: {
         return Number(params.run?.integrityIndex ?? 0);
       }
       if (metric === "value_score") {
+        if (params.scope.type === "AGENT") params.reads?.outcome(params.workspace, params.scope.agentId, undefined, true);
         const reportDir = params.scope.type === "AGENT"
           ? join(params.workspace, ".amc", "agents", params.scope.agentId, "outcomes", "reports")
           : null;
@@ -181,6 +191,21 @@ function evaluateCheckpoint(params: {
   };
 }
 
+/**
+ * The newest attestation for a task that the verified-artifact registry admits (WP37 review): an unsigned, tampered or
+ * otherwise refused file never marks a task ATTESTED.
+ * ponytail: verifies every attestation file of the scope per task; index by task if plans grow large.
+ */
+function verifiedTaskAttestation(workspace: string, scope: Parameters<typeof attestationPathById>[1], taskId: string): { path: string; attestation: TransformAttestation } | null {
+  const dir = dirname(attestationPathById(workspace, scope, "_")), trust = workspaceSelfTrust(workspace);
+  let names: string[] = [];
+  try { names = readdirSync(dir).filter((name) => name.endsWith(".json")); } catch { return null; }
+  return names.flatMap((name) => {
+    const read = readVerified("transform-attestation", { file: join(dir, name), workspace, trust });
+    return read.status === "verified" && read.artifact.taskId === taskId ? [{ path: join(dir, name), attestation: read.artifact }] : [];
+  }).sort((a, b) => b.attestation.createdTs - a.attestation.createdTs)[0] ?? null;
+}
+
 function recalcPlanSummary(plan: TransformPlan): TransformPlan {
   const tasks = plan.tasks;
   const by4C = summarizeBy4C(tasks);
@@ -196,26 +221,7 @@ function recalcPlanSummary(plan: TransformPlan): TransformPlan {
   });
 }
 
-export function runTransformTracker(params: {
-  workspace: string;
-  scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string };
-  window?: string;
-}): {
-  before: TransformPlan;
-  after: TransformPlan;
-  changed: boolean;
-  written: {
-    planPath: string;
-    sigPath: string;
-    latestPath: string;
-    latestSigPath: string;
-  };
-  snapshot: {
-    path: string;
-    sigPath: string;
-  };
-  missingEvidence: string[];
-} {
+function computeTransformTracking(params: Parameters<typeof runTransformTracker>[0], reads?: TransformInputCapture, asOfTs?: number) {
   const scope = params.scope.type === "AGENT"
     ? { type: "AGENT" as const, agentId: resolveAgentId(params.workspace, params.scope.agentId) }
     : params.scope;
@@ -224,14 +230,16 @@ export function runTransformTracker(params: {
     throw new Error("No transformation plan found for scope. Generate one with `amc transform plan`.");
   }
 
+  if (scope.type === "AGENT") reads?.diagnostic(params.workspace, scope.agentId);
   const run = scope.type === "AGENT" ? latestRunForAgent(params.workspace, scope.agentId) : null;
-  const windowStartTs = run?.windowStartTs ?? Date.now() - 14 * 86_400_000;
-  const windowEndTs = run?.windowEndTs ?? Date.now();
+  const windowStartTs = run?.windowStartTs ?? (asOfTs ?? Date.now()) - 14 * 86_400_000;
+  const windowEndTs = run?.windowEndTs ?? (asOfTs ?? Date.now());
 
   const ledger = openLedger(params.workspace);
-  const events = ledger.getEventsBetween(windowStartTs, windowEndTs);
-  ledger.close();
+  let events: ReturnType<typeof ledger.getEventsBetween>;
+  try { events = ledger.getEventsBetween(windowStartTs, windowEndTs); } finally { ledger.close(); }
 
+  if (scope.type === "AGENT") reads?.assurance(params.workspace, scope.agentId, windowStartTs, windowEndTs, [...new Set(before.tasks.flatMap(task => task.evidenceCheckpoints.filter(check => check.kind === "assurance_pack_min").map(check => String(check.packId ?? ""))))]);
   const assurance = scope.type === "AGENT"
     ? latestAssuranceByPack({
         workspace: params.workspace,
@@ -249,7 +257,7 @@ export function runTransformTracker(params: {
         checkpoint,
         run,
         events,
-        assurance
+        assurance, reads
       })
     );
     const failed = checks.filter((check) => !check.ok);
@@ -267,7 +275,8 @@ export function runTransformTracker(params: {
       };
     }
 
-    const attestation = findLatestAttestationForTask(params.workspace, scope, task.taskId);
+    reads?.select(() => { const found = verifiedTaskAttestation(params.workspace, scope, task.taskId); return found === null ? [] : [found.path, `${found.path}.sig`]; });
+    const attestation = verifiedTaskAttestation(params.workspace, scope, task.taskId)?.attestation ?? null;
     if (attestation) {
       return {
         ...task,
@@ -305,6 +314,30 @@ export function runTransformTracker(params: {
   const changed = JSON.stringify(before.tasks.map((task) => ({ id: task.taskId, status: task.status, reason: task.statusReason }))) !==
     JSON.stringify(after.tasks.map((task) => ({ id: task.taskId, status: task.status, reason: task.statusReason })));
 
+  return { scope, before, after, changed, windowStartTs, windowEndTs, events };
+}
+
+export function runTransformTracker(params: {
+  workspace: string;
+  scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string };
+  window?: string;
+}): {
+  before: TransformPlan;
+  after: TransformPlan;
+  changed: boolean;
+  written: {
+    planPath: string;
+    sigPath: string;
+    latestPath: string;
+    latestSigPath: string;
+  };
+  snapshot: {
+    path: string;
+    sigPath: string;
+  };
+  missingEvidence: string[];
+} {
+  const { scope, before, after, changed } = computeTransformTracking(params);
   const written = writeSignedTransformPlan(params.workspace, after);
   const snapshot = writeSignedTransformSnapshot(params.workspace, scope, after);
 
@@ -357,4 +390,38 @@ export function runTransformTracker(params: {
     snapshot,
     missingEvidence: blockedTasks.map((task) => `${task.taskId}: ${task.statusReason}`)
   };
+}
+
+export async function runTransformTrackerAsync(input: Parameters<typeof runTransformTracker>[0], checks: TransformPublicationChecks = {}) {
+  const params = structuredClone(input), workspace = params.workspace;
+  assertOwnerMode(workspace, "transform track"); checks.beforePublish?.();
+  const scope = params.scope.type === "AGENT" ? { type: "AGENT" as const, agentId: resolveAgentId(workspace, params.scope.agentId) } : params.scope;
+  const inputPair = captureOrgPairs([transformLatestPath(workspace, scope)]), reads = new TransformInputCapture();
+  const assertInputs = reads.assertCurrent;
+  const computed = computeTransformTracking({ ...params, scope }, reads, Date.now());
+  assertOrgPairsCurrent(inputPair); assertInputs();
+  const expectedEvents = JSON.stringify(computed.events);
+  const assertEvents = () => {
+    const ledger = openLedger(workspace, { readonly: true });
+    try { if (JSON.stringify(ledger.getEventsBetween(computed.windowStartTs, computed.windowEndTs)) !== expectedEvents)
+      throw new Error("transformation tracker evidence window changed while signing; retry"); }
+    finally { ledger.close(); }
+  };
+  assertEvents();
+  const prepared = await prepareTransformOutputsAsync(workspace, computed.after, true, "transform track", {
+    beforePublish: checks.beforePublish, assertInputsCurrent() { checks.assertInputsCurrent?.(); assertOrgPairsCurrent(inputPair); assertInputs(); assertEvents(); }
+  });
+  const { written, snapshot } = prepared.publish();
+  if (snapshot === null) throw new Error("transformation tracker snapshot preparation is missing");
+  const agentId = scope.type === "AGENT" ? scope.agentId : `node:${scope.nodeId}`, events: Parameters<typeof dispatchIntegrationEvent>[0][] = [];
+  const blockedTasks = computed.after.tasks.filter(task => task.status === "BLOCKED"), doneTasks = computed.after.tasks.filter(task => task.status === "DONE");
+  if (blockedTasks.length > 0) events.push({ workspace, eventName: "TRANSFORM_TASK_BLOCKED", agentId,
+    summary: `Transformation tracker found ${blockedTasks.length} blocked tasks`, details: { scope, planId: computed.after.planId, blockedTaskIds: blockedTasks.slice(0, 10).map(task => task.taskId) } });
+  if (doneTasks.length > 0) events.push({ workspace, eventName: "TRANSFORM_TASK_DONE", agentId,
+    summary: `Transformation tracker reports ${doneTasks.length} done tasks`, details: { scope, planId: computed.after.planId, doneTaskIds: doneTasks.slice(0, 10).map(task => task.taskId) } });
+  const secondaryWarnings = await finishTransformPublication(prepared, [...Object.values(written), snapshot.path, snapshot.sigPath], {
+    workspace, type: "TRANSFORM_PLAN_UPDATED", agentId, artifact: { kind: "policy", sha256: sha256Hex(Buffer.from(JSON.stringify(computed.after, null, 2))), id: computed.after.planId }
+  }, events);
+  return { before: computed.before, after: computed.after, changed: computed.changed, written, snapshot,
+    missingEvidence: blockedTasks.map(task => `${task.taskId}: ${task.statusReason}`), secondaryWarnings };
 }

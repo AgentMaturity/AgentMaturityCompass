@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-50",
+  "date": "2026-10-14",
+  "commit": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "branch": "codex/p0-50-current-qualification",
+  "node": "v22.23.3; focused Node24 v24.21.0 separately",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm exec vitest run tests/nativeMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-50-node22-mcp-components-20261014.json",
+      "exit": 0,
+      "durationMs": 11392
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 1,
+      "durationMs": 309
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 3732
+    },
+    {
+      "cmd": "npm pack --json --ignore-scripts --pack-destination /private/tmp/p0-50-packed-artifact-20261014",
+      "exit": 0,
+      "durationMs": 7621
+    },
+    {
+      "cmd": "npm run release:gate -- --out tmp/p0-50-qualification/full-release-gate.json --json",
+      "exit": 1,
+      "durationMs": 915537
+    },
+    {
+      "cmd": "npm run check:coverage",
+      "exit": 1,
+      "durationMs": 224
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@24/bin/node node_modules/vitest/vitest.mjs run tests/nativeMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts --reporter=default --reporter=json --outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-50-node24-mcp-components-20261014T150040Z/current-four-files.json",
+      "exit": 0,
+      "durationMs": 10719
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/installed-crash-recovery-check.mjs --artifact /private/tmp/p0-50-packed-artifact-20261014/agent-maturity-compass-1.2.0.tgz --artifact-sha256 c3932ba3b2d693c018c874191c608fbb06709e9e83c77c95f7b9a4ff4d8d82aa --cli-sha256 0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f --source 07125b76cb17ecf063f19b914085a5bfc968df35 --source-tree /Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass --out /private/tmp/p0-50-stdio-recovery-20261014T151342Z",
+      "exit": 0,
+      "durationMs": 57360
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /private/tmp/p0-50-installed-http-attempt3-1vb61m0h/run.mjs",
+      "exit": 0,
+      "durationMs": 41262
+    }
+  ],
+  "tests": {
+    "total": 23125,
+    "passed": 23125,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "D-03-health-skip-decision.json",
+      "sha256": "7d9ae74e43c62a42ea7968a342fb934e18e5c694287c710a5abc37fc6d6a429a"
+    },
+    {
+      "path": "README.md",
+      "sha256": "923a280eab606629bbffe662b6eb65cf601309d2db443cf6b500a134a4786dbb"
+    },
+    {
+      "path": "component-input-correspondence.json",
+      "sha256": "43b452ccc33f4a524d1e22e9e5b8f8a703431d4520625e90273405afa10cc841"
+    },
+    {
+      "path": "freeze-after-build.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811"
+    },
+    {
+      "path": "freeze-before-build.log",
+      "sha256": "aebe0b8bb2be25cfeaae6b38ab1731d56909543846b959611e7314aa92ebe0b1"
+    },
+    {
+      "path": "full-release-gate-summary.json",
+      "sha256": "f3a5d7698d7e54596435f2fcdcef6d03bb3d8f3bc00c49c137c4353c328fc5cb"
+    },
+    {
+      "path": "full-release-gate.json",
+      "sha256": "c18d61893d8b5505aa69ab8ba65beb6fff0b5e40ae47e6def8f124d711dcd420"
+    },
+    {
+      "path": "graph-navigation.log",
+      "sha256": "7be6c5a6bc38a01208505da40a89b0102ad7c265b9c4598d33a26dcf5265c289"
+    },
+    {
+      "path": "http-monitor-pin-adaptation.patch",
+      "sha256": "b97bc57cf0223c290acfad34e5e26369eec68cf8dd3a1b19d10b95e20dfb1b04"
+    },
+    {
+      "path": "http-observer-adaptations.patch",
+      "sha256": "87246a988615164059df768490ac200fa0832690158081497d6d0bbd474b081d"
+    },
+    {
+      "path": "installed-http-15-checkpoint-receipt.json",
+      "sha256": "5ccab8bf864aef7be233c864324ee42cba5010ec16d0229ebcb5175350d5601b"
+    },
+    {
+      "path": "installed-http-evidence-manifest.json",
+      "sha256": "0df7aabeca981c20cc0a2d3c04cbd88cac4d23c06275c25d650a79fd8bf69562"
+    },
+    {
+      "path": "installed-http-qualification.json",
+      "sha256": "8a67aa78bac2648f02b51514b39810358f2674ed2208247f09eace9177ce6d4d"
+    },
+    {
+      "path": "installed-http-qualification.md",
+      "sha256": "4b0cec41ab620b48fae975093a229cb316e2e2cc51f9e357e67671566c2bc09e"
+    },
+    {
+      "path": "installed-stdio-recovery.json",
+      "sha256": "e89f3d45b34eeda62db761b17011d757901d13c2059ebfc7e303230910d3c56c"
+    },
+    {
+      "path": "installed-stdio-recovery.md",
+      "sha256": "7df7e3c352f2e4a6e858d1ea7b019bce7d0ed1956ae603d8d2c6dcc5eb8ad420"
+    },
+    {
+      "path": "integration-provenance.json",
+      "sha256": "723db658a39ee77b83e92b94053f170c6d35537e9c384c46b6d531f701a9e9d3"
+    },
+    {
+      "path": "next-priority-audit.json",
+      "sha256": "0ea316e847221653f1a3dae1891e8c9b64aa8ec837b1af8643249b6ebef7f6a8"
+    },
+    {
+      "path": "next-priority-audit.md",
+      "sha256": "7e5aa270ae27a0137251b5012d885bacd2ed245c58f8bf3266b9d262fcff8859"
+    },
+    {
+      "path": "node22-mcp-tests.json",
+      "sha256": "833ab7f292b83ea477b8fad407eb3754683780ff85a23b44c0e60a9b08647f87"
+    },
+    {
+      "path": "node22-mcp-tests.log",
+      "sha256": "19a6bb926bd1da07048a86189cba96401fdcb0420a84b464337071e4b0e9cfb2"
+    },
+    {
+      "path": "node24-mcp-components.json",
+      "sha256": "ae50fba10c528a3b923e47371b99c1ec2d86cebfb8bc974371077f70fe228274"
+    },
+    {
+      "path": "node24-mcp-components.md",
+      "sha256": "c6622fa0ab4d1bac5393e6ccdeabf9483dbef17cfff6e46b5df1c1b5502fee36"
+    },
+    {
+      "path": "node24-mcp-tests.json",
+      "sha256": "2a21f490d304c02413f90f7fc3f79f3baf26ba5261cee3a53a5aabac03006460"
+    },
+    {
+      "path": "node24-mcp-tests.log",
+      "sha256": "cd5c922f84d871a9a85ad12701f115ca2c915b35f5e3039f0fa72011724f8c2b"
+    },
+    {
+      "path": "per-file-coverage-audit.json",
+      "sha256": "08942cbfcc62963b0af354940f23bd7af28dec2c1bca2502772f73e3f7e3a5cd"
+    },
+    {
+      "path": "phase-notes.md",
+      "sha256": "3c459a04a113b6efa5e64041df713a37981cf536b7ae4dd0540e12e6b977aa56"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "6d067893bd98782bd4636849f2bac267098b9953a021a00821ad6bc5dbf2a037"
+    },
+    {
+      "path": "private-artifact-metadata.json",
+      "sha256": "26067e7aad6d5b1789f0cae9bbfb8ff6c786e13bf73ada54397239ad9073d06c"
+    },
+    {
+      "path": "readiness-phases.json",
+      "sha256": "deae5201c0623f84cc99378e14e99e37f6af75cb30220c1a28d88fd50bbd8603"
+    },
+    {
+      "path": "readiness-phases.md",
+      "sha256": "fd5d97b096ae4df63db3d0aa42511c04f8becf9425639fce10121137cae00c35"
+    },
+    {
+      "path": "readonly-preflight.json",
+      "sha256": "901d2d8a2775be38cb9f08acc8fb0d1a29ab7d944c4cddbad324cab2af32a7f3"
+    },
+    {
+      "path": "readonly-preflight.md",
+      "sha256": "70c9d45de796ca0cede1b88629475db06fadb148529bd6f51f61aa8a2a5fc758"
+    },
+    {
+      "path": "canonical-receipt-review.json",
+      "sha256": "36ce2a99cda29d674cd3567736db3616f7e1b7a6c46fefb1a7b6abd976715606"
+    }
+  ],
+  "notes": "The current installed MCP component is qualified within the recorded scope; P0-50 full acceptance remains blocked. All 34 current component cases pass on Node 22 and Node 24, with no failed, pending or todo cases and verified input correspondence. The current private artifact resolves SDK 1.32.1. The unchanged installed stdio crash-recovery harness passes all three checkpoints, and HTTP attempt 3 passes all 15 original checkpoint groups. Earlier HTTP attempts failed on an obsolete typed-refusal observer and correctly refused unpinned monitor verification. Both are retained with exact source-backed observer changes. Attempt 3 supplies the local public monitor pin captured before execution; this is not third-party trust certification. Approval, zero-effect, budget, cancellation and cold-integrity assertions remain mandatory.\n\nThe actual full gate exits 1 although all 23,125 cases across 1,610 reported files pass, including five performance cases, with no failed suites, pending or todo cases. Function coverage is 72.09% against the unchanged 75% floor. Required duplicate and dead-code checks fail with 1,270 and 2,787 findings. The gate records 16 passed, three failed and two skipped steps. The independent per-file diagnostic also fails, with 894 rows across 281 files; the gate's dependency skip remains unchanged. Sid directly authorized the D-03 live-health written skip until P2-06 only. The first normal freeze invocation failed because dist was missing; the normal check after the actual build passed against accepted main. Protected policy hashes remain unchanged.\n\nOnly the four separately qualified P0-47/P0-48 source commits are integrated here. Main, Claude, the held root and reservation bytes remain unchanged. Earlier preflight descriptions of 51 failures, 71.96% coverage and 924 per-file rows are retained phase history and are superseded by this actual full-gate report. No quick execution, floor reduction, baseline or exclusion edit, waiver, dependency change, broad source cleanup, base exception, tracker closure, push, publication, live-provider or OS-confinement claim occurred. Fresh hosted full-CI evidence remains open. P0-50 is not Done or fully qualified. P0-29 remains explicitly skipped; the next eligible items are P0-22, then P0-23."
+}

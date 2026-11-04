@@ -1,0 +1,10 @@
+{
+  "head": "7458c47c343d1b54921501a04e0be6f280a38963",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17",
+  "branch": "codex/p3-17-mobility-overlay",
+  "statusPorcelain": "",
+  "logIntToHead": "7458c47c3 test(catalog): cover independent Mobility guard boundaries (P3-17)\n101cd9a8e test(catalog): isolate the duplicate-feature counterexample (P3-17)\n596f0b280 fix(catalog): refuse whitespace ZIP proxies and strengthen adverse cases (P3-17)\n22283987f test(catalog): expose ZIP proxy alias and unsigned OTA effects (P3-17)\nf2c9d7cfc feat(catalog): implement synthetic Mobility reference oracles (P3-17)\na85578dee test(catalog): add Mobility oracle cases and inert stubs (P3-17)\ndab15352c feat(catalog): draft experimental Mobility overlay content (P3-17)\nf4001afd5 test(catalog): specify Mobility overlay draft contract (P3-17)",
+  "qualificationCommit": null,
+  "nativeValidation": "NOT_RUN_AT_ASSEMBLY; root records subsequent validation off-tree and in the handoff."
+}

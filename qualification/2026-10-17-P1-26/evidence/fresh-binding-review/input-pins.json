@@ -1,0 +1,106 @@
+{
+  "schema": "p126-binding-peer-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-source-binding.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-source-binding.json",
+      "bytes": 80054,
+      "sha256": "0a13c12198469de7ed9ce373728e015b97cc5209c8b346b721913c73b72df6be",
+      "dev": 16777231,
+      "inode": 543401491,
+      "nlink": 1,
+      "readScope": "exact review input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/protected-inputs-after-metadata-repair.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/protected-inputs-after-metadata-repair.json",
+      "bytes": 31630,
+      "sha256": "3daf1deac107320055200ca014d74348068797122547951e1663995466af5e2a",
+      "dev": 16777231,
+      "inode": 543332179,
+      "nlink": 1,
+      "readScope": "exact review input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/source-pinset.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/source-pinset.json",
+      "bytes": 42209,
+      "sha256": "1adb4e152c3bd35368edb7ba2903c4396d08e29c4b8e29f902a5f06b74f5ad45",
+      "dev": 16777231,
+      "inode": 543338967,
+      "nlink": 1,
+      "readScope": "exact review input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/seal.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-control-audit-plan/seal.json",
+      "bytes": 3386,
+      "sha256": "83080afa4ba861b7ca671bd8180381247d7486fcdf4df196c48980ecd515eb10",
+      "dev": 16777231,
+      "inode": 543338971,
+      "nlink": 1,
+      "readScope": "exact review input"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-commit.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-commit.json",
+      "bytes": 666,
+      "sha256": "028c6055333f16cc1f046bc8cadaf96f21c8488dfa4ba110a1a1fccca8aafc61",
+      "dev": 16777231,
+      "inode": 543344212,
+      "nlink": 1,
+      "readScope": "exact review input"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+      "dev": 16777231,
+      "inode": 542458545,
+      "nlink": 1,
+      "readScope": "exact review input"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/command.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/command.json",
+      "bytes": 1496,
+      "sha256": "45e2c650828854e07805c619028cb0e790d0ab16aeca68efd3dffd52e3844f11",
+      "dev": 16777231,
+      "inode": 543401417,
+      "nlink": 1,
+      "readScope": "exact review input"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/owned-process.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/owned-process.json",
+      "bytes": 576,
+      "sha256": "a2b74e42bf5995e1b91668164f7fa6c4a3d7657eda84f32f0f8447642da01309",
+      "dev": 16777231,
+      "inode": 543344230,
+      "nlink": 1,
+      "readScope": "exact review input"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/owned-group-after-exit.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "1de93cfdee11b4c2af6704b06de14b9ff097398c390af23264a3ff600c46f3ee",
+      "dev": 16777231,
+      "inode": 543401416,
+      "nlink": 1,
+      "readScope": "exact review input"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/stdout-stderr.log",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "ad479b234b966e8bcae15d0daf422306fcdf123ef64fc382c4b99f3d538c6f04",
+      "dev": 16777231,
+      "inode": 543344229,
+      "nlink": 1,
+      "readScope": "exact review input"
+    }
+  ],
+  "completeComparedFilePins": "observations.json"
+}

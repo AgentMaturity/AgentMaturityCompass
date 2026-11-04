@@ -85,7 +85,7 @@ describe("AI Reputation Claude live drift", () => {
     expect(result.receipt.failClosed).toBe(false);
 
     // CHARACTERIZATION PIN (ADR-0025, cluster collapse): the whole result.
-    expect(sha256Hex(canonicalize(result))).toBe("26745afd3b3d06717177a71a0f825af9c542cab338e1aae3d0b5ee392460daff");
+    expect(sha256Hex(canonicalize(result))).toBe("037dd3804f109a9495a0b8bf8f2be52df212433e9fad6d504117a560e69179a3");
     expect(result.receipt.recommendation).toBe("approve");
     expect(result.receipt.sourceRefs).toContain("https://github.com/zubair-trabzada/ai-reputation-claude");
     expect(result.liveDistribution.evidenceCoverage0to1).toBe(1);

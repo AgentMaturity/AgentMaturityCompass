@@ -1,0 +1,98 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 75982,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts"
+  ],
+  "testCount": 3,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-1152513869",
+      "name": "tests/mcp/mcp20260728.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1152513869_0",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_0",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow reviews a version-bound catalog and executes one granted call without a session",
+      "fullName": "P1-39 governed stateless MCP public flow reviews a version-bound catalog and executes one granted call without a session",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_1",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow a finite broken tools/call response is not replayed and disposes its grant",
+      "fullName": "P1-39 governed stateless MCP public flow a finite broken tools/call response is not replayed and disposes its grant",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1152513869_0_2",
+      "name": "tests/mcp/mcp20260728.test.ts P1-39 governed stateless MCP public flow a broken tools/call is recorded with strict typed unknown evidence",
+      "fullName": "P1-39 governed stateless MCP public flow a broken tools/call is recorded with strict typed unknown evidence",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'ERROR' to be 'TOOL_OUTCOME_UNKNOWN' // Object.is equality",
+          "actual": "ERROR",
+          "expected": "TOOL_OUTCOME_UNKNOWN",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"TOOL_OUTCOME_UNKNOWN\"\nReceived: \"ERROR\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'ERROR' to be 'TOOL_OUTCOME_UNKNOWN' // Object.is equality\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts:342:35\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts:222:5)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts:336:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts",
+              "line": 342,
+              "column": 35
+            },
+            {
+              "method": "owned",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts",
+              "line": 222,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts",
+              "line": 336,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

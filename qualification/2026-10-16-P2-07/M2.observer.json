@@ -1,0 +1,1701 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 45920,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/enterpriseSsoScim.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/security/api-security.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/security/identityAccountBinding.test.ts"
+  ],
+  "testCount": 150,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-981115775",
+      "name": "tests/enterpriseSsoScim.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/enterpriseSsoScim.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-981115775_0",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM)",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_0",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) OIDC provider add bootstraps host identity config on a fresh host",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) OIDC provider add bootstraps host identity config on a fresh host",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_1",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) OIDC auth code + PKCE flow creates session and mapped workspace roles",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) OIDC auth code + PKCE flow creates session and mapped workspace roles",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_2",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) OIDC rejects identity tokens without an affirmative email_verified claim",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects identity tokens without an affirmative email_verified claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_3",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) OIDC rejects bad state, bad nonce/signature, and missing email",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) OIDC rejects bad state, bad nonce/signature, and missing email",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_4",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) SAML ACS path verifies signed compact assertion and grants mapped roles",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) SAML ACS path verifies signed compact assertion and grants mapped roles",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_5",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) SCIM users/groups provisioning applies and revokes workspace memberships by group source",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) SCIM users/groups provisioning applies and revokes workspace memberships by group source",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_6",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) SCIM init enables provisioning without resetting existing SSO providers",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) SCIM init enables provisioning without resetting existing SSO providers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_7",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) lease-auth cannot call host identity/scim endpoints and users without membership cannot access workspace routes",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) lease-auth cannot call host identity/scim endpoints and users without membership cannot access workspace routes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_8",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) tampered identity config signature fails closed for auth/scim endpoints",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) tampered identity config signature fails closed for auth/scim endpoints",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-981115775_0_9",
+      "name": "tests/enterpriseSsoScim.test.ts enterprise identity (OIDC/SAML/SCIM) responses do not leak client secrets, SCIM token, or private key markers",
+      "fullName": "enterprise identity (OIDC/SAML/SCIM) responses do not leak client secrets, SCIM token, or private key markers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-199303382",
+      "name": "tests/identity/jwtVerify.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-199303382_0",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_0",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts genuine RS256 with exactly one compatible public key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts genuine RS256 with exactly one compatible public key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_1",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts genuine PS256 with exactly one compatible public key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts genuine PS256 with exactly one compatible public key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_2",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts genuine ES256 with exactly one compatible public key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts genuine ES256 with exactly one compatible public key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_3",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses a genuine wrong-key RS256 signature before accepting any claims",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses a genuine wrong-key RS256 signature before accepting any claims",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_4",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses a flipped signature without a second same-kid refresh",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses a flipped signature without a second same-kid refresh",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_5",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses a genuinely signed token missing exp independently of all other claim failures",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses a genuinely signed token missing exp independently of all other claim failures",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected { ok: true, claims: { …(5) } } to deeply equal { ok: false, …(1) }",
+          "actual": "{\n  \"claims\": {\n    \"aud\": \"synthetic-oidc-client\",\n    \"iat\": 1800000000,\n    \"iss\": \"http://127.0.0.1:64695/7ce88c81-a8e1-410a-8a6f-3b18f194abc1\",\n    \"nonce\": \"synthetic-exact-nonce\",\n    \"sub\": \"synthetic-subject\",\n  },\n  \"ok\": true,\n}",
+          "expected": "{\n  \"error\": \"id_token missing exp\",\n  \"ok\": false,\n}",
+          "showDiff": true,
+          "operator": "deepStrictEqual",
+          "diff": "- Expected\n+ Received\n\n  {\n-   \"error\": \"id_token missing exp\",\n-   \"ok\": false,\n+   \"claims\": {\n+     \"aud\": \"synthetic-oidc-client\",\n+     \"iat\": 1800000000,\n+     \"iss\": \"http://127.0.0.1:64695/7ce88c81-a8e1-410a-8a6f-3b18f194abc1\",\n+     \"nonce\": \"synthetic-exact-nonce\",\n+     \"sub\": \"synthetic-subject\",\n+   },\n+   \"ok\": true,\n  }",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected { ok: true, claims: { …(5) } } to deeply equal { ok: false, …(1) }\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:281:10\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:200:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts:279:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+              "line": 281,
+              "column": 10
+            },
+            {
+              "method": "withFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+              "line": 200,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/identity/jwtVerify.test.ts",
+              "line": 279,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_6",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'null exp' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'null exp' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_7",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'string exp' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'string exp' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_8",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'raw numeric overflow exp' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'raw numeric overflow exp' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_9",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'missing iat' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'missing iat' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_10",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'null iat' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'null iat' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_11",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'raw numeric overflow iat' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'raw numeric overflow iat' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_12",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'expiry at zero-skew boundary' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'expiry at zero-skew boundary' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_13",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'expiry at default-skew boundary' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'expiry at default-skew boundary' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_14",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'expiry at clamped upper-skew boundary' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'expiry at clamped upper-skew boundary' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_15",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'negative skew clamps to zero' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'negative skew clamps to zero' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_16",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'future iat beyond zero skew' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'future iat beyond zero skew' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_17",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'future iat beyond default skew' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'future iat beyond default skew' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_18",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'iat older than ten minutes with zero …' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'iat older than ten minutes with zero …' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_19",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'iat beyond ten-minute plus default-sk…' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'iat beyond ten-minute plus default-sk…' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_20",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'future nbf' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'future nbf' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_21",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'null nbf' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'null nbf' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_22",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'string nbf' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'string nbf' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_23",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'raw numeric overflow nbf' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'raw numeric overflow nbf' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_24",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'issuer differs by slash' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'issuer differs by slash' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_25",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'missing audience' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'missing audience' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_26",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'empty audience list' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'empty audience list' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_27",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'mixed audience list' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'mixed audience list' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_28",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'wrong audience' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'wrong audience' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_29",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'empty expected audience' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'empty expected audience' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_30",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'several audiences without azp' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'several audiences without azp' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_31",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'several audiences with wrong azp' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'several audiences with wrong azp' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_32",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'single audience with wrong supplied a…' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'single audience with wrong supplied a…' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_33",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'duplicate audiences without azp' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'duplicate audiences without azp' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_34",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'missing subject' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'missing subject' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_35",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'empty subject' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'empty subject' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_36",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'numeric subject' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'numeric subject' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_37",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'missing nonce' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'missing nonce' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_38",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'wrong nonce' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'wrong nonce' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_39",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'empty expected nonce' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'empty expected nonce' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_40",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'nonfinite requested skew' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'nonfinite requested skew' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_41",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'infinite requested skew' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'infinite requested skew' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_42",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'nonfinite supplied claims clock' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'nonfinite supplied claims clock' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_43",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'infinite supplied claims clock' with its specific diagnostic",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures rejects signed 'infinite supplied claims clock' with its specific diagnostic",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_44",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'optional nbf absent'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'optional nbf absent'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_45",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'expiry one second ahead at zero skew'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'expiry one second ahead at zero skew'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_46",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'expiry just inside default skew'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'expiry just inside default skew'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_47",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'expiry just inside clamped skew'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'expiry just inside clamped skew'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_48",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'iat at future default boundary'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'iat at future default boundary'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_49",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'iat at oldest default boundary'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'iat at oldest default boundary'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_50",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'iat exactly ten minutes old with zero…'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'iat exactly ten minutes old with zero…'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_51",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'nbf at default boundary'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'nbf at default boundary'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_52",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'fractional finite time'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'fractional finite time'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_53",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'several audiences with exact azp'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'several audiences with exact azp'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_54",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'single audience array'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts signed 'single audience array'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_55",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'OKP with RS256' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'OKP with RS256' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_56",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'encryption use' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'encryption use' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_57",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'algorithm mismatch' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'algorithm mismatch' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_58",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'empty key operations' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'empty key operations' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_59",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'extra signing operation' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'extra signing operation' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_60",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'nonarray key operations' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'nonarray key operations' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_61",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'private component field present' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'private component field present' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_62",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'noncanonical modulus' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'noncanonical modulus' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_63",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'weak RSA modulus' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'weak RSA modulus' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_64",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'duplicate compatible kid' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'duplicate compatible kid' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_65",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'two compatible keys without token kid' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'two compatible keys without token kid' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_66",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'invalid JWK kid without token kid' without selecting an arbitrary key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'invalid JWK kid without token kid' without selecting an arbitrary key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_67",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures accepts no token kid only with one compatible signing key",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures accepts no token kid only with one compatible signing key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_68",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses ES256 'wrong EC curve'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses ES256 'wrong EC curve'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_69",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses ES256 'short EC coordinate'",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses ES256 'short EC coordinate'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_70",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses unsupported none before fetching any JWK",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses unsupported none before fetching any JWK",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_71",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses unsupported HS256 before fetching any JWK",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses unsupported HS256 before fetching any JWK",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_72",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses unsupported EdDSA before fetching any JWK",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses unsupported EdDSA before fetching any JWK",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_73",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'critical header' before fetching",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'critical header' before fetching",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_74",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'empty token kid' before fetching",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'empty token kid' before fetching",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_75",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses 'numeric token kid' before fetching",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses 'numeric token kid' before fetching",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_76",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'two parts' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'two parts' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_77",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'empty part' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'empty part' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_78",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'extra part' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'extra part' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_79",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'token over one MiB' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'token over one MiB' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_80",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'padded header' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'padded header' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_81",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'noncanonical header' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'noncanonical header' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_82",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'invalid UTF8 header' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'invalid UTF8 header' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_83",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'invalid UTF8 claims' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'invalid UTF8 claims' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_84",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'array claims' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'array claims' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_85",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'null header' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'null header' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_0_86",
+      "name": "tests/identity/jwtVerify.test.ts independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'malformed signature base64' without a key request",
+      "fullName": "independent OIDC JWT verifier: genuine synthetic signatures refuses malformed 'malformed signature base64' without a key request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-199303382_1",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_1_0",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation refreshes one unknown kid then suppresses another refresh on the real 60-second cache clock",
+      "fullName": "real JWKS cache and rotation refreshes one unknown kid then suppresses another refresh on the real 60-second cache clock",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_1_1",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation retains known good keys after a real failed refresh while refusing unknown keys",
+      "fullName": "real JWKS cache and rotation retains known good keys after a real failed refresh while refusing unknown keys",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_1_2",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation refuses a fresh malformed JWKS {}",
+      "fullName": "real JWKS cache and rotation refuses a fresh malformed JWKS {}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_1_3",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation refuses a fresh malformed JWKS {\"keys\":[]}",
+      "fullName": "real JWKS cache and rotation refuses a fresh malformed JWKS {\"keys\":[]}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_1_4",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation refuses a fresh malformed JWKS {\"keys\":[null]}",
+      "fullName": "real JWKS cache and rotation refuses a fresh malformed JWKS {\"keys\":[null]}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_1_5",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation refuses a fresh malformed JWKS {\"keys\":[1]}",
+      "fullName": "real JWKS cache and rotation refuses a fresh malformed JWKS {\"keys\":[1]}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_1_6",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation refuses a fresh malformed JWKS {\"keys\":[[]]}",
+      "fullName": "real JWKS cache and rotation refuses a fresh malformed JWKS {\"keys\":[[]]}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_1_7",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation revalidates an HTTP JWKS URI even when its known key is cached",
+      "fullName": "real JWKS cache and rotation revalidates an HTTP JWKS URI even when its known key is cached",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_1_8",
+      "name": "tests/identity/jwtVerify.test.ts real JWKS cache and rotation refuses a loopback issuer without opt-in before any HTTP request",
+      "fullName": "real JWKS cache and rotation refuses a loopback issuer without opt-in before any HTTP request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-199303382_2",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_0",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery sends the actual form method, headers and UTF8 byte length without global fetch",
+      "fullName": "bounded real OIDC JSON transport and discovery sends the actual form method, headers and UTF8 byte length without global fetch",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_1",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses a real redirect without contacting its owned destination",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses a real redirect without contacting its owned destination",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_2",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery sanitizes a real non-success endpoint response",
+      "fullName": "bounded real OIDC JSON transport and discovery sanitizes a real non-success endpoint response",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_3",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses a real 'invalid JSON' response",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses a real 'invalid JSON' response",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_4",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses a real 'array' response",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses a real 'array' response",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_5",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses a real 'null' response",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses a real 'null' response",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_6",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses a real 'string' response",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses a real 'string' response",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_7",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses a real 'fatal UTF8' response",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses a real 'fatal UTF8' response",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_8",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery enforces the literal one-MiB response boundary plus 0 byte",
+      "fullName": "bounded real OIDC JSON transport and discovery enforces the literal one-MiB response boundary plus 0 byte",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_9",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery enforces the literal one-MiB response boundary plus 1 byte",
+      "fullName": "bounded real OIDC JSON transport and discovery enforces the literal one-MiB response boundary plus 1 byte",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_10",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery enforces the real ten-second request timeout and naturally closes its owned endpoint",
+      "fullName": "bounded real OIDC JSON transport and discovery enforces the real ten-second request timeout and naturally closes its owned endpoint",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_11",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'not a URL' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'not a URL' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_12",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'http://127.0.0.1.attacker.invalid/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'http://127.0.0.1.attacker.invalid/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_13",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'http://localhost/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'http://localhost/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_14",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'http://127.1/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'http://127.1/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_15",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'ftp://127.0.0.1/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'ftp://127.0.0.1/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_16",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'https://user:pass@example.invalid/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'https://user:pass@example.invalid/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_17",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'https://@example.invalid/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'https://@example.invalid/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_18",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'https://example.invalid/#' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'https://example.invalid/#' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_19",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'https://10.0.0.1/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'https://10.0.0.1/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_20",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'https://169.254.169.254/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'https://169.254.169.254/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_21",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'https://192.0.2.1/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'https://192.0.2.1/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_22",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses URL 'https://[::ffff:127.0.0.1]/' without a request",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses URL 'https://[::ffff:127.0.0.1]/' without a request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_23",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery admits only exact opt-in literals and restores the prior value",
+      "fullName": "bounded real OIDC JSON transport and discovery admits only exact opt-in literals and restores the prior value",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_24",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery resolves localhost inward and refuses before connecting to the owned server",
+      "fullName": "bounded real OIDC JSON transport and discovery resolves localhost inward and refuses before connecting to the owned server",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_25",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery fetches exact issuer-bound discovery on each call and preserves the endpoint values",
+      "fullName": "bounded real OIDC JSON transport and discovery fetches exact issuer-bound discovery on each call and preserves the endpoint values",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_26",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses discovery issuer mismatch from an actual local response",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses discovery issuer mismatch from an actual local response",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_27",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses discovery 'missing endpoint' without requesting the returned endpoint",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses discovery 'missing endpoint' without requesting the returned endpoint",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_28",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses discovery 'private endpoint' without requesting the returned endpoint",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses discovery 'private endpoint' without requesting the returned endpoint",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_29",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses discovery 'HTTP named endpoint' without requesting the returned endpoint",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses discovery 'HTTP named endpoint' without requesting the returned endpoint",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_30",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses discovery 'endpoint credentials' without requesting the returned endpoint",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses discovery 'endpoint credentials' without requesting the returned endpoint",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-199303382_2_31",
+      "name": "tests/identity/jwtVerify.test.ts bounded real OIDC JSON transport and discovery refuses discovery 'endpoint fragment' without requesting the returned endpoint",
+      "fullName": "bounded real OIDC JSON transport and discovery refuses discovery 'endpoint fragment' without requesting the returned endpoint",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "356459521",
+      "name": "tests/security/api-security.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/security/api-security.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "356459521_0",
+      "name": "tests/security/api-security.test.ts API security hardening",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356459521_0_0",
+      "name": "tests/security/api-security.test.ts API security hardening internal /api/v1 routes require human/admin auth and reject lease principals",
+      "fullName": "API security hardening internal /api/v1 routes require human/admin auth and reject lease principals",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356459521_0_1",
+      "name": "tests/security/api-security.test.ts API security hardening Studio sessions enforce least-privilege roles across protected /api/v1 routes",
+      "fullName": "API security hardening Studio sessions enforce least-privilege roles across protected /api/v1 routes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356459521_0_2",
+      "name": "tests/security/api-security.test.ts API security hardening console snapshot is no longer anonymously accessible",
+      "fullName": "API security hardening console snapshot is no longer anonymously accessible",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356459521_0_3",
+      "name": "tests/security/api-security.test.ts API security hardening expired signed session token is rejected",
+      "fullName": "API security hardening expired signed session token is rejected",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356459521_0_4",
+      "name": "tests/security/api-security.test.ts API security hardening CORS blocks non-allowlisted origins",
+      "fullName": "API security hardening CORS blocks non-allowlisted origins",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356459521_0_5",
+      "name": "tests/security/api-security.test.ts API security hardening host and workspace login flows are rate-limited",
+      "fullName": "API security hardening host and workspace login flows are rate-limited",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356459521_0_6",
+      "name": "tests/security/api-security.test.ts API security hardening workspace IDOR attempt with cross-workspace cookie is denied",
+      "fullName": "API security hardening workspace IDOR attempt with cross-workspace cookie is denied",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356459521_0_7",
+      "name": "tests/security/api-security.test.ts API security hardening OIDC JWT verifier rejects expired, nonce-mismatched, EdDSA and non-loopback-opt-in HTTP tokens",
+      "fullName": "API security hardening OIDC JWT verifier rejects expired, nonce-mismatched, EdDSA and non-loopback-opt-in HTTP tokens",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "744488484",
+      "name": "tests/security/identityAccountBinding.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0ax4ak/checkout/tests/security/identityAccountBinding.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "744488484_0",
+      "name": "tests/security/identityAccountBinding.test.ts federated identity account binding",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "744488484_0_0",
+      "name": "tests/security/identityAccountBinding.test.ts federated identity account binding does not merge an OIDC login into a local administrator by email",
+      "fullName": "federated identity account binding does not merge an OIDC login into a local administrator by email",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "744488484_0_1",
+      "name": "tests/security/identityAccountBinding.test.ts federated identity account binding keys federated users by provider and subject, not mutable email",
+      "fullName": "federated identity account binding keys federated users by provider and subject, not mutable email",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "744488484_0_2",
+      "name": "tests/security/identityAccountBinding.test.ts federated identity account binding rejects cross-provider email collision and incomplete federated identities",
+      "fullName": "federated identity account binding rejects cross-provider email collision and incomplete federated identities",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "744488484_0_3",
+      "name": "tests/security/identityAccountBinding.test.ts federated identity account binding does not convert an existing SAML binding into OIDC when provider and subject collide",
+      "fullName": "federated identity account binding does not convert an existing SAML binding into OIDC when provider and subject collide",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

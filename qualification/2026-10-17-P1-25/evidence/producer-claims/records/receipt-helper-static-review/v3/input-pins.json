@@ -1,0 +1,80 @@
+{
+  "count": 15,
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+      "bytes": 40872,
+      "sha256": "4d825f2a41ae308837c1093c1db4636677b897e906aed3a9a98a6980b914f733"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/root-runtime-review.json",
+      "bytes": 30212,
+      "sha256": "88b6051dab7a11566c43f22b12a1ae5f362bf2b4a39815f799f2936a0d66d214"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply1.json",
+      "bytes": 3851,
+      "sha256": "93b81a8340a2fe10428494477a2d45c6ccd4f9df1b3869b1f8b24823060eb0ec"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore1.json",
+      "bytes": 5835,
+      "sha256": "acb452e7a46b8b3d38f05e0878242718318d80058df739ce8a3cf10df7162e73"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-apply2.json",
+      "bytes": 4243,
+      "sha256": "e3ecf474031cd0e25aa1f02a24abe493af2f79fd408931cf2e2b236ad71f6b3b"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-action-restore2.json",
+      "bytes": 5843,
+      "sha256": "62e7e01be57b4558e629607603c423b84d6b22a8f1f98fc3a826229b675fee3c"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+      "bytes": 41612,
+      "sha256": "00144c15ee50956f0ef82ddabe1a9e70f6ffdc161390c72ac48120cd24d1cc23"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/v2-to-v3.patch.txt",
+      "bytes": 2422,
+      "sha256": "28fb8de5c6ae428a050d5b8ca9b2277f9a2f1d59767dd06829dabdda766bda27"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/c39-to-producer.patch.txt",
+      "bytes": 30254,
+      "sha256": "3f7af53dff15e017bfe0d59a297735ce8597d70c00604677f51db9acb5d887d1"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/README.md",
+      "bytes": 882,
+      "sha256": "fb007b7a366299cfbe98f40fdeb9a97660d3de70f8354590517273ed6ba59014"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/seal.json",
+      "bytes": 4660,
+      "sha256": "89c5a4dbf2aa47348aff69ae97f219a24c0311b982f9b1aded75bab30d602de4"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-helper-static-review/review.json",
+      "bytes": 4800,
+      "sha256": "f9b20c9a6768a5ab972545215e74bc22e04d250aeab36c8f63a797ef55fe339d"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-helper-static-review/seal.json",
+      "bytes": 951,
+      "sha256": "ad5e4d2116de0b5466b6605c0e6df483b580374c0b497a7f5342870e6dcac607"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/review.json",
+      "bytes": 10143,
+      "sha256": "e2e0e6abb0e4bf92d0d8299660e3f47e506e6490a9b41a709f7ef374bd39191c"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/completed-runtime-review/seal.json",
+      "bytes": 1602,
+      "sha256": "26fb99490c91f1347217c3a0fd1456ff71d51e0f70d112f79412a1088cab1869"
+    }
+  ]
+}

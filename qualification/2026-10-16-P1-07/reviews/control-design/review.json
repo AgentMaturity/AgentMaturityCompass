@@ -1,0 +1,130 @@
+{
+  "schema": "p107-private-control-static-independent-review/1",
+  "at": "2026-10-16T17:39:29.314631+00:00",
+  "sourceBaseAsRecorded": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "allPatchesRead": true,
+  "currentSelectedSourcesRead": true,
+  "allOriginalAndMutantHashesVerifiedByStaticReconstruction": true,
+  "operators": [
+    {
+      "name": "M1-highest-pass",
+      "target": "src/diagnostic/levelSemantics.ts",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+        "bytes": 12367,
+        "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+      },
+      "patchPin": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M1-highest-pass.patch",
+        "bytes": 459,
+        "sha256": "27d7f6fafeadc9e324280ae2f10599b61e917851988c41450f98996a0e065ff0"
+      },
+      "originalMatches": true,
+      "mutantReconstructedInMemory": {
+        "bytes": 12304,
+        "sha256": "923d8204905bb192a266857be27ec7a22842e0b1533f62fbf46057db169543fb"
+      },
+      "mutantMatchesOperatorsRecord": true,
+      "hunks": 1,
+      "hunkOriginalLines": [
+        185,
+        193
+      ],
+      "singleExactPreimage": true,
+      "mutantWrittenToDisk": false,
+      "executed": false
+    },
+    {
+      "name": "M2-register-seeder",
+      "target": "src/diagnostic/evidenceEmitters.ts",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+        "bytes": 12985,
+        "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+      },
+      "patchPin": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M2-register-seeder.patch",
+        "bytes": 872,
+        "sha256": "ccacc51c961cc87b6fa386688b628d517e666e4d85eff9cfa647e98509a7d300"
+      },
+      "originalMatches": true,
+      "mutantReconstructedInMemory": {
+        "bytes": 13197,
+        "sha256": "5a837201d16449baf1c93da9342709510fa2fe8b0363dad5b94836af91684890"
+      },
+      "mutantMatchesOperatorsRecord": true,
+      "hunks": 1,
+      "hunkOriginalLines": [
+        38,
+        43
+      ],
+      "singleExactPreimage": true,
+      "mutantWrittenToDisk": false,
+      "executed": false
+    },
+    {
+      "name": "M3-remove-denied",
+      "target": "src/diagnostic/evidenceEmitters.ts",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+        "bytes": 12985,
+        "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+      },
+      "patchPin": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M3-remove-denied.patch",
+        "bytes": 1190,
+        "sha256": "e55b8de720912fd4e8d4bea3c547b9b6ee8780a6cf1bb9234d79fcf54b25c6ed"
+      },
+      "originalMatches": true,
+      "mutantReconstructedInMemory": {
+        "bytes": 12795,
+        "sha256": "086ad9d62d267e3733b9d51d1ba2605484b228105d75e561ffc771859471ed47"
+      },
+      "mutantMatchesOperatorsRecord": true,
+      "hunks": 1,
+      "hunkOriginalLines": [
+        40,
+        46
+      ],
+      "singleExactPreimage": true,
+      "mutantWrittenToDisk": false,
+      "executed": false
+    }
+  ],
+  "causalFeasibility": [
+    {
+      "name": "M1-highest-pass",
+      "finding": "Actual patch preserves evaluation and replaces only final contiguous selection. perLevel is sorted ascending, so the last passing row becomes the highest pass even across missing/failed lower gates.",
+      "baselineNeeded": "Fixed synthetic pass/fail/pass graph final1 plus adjacent all-pass positive; first intended sensitive assertion final1.",
+      "boundary": "Artificial L3 gate is only an algorithm witness; canonical maps remainL3empty."
+    },
+    {
+      "name": "M2-register-seeder",
+      "finding": "Unique entry names the actual seeder, uses synthetic_example and type-correct amc-runtime producer. EmitterEntry excludes producer synthetic but ClaimKind includes synthetic_example. It must fail registry truth, not authenticate or admit seeded rows.",
+      "additionalFailurePossibility": "The added unique audit literal is absent from its named module. A literal-correspondence assertion may also fail.",
+      "requiredAttribution": "Keep no-seeder/no-synthetic assertion independently reached in a fixed body or before the literal assertion; classify extra failures/masking from actual output. No patch change is required by this review.",
+      "boundary": "No dynamic test.each over mutated registry; test identities stay fixed."
+    },
+    {
+      "name": "M3-remove-denied",
+      "finding": "Only the denied registry item is removed. It is then absent from EMITTERS_BY_ID and map-bound L2 rows; levelGates marks the real AMC-5.29 map inadmissible.",
+      "baselineNeeded": "Independent literal4-row/two-session/two-day canonical positive has L2 before mutation; real governed same-day fixture can separately witness loss of L2 matched denied rows.",
+      "requiredAttribution": "Same-day earned level may remainL1 due continuity. Lost mapped selection is distinct from an earned-level drop; do not conflate them.",
+      "boundary": "No real governed run or pure baseline is executed/qualified by this static report."
+    }
+  ],
+  "blockers": [],
+  "attention": [
+    "M2 has an additional literal-correspondence adverse condition; intended registry rejection must be reached and reported honestly.",
+    "M3 same-day runtime level need not drop; claim the actual selection witness separately."
+  ],
+  "executions": {
+    "patchApplied": false,
+    "productOrHelperExecuted": false,
+    "parserOrCompilerExecuted": false,
+    "nativeSqlNetworkProcessProbeExecuted": false
+  },
+  "writes": "Only new private review/pins/seal. No mutant stored, source/index/checkout/QA write, or production source-integration authority.",
+  "futureQualification": "Root must first read/admit candidates and qualify actual canonical positives, then independently allocate one control at a time in freshQ, retain actual failure causes, restore exact bytes and rerun. No future counts or sensitivity credit.",
+  "ownership": "Claude registry and every authored/historical variant remain protected; no ownership release or approval is inferred."
+}

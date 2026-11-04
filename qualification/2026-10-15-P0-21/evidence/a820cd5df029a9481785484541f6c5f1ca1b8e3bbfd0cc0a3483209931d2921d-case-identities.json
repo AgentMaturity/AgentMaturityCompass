@@ -1,0 +1,150 @@
+[
+  {
+    "file": "tests/domainAssessmentUnits.test.ts",
+    "fullName": "domain engine takes typed units (P0-21) a base level of 7 throws"
+  },
+  {
+    "file": "tests/domainAssessmentUnits.test.ts",
+    "fullName": "domain engine takes typed units (P0-21) a percentage passed as a Likert answer throws"
+  },
+  {
+    "file": "tests/domainAssessmentUnits.test.ts",
+    "fullName": "domain engine takes typed units (P0-21) a raw 6 in domainQuestionScores throws instead of scoring 6%"
+  },
+  {
+    "file": "tests/domainAssessmentUnits.test.ts",
+    "fullName": "domain engine takes typed units (P0-21) valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent"
+  },
+  {
+    "file": "tests/logisticsIndustryPack.test.ts",
+    "fullName": "freight, 3PL, and warehouse industry pack registers the dedicated logistics pack under mobility discovery"
+  },
+  {
+    "file": "tests/logisticsIndustryPack.test.ts",
+    "fullName": "freight, 3PL, and warehouse industry pack scores concrete logistics controls and surfaces low-level compliance gaps"
+  },
+  {
+    "file": "tests/noCertificationFromSelfAssessment.test.ts",
+    "fullName": "no certification from self-assessment (P0-21) MCP sector-pack and trust-score text say self-assessment and evidence standing"
+  },
+  {
+    "file": "tests/noCertificationFromSelfAssessment.test.ts",
+    "fullName": "no certification from self-assessment (P0-21) a partial self-assessment is reported as incomplete"
+  },
+  {
+    "file": "tests/noCertificationFromSelfAssessment.test.ts",
+    "fullName": "no certification from self-assessment (P0-21) all-5 answers on every registered pack are a complete self-assessment, not a certification"
+  },
+  {
+    "file": "tests/noCertificationFromSelfAssessment.test.ts",
+    "fullName": "no certification from self-assessment (P0-21) an answer outside 1-5 is refused, not clamped"
+  },
+  {
+    "file": "tests/noCertificationFromSelfAssessment.test.ts",
+    "fullName": "no certification from self-assessment (P0-21) the domain report carries no certification field or wording"
+  },
+  {
+    "file": "tests/noCertificationFromSelfAssessment.test.ts",
+    "fullName": "no certification from self-assessment (P0-21) the pack audit reports a self-reported overall with no certified field"
+  },
+  {
+    "file": "tests/noCertificationFromSelfAssessment.test.ts",
+    "fullName": "no certification from self-assessment (P0-21) the transparency report shows evidence standing, never certification"
+  },
+  {
+    "file": "tests/scoreUnits.test.ts",
+    "fullName": "typed score units (P0-21) a Likert answer is an integer 1-5 and nothing else"
+  },
+  {
+    "file": "tests/scoreUnits.test.ts",
+    "fullName": "typed score units (P0-21) conversions are explicit"
+  },
+  {
+    "file": "tests/scoreUnits.test.ts",
+    "fullName": "typed score units (P0-21) percent, level and fraction reject values outside their range"
+  },
+  {
+    "file": "tests/scoreUnits.test.ts",
+    "fullName": "typed score units (P0-21) percentToLevel is the one level table: L2 starts at 30"
+  },
+  {
+    "file": "tests/selfReportedLevelCap.test.ts",
+    "fullName": "self-reported evidence caps at L1 (P0-21) L2 counts met only by SELF_REPORTED events support at most level 1"
+  },
+  {
+    "file": "tests/selfReportedLevelCap.test.ts",
+    "fullName": "self-reported evidence caps at L1 (P0-21) a gate that lists no tiers defaults to OBSERVED and ATTESTED"
+  },
+  {
+    "file": "tests/selfReportedLevelCap.test.ts",
+    "fullName": "self-reported evidence caps at L1 (P0-21) imported rows tagged to the question support exactly level 1"
+  },
+  {
+    "file": "tests/selfReportedLevelCap.test.ts",
+    "fullName": "self-reported evidence caps at L1 (P0-21) no base gate at L2 or above accepts SELF_REPORTED"
+  },
+  {
+    "file": "tests/selfReportedLevelCap.test.ts",
+    "fullName": "self-reported evidence caps at L1 (P0-21) the same counts with OBSERVED events support level 2, the highest its evidence map evaluates (P1-07)"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport does not promote an unsealed current transparency run to observed"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport evidence standing \u2014 evidence_supported when integrity >= 0.9 and level >= 4"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport evidence standing \u2014 insufficient_evidence when integrity < 0.6 and level < 2"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport evidence standing \u2014 partial_evidence when integrity >= 0.6 or level >= 2"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport generates report for valid agent"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport handles agent with no BOM gracefully"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport handles agent with no runs gracefully"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport preserves legacy version 1.1.1 in rendered transparency output"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport preserves legacy version undefined in rendered transparency output"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport renders markdown with expected sections"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport renders valid JSON"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport report has correct dimensions from run"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport report has correct identity fields"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport report version is 1.0"
+  },
+  {
+    "file": "tests/transparencyReport.test.ts",
+    "fullName": "generateTransparencyReport throws for non-existent agent"
+  }
+]

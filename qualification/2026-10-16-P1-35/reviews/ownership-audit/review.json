@@ -1,0 +1,157 @@
+{
+  "schema": "p135-bounded-static-ownership-review/1",
+  "at": "2026-10-16T16:23:23.889811+00:00",
+  "conclusion": "No observed current or historical overlap for the exact four proposed new scopes. This is a finite static no-overlap observation for root allocation; absence and clean status do not release ownership of any existing path.",
+  "blockers": [],
+  "proposedWriteScopeOnly": [
+    "tests/migration/legacyRelabel.test.ts",
+    "scripts/make-legacy-fixtures.mjs",
+    "tests/fixtures/legacy-1.1.1",
+    "qualification/2026-10-16-P1-35"
+  ],
+  "productionReadOnly": [
+    "src/migration/legacy/classify.ts",
+    "src/migration/legacy/notices.ts",
+    "src/migration/legacy/notices/AMC-LEGACY-2026-001.json",
+    "src/migration/legacy/relabelLog.ts",
+    "src/migration/legacy/receipt.ts",
+    "src/migration/legacy/scan.ts"
+  ],
+  "otherReadOnly": [
+    "docs/migration/LEGACY_RESULTS.md",
+    "src/cli.ts",
+    "src/crypto/signing/signerTypes.ts",
+    "src/trust/trustConfig.ts"
+  ],
+  "inventory": {
+    "registries": 3,
+    "registeredRoots": 170,
+    "retainedFreshRoots": 5,
+    "distinctPhysicalRoots": 175,
+    "newRetainedRootIncluded": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+    "proposedPresenceChecks": 700,
+    "allProposedAbsent": true,
+    "all175SelectedStatusesEmpty": true,
+    "targetHistoryAllThreeRegistriesEmpty": true,
+    "readErrors": [],
+    "registeredUnionAdded": [],
+    "registeredUnionRemoved": [],
+    "prior174ProductionPresenceChecks": 1044,
+    "oldPresentPinsExact": 444,
+    "oldAbsentStatesExact": 600,
+    "newQSixSourcePinsEqualS": true
+  },
+  "ownershipAndPreservation": {
+    "reservationPin": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "reservationPriorExact": true,
+    "noExactScopeReservationMatched": true,
+    "CLIRequirement": [
+      {
+        "startLine": 1587,
+        "endLine": 1589,
+        "text": "  - Edits: src/cli.ts (one net-zero registration line), src/cli/resultCommandRegistry.ts, src/repl/replParser.ts, scripts/freeze-baseline.json (--write-baseline output), .changeset/a4-cli.md, docs/CLI_COMMAND_INVENTORY.md.\n  - Codex and 7fccbbfa: tell Claude before editing src/cli.ts, resultCommandRegistry.ts or replParser.ts. P0-28 and P0-55 also edit cli.ts net-zero on int. At the combine, rebase and keep the line count.\n"
+      }
+    ],
+    "CLIIsExcludedAndNoClaudeMessageSent": true,
+    "SHead": "721e60d75cb45d116391091d83505a1a276968a3",
+    "SBranch": "codex/p1-39-mcp-qualification",
+    "SObservedClean": true,
+    "P139SourceMetadataCheckpointPreserved": true,
+    "heldRHeadStatusIndexAnd26PinsExact": true,
+    "ClaudeHead": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+    "sixProductionFilesEqualS_R_Claude": true,
+    "fourClaudeProtectedVariantsRemainExactAndDistinct": true,
+    "allFiveMergedMigrationCommitsAreSAncestors": true
+  },
+  "existingCandidates": {
+    "exactGeneratorTestCorpusAndPacketAbsentInAll175Roots": true,
+    "onlyLegacyNamedCandidateObserved": "tests/ledgerLegacyReadOnly.test.ts",
+    "candidateSha256": "2b1c192c18f9b9a05be38f7f1d6f093dbb3f3af4f6d0960e357801308156a18f",
+    "candidateCopies": 134,
+    "scope": "Existing file creates synthetic schema-prefix ledgers to verify read-only compatibility. It does not exercise migration APIs or establish actual v1.1.1 generator/corpus provenance; preserve it unchanged.",
+    "localTagAllS_R_Claude": {
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass": "ff53902225ff276c55558d5ca17a8fc60b780655",
+      "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass": "ff53902225ff276c55558d5ca17a8fc60b780655",
+      "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone": "ff53902225ff276c55558d5ca17a8fc60b780655"
+    },
+    "officialRemoteTagAndActualGenerationNotVerifiedHere": true
+  },
+  "sourceFlow": [
+    {
+      "path": "src/migration/legacy/classify.ts:110",
+      "api": "classifyLegacyArtifact(kind, parsed)",
+      "fit": "Pure classifier. R1 requires assuranceRunId and absent evidenceStatus. R2 requires dogfood markers plus unmarked event claim kinds. R4 preserves overclaimed imported/manual/external tier and excludes runtime/synthetic producers; ATTESTED with attestation keyId is distinct. R5 uses actual legacy version/layer scores and records the mean original level with L1 cap. A top-level claimKind plus statusDimensions object bypasses legacy classification."
+    },
+    {
+      "path": "src/migration/legacy/scan.ts:229",
+      "api": "relabelLegacyArtifacts(workspace, {trust, ledgerCheck?, dryRun?, paths?, now?})",
+      "fit": "Uses real ledger/run/bundle/certificate verification before classification, read-only ledger access and bounded workspace/explicit paths. Do not fabricate ledgerCheck to admit an old fixture. Failed unreadable checks are skipped; readable legacy content may retain integrityFailed with its legacy label. Unversioned passport/assurance cert/trust JSON remains an explicit skip."
+    },
+    {
+      "path": "src/migration/legacy/scan.ts:271",
+      "api": "Persistent writes",
+      "fit": "Checks existing log first; signs MIGRATION_RECEIPT before append, then appends lines and exclusively creates receipt JSON/signature. Dry-run returns before signing/writes. Idempotence is artifact SHA plus notice version; second run appends no lines but still writes a new receipt, so distinct real timestamps are required for repeated runs."
+    },
+    {
+      "path": "src/migration/legacy/relabelLog.ts:54",
+      "api": "verifyRelabelLog(workspace)",
+      "fit": "Checks line sequence/prevHash and signed receipt line-count/head coverage, including tail rewrite/extension. Tamper refusal must be actual; do not substitute chain-only checks or fabricate signed receipts."
+    },
+    {
+      "path": "src/migration/legacy/receipt.ts:31",
+      "api": "originalsDigest(hashes)",
+      "fit": "Hashes sorted scanned artifact SHA strings joined by newline. Preserve original file and SQLite bytes before/after real relabel; session artifact SHA covers ordered event hashes. Corpus generation must retain provenance, exclude keys/secrets and stay below the spec 1 MB total."
+    },
+    {
+      "path": "src/cli.ts:6232",
+      "api": "Existing verify flag routing",
+      "fit": "relabel/repair combination is refused before repair. Real integrity verdict controls relabel admission; failure skips writes. Existing CLI and signing purposes already exist and remain read-only. A source gap revealed by qualification requires separate exact allocation, not automatic production expansion."
+    }
+  ],
+  "sourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/migration/legacy/classify.ts",
+      "bytes": 8451,
+      "sha256": "da93bdaf7af938ce1c75323440cd3c4be5c97e92f6bcb87b1509d9c228c324a0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/migration/legacy/notices.ts",
+      "bytes": 1187,
+      "sha256": "91380ebd370671d953181bac6ef2370091644fd36abf22a91d91366ed691d023"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/migration/legacy/notices/AMC-LEGACY-2026-001.json",
+      "bytes": 1876,
+      "sha256": "165b430d830da41eb845144daa9fd151983516bbf7ccc95162da77dd186bebe4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/migration/legacy/relabelLog.ts",
+      "bytes": 5262,
+      "sha256": "8a6496aa3c1e6785ba27d74000251d5f4114f8a7ee3ecba8e2a2468c6f8cec39"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/migration/legacy/receipt.ts",
+      "bytes": 4086,
+      "sha256": "0a3e40ddd273ae16e3503c1c0f7c58323d406b7f52315078dfda432bf40c9a89"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/migration/legacy/scan.ts",
+      "bytes": 16329,
+      "sha256": "a857c9dc27a993db83036a2044a5de7da5d1b262d3ac60ec2840e6950d87f272"
+    }
+  ],
+  "normalRootWorkStillApplies": "Root performs current all-path hosted/WIP checks, ordinary needs-snapshot/freeze/quality/deadline admission and exact eventual fixture/packet filenames. Dependabot is excluded only from WIP. No frozen baseline, validator, schema, signing/trust contract, human hold or F37 skip is weakened.",
+  "staticPreparationNotes": [
+    {
+      "kind": "metadata-summary-shape-correction",
+      "exit": 1,
+      "error": "AttributeError: 'list' object has no attribute 'items'",
+      "meaning": "A read-only summary assumed the prior current collection was a mapping. No artifact was written by that command; corrected summary uses the observed list. No product/runtime qualification credit."
+    }
+  ],
+  "boundary": "Filesystem reads/read-only Git metadata and private audit artifacts only. No checkout/index/QA/source/test writes, helper/product/compiler/test/runtime/native/SQL/network/process execution, Git mutation, Claude messaging or worktree creation. No fixture was generated, no acceptance passed and no issue/plan Done claim."
+}

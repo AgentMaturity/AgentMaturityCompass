@@ -1,0 +1,15 @@
+{
+  "schema": "p125ec-source-checkpoint/1",
+  "at": "2026-10-17T01:01:38.714935+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "parent": "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+  "branch": "codex/p1-25-cadence-qualification",
+  "paths": [
+    "tests/time/checkpointWindow.test.ts"
+  ],
+  "ordinaryCommitExit": 0,
+  "sourceCleanIndexEmpty": true,
+  "source23AndTwelveChecks0": true,
+  "globalQualityRedUnwaived": true
+}

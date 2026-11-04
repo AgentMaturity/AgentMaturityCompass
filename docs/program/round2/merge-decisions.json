@@ -1,0 +1,480 @@
+{
+  "issue": "P1-42",
+  "status": "awaiting Sid: no decision recorded; all 47 questions stay as they are on main",
+  "reviewedBy": null,
+  "reviewedAt": null,
+  "source": "Round-2 content inputs (round2/content/<station>/questions.json in the program records). They are in no commit; P1-42 read them from Sid's root checkout on 2026-10-18. Each proposal is an F5 merge recommendation the candidate applied without a recorded target.",
+  "legend": "decision is merge, keep or defer. defer keeps the question exactly as on main until Sid decides, like keep; only a Sid-reviewed merge removes it (tests/roundTwoMergeDecisions.test.ts).",
+  "items": [
+    {
+      "id": "ENV-FF-2",
+      "packId": "farm-to-fork",
+      "station": "environment",
+      "proposedAction": "merge",
+      "proposedInto": "ENV-FF-10",
+      "rationale": "F5 merge: Regulation (EC) No 178/2002 Art. 18 traceability is asked twice; ENV-FF-10 carries the measurable one-step-back/one-step-forward wording. Weight of the survivor unchanged (15).",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "ENV-STS-4",
+      "packId": "sip-to-sanitation",
+      "station": "environment",
+      "proposedAction": "merge",
+      "proposedInto": "ENV-STS-13",
+      "rationale": "F5 merge: WHO water safety plan methodology is asked three times (STS-4, STS-9, STS-13); ENV-STS-13 has the most checkable wording.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "ENV-SS-15",
+      "packId": "source-to-sustenance",
+      "station": "environment",
+      "proposedAction": "merge",
+      "proposedInto": "ENV-SS-1",
+      "rationale": "F5 merge: permit validation is part of the CITES Res. Conf. 12.3 control now in ENV-SS-1.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "ENV-UU-15",
+      "packId": "ubiquity-to-utility",
+      "station": "environment",
+      "proposedAction": "merge",
+      "proposedInto": "ENV-UU-9",
+      "rationale": "F5 merge: IBR model re-validation is the Order 901/MOD-026-2 control now in ENV-UU-9; 'Order 887' was the wrong order.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "ENV-WW-13",
+      "packId": "weave-to-wear",
+      "station": "environment",
+      "proposedAction": "merge",
+      "proposedInto": "ENV-WW-2",
+      "rationale": "F5 merge: same DPP control as ENV-WW-2; the survivor carries the corrected Art. 9 anchor.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-CS-12",
+      "packId": "citizen-services",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-CS-1",
+      "rationale": "F5 merge: WCAG 2.1 SC 2.4.3 is one criterion within the WCAG 2.1 AA control in GOV-CS-1; focus-order regression testing is folded into GOV-CS-1 L5.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-DD-2",
+      "packId": "dance-of-democracy",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-DD-11",
+      "rationale": "F5 merge: DSA Art. 34 electoral risk asked twice. Its 'Code of Practice on Disinformation 2022 Commitment 22' is replaced in GOV-DD-11 by the Code of Conduct on Disinformation (DSA framework, auditable from 1 Jul 2025, read this run); commitment numbers not verified, so none are cited.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-DD-3",
+      "packId": "dance-of-democracy",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-DD-13",
+      "rationale": "F5 merge: GDPR Art. 9(2)(d) political-opinion processing asked twice; GOV-DD-13 already uses the correct 'Art. 9(2)(d)'.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-DD-5",
+      "packId": "dance-of-democracy",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-DD-12",
+      "rationale": "F5 merge: OSCE/ODIHR electoral technology asked twice; 'OSCE Commitments §7' not verified.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-DD-9",
+      "packId": "dance-of-democracy",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-DD-7",
+      "rationale": "F5 merge: EU political-advertising transparency asked twice. The GDPR Art. 22(4) profiling half is covered by new GOV-DD-17 on targeting under Regulation (EU) 2024/900 Art. 18.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-DCR-1",
+      "packId": "digital-citizens-rights",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-DCR-10",
+      "rationale": "F5 merge: duplicate of GOV-DCR-10 (EUDI Wallet assurance level high). Its 'Art. 6a' does not exist in Regulation 910/2014 as amended; wallet requirements are Art. 5a. The assurance-level element moves to GOV-DCR-7 and the wallet element is already in GOV-DCR-10.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-DCR-13",
+      "packId": "digital-citizens-rights",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-DCR-7",
+      "rationale": "F5 merge: ISO/IEC 29115 assurance asked twice (LoA4 in GOV-DCR-7, AL3 here). GOV-DCR-7 now asks for a documented assurance-level mapping.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-PL-2",
+      "packId": "petition-to-law",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-PL-13",
+      "rationale": "F5 merge: inclusive e-participation asked twice. 'OECD OG Rec Art. 2' could not be verified (the 2017 Recommendation uses numbered provisions, station digest) and is not carried over.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-PL-3",
+      "packId": "petition-to-law",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-PL-10",
+      "rationale": "F5 merge: Open Data Directive Art. 5 asked twice; the INSPIRE half is GOV-PL-11.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-PPC-12",
+      "packId": "public-private-collaboration",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "WLT-DP-7",
+      "rationale": "F5 merge (cross-station): the FATF R.16 wire-transfer control is asked in digital-payments WLT-DP-7. R.16 was revised in June 2025 (station digest, unverified: fatf-gafi.org 403).",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-PPC-2",
+      "packId": "public-private-collaboration",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "GOV-PPC-11",
+      "rationale": "F5 merge: OECD PPP value for money asked twice. Its '§6 transparency and accountability' is wrong: OECD/LEGAL/0392 Principle 6 is risk transfer (read this run).",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "GOV-PPC-5",
+      "packId": "public-private-collaboration",
+      "station": "governance",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-PP-3",
+      "rationale": "F5 merge (cross-station): SDG 17 / ISO 26000 partnership monitoring is asked in partnerships-prosperity TECH-PP-3; ISO 26000 §6.6.2 is not community involvement. Note for the technology engineer: TECH-PP-3 cites ISO 26000 §6.7, which F5 and the station digest place at clause 6.8 (unverified).",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-DHR-13",
+      "packId": "digital-health-record",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-DHR-2",
+      "rationale": "F5 merge: duplicate of HLT-DHR-2; \"§4006\" is not the information-blocking section (§4004, 42 U.S.C. 300jj-52).",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-DHR-14",
+      "packId": "digital-health-record",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-DHR-5",
+      "rationale": "F5 merge: §164.312(e)(2)(ii) transmission encryption is already in HLT-DHR-5.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-DHR-18",
+      "packId": "digital-health-record",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-DHR-9",
+      "rationale": "F5 merge: ITI-18 is one transaction of the XDS.b profile asked in HLT-DHR-9.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-DD-15",
+      "packId": "drug-discovery",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-DD-1",
+      "rationale": "F5 merge: §211.68 computerised-system controls already anchor HLT-DD-1.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-DD-16",
+      "packId": "drug-discovery",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-DD-2",
+      "rationale": "F5 merge: design-space governance is the Q8(R2) control asked in HLT-DD-2.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-LT-12",
+      "packId": "life-technology",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-LT-2",
+      "rationale": "F5 merge: Art. 10(2) data governance is the second half of HLT-LT-2.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-PL-15",
+      "packId": "patient-lifecycle",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-LT-13",
+      "rationale": "F5 merge (cross-pack): IEC 62304 §5.2 requirements traceability is asked identically in HLT-LT-13.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-PP-11",
+      "packId": "professional-practice",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-PP-4",
+      "rationale": "F5 merge: FCA/AKS billing compliance asked twice; HLT-PP-4 already cites 31 U.S.C. §3729; AKS wording folded into HLT-PP-4.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-PP-7",
+      "packId": "professional-practice",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-PP-12",
+      "rationale": "F5 merge: duplicate of HLT-PP-12; HITECH §13401 is the security-provisions section, breach notification is §13402.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "HLT-SM-11",
+      "packId": "specialized-medicine",
+      "station": "health",
+      "proposedAction": "merge",
+      "proposedInto": "HLT-SM-1",
+      "rationale": "F5 merge: DSCSA §582 asked twice; enhanced §582(g) wording folded into HLT-SM-1. \"Effective November 2024\" was FDA's stabilization period; the current schedule is per-trading-partner exemptions.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-CI-12",
+      "packId": "cognition-to-intelligence",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-CI-3",
+      "rationale": "F5 merge: ISO/IEC 42001 §6.1 planning is part of the AIMS asked in TECH-CI-3.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-CI-13",
+      "packId": "cognition-to-intelligence",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-CI-1",
+      "rationale": "F5 merge: IEEE 7001 transparency asked twice.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-CI-9",
+      "packId": "cognition-to-intelligence",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-CI-10",
+      "rationale": "F5 merge: Art. 50 asked twice. Its marking half is carried by the new TECH-CI-15 (Art. 50(2)); its NIST GOVERN 1.1 half belongs to TECH-CI-14.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-INF-4",
+      "packId": "infotainment",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-INF-12",
+      "rationale": "F5 merge: CDSM Art. 17 asked twice; TECH-INF-12 is clause-precise. The Art. 15 press-publisher half is not carried (see summary decision list).",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-NE-11",
+      "packId": "networked-ecosystems",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-NE-3",
+      "rationale": "F5 merge: DGA Art. 12 conditions are the Chapter III control in TECH-NE-3.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-NE-12",
+      "packId": "networked-ecosystems",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-NE-2",
+      "rationale": "F5 merge: OWASP API1 is one item of the API Top 10 asked in TECH-NE-2.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-NE-13",
+      "packId": "networked-ecosystems",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-NE-1",
+      "rationale": "F5 merge: Data Act Art. 4 asked twice.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-NE-8",
+      "packId": "networked-ecosystems",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-NE-9",
+      "rationale": "F5 merge: textual near-duplicate of TECH-NE-9.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-OS-10",
+      "packId": "os-sustainable-outcomes",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-OS-9",
+      "rationale": "F5 merge: Art. 9(4) is not a TLPT provision and the 'Council-required anchor' wording has no source; folded into TECH-OS-9 with Arts. 26-27.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-OS-12",
+      "packId": "os-sustainable-outcomes",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-OS-5",
+      "rationale": "F5 merge: ISO 22301 §8.4.4 recovery procedures are part of the §8.4 control.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-OS-14",
+      "packId": "os-sustainable-outcomes",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-OS-2",
+      "rationale": "F5 merge: 'ITIL v4 §5.2.7' is not a citable section; covered by TECH-OS-2.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-OS-7",
+      "packId": "os-sustainable-outcomes",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "MOB-VI-13",
+      "rationale": "F5 cross-pack merge: NIS2 Art. 21 is asked in virtual-infrastructure. NIS2 stays represented in this pack through TECH-OS-17 (Art. 23).",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-PP-1",
+      "packId": "partnerships-prosperity",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-PP-10",
+      "rationale": "F5 merge: TRIPS patent rights asked twice; TECH-PP-10 is clause-precise (Art. 28 confirmed).",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "TECH-PP-9",
+      "packId": "partnerships-prosperity",
+      "station": "technology",
+      "proposedAction": "merge",
+      "proposedInto": "TECH-PP-6",
+      "rationale": "F5 merge: Trade Secrets Directive Art. 2 asked twice; the WCT Art. 11 TPM half belongs to the WIPO scope (TECH-PP-11).",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "WLT-BC-14",
+      "packId": "blockchain",
+      "station": "wealth",
+      "proposedAction": "merge",
+      "proposedInto": "WLT-BC-4",
+      "rationale": "F5 verdict (research/pack-quality/wealth.json): merge into WLT-BC-4; SEC v. Ripple applies Howey, already the anchor of BC-4.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "WLT-BC-9",
+      "packId": "blockchain",
+      "station": "wealth",
+      "proposedAction": "merge",
+      "proposedInto": "WLT-BC-12",
+      "rationale": "F5 verdict (research/pack-quality/wealth.json): merge into WLT-BC-12; TFR Arts 4-7 govern transfers of funds, crypto-asset rules are Arts 14-16.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "WLT-CE-11",
+      "packId": "circular-economy",
+      "station": "wealth",
+      "proposedAction": "merge",
+      "proposedInto": "WLT-CE-9",
+      "rationale": "F5 verdict (research/pack-quality/wealth.json): merge into WLT-CE-9; ESRS E1 Scope 3 governance is a subset of the CSRD/ESRS control.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "WLT-DP-12",
+      "packId": "digital-payments",
+      "station": "wealth",
+      "proposedAction": "merge",
+      "proposedInto": "WLT-DP-4",
+      "rationale": "F5 verdict (research/pack-quality/wealth.json): merge into WLT-DP-4; dynamic linking is RTS 2018/389 Art. 5 and is the second half of the SCA control.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "WLT-DP-14",
+      "packId": "digital-payments",
+      "station": "wealth",
+      "proposedAction": "merge",
+      "proposedInto": "WLT-DP-7",
+      "rationale": "Added by S3 in its worktree (industryPacks.ts:1262). Duplicates WLT-DP-7 for transfers of funds and WLT-BC-12 for crypto-assets; merged into WLT-DP-7 (funds). Its dimension 'Crypto-Asset Transfer Information' would have been a single-use dimension.",
+      "decision": "defer",
+      "note": "pending Sid"
+    },
+    {
+      "id": "WLT-NP-12",
+      "packId": "no-poverty",
+      "station": "wealth",
+      "proposedAction": "merge",
+      "proposedInto": "WLT-NP-1",
+      "rationale": "F5 verdict (research/pack-quality/wealth.json): merge into WLT-NP-1; restates NP-1, and GPFI 2020 is a non-binding report.",
+      "decision": "defer",
+      "note": "pending Sid"
+    }
+  ]
+}

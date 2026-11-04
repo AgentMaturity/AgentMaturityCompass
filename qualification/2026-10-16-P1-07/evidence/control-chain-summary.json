@@ -1,0 +1,202 @@
+{
+  "schema": "p107-control-chain-summary/1",
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "canonicalTotalNotSummed": {
+    "numTotalTests": 971,
+    "numPassedTests": 971,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "actualCaseFiles": 17,
+  "same971CasesAndPerFileOrderAcrossSevenRuns": true,
+  "allOwnedGroupsAbsentNaturally": true,
+  "allHookValuesPassedNoUnhandledErrors": true,
+  "runs": [
+    {
+      "phase": "p107-fresh-canonical",
+      "exit": 0,
+      "durationMs": 5503,
+      "pgid": 5334,
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 971,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "publicEvidence": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-gDEMP5/public-evidence.json",
+          "bytes": 29136,
+          "sha256": "38b90d70b9e954e7ec66325acd61b57a02d7e4507b44f37fcbe318763d1b4b3b",
+          "bodyFailed": false,
+          "cleanupErrors": [],
+          "environmentRestored": true,
+          "vaultLocked": true,
+          "poolClosed": true
+        }
+      ]
+    },
+    {
+      "phase": "p107-m1",
+      "exit": 1,
+      "durationMs": 4684,
+      "pgid": 5587,
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 968,
+        "numFailedTests": 3,
+        "numPendingTests": 0
+      },
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "publicEvidence": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-3IqwGf/public-evidence.json",
+          "bytes": 29136,
+          "sha256": "42ab7768db9ecc3499febbad9a54fcb2370c46843eb04a3ecfaa2e11762ff5f3",
+          "bodyFailed": false,
+          "cleanupErrors": [],
+          "environmentRestored": true,
+          "vaultLocked": true,
+          "poolClosed": true
+        }
+      ]
+    },
+    {
+      "phase": "p107-m1-restored",
+      "exit": 0,
+      "durationMs": 4689,
+      "pgid": 5658,
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 971,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "publicEvidence": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-CjoLaF/public-evidence.json",
+          "bytes": 29136,
+          "sha256": "e49e19c50bca44684144fdfb113b9c1ec9a19e0b85d13ab8a9bd42b6d25605c9",
+          "bodyFailed": false,
+          "cleanupErrors": [],
+          "environmentRestored": true,
+          "vaultLocked": true,
+          "poolClosed": true
+        }
+      ]
+    },
+    {
+      "phase": "p107-m2",
+      "exit": 1,
+      "durationMs": 4722,
+      "pgid": 5730,
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 969,
+        "numFailedTests": 2,
+        "numPendingTests": 0
+      },
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "publicEvidence": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-FrDZfv/public-evidence.json",
+          "bytes": 29136,
+          "sha256": "500c33980b76780a7707a41b4c60616bf2fde89ef5a2057ced4380c557202a7e",
+          "bodyFailed": false,
+          "cleanupErrors": [],
+          "environmentRestored": true,
+          "vaultLocked": true,
+          "poolClosed": true
+        }
+      ]
+    },
+    {
+      "phase": "p107-m2-restored",
+      "exit": 0,
+      "durationMs": 4664,
+      "pgid": 5838,
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 971,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "publicEvidence": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-TCJYdx/public-evidence.json",
+          "bytes": 29136,
+          "sha256": "37ab7e8cc4562460056091a5c7382ea446551b40a04bde3bdfd55a3b9681d6ba",
+          "bodyFailed": false,
+          "cleanupErrors": [],
+          "environmentRestored": true,
+          "vaultLocked": true,
+          "poolClosed": true
+        }
+      ]
+    },
+    {
+      "phase": "p107-m3",
+      "exit": 1,
+      "durationMs": 4709,
+      "pgid": 5898,
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 961,
+        "numFailedTests": 10,
+        "numPendingTests": 0
+      },
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "publicEvidence": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/public-evidence.json",
+          "bytes": 29578,
+          "sha256": "a31988e4a9bfe76ba330b26d0132a2af08e18620af7aea7c5222d0f4815e0e19",
+          "bodyFailed": true,
+          "cleanupErrors": [],
+          "environmentRestored": true,
+          "vaultLocked": true,
+          "poolClosed": true
+        }
+      ]
+    },
+    {
+      "phase": "p107-m3-restored",
+      "exit": 0,
+      "durationMs": 4809,
+      "pgid": 6021,
+      "tests": {
+        "numTotalTests": 971,
+        "numPassedTests": 971,
+        "numFailedTests": 0,
+        "numPendingTests": 0
+      },
+      "hookTaskEntries": 46,
+      "hookValues": 47,
+      "publicEvidence": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-qMHC5s/public-evidence.json",
+          "bytes": 29136,
+          "sha256": "732f599d87163e8dbadde43d9f3613e15a782417e03f54eefcc32f80ab382ad0",
+          "bodyFailed": false,
+          "cleanupErrors": [],
+          "environmentRestored": true,
+          "vaultLocked": true,
+          "poolClosed": true
+        }
+      ]
+    }
+  ],
+  "sourceOnlyNoCompiledMutationCredit": true,
+  "restoredFinalSourcePinsAndNativeVerified": true,
+  "qualityGreen": false,
+  "formalDone": false
+}

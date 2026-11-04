@@ -1,0 +1,137 @@
+{
+  "schema": "p126-discovery-review-pins/1",
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-12/evidence/test-design/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+      "readScope": "full raw evidence source; exact hash checked against receipt/manifest/current real test"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+      "readScope": "full exact byte comparison only; earlier test/static runtime review remains separate"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-current-full.json",
+      "bytes": 248137,
+      "sha256": "6b82381cb434c3f7d787815280a9fc4e7279ae64f5e5b48cf61603ca9495b7a3",
+      "readScope": "full normalized findings compared as sets, not source re-execution"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/before-full.json",
+      "bytes": 248942,
+      "sha256": "6a80bacf2deaefbaeb28ef400cb0caf30ae472dcb8a5f1bc60d5952622088a0b",
+      "readScope": "full normalized findings compared as sets"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/capture.mjs",
+      "bytes": 899,
+      "sha256": "56d348df0273e76c2a58d4fccd13b55e0bf7b16b5cda5d0869ff8c64fabc7034",
+      "readScope": "full unchanged scanner invocation diagnostic"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/expectation-stop.json",
+      "bytes": 439,
+      "sha256": "e07f4e09e8d9c7eed3fb710ed67f1b36225d4cbf06e8c6b3f7759516327d27b3",
+      "readScope": "full actual expectation stop"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/assemble-receipt.py",
+      "bytes": 4119,
+      "sha256": "55a5d8ef05e6ae776e0f6e9b69e49e2dc6c948275b3da606122487e3f3217868",
+      "readScope": "full historical builder source"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-12/receipt.json",
+      "bytes": 54938,
+      "sha256": "adf6d71c19c853eea55a92d1c896fa97ab92211d6bb357e004d73691416e5e57",
+      "readScope": "artifact record and unchanged historical source/result metadata"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-12/evidence/assembly-inputs.json",
+      "bytes": 40407,
+      "sha256": "6531c6447eac9e7e4dc69e85e88f0e3f31bff675e3f8a5a27a100bf660992f10",
+      "readScope": "historical original copied candidate target/envelope fields"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "full current Vitest config"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "readScope": "full test compiler config"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/knip.json",
+      "bytes": 1928,
+      "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1",
+      "readScope": "full current scanner config"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "readScope": "full unchanged scanner source"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48",
+      "readScope": "full existing validator source"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6",
+      "readScope": "full existing receipt schema"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/knip/dist/plugins/vitest/index.js",
+      "bytes": 11386,
+      "sha256": "daba5f7ed4ae024b3788b1d095fe6f481cad010572075dee7d3484e5d51fc8d9",
+      "readScope": "full installed plugin source"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/knip/dist/WorkspaceWorker.js",
+      "bytes": 26103,
+      "sha256": "af522051e80bf9b434e90911b2f02b87d91dd798ecdb15aaf97d7f5708f8985a",
+      "readScope": "selected plugin entry/config selection span285..355; hash pins complete file"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/knip/package.json",
+      "bytes": 3236,
+      "sha256": "ad04a430a7720eb3d4f77f3147a844846d91efa8ec0f919788f997a2acd321f5",
+      "readScope": "version metadata"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-dead-code-before/command.json",
+      "bytes": 1369,
+      "sha256": "d2d396d540189c389f3f6c0cd92b0d1ce54656ef741cf00b7f59bb76e7759c78",
+      "readScope": "full actual command/process/log metadata"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-dead-code-before/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "5b72aeb182d88bb2e5c773f2ec6444e5b8e8acf5404448ed72ee8cf33d55a4b6",
+      "readScope": "full actual command/process/log metadata"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-dead-code-before/owned-process.json",
+      "bytes": 512,
+      "sha256": "7b23463dd7ef4abd448a359d750887ac60498532bf59c6457d016ce422820c91",
+      "readScope": "full actual command/process/log metadata"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-dead-code-before/stdout-stderr.log",
+      "bytes": 1584,
+      "sha256": "420fbdc8e67454fb383d361da2eaba0df2513ede7a856136f6856d2696dad9c3",
+      "readScope": "full actual command/process/log metadata"
+    }
+  ]
+}

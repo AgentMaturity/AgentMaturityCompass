@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 import { readFileSync, readdirSync } from "node:fs";
 import { relative, resolve, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 const metrics = ["lines", "functions", "branches", "statements"];
+const sourceRoots = ["src", "packages/verifier/src"];
 export function coverageSourceFiles(root) {
   const files = [];
   function walk(directory, prefix) {
@@ -15,7 +16,7 @@ export function coverageSourceFiles(root) {
       else if (entry.isFile() && entry.name.endsWith(".ts") && !entry.name.endsWith(".d.ts")) files.push(name);
     }
   }
-  walk(resolve(root, "src"), "src");
+  for (const sourceRoot of sourceRoots) walk(resolve(root, sourceRoot), sourceRoot);
   return files.sort();
 }
 function fraction(metric, label) {
@@ -33,7 +34,7 @@ export function coverageFiles(summary, root) {
   for (const [path, values] of Object.entries(summary)) {
     if (path === "total") continue;
     const name = relative(root, resolve(root, path)).split(sep).join("/");
-    if (!name.startsWith("src/") || name.includes("../")) throw new Error(`Coverage file outside source scope: ${path}`);
+    if (!sourceRoots.some(sourceRoot => name.startsWith(`${sourceRoot}/`)) || name.includes("../")) throw new Error(`Coverage file outside source scope: ${path}`);
     for (const metric of metrics) fraction(values?.[metric], `${name}:${metric}`);
     files[name] = Object.fromEntries(metrics.map(metric => [metric, { total: values[metric].total, covered: values[metric].covered }]));
   }
@@ -79,7 +80,7 @@ export function checkPerFileCoverage(files, baseline, expectedFiles = Object.key
   return failures;
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   const root = process.cwd();
   const summaryPath = resolve(root, process.argv[2] ?? "coverage/coverage-summary.json");
   const baselinePath = resolve(root, "scripts/quality/coverage-baseline.json");

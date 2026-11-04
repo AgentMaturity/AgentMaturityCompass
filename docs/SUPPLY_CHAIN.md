@@ -47,14 +47,14 @@ AMC release engineering produces signed, offline-verifiable release evidence.
 - strict secret scan (`secret-scan.json`)
 - signed manifest (`manifest.json` + `manifest.sig`)
 
-## What Is Guaranteed
+## What Is Checked
 
 - Artifact hashes are checked against the signed manifest.
 - Manifest signatures are Ed25519 and verifiable offline.
 - Secret scanning blocks HIGH-risk findings.
 - Verification does not require network access.
 
-## What Is Not Guaranteed
+## What It Does Not Prove
 
 - This is not a legal attestation.
 - Provenance is an AMC provenance record, not formal SLSA certification.

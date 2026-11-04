@@ -1,0 +1,240 @@
+{
+  "schema": "p125w-runtime-adapter-independent-static-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+      "bytes": 2195,
+      "sha256": "ecfc3fe96e8b0d895645c229e4c67bd92e54e0d395544d82f1711e08b4fbfe88",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+      "dev": 16777231,
+      "inode": 543743019,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-public.py.source.txt",
+      "bytes": 14619,
+      "sha256": "bfafc3c25fa9c1f5f15da69b7dca818e63ddfb78bda66ae74a2965e31b11a0f5",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-public.py.source.txt",
+      "dev": 16777231,
+      "inode": 543743020,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-observed.adaptation.patch.txt",
+      "bytes": 873,
+      "sha256": "8f4cd15b20d62dc175017038bb3d96714040f15175f70019b2b4095ca9cd07a2",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-observed.adaptation.patch.txt",
+      "dev": 16777231,
+      "inode": 543743021,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-public.adaptation.patch.txt",
+      "bytes": 14628,
+      "sha256": "f50f457300a1e83ec8a484dd5e74579bb13f78de970a1d1da5fcd8e16700e4dd",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/audit-public.adaptation.patch.txt",
+      "dev": 16777231,
+      "inode": 543743022,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/input-pins.json",
+      "bytes": 3312,
+      "sha256": "54282b73e7550cd330c108772b8af5d76b6e23bb977609b66a5af9df88ed8acf",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/input-pins.json",
+      "dev": 16777231,
+      "inode": 543743023,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/matrix.json",
+      "bytes": 1747,
+      "sha256": "3ae8fa9d86193fdc0a8935b9d79f9bff0ddf4202ad66cd7d6c840a44e31c65bc",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/matrix.json",
+      "dev": 16777231,
+      "inode": 543743024,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/README.md",
+      "bytes": 3344,
+      "sha256": "a1c245e999f48c821990d969f6087d65b5748c284afd25bdb8bf7b5ffe3fa6a6",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/README.md",
+      "dev": 16777231,
+      "inode": 543743025,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/author-static-review.json",
+      "bytes": 700,
+      "sha256": "910fd611e39ca1269d7ba9a3eb2adb1220d4f317ee5d780aa65c7d8c03068cc2",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/author-static-review.json",
+      "dev": 16777231,
+      "inode": 543743026,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/audit-observed.py",
+      "bytes": 2165,
+      "sha256": "3fa420420119af3654c1fe6e6c4ccccdae7c5a4e7f0e2d51a0bc1229cd2f3c3e",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/audit-observed.py",
+      "dev": 16777231,
+      "inode": 543659952,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/audit-public.py",
+      "bytes": 5367,
+      "sha256": "00bbdd28399cdc07f54701e59afc5424d4c174c9f02c6027875140247052be65",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/audit-public.py",
+      "dev": 16777231,
+      "inode": 543660002,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.source.txt",
+      "bytes": 25255,
+      "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.source.txt",
+      "dev": 16777231,
+      "inode": 543667802,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "dev": 16777231,
+      "inode": 543727816,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/README.md",
+      "bytes": 4294,
+      "sha256": "df44429f93ab0071cd7edeabf1ec34164e9133b5b0682eca868e59188fc69f18",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/README.md",
+      "dev": 16777231,
+      "inode": 543729291,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/matrix.json",
+      "bytes": 4138,
+      "sha256": "b06211705c317ad84cbe07707b9f5141f20c737dcf5f61bbbdd11232c5314286",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/matrix.json",
+      "dev": 16777231,
+      "inode": 543729290,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/seal.json",
+      "bytes": 3262,
+      "sha256": "e0ee965ad1ac607320c2c37ba9bd274422e53300cdbe2572ec0b829b2acb9301",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/seal.json",
+      "dev": 16777231,
+      "inode": 543729294,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/branch-adoption.json",
+      "bytes": 302,
+      "sha256": "5126b3618759e581b223a414f51deb08d850d10830e297042280e443b693832d",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/branch-adoption.json",
+      "dev": 16777231,
+      "inode": 543741189,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "bytes": 73883,
+      "sha256": "d5e42ca4121f2cb2b098303d1e79e8645ba02045bd012c466a0b55ec5a0e62ca",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "dev": 16777231,
+      "inode": 543741190,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "dev": 16777231,
+      "inode": 542461052,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "dev": 16777231,
+      "inode": 542461050,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/receipt-preparation/assemble-receipt.py",
+      "bytes": 21413,
+      "sha256": "28ddcb18ec76480886dc6856dee2a976adf15d2282c1b72d58c26ba22269a5c7",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/receipt-preparation/assemble-receipt.py",
+      "dev": 16777231,
+      "inode": 543075322,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6",
+      "physicalPath": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "dev": 16777231,
+      "inode": 542688370,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447",
+      "physicalPath": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "dev": 16777231,
+      "inode": 538608953,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/seal.json",
+      "bytes": 2368,
+      "sha256": "75e8b6bef1d9d8f0029f7214042cc24c65a5396bf1f11286d3a0544644d25981",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-audit-preparation/seal.json",
+      "dev": 16777231,
+      "inode": 543743027,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-candidate-review/seal.json",
+      "bytes": 1235,
+      "sha256": "559935473816627bc49c8eb6c78958edce0d2474554385793809beff7266e4d1",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-candidate-review/seal.json",
+      "dev": 16777231,
+      "inode": 543737260,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "dev": 16777231,
+      "inode": 543658576,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "bytes": 25255,
+      "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "dev": 16777231,
+      "inode": 543658575,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 26
+}

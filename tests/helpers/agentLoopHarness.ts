@@ -14,7 +14,6 @@
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { initWorkspace } from "../../src/workspace.js";
 import { openLedger } from "../../src/ledger/ledger.js";
 import { AdapterRegistry } from "../../src/llm/adapter/adapterRegistry.js";
 import type { LlmAdapter } from "../../src/llm/adapter/adapterTypes.js";
@@ -35,6 +34,7 @@ import type { AgentLoopConfig, LoopHooks, LoopRetryRuntime } from "../../src/age
 import { NO_HOOKS } from "../../src/agent/loopTypes.js";
 import type { AgentToolSeam, ToolCallOutcome, ToolCallRequest } from "../../src/agent/toolSeam.js";
 import type { EvidenceEvent } from "../../src/types.js";
+import { initWorkspaceWithoutActionPolicy } from "./actionPolicyFixtures.js";
 
 export const LOOP_PROVIDER = "anthropic";
 export const LOOP_MODEL = "claude-loop-test";
@@ -282,7 +282,7 @@ export function recordingRetryRuntime(random = 0.5): LoopRetryRuntime & { readon
  */
 export function loopHarness(options: LoopHarnessOptions): LoopHarness {
   const dir = mkdtempSync(join(tmpdir(), "amc-agent-loop-"));
-  initWorkspace({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" });
+  initWorkspaceWithoutActionPolicy({ workspacePath: dir, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
 
   const session = new SessionService(dir);
   session.open({

@@ -1,0 +1,731 @@
+{
+  "schema": "amc-p139-stateless/2",
+  "label": "digest-grant-and-fresh-catalog",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-BnlhsS",
+  "configuredProtocolVersion": "2026-07-28",
+  "loseFirstToolResponse": false,
+  "remoteEffects": 0,
+  "options": {},
+  "observations": [
+    {
+      "kind": "admission-attempt",
+      "attempt": {
+        "label": "wrong-digest",
+        "accepted": false,
+        "visible": false,
+        "requestDelta": 2,
+        "error": {
+          "scope": "expected-admission-refusal",
+          "name": "Error",
+          "message": "MCP mount refused; review the configured server, catalog digest and tool grants",
+          "stack": "Error: MCP mount refused; review the configured server, catalog digest and tool grants\n    at connectionFailure (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:116:62)\n    at mountNativeMcpServer (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:390:11)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at Object.mountPinned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:117:17)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:431:25\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:420:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        }
+      }
+    },
+    {
+      "kind": "admission-attempt",
+      "attempt": {
+        "label": "empty-grants",
+        "accepted": false,
+        "visible": false,
+        "requestDelta": 0,
+        "error": {
+          "scope": "expected-admission-refusal",
+          "name": "Error",
+          "message": "Choose an explicit bounded MCP tool grant",
+          "stack": "Error: Choose an explicit bounded MCP tool grant\n    at mountNativeMcpServer (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:282:68)\n    at Object.mountPinned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:117:23)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:431:33\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:420:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        }
+      }
+    },
+    {
+      "kind": "admission-attempt",
+      "attempt": {
+        "label": "absent-remote-tool",
+        "accepted": false,
+        "visible": false,
+        "requestDelta": 2,
+        "error": {
+          "scope": "expected-admission-refusal",
+          "name": "Error",
+          "message": "MCP mount refused; review the configured server, catalog digest and tool grants",
+          "stack": "Error: MCP mount refused; review the configured server, catalog digest and tool grants\n    at connectionFailure (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:116:62)\n    at mountNativeMcpServer (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/src/mcp/nativeMcpClient.ts:390:11)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at Object.mountPinned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:117:17)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:431:25\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:420:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+        }
+      }
+    },
+    {
+      "kind": "changed-catalog-call",
+      "advertisedTtlMs": 86400000,
+      "cacheScope": "server",
+      "description": "Synthetic changed catalog despite long TTL",
+      "requestsAfterCall": [
+        {
+          "ordinal": 11,
+          "httpMethod": "POST",
+          "path": "/mcp",
+          "rpc": "tools/list",
+          "id": 2,
+          "meta": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "amc-governed-native-tools",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {}
+          },
+          "bodyBytes": 262,
+          "bodySha256": "2cf0cae5d2074c29de545e8f100f0775174f55dd2b5886b4f46f6d17775d2883",
+          "query": null,
+          "protocolHeader": "2026-07-28",
+          "methodHeader": "tools/list",
+          "nameHeader": null,
+          "paramHeader": null,
+          "originMatches": true,
+          "acceptJson": true,
+          "acceptSse": true,
+          "requestSessionPresent": false,
+          "lastEventIdPresent": false,
+          "requestEnded": true,
+          "requestComplete": true,
+          "requestClosed": true,
+          "responseStatus": 200,
+          "responseKind": "json",
+          "responseId": 2,
+          "responseResultType": "complete",
+          "responseSessionPresent": true,
+          "responseFinished": true,
+          "responseClosed": true
+        }
+      ],
+      "outcome": {
+        "outcome": "ERROR",
+        "content": "MCP call failed or catalog changed; review and mount again",
+        "exitCode": 1,
+        "timedOut": false,
+        "denied": false
+      },
+      "granted": false
+    }
+  ],
+  "requests": [
+    {
+      "ordinal": 1,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "server/discover",
+      "id": 0,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 267,
+      "bodySha256": "5215aa4c2fcf84d0435055d27cfd85cd8847c3d496dfce89f4e0151e32dbeb66",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "server/discover",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 0,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 2,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 1,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 262,
+      "bodySha256": "2895f7262d0eec0bb9146f2eba47348d721068319f947a48b05c5e5d9764cadd",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/list",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 1,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 3,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "server/discover",
+      "id": 0,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 267,
+      "bodySha256": "5215aa4c2fcf84d0435055d27cfd85cd8847c3d496dfce89f4e0151e32dbeb66",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "server/discover",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 0,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 4,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 1,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 262,
+      "bodySha256": "2895f7262d0eec0bb9146f2eba47348d721068319f947a48b05c5e5d9764cadd",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/list",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 1,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 5,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "server/discover",
+      "id": 0,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 267,
+      "bodySha256": "5215aa4c2fcf84d0435055d27cfd85cd8847c3d496dfce89f4e0151e32dbeb66",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "server/discover",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 0,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 6,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 1,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 262,
+      "bodySha256": "2895f7262d0eec0bb9146f2eba47348d721068319f947a48b05c5e5d9764cadd",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/list",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 1,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 7,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "server/discover",
+      "id": 0,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 267,
+      "bodySha256": "5215aa4c2fcf84d0435055d27cfd85cd8847c3d496dfce89f4e0151e32dbeb66",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "server/discover",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 0,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 8,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 1,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 262,
+      "bodySha256": "2895f7262d0eec0bb9146f2eba47348d721068319f947a48b05c5e5d9764cadd",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/list",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 1,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 9,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "server/discover",
+      "id": 0,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 267,
+      "bodySha256": "5215aa4c2fcf84d0435055d27cfd85cd8847c3d496dfce89f4e0151e32dbeb66",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "server/discover",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 0,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 10,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 1,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 262,
+      "bodySha256": "2895f7262d0eec0bb9146f2eba47348d721068319f947a48b05c5e5d9764cadd",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/list",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 1,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "ordinal": 11,
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 2,
+      "meta": {
+        "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+        "io.modelcontextprotocol/clientInfo": {
+          "name": "amc-governed-native-tools",
+          "version": "1.0.0"
+        },
+        "io.modelcontextprotocol/clientCapabilities": {}
+      },
+      "bodyBytes": 262,
+      "bodySha256": "2cf0cae5d2074c29de545e8f100f0775174f55dd2b5886b4f46f6d17775d2883",
+      "query": null,
+      "protocolHeader": "2026-07-28",
+      "methodHeader": "tools/list",
+      "nameHeader": null,
+      "paramHeader": null,
+      "originMatches": true,
+      "acceptJson": true,
+      "acceptSse": true,
+      "requestSessionPresent": false,
+      "lastEventIdPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseKind": "json",
+      "responseId": 2,
+      "responseResultType": "complete",
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "reviewed": {
+    "serverId": "stateless_fixture",
+    "protocol": {
+      "negotiatedVersion": "2026-07-28",
+      "mode": "stateless",
+      "serverInfo": {
+        "name": "synthetic-stateless-untrusted",
+        "version": "1"
+      }
+    },
+    "tools": [
+      {
+        "name": "lookup",
+        "description": "Synthetic stateless lookup",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "x-mcp-header": "Query"
+            }
+          },
+          "required": [
+            "query"
+          ],
+          "additionalProperties": false
+        },
+        "outputSchema": null,
+        "annotations": null,
+        "execution": null
+      }
+    ],
+    "digest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719"
+  },
+  "receipt": {
+    "serverId": "stateless_fixture",
+    "catalogDigest": "64edffb1f8d20ebcf1e16a6cf19789c2ba9545786e4253610e2d1d0f7ec25719",
+    "protocol": {
+      "negotiatedVersion": "2026-07-28",
+      "mode": "stateless",
+      "serverInfo": {
+        "name": "synthetic-stateless-untrusted",
+        "version": "1"
+      }
+    },
+    "auth": null
+  },
+  "outcomes": [
+    {
+      "callId": "stateless-call-1",
+      "result": {
+        "outcome": "ERROR",
+        "content": "MCP call failed or catalog changed; review and mount again",
+        "exitCode": 1,
+        "timedOut": false,
+        "denied": false
+      }
+    }
+  ],
+  "toolEvidence": [
+    {
+      "id": "f6c945cd-0955-4bb4-a7eb-5967694e5d9d",
+      "eventType": "tool/call",
+      "signed": true,
+      "payloadSha256": "48cd4407dd19702c73fe81c0ecd14641a6fa51dbcd3ce2db056ffc381c48b3fa",
+      "meta": {
+        "amcSession": {
+          "v": 1,
+          "sessionId": "72eda69e-71a7-4309-8456-bb3c7092f2b3",
+          "seq": 3,
+          "prevSessionEventHash": "72a1c68d9b5a2ac41efe38c08a4862a5a74625d273cfc77d9d002b6c864597f5",
+          "turn": 1,
+          "step": 1,
+          "surface": {
+            "op": "append",
+            "slot": "tool_use:stateless-call-1",
+            "role": "assistant",
+            "part": {
+              "kind": "tool_use",
+              "sha256": "48cd4407dd19702c73fe81c0ecd14641a6fa51dbcd3ce2db056ffc381c48b3fa"
+            }
+          },
+          "synthetic": false
+        },
+        "trustTier": "OBSERVED",
+        "turn": 1,
+        "step": 1,
+        "toolCallId": "stateless-call-1",
+        "toolName": "mcp_stateless_fixture_29a1af58c1382740",
+        "argsSha256": "48cd4407dd19702c73fe81c0ecd14641a6fa51dbcd3ce2db056ffc381c48b3fa",
+        "dispatch": "native",
+        "parentToken": null,
+        "amcSessionWriter": {
+          "v": 1,
+          "token": "8027f2c8-7e3a-4494-aa97-3f44e02c2178",
+          "pid": 83343,
+          "hostId": "Sids-MacBook-Pro.local",
+          "state": "active"
+        }
+      }
+    },
+    {
+      "id": "740b9bea-f7fc-4c9c-8701-9df318863581",
+      "eventType": "tool/result",
+      "signed": true,
+      "payloadSha256": "eafdaec85c07a03192d620333ce464541b6ff143e5c71b878a0ca312706609a9",
+      "meta": {
+        "amcSession": {
+          "v": 1,
+          "sessionId": "72eda69e-71a7-4309-8456-bb3c7092f2b3",
+          "seq": 8,
+          "prevSessionEventHash": "3546da0d89b96602a8074d7e2ba776c89f11cd83b82008f3d458690edff80465",
+          "turn": 1,
+          "step": 1,
+          "surface": {
+            "op": "append",
+            "slot": "tool_result:stateless-call-1",
+            "role": "tool",
+            "part": {
+              "kind": "tool_result",
+              "sha256": "eafdaec85c07a03192d620333ce464541b6ff143e5c71b878a0ca312706609a9"
+            }
+          },
+          "synthetic": false
+        },
+        "trustTier": "OBSERVED",
+        "turn": 1,
+        "step": 1,
+        "toolCallId": "stateless-call-1",
+        "outcome": "ERROR",
+        "exitCode": 1,
+        "timedOut": false,
+        "denied": false,
+        "spilled": null,
+        "amcSessionWriter": {
+          "v": 1,
+          "token": "8027f2c8-7e3a-4494-aa97-3f44e02c2178",
+          "pid": 83343,
+          "hostId": "Sids-MacBook-Pro.local",
+          "state": "active"
+        }
+      }
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0,
+    "sessionOpened": true,
+    "stepEnded": true,
+    "turnEnded": true,
+    "turnSealed": true,
+    "sessionClosed": true,
+    "toolsetClosed": true
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": true,
+  "environmentRestored": true,
+  "childProcessCreated": false,
+  "signalsSent": false,
+  "typedUnknownQualification": "not claimed by this case"
+}

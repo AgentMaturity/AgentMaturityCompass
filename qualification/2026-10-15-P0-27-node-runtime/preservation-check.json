@@ -1,0 +1,18 @@
+{
+  "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "base": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "checkouts": {
+    "primary": {
+      "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "status": "",
+      "path": "/Users/sid/AgentMaturityCompass"
+    },
+    "Claude": {
+      "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+      "status": "",
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone"
+    }
+  },
+  "heldRef": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+  "change": "Only two runtime predicates in our qualification test; all behavior, production, original Claude tests, shared files, dependencies, archives, floors, ratchets and freeze guards are unchanged. No shared native rebuild, source proposal approval, tracker closure, push or release."
+}

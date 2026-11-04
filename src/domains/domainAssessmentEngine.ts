@@ -4,6 +4,8 @@ import {
 } from "../score/units.js";
 import { getDomainMetadata, type Domain, type DomainMetadata } from "./domainRegistry.js";
 import { getDomainModuleActivations } from "./domainModuleMap.js";
+import { QUESTIONNAIRE_CONTENT_STATUS } from "./questionnaireLabel.js";
+import { getIndustryPacksByStation } from "./industryPacks.js";
 
 export interface DomainAssessmentInput {
   agentId: string;
@@ -25,6 +27,24 @@ export interface DomainAssessmentResult {
   activeModules: ActiveModuleProfile[];
   roadmap: DomainRoadmapItem[];
   regulatoryWarnings: string[];
+  euAIActClassification: EuAIActClassification;
+}
+
+/** Station-level EU AI Act category plus each station pack's Annex III classification. */
+export interface EuAIActClassification {
+  domainCategory: DomainMetadata["euAIActCategory"];
+  /** The pack classifications are AI-drafted and unreviewed (P1-42). */
+  contentStatus: typeof QUESTIONNAIRE_CONTENT_STATUS;
+  packs: Array<{
+    packId: string;
+    packName: string;
+    classification: string;
+    /** Annex III points (1-8) named in the classification text. */
+    annexIIIPoints: number[];
+    generalPurpose: boolean;
+    /** The classification carries a PROHIBITED qualifier (an Art. 5 practice is possible in this pack's use). */
+    prohibitedFlag: boolean;
+  }>;
 }
 
 export interface ComplianceGap {
@@ -210,6 +230,52 @@ function buildRegulatoryWarnings(complianceGaps: ComplianceGap[]): string[] {
   return [...warnings];
 }
 
+const ANNEX_III_POINT_COUNT = 8;
+
+/** A parenthetical that explains what a point covers, e.g. "(§2 covers road traffic, not port operations)". */
+const SCOPE_NOTE = /\([^()]*\bcovers\b[^()]*\)/g;
+/** "PROHIBITED", or a specific Art. 5(1)(x) prohibition cited in the same clause. */
+const PROHIBITION = /\bPROHIBITED\b|Art\. 5\(1\)\([a-h]\)[^;]*\bprohibit/;
+
+/**
+ * Annex III points named after "Annex III" (e.g. "§2 ... / §4" gives [2, 4]), whether a general-purpose AI
+ * route is declared, and whether the text flags an Art. 5 prohibition (kept separate: Art. 5 is not an Annex III point).
+ * Scope-note parentheticals are skipped, so "Not listed in Annex III (§8 covers judicial authorities)" gives no point.
+ */
+export function parseAnnexIIIPoints(classification: string): { points: number[]; generalPurpose: boolean; prohibitedFlag: boolean } {
+  const annexAt = classification.indexOf("Annex III");
+  const points = new Set<number>();
+  if (annexAt >= 0) {
+    for (const match of classification.slice(annexAt).replace(SCOPE_NOTE, "").matchAll(/§\s*(\d+)/g)) {
+      const point = Number(match[1]);
+      if (point >= 1 && point <= ANNEX_III_POINT_COUNT) points.add(point);
+    }
+  }
+  return {
+    points: [...points].sort((a, b) => a - b),
+    generalPurpose: /General[- ]Purpose AI/i.test(classification),
+    prohibitedFlag: PROHIBITION.test(classification)
+  };
+}
+
+function buildEuAIActClassification(domain: Domain, metadata: DomainMetadata): EuAIActClassification {
+  return {
+    domainCategory: metadata.euAIActCategory,
+    contentStatus: QUESTIONNAIRE_CONTENT_STATUS,
+    packs: getIndustryPacksByStation(domain).map((pack) => {
+      const parsed = parseAnnexIIIPoints(pack.euAIActClassification);
+      return {
+        packId: pack.id,
+        packName: pack.name,
+        classification: pack.euAIActClassification,
+        annexIIIPoints: parsed.points,
+        generalPurpose: parsed.generalPurpose,
+        prohibitedFlag: parsed.prohibitedFlag
+      };
+    })
+  };
+}
+
 export function assessDomain(input: DomainAssessmentInput): DomainAssessmentResult {
   const metadata = getDomainMetadata(input.domain);
   const questions = getDomainPackQuestions(input.domain);
@@ -232,6 +298,7 @@ export function assessDomain(input: DomainAssessmentInput): DomainAssessmentResu
     complianceGaps,
     activeModules,
     roadmap,
-    regulatoryWarnings
+    regulatoryWarnings,
+    euAIActClassification: buildEuAIActClassification(input.domain, metadata)
   };
 }

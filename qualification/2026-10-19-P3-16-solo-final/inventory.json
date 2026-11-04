@@ -1,0 +1,2189 @@
+{
+  "sourceInventoryAudit": {
+    "schemaVersion": 1,
+    "item": "P3-16",
+    "state": "STATIC_SOURCE_AUDIT_AND_UNAPPLIED_PROSE_PROPOSAL",
+    "recordedAtUtc": "2026-10-19T13:18:56.934249+00:00",
+    "currentClone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019",
+    "currentIntAndHeadFromCoordinatorRecord": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+    "currentStateProof": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/fresh-clone-bootstrap.json",
+      "sha256": "9482a00f0b78d451e1e41d1c740a366bb43a5cde7cbe68005119ce9e174845fc",
+      "bytes": 1864
+    },
+    "oldCandidate": {
+      "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16",
+      "qualificationHead": "9c6d38a836fdc07ea0750458827b4786e174ee9e",
+      "productHead": "49cd72a2440fae02c45af17aee7ec109c84900c7",
+      "coordinatorReadOnlyProof": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/candidate-readonly-state.json",
+        "sha256": "8c0e3b19fd5821b9382bcfe5a135e9f0c23a4d0e40f3ac7b5a6519bab57c7a25",
+        "bytes": 2515
+      }
+    },
+    "method": "Python source/JSON file I/O only. Literal q-call arguments and explicit Environment deep objects were extracted without importing or executing TypeScript. Existing registry source includes exactly the six pack exports and the literal Environment deep array. This is no new native runtime enumeration, compile, test, mutation, legal review or Git-state execution. Current HEAD/int identity is bound to the coordinator's existing capture; each listed source byte was independently read and hashed here.",
+    "bindingInputs": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P3-16.md",
+        "sha256": "e7ae87d513051825a1ab1931eee17694e56dfd94d1d150d36abe767fff05dd31",
+        "bytes": 14605
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/codex/BRIEF-2026-10-18.md",
+        "sha256": "8f86ae48d50b2e8fead1984f703a314285183da71ef3f0da44332ff388166584",
+        "bytes": 6461
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/codex/HANDOVER-2026-10-18.md",
+        "sha256": "b302663d608719bff7e66cd5ebdd0d0ed3bb291348ddf92caf724584dcb56799",
+        "bytes": 45044
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/brief.md",
+        "sha256": "dcb0b2e7164f5e7fa9799497e162db7507b8b8b21012e30746dcd1e748d8a38b",
+        "bytes": 8878
+      }
+    ],
+    "oldDocs": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/README.md",
+        "sha256": "95c2a4ab86bc81166e27e94764c6ff94ef9ff1d1e696ee06b032a1a69f816859",
+        "bytes": 10432
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/dispositions.json",
+        "sha256": "87f12348064115763ecacc152824f339734746441fc560431eabab8aada9ac98",
+        "bytes": 148229
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/guide-section.md",
+        "sha256": "6a1f7b4eecfb323b2bdabed57e8cfbd3fbbdd973869e3a001fac4cd0598d377e",
+        "bytes": 2705
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/instruments.json",
+        "sha256": "6cb9483bded5eecc19a3ad046f504a526ca49b31808f087bed535566261d09d7",
+        "bytes": 31115
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/profile.food-lot-release.json",
+        "sha256": "0a8c071f6a00b7ed62dfbea8b767dfcd1b187c89f8358c28c254e30d7372bc17",
+        "bytes": 2227
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/profile.grid-operations-in.json",
+        "sha256": "bdaafa5c1ade4c3be170aac2d267f16dcbcd0f2e82fbb241a35e2c2c5bc27fd1",
+        "bytes": 2222
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/profile.grid-operations.json",
+        "sha256": "284c1d6720f7fedf70a79bbd096962c345ef357fde6a7870464db91ee7ff84dd",
+        "bytes": 2230
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/promotion.yaml",
+        "sha256": "0b8f8f308fe9803973339a25b56c18af31bd05f1da6dc4d90a02b0b51317187f",
+        "bytes": 2769
+      }
+    ],
+    "inventory": {
+      "packCount": 104,
+      "literalDeepCount": 17,
+      "generatedDeepAdditionsInCurrentRegistry": 0,
+      "total": 121,
+      "unique": 121,
+      "sourceHashes": [
+        {
+          "relativePath": "src/domains/packs/stations/environment.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/packs/stations/environment.ts",
+          "sha256": "c6fc46d1bec773867a6ae32f6d4397e615d17b15e06d83e662d7ac7df1800594",
+          "bytes": 96884,
+          "matchesOldDeclaredHash": true,
+          "matchesOldCandidateSource": true,
+          "historicalDeclaredRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+        },
+        {
+          "relativePath": "src/domains/packs/stations/shared.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/packs/stations/shared.ts",
+          "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+          "bytes": 391,
+          "matchesOldDeclaredHash": true,
+          "matchesOldCandidateSource": true,
+          "historicalDeclaredRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+        },
+        {
+          "relativePath": "src/domains/deep/environment.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/deep/environment.ts",
+          "sha256": "19ebb15ea8c74f27b7b26813df2c87d5aec7b07f2c304fea5463caca0f79a4a0",
+          "bytes": 24997,
+          "matchesOldDeclaredHash": true,
+          "matchesOldCandidateSource": true,
+          "historicalDeclaredRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+        },
+        {
+          "relativePath": "src/domains/deep/shared.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/deep/shared.ts",
+          "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+          "bytes": 3087,
+          "matchesOldDeclaredHash": true,
+          "matchesOldCandidateSource": true,
+          "historicalDeclaredRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+        },
+        {
+          "relativePath": "src/domains/industryPacks.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/industryPacks.ts",
+          "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+          "bytes": 11129,
+          "matchesOldDeclaredHash": true,
+          "matchesOldCandidateSource": true,
+          "historicalDeclaredRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+        },
+        {
+          "relativePath": "src/domains/deepIndustryPacks.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/deepIndustryPacks.ts",
+          "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+          "bytes": 7937,
+          "matchesOldDeclaredHash": true,
+          "matchesOldCandidateSource": true,
+          "historicalDeclaredRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+        },
+        {
+          "relativePath": "src/domains/questionnaireLabel.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/questionnaireLabel.ts",
+          "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+          "bytes": 1186,
+          "matchesOldDeclaredHash": true,
+          "matchesOldCandidateSource": true,
+          "historicalDeclaredRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+        },
+        {
+          "relativePath": "src/domains/stations.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/stations.ts",
+          "sha256": "c06b9d3404656aea19179b03ed0eca13dd382e29839fa91baeb7936fcbb578c0",
+          "bytes": 8759,
+          "matchesOldDeclaredHash": true,
+          "matchesOldCandidateSource": true,
+          "historicalDeclaredRevision": "ccaabe07fdddfad442bfd1a738026862c67f7985"
+        }
+      ],
+      "packs": [
+        {
+          "id": "farm-to-fork",
+          "label": "Farm to Fork",
+          "actualCount": 18,
+          "specCount": 17,
+          "difference": 1,
+          "websiteAndSpecLabelMatch": true
+        },
+        {
+          "id": "weave-to-wear",
+          "label": "Weave to Wear",
+          "actualCount": 16,
+          "specCount": 15,
+          "difference": 1,
+          "websiteAndSpecLabelMatch": true
+        },
+        {
+          "id": "material-to-machines",
+          "label": "Material to Machines",
+          "actualCount": 16,
+          "specCount": 16,
+          "difference": 0,
+          "websiteAndSpecLabelMatch": true
+        },
+        {
+          "id": "source-to-sustenance",
+          "label": "Source to Sustenance",
+          "actualCount": 18,
+          "specCount": 15,
+          "difference": 3,
+          "websiteAndSpecLabelMatch": true
+        },
+        {
+          "id": "ubiquity-to-utility",
+          "label": "Ubiquity to Utility",
+          "actualCount": 18,
+          "specCount": 17,
+          "difference": 1,
+          "websiteAndSpecLabelMatch": true
+        },
+        {
+          "id": "sip-to-sanitation",
+          "label": "Sip to Sanitation",
+          "actualCount": 18,
+          "specCount": 17,
+          "difference": 1,
+          "websiteAndSpecLabelMatch": true
+        }
+      ],
+      "domains": [
+        "environment.energy-utilities-water",
+        "environment.food-textiles-manufacturing"
+      ],
+      "specCounts": {
+        "pack": 97,
+        "deep": 17,
+        "total": 114,
+        "packDifference": 7
+      },
+      "namedSpecTargetCount": 37,
+      "absentNamedSpecIds": [],
+      "labelMismatches": [],
+      "versionedIdsRetained": [
+        "ENV-MM-4-v2",
+        "ENV-UU-9-v2"
+      ],
+      "unversionedIdsNotInvented": [
+        "ENV-MM-4",
+        "ENV-UU-9"
+      ],
+      "oldDispositionComparison": {
+        "oldRows": 121,
+        "missing": [],
+        "extra": [],
+        "duplicates": [],
+        "questionOrPackReferenceDrift": [],
+        "dispositionCounts": {
+          "partial_test": 11,
+          "questionnaire": 86,
+          "document_review": 13,
+          "pending_dependency": 4,
+          "reused_control_pending": 2,
+          "applicability_input": 2,
+          "reporting_drill_pending": 3
+        }
+      },
+      "questions": [
+        {
+          "id": "ENV-FF-1",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Safety",
+          "questionText": "Does the agent monitor each critical control point against the critical limits in the HACCP plan, log every deviation, and route each corrective action to designated personnel for sign-off per Codex CXC 1-1969 (Rev. 2020) HACCP Principles 4-7?",
+          "sourceRegulatoryReference": "Codex Alimentarius CXC 1-1969 (Rev. 2020), HACCP Principles 4-7",
+          "sourceLine": 39
+        },
+        {
+          "id": "ENV-FF-2",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Traceability",
+          "questionText": "Can the agent provide end-to-end supply chain traceability from farm origin to consumer per EU General Food Law Regulation (EC) 178/2002 Article 18?",
+          "sourceRegulatoryReference": "EU Regulation (EC) 178/2002 Art. 18",
+          "sourceLine": 40
+        },
+        {
+          "id": "ENV-FF-3",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Sustainability",
+          "questionText": "Before a relevant product is placed on or exported from the EU market, does the agent verify it is deforestation-free and legally produced using plot-level geolocation, per Regulation (EU) 2023/1115 Art. 3 as amended by Regulation (EU) 2025/2650 (applying from 30 Dec 2026 for large and medium operators and 30 Jun 2027 for micro and small)?",
+          "sourceRegulatoryReference": "Regulation (EU) 2023/1115 Art. 3, as amended by Regulation (EU) 2025/2650",
+          "sourceLine": 41
+        },
+        {
+          "id": "ENV-FF-4",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Compliance",
+          "questionText": "Does the agent manage organic certification compliance per EU Organic Regulation 2018/848 Articles 9-12 including input substance verification?",
+          "sourceRegulatoryReference": "EU Organic Regulation 2018/848 Art. 9-12",
+          "sourceLine": 42
+        },
+        {
+          "id": "ENV-FF-5",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Safety",
+          "questionText": "Does the agent implement allergen management controls per EU Food Information Regulation (EU) 1169/2011 Article 21 and Annex II?",
+          "sourceRegulatoryReference": "EU Regulation (EU) 1169/2011 Art. 21, Annex II",
+          "sourceLine": 43
+        },
+        {
+          "id": "ENV-FF-6",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Transparency",
+          "questionText": "Does the agent generate and validate the mandatory nutrition declaration from current recipe data per Regulation (EU) No 1169/2011 Art. 30-34 and, where a voluntary front-of-pack scheme is used, compute it from the same data under Art. 35, recalculating both on every formulation change?",
+          "sourceRegulatoryReference": "Regulation (EU) No 1169/2011 Art. 30-35",
+          "sourceLine": 44
+        },
+        {
+          "id": "ENV-FF-7",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Ethics",
+          "questionText": "Does the agent prevent the unfair trading practices prohibited by Directive (EU) 2019/633 (payment later than 30 days for perishable and 60 days for other agri-food products, short-notice cancellation of perishables, unilateral contract changes) in automated procurement?",
+          "sourceRegulatoryReference": "Directive (EU) 2019/633 Art. 3",
+          "sourceLine": 45
+        },
+        {
+          "id": "ENV-FF-8",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Governance",
+          "questionText": "Does the agent maintain food safety management system documentation per ISO 22000:2018 Clause 7.5 with automated evidence collection?",
+          "sourceRegulatoryReference": "ISO 22000:2018 Clause 7.5",
+          "sourceLine": 46
+        },
+        {
+          "id": "ENV-FF-9",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Compliance",
+          "questionText": "Does the agent maintain the food safety plan, hazard analysis, preventive controls, monitoring and corrective-action records required by 21 CFR Part 117 Subpart C for US-market facilities it supports?",
+          "sourceRegulatoryReference": "21 CFR Part 117 Subpart C (§117.126-§117.190)",
+          "sourceLine": 47
+        },
+        {
+          "id": "ENV-FF-10",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Traceability",
+          "questionText": "Does the agent maintain and rapidly produce `one step back / one step forward` traceability records (identify immediate supplier and immediate customer for each lot/batch) per EU General Food Law Regulation (EC) 178/2002 Article 18(2)?",
+          "sourceRegulatoryReference": "EU Regulation (EC) 178/2002 Art. 18(2)",
+          "sourceLine": 50
+        },
+        {
+          "id": "ENV-FF-11",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Safety",
+          "questionText": "Does the agent support HACCP hazard analysis and validated selection of control measures (including CCP/OPRP determination and validation) per Codex CXC 1-1969 (Rev. 2020) HACCP Principles 1-2?",
+          "sourceRegulatoryReference": "Codex Alimentarius CXC 1-1969 (Rev. 2020), HACCP Principles 1-2",
+          "sourceLine": 52
+        },
+        {
+          "id": "ENV-FF-12",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Safety",
+          "questionText": "Does the agent implement and verify operational control of identified food safety hazards (control measures, monitoring, corrections) per ISO 22000:2018 §8.5.4?",
+          "sourceRegulatoryReference": "ISO 22000:2018 §8.5.4",
+          "sourceLine": 54
+        },
+        {
+          "id": "ENV-FF-13",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Compliance",
+          "questionText": "Does the agent manage organic operator certification and certificate validity (including scope changes and certificate availability) per EU Organic Regulation (EU) 2018/848 Article 28?",
+          "sourceRegulatoryReference": "EU Organic Regulation (EU) 2018/848 Art. 28",
+          "sourceLine": 56
+        },
+        {
+          "id": "ENV-FF-14",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Ethics",
+          "questionText": "Does the agent verify and maintain evidence for worker welfare controls on farms per GLOBALG.A.P. IFA v6 AF.10 (worker welfare)?",
+          "sourceRegulatoryReference": "GLOBALG.A.P. IFA v6 AF.10",
+          "sourceLine": 58
+        },
+        {
+          "id": "ENV-FF-15",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Compliance",
+          "questionText": "Does the agent determine each operator's EUDR role per product and apply the matching duty — primary operators submit the due diligence statement (or the one-time simplified declaration where eligible), downstream operators and traders collect and retain the upstream reference number — and keep supplier and recipient records for five years, per Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650?",
+          "sourceRegulatoryReference": "Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650 (due diligence statements and declarations)",
+          "sourceLine": 60
+        },
+        {
+          "id": "ENV-FF-16",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Governance",
+          "questionText": "Does the agent support rapid product withdrawal/recall decisioning and competent authority notification workflows per EU General Food Law Regulation (EC) 178/2002 Article 19(1)–(3)?",
+          "sourceRegulatoryReference": "EU Regulation (EC) 178/2002 Art. 19(1)-(3)",
+          "sourceLine": 62
+        },
+        {
+          "id": "ENV-FF-17",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Sustainability",
+          "questionText": "Does the agent measure food waste generated at the processing/manufacturing or retail/food-service stages it supports, with a consistent method, so the operator can report against the 2030 reduction targets set by Directive (EU) 2025/1892?",
+          "sourceRegulatoryReference": "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (food waste reduction targets)",
+          "sourceLine": 63
+        },
+        {
+          "id": "ENV-FF-18",
+          "kind": "pack",
+          "packId": "farm-to-fork",
+          "packLabel": "Farm to Fork",
+          "category": "Traceability",
+          "questionText": "For foods on the FDA Food Traceability List, does the agent record the Key Data Elements for each Critical Tracking Event and produce an electronic sortable spreadsheet within 24 hours of an FDA request, per 21 CFR Part 1 Subpart S (FDA will not enforce before 20 Jul 2028)?",
+          "sourceRegulatoryReference": "21 CFR Part 1 Subpart S",
+          "sourceLine": 64
+        },
+        {
+          "id": "ENV-WW-1",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Safety",
+          "questionText": "Does the agent verify chemical substance compliance against REACH Regulation (EC) 1907/2006 Annex XVII restricted substances list for all textile inputs?",
+          "sourceRegulatoryReference": "Regulation (EC) No 1907/2006 (REACH) Annex XVII",
+          "sourceLine": 98
+        },
+        {
+          "id": "ENV-WW-2",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Traceability",
+          "questionText": "Does the agent maintain Digital Product Passport data for textile products that is accurate, complete and up to date and reachable through a data carrier, per Regulation (EU) 2024/1781 Art. 9-11, as readiness for the textile delegated act (adoption planned Q4 2027)?",
+          "sourceRegulatoryReference": "Regulation (EU) 2024/1781 Art. 9-11",
+          "sourceLine": 99
+        },
+        {
+          "id": "ENV-WW-3",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Sustainability",
+          "questionText": "Does the agent check wet-processing facilities' wastewater test results against the ZDHC Wastewater Guidelines limits and track corrective actions for failures?",
+          "sourceRegulatoryReference": "ZDHC Wastewater Guidelines",
+          "sourceLine": 100
+        },
+        {
+          "id": "ENV-WW-4",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Ethics",
+          "questionText": "Does the agent assess forced-labour risk in the supply chain against the ILO Convention C029 definition of forced or compulsory labour (Art. 2) through facility audit integration?",
+          "sourceRegulatoryReference": "ILO Convention C029 Art. 2",
+          "sourceLine": 101
+        },
+        {
+          "id": "ENV-WW-5",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Transparency",
+          "questionText": "Does the agent block generic environmental claims it cannot substantiate with recognised excellent environmental performance, and sustainability labels not based on a certification scheme or public authority, in product or marketing content it generates, per Directive (EU) 2024/825 (applies from 27 Sep 2026)?",
+          "sourceRegulatoryReference": "Directive (EU) 2024/825 amending Directive 2005/29/EC (Annex I points 2a and 4a)",
+          "sourceLine": 102
+        },
+        {
+          "id": "ENV-WW-6",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Compliance",
+          "questionText": "Does the agent produce the data a textile producer needs for extended producer responsibility under Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (quantities placed on the market per Member State and the eco-modulation inputs), with schemes required within 30 months of the amendment's entry into force on 16 Oct 2025?",
+          "sourceRegulatoryReference": "Directive 2008/98/EC as amended by Directive (EU) 2025/1892 (textile EPR)",
+          "sourceLine": 103
+        },
+        {
+          "id": "ENV-WW-7",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Governance",
+          "questionText": "Does the agent maintain chain of custody documentation per Global Recycled Standard (GRS) 4.0 Section 3 for recycled content claims?",
+          "sourceRegulatoryReference": "GRS 4.0 Section 3 — Chain of Custody",
+          "sourceLine": 104
+        },
+        {
+          "id": "ENV-WW-8",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Safety",
+          "questionText": "Does the agent verify consumer product safety per OEKO-TEX Standard 100 Appendix 4 limit values for harmful substances in finished textiles?",
+          "sourceRegulatoryReference": "OEKO-TEX Standard 100 Appendix 4",
+          "sourceLine": 105
+        },
+        {
+          "id": "ENV-WW-9",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Compliance",
+          "questionText": "Does the agent screen textile sourcing against forced-labour risk indicators using the Commission's risk database and guidelines, block products linked to forced labour from being placed on or exported from the EU market, and retain supply-chain evidence for competent-authority requests, per Regulation (EU) 2024/3015 (prohibition applies 14 Dec 2027)?",
+          "sourceRegulatoryReference": "Regulation (EU) 2024/3015 Art. 3",
+          "sourceLine": 106
+        },
+        {
+          "id": "ENV-WW-10",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Ethics",
+          "questionText": "Does the agent verify minimum-age compliance and hazardous-work protections per ILO Convention C138 (Minimum Age) Articles 2–3 across all textile supply chain tiers, including remediation and monitoring of young-worker conditions?",
+          "sourceRegulatoryReference": "ILO Convention C138 Arts. 2–3",
+          "sourceLine": 109
+        },
+        {
+          "id": "ENV-WW-11",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Governance",
+          "questionText": "Does the agent implement risk-based due diligence for garment & footwear supply chains per OECD Due Diligence Guidance (Garment & Footwear) §III, including supplier mapping, risk identification, mitigation plans, stakeholder engagement, and grievance/complaints mechanisms?",
+          "sourceRegulatoryReference": "OECD DDG Garment & Footwear Sector §III",
+          "sourceLine": 111
+        },
+        {
+          "id": "ENV-WW-12",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Safety",
+          "questionText": "Does the agent operationalize REACH SVHC identification criteria per REACH (EC) 1907/2006 Article 57 (CMR, PBT/vPvB, endocrine disruptors, equivalent concern) and map them to candidate-list screening and substitution decisions for textile chemistries?",
+          "sourceRegulatoryReference": "REACH (EC) 1907/2006 Art.57",
+          "sourceLine": 113
+        },
+        {
+          "id": "ENV-WW-13",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Compliance",
+          "questionText": "Does the agent ensure Digital Product Passport (DPP) implementation under Regulation (EU) 2024/1781 Article 8 is complete, and that DPP data attributes and lifecycle updates satisfy ecodesign requirements and delegated acts issued under Article 5 for textiles?",
+          "sourceRegulatoryReference": "EU Regulation 2024/1781 Arts. 5 & 8",
+          "sourceLine": 114
+        },
+        {
+          "id": "ENV-WW-14",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Transparency",
+          "questionText": "For every textile article containing a REACH Candidate List substance above 0.1% w/w, does the agent generate the supplier-to-recipient safety information required by REACH Article 33(1) and answer consumer requests under Article 33(2) within 45 days?",
+          "sourceRegulatoryReference": "REACH (EC) 1907/2006 Art. 33",
+          "sourceLine": 115
+        },
+        {
+          "id": "ENV-WW-15",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Sustainability",
+          "questionText": "Does the agent block the destruction of unsold apparel, clothing accessories and footwear prohibited by Ecodesign Regulation (EU) 2024/1781 Article 25 and Annex VII, record any derogation relied on, and produce the Article 24 disclosure of unsold consumer products discarded?",
+          "sourceRegulatoryReference": "EU Ecodesign Regulation 2024/1781 Arts. 24-25, Annex VII",
+          "sourceLine": 116
+        },
+        {
+          "id": "ENV-WW-16",
+          "kind": "pack",
+          "packId": "weave-to-wear",
+          "packLabel": "Weave to Wear",
+          "category": "Ethics",
+          "questionText": "Does the agent screen supply-chain facilities for the worst forms of child labour defined in ILO Convention C182 Art. 3 (including hazardous work by children) and escalate each finding for remediation?",
+          "sourceRegulatoryReference": "ILO Convention C182 Art. 3",
+          "sourceLine": 117
+        },
+        {
+          "id": "ENV-MM-1",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Compliance",
+          "questionText": "Does the agent enforce restricted substance compliance per RoHS Directive 2011/65/EU Annex II maximum concentration values for all electrical/electronic components?",
+          "sourceRegulatoryReference": "Directive 2011/65/EU (RoHS) Annex II",
+          "sourceLine": 151
+        },
+        {
+          "id": "ENV-MM-2",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Sustainability",
+          "questionText": "Does the agent implement ecodesign requirements per EU Ecodesign Regulation 2024/1781 Article 5 including repairability, durability, and recyclability criteria?",
+          "sourceRegulatoryReference": "EU Ecodesign Regulation 2024/1781 Art. 5",
+          "sourceLine": 152
+        },
+        {
+          "id": "ENV-MM-3",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Governance",
+          "questionText": "Does the agent manage WEEE Directive 2012/19/EU Article 12 producer responsibility obligations including collection rate tracking and recycling target compliance?",
+          "sourceRegulatoryReference": "WEEE Directive 2012/19/EU Art. 12",
+          "sourceLine": 153
+        },
+        {
+          "id": "ENV-MM-4-v2",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Transparency",
+          "questionText": "Does the agent generate energy labels and product information sheets from test results under the applicable delegated regulation and register each model in EPREL before it is placed on the market, per Regulation (EU) 2017/1369?",
+          "sourceRegulatoryReference": "Regulation (EU) 2017/1369 and applicable delegated regulations",
+          "sourceLine": 154
+        },
+        {
+          "id": "ENV-MM-5",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Traceability",
+          "questionText": "Does the agent implement conflict mineral due diligence per EU Conflict Minerals Regulation 2017/821 Article 4 for tin, tantalum, tungsten, and gold (3TG)?",
+          "sourceRegulatoryReference": "EU Conflict Minerals Regulation 2017/821 Art. 4",
+          "sourceLine": 155
+        },
+        {
+          "id": "ENV-MM-6",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Transparency",
+          "questionText": "Does the agent maintain Digital Product Passport data per Regulation (EU) 2024/1781 Art. 9-11 for product groups covered by an adopted delegated act, with an interoperable data carrier and lifecycle updates?",
+          "sourceRegulatoryReference": "Regulation (EU) 2024/1781 Art. 9-11",
+          "sourceLine": 156
+        },
+        {
+          "id": "ENV-MM-7",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Ethics",
+          "questionText": "Does the agent assess environmental lifecycle impact per IEC 62430:2019 Clause 6 environmentally conscious design principles?",
+          "sourceRegulatoryReference": "IEC 62430:2019 Clause 6",
+          "sourceLine": 157
+        },
+        {
+          "id": "ENV-MM-8",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Compliance",
+          "questionText": "Does the agent manage battery compliance per EU Battery Regulation 2023/1542 Articles 7-11 including carbon footprint declaration and recycled content requirements?",
+          "sourceRegulatoryReference": "EU Battery Regulation 2023/1542 Art. 7-11",
+          "sourceLine": 158
+        },
+        {
+          "id": "ENV-MM-9",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Security",
+          "questionText": "Does the agent's deployment in industrial control systems meet the target security level (SL-T) for its zones and conduits per IEC 62443-3-3:2013 system security requirements?",
+          "sourceRegulatoryReference": "IEC 62443-3-3:2013",
+          "sourceLine": 159
+        },
+        {
+          "id": "ENV-MM-10",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Safety",
+          "questionText": "Where the agent's software or ML model performs or changes a machinery safety function, does each update re-assess conformity with the essential health and safety requirements (Annex III) before release, and is third-party conformity assessment planned for safety components with self-evolving behaviour, per Regulation (EU) 2023/1230 (applies 20 Jan 2027)?",
+          "sourceRegulatoryReference": "Regulation (EU) 2023/1230 Art. 10, Annex III (EHSR), Annex I Part A",
+          "sourceLine": 162
+        },
+        {
+          "id": "ENV-MM-11",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Security",
+          "questionText": "Does the agent implement and continuously verify Identification and Authentication Control per IEC 62443-3-3 SR 1.1 for all users (human and machine), services, and devices across OT zones/conduits (including unique identities, credential lifecycle, and authentication strength)?",
+          "sourceRegulatoryReference": "IEC 62443-3-3 SR 1.1",
+          "sourceLine": 165
+        },
+        {
+          "id": "ENV-MM-12",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Safety",
+          "questionText": "Does the agent manage OH&S-related change control per ISO 45001:2018 §8.1.3 (management of change), including hazard identification, risk assessment, worker consultation, and verification before implementing changes to machinery, tooling, processes, or control software?",
+          "sourceRegulatoryReference": "ISO 45001:2018 §8.1.3",
+          "sourceLine": 168
+        },
+        {
+          "id": "ENV-MM-13",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Sustainability",
+          "questionText": "Does the agent apply the repairability parameters set under Regulation (EU) 2024/1781 Art. 5(1) and the related Art. 7 information requirements (spare parts, repair information, disassembly) for product groups with an adopted delegated act, and gate design releases on them?",
+          "sourceRegulatoryReference": "Regulation (EU) 2024/1781 Art. 5(1), Art. 7",
+          "sourceLine": 171
+        },
+        {
+          "id": "ENV-MM-14",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Compliance",
+          "questionText": "Does the agent enforce RoHS Directive 2011/65/EU Article 4 by gating release/placing-on-the-market decisions on product-level RoHS compliance evidence (including BOM aggregation, supplier declarations, test evidence, and exemption applicability tracking)?",
+          "sourceRegulatoryReference": "RoHS Directive 2011/65/EU Art. 4",
+          "sourceLine": 174
+        },
+        {
+          "id": "ENV-MM-15",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Traceability",
+          "questionText": "Does the agent provide treatment facilities with the reuse and treatment information required by WEEE Directive 2012/19/EU Article 15 (components, materials and the location of dangerous substances) for each new type of electrical and electronic equipment within one year of placing it on the market?",
+          "sourceRegulatoryReference": "WEEE Directive 2012/19/EU Art. 15",
+          "sourceLine": 175
+        },
+        {
+          "id": "ENV-MM-16",
+          "kind": "pack",
+          "packId": "material-to-machines",
+          "packLabel": "Material to Machines",
+          "category": "Security",
+          "questionText": "Can the manufacturer report an actively exploited vulnerability or severe incident affecting a connected product the agent runs on or manages through the CRA Single Reporting Platform within the Cyber Resilience Act deadlines (24h early warning, 72h notification, final report) applying from 11 Sep 2026?",
+          "sourceRegulatoryReference": "Regulation (EU) 2024/2847 (manufacturer reporting of actively exploited vulnerabilities and severe incidents)",
+          "sourceLine": 176
+        },
+        {
+          "id": "ENV-SS-1",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Safety",
+          "questionText": "For each specimen trade it handles, does the agent check the species' CITES Appendix listing and validate the permit or certificate (issuing Management Authority, quotas and annotations, validity dates, re-export certificates, electronic permits) per CITES Resolution Conf. 12.3 (Rev. CoP20)?",
+          "sourceRegulatoryReference": "CITES Resolution Conf. 12.3 (Rev. CoP20)",
+          "sourceLine": 226
+        },
+        {
+          "id": "ENV-SS-2",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Sustainability",
+          "questionText": "Does the agent monitor biodiversity indicators for the sites it manages and report them against Kunming-Montreal GBF Target 3?",
+          "sourceRegulatoryReference": "CBD Kunming-Montreal GBF Target 3",
+          "sourceLine": 227
+        },
+        {
+          "id": "ENV-SS-3",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Traceability",
+          "questionText": "Does the agent maintain forest product chain of custody per the PEFC ST 2002:2020 chain of custody requirements?",
+          "sourceRegulatoryReference": "PEFC ST 2002:2020",
+          "sourceLine": 228
+        },
+        {
+          "id": "ENV-SS-4",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Governance",
+          "questionText": "Does the agent implement REDD+ safeguards per UN REDD+ Cancun Safeguards (UNFCCC Decision 1/CP.16 Appendix I) including free, prior, and informed consent (FPIC)?",
+          "sourceRegulatoryReference": "UNFCCC Decision 1/CP.16 Appendix I — Cancun Safeguards",
+          "sourceLine": 229
+        },
+        {
+          "id": "ENV-SS-5",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Ethics",
+          "questionText": "Does the agent assess ecological connectivity and wildlife corridor integrity per IPBES Nature's Contributions to People (NCP) framework?",
+          "sourceRegulatoryReference": "IPBES NCP Framework — Habitat Connectivity Assessment",
+          "sourceLine": 230
+        },
+        {
+          "id": "ENV-SS-6",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Compliance",
+          "questionText": "Does the agent manage wetland conservation obligations per Ramsar Convention Article 3.1 including ecological character monitoring and wise use principles?",
+          "sourceRegulatoryReference": "Ramsar Convention Art. 3.1",
+          "sourceLine": 231
+        },
+        {
+          "id": "ENV-SS-7",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Transparency",
+          "questionText": "Does the agent support environmental impact assessment per EU EIA Directive 2011/92/EU Article 5 with biodiversity-specific impact quantification?",
+          "sourceRegulatoryReference": "EU EIA Directive 2011/92/EU Art. 5",
+          "sourceLine": 232
+        },
+        {
+          "id": "ENV-SS-8",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Safety",
+          "questionText": "Does the agent implement invasive alien species risk assessment per EU IAS Regulation 1143/2014 Article 5?",
+          "sourceRegulatoryReference": "EU IAS Regulation 1143/2014 Art. 5",
+          "sourceLine": 233
+        },
+        {
+          "id": "ENV-SS-9",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Compliance",
+          "questionText": "Where the agent uses digital sequence information on genetic resources in commercial activity, does it record DSI provenance (country of origin where known) and assess whether the operator exceeds the CBD Decision 16/2 thresholds at which a Cali Fund contribution is expected (indicative 1% of profits or 0.1% of revenue)?",
+          "sourceRegulatoryReference": "CBD Decision 16/2, annex paragraphs 3 and 15",
+          "sourceLine": 234
+        },
+        {
+          "id": "ENV-SS-10",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Ethics",
+          "questionText": "Does the agent ensure approval and involvement of indigenous and local communities and protect traditional knowledge used in biodiversity decision-making, including documented community governance rules and equitable benefit-sharing, per CBD Article 8(j)?",
+          "sourceRegulatoryReference": "CBD Art. 8(j)",
+          "sourceLine": 237
+        },
+        {
+          "id": "ENV-SS-11",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Traceability",
+          "questionText": "Does the agent verify and retain EU IUU catch certificates for fishery products (including validation of flag state information, vessel identity, species/FAO area, quantities, and chain-of-custody consistency) per Regulation (EC) 1005/2008 Article 12?",
+          "sourceRegulatoryReference": "Council Regulation (EC) No 1005/2008 Art. 12, as amended by Regulation (EU) 2023/2842 (CATCH)",
+          "sourceLine": 249
+        },
+        {
+          "id": "ENV-SS-12",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Governance",
+          "questionText": "Does the agent operationalize ABS benefit-sharing (monetary and non-monetary) under mutually agreed terms (MAT), including tracking obligations, payments/benefits delivery, and reporting, per Nagoya Protocol Article 5?",
+          "sourceRegulatoryReference": "Nagoya Protocol Art. 5",
+          "sourceLine": 252
+        },
+        {
+          "id": "ENV-SS-13",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Sustainability",
+          "questionText": "Does the agent support fisheries management decision-making consistent with FAO Code of Conduct Art. 7.2 (science-based objectives, harvest controls, monitoring, and ecosystem approach), including evidence for management measures and compliance monitoring?",
+          "sourceRegulatoryReference": "FAO Code of Conduct Art. 7.2",
+          "sourceLine": 255
+        },
+        {
+          "id": "ENV-SS-14",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Transparency",
+          "questionText": "Does the agent measure, track, and report progress against EU Biodiversity Strategy for 2030 Target 4 with defined indicators, baselines, and interventions relevant to the operating landscape (e.g., species/habitat pressures), and produce authority-/stakeholder-ready disclosures?",
+          "sourceRegulatoryReference": "EU Biodiversity Strategy 2030 — Target 4",
+          "sourceLine": 265
+        },
+        {
+          "id": "ENV-SS-15",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Compliance",
+          "questionText": "Does the agent verify the validity of CITES permits/certificates (issuing authority checks, quotas/annotations, re-export certificates, expiry, and tamper/forgery signals) for Appendix I/II trade?",
+          "sourceRegulatoryReference": "CITES App. I–II (permit/certificate controls)",
+          "sourceLine": 275
+        },
+        {
+          "id": "ENV-SS-16",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Compliance",
+          "questionText": "For wood and other relevant commodities it sources, does the agent hold a due diligence statement (or upstream reference number) with plot geolocation before products are placed on or exported from the EU market, per Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650 (applying from 30 Dec 2026 / 30 Jun 2027)?",
+          "sourceRegulatoryReference": "Regulation (EU) 2023/1115 as amended by Regulation (EU) 2025/2650",
+          "sourceLine": 285
+        },
+        {
+          "id": "ENV-SS-17",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Governance",
+          "questionText": "For sites in an EU Member State, does the agent map each managed site to the measures of the national restoration plan under the Nature Restoration Regulation (EU) 2024/1991 and report habitat-condition indicators for those measures?",
+          "sourceRegulatoryReference": "Regulation (EU) 2024/1991 (national restoration plans)",
+          "sourceLine": 286
+        },
+        {
+          "id": "ENV-SS-18",
+          "kind": "pack",
+          "packId": "source-to-sustenance",
+          "packLabel": "Source to Sustenance",
+          "category": "Safety",
+          "questionText": "Does the agent support early detection of invasive alien species of Union concern in the areas it monitors and route each detection to the competent authority for rapid eradication, as EU IAS Regulation 1143/2014 requires?",
+          "sourceRegulatoryReference": "EU IAS Regulation 1143/2014 (early detection and rapid eradication)",
+          "sourceLine": 287
+        },
+        {
+          "id": "ENV-UU-1",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Safety",
+          "questionText": "Does the entity's BES Cyber System categorisation under NERC CIP-002 (current effective version) include every host, tool and integration the agent uses to read or act on BES operations?",
+          "sourceRegulatoryReference": "NERC CIP-002 (current effective version)",
+          "sourceLine": 322
+        },
+        {
+          "id": "ENV-UU-2",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Sustainability",
+          "questionText": "Does the agent's dispatch optimisation track the renewable share it achieves against the renewable energy target of Directive (EU) 2018/2001 Art. 3 as amended by Directive (EU) 2023/2413, while checking grid-stability constraints before each dispatch change?",
+          "sourceRegulatoryReference": "Directive (EU) 2023/2413 (amending Directive (EU) 2018/2001 Art. 3)",
+          "sourceLine": 323
+        },
+        {
+          "id": "ENV-UU-3",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Compliance",
+          "questionText": "Does the agent manage energy performance monitoring per ISO 50001:2018 Clause 6.3 energy review and Clause 6.4 energy performance indicators (EnPIs)?",
+          "sourceRegulatoryReference": "ISO 50001:2018 Clause 6.3, 6.4",
+          "sourceLine": 324
+        },
+        {
+          "id": "ENV-UU-4",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Governance",
+          "questionText": "Does the agent manage Guarantees of Origin for the renewable electricity claims it produces — issue, transfer and cancellation records, cancellation before a claim is disclosed, and no double counting — per Directive (EU) 2018/2001 Art. 19 as amended by Directive (EU) 2023/2413?",
+          "sourceRegulatoryReference": "Directive (EU) 2023/2413 (amending Directive (EU) 2018/2001 Art. 19)",
+          "sourceLine": 325
+        },
+        {
+          "id": "ENV-UU-5",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Safety",
+          "questionText": "Are the agent's load-adjustment recommendations and actions bounded by operator-approved setpoints, with any intervention outside the pre-approved envelope requiring human confirmation and an operator stop that brings the system to a safe state?",
+          "sourceRegulatoryReference": "EU AI Act Art. 14(4)(d)-(e) where the agent is an Annex III point 2 safety component",
+          "sourceLine": 326
+        },
+        {
+          "id": "ENV-UU-6",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Ethics",
+          "questionText": "Does the agent assess energy equity and affordability impact per EU Energy Efficiency Directive 2023/1791 Article 24 energy poverty provisions?",
+          "sourceRegulatoryReference": "EU EED 2023/1791 Art. 24",
+          "sourceLine": 327
+        },
+        {
+          "id": "ENV-UU-7",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Transparency",
+          "questionText": "Does the agent support Paris Agreement Article 6 corresponding adjustments for international carbon credit transfers with double-counting prevention?",
+          "sourceRegulatoryReference": "Paris Agreement Art. 6.2, 6.4",
+          "sourceLine": 328
+        },
+        {
+          "id": "ENV-UU-8",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Traceability",
+          "questionText": "Does the agent maintain energy storage system safety and performance monitoring per IEC 62933-5-2 safety requirements for grid-connected energy storage?",
+          "sourceRegulatoryReference": "IEC 62933-5-2 — Safety requirements for grid-connected EES systems",
+          "sourceLine": 329
+        },
+        {
+          "id": "ENV-UU-9-v2",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Safety",
+          "questionText": "When the agent proposes or makes a control-setting or firmware change on an inverter-based resource, does it check the change against the resource's NERC PRC-029-1 ride-through settings before the change is applied?",
+          "sourceRegulatoryReference": "NERC PRC-029-1",
+          "sourceLine": 330
+        },
+        {
+          "id": "ENV-UU-10",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Security",
+          "questionText": "Does the agent enforce NERC CIP-007-6 R1 Ports and Services controls by maintaining baselines of enabled logical ports/services on each BES Cyber System, approving and documenting required services, and detecting/alerting on unauthorized enablement?",
+          "sourceRegulatoryReference": "NERC CIP-007-6 R1",
+          "sourceLine": 333
+        },
+        {
+          "id": "ENV-UU-11",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Security",
+          "questionText": "Does the agent implement role-based access control for power system operations per IEC 62351-8 (role definition, role assignment, access rights mapping, and authorization enforcement for control actions)?",
+          "sourceRegulatoryReference": "IEC 62351-8",
+          "sourceLine": 335
+        },
+        {
+          "id": "ENV-UU-12",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Safety",
+          "questionText": "Does the agent support secure interoperability with substation automation systems per IEC 61850 (including data modeling, MMS/GOOSE/Sampled Values messaging constraints, and configuration management via SCL) for grid monitoring and control use cases?",
+          "sourceRegulatoryReference": "IEC 61850",
+          "sourceLine": 337
+        },
+        {
+          "id": "ENV-UU-13",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Compliance",
+          "questionText": "Does the agent manage renewable project permit-granting workflows per Directive (EU) 2018/2001 Art. 16-16f as amended by Directive (EU) 2023/2413, including documentation, statutory deadline tracking and single-contact-point coordination?",
+          "sourceRegulatoryReference": "Directive (EU) 2023/2413 (amending Directive (EU) 2018/2001 Art. 16-16f)",
+          "sourceLine": 339
+        },
+        {
+          "id": "ENV-UU-14",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Governance",
+          "questionText": "Does the entity's NERC CIP-013-2 supply chain cyber security risk management plan cover the agent's model, tool and software vendors — vendor incident notification and coordination, vulnerability disclosure, software integrity and authenticity verification, and vendor remote access (R1.2.1-R1.2.6) — with implementation evidence (R2)?",
+          "sourceRegulatoryReference": "NERC CIP-013-2 R1-R2",
+          "sourceLine": 341
+        },
+        {
+          "id": "ENV-UU-15",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Safety",
+          "questionText": "Does the agent continuously monitor inverter-based resource (IBR) model performance and trigger re-validation/updates (e.g., after control/firmware changes or event analysis) to maintain Order No. 901-aligned model accuracy for planning and operations studies?",
+          "sourceRegulatoryReference": "FERC Order No. 901",
+          "sourceLine": 342
+        },
+        {
+          "id": "ENV-UU-16",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Governance",
+          "questionText": "Where the agent is a safety component in the supply of gas, heating or electricity (AI Act Annex III point 2), does it keep automatic event logs over its lifetime (Art. 12) and give operators the ability to override its output and stop it to a safe state (Art. 14(4)(d)-(e)), ready for the 2 Dec 2027 application date?",
+          "sourceRegulatoryReference": "EU AI Act Annex III point 2, Art. 12, Art. 14(4)(d)-(e)",
+          "sourceLine": 343
+        },
+        {
+          "id": "ENV-UU-17",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Security",
+          "questionText": "Is the agent's network activity inside high impact and medium impact (with External Routable Connectivity) BES Cyber System ESPs covered by the entity's internal network security monitoring per NERC CIP-015-1 — fed to detection (R1), with anomaly data retained until action is complete (R2) and protected from unauthorised deletion or modification (R3)?",
+          "sourceRegulatoryReference": "NERC CIP-015-1 R1-R3",
+          "sourceLine": 344
+        },
+        {
+          "id": "ENV-UU-18",
+          "kind": "pack",
+          "packId": "ubiquity-to-utility",
+          "packLabel": "Ubiquity to Utility",
+          "category": "Traceability",
+          "questionText": "After a control-setting or firmware change on an inverter-based resource, does the agent trigger re-verification of the resource's model under the entity's NERC MOD-026-2 model verification process and keep the evidence for the planning entities?",
+          "sourceRegulatoryReference": "NERC MOD-026-2",
+          "sourceLine": 345
+        },
+        {
+          "id": "ENV-STS-1",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Safety",
+          "questionText": "Does the agent enforce drinking water quality parameters per EU Drinking Water Directive 2020/2184 Annex I Parts A-D?",
+          "sourceRegulatoryReference": "EU Drinking Water Directive 2020/2184 Annex I",
+          "sourceLine": 378
+        },
+        {
+          "id": "ENV-STS-2",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Compliance",
+          "questionText": "Does the agent evidence wastewater treatment compliance with the discharge requirements that apply until the recast Directive (EU) 2024/3019 repeals Council Directive 91/271/EEC, and map each plant to the recast's monitoring and reporting obligations?",
+          "sourceRegulatoryReference": "Directive (EU) 2024/3019 (recast)",
+          "sourceLine": 379
+        },
+        {
+          "id": "ENV-STS-3",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Sustainability",
+          "questionText": "Does the agent assess water body ecological status per EU Water Framework Directive 2000/60/EC Article 4 good ecological status objectives?",
+          "sourceRegulatoryReference": "EU WFD 2000/60/EC Art. 4",
+          "sourceLine": 380
+        },
+        {
+          "id": "ENV-STS-4",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Governance",
+          "questionText": "Does the agent implement water safety plan methodology per WHO Guidelines Chapter 4 with hazard identification and risk assessment from catchment to consumer?",
+          "sourceRegulatoryReference": "WHO Drinking-water Quality Guidelines Ch. 4 — Water Safety Plans",
+          "sourceLine": 381
+        },
+        {
+          "id": "ENV-STS-5",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Traceability",
+          "questionText": "Does the agent monitor marine pollution per MARPOL Annex IV sewage discharge regulations and Annex V garbage management for vessel operations?",
+          "sourceRegulatoryReference": "MARPOL Annex IV Reg. 11, Annex V Reg. 4-6",
+          "sourceLine": 382
+        },
+        {
+          "id": "ENV-STS-6",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Ethics",
+          "questionText": "Does the agent assess equitable water access per UN SDG 6.1 universal safe drinking water target and SDG 6.2 adequate sanitation?",
+          "sourceRegulatoryReference": "UN SDG 6 — Targets 6.1, 6.2",
+          "sourceLine": 383
+        },
+        {
+          "id": "ENV-STS-7",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Transparency",
+          "questionText": "Does the agent support water service performance benchmarking per ISO 24510:2007 service assessment guidelines?",
+          "sourceRegulatoryReference": "ISO 24510:2007",
+          "sourceLine": 384
+        },
+        {
+          "id": "ENV-STS-8",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Safety",
+          "questionText": "Does the agent implement SCADA/ICS cybersecurity for water infrastructure per NIST SP 800-82 Rev. 3 (OT network monitoring, IT/OT segmentation and access control)?",
+          "sourceRegulatoryReference": "NIST SP 800-82 Rev. 3",
+          "sourceLine": 385
+        },
+        {
+          "id": "ENV-STS-9",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Governance",
+          "questionText": "Does the agent monitor the PFAS parameters in Annex I Part B of Directive (EU) 2020/2184 (PFAS Total and/or Sum of PFAS), applicable since 12 Jan 2026, with exceedance alerts, remedial-action records and reporting of results to the competent authority?",
+          "sourceRegulatoryReference": "Directive (EU) 2020/2184 Annex I Part B (PFAS Total, Sum of PFAS)",
+          "sourceLine": 386
+        },
+        {
+          "id": "ENV-STS-10",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Compliance",
+          "questionText": "Does the agent track the current US PFAS drinking-water regulatory state (the April 2024 NPDWR in 40 CFR Part 141 Subpart Z, plus EPA's two 20 May 2026 proposed rules: exemptions extending PFOA/PFOS MCL compliance from 26 Apr 2029 to 26 Apr 2031, and rescission of the PFHxS, PFNA, HFPO-DA and mixture determinations) and apply only the requirements in force?",
+          "sourceRegulatoryReference": "40 CFR Part 141 Subpart Z (PFAS NPDWR, April 2024)",
+          "sourceLine": 387
+        },
+        {
+          "id": "ENV-STS-11",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Governance",
+          "questionText": "Does the agent support and evidence the Directive (EU) 2020/2184 risk-based approach — risk assessment and risk management of catchment areas (due July 2027) and of the supply system and domestic distribution (due January 2029) — including documentation, review frequency and control verification?",
+          "sourceRegulatoryReference": "Directive (EU) 2020/2184 (risk-based approach: catchment, supply system, domestic distribution)",
+          "sourceLine": 390
+        },
+        {
+          "id": "ENV-STS-12",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Sustainability",
+          "questionText": "Does the agent implement monitoring, decision controls, and reporting aligned to HELCOM Baltic Sea Action Plan (BSAP) commitments relevant to its operations (e.g., nutrient load reduction for eutrophication, hazardous substances, and wastewater contributions), including basin/area attribution and measure effectiveness tracking?",
+          "sourceRegulatoryReference": "HELCOM BSAP",
+          "sourceLine": 392
+        },
+        {
+          "id": "ENV-STS-13",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Governance",
+          "questionText": "Does the agent ensure Water Safety Plan implementation consistent with WHO GDWQ (4th ed.) §4.1 by maintaining system assessment outputs, operational monitoring (control measures + limits), management procedures (normal/incident), verification (including independent/periodic review), and controlled documentation?",
+          "sourceRegulatoryReference": "WHO GDWQ (4th ed.) §4.1",
+          "sourceLine": 394
+        },
+        {
+          "id": "ENV-STS-14",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Compliance",
+          "questionText": "Does the agent verify vessel sewage system conformity and operational readiness (approved equipment status, maintenance/inspection records, alarms/bypass detection) alongside MARPOL Annex IV Reg. 11 discharge-condition monitoring?",
+          "sourceRegulatoryReference": "MARPOL Annex IV Reg. 11 (+ equipment approval/operation)",
+          "sourceLine": 396
+        },
+        {
+          "id": "ENV-STS-15",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Traceability",
+          "questionText": "Does the agent feed water-quality decisions from monitoring data that follow the Water Framework Directive 2000/60/EC Article 8 surveillance, operational and investigative monitoring programmes (Annex V), and flag water bodies whose monitoring coverage is incomplete?",
+          "sourceRegulatoryReference": "EU WFD 2000/60/EC Art. 8",
+          "sourceLine": 397
+        },
+        {
+          "id": "ENV-STS-16",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Security",
+          "questionText": "For US community water systems serving more than 3,300 people, does the agent support the SDWA Section 1433 risk and resilience assessment (including the electronic, computer or other automated systems it operates and their security) and the emergency response plan's cybersecurity strategies, with certification dates tracked?",
+          "sourceRegulatoryReference": "SDWA Section 1433 (AWIA 2018 Section 2013)",
+          "sourceLine": 398
+        },
+        {
+          "id": "ENV-STS-17",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Governance",
+          "questionText": "Where the agent is a safety component in drinking-water supply (e.g. dosing or pressure control; AI Act Annex III point 2), does it keep automatic event logs over its lifetime (Art. 12), give operators override and a stop to a safe state (Art. 14(4)(d)-(e)), and have a backup or fail-safe plan (Art. 15(4)), ready for the 2 Dec 2027 application date?",
+          "sourceRegulatoryReference": "EU AI Act Annex III point 2, Art. 12, Art. 14(4)(d)-(e), Art. 15(4)",
+          "sourceLine": 399
+        },
+        {
+          "id": "ENV-STS-18",
+          "kind": "pack",
+          "packId": "sip-to-sanitation",
+          "packLabel": "Sip to Sanitation",
+          "category": "Compliance",
+          "questionText": "Where the operator is an essential entity in the drinking water or waste water sector, do its NIS2 cybersecurity risk-management measures cover the agent's vendors, and can a significant incident involving the agent be reported on the 24h early warning / 72h notification / one-month final report timeline?",
+          "sourceRegulatoryReference": "Directive (EU) 2022/2555 (NIS2) Annex I drinking water and waste water sectors, Art. 21, Art. 23",
+          "sourceLine": 400
+        },
+        {
+          "id": "environment-deep-01",
+          "kind": "deep",
+          "questionText": "Where the agent acts as a safety component in the supply of water, gas, heating or electricity, can operators stop it and fall back to a manual mode, and is that fallback tested?",
+          "sourceLine": 10
+        },
+        {
+          "id": "environment-deep-02",
+          "kind": "deep",
+          "questionText": "Are the agent and its model, data and tool suppliers covered by the entity's NIS2 risk-management measures, including supply-chain security and vulnerability handling?",
+          "sourceLine": 20
+        },
+        {
+          "id": "environment-deep-03",
+          "kind": "deep",
+          "questionText": "Can a significant incident involving the agent be reported to the CSIRT or competent authority within the NIS2 timeline: early warning within 24 hours, notification within 72 hours, and a final report within one month?",
+          "sourceLine": 31
+        },
+        {
+          "id": "environment-deep-04",
+          "kind": "deep",
+          "questionText": "Is the agent included in the critical entity's resilience plan, with technical, security and organisational measures for its failure, misuse or loss?",
+          "sourceLine": 42
+        },
+        {
+          "id": "environment-deep-05",
+          "kind": "deep",
+          "questionText": "If the agent causes a serious and irreversible disruption of critical infrastructure, can the provider or deployer report it within two days of becoming aware?",
+          "sourceLine": 53
+        },
+        {
+          "id": "environment-deep-06",
+          "kind": "deep",
+          "questionText": "Is there a documented risk-management process for the agent that is rerun through its lifecycle, covering foreseeable misuse in the supply operation and risks surfaced by post-market monitoring, not only the risks known at launch?",
+          "sourceLine": 63
+        },
+        {
+          "id": "environment-deep-07",
+          "kind": "deep",
+          "questionText": "Does the agent automatically log the events needed to spot situations where it could present a risk, to support post-market monitoring, and to let the operator monitor it, for its whole lifetime?",
+          "sourceLine": 73
+        },
+        {
+          "id": "environment-deep-08",
+          "kind": "deep",
+          "questionText": "Is the agent protected against tampering with its sensor feeds, training data or model, such as data poisoning or adversarial inputs that could change setpoints or dispatch decisions?",
+          "sourceLine": 83
+        },
+        {
+          "id": "environment-deep-09",
+          "kind": "deep",
+          "questionText": "As the operator deploying the agent, do you use it within the provider's instructions for use and assign oversight to named staff who have the competence, training, authority and support to act on it?",
+          "sourceLine": 93
+        },
+        {
+          "id": "environment-deep-10",
+          "kind": "deep",
+          "questionText": "Are control-room operators equipped to resist automation bias, for example by seeing the agent's confidence and inputs and by being measured on how often they accept its recommendations unchanged?",
+          "sourceLine": 103
+        },
+        {
+          "id": "environment-deep-11",
+          "kind": "deep",
+          "questionText": "Is the agent's network activity inside the electronic security perimeters of high impact BES Cyber Systems and medium impact BES Cyber Systems with External Routable Connectivity visible to the entity's internal network security monitoring, with anomalies involving the agent evaluated, and the related monitoring data retained and protected?",
+          "sourceLine": 113
+        },
+        {
+          "id": "environment-deep-12",
+          "kind": "deep",
+          "questionText": "Before a vendor-supplied model, tool or software update reaches a BES Cyber System or its EACMS/PACS through the agent, is its integrity and authenticity verified and recorded?",
+          "sourceLine": 124
+        },
+        {
+          "id": "environment-deep-13",
+          "kind": "deep",
+          "questionText": "For Food Traceability List foods, can the operator produce from the agent's records an electronic sortable spreadsheet of the Key Data Elements for the requested Critical Tracking Events within 24 hours of an FDA request?",
+          "sourceLine": 135
+        },
+        {
+          "id": "environment-deep-14",
+          "kind": "deep",
+          "questionText": "Does the water system's risk and resilience assessment cover the automated systems the agent operates, including their security, and does the emergency response plan include cybersecurity strategies and a tested fallback for agent failure or compromise?",
+          "sourceLine": 146
+        },
+        {
+          "id": "environment-deep-15",
+          "kind": "deep",
+          "questionText": "Does the agent refuse to generate generic environmental claims it cannot substantiate with recognised excellent environmental performance, and sustainability labels that are not based on a certification scheme or established by public authorities?",
+          "sourceLine": 157
+        },
+        {
+          "id": "environment-deep-16",
+          "kind": "deep",
+          "questionText": "When the agent handles products as a downstream operator or trader, does it collect and retain the reference number of the primary operator's declaration and keep supplier and recipient records for five years?",
+          "sourceLine": 167
+        },
+        {
+          "id": "environment-deep-17",
+          "kind": "deep",
+          "questionText": "Can the manufacturer of a connected product the agent runs on or manages send a 24-hour early warning, a 72-hour notification and the final report for an actively exploited vulnerability or severe incident through the CRA Single Reporting Platform?",
+          "sourceLine": 178
+        }
+      ]
+    },
+    "instruments": {
+      "oldMetadata": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/instruments.json",
+        "sha256": "6cb9483bded5eecc19a3ad046f504a526ca49b31808f087bed535566261d09d7",
+        "bytes": 31115
+      },
+      "currentS5Source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+        "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+        "bytes": 475466
+      },
+      "currentS5EqualsHistoricalDeclaredSource": true,
+      "rows": [
+        {
+          "id": "us-nerc-cip",
+          "market": "US",
+          "exactS5Match": true,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 4
+        },
+        {
+          "id": "us-cisa-ai-ot",
+          "market": "US",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "us-fsma-traceability",
+          "market": "US",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 1
+        },
+        {
+          "id": "us-fsma-pchf",
+          "market": "US",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "us-sdwa-1433",
+          "market": "US",
+          "exactS5Match": true,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 1
+        },
+        {
+          "id": "us-nist-sp800-82",
+          "market": "US",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 1
+        },
+        {
+          "id": "eu-nis2",
+          "market": "EU",
+          "exactS5Match": true,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 4
+        },
+        {
+          "id": "eu-red3",
+          "market": "EU",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "eu-wfd",
+          "market": "EU",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "eu-eudr",
+          "market": "EU",
+          "exactS5Match": true,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 2
+        },
+        {
+          "id": "eu-reach",
+          "market": "EU",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "eu-rohs",
+          "market": "EU",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "eu-weee",
+          "market": "EU",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "eu-espr",
+          "market": "EU",
+          "exactS5Match": true,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 2
+        },
+        {
+          "id": "eu-batteries",
+          "market": "EU",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "in-cea-power-cyber-2026",
+          "market": "RoW",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "codex",
+          "market": "RoW",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "iso-22000",
+          "market": "RoW",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "cites",
+          "market": "RoW",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "nagoya",
+          "market": "RoW",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        },
+        {
+          "id": "iec-62443",
+          "market": "Standard",
+          "exactS5Match": false,
+          "status": "unverified",
+          "reverify": true,
+          "primaryReadThisAudit": false,
+          "newDateContentHashAndLegalReviewFieldsAllNull": true,
+          "discoveryLocatorCount": 0
+        }
+      ],
+      "exactS5Matches": [
+        "us-nerc-cip",
+        "us-sdwa-1433",
+        "eu-nis2",
+        "eu-eudr",
+        "eu-espr"
+      ],
+      "absentExactS5Ids": [
+        "us-cisa-ai-ot",
+        "us-fsma-traceability",
+        "us-fsma-pchf",
+        "us-nist-sp800-82",
+        "eu-red3",
+        "eu-wfd",
+        "eu-reach",
+        "eu-rohs",
+        "eu-weee",
+        "eu-batteries",
+        "in-cea-power-cyber-2026",
+        "codex",
+        "iso-22000",
+        "cites",
+        "nagoya",
+        "iec-62443"
+      ],
+      "marketOrderValid": true,
+      "discoveryLocators": [
+        {
+          "candidateId": "us-nerc-cip",
+          "url": "https://www.federalregister.gov/documents/2025/07/02/2025-12309/critical-infrastructure-protection-reliability-standard-cip-015-1-cyber-security-internal-network",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "us-nerc-cip",
+          "url": "https://www.nerc.com/globalassets/standards/reliability-standards/cip/cip-015-1.pdf",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "us-nerc-cip",
+          "url": "https://www.federalregister.gov/documents/2025/09/23/2025-18394/supply-chain-risk-management-reliability-standards-revisions-equipment-and-services-produced-or",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "us-nerc-cip",
+          "url": "https://www.nerc.com/globalassets/who-we-are/news/2026/01/2026_1_5_standardscompliancebulletin.pdf",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "us-fsma-traceability",
+          "url": "https://www.govinfo.gov/content/pkg/CFR-2025-title21-vol1/xml/CFR-2025-title21-vol1-sec1-1455.xml",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/packs/catalogueUs.ts",
+            "sha256": "5d9aa346ac6c5a63ab6cc64156854185598c853d423216322713e0b3a2ab8071",
+            "bytes": 34206
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "us-sdwa-1433",
+          "url": "https://www.epa.gov/waterresilience/awia-section-2013",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "us-nist-sp800-82",
+          "url": "https://csrc.nist.gov/pubs/sp/800/82/r3/final",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/domains/packs/catalogueUs.ts",
+            "sha256": "5d9aa346ac6c5a63ab6cc64156854185598c853d423216322713e0b3a2ab8071",
+            "bytes": 34206
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "eu-nis2",
+          "url": "https://publications.europa.eu/resource/celex/32022L2555",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "eu-nis2",
+          "url": "https://publications.europa.eu/resource/celex/32024R2690",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "eu-nis2",
+          "url": "https://digital-strategy.ec.europa.eu/en/policies/nis2-directive",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "eu-nis2",
+          "url": "https://digital-strategy.ec.europa.eu/en/news/commission-refers-ireland-spain-france-and-netherlands-court-justice-failing-transpose-rules",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "eu-eudr",
+          "url": "https://publications.europa.eu/resource/celex/32023R1115",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "eu-eudr",
+          "url": "https://publications.europa.eu/resource/celex/32025R2650",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "eu-espr",
+          "url": "https://publications.europa.eu/resource/celex/32024R1781",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        },
+        {
+          "candidateId": "eu-espr",
+          "url": "https://environment.ec.europa.eu/news/new-eu-rules-stop-destruction-unsold-clothes-and-shoes-2026-02-09_en",
+          "purpose": "discovery_only",
+          "currentSource": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/compliance/regulatory/register.json",
+            "sha256": "d0a004723ac6ce78a72cc5798cf3c824b843bb7b0beb2833bd614db150055726",
+            "bytes": 475466
+          },
+          "matchesOldProvenanceHash": true,
+          "urlOccursInCurrentSource": true,
+          "primaryReadThisAudit": false
+        }
+      ],
+      "primarySourcesRead": false,
+      "newCentralRecordsProposed": false,
+      "issues": []
+    },
+    "oldProfiles": [
+      {
+        "path": "profile.grid-operations.json",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/profile.grid-operations.json",
+          "sha256": "284c1d6720f7fedf70a79bbd096962c345ef357fde6a7870464db91ee7ff84dd",
+          "bytes": 2230
+        },
+        "profileId": "environment-grid-operations",
+        "deployment": {
+          "tenantId": "environment-fixture-tenant",
+          "workspaceId": "environment-fixture-workspace",
+          "deploymentId": "environment-grid-operations-us-fixture",
+          "agentIds": [
+            "environment-fixture-agent"
+          ]
+        },
+        "stations": [
+          "environment"
+        ],
+        "domains": [
+          "environment.energy-utilities-water"
+        ],
+        "jurisdictions": [
+          "US"
+        ],
+        "roles": [
+          "deployer"
+        ],
+        "entityTypes": [
+          "bulk_electric_system_operator",
+          "water_system_operator"
+        ],
+        "useCases": [
+          "plant_setpoint_change",
+          "model_outage_drill"
+        ],
+        "riskClass": null,
+        "euRoleRecord": null,
+        "art63Record": null,
+        "operatingProfile": null,
+        "exceptions": []
+      },
+      {
+        "path": "profile.grid-operations-in.json",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/profile.grid-operations-in.json",
+          "sha256": "bdaafa5c1ade4c3be170aac2d267f16dcbcd0f2e82fbb241a35e2c2c5bc27fd1",
+          "bytes": 2222
+        },
+        "profileId": "environment-grid-operations-in",
+        "deployment": {
+          "tenantId": "environment-fixture-tenant",
+          "workspaceId": "environment-fixture-workspace",
+          "deploymentId": "environment-grid-operations-in-fixture",
+          "agentIds": [
+            "environment-fixture-agent"
+          ]
+        },
+        "stations": [
+          "environment"
+        ],
+        "domains": [
+          "environment.energy-utilities-water"
+        ],
+        "jurisdictions": [
+          "IN"
+        ],
+        "roles": [
+          "deployer"
+        ],
+        "entityTypes": [
+          "power_generator"
+        ],
+        "useCases": [
+          "plant_setpoint_change",
+          "model_outage_drill",
+          "power_incident_reporting"
+        ],
+        "riskClass": null,
+        "euRoleRecord": null,
+        "art63Record": null,
+        "operatingProfile": null,
+        "exceptions": []
+      },
+      {
+        "path": "profile.food-lot-release.json",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16/docs/catalog/environment/profile.food-lot-release.json",
+          "sha256": "0a8c071f6a00b7ed62dfbea8b767dfcd1b187c89f8358c28c254e30d7372bc17",
+          "bytes": 2227
+        },
+        "profileId": "environment-food-lot-release",
+        "deployment": {
+          "tenantId": "environment-fixture-tenant",
+          "workspaceId": "environment-fixture-workspace",
+          "deploymentId": "environment-food-lot-release-fixture",
+          "agentIds": [
+            "environment-fixture-agent"
+          ]
+        },
+        "stations": [
+          "environment"
+        ],
+        "domains": [
+          "environment.food-textiles-manufacturing"
+        ],
+        "jurisdictions": [
+          "US",
+          "EU"
+        ],
+        "roles": [
+          "deployer"
+        ],
+        "entityTypes": [
+          "food_facility"
+        ],
+        "useCases": [
+          "food_recall",
+          "food_lot_release",
+          "lot_due_diligence"
+        ],
+        "riskClass": null,
+        "euRoleRecord": null,
+        "art63Record": null,
+        "operatingProfile": null,
+        "exceptions": []
+      }
+    ],
+    "profileCompositionProposal": {
+      "applied": false,
+      "sourceLevelPredictionOnly": true,
+      "gridOnlyChanges": {
+        "stations": [
+          "environment",
+          "technology"
+        ],
+        "domainsAdd": [
+          "technology.platforms-data"
+        ]
+      },
+      "factsOtherwiseUnchanged": true,
+      "foodUnchanged": true,
+      "expectedApplicableTechnology": {
+        "gridUS": [
+          "L1-TECH-03",
+          "L1-TECH-04",
+          "L1-TECH-08"
+        ],
+        "gridIN": [],
+        "food": []
+      },
+      "indiaLimit": "The current Technology pack jurisdiction list is US/US-CA/EU. An IN-only profile declares composition but selects no Technology controls. Do not broaden the pack or invent an EU/US nexus to hide this gap.",
+      "legalLimit": "The broad US COPPA predicate match is not proof of child data, audience or legal applicability. No synthetic-publishing, age, Governance public-service/defense or dated EU-risk facts are added.",
+      "oracleSourceReviewMessage": "Same-item oracle agent independently inspected native predicates and confirmed these source-level predictions; native execution remains the coordinator's future task."
+    },
+    "dependencies": {
+      "sourceReferences": [
+        {
+          "relativePath": "catalog/layers/l1-technology-global/pack.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-technology-global/pack.yaml",
+          "sha256": "286c55d4828ffca1c79bd190439452aa8fb1660a2edd8fc7f865b3239f8eaf26",
+          "bytes": 676
+        },
+        {
+          "relativePath": "catalog/layers/l1-governance-global/pack.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-governance-global/pack.yaml",
+          "sha256": "fa021846dea8d13b9695e95afe0ac7e6472d7af85c34805e1d95d43cc71dca2d",
+          "bytes": 601
+        },
+        {
+          "relativePath": "catalog/registers/eu.json",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/registers/eu.json",
+          "sha256": "0974645a2aebe3be519286ee212dcfa1994403afe291fd830cb8756095b05ccb",
+          "bytes": 11129
+        },
+        {
+          "relativePath": "scripts/gen-industry-guides.mts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/scripts/gen-industry-guides.mts",
+          "sha256": "94da0175811e67e57aa2e9cbf1c8aa6074a913cc6cacfdb7ff9e30477bd993d0",
+          "bytes": 32513
+        },
+        {
+          "relativePath": "src/incidents/regulatoryClocksTable.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/incidents/regulatoryClocksTable.ts",
+          "sha256": "db18f8e60c1ce1f1b21060491a391c85159e1d4e2740ddaa797c514572f49d41",
+          "bytes": 36400
+        },
+        {
+          "relativePath": "catalog/producers.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/producers.yaml",
+          "sha256": "36fd054cb2c3e29549db022cf3ae3410b9244c25ab7a856430c0ec33e5ea5db9",
+          "bytes": 10227
+        },
+        {
+          "relativePath": "catalog/profiles/cross-station.json",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/profiles/cross-station.json",
+          "sha256": "8a8d61f08c30217a1c327121b890105a18ab37f556ddefe6c05888128380b0ca",
+          "bytes": 3486
+        },
+        {
+          "relativePath": "src/catalog/compiler/mergeStations.ts",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/src/catalog/compiler/mergeStations.ts",
+          "sha256": "8658ac6dd9a1a2e8e70965c000f042be53548cc6c8dd8627530396e470e0ca30",
+          "bytes": 7253
+        },
+        {
+          "relativePath": "catalog/layers/l1-technology-global/controls/L1-TECH-01.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-01.yaml",
+          "sha256": "8676a859a1058655f7b8aea9e0e15e10ed5c086de1632525f8a8e3e5c98be789",
+          "bytes": 6123
+        },
+        {
+          "relativePath": "catalog/layers/l1-technology-global/controls/L1-TECH-02.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-02.yaml",
+          "sha256": "04fedabf1219137ed191e8f27689eaa81fca8d9b493725f21cd14b9eae75279d",
+          "bytes": 6946
+        },
+        {
+          "relativePath": "catalog/layers/l1-technology-global/controls/L1-TECH-03.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-03.yaml",
+          "sha256": "a3b95d49190bb873bbd19d56a5af02fbb035942b0fc32df3d206f328f5a17ff3",
+          "bytes": 4183
+        },
+        {
+          "relativePath": "catalog/layers/l1-technology-global/controls/L1-TECH-04.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-04.yaml",
+          "sha256": "4bd9fce707e56a16155dadb9fd54ff05971082eb51124a2769384d060e24255b",
+          "bytes": 5578
+        },
+        {
+          "relativePath": "catalog/layers/l1-technology-global/controls/L1-TECH-05.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-05.yaml",
+          "sha256": "b242d67dbfb3c3f7655f93575598d88c71bcae5cc8c64cdc25e3a8daabac70ea",
+          "bytes": 6137
+        },
+        {
+          "relativePath": "catalog/layers/l1-technology-global/controls/L1-TECH-06.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-06.yaml",
+          "sha256": "4cb2364b86a36a989297b0d59fd84fbe2888cb6a9eedb7fb424dd867ecd554e7",
+          "bytes": 5562
+        },
+        {
+          "relativePath": "catalog/layers/l1-technology-global/controls/L1-TECH-07.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-07.yaml",
+          "sha256": "1ec0251d580269cfa807a1029326bdef766cd3a351589be0331071b42bdba424",
+          "bytes": 6248
+        },
+        {
+          "relativePath": "catalog/layers/l1-technology-global/controls/L1-TECH-08.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-technology-global/controls/L1-TECH-08.yaml",
+          "sha256": "6097bdd81111f99557edf98b268760a8a0b5422c17501794bce12208f683155f",
+          "bytes": 5685
+        },
+        {
+          "relativePath": "catalog/layers/l1-governance-global/controls/L1-GOV-01.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-governance-global/controls/L1-GOV-01.yaml",
+          "sha256": "0e1f16c1921b7492660fa20b67ee10b9ed6ccf3c08ebdbbb1ce6b251ea72d363",
+          "bytes": 7104
+        },
+        {
+          "relativePath": "catalog/layers/l1-governance-global/controls/L1-GOV-02.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-governance-global/controls/L1-GOV-02.yaml",
+          "sha256": "77e29fee68e56a0d0c645a8a1c7228d51e3c189bb6465a1cb4b648d58b487ed2",
+          "bytes": 7621
+        },
+        {
+          "relativePath": "catalog/layers/l1-governance-global/controls/L1-GOV-03.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-governance-global/controls/L1-GOV-03.yaml",
+          "sha256": "ba97683307fcb9af16c22628dbaf3ab976a6cb971d2c051c3ce6edc1594a1892",
+          "bytes": 5842
+        },
+        {
+          "relativePath": "catalog/layers/l1-governance-global/controls/L1-GOV-04.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-governance-global/controls/L1-GOV-04.yaml",
+          "sha256": "688bc32326e285f92a87fc4329160801eed319dc0f6f9d9e8671b57c6a2b2e19",
+          "bytes": 4456
+        },
+        {
+          "relativePath": "catalog/layers/l1-governance-global/controls/L1-GOV-05.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-governance-global/controls/L1-GOV-05.yaml",
+          "sha256": "5cbefe8875b27b2e2fa1e309739e3d78dfd77561d0b27af617d63cb142aae926",
+          "bytes": 8983
+        },
+        {
+          "relativePath": "catalog/layers/l1-governance-global/controls/L1-GOV-06.yaml",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/catalog/layers/l1-governance-global/controls/L1-GOV-06.yaml",
+          "sha256": "f4d4766981c5e7198089939fb17a21e47f685db2e5d4bd78b0e231d4ceb77687",
+          "bytes": 8360
+        }
+      ],
+      "technology": "Eight current experimental/unreviewed controls, EU register and optional ENOENT-only guide hook are present. Availability is distinct from actual Environment profile compilation/reuse. No CRA/NIS2 full-stage completion or legal scope is claimed.",
+      "governance": "Six current experimental/unreviewed control sources are present, including FRIA02. This creates no Environment FRIA applicability, human assessment or approval. No Governance facts are proposed.",
+      "absentOwnerPaths": [
+        "tests/fixtures/assurance/env",
+        "src/assurance/executed",
+        "catalog/jurisdictions/eu/profiles.json",
+        "catalog/layers/l1-mobility-global/pack.yaml"
+      ],
+      "ceaClockPresent": false,
+      "producerStatuses": {
+        "amc.killSwitch": "planned/P2-26",
+        "amc.providerOutage.safeState": "planned/P1-76"
+      },
+      "remainingUnresolved": [
+        "P2-27 recall fixture/API and actual delivery",
+        "P3-09 CEA clocks, numeric capacity/scope and separate orders",
+        "P2-26/P1-76 live runtime and hazard-reviewed safe state",
+        "P2-11 dated EU profile",
+        "P3-13 Wealth/P3-17 Mobility cross-station evidence not bound here"
+      ]
+    },
+    "humanLimits": [
+      "D-14/D-10 OT/grid cybersecurity expert",
+      "D-14/D-10 food-safety/due-diligence expert",
+      "independent legal/domain/risk sign-offs",
+      "manual hazard assessment and real asset/capacity/write scope",
+      "P1-29 separate partner per domain",
+      "stewardship owner/funding/update plan",
+      "D-04 licence determination",
+      "Sid promotion decision"
+    ],
+    "qualificationClaim": false,
+    "mutationsOrNativeResultsCreatedThisAudit": false,
+    "productOrOldEvidenceEdits": false
+  },
+  "auditReference": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/inventory-provenance-audit-dcec5999.json",
+    "sha256": "6f137b2124f5fc6179a0bb211dd5c3c141170f0a5e82de10c566bfc803cc21a7",
+    "bytes": 103567
+  },
+  "currentDispositionSource": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-20261019/docs/catalog/environment/dispositions.json",
+    "sha256": "6c5eb21936a93a51d7cccb8dea8cd92dad0146d31034fce9464f91e7ccfdcd6d",
+    "bytes": 162376
+  },
+  "limit": "Original runtime provenance is historical; current static identity and current runtime case/compile measurements are separate."
+}

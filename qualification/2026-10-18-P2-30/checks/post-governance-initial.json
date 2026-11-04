@@ -1,0 +1,32 @@
+[
+  {
+    "name": "post-governance-build",
+    "cmd": "npm run -s build",
+    "exit": 0,
+    "durationMs": 134844,
+    "head": "65115c281ca269602a3382c18de15746388888f2",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance-build.log",
+    "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+    "rawLogBytes": 375
+  },
+  {
+    "name": "post-governance-currency",
+    "cmd": "npm run -s check:catalog-currency",
+    "exit": 0,
+    "durationMs": 920,
+    "head": "65115c281ca269602a3382c18de15746388888f2",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance-currency.log",
+    "rawLogSha256": "a6563dbac4458bd80e8501d462db8933ae2dff86c0adbceec2eddf9dec3a7e9f",
+    "rawLogBytes": 161
+  },
+  {
+    "name": "post-governance-changelog-red",
+    "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+    "exit": 1,
+    "durationMs": 3869,
+    "head": "65115c281ca269602a3382c18de15746388888f2",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance-changelog-red.log",
+    "rawLogSha256": "a35b43514980f6fc34bd9d834077cd704ad6c4b6cc7b38a66c6f7689ae96bf38",
+    "rawLogBytes": 1166
+  }
+]

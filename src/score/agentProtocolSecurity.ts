@@ -46,7 +46,8 @@ export function scoreAgentProtocolSecurity(cwd?: string): AgentProtocolSecurityR
   const hasProtocolAuthNOutcome = assessCriterion(root, ["src/auth", "src/enforce/protocolAuth.ts"]);
   const hasProtocolAuthN = hasProtocolAuthNOutcome.met;
 
-  const hasProtocolAuthZOutcome = assessCriterion(root, ["src/enforce", "src/policy"]);
+  // The authorization record (src/actions/authorize.ts) is rechecked before every authorized call; src/policy only records it.
+  const hasProtocolAuthZOutcome = assessCriterion(root, ["src/enforce", "src/actions/authorize.ts"]);
   const hasProtocolAuthZ = hasProtocolAuthZOutcome.met;
 
   const hasProtocolInputValidationOutcome = assessCriterion(root, ["src/enforce/inputValidator.ts", "src/shield/sanitizer.ts", "src/shield/ingress.ts"]);

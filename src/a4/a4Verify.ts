@@ -20,7 +20,7 @@ import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { a4ProjectIds, materializeA4Record, seqZeroReceiptAgent, syntheticIn, type A4BundleSlice } from "../bundles/bundleA4.js";
 import { eventMeta } from "../claims/evidenceProvenance.js";
 import { a4RecordV1Schema, type A4RecordV1 } from "../contracts/v1/a4Record.js";
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { getPublicKeyHistory, verifyHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { canonicalMetadataForHash, openLedger, type Ledger } from "../ledger/ledger.js";
 import { hasTable } from "../ledger/ledgerSchema.js";
 import { highSeveritySecretTypes } from "../release/releaseSecretScan.js";
@@ -33,16 +33,18 @@ import { buildVerifierReport, type VerifierReportV1 } from "../trust/verifierRep
 import type { EvidenceEvent } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { resolveRefs } from "./a4Evidence.js";
+import { derivedRefCount, revisionDerivedProblems } from "./a4Derived.js";
+import { a4AlgorithmAllowed, ledgerRowAgent, resolveRefs } from "./a4Evidence.js";
 import {
-  A4_BOUND_ITEMS, A4_ENVELOPE_KINDS, DEFAULT_A4_GATE_POLICY, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
+  A4_ENVELOPE_KINDS, boundItemsFor, DEFAULT_A4_GATE_POLICY, storedBoundItems, a4EvidenceRefRowSchema, a4TransitionRowSchema, flatSlots, gatePolicyDigestOf, gateSupersededBy,
   ratchetedFromChain, type A4ChainLink, type A4EvidenceRefRow, type A4Stage
 } from "./a4Schema.js";
 import { authorsOf, buildersOf, evaluateSod, type SodDecision } from "./a4SoD.js";
 import { a4WitnessExists, A4StoreError, readA4Store } from "./a4Store.js";
+import { openLedgerMirror } from "../persistence/postgres/postgresLedgerMirror.js";
 
 /** The ledger migration that created the A4 tables (src/ledger/ledgerSchemaA4.ts). */
-export const A4_MIGRATION = 13;
+const A4_MIGRATION = 13;
 const OBSERVED_TIERS = new Set(["OBSERVED", "OBSERVED_HARDENED"]);
 /** Lowest first, as src/a4/a4Evidence.ts ranks them; a missing or unknown tier ranks below all of them. */
 const TIER_ORDER: readonly string[] = ["SELF_REPORTED", "ATTESTED", "OBSERVED", "OBSERVED_HARDENED"];
@@ -103,11 +105,16 @@ function checkTransitions(ledger: Ledger, rows: ReturnType<typeof chainOf>["rows
       out.errors.push(`A4_ENVELOPE_INVALID: transition ${row.seq} envelope does not sign its body`);
       continue;
     }
+    // Only keys whose algorithm the workspace's policy allows may have made it (P2-08 algorithm policy; P2-36).
+    const candidates = [envelopePublicKey(envelope.envelope), ...auditorKeys];
+    const allowed = candidates.filter((pem) => a4AlgorithmAllowed(ledger.workspace, pem));
     const check = checkDigestSignature({ signature: `a4 transition ${row.seq}`, purpose: "artifact-seal", digestHex: row.body_digest,
-      signatureB64: envelope.signature, candidates: [envelopePublicKey(envelope.envelope), ...auditorKeys], context: trust,
+      signatureB64: envelope.signature, candidates: allowed, context: trust,
       claimedSignedAt: typeof envelope.signedTs === "number" ? envelope.signedTs : null });
     out.signatures.push(check.admission);
-    if (!check.verified) out.errors.push(`A4_ENVELOPE_INVALID: transition ${row.seq} envelope does not verify`);
+    const refusedAlgorithm = !check.verified && candidates.some((pem) => typeof pem === "string" && !allowed.includes(pem) && verifyHexDigest(row.body_digest, String(envelope.signature), pem));
+    if (refusedAlgorithm) out.errors.push(`A4_ENVELOPE_ALGORITHM_REFUSED: transition ${row.seq} envelope is signed with an algorithm this workspace's policy does not allow`);
+    else if (!check.verified) out.errors.push(`A4_ENVELOPE_INVALID: transition ${row.seq} envelope does not verify`);
     else if (ROTATED_OUT.has(check.admission.status)) out.warnings.push(`KEY_ROTATED_OUT: transition ${row.seq} envelope key is ${check.admission.status} (not evaluated)`);
   }
 }
@@ -149,10 +156,10 @@ function intentProblems(db: Ledger["db"], projectId: string, links: readonly A4C
   const problems = Object.keys(expected).filter((key) => canonicalize(expected[key]) !== canonicalize(intent[key] ?? null)).map((key) => `A4_INTENT_MISMATCH: gate ${gateId} ${key}`);
   if (gate.intent_json !== canonicalize(intent) || request?.boundHashes?.intentHash !== sha256Hex(String(gate.intent_json))
     || requested.body.readinessBindingDigest !== gate.readiness_sha256) problems.push(`A4_INTENT_MISMATCH: gate ${gateId} intentHash`);
-  // Exactly the stage's set: never a gate-derived item or an environment fact, never fewer than the mandatory items.
-  // ponytail: one v1 table; key A4_BOUND_ITEMS by intent version the day it changes, or older gates would fail here.
-  if (canonicalize(expected.boundItemIds) !== canonicalize(A4_BOUND_ITEMS[gate.stage as A4Stage] ?? null)) {
-    problems.push(`A4_BOUND_ITEMS: gate ${gateId} binds an item set other than A4_BOUND_ITEMS[${String(gate.stage)}]`);
+  // Exactly the stage's set under the intent version the request names: never a gate-derived item or an environment fact,
+  // never fewer than the mandatory items, and an older gate verifies under the set it bound.
+  if (canonicalize(expected.boundItemIds) !== canonicalize(boundItemsFor(gate.stage as A4Stage, requested.body.boundItemsVersion))) {
+    problems.push(`A4_BOUND_ITEMS: gate ${gateId} binds an item set other than its intent version's set for ${String(gate.stage)}`);
   }
   return problems;
 }
@@ -219,11 +226,14 @@ function checkRefs(ledger: Ledger, projectId: string, trust: TrustContext, now: 
   });
 }
 
-/** Every EFFECT_FINISHED names exactly the bound slots of its gate's intent, each checked. */
+/**
+ * Every EFFECT_FINISHED names exactly the bound slots of its gate's intent, each checked. A rollback's engine intent binds
+ * its preview, not the release gate's resources (src/a4/a4Rollback.ts), so it names none.
+ */
 function checkEffects(links: readonly A4ChainLink[], gates: Map<string, Row>, out: Findings): void {
   for (const finished of links.filter((link) => link.kind === "EFFECT_FINISHED")) {
     const started = links.find((link) => link.kind === "EFFECT_STARTED" && link.body.effectId === finished.body.effectId);
-    const intent = object(gates.get(String(started?.body.gateId))?.intent_json);
+    const intent = started?.body.effect === "a4.activate.rollback" ? null : object(gates.get(String(started?.body.gateId))?.intent_json);
     const bound = flat(intent?.resourceDigests).map(([slot, expected]) => canonicalize({ slot, expected })).sort();
     const checks = Array.isArray(finished.body.slotChecks) ? finished.body.slotChecks as Row[] : null;
     const recorded = (checks ?? []).map((check) => canonicalize({ slot: check.slot, expected: check.expected })).sort();
@@ -236,10 +246,24 @@ function checkEffects(links: readonly A4ChainLink[], gates: Map<string, Row>, ou
 interface Findings { errors: string[]; warnings: string[]; stale: string[]; signatures: IssuerAdmission[] }
 
 /** One project's VerifierReportV1. Trust is the operator's (`loadTrustContext()`), never a request's. */
-export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustContext = loadTrustContext(), now = Date.now()): VerifierReportV1 {
+/**
+ * `options.mirror` (the workspace's own ledger only, never an exported one): on a Postgres-pinned workspace the
+ * project's Postgres mirror must also be in parity, its log whole and its signed head held (P2-36); an unreachable
+ * mirror is an integrity error, never a pass.
+ */
+export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustContext = loadTrustContext(), now = Date.now(),
+  options: { mirror?: boolean; derived?: boolean } = {}): VerifierReportV1 {
   const out: Findings = { errors: [], warnings: [], stale: [], signatures: [] };
+  if (options.mirror) {
+    const mirror = openLedgerMirror(ledger.workspace);
+    try {
+      out.errors.push(...(mirror?.problems(ledger.db, { kind: "a4", id: projectId }, { walk: true }) ?? []));
+    } finally {
+      mirror?.close();
+    }
+  }
   try {
-    if (readA4Store(ledger).verifyChain(projectId) === null) out.errors.push(`A4_PROJECT_NOT_FOUND: ${projectId}`);
+    if (readA4Store(ledger, trust).verifyChain(projectId) === null) out.errors.push(`A4_PROJECT_NOT_FOUND: ${projectId}`);
   } catch (error) {
     const problems = error instanceof A4StoreError && Array.isArray(error.detail) ? error.detail as string[] : [error instanceof Error ? error.message : String(error)];
     out.errors.push(...problems.map((problem) => problem.startsWith("A4_SIDE_ROW_") ? problem : `A4_CHAIN_INVALID: ${problem}`));
@@ -249,6 +273,12 @@ export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustCon
   const gates = checkGates(ledger, projectId, links, out, !out.errors.some((error) => error.startsWith("A4_SIDE_ROW_")));
   checkRefs(ledger, projectId, trust, now, out);
   checkEffects(links, gates, out);
+  // P2-42: each Adapt plan a revision binds by sha256 is read back from the workspace (an offline record does not carry them).
+  if (options.derived !== false) {
+    for (const row of ledger.db.prepare("SELECT revision_no, stage, spec_json FROM a4_revisions WHERE project_id = ? AND stage = 'adapt'").all(projectId) as Row[]) {
+      out.errors.push(...revisionDerivedProblems(ledger.workspace, projectId, row as Parameters<typeof revisionDerivedProblems>[2]));
+    }
+  }
   for (const request of ledger.db.prepare("SELECT client_request_id, response_json FROM a4_requests WHERE project_id = ?").all(projectId) as Row[]) {
     const json = String(request.response_json);
     if (LEASE_TOKEN.test(json) || highSeveritySecretTypes(json).length > 0) out.errors.push(`A4_REQUEST_SECRET: request ${String(request.client_request_id)} stores a credential`);
@@ -260,37 +290,30 @@ export function verifyA4Chain(ledger: Ledger, projectId: string, trust: TrustCon
 }
 
 /**
- * The `a4-projects` rows of `amc verify all`: one per project, opened read-only. A ledger whose schema is a contiguous
- * prefix below migration 13 skips (no A4 tables yet); a schema at or above it without the tables fails, never an empty pass.
+ * The `a4-projects` rows of `amc verify all`: one per project, read on the handle ledger verification checked (verify all
+ * passes its verified read-only handle, so a file swapped after verification is never what these rows judge). A ledger whose
+ * schema is a contiguous prefix below migration 13 skips (no A4 tables yet); a schema at or above it without the tables
+ * fails, never an empty pass. A migrated ledger with no project reads NOT_CONFIGURED here; verify all decides that from its
+ * witnesses. Each project row names its project id so verify all can match the A4_PROJECT_CREATED witnesses.
  */
-export function verifyA4Projects(workspace: string, trust: TrustContext): Array<{ status: "PASS" | "FAIL" | "SKIP"; details: string[] }> {
-  let ledger: Ledger;
-  try {
-    ledger = openLedger(workspace, { readonly: true });
-  } catch (error) {
-    return [{ status: "SKIP", details: [`no readable evidence ledger: ${error instanceof Error ? error.message : String(error)}`] }];
+export function verifyA4Projects(ledger: Ledger, trust: TrustContext): Array<{ status: "PASS" | "FAIL" | "SKIP" | "NOT_CONFIGURED"; details: string[]; projectId?: string }> {
+  const db = ledger.db;
+  if (!hasTable(db, "a4_projects")) {
+    const versions = hasTable(db, "schema_migrations") ? (db.prepare("SELECT version FROM schema_migrations ORDER BY version").all() as Array<{ version: number }>) : [];
+    const prefix = versions.length > 0 && versions.length < A4_MIGRATION && versions.every((row, index) => row.version === index + 1);
+    return [prefix ? { status: "SKIP", details: [`ledger schema predates migration ${A4_MIGRATION}; no A4 tables`] }
+      : { status: "FAIL", details: [`A4 tables are missing from a ledger schema at or after migration ${A4_MIGRATION}`] }];
   }
-  try {
-    const db = ledger.db;
-    if (!hasTable(db, "a4_projects")) {
-      const versions = hasTable(db, "schema_migrations") ? (db.prepare("SELECT version FROM schema_migrations ORDER BY version").all() as Array<{ version: number }>) : [];
-      const prefix = versions.length > 0 && versions.length < A4_MIGRATION && versions.every((row, index) => row.version === index + 1);
-      return [prefix ? { status: "SKIP", details: [`ledger schema predates migration ${A4_MIGRATION}; no A4 tables`] }
-        : { status: "FAIL", details: [`A4 tables are missing from a ledger schema at or after migration ${A4_MIGRATION}`] }];
-    }
-    // A deleted head row (or project) fails as A4_CHAIN_INVALID / A4_PROJECT_NOT_FOUND, never reads as a smaller passing set.
-    const projects = a4ProjectIds(db);
-    if (projects.length === 0) return [{ status: "SKIP", details: ["no A4 projects"] }];
-    return projects.map((projectId) => {
-      const report = verifyA4Chain(ledger, projectId, trust);
-      const failed = report.integrity.status === "fail";
-      return { status: failed ? "FAIL" : "PASS", details: [projectId, ...(failed ? report.integrity.errors.slice(0, 20)
-        : ["chain, side rows and envelopes verify (integrity of bytes under this workspace's keys)"]),
-        ...(report.freshness.status === "fail" ? report.freshness.reasons.slice(0, 5) : [])] };
-    });
-  } finally {
-    ledger.close();
-  }
+  // A deleted head row (or project) fails as A4_CHAIN_INVALID / A4_PROJECT_NOT_FOUND, never reads as a smaller passing set.
+  const projects = a4ProjectIds(db);
+  if (projects.length === 0) return [{ status: "NOT_CONFIGURED", details: ["no A4 projects"] }];
+  return projects.map((projectId) => {
+    const report = verifyA4Chain(ledger, projectId, trust, Date.now(), { mirror: true });
+    const failed = report.integrity.status === "fail";
+    return { status: failed ? "FAIL" : "PASS", projectId, details: [projectId, ...(failed ? report.integrity.errors.slice(0, 20)
+      : ["chain, side rows and envelopes verify (integrity of bytes under this workspace's keys)"]),
+      ...(report.freshness.status === "fail" ? report.freshness.reasons.slice(0, 5) : [])] };
+  });
 }
 
 // ── Offline verification of an exported project (P1-63; spec/ACCEPTANCE_RULES.md "A4 project record") ──
@@ -357,11 +380,16 @@ function recordChecks(ledger: Ledger, record: A4RecordV1, bundleAgentId: string 
   const signed = seqZero === undefined ? null : seqZeroReceiptAgent(seqZero, record.projectId, keys);
   if (bundleAgentId !== undefined && (agent !== bundleAgentId || signed !== bundleAgentId)) scope.push(`A4_SCOPE_AGENT: record ${record.projectId} is not about the bundle's agent`);
   const completeness: string[] = [];
+  // A session's open row as the export carries it: the only session/open row of that session (none, or two, names no agent).
+  const openRowOf = (sessionId: string): EvidenceEvent | undefined => {
+    const opens = [...events.values()].filter((event) => event.session_id === sessionId && event.event_type === "session/open");
+    return opens.length === 1 ? opens[0] : undefined;
+  };
   for (const ref of record.tables.a4_evidence_refs.filter((row) => row.ref_kind === "ledger_event")) {
     const event = events.get(String(ref.ref_id));
     if (event === undefined) completeness.push(`REF_DANGLING: evidence ref ${String(ref.seq)} names ledger row ${String(ref.ref_id)}, absent from this export`);
     else if (ref.sha256 !== event.event_hash && ref.sha256 !== event.payload_sha256) completeness.push(`REF_DIGEST_MISMATCH: evidence ref ${String(ref.seq)}`);
-    else if ((eventMeta(event).agentId ?? eventMeta(event).agent_id) !== agent) scope.push(`A4_SCOPE_FOREIGN_AGENT: evidence ref ${String(ref.seq)} names a row of another agent`);
+    else if (ledgerRowAgent(event, openRowOf, (open) => rowProblem(open, keys) === null) !== agent) scope.push(`A4_SCOPE_FOREIGN_AGENT: evidence ref ${String(ref.seq)} names a row of another agent`);
   }
   return { errors, scope, completeness, agentId: agent };
 }
@@ -412,7 +440,7 @@ function satisfactionOf(snapshot: ReturnType<ReturnType<typeof readA4Store>["sna
     const revisionNo = Number(gate.revision_no);
     const requested = links.find((link) => link.kind === "GATE_REQUESTED" && link.body.gateId === gateId);
     if (requested === undefined) continue; // a side row the chain does not name fails completeness first
-    const supersededBy = gateSupersededBy(links, { gateId, revisionNo, requestedSeq: requested.seq });
+    const supersededBy = gateSupersededBy(links, { gateId, revisionNo, requestedSeq: requested.seq, stage: String(gate.stage), boundItemIds: storedBoundItems(gate.bound_items_json === null ? null : String(gate.bound_items_json)) });
     const counted = rows.a4_decisions.filter((row) => row.gate_id === gateId).flatMap((row) => {
       const decided = links.find((link) => link.kind === "GATE_DECIDED" && link.body.decisionId === row.decision_id);
       const record = approvalDecisionSchema.safeParse(object(row.decision_json));
@@ -447,7 +475,7 @@ function satisfactionOf(snapshot: ReturnType<ReturnType<typeof readA4Store>["sna
 /** One exported project: verifyA4Chain on its rows, the export's own checks, then the four dimensions under admitted keys only. */
 function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, now: number, artifact: VerifierReportV1["artifact"], note: string | null,
   bundleAgentId: string | null | undefined): VerifierReportV1 {
-  const chain = verifyA4Chain(ledger, record.projectId, trust, now);
+  const chain = verifyA4Chain(ledger, record.projectId, trust, now, { derived: false });
   const checks = recordChecks(ledger, record, bundleAgentId);
   const integrityErrors = [...chain.integrity.errors, ...checks.errors];
   const sideRows = integrityErrors.filter((error) => error.startsWith("A4_SIDE_ROW_"));
@@ -457,9 +485,11 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
     keyHistory: record.publicKeys.monitor.history ?? undefined });
   const anchoring = carriedLedgerAnchoring(monitor, intact, signatures);
   const fileRefs = record.tables.a4_evidence_refs.filter((row) => row.ref_kind !== "ledger_event" && row.ref_kind !== "external").length;
+  const derived = derivedRefCount(record.tables.a4_revisions);
   const report = buildVerifierReport({ artifact, context: trust, integrityErrors, signatures, anchoring, verifiedAt: new Date(now),
     warnings: [...chain.warnings.filter((warning) => !warning.startsWith("workspace-self:")), ...(note === null ? [] : [note]),
-      ...(fileRefs > 0 ? [`FILE_REFS_BOUND_BY_DIGEST: ${fileRefs} file evidence refs are bound by sha256; their bytes are not part of an export`] : [])] });
+      ...(fileRefs > 0 ? [`FILE_REFS_BOUND_BY_DIGEST: ${fileRefs} file evidence refs are bound by sha256; their bytes are not part of an export`] : []),
+      ...(derived > 0 ? [`DERIVED_BOUND_BY_DIGEST: ${derived} derived parts (compiled plans, catalog-sized lists) are bound by sha256; their bytes stay under the workspace's a4-projects/<projectId>/derived`] : [])] });
   if (!intact) return { ...report, ...allNotEvaluated("INTEGRITY_FAILED") };
   // A project with no envelope yet has no auditor signature to admit (issuer admission not-evaluated): only a refused key blocks.
   if (report.issuerAdmission.status === "fail" || anchoring.status !== "anchored") return { ...report, ...allNotEvaluated(NOT_ADMITTED) };
@@ -470,7 +500,7 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
     freshness: chain.freshness.status === "fail" ? chain.freshness
       : record.tables.a4_decisions.length > 0 ? dimension("pass", ["every decision carries its gate's request digest"]) : dimension("not-evaluated", ["NO_DECISIONS"]),
     completeness: completeness.length > 0 ? dimension("fail", completeness) : dimension("pass", ["every side row the chain names is present and unchanged; every ledger_event ref resolves"]),
-    satisfaction: completeness.length > 0 ? dimension("not-evaluated", ["COMPLETENESS_FAILED"]) : satisfactionOf(readA4Store(ledger).snapshot(record.projectId))
+    satisfaction: completeness.length > 0 ? dimension("not-evaluated", ["COMPLETENESS_FAILED"]) : satisfactionOf(readA4Store(ledger, trust).snapshot(record.projectId))
   };
 }
 
@@ -478,7 +508,7 @@ function recordReport(ledger: Ledger, record: A4RecordV1, trust: TrustContext, n
  * An `amc.a4-record/v1` export, loaded into a temporary ledger of exactly its rows. Trust is the caller's. `bundleAgentId`
  * is the signed manifest's agent when the record came from a bundle (undefined for a record file on its own).
  */
-export function verifyA4Record(record: A4RecordV1, trust: TrustContext, now = Date.now(),
+function verifyA4Record(record: A4RecordV1, trust: TrustContext, now = Date.now(),
   artifact: VerifierReportV1["artifact"] = { kind: "a4-record", path: record.projectId, sha256: sha256Hex(canonicalize(record)) }, note: string | null = RECORD_NOTE,
   bundleAgentId?: string | null): VerifierReportV1 {
   let materialized: ReturnType<typeof materializeA4Record>;

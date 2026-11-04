@@ -1,0 +1,32 @@
+{
+  "schema": "p125ec-independent-receipt-helper-v2-provenance-delta-review/1",
+  "at": "2026-10-17T01:22:11.529232+00:00",
+  "blockers": [],
+  "scope": "Exact V1-to-V2 code delta and compatibility with the actual immutable root snapshot provenance; no repeated full audit or helper execution.",
+  "checks": {
+    "all6V2OutputPinsAnd7DeclaredInputsExact": true,
+    "full1212ByteUnifiedDeltaReproduced": true,
+    "onlyOneOldSourceHeadAssertionReplacedByFiveExactProvenanceAssertions": true,
+    "allOtherV1CodeByteExact": true,
+    "actualSnapshotSchemaSourceHead802PreviousMetadata850PriorSemanticF11AndHeadBlobsFlagMatch": true,
+    "snapshot1917RowsAndRetentionFlagsRemainExact": true,
+    "originalV1ReviewAndArtifactsUnchanged": true,
+    "originalTemplateUnreadyAndUnchanged": true
+  },
+  "actualProvenance": {
+    "schema": "p125ec-prior-packet-byte-preservation/1",
+    "sourceHead": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+    "previousMetadataCommit": "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+    "priorSemanticSourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+    "all1917SourceHeadBlobsExact": true,
+    "retainedRoot": "/private/tmp/p1-25-cadence-qualification-20261017/original-p125-packet",
+    "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25"
+  },
+  "resolvedMismatch": "V1 required snapshot sourceHead 8506539. The actual later snapshot is bound to source checkpoint 80268079, with previous metadata 8506539 and prior semantic source f11a15ae separately retained. V2 requires all three identities and the verified-HEAD-blob flag. The immutable pinset was not changed to fit the helper.",
+  "limitations": [
+    "The preserved V1 report is a static code/base review and did not establish compatibility with the later filled basePreservationPin. This review specifically closes that known provenance mismatch.",
+    "All non-provenance code is byte exact. The old base retention, privacy, RED control, chronology, peer, restoration, physical preservation and later source-publication guards therefore retain the prior static assessment.",
+    "The complete actual filled manifest, artifact/command selection, execution, assembly, validators, source admission, index, commit and export remain separate root work. No such outcome or approval is inferred here.",
+    "No helper import, parser/compiler, execution, source/index/QA mutation, native/crypto/network/key/stream/reservation operation occurred. All holds, F37 skip and RED quality remain intact."
+  ]
+}

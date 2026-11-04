@@ -1,0 +1,59 @@
+{
+  "note": "Summary of the 2026-09-14 reconciliation record. The original is not in main's git history; it is a file in candidate commit 37c1466b (branch amc/regulated-platform-20261003), read with git show. Facts only; no claim below is used as Done evidence unless the README re-measures it.",
+  "original": {
+    "candidateCommit": "37c1466b32ed878ed89877fdcae2e3145d82d546",
+    "gitBlob": "aba1075177e89196a01d86ef3e2b4d96c48bfeaf",
+    "sha256": "9b57fceafe767f0c295eb42a47ba1531c46b50876942deae108a6e68e9e75f8f",
+    "bytes": 16500
+  },
+  "measuredAt": "6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f",
+  "verdict": "PARTIAL",
+  "claimsHeld": 13,
+  "claimsNotHeld": [
+    "The CLI's kernel-missing message no longer names a `build:workspace` script that does not exist",
+    "Receipts exist at <untracked>/RESEARCH/2026-09-08-dsh-pi/source-install-review.{md,json}, <untracked>/RESEARCH/2026-09-09-clean-source-followthrough/README.md and <untracked>/RESEARCH/2026-09-09-phase-a-reconciliation/reconciliation.json (row AMC-1509)"
+  ],
+  "testsRun": [
+    {
+      "command": "npx vitest run tests/cleanSourceDocs.test.ts tests/installPersonaIsolation.test.ts",
+      "passed": 14,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "node scripts/clean-source-check.mjs (equivalent of `npm run check:clean-source`; 15 helper steps: clone, checkout, pnpm install --frozen-lockfile, pnpm run build, doctor, init, keyless stub turn, session verify, agent-loop verify, 1-turn reconstruction, process A keep-open, process B resume, session verify, agent-loop verify, 2-turn reconstruction) — exit 0",
+      "passed": 15,
+      "failed": 0,
+      "skipped": 0
+    },
+    {
+      "command": "MUTATION CHECK (then restored): scripts/clean-source-check.mjs:98 `const verified = true`; npx vitest run tests/cleanSourceDocs.test.ts — expected red",
+      "passed": 6,
+      "failed": 2,
+      "skipped": 0
+    }
+  ],
+  "missingForDone": [
+    "A tracked receipt for AMC-1509 at 6e7875f21bb6b30bc0f1a32713deb3bc6a7cad2f naming commit, environment (Darwin 25.6.0 arm64 / Node v25.5.0 / pnpm 10.33.0), exercised (helper 15/15, vitest 14/14, one mutation red) and not-exercised (hosted CI, Node 20/22, npm link, published-package path, real providers, Windows). This run's numbers exist only in this report; the only tracked helper receipt is attempt-3 at a5987643 on Node 22.22.0.",
+    "The receipts the Linear comments cite (<untracked>/RESEARCH/2026-09-08-dsh-pi/source-install-review.{md,json}, 2026-09-09-clean-source-followthrough/README.md, 2026-09-09-phase-a-reconciliation/reconciliation.json) are untracked (<untracked>/ is gitignored at .gitignore:81) and absent at HEAD; either force-add them (git add -f) or re-point the Linear comments at tracked receipts.",
+    "A Linear comment on AMC-1509 recording the 6e7875f2 result; the latest comment (2026-09-09) states no tests/build/install ran for that batch and acceptance was pending.",
+    "Obsidian note update: Evidence/2026-09-09 Clean Source Follow-through.md is pinned to 79f36cfd with evidence_status source-implementation-acceptance-pending; it needs the 6e7875f2 acceptance and boundaries recorded (brief §9).",
+    "Fix or explicitly defer the two remaining kernel-missing messages that still tell users to run `npm install && npm run build:workspace` (src/cli-composition-commands.ts:48, src/approvals/approvalAskCommand.ts:56); package.json has no build:workspace script and npm cannot install the workspace:* protocol.",
+    "Named disposition of the hosted CI `clean-source` job (.github/workflows/ci.yml:173-189, ubuntu-latest / Node 24) for 6e7875f2 — not observable from this macOS/Node 25 environment; the issue's own text notes hosted Ubuntu CI remains separate.",
+    "Explicit statement in the closing comment that the acceptance bullet 'public npm/release install instructions remain tied to verified assets' is owned by AMC-7/AMC-483 and was not exercised under this issue."
+  ],
+  "defectsFound": [
+    {
+      "file": "src/cli-composition-commands.ts",
+      "line": 48,
+      "description": "Kernel-missing error message instructs users to run `npm install && npm run build:workspace`. `build:workspace` does not exist in package.json (0 matches) and `npm install` cannot resolve the workspace:* protocol the vendored @amc/* packages use, so the advice fails twice. 2b737b3c fixed the same text only in src/cli-agent-commands.ts. Correct text per docs/INSTALL.md:47-48 is `pnpm install --frozen-lockfile && pnpm run build`.",
+      "severity": "low"
+    },
+    {
+      "file": "src/approvals/approvalAskCommand.ts",
+      "line": 56,
+      "description": "Same stale guidance as src/cli-composition-commands.ts:48 — `approvals ask` kernel-missing message names the nonexistent `npm run build:workspace` and `npm install`, which cannot install this pnpm workspace.",
+      "severity": "low"
+    }
+  ]
+}

@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-20",
+  "date": "2026-10-15",
+  "commit": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "branch": "codex/p0-20-current-qualification",
+  "node": "v22.23.3; Node24 unqualified",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 33399
+    },
+    {
+      "cmd": "node /private/tmp/p0-20-compiled-cli-20261015.mjs",
+      "exit": 1,
+      "durationMs": 11484
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 5403
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 29302
+    },
+    {
+      "cmd": "python3 -c 'import subprocess,sys; commands=[\"check:freeze\",\"check:architecture-boundaries\",\"check:counts\",\"check:docs-drift\",\"check:clean-source\",\"check:api-ref\"]; statuses=[]; [(print(\"RUN \"+c,flush=True),statuses.append(subprocess.run([\"npm\",\"run\",c]).returncode)) for c in commands]; print(statuses); sys.exit(any(statuses))'",
+      "exit": 0,
+      "durationMs": 57483
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 2488
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 6799
+    },
+    {
+      "cmd": "npx vitest run tests/industryPackAudit.test.ts tests/auditBinderComplianceMaps.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts tests/industryPackAuditSigningQualification.test.ts tests/industryPackAuditReaderQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-final-bounded-node22-20261015.json",
+      "exit": 0,
+      "durationMs": 10526
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 40686
+    }
+  ],
+  "tests": {
+    "total": 300,
+    "passed": 300,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "513260f49811913e2385ac32137ec000c7bf26cdabe9fa21b1ead8a6fcf0bb41"
+    },
+    {
+      "path": "candidate-lint.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898"
+    },
+    {
+      "path": "candidate-normal-static.log",
+      "sha256": "e1198d1a799f5ba5405832659e05998ca62e7a55d60d39bef579ce172ebb90ae"
+    },
+    {
+      "path": "candidate-production-types.log",
+      "sha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d"
+    },
+    {
+      "path": "command-phases.json",
+      "sha256": "9696c237ad289c01264b3816d7af19291395e6f2008fd039945dbf731a1e102a"
+    },
+    {
+      "path": "compiled-cli-corrected.log",
+      "sha256": "f2f8644d93af165394672153bc846850dd8f3bdf842cdbfc608099b6cd57dc43"
+    },
+    {
+      "path": "compiled-cli-first.json",
+      "sha256": "cb4456686fe72c5e004662cffd2a46cdd7185e7d135a0801fc8ae2da968c2046"
+    },
+    {
+      "path": "compiled-cli-real-label.log",
+      "sha256": "30c5c2f15b4ca34b93370e4011f30477759a692e7cc84a21dc34d00d9495583e"
+    },
+    {
+      "path": "compiled-cli-restored-real-label.json",
+      "sha256": "6b21f1847fa9807599b53c51a70e6da088373b1b4ae7cd04f085f620041d0075"
+    },
+    {
+      "path": "compiled-cli-wrapper-only.json",
+      "sha256": "00f23aaa66835d56c71d4c98b5b344f58e37473b8d36c73d1a0f8b75300d2dc6"
+    },
+    {
+      "path": "compiled-cli.log",
+      "sha256": "ca2c95d1e0200c37f6ad43a975799f42501b4fca74728b4aa61fcf6ade199a62"
+    },
+    {
+      "path": "current-build.log",
+      "sha256": "edd578fe85d879f9a6a25e8c72f80c534db4cb67f9ce4a48afff282415b49096"
+    },
+    {
+      "path": "final-bounded-node22.json",
+      "sha256": "6f2be6ee05d0d91e8132f29a74689835984b87746438947566d0ea87cd737118"
+    },
+    {
+      "path": "final-bounded-node22.log",
+      "sha256": "2d00eeb68b4dff95af046996918bd40c3a5aabf406b099b11c4eaf441f6d8ec7"
+    },
+    {
+      "path": "final-bounded-summary.json",
+      "sha256": "bf64adea0c9807f9e966b78c2693637ed4dea3bfa1a338eae2bf7f12e87d1c2f"
+    },
+    {
+      "path": "final-source-dead-code.log",
+      "sha256": "641ee20cbbdd2b2cbaa59faa2c874ad9141a36791f2dc2004801f5faa6cd9ec2"
+    },
+    {
+      "path": "final-source-duplicates.log",
+      "sha256": "7f18b6b3aa86a2b6005f61c1fdf9b0cd1f366d8831d96f72af99267512ed9c2e"
+    },
+    {
+      "path": "final-source-manifest.json",
+      "sha256": "d6d0d67d7eec37d9dd210680d08c7a47b04cece3f704a04c1947ca53a32bedaf"
+    },
+    {
+      "path": "final-test-types.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    },
+    {
+      "path": "frozen-install.log",
+      "sha256": "36952b3ec4a004ee44f78f5efe34f547cfc0345cdf468154976ac47daa776b56"
+    },
+    {
+      "path": "generate-current-counts.log",
+      "sha256": "c97ef4b9ff3c72dc865e798870d720eff9a229a5f89136957f3a49fd8a696e26"
+    },
+    {
+      "path": "next-routing-preflight.json",
+      "sha256": "3b594cc9347bbc5470aaaef46fd58e86ae04585579386ae9f8776560d15562ed"
+    },
+    {
+      "path": "next-routing-preflight.md",
+      "sha256": "b352b8e6d680310e2d90cbd8baf099dbfe23d8ce35154adafafd3f072b17ee0c"
+    },
+    {
+      "path": "original-audit-contracts.json",
+      "sha256": "3ea2c4e85f2cf917ec50cb44217969b2598b33b72d80d6ddb5878ad56b125d47"
+    },
+    {
+      "path": "original-audit-contracts.log",
+      "sha256": "6c5f232e3fe79464e64f6fce9f6bc0ce39b35440e909a4bb81a00674ecc4d01b"
+    },
+    {
+      "path": "preservation-check.json",
+      "sha256": "6e5ad3bb86ba9bef888cb58988db72fe19a65a50b4139ca654a09bab3bb5b6ed"
+    },
+    {
+      "path": "private-cli-proposal-proof.json",
+      "sha256": "01bcd10516a9a3662656240f4ad8776638d615fbceef85a16d594b81db2610fe"
+    },
+    {
+      "path": "private-cli-proposal-proof.md",
+      "sha256": "efc3a86cfe215e0960465469c96ec4ad6cba7d3aee5033f4ab8909fae9538d2f"
+    },
+    {
+      "path": "private-evidence-index.json",
+      "sha256": "457715c4927f7dfea2bf671078f5f6f467415af368ad0a033092440c673f4b57"
+    },
+    {
+      "path": "proposal-private-baseline.log",
+      "sha256": "6fc0d99f79ab38a91598b9694236c077352a1fef39839b4a3a0b5bc59f9732eb"
+    },
+    {
+      "path": "proposal-private-candidate-ready.log",
+      "sha256": "6111d9e2e640909039314b72f930dc1119cf8aa18259d9346b8e359d32f6c0dd"
+    },
+    {
+      "path": "proposal-private-candidate.log",
+      "sha256": "30f70268f986c46c548b934cd01431195137bf9f712c9fdb408a11e56610e5c3"
+    },
+    {
+      "path": "proposal-private-restored.log",
+      "sha256": "ba5013ef2aab6eec060bab06245eec0b7edf30a8b10ef01b2560bbf3e08cee2c"
+    },
+    {
+      "path": "proposed-cli-label-repair.patch",
+      "sha256": "07dcac5567c93023fb33f99434bfc8f533304743cf7f7625575d4fb86ebd63d3"
+    },
+    {
+      "path": "proposed-cli-repair-review.json",
+      "sha256": "c47f58c28807ed71c6612cd2baa4b5bbbda1612e727aa3c6f3b1d7b3cd0809e9"
+    },
+    {
+      "path": "proposed-cli-repair-review.md",
+      "sha256": "36a4b44c4ea4eee044f7213674445ae8e82290af214083c4220042766089fe9b"
+    },
+    {
+      "path": "reader-corrected.json",
+      "sha256": "5061b188e97aca3ee6a827f5e4022fcda832ba06da9f9fdffa1cfd27e837e568"
+    },
+    {
+      "path": "reader-current-level-contract.log",
+      "sha256": "6b16da6b3af58893916db4b7e24f3b624f8508964f1d73c536958cfdd80ed46f"
+    },
+    {
+      "path": "reader-first.json",
+      "sha256": "c84d552c1e63288dcbd50e8ef2accd43dc08c2fd1182849f5fefe81905182429"
+    },
+    {
+      "path": "reader-first.log",
+      "sha256": "a5566d4da8572193be52b8927c8fdb21a35bebad2a26c72cabc0e67dddbe3b68"
+    },
+    {
+      "path": "reader-qualification.json",
+      "sha256": "6f3f819634328241b301a74d1ac386781b468b8df25f4821c225be0e44f7d1f4"
+    },
+    {
+      "path": "reader-qualification.md",
+      "sha256": "9221072123a2588160dadeb23c59ab91522af932d430c662deecc7845a87a6a7"
+    },
+    {
+      "path": "rejected-wrapper-boundary.json",
+      "sha256": "0ea41a61c7dcf82c84e206c0cafb1985b7437d896f10d0e97a78cfd625467630"
+    },
+    {
+      "path": "rejected-wrapper-candidate.ts",
+      "sha256": "4e646870a7f58245e9e517c130571e66b09ad0c89f693c1fb75be8a11b91c1a5"
+    },
+    {
+      "path": "rejected-wrapper-review.json",
+      "sha256": "d25c982cf61f0e40bcae4c4ac33d5340172588c2ef157ddde950029d4fcc4fd2"
+    },
+    {
+      "path": "rejected-wrapper-review.md",
+      "sha256": "e62968e06bf37a4aec29898608e636118c4e700b60694399ca58ed10af31c0c7"
+    },
+    {
+      "path": "rejected-wrapper-test-boundary.json",
+      "sha256": "f3b681d85560cce65284fc58dcc528ead5d79ff1eb6f1bd3f8b9cc7244777817"
+    },
+    {
+      "path": "rejected-wrapper-test-boundary.md",
+      "sha256": "589ab4646ace9aad88b235ddab738aa6556641987063e0b88bbd788c90199118"
+    },
+    {
+      "path": "rejected-wrapper-test.json",
+      "sha256": "72b9b42ca92bfcf0c3dc5b3603f64c672d65e9bbdf68858bd9e48244b2a78ea7"
+    },
+    {
+      "path": "rejected-wrapper-test.ts",
+      "sha256": "a5d3dc343d5e5a001e0ba13e941c89a79b849337d7452c374846c783507daedf"
+    },
+    {
+      "path": "remaining-acceptance.json",
+      "sha256": "317df171b2810c6cd903e9666877f0617585a54c732e3ab3e06c39f9377b6b45"
+    },
+    {
+      "path": "repaired-build.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a"
+    },
+    {
+      "path": "restored-build.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a"
+    },
+    {
+      "path": "routing-preflight.json",
+      "sha256": "181650a72845cb8f9fe3c4d848a7f9d3836b2cea9155641afae9c34d41a80016"
+    },
+    {
+      "path": "routing-preflight.md",
+      "sha256": "517d7f0879b055be1e01eea5919d439f32eaa25c57ada68f8cf825457578ef8b"
+    },
+    {
+      "path": "scope-freeze-preflight.json",
+      "sha256": "b9a95c1fdf9ebf435f82b53fd4eb9b69ce77ba23a54015c1827eac368e00f8c8"
+    },
+    {
+      "path": "scope-freeze-preflight.md",
+      "sha256": "09cd6533e05deaa8f27bc2da76a3a612518ec790014fed3af7093328ed15a1f4"
+    },
+    {
+      "path": "signing-first.json",
+      "sha256": "a3e92cc0b7ce53530c01a6cf1a6b7bc9119ec207faa3c3acd36b9ae59a277b13"
+    },
+    {
+      "path": "signing-first.log",
+      "sha256": "674b82eb5dffd1b217f1ffcbc07ccae82bea237b4c44c84131fb7f21dca714e4"
+    },
+    {
+      "path": "signing-independent-review.json",
+      "sha256": "33e1fec8d8a2e9ed8923b219e45de96a0c90216e8d7fac2f79c1aaacc6bcb4b6"
+    },
+    {
+      "path": "signing-independent-review.md",
+      "sha256": "94940f9a0b333eb480e5ffed76e6aa9378bb077c8791a5dad8ff596ed30d9fda"
+    },
+    {
+      "path": "signing-private-auto-pin.log",
+      "sha256": "3c95713d4bcef04143177f4c5be9a544511f7882779fc6f2a206c1d24d94d097"
+    },
+    {
+      "path": "signing-private-baseline.log",
+      "sha256": "e02cc8490c2c3e8d7700302b03adb6c361b3551b9ac90cf5916f948274082897"
+    },
+    {
+      "path": "signing-private-digest-check-removed.log",
+      "sha256": "62cb7b505c499682efcccad95a8c2e96dca7c446ef933b4e987950ef9af50879"
+    },
+    {
+      "path": "signing-private-restored.log",
+      "sha256": "c7538fa9889b7b447e89119e274c732cc49a51b7ad4159f24ee09b8447b2a043"
+    },
+    {
+      "path": "signing-qualification.json",
+      "sha256": "9959d38414eac38abd90e6392adcac72954cbc83ed61b310efe8d14aa0c4a9b8"
+    },
+    {
+      "path": "signing-qualification.md",
+      "sha256": "b8ce91f18f1a032ad18bb2408d09c3993b0649712caf4b5d99cb5a7737da2a13"
+    },
+    {
+      "path": "signing-wrapper-expanded.log",
+      "sha256": "246781862d68a8b96de5a6e3cb223c32223dbadf65ad653ce6c054ef866468de"
+    },
+    {
+      "path": "source-quality.json",
+      "sha256": "e561fe0cc9aff52c1b0ddc127aac414f04e155cd7ba357f1326b71e24898e282"
+    }
+  ],
+  "notes": "Bounded300/300 Node22 signing/reader corpus passes with zero pending/todo; actual accepted-source compiledCLI10/12, two trusted verification exits70 remain. Correct one-line shared CLI repair is privately reviewed/proven but pending narrow human transfer. Rejected wrapper text-label masking and helper23 observations are explicitly superseded/restored. Actual L1/casing observer corrections and both limited/private causal signing phases remain distinct. Required source-quality1269duplicates/2779dead-code fail; other normal build/types/lint/API-ref/freeze/architecture/counts/docs/clean checks pass on manifest-proven same bytes. Whole suite/coverage/Node24/authenticated HTTP/initiator/notary-HSM/live/hosted/release open; not Done. No production/old-test/shared/held/archive/guard/floor/dependency changes, reservation/freeze waiver, paused work, tracker closure, external message or publication. Earlier failures/approved skips remain active; continue current plan dependency order."
+}

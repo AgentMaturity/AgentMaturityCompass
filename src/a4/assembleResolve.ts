@@ -67,6 +67,20 @@ function settledBy(route: A4Route, executionId: string, approvalRequestId: strin
 }
 
 /**
+ * The two resolution routes' preamble, in this order: the principal, the body, a replay (answered here; then null), the
+ * step order at review, owner mode.
+ */
+async function resolutionCall<S extends z.ZodType<{ expectedHeadSeq: number }>>(route: A4Route, projectId: string, schema: S) {
+  const principal = requirePrincipal(route);
+  const { body, request } = await readJson(route, schema);
+  const replay = priorReplay(route.store, request, projectId);
+  if (replay) return (apiSuccess(route.res, replay), null);
+  const state = precheck(route, projectId, "review", body.expectedHeadSeq);
+  assertOwnerMode(route.workspace, "a4 resolve");
+  return { principal, body, request, state };
+}
+
+/**
  * POST …/outcome-unknown/:executionId/request: the operator's statement (effect, external ref, note) as an engine request
  * of tool amc.action.resolve, recorded as an `approval` ref (self_reported). The statement is scanned for secrets before
  * anything is written; the note is sealed in the project's blob store. Builder or owner; refused unless the execution
@@ -75,12 +89,9 @@ function settledBy(route: A4Route, executionId: string, approvalRequestId: strin
  * unreferenced blob and a PENDING request that expires unconsumed (openEffectGate's ceiling).
  */
 async function requestResolution(route: A4Route, projectId: string, executionId: string): Promise<true> {
-  const principal = requirePrincipal(route);
-  const { body, request } = await readJson(route, requestSchema);
-  const replay = priorReplay(route.store, request, projectId);
-  if (replay) return (apiSuccess(route.res, replay), true);
-  const state = precheck(route, projectId, "review", body.expectedHeadSeq);
-  assertOwnerMode(route.workspace, "a4 resolve");
+  const call = await resolutionCall(route, projectId, requestSchema);
+  if (call === null) return true;
+  const { principal, body, request, state } = call;
   // The external reference is stored inline in the signed EVIDENCE_REF row and in the engine request (design §16 rule 11).
   assertNoSecrets({ externalRef: body.externalRef, note: body.note }, "The resolution statement");
   const agentId = state.project.agent_id;
@@ -167,12 +178,9 @@ function receiptRow(route: A4Route, receipt: ActionReceiptV1): { refId: string; 
  * retry after the journal already settled it under this request records that receipt.
  */
 async function resolveResolution(route: A4Route, projectId: string, executionId: string): Promise<true> {
-  const principal = requirePrincipal(route);
-  const { body, request } = await readJson(route, resolveSchema);
-  const replay = priorReplay(route.store, request, projectId);
-  if (replay) return (apiSuccess(route.res, replay), true);
-  const state = precheck(route, projectId, "review", body.expectedHeadSeq);
-  assertOwnerMode(route.workspace, "a4 resolve");
+  const call = await resolutionCall(route, projectId, resolveSchema);
+  if (call === null) return true;
+  const { principal, body, request, state } = call;
   const link = resolutionOf(state.chain, executionId);
   if (link === undefined) throw a4Fail(404, "A4_RESOLUTION_NOT_REQUESTED", `No resolution was requested on this project for ${executionId}.`);
   const approvalRequestId = String(link.body.refId);

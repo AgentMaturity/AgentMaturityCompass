@@ -1,0 +1,23 @@
+{
+  "release": "2.1.296",
+  "recordedFrom": "the native claude binary, scripted loopback model, sandbox-exec loopback-only; paths redacted to /__PROJECT__ and /__HOME__",
+  "files": {
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PostToolUse-bash.json": "6d6a83f72f7807f57da8fe01278c53741c2eb31876a67a920afd15c3b4d73d9d",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PostToolUse-edit.json": "89d76265de4ca6c625583a6324b3c73e4f8ff0ca26a9757b07abc069e6afabbc",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PostToolUse-mcp.json": "7a1b2418286befd535b4ad6a4082423aec60f2bf7a75ff99fdbeebad1f2ace93",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PostToolUse-read.json": "ebf9fce9101c431df894c5445c7f7c662edd61f80d215feed84b683550600c43",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PostToolUse-rewritten-by-another-hook.json": "57e9d638fd7051dca091d0549b3da7997a7d3c66e4f28e504d1ec04fca3d5dab",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PostToolUse-write.json": "ad0e1e534212e932eba8fb828441e594cf0898173657862db0ccff0c7e78ac72",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PostToolUseFailure-failing.json": "83ffe7b8423f45ac11a5296d45c94e6106d5c37a28d137369e40fbc468c7e6cc",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PreToolUse-bash.json": "2d70ff0337eef79c5d88d75be992f96bb502d77a0db89cfeb3b81a3e92def8aa",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PreToolUse-edit.json": "1d4061f64b75d0bcf19431b348886e8c1b32fbb9c07527e4a9b0e73f27b83fed",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PreToolUse-failing.json": "ac095299e48449faeeabc7a478b9a6337947cafa7a5b7c21f07d99fd3816183c",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PreToolUse-mcp.json": "169d34dddc8e92784aa24b49de7578738ef5bde81a4a2a56e3be21fd786a4494",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PreToolUse-read.json": "e7d34eaa613cf5b3c729927d1d44cdb2a1964742cd9450e20b7f3c7ab3a1e9f1",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PreToolUse-webfetch.json": "4ede7b837d0b00f4bae98c96704f7fca4bd662241292e09f75352e471a533982",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/PreToolUse-write.json": "49c3c15d967fb0651a490cf84171201dc4ae1b75032b6ad10e45798e993030e3",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/SessionStart-startup.json": "d2a8e743064ae0dc03dcc3a29e8a69f541f84c5b0ba44aaf4fd0e28dca0baf76",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/Stop-stop.json": "3c554ced364f54173a3d0f742abb9fb0956bb85536a33d01ee6128fdcea242c5",
+    "tests/fixtures/harness-hooks/claude-code/2.1.296/UserPromptSubmit-prompt.json": "4caf4869d4c1e745065cedcd78b6d7261dfbad1a6dc1b54446ee5e61ec5add86"
+  }
+}

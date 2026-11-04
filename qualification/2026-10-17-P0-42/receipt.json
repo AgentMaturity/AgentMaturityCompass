@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-42",
+  "date": "2026-10-17",
+  "commit": "13b131749119b84f6643a36b574c89aecee466be",
+  "branch": "codex/p1-28-qualification",
+  "node": "22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "python3 -B -c 'import subprocess,sys\nr=subprocess.run(['\"'\"'/Users/sid/.local/share/uv/tools/graphifyy/bin/python3'\"'\"','\"'\"'-B'\"'\"','\"'\"'-m'\"'\"','\"'\"'graphify'\"'\"','\"'\"'query'\"'\"','\"'\"'claudeHookInstalledConfig connectHookIntegration hook package'\"'\"','\"'\"'--budget'\"'\"','\"'\"'1000'\"'\"'],cwd='\"'\"'/Users/sid/AgentMaturityCompass'\"'\"')\nsys.exit(r.returncode)'",
+      "exit": 0,
+      "durationMs": 1208
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,sys; r=subprocess.run([\"/opt/homebrew/opt/node@22/bin/node\",\"/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs\",\"--paths\",\"tests/claudeHookInstalledConfig.test.ts\",\"tests/connectHookIntegration.test.ts\"],cwd=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\"); sys.exit(r.returncode)'",
+      "exit": 0,
+      "durationMs": 302
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/audit-ownership.py /private/tmp/p0-42-qualification-20261017/ownership-observations.actual.json",
+      "exit": 0,
+      "durationMs": 16131
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1764
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/claudeHookInstalledConfig.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/connectHookIntegration.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p042-unchanged-hook-baseline.raw.json",
+      "exit": 1,
+      "durationMs": 30523
+    },
+    {
+      "cmd": "git --no-optional-locks -c core.fsmonitor=false -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass check-ignore -v -- tests/claudeHookInstalledConfig.test.ts tests/connectHookIntegration.test.ts",
+      "exit": 1,
+      "durationMs": 22
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json; root=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\"; rows={}; base=[\"git\",\"--no-optional-locks\",\"-c\",\"core.fsmonitor=false\",\"-C\",root]; pairs=[(\"head\",[\"rev-parse\",\"HEAD\"]),(\"branch\",[\"branch\",\"--show-current\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"-z\",\"--untracked-files=all\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"])];\nfor name,args in pairs:\n r=subprocess.run(base+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE); assert r.returncode==0; rows[name]={\"argv\":base+args,\"exit\":r.returncode,\"stdout\":r.stdout.decode(),\"stderr\":r.stderr.decode()}\nprint(json.dumps(rows))'",
+      "exit": 0,
+      "durationMs": 146
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/claudeHookInstalledConfig.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/connectHookIntegration.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p042-repaired-hook-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 31810
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 40402
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1561
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 383
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 331
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1692
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 3005
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 615
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/audit-p042-whole-staged-source.py",
+      "exit": 0,
+      "durationMs": 407
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass commit -m 'test(hooks): resolve CLI paths from the tested package'",
+      "exit": 0,
+      "durationMs": 49
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json; root=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\"; rows={}; base=[\"git\",\"--no-optional-locks\",\"-c\",\"core.fsmonitor=false\",\"-C\",root]; pairs=[(\"head\",[\"log\",\"-1\",\"--format=%H%n%P\",\"--name-status\"]),(\"branch\",[\"branch\",\"--show-current\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"-z\",\"--untracked-files=all\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"]),(\"tree\",[\"ls-tree\",\"-r\",\"HEAD\",\"--\",\"tests/claudeHookInstalledConfig.test.ts\",\"tests/connectHookIntegration.test.ts\"])];\nfor name,args in pairs:\n r=subprocess.run(base+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE); assert r.returncode==0; rows[name]={\"argv\":base+args,\"exit\":r.returncode,\"stdout\":r.stdout.decode(),\"stderr\":r.stderr.decode()}\nprint(json.dumps(rows))'",
+      "exit": 0,
+      "durationMs": 160
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:clean-source",
+      "exit": 0,
+      "durationMs": 51956
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:clean-source -- --keep",
+      "exit": 0,
+      "durationMs": 48143
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json; root=\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-lXfGgL/checkout\"; base=[\"git\",\"--no-optional-locks\",\"-c\",\"core.fsmonitor=false\",\"-C\",root]; rows={}; pairs=[(\"head\",[\"rev-parse\",\"HEAD\"]),(\"root\",[\"rev-parse\",\"--show-toplevel\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"-z\",\"--untracked-files=all\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"])];\nfor name,args in pairs:\n r=subprocess.run(base+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE); assert r.returncode==0; rows[name]={\"argv\":base+args,\"exit\":r.returncode,\"stdout\":r.stdout.decode(),\"stderr\":r.stderr.decode()}\nprint(json.dumps(rows))'",
+      "exit": 0,
+      "durationMs": 581
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-lXfGgL/checkout /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-lXfGgL/checkout/tests/claudeHookInstalledConfig.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-lXfGgL/checkout/tests/connectHookIntegration.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p042-fresh-hook-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 32303
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,sys; r=subprocess.run([\"/opt/homebrew/opt/node@22/bin/node\",\"/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs\",\"--paths\",\"tests/claudeHookFailClosed.test.ts\",\"tests/connectHookCli.test.ts\"],cwd=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\"); sys.exit(r.returncode)'",
+      "exit": 0,
+      "durationMs": 230
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json; roots={\"U\":\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\",\"fresh\":\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-lXfGgL/checkout\"}; rows={};\nfor role,root in roots.items():\n rows[role]={}; base=[\"git\",\"--no-optional-locks\",\"-c\",\"core.fsmonitor=false\",\"-C\",root]\n for name,args in [(\"head\",[\"rev-parse\",\"HEAD\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"-z\",\"--untracked-files=all\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"])]:\n  r=subprocess.run(base+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE); assert r.returncode==0; rows[role][name]={\"argv\":base+args,\"exit\":r.returncode,\"stdout\":r.stdout.decode(),\"stderr\":r.stderr.decode()}\nprint(json.dumps(rows))'",
+      "exit": 0,
+      "durationMs": 682
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/remaining-cli-admission/audit-ownership.py /private/tmp/p0-42-qualification-20261017/remaining-cli-admission/ownership-observations.actual.json",
+      "exit": 0,
+      "durationMs": 16218
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1910
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/claudeHookFailClosed.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/connectHookCli.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p042-remaining-cli-baseline.raw.json",
+      "exit": 0,
+      "durationMs": 25863
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 1298
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 1121
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 849
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 832
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 852
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 847
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 937
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 877
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 831
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/cold-start-measurement/capture-one-sample.py",
+      "exit": 0,
+      "durationMs": 889
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json; root=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\"; rows={}; base=[\"git\",\"--no-optional-locks\",\"-c\",\"core.fsmonitor=false\",\"-C\",root]; pairs=[(\"head\",[\"rev-parse\",\"HEAD\"]),(\"branch\",[\"branch\",\"--show-current\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"-z\",\"--untracked-files=all\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"])];\nfor name,args in pairs:\n r=subprocess.run(base+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE); assert r.returncode==0; rows[name]={\"argv\":base+args,\"exit\":r.returncode,\"stdout\":r.stdout.decode(),\"stderr\":r.stderr.decode()}\nprint(json.dumps(rows))'",
+      "exit": 0,
+      "durationMs": 201
+    },
+    {
+      "cmd": "git --no-optional-locks -c core.fsmonitor=false -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass check-ignore -v -- tests/claudeHookFailClosed.test.ts tests/connectHookCli.test.ts",
+      "exit": 1,
+      "durationMs": 21
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/claudeHookFailClosed.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/claudeHookInstalledConfig.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/connectHookIntegration.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/connectHookCli.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/hookControl.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/amc1480HookHealthDiagnostics.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p042-six-file-hook-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 33577
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 39270
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1656
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 390
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 453
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1986
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 3264
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 698
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass add -- tests/claudeHookFailClosed.test.ts tests/connectHookCli.test.ts",
+      "exit": 0,
+      "durationMs": 28
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-42-qualification-20261017/audit-p042-remaining-cli-staged-source.py",
+      "exit": 0,
+      "durationMs": 399
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass commit -m 'test(hooks): anchor remaining CLI helpers to their test package'",
+      "exit": 0,
+      "durationMs": 48
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json\nroot=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\"\nrows={}\nfor key,args in [(\"head\",[\"rev-parse\",\"HEAD\"]),(\"parent\",[\"rev-parse\",\"HEAD^\"]),(\"branch\",[\"branch\",\"--show-current\"]),(\"changed\",[\"diff-tree\",\"--no-commit-id\",\"--name-only\",\"-r\",\"-z\",\"HEAD\"]),(\"tree\",[\"ls-tree\",\"-z\",\"HEAD\",\"--\",\"tests/claudeHookFailClosed.test.ts\",\"tests/connectHookCli.test.ts\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"--untracked-files=all\",\"-z\"])]:\n r=subprocess.run([\"git\",\"--no-optional-locks\",\"-C\",root,*args],capture_output=True)\n assert r.returncode==0 and not r.stderr,(key,r.returncode)\n rows[key]=r.stdout.decode(\"utf-8\")\nprint(json.dumps({\"root\":root,\"reads\":rows},indent=2))'",
+      "exit": 0,
+      "durationMs": 213
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:clean-source -- --keep",
+      "exit": 0,
+      "durationMs": 48806
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/claudeHookFailClosed.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/claudeHookInstalledConfig.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/connectHookIntegration.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/connectHookCli.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/hookControl.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/amc1480HookHealthDiagnostics.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p042-causal-fresh-baseline.raw.json",
+      "exit": 0,
+      "durationMs": 33755
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/claudeHookFailClosed.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/claudeHookInstalledConfig.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/connectHookIntegration.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/connectHookCli.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/hookControl.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/amc1480HookHealthDiagnostics.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p042-causal-exit-zero-mutant.raw.json",
+      "exit": 1,
+      "durationMs": 32282
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/claudeHookFailClosed.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/claudeHookInstalledConfig.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/connectHookIntegration.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/connectHookCli.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/hookControl.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout/tests/amc1480HookHealthDiagnostics.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p042-causal-exact-restoration.raw.json",
+      "exit": 0,
+      "durationMs": 34066
+    },
+    {
+      "cmd": "/opt/homebrew/bin/docker info --format '{\"OSType\":{{json .OSType}},\"Architecture\":{{json .Architecture}},\"ServerVersion\":{{json .ServerVersion}},\"NCPU\":{{json .NCPU}},\"ContainersRunning\":{{json .ContainersRunning}}}'",
+      "exit": 1,
+      "durationMs": 82
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck",
+      "exit": 0,
+      "durationMs": 27129
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 2958
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json\nroots=[\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\",\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-sY32ia/checkout\"]\nout=[]\nfor root in roots:\n rows={}\n for key,args in [(\"root\",[\"rev-parse\",\"--show-toplevel\"]),(\"head\",[\"rev-parse\",\"HEAD\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"--untracked-files=all\",\"-z\"])]:\n  r=subprocess.run([\"git\",\"--no-optional-locks\",\"-C\",root,*args],capture_output=True)\n  assert r.returncode==0 and not r.stderr,(key,r.returncode)\n  rows[key]=r.stdout.decode(\"utf-8\")\n out.append({\"root\":root,\"reads\":rows})\nprint(json.dumps({\"sourceContexts\":out},indent=2))'",
+      "exit": 0,
+      "durationMs": 635
+    }
+  ],
+  "tests": {
+    "total": 78,
+    "passed": 78,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "0d2070d5f9615eca79b0009a1b7946f8781dcf7072fab4cb4a463d1bc63001d2"
+    },
+    {
+      "path": "ordered-case-audit.json",
+      "sha256": "1b0dd7d11303769be7e17c2e60fbf929e19cdb1f9c1298b5eeba723b17cd91d7"
+    }
+  ],
+  "notes": "Bounded hook qualification for source commit 13b131749119b84f6643a36b574c89aecee466be. Four test files select their package CLI through module URLs; all production source, configuration, dependencies and existing assertions remain unchanged. The original 47-case baseline retains both failures, followed by repaired and fresh 47/47. The remaining 14-case baseline passed before provenance hardening. The whole six-file U run at 9cd325 plus two admitted uncommitted test successors passed 78/78; the later final-source fresh run and exact-restored run also passed 78/78. The deliberately failing compiled exit-zero control recorded 71 passed and seven semantic AssertionErrors, including actual 0 versus required 2 for hung Bridge and first empty stdin. All 74 original pins were restored; all whole raw/observer bodies and ordered joins remain in the audit. Receipt tests report the final restored canonical population of 78, never the sum of repeats. Ten macOS children naturally exited 2 with complete 173-byte stdout and 47-byte stderr; capture/H exited 0, and conservative p95 ceil 1187 ms gives 5000 + 1187 + 1000 = 7187 <= 10000 ms. Linux discovery failed at the absent local Docker socket, with no Linux execution or global capability claim. Actual source typecheck, test typecheck, lint, freeze, counts, docs drift, architecture and clean-source checks passed within their recorded scope. Global dead code 2710 and duplicates 1268 remain RED and unwaived; 19 historical full-suite failures remain unwaived. Linux ten samples, formal live-client or truthful PR-skip evidence, full CI, release and whole P0-42/plan completion remain incomplete. Held decisions, Claude work, F37 skipped/unfixed/unqualified, held P1-25 publication and held D15 archive remain preserved. The preparation worker supplied no metadata-adoption or publication-validator execution credit; root actions are recorded separately when performed."
+}

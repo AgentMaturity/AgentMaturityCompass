@@ -25,6 +25,17 @@ export const catalogLockSchema = z.strictObject({
   register: z.strictObject({ path: z.literal("src/compliance/regulatory/register.json"), schemaVersion: z.literal(1), digest }),
   producers: z.strictObject({ digest }),
   vocabulary: z.strictObject({ digest })
+}).superRefine((lock, ctx) => {
+  const unique = (identities: string[], field: "packs" | "controls" | "sources"): void => {
+    const seen = new Set<string>();
+    identities.forEach((identity, index) => {
+      if (seen.has(identity)) ctx.addIssue({ code: "custom", path: [field, index], message: `duplicate ${field} identity ${identity}` });
+      seen.add(identity);
+    });
+  };
+  unique(lock.packs.map(row => row.id), "packs");
+  unique(lock.controls.map(row => row.id), "controls");
+  unique(lock.sources.map(row => JSON.stringify([row.controlId, row.citationKey])), "sources");
 });
 export type CatalogLockfile = z.infer<typeof catalogLockSchema>;
 
@@ -55,10 +66,10 @@ export function buildCatalogLock(cat: LoadedCatalog): CatalogLockfile {
   };
 }
 
-/** Every pinned value keyed by a stable path; array rows are keyed by id, not position. `generatedBy` is informational. */
+/** JSON-encoded pinned values keyed by stable paths; row order is irrelevant. `generatedBy` is informational. */
 function flatten(lock: CatalogLockfile): Map<string, string> {
   const out = new Map<string, string>([["lockfileVersion", String(lock.lockfileVersion)]]);
-  const put = (prefix: string, row: object) => { for (const [k, v] of Object.entries(row)) out.set(`${prefix}.${k}`, v === null ? "null" : String(v)); };
+  const put = (prefix: string, row: object) => { for (const [k, v] of Object.entries(row)) out.set(`${prefix}.${k}`, JSON.stringify(v)); };
   for (const key of ["catalog", "register", "producers", "vocabulary"] as const) put(key, lock[key]);
   for (const p of lock.packs) put(`packs[${p.id}]`, p);
   for (const c of lock.controls) put(`controls[${c.id}]`, c);

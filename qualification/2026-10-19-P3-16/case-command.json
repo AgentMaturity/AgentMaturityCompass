@@ -1,0 +1,36 @@
+{
+  "startedAt": "2026-10-19T02:03:19.379700+00:00",
+  "command": [
+    "npx",
+    "tsx",
+    "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/probe-environment.mts",
+    "49cd72a2440fae02c45af17aee7ec109c84900c7",
+    "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/native-case-probe-final-49cd72a2440fae02c45af17aee7ec109c84900c7/cases.json"
+  ],
+  "expectedExit": 0,
+  "before": {
+    "head": "49cd72a2440fae02c45af17aee7ec109c84900c7",
+    "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16",
+    "node": "v22.23.3",
+    "statusPorcelain": "",
+    "lockSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914"
+  },
+  "runnerSha256": "dfdaeb23506384383cd59c1dcba3820fb0f56f45d60849d642745509b7b3046e",
+  "exit": 0,
+  "durationMs": 3243,
+  "after": {
+    "head": "49cd72a2440fae02c45af17aee7ec109c84900c7",
+    "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16",
+    "node": "v22.23.3",
+    "statusPorcelain": "",
+    "lockSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914"
+  },
+  "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/native-case-probe-final-49cd72a2440fae02c45af17aee7ec109c84900c7/raw.log",
+  "rawLogSha256": "56759270f1ef0b79aaa98c5c8197f6a3258aadb693d5b1fa96be9e5ebd49a986",
+  "rawLogBytes": 435
+}

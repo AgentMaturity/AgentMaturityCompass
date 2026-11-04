@@ -125,6 +125,12 @@ export function notEvaluatedLevel(
     : undefined;
 }
 
+/** `hint` toward `target`, followed by the notEvaluatedLevel notice; only the notice when the next level is not evaluated. */
+export function hintTowardLevel(question: Pick<DiagnosticQuestion, "gates"> | undefined, current: number, target: number, hint: string): string {
+  const blocked = notEvaluatedLevel(question, current, target);
+  return blocked?.level === current + 1 ? blocked.notice : [hint, blocked?.notice].filter(Boolean).join(" ");
+}
+
 /**
  * The questions one event is tagged to: `meta.questionIds` (a list), `meta.questionId` or `meta.question_id`.
  * A list, because one governed fact can evidence several questions; it counts once per question.

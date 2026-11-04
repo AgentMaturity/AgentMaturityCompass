@@ -1,0 +1,30 @@
+{
+  "schema": "p125g-scope-review-seal/1",
+  "at": "2026-10-16T22:45:09.772756+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/scope-review/review.json",
+      "bytes": 4869,
+      "sha256": "5dcf4acf3fc81d4f9fe5b5efa882ca3b5e0780bacdfd48437bbf5b37c6793730"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/scope-review/README.md",
+      "bytes": 1978,
+      "sha256": "f8faeba8ee00cc1d922c87a244cac9348a1119a87dca43ae0fdbb2c12ece4fb2"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/scope-review/pins.json",
+      "bytes": 500618,
+      "sha256": "5b9dfc5e8a8b1e8884372b1825f72b54a18dcd48838a9499996fdc6c06da8c05"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/scope-review/observations.json",
+      "bytes": 1107015,
+      "sha256": "9cc6e8bdcf8448fe93b5d5451f142862106dc6cb80cbbd68b86e3eb6c0e63607"
+    }
+  ],
+  "sourceAllocationRuntimeOrProductClaim": false,
+  "sourceIndexQaWrites": false
+}

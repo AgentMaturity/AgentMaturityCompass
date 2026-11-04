@@ -1,0 +1,50 @@
+{
+  "at": "2026-10-16T19:01:53.491982+00:00",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+  "all44SAndQBoundFilesExact": true,
+  "boundHashComparisons": 88,
+  "all88ProtectedOwnershipInputsExact": true,
+  "nativePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 542501039,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543125595,
+      "nlink": 1
+    }
+  ],
+  "allThreeNativePhysicalIdentitiesExact": true,
+  "sourceAndFreshClean": true,
+  "sourceAndFreshIndexesEmpty": true,
+  "heldR18RowsHeadAndEmptyIndexExact": true,
+  "heldRPins26AndClaudePins10IncludedInProtectedSet": true,
+  "heldArchivePreservedIgnoredUnstaged": true,
+  "sharedReservationStillMissing": true,
+  "lastKnownReservationBindingRetained": true,
+  "sharedAppendStillPending": true,
+  "allHumanHoldsPreserved": true,
+  "allOwnedSourceControlsRestored": true,
+  "compiledMutation": false
+}

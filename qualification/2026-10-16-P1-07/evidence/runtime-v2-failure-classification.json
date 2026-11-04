@@ -1,0 +1,69 @@
+{
+  "schema": "p107-runtime-v2-failure-classification/1",
+  "actualExit": 1,
+  "actualTests": {
+    "total": 1,
+    "passed": 0,
+    "failed": 1
+  },
+  "publicEvidence": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/public-evidence.json",
+    "bytes": 27690,
+    "sha256": "5f0bed636d7cd4cab32707130171c0ab6e061292c1de38154cc022852d76a09b"
+  },
+  "firstFailure": {
+    "line": 365,
+    "assertion": "facts.afterPins deeply equal beforePins",
+    "actualDeltas": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub",
+        "differences": {
+          "inode": {
+            "before": 542975566,
+            "after": 542975703
+          }
+        }
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub",
+        "differences": {
+          "inode": {
+            "before": 542975568,
+            "after": 542975704
+          }
+        }
+      }
+    ]
+  },
+  "separateCleanupFailure": "same physical public-key mirror inode mismatch",
+  "observedBeforeFirstFailure": {
+    "nativeOutcomes": [
+      "OK",
+      "DENIED",
+      "OK",
+      "DENIED"
+    ],
+    "rows": 24,
+    "signedClosedSessions": 2,
+    "oneTurnAndSealEach": true,
+    "pinnedLedgerIntegrity": true,
+    "allWriterSignaturesValid": true,
+    "fourExactAuditIdsMapped": true,
+    "actualUtcDays": 1,
+    "earnedLevel": 1
+  },
+  "cleanupObservations": {
+    "environmentRestored": true,
+    "vaultLocked": true,
+    "poolClosed": true,
+    "nativeUnchanged": true
+  },
+  "notReached": [
+    "following nativeAfter equality assertion",
+    "final successful ownership predicate",
+    "final cleanup success predicate"
+  ],
+  "noPassCredit": true,
+  "failedRootPreserved": true,
+  "productionUnmodified": true
+}

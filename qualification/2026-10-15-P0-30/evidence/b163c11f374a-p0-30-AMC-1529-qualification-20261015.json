@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1529",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T03:13:41.629386+00:00",
+  "state": "BOUNDED_ORIGINAL_NOTARY_CONTROLS_COMPLETE_PENDING_ACTUAL_INDEPENDENT_REVIEW",
+  "setup": {
+    "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/setup-v2.json",
+    "bytes": 13288,
+    "sha256": "fcfcaa5637761e2f81b264a6dd7c22f33e33b8dc446be6fb2f9a0a9719dd96c1"
+  },
+  "release": {
+    "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/root-runtime-release.json",
+    "bytes": 2321,
+    "sha256": "1afd1428ef2a70fa1490a2fa2f0eddb22f757f351bc2371f4ec58165f85d345c"
+  },
+  "v1SetupBlockerPreserved": {
+    "path": "/private/tmp/p0-30-AMC-1529-setup-independent-review-20261015.json",
+    "bytes": 35566,
+    "sha256": "bf994411c25d8a2ae5cfe61fe3299092584394fa50da54b9298b579b4c675fb7"
+  },
+  "v2SetupReview": {
+    "path": "/private/tmp/p0-30-AMC-1529-v2-setup-independent-review-20261015.json",
+    "bytes": 36410,
+    "sha256": "cfc8ffe5322fdd80328081563dea335b877c69bc5e97ae7714fd235b4dfdfce4"
+  },
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 18202,
+    "sha256": "084ffd9ab36bfabb1f1ba8e833c364ee16d597812fe178c5857978943794c5ad"
+  },
+  "actualCommands": 8,
+  "corpusProcesses": 7,
+  "originalUniqueRegisteredCases": 16,
+  "caseExecutions": 82,
+  "phases": [
+    {
+      "phase": "initial-original-notary-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/initial-original-notary-baseline/summary.json",
+        "bytes": 10547,
+        "sha256": "8653a755b371d1af9e53bb1bc95b69a95f910e14a433be1221dadb721a9c739e"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/initial-original-notary-baseline/raw-tests.json",
+        "bytes": 7027,
+        "sha256": "193df04e71b021f12698eb44ff347a7b2c054c1e82800ee9122813fb0108b1cd"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/initial-original-notary-baseline/runtime-observer.json",
+        "bytes": 8029,
+        "sha256": "23ded7e6a36e2da3426b8f179e2c9d195dca41c2dda7b5fda0118a25ee23ffe1"
+      },
+      "counts": {
+        "numTotalTests": 16,
+        "numPassedTests": 16,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeRuntimeObservation": true
+    },
+    {
+      "phase": "P30-1529-replay-bytes-binding-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-baseline/summary.json",
+        "bytes": 10566,
+        "sha256": "38dfc23a84c7061b2a06577d72afa6b9d5716d77051e958912bce4bfd35ce7ec"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-baseline/raw-tests.json",
+        "bytes": 7023,
+        "sha256": "e293c24373279da56e4eaab4ac06e48ec6ae799e1182328856871949ff939614"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-baseline/runtime-observer.json",
+        "bytes": 8029,
+        "sha256": "d9d8894594b1377b0dd712078a19c7e1bc651d2e86eeee7fbf1a3497d0635b44"
+      },
+      "counts": {
+        "numTotalTests": 16,
+        "numPassedTests": 16,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeRuntimeObservation": true
+    },
+    {
+      "phase": "P30-1529-replay-bytes-binding-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-mutant/summary.json",
+        "bytes": 17415,
+        "sha256": "6d458af2f434256fad95bde9ee3dc4bf26ce86a22884d8556a445f530e8d2f4c"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-mutant/raw-tests.json",
+        "bytes": 10100,
+        "sha256": "092603efe222f64355fe636ff638f4a78834ef5adbbd4b6ee2872738686d8d8b"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-mutant/runtime-observer.json",
+        "bytes": 13819,
+        "sha256": "ee69038f7dec4c6c7a9cfa5a14ada983856f2ad1d4d7e443ec03e79a1264d479"
+      },
+      "counts": {
+        "numTotalTests": 16,
+        "numPassedTests": 13,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 1,
+      "completeRuntimeObservation": true
+    },
+    {
+      "phase": "P30-1529-replay-bytes-binding-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-restored/summary.json",
+        "bytes": 10564,
+        "sha256": "fe78f9e89d3594aa7a15d619537a377d00a22374dba16fcfbce7a144417e0e46"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-restored/raw-tests.json",
+        "bytes": 7020,
+        "sha256": "861527f93f46818dd7018fbc3f52eec62066d09771477b6aa9ff58dab71505b9"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-bytes-binding-restored/runtime-observer.json",
+        "bytes": 8029,
+        "sha256": "e20e22959d052aa2497c22ff77f8704a77899691c3fa3f6e87f7434a9dcb758d"
+      },
+      "counts": {
+        "numTotalTests": 16,
+        "numPassedTests": 16,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeRuntimeObservation": true
+    },
+    {
+      "phase": "P30-1529-replay-lifetime-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-baseline/summary.json",
+        "bytes": 5439,
+        "sha256": "4843b3b55b056b6f0dd0e0fe8964f12a2635d9bceb84829f304bc2316928ae10"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-baseline/raw-tests.json",
+        "bytes": 2884,
+        "sha256": "0680c0b0ef3cb409905f7beecebd546527f518acaebb53a33d0345c06b6ba187"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-baseline/runtime-observer.json",
+        "bytes": 3344,
+        "sha256": "7750a1066e8180887e47193ca4c79a41a6b76405299c0252d7c174556911c627"
+      },
+      "counts": {
+        "numTotalTests": 6,
+        "numPassedTests": 6,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeRuntimeObservation": true
+    },
+    {
+      "phase": "P30-1529-replay-lifetime-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-mutant/summary.json",
+        "bytes": 8214,
+        "sha256": "fc822c8e46e4472d20d08740c7ae0ab8212e4141cf78c9e2bedb80b8d61e4344"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-mutant/raw-tests.json",
+        "bytes": 4177,
+        "sha256": "7df6cd55d809ba737bdb8e8cd928b8678065e4e20d82391274e026c40b85808e"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-mutant/runtime-observer.json",
+        "bytes": 5420,
+        "sha256": "f3651a63e3ae9d9802b9769d2785d05a0ed98e2615a1592db095e926821281dc"
+      },
+      "counts": {
+        "numTotalTests": 6,
+        "numPassedTests": 5,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 1,
+      "completeRuntimeObservation": true
+    },
+    {
+      "phase": "P30-1529-replay-lifetime-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-restored/summary.json",
+        "bytes": 5449,
+        "sha256": "bb000360c2d040b37d240702e7fdfa094e511d057d8d1a40a30dbe1bd41f2382"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-restored/raw-tests.json",
+        "bytes": 2894,
+        "sha256": "e1b05557cf243d06bce03d8535c6115740b9a3d2586efcd860323d6670407669"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/phases/P30-1529-replay-lifetime-restored/runtime-observer.json",
+        "bytes": 3344,
+        "sha256": "876c7e33749e8c1af927afc568b0755efd6315c7a5baf7c61260f899e4339a53"
+      },
+      "counts": {
+        "numTotalTests": 6,
+        "numPassedTests": 6,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numPendingTestSuites": 0
+      },
+      "exit": 0,
+      "completeRuntimeObservation": true
+    }
+  ],
+  "failedAssertions": [
+    {
+      "phase": "P30-1529-replay-bytes-binding-mutant",
+      "name": "authenticated notary replay admission consumes one admission across accepted signature and timestamp spellings for POST /sign",
+      "messages": [
+        "AssertionError: expected 'POST:/sign:1800000000000:71962EC1F84C\u2026' to be 'POST:/sign:1800000000000:71962ec1f84c\u2026' // Object.is equality\n    at /private/tmp/p0-30-AMC-1529-qualification-20261015/closure/tests/notaryAuthReplay.test.ts:47:38\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2025:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+      ]
+    },
+    {
+      "phase": "P30-1529-replay-bytes-binding-mutant",
+      "name": "authenticated notary replay admission consumes one admission across accepted signature and timestamp spellings for GET /log/tail",
+      "messages": [
+        "AssertionError: expected 'GET:/log/tail:1800000000000:4D0469C39\u2026' to be 'GET:/log/tail:1800000000000:4d0469c39\u2026' // Object.is equality\n    at /private/tmp/p0-30-AMC-1529-qualification-20261015/closure/tests/notaryAuthReplay.test.ts:47:38\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2025:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+      ]
+    },
+    {
+      "phase": "P30-1529-replay-bytes-binding-mutant",
+      "name": "optional Compose notary listener and policy signing signs the original digest through the actual CLI service and policy producer, retaining auth and payload checks",
+      "messages": [
+        "AssertionError: expected 200 to be 401 // Object.is equality\n    at /private/tmp/p0-30-AMC-1529-qualification-20261015/closure/tests/notaryComposeIntegration.test.ts:191:39\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "phase": "P30-1529-replay-lifetime-mutant",
+      "name": "authenticated notary replay admission retains a future-dated authentication through its inclusive validity boundary",
+      "messages": [
+        "AssertionError: expected { ok: true } to deeply equal { ok: false, \u2026(1) }\n    at /private/tmp/p0-30-AMC-1529-qualification-20261015/closure/tests/notaryAuthReplay.test.ts:70:29\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    }
+  ],
+  "controls": [
+    {
+      "id": "P30-1529-replay-bytes-binding",
+      "counts": [
+        16,
+        13,
+        16
+      ],
+      "meaning": "Two pure cases first fail exact canonical replay-key equality at47:38 for uppercase signature spelling. Their later guard(equivalent), whitespace and later loop assertions are masked. Actual HTTP healthy signature, wrong-secret401, checksum400, valid200 and identical-spelling replay401 checks precede the uppercase replay200-vs-required401 failure at191:39. That assertion masks its response reason and all GET-tail checks. No unobserved response-body signature or GET-tail bypass is inferred."
+    },
+    {
+      "id": "P30-1529-replay-lifetime",
+      "counts": [
+        6,
+        5,
+        6
+      ],
+      "meaning": "Retained original authenticated request is wrongly readmitted after inclusive expiry under the private guard removal; expected authentication expired, actual ok:true at70:29. Earlier boundary/replay and fresh HTTP-style timestamp-skew refusal pass. This is fixed-clock retained-object helper expiry, not an observed HTTP expiry bypass."
+    }
+  ],
+  "observation": "Every original corpus retains raw JSON, recursive task/hook/unhandled receipt, full outer streams and group proof. No pending/todo/suite/hook/unhandled/file/late-close/guard diagnostic or forced termination. Original v1 was never run; additional observer only closes its static reporting gap. Known late global teardown paths are gated by post-exit streams; no universal absence of unlogged errors.",
+  "runtime": "Separate actual fingerprint Node22.23.3/ABI127/NAPI10. Native binary physical identity is pinned by preservation. Per-service-child loaded native/ABI or full child streams were not independently recorded; original stdout is ignored/stderr drained.",
+  "preservation": {
+    "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/root-final-readonly-preservation.json",
+    "bytes": 631,
+    "sha256": "2292bb9e34ced6c98860c7ac882bc69c95b78b4e326e91e80322fa99916f5da7"
+  },
+  "finalClosure": {
+    "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/full-closure-final.json",
+    "bytes": 1399777,
+    "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/artifact-index.json",
+    "bytes": 1054164,
+    "sha256": "167a58b054e636b0c1c219e10b175686121f65130fc259073cfb07cd0a2ba465"
+  },
+  "indexReferenceCount": 4211,
+  "counting": "Original replay6 plus integration10 =16. Lifetime reuses6; initial16 plus bytes-binding16BMR plus lifetime6BMR is82 case executions, not82unique tests. Both source recipes and all12268 source/dist bytes are restored unchanged.",
+  "limits": [
+    "Real local SOFTWARE Ed25519 and HMAC, pinned local policy and source CLI foreground service; not hardware/provider/external identity.",
+    "Original wildcard0.0.0.0 listener requests127.0.0.1. Port release-before-service-bind and original sync HTTP bridge remain; no blanket network-isolation claim.",
+    "Original child lifecycle/deadlines/guards/config/imports/fixtures/assertions remain unchanged; parent pools may persist until parent exit. No independent cold-reader interval or P0-27 corruption-cause repair.",
+    "Compose/Caddy case reads configuration only; no container, installed-package, fullbatch/fullsuite/coverage/Node24/hosted/release/G0/Done acceptance.",
+    "Required exact-source duplicates 1269/dead 2751 remain unwaived."
+  ],
+  "formalAcceptanceClosed": false,
+  "allRuntimeFinished": true,
+  "allRootFreezeReadsFinished": true
+}

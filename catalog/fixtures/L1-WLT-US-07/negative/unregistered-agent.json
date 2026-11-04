@@ -1,0 +1,15 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-07",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "agent_config",
+    "agentId": "finance-ops-agent",
+    "entry": "missing"
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "signature_missing"
+  }
+}

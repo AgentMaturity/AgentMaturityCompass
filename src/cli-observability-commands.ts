@@ -183,7 +183,7 @@ export function registerCorrectionCommands(program: Command, activeAgent: (p: Co
           "./corrections/correctionStore.js"
         );
         const { buildOwnerCorrection } = await import("./corrections/correctionTracker.js");
-        const { latestRunForAgent } = await import("./governor/actionPolicyEngine.js");
+        const { latestTrustedRun } = await import("./governor/actionPolicyEngine.js");
         const agentId = opts.agent ?? activeAgent(program) ?? "default";
         const questionIds = opts.questions.split(",").map(q => q.trim()).filter(Boolean);
         if (questionIds.length === 0) {
@@ -194,10 +194,11 @@ export function registerCorrectionCommands(program: Command, activeAgent: (p: Co
         // run to compare against, effectiveness can never be verified. The
         // schema enforces this with NOT NULL on baseline_run_id, so say why
         // rather than surfacing the constraint error.
-        const baseline = latestRunForAgent(process.cwd(), agentId);
+        // The baseline is recorded into the correction hash chain, so only a sealed, ledger-anchored run counts.
+        const { run: baseline, refusal } = latestTrustedRun(process.cwd(), agentId);
         if (!baseline) {
           throw new Error(
-            `No diagnostic run found for agent "${agentId}". A correction is measured against a ` +
+            `No ${refusal ? `verified diagnostic run (${refusal})` : "diagnostic run found"} for agent "${agentId}". A correction is measured against a ` +
               `baseline run, so record one first:\n  amc score --agent ${agentId}`
           );
         }

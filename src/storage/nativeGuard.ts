@@ -81,6 +81,20 @@ function isReadOnlyCliRequest(argv: readonly string[]): boolean {
   const helpPath = args.slice(0, -1).join(" ");
   if (["--help", "-h"].includes(args.at(-1) ?? "") &&
       ["agent-loop", "agent-loop run", "agent-loop chat", "agent-loop verify", "credentials", "credentials list", "credentials describe", "credentials set", "credentials unset"].includes(helpPath)) return true;
+  // Schema inspection must not probe or repair SQLite before the boot-free config handler.
+  if (args[0] === "config" && args[1] === "validate") {
+    let schema = false;
+    for (let index = 2; index < args.length; index++) {
+      const arg = args[index]!;
+      if (["--json", "--no-color"].includes(arg)) continue;
+      if (arg === "--schema") {
+        schema = true;
+        if (args[index + 1] && !args[index + 1]!.startsWith("-")) index++;
+      } else if (arg.startsWith("--schema=")) schema = true;
+      else return false;
+    }
+    return schema;
+  }
   if (args[0] === "imports" && args[1] === "verify-profile") {
     let positional = 0;
     const values = ["--authorities", "--original", "--expected-digest"];

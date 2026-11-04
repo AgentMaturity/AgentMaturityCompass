@@ -18,13 +18,12 @@ const payloadSchema = z.object({
 export type IdentitySessionPayload = z.infer<typeof payloadSchema>;
 
 function toBase64Url(bytes: Buffer): string {
-  return bytes.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+  return bytes.toString("base64url");
 }
 
 function fromBase64Url(value: string): Buffer {
-  const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
-  const pad = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
-  return Buffer.from(`${normalized}${pad}`, "base64");
+  if (typeof value !== "string") throw new TypeError("base64url input must be a string");
+  return Buffer.from(value, "base64url");
 }
 
 export function issueIdentitySessionToken(params: {

@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-TOOL-01",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "tool_allowlist",
+    "tool": "fixture.unregistered",
+    "actionClass": "WRITE_HIGH",
+    "listed": [
+      "fixture.unregistered"
+    ],
+    "config": "signed",
+    "registered": false
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "visibility_denied"
+  }
+}

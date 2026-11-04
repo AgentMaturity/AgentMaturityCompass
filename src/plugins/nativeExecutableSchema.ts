@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { nativeExtensionHookKindSchema } from "../extensions/nativeExtensionHookSchema.js";
 import { pluginArtifactPathSchema, pluginIdSchema, pluginVersionSchema } from "./pluginIdentifiers.js";
 
 export const NATIVE_EXECUTABLE_LIMITS = Object.freeze({
@@ -14,7 +15,7 @@ export const NATIVE_EXECUTABLE_LIMITS = Object.freeze({
 });
 
 export const nativeExecutableDigestSchema = z.string().regex(/^[a-f0-9]{64}$/);
-export const nativeExecutableCapabilitySchema = z.enum(["context.generate", "command.invoke"]);
+export const nativeExecutableCapabilitySchema = z.enum(["context.generate", "command.invoke", "hook.observe", "hook.deny"]);
 export type NativeExecutableCapability = z.infer<typeof nativeExecutableCapabilitySchema>;
 const contributionName = z.string().regex(/^[a-z][a-z0-9-]{0,63}$/);
 const exportName = z.string().regex(/^[A-Za-z_$][A-Za-z0-9_$]{0,63}$/)
@@ -38,10 +39,11 @@ export function nativeExecutableReference(value: NativeExecutableReference): Nat
 
 export const nativeExecutableDeclarationSchema = nativeExecutableReferenceSchema.extend({
   apiVersion: z.literal(1),
-  capabilities: z.array(nativeExecutableCapabilitySchema).min(1).max(2),
+  capabilities: z.array(nativeExecutableCapabilitySchema).min(1).max(4),
   contexts: z.array(z.object({ name: contributionName, export: exportName }).strict()).max(16),
   commands: z.record(contributionName, z.object({ export: exportName }).strict())
     .refine(value => Object.keys(value).length <= 32),
+  hooks: z.partialRecord(nativeExtensionHookKindSchema, z.object({ export: exportName }).strict()).optional(),
   limits: z.object({
     timeoutMs: z.number().int().min(100).max(NATIVE_EXECUTABLE_LIMITS.timeoutMs),
     maxOutputBytes: z.number().int().min(1).max(NATIVE_EXECUTABLE_LIMITS.outputBytes),
@@ -52,7 +54,9 @@ export const nativeExecutableDeclarationSchema = nativeExecutableReferenceSchema
   const capabilities = new Set(value.capabilities);
   if (capabilities.size !== value.capabilities.length
     || capabilities.has("context.generate") !== (value.contexts.length > 0)
-    || capabilities.has("command.invoke") !== (Object.keys(value.commands).length > 0)) {
+    || capabilities.has("command.invoke") !== (Object.keys(value.commands).length > 0)
+    || capabilities.has("hook.observe") !== Object.keys(value.hooks ?? {}).some(kind => kind !== "pre-tool")
+    || capabilities.has("hook.deny") !== Object.hasOwn(value.hooks ?? {}, "pre-tool")) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Capabilities must exactly describe the declared executable contributions." });
   }
   if (new Set(value.contexts.map(entry => entry.name)).size !== value.contexts.length) {

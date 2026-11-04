@@ -1,0 +1,1311 @@
+{
+  "schema": "p125g-independent-actual-source-evidence-review/1",
+  "state": "CLOSED_BOUNDED_SOURCE_EVIDENCE_ONLY",
+  "phases": [
+    {
+      "phase": "p125g-unchanged-verifier",
+      "actualTests": 17,
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 1,
+      "hookValues": 2,
+      "hooks": [
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "allRawAndObserverErrors": [],
+      "lateDiagnosticMatches": [],
+      "exit": 0,
+      "durationMs": 691,
+      "ownedPgid": 55492,
+      "closedGroupAbsentByESRCH": true,
+      "noSignalsOtherThanZeroSent": true,
+      "actualSourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "borrowedRunnerRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "borrowedRunnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d"
+    },
+    {
+      "phase": "p125g-source-combined",
+      "actualTests": 19,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "hookValues": 3,
+      "hooks": [
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "failureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "allRawAndObserverErrors": [],
+      "lateDiagnosticMatches": [],
+      "exit": 0,
+      "durationMs": 1927,
+      "ownedPgid": 55880,
+      "closedGroupAbsentByESRCH": true,
+      "noSignalsOtherThanZeroSent": true,
+      "actualSourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "borrowedRunnerRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "borrowedRunnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d"
+    }
+  ],
+  "actualGrantCases": [
+    {
+      "caseId": "FIRST-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/public-evidence.json",
+        "bytes": 12992,
+        "sha256": "fb97ac2eb4d1a822cf337cf0142bd75ce6291eae7cf254d7307c11e3bc8b5373"
+      },
+      "publicFileEqualsFullOuterLogAndRootReview": true,
+      "routes": [
+        "/good-first"
+      ],
+      "failureStrings": [],
+      "returnedGrant": {
+        "tsa": "good-first",
+        "tokenDerBytes": 2298,
+        "tokenDerSha256": "11112060644cc58f9c61c6d2ed3e077ed2e2119839bfb8703147b73f2c126557",
+        "genTime": "2026-10-16T22:47:30.000Z",
+        "anchorId": "amc-p125-grant-test-root",
+        "signerCertSha256": "1a34c09994345dac8e98cde9b3def9a74a92d50d0d0bd69e9799b0a779e30f28",
+        "policyOid": "1.2.3.4.1",
+        "messageImprint": {
+          "hashAlgorithm": "sha256",
+          "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+        },
+        "revocationChecked": false
+      },
+      "replyObservation": {
+        "path": "/good-first",
+        "querySha256": "5073a3d1498f6b3834248671598e90b70b1fc362bd97f1054a8b23a009671e59",
+        "responseSha256": "ee65d41f31a100b9e727a88934330c1f586775efa9391eedc66284e2ff42e270",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "actualChildren": [
+        {
+          "id": "tool-version",
+          "pid": 55889,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 0,
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "id": "create-root",
+          "pid": 55890,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 1210,
+          "stderrSha256": "6c54e2040a63f64a2814e2f1808cf5a58e0757055a16dd97cecec6ba0e6592c7"
+        },
+        {
+          "id": "create-tsa-csr",
+          "pid": 55891,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 1725,
+          "stderrSha256": "28911bec2d57dfdb7bbeab635de75153faa89912413c367f69b4047116947fb4"
+        },
+        {
+          "id": "issue-tsa",
+          "pid": 55892,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 80,
+          "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "id": "sign-captured-query",
+          "pid": 55893,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 354,
+          "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "id": "verify-query-bound-reply",
+          "pid": 55894,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 120,
+          "stderrSha256": "3e848ecd7dd4cd26a73d37cd8aa311250eab996bce6f132eaeacf65b12bb6e68"
+        }
+      ],
+      "childStreamsNotOpenedByThisReview": true,
+      "rootReviewedAll24StreamHashes": true,
+      "sockets": 1,
+      "httpTerminalsClosed": true,
+      "cleanupErrors": 0
+    },
+    {
+      "caseId": "HTTP500-THEN-GRANT",
+      "publicRecord": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/public-evidence.json",
+        "bytes": 13547,
+        "sha256": "10b2deec9636d49bce10c4c2b1b600e8d8d21e87b13198efc30888d81f743167"
+      },
+      "publicFileEqualsFullOuterLogAndRootReview": true,
+      "routes": [
+        "/http-first",
+        "/good-second"
+      ],
+      "failureStrings": [
+        "http-first: HTTP 500"
+      ],
+      "returnedGrant": {
+        "tsa": "good-second",
+        "tokenDerBytes": 2298,
+        "tokenDerSha256": "8ad122b89695df2393834fdc38860481959dd7b6686f52b4056eaba0df43870d",
+        "genTime": "2026-10-16T22:47:31.000Z",
+        "anchorId": "amc-p125-grant-test-root",
+        "signerCertSha256": "536a424fbff61b0d4cfba80eab8dd04d1d43a538267d3b474126d9aad115d390",
+        "policyOid": "1.2.3.4.1",
+        "messageImprint": {
+          "hashAlgorithm": "sha256",
+          "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+        },
+        "revocationChecked": false
+      },
+      "replyObservation": {
+        "path": "/good-second",
+        "querySha256": "f358126e49e55de9bad9fa028ccc91f02f2d56ead9cf174c69dedf4938aed6c8",
+        "responseSha256": "b94117e12cb466f0f9235beb3fe05d8f610f2ca4c9c0be45eecd29ad2faac86e",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "actualChildren": [
+        {
+          "id": "tool-version",
+          "pid": 55895,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 0,
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "id": "create-root",
+          "pid": 55896,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 2575,
+          "stderrSha256": "bbb5c55cbbae100bdec6165d00a9734a95909a2d9a10fbe7560d27e5a4afdd8a"
+        },
+        {
+          "id": "create-tsa-csr",
+          "pid": 55897,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 1462,
+          "stderrSha256": "73b037cc2c068f60978b65b533adb97f37dab0a15ec1356b54e5743b297c7abc"
+        },
+        {
+          "id": "issue-tsa",
+          "pid": 55898,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 80,
+          "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "id": "sign-captured-query",
+          "pid": 55899,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 354,
+          "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "id": "verify-query-bound-reply",
+          "pid": 55900,
+          "exit": 0,
+          "close": 0,
+          "signal": null,
+          "stderrBytes": 120,
+          "stderrSha256": "0b3360b4499f2d01eb7d632b961a3cc1fb043b97079a4c262ef22aaba2dac5a8"
+        }
+      ],
+      "childStreamsNotOpenedByThisReview": true,
+      "rootReviewedAll24StreamHashes": true,
+      "sockets": 2,
+      "httpTerminalsClosed": true,
+      "cleanupErrors": 0
+    }
+  ],
+  "rootLifecycleReviewPin": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/source-lifecycle-review.json",
+    "bytes": 40236,
+    "sha256": "1ac84278662a9aa1c9b705ac43c7fa14e103348e4b585c5952e793d5df501514"
+  },
+  "opensslOptionalDiagnostics": {
+    "at": "2026-10-16T22:49:42.664256+00:00",
+    "sourcePhase": "p125g-source-combined",
+    "actualSigningChildExit": 0,
+    "actualQueryBoundOraclesExit": 0,
+    "actualAmcGrants": 2,
+    "diagnostics": [
+      "NCONF_get_string:no value:group=tsa_local name=other_policies",
+      "NCONF_get_string:no value:group=tsa_local name=accuracy"
+    ],
+    "classification": "OpenSSL emits absent optional configuration-field diagnostics after response generation. Both exact-query/root oracles and actual AMC verification accept the generated responses; no child error event/nonzero exit, hook or cleanup failure occurred. These stderr diagnostics remain private retained originals and are not relabelled as absent.",
+    "documentation": {
+      "path": "/opt/homebrew/Cellar/openssl@4/4.0.3/share/man/man1/openssl-ts.1ssl.gz",
+      "bytes": 9162,
+      "sha256": "6f6de32de7aca71f4e6e3f83066498bafd853e217c3658678d13ef7d40490265"
+    },
+    "sourceOrConfigChanged": false,
+    "priorReadOnlyLookupFailure": "An uncompressed4.0.3 manpage filename was absent. The actual pinned installed gz path was then read; no source/helper/product/QA mutation came from the lookup."
+  },
+  "installedDocumentationExcerpts": [
+    {
+      "line": 540,
+      "text": "policy. The same as the \\fB\\-tspolicy\\fR command line option. (Optional)\n.IP \"\\fBother_policies\\fR\" 4\n.IX Item \"other_policies\"\nComma separated list of policies that are also acceptable by the \\s-1TSA\\s0\nand used only if the request explicitly specifies one of them. (Optional)\n.IP \"\\fBdigests\\fR\" 4\n.IX Item \"digests\"\nThe list of message digest algorithms that the \\s-1TSA\\s0 accepts. At least\none algorithm must be specified. (Mandatory)"
+    },
+    {
+      "line": 541,
+      "text": ".IP \"\\fBother_policies\\fR\" 4\n.IX Item \"other_policies\"\nComma separated list of policies that are also acceptable by the \\s-1TSA\\s0\nand used only if the request explicitly specifies one of them. (Optional)\n.IP \"\\fBdigests\\fR\" 4\n.IX Item \"digests\"\nThe list of message digest algorithms that the \\s-1TSA\\s0 accepts. At least\none algorithm must be specified. (Mandatory)\n.IP \"\\fBaccuracy\\fR\" 4"
+    },
+    {
+      "line": 548,
+      "text": "one algorithm must be specified. (Mandatory)\n.IP \"\\fBaccuracy\\fR\" 4\n.IX Item \"accuracy\"\nThe accuracy of the time source of the \\s-1TSA\\s0 in seconds, milliseconds\nand microseconds. E.g. secs:1, millisecs:500, microsecs:100. If any of\nthe components is missing zero is assumed for that field. (Optional)\n.IP \"\\fBclock_precision_digits\\fR\" 4\n.IX Item \"clock_precision_digits\"\nSpecifies the maximum number of digits, which represent the fraction of"
+    },
+    {
+      "line": 549,
+      "text": ".IP \"\\fBaccuracy\\fR\" 4\n.IX Item \"accuracy\"\nThe accuracy of the time source of the \\s-1TSA\\s0 in seconds, milliseconds\nand microseconds. E.g. secs:1, millisecs:500, microsecs:100. If any of\nthe components is missing zero is assumed for that field. (Optional)\n.IP \"\\fBclock_precision_digits\\fR\" 4\n.IX Item \"clock_precision_digits\"\nSpecifies the maximum number of digits, which represent the fraction of\nseconds, that  need to be included in the time field. The trailing zeros"
+    },
+    {
+      "line": 550,
+      "text": ".IX Item \"accuracy\"\nThe accuracy of the time source of the \\s-1TSA\\s0 in seconds, milliseconds\nand microseconds. E.g. secs:1, millisecs:500, microsecs:100. If any of\nthe components is missing zero is assumed for that field. (Optional)\n.IP \"\\fBclock_precision_digits\\fR\" 4\n.IX Item \"clock_precision_digits\"\nSpecifies the maximum number of digits, which represent the fraction of\nseconds, that  need to be included in the time field. The trailing zeros\nmust be removed from the time, so there might actually be fewer digits,"
+    }
+  ],
+  "boundaries": [
+    "Only the two explicitly approved public JSON files were opened in signing roots.",
+    "No keys, private-run files, child streams or generated public signing files were opened.",
+    "Root stream hash verification is adopted as root evidence, not independently repeated.",
+    "The named actual source checkpoint and closed source checks are claimed here. Later fresh-checkout or control results are not claimed.",
+    "No helper, product, OpenSSL, native, SQL, network or probe execution occurred."
+  ],
+  "sourceCandidate": {
+    "actualMaterializedPin": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+      "bytes": 27505,
+      "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc"
+    },
+    "sealedPrivateCandidatePin": {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-proposal/tsaGrant.test.ts.source.txt",
+      "bytes": 27505,
+      "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc"
+    },
+    "candidateByteEquality": true,
+    "sourceParent": "da61205c0817267133451bac11e57bd0318fe44f",
+    "sourceCommitNotYetAdopted": false,
+    "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576"
+  },
+  "quality": {
+    "beforeReferencePin": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/quality-before-source-reference.json",
+      "bytes": 843,
+      "sha256": "8e3d935d0cb6e1470322f758ca193a5e29fb40bbc29b6ad0811fd799261538af"
+    },
+    "actualPriorDiagnosticPin": {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/after-metadata-full.json",
+      "bytes": 247823,
+      "sha256": "36b9e659ca601d24982ccc8f4d7bf2d54779bbddb2f84ada1a35b174a0356182"
+    },
+    "actualAfterPin": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/after-source-full.json",
+      "bytes": 247821,
+      "sha256": "0c0ad51bb621ff2208fab191e0e431f01b7086c5ca80230ae407572825f91a5d"
+    },
+    "sameOrdered2719Findings": true,
+    "added": [],
+    "removed": [],
+    "duplicates": 1268,
+    "status": "RED",
+    "waiverOrBaselineChange": false,
+    "diagnosticExitZeroIsNotQualityGatePass": true
+  },
+  "at": "2026-10-16T22:58:21.311693+00:00",
+  "blockers": [],
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "sourceCheckpoint": {
+    "schema": "p125g-actual-source-checkpoint/1",
+    "at": "2026-10-16T22:56:27.758325+00:00",
+    "commit": "188681b32dc472983404dce19e7833cd76ee7576",
+    "parent": "da61205c0817267133451bac11e57bd0318fe44f",
+    "branch": "codex/p1-25-grant-qualification",
+    "paths": [
+      {
+        "relativePath": "README.md",
+        "bytes": 59828,
+        "sha256": "3fae755d626825e532af828157829450ef124062df279c7c822ad9d8a7ee3e5f"
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "34bf446c16cfdee4812eb5622cf153baad344fce179befb98c2f606a27a9a08b"
+      },
+      {
+        "relativePath": "website/index.html",
+        "bytes": 43520,
+        "sha256": "557d3c7bf5b151e9bcb2c321295fd21e4494703b4c198c47c9bacad329de8871"
+      },
+      {
+        "relativePath": "website/lite.html",
+        "bytes": 11197,
+        "sha256": "43bcc499c40ec937ae58eb841559bfdee59c529eda0253263f07f34acd760e4e"
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "bytes": 44169,
+        "sha256": "bd55631b79e23f5ec9b25d48e00b072c1ff464f7bc9c43affb8e914c747325f1"
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "46407030cf8d7fb764fa5135c57409bfdd5827913f795ad4e2ede7c1acad53f3"
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "8080c44268913f9c1ee5aab995686ebb50d1cfcbc3cdd518536d12cb0a4f59ce"
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "39038febb8a7f72c514582397df294fd57c2dd113d2811940f9dafd541c0d992"
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "8bd704d810761009e5b9a0a2649743ddc73509dcb316675dea06fdc3ef0d0a35"
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "86c7c720a78b1450af3ef7a15c2c7c9ee16b1f46576d479fe8732fc42b44fe35"
+      },
+      {
+        "relativePath": "tests/time/tsaGrant.test.ts",
+        "bytes": 27505,
+        "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc"
+      }
+    ],
+    "clean": true,
+    "indexEmpty": true,
+    "actualGitBlobsExact": true,
+    "qualityStillRed": true,
+    "allHoldsRetained": true,
+    "noPushPrMergeRelease": true
+  },
+  "actualSourceChecks": [
+    {
+      "phase": "p125g-test-types",
+      "exit": 0,
+      "durationMs": 36622,
+      "ownedPgid": 56168,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-test-types/stdout-stderr.log",
+        "bytes": 161,
+        "sha256": "fb4ed4c9025dd5e6271e65a32d037c413d19a08be3c3b2a5cac093c68f75f865"
+      }
+    },
+    {
+      "phase": "p125g-source-types",
+      "exit": 0,
+      "durationMs": 26184,
+      "ownedPgid": 56528,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-types/stdout-stderr.log",
+        "bytes": 149,
+        "sha256": "ffc3342aa63f1c01882b849ff8dd0a3cd4e7b509f07c4fb8c69713242b5a98d5"
+      }
+    },
+    {
+      "phase": "p125g-lint",
+      "exit": 0,
+      "durationMs": 2975,
+      "ownedPgid": 56610,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-lint/stdout-stderr.log",
+        "bytes": 447,
+        "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95"
+      }
+    },
+    {
+      "phase": "p125g-build",
+      "exit": 0,
+      "durationMs": 29428,
+      "ownedPgid": 56639,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-build/stdout-stderr.log",
+        "bytes": 955,
+        "sha256": "e6e36dcd7bda0fc5d63469c9f1781ef19fe59c3a49afbf5d2c7c6c0c8dd1acce"
+      }
+    },
+    {
+      "phase": "p125g-gen-counts",
+      "exit": 0,
+      "durationMs": 399,
+      "ownedPgid": 57631,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-gen-counts/stdout-stderr.log",
+        "bytes": 176,
+        "sha256": "01c62fa9c66c468bd10c769615d94804a36d50969143b181132a836158ebfbc4"
+      }
+    },
+    {
+      "phase": "p125g-source-counts",
+      "exit": 0,
+      "durationMs": 396,
+      "ownedPgid": 57682,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-counts/stdout-stderr.log",
+        "bytes": 239,
+        "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4"
+      }
+    },
+    {
+      "phase": "p125g-source-gates",
+      "exit": 0,
+      "durationMs": 439,
+      "ownedPgid": 57702,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-gates/stdout-stderr.log",
+        "bytes": 821,
+        "sha256": "5664206ddf6d3b7a49d53c87907f78750517c4c583479f77268a1da353dba4ed"
+      }
+    },
+    {
+      "phase": "p125g-source-threat",
+      "exit": 0,
+      "durationMs": 285,
+      "ownedPgid": 57718,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-threat/stdout-stderr.log",
+        "bytes": 294,
+        "sha256": "d8a37764ab52c8fe6a84b8aaf1de67c240c7f01698f2abf5b1a802764503d3f4"
+      }
+    },
+    {
+      "phase": "p125g-source-architecture",
+      "exit": 0,
+      "durationMs": 1635,
+      "ownedPgid": 57734,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-architecture/stdout-stderr.log",
+        "bytes": 95863,
+        "sha256": "b087df083209af89c9f69496ec867445d1dd69fb2b68b44665ac280965341751"
+      }
+    },
+    {
+      "phase": "p125g-source-docs",
+      "exit": 0,
+      "durationMs": 336,
+      "ownedPgid": 57754,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-docs/stdout-stderr.log",
+        "bytes": 205,
+        "sha256": "ff57cb43abfed0a3cdba4ccb780bf3ee40b5fe7ddb1345e712cb8ca9a6e5461a"
+      }
+    },
+    {
+      "phase": "p125g-source-freeze",
+      "exit": 0,
+      "durationMs": 1197,
+      "ownedPgid": 57770,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-freeze/stdout-stderr.log",
+        "bytes": 268,
+        "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad"
+      }
+    },
+    {
+      "phase": "p125g-source-notices",
+      "exit": 0,
+      "durationMs": 238,
+      "ownedPgid": 57831,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-source-notices/stdout-stderr.log",
+        "bytes": 246,
+        "sha256": "b08a81bb4bc0bf41a60819f50f08086ced4d2a2e97ae8676d4948ca3695ecb00"
+      }
+    },
+    {
+      "phase": "p125g-quality-after-diagnostic",
+      "exit": 0,
+      "durationMs": 2535,
+      "ownedPgid": 56886,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-quality-after-diagnostic/stdout-stderr.log",
+        "bytes": 121,
+        "sha256": "306de4fc2d96e0d9d44a4aa59f3764830f719cbf336f2f37be06eee6f4130f90"
+      }
+    },
+    {
+      "phase": "p125g-count-freeze",
+      "exit": 0,
+      "durationMs": 1348,
+      "ownedPgid": 57525,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-freeze/stdout-stderr.log",
+        "bytes": 268,
+        "sha256": "3199e5a58779af0c155703596b9ee80ae34437586d6d73ebc321f54f0fa6aaad"
+      }
+    },
+    {
+      "phase": "p125g-count-d15",
+      "exit": 0,
+      "durationMs": 355,
+      "ownedPgid": 57584,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-count-d15/stdout-stderr.log",
+        "bytes": 5,
+        "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345"
+      }
+    },
+    {
+      "phase": "p125g-counts-before",
+      "exit": 1,
+      "durationMs": 570,
+      "ownedPgid": 56130,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-counts-before/stdout-stderr.log",
+        "bytes": 1436,
+        "sha256": "1e8dbf860104a0d98edde26793d535a89b9acaf1cfbf3cd2acdb0b75f879f3cb"
+      }
+    },
+    {
+      "phase": "p125g-dead-code-after",
+      "exit": 1,
+      "durationMs": 2916,
+      "ownedPgid": 56858,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-dead-code-after/stdout-stderr.log",
+        "bytes": 1207,
+        "sha256": "770a8a1d051a73cff8ccc73804b660ff07ced6240ab077a2ae0a6f516c784043"
+      }
+    },
+    {
+      "phase": "p125g-duplicates-after",
+      "exit": 1,
+      "durationMs": 642,
+      "ownedPgid": 56826,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-duplicates-after/stdout-stderr.log",
+        "bytes": 2064,
+        "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29"
+      }
+    }
+  ],
+  "allElevenTypesLintBuildAndSourceChecksPass": true,
+  "sourceCommitIndependentlyReadFromGit": true,
+  "sourceScope": {
+    "changedPaths": [
+      "CONTRIBUTING.md",
+      "README.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/content/show-hn-draft.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "tests/time/tsaGrant.test.ts",
+      "website/i18n.js",
+      "website/index.html",
+      "website/lite.html",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "allElevenWorkingAndCommittedBlobsExact": true,
+    "sourceCleanAndIndexEmptyAtReview": true,
+    "defaultAndFullParentRangeWhitespaceExit": 0,
+    "countSpanCount": 15,
+    "countPathCount": 10,
+    "countOnlyFourteenFormattedAndOneEncoded": true,
+    "allOtherAuthoredBytesEqualParent": true,
+    "countSpans": [
+      {
+        "relativePath": "README.md",
+        "kind": "encoded-badge",
+        "line": 17,
+        "byteStart": 1345,
+        "byteEnd": 1352,
+        "before": "1%2C693",
+        "anticipatedAfter": "1%2C694"
+      },
+      {
+        "relativePath": "README.md",
+        "kind": "marker-testFiles",
+        "line": 918,
+        "byteStart": 58651,
+        "byteEnd": 58656,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "kind": "marker-testFiles",
+        "line": 54,
+        "byteStart": 1886,
+        "byteEnd": 1891,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "website/index.html",
+        "kind": "website-stat",
+        "line": 90,
+        "byteStart": 5872,
+        "byteEnd": 5877,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "website/lite.html",
+        "kind": "lite-stat",
+        "line": 74,
+        "byteStart": 4426,
+        "byteEnd": 4431,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "kind": "prose-source-inventory",
+        "line": 17,
+        "byteStart": 789,
+        "byteEnd": 794,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "kind": "prose-source-inventory",
+        "line": 33,
+        "byteStart": 1734,
+        "byteEnd": 1739,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "kind": "prose-source-inventory",
+        "line": 25,
+        "byteStart": 1341,
+        "byteEnd": 1346,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "kind": "prose-source-inventory",
+        "line": 49,
+        "byteStart": 2892,
+        "byteEnd": 2897,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "kind": "prose-source-inventory",
+        "line": 57,
+        "byteStart": 2871,
+        "byteEnd": 2876,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "kind": "prose-source-inventory",
+        "line": 6,
+        "byteStart": 206,
+        "byteEnd": 211,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "kind": "prose-source-inventory",
+        "line": 22,
+        "byteStart": 3964,
+        "byteEnd": 3969,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "kind": "prose-source-inventory",
+        "line": 415,
+        "byteStart": 42275,
+        "byteEnd": 42280,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "kind": "prose-source-inventory",
+        "line": 423,
+        "byteStart": 42797,
+        "byteEnd": 42802,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "kind": "prose-source-inventory",
+        "line": 873,
+        "byteStart": 88911,
+        "byteEnd": 88916,
+        "before": "1,693",
+        "anticipatedAfter": "1,694"
+      }
+    ],
+    "unchangedGenerator": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+    },
+    "ordinaryCommitAndStagesNoForceNoVerify": true
+  },
+  "preservation": {
+    "protectedByteInputsExact": 135,
+    "existingNativePhysicalPinsExact": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543125595,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543200130,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543305423,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543396326,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543499352,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543570530,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      }
+    ],
+    "allEightDistinct": true,
+    "ClaudeRCountVariantsExact": 20,
+    "heldRHeadStatus18AndEmptyIndexExact": true,
+    "missingReservationReprobed": false,
+    "noOwnershipReleaseInferred": true,
+    "allHoldsRetained": true
+  },
+  "countEvidenceBoundary": {
+    "preferredV3Review": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/review-v3.json",
+      "bytes": 2547,
+      "sha256": "72706fe7304cbd9860decd26dc1d49228dd167077dcf20c590733e8bd5a1b011"
+    },
+    "actualRootAllocation": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-source-allocation.json",
+      "bytes": 905,
+      "sha256": "fe06f05385cc4aff2817e3b0ce4ff053b4eedc003686c092d875a734d996f6c3"
+    },
+    "sourceActualCountRedThenWriteThenGreen": true,
+    "lostInitialScanAndV1V2Excluded": true,
+    "lostScanCoordinatorExit": null,
+    "lostScanNaturalClosureUnestablished": true,
+    "limitationPin": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/lost-session-limitation.json",
+      "bytes": 1243,
+      "sha256": "200805ac3c855952a4406bc52815f26b63c7fa7d80ac9fa3c224af2c17e6e561"
+    },
+    "largeObservationsAndOriginalsPrivateNotCopied": true
+  },
+  "retainedNonzeroHistory": [
+    {
+      "phase": "p125g-counts-before",
+      "exit": 1,
+      "durationMs": 570,
+      "ownedPgid": 56130,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-counts-before/stdout-stderr.log",
+        "bytes": 1436,
+        "sha256": "1e8dbf860104a0d98edde26793d535a89b9acaf1cfbf3cd2acdb0b75f879f3cb"
+      }
+    },
+    {
+      "phase": "p125g-dead-code-after",
+      "exit": 1,
+      "durationMs": 2916,
+      "ownedPgid": 56858,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-dead-code-after/stdout-stderr.log",
+        "bytes": 1207,
+        "sha256": "770a8a1d051a73cff8ccc73804b660ff07ced6240ab077a2ae0a6f516c784043"
+      }
+    },
+    {
+      "phase": "p125g-duplicates-after",
+      "exit": 1,
+      "durationMs": 642,
+      "ownedPgid": 56826,
+      "closedGroupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-duplicates-after/stdout-stderr.log",
+        "bytes": 2064,
+        "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29"
+      }
+    }
+  ],
+  "sourceQualityRemainsRedUnwaived": true,
+  "freshQualificationClaim": false,
+  "sourceControlSensitivityClaim": false,
+  "wholeIssuePlanReleaseOrPublicTsaClaim": false,
+  "finalBoundary": "This is actual local source qualification at the named commit. Future clean-source checkout, source controls/restorations, metadata publication and whole-issue acceptance require their own actual records. Existing held decisions, F37 skip, frozen wrapper, default client/test deadlines and quality checks remain intact.",
+  "preferredVersionCorrection": {
+    "preservedOriginalReview": {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/source-evidence-review/review.json",
+      "bytes": 48421,
+      "sha256": "0249e8abbe8447416ff0a59b32a0977fea65e3679fd4790638b41337bb3534c3"
+    },
+    "scope": "Correct the inherited draft boundary sentence after actual source checkpoint adoption; no evidence, outcome or source changes."
+  }
+}

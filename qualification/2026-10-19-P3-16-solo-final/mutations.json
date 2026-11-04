@@ -1,0 +1,2779 @@
+{
+  "summary": {
+    "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+    "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+    "plan": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/mutation-plan-execution-ready-e47ed.json",
+      "sha256": "3c8b302d522239e356fdccf7f5c8d2aa66d954e1d67be5e2a9f9401b411273b4",
+      "bytes": 209881
+    },
+    "runner": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/solo-20261019/run-isolated-mutations-root-reviewed-e47ed.py",
+      "sha256": "97b343fa6b919b477e4e131756308831457d2da2ade185f7ee4ad44610c0e2c2",
+      "bytes": 36071
+    },
+    "initialState": {
+      "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "status": "",
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+      "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+      "node": "v22.23.3",
+      "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+    },
+    "expectedOwnGreenTotal": 180,
+    "ownGreenTestFiles": [
+      "tests/catalog/stations/environment/compiledPolicy.test.ts",
+      "tests/catalog/stations/environment/fixtures.test.ts",
+      "tests/catalog/stations/environment/overlay.test.ts"
+    ],
+    "coverageGaps": [],
+    "initialGreen": {
+      "passed": true,
+      "command": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/initial-green/command.json",
+        "sha256": "5ce7713001d85b54b015f5411b483dad5fe868d06ad2d77d8ad56fd4e378fb92",
+        "bytes": 3610
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/initial-green/report.json",
+        "sha256": "83e5a3efc33558b745d3eefcecc661206d82d5b030511a0ab3b18bbde551e142",
+        "bytes": 73909
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/initial-green/raw.log",
+        "sha256": "13741c78ccd5f61d02221b2f285bd447db0405b62d7d5555234aabae74b67872",
+        "bytes": 813
+      },
+      "counts": {
+        "numTotalTests": 180,
+        "numPassedTests": 180,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      }
+    },
+    "initialGreenReportSha256": "83e5a3efc33558b745d3eefcecc661206d82d5b030511a0ab3b18bbde551e142",
+    "mutations": [
+      {
+        "id": "shared-invalid-input-refusal",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-01-shared-invalid-input-refusal.json",
+          "sha256": "755b2c1dd9e201298aeb578db73d4732093620887b6860f165addbe84f7c0357",
+          "bytes": 11894
+        }
+      },
+      {
+        "id": "bounded-clean-identifiers",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-02-bounded-clean-identifiers.json",
+          "sha256": "4238d7b9d9e4c4e590bf3ee51e508075d08b2335a7d27ab591fe766c9aa263ee",
+          "bytes": 2365
+        }
+      },
+      {
+        "id": "exact-helper-control-scope",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-03-exact-helper-control-scope.json",
+          "sha256": "8080222f525eab74ce0554a0a5133c5e461f36784c1be608131f1032569616d5",
+          "bytes": 2303
+        }
+      },
+      {
+        "id": "utc-millisecond-precision",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-04-utc-millisecond-precision.json",
+          "sha256": "c7d760a11d4904a078e3bd7743887e9ce8ee6abe05bec4b2fe1db347d08f4e42",
+          "bytes": 2218
+        }
+      },
+      {
+        "id": "finite-physical-values",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-05-finite-physical-values.json",
+          "sha256": "7e6d785b2f2f0715aff3f6db2cb3a2a3d128237be87736c9e2243a3c88015e27",
+          "bytes": 2700
+        }
+      },
+      {
+        "id": "positive-safe-duration",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-06-positive-safe-duration.json",
+          "sha256": "054adae414a099db8e9b451a71f9b1999af31c63e9293e36e9df25c95a223832",
+          "bytes": 2263
+        }
+      },
+      {
+        "id": "strict-boolean-flags",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-07-strict-boolean-flags.json",
+          "sha256": "98e483f44a7c3848086368bdce191efcff9afea1bc84458a9b0891a636e1611b",
+          "bytes": 2276
+        }
+      },
+      {
+        "id": "range-order-schema",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-08-range-order-schema.json",
+          "sha256": "915f448c118a9cf2d1b40fed17a00cc181ab06ecc45584d602b570e61dcc0d2d",
+          "bytes": 2264
+        }
+      },
+      {
+        "id": "strict-setpoint-extra-fields",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-09-strict-setpoint-extra-fields.json",
+          "sha256": "b68697f649ae425bb2a2301b534ba66fd990e137da162c01dc1e55caea031ef0",
+          "bytes": 2271
+        }
+      },
+      {
+        "id": "strict-cea-caller-clock",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-10-strict-cea-caller-clock.json",
+          "sha256": "33139504db1ef2d9b68b2be1b322b10f2c77920c614ff63772bbcf0e720c9489",
+          "bytes": 2407
+        }
+      },
+      {
+        "id": "same-subject-control-plan-binding",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-11-same-subject-control-plan-binding.json",
+          "sha256": "6a0d99ddd94d29d4b8f2a307ddc38f87937195ff1169d0720245162505b1867d",
+          "bytes": 2698
+        }
+      },
+      {
+        "id": "setpoint-inventory-unavailable",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-12-setpoint-inventory-unavailable.json",
+          "sha256": "992caded65dc5dc5f76a8ced251aca893ad3df846cff3de145f6066b3a611022",
+          "bytes": 2331
+        }
+      },
+      {
+        "id": "outage-inventory-unavailable",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-13-outage-inventory-unavailable.json",
+          "sha256": "cf333df5c5b3887e58a7feb23d59ba8b2612ff415aaafc2141f2e2f423d7191e",
+          "bytes": 2333
+        }
+      },
+      {
+        "id": "shared-unique-asset",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-14-shared-unique-asset.json",
+          "sha256": "df5837189ea5bc8d811ffc7920c5fb4a6bf7d0b2e02ddb550160c12173e47903",
+          "bytes": 2298
+        }
+      },
+      {
+        "id": "authenticated-command-actor",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-15-authenticated-command-actor.json",
+          "sha256": "ec588ba9efcd882e55035c342fa0fa12639a56af2c1f840cb1436eec4a29b0ce",
+          "bytes": 2319
+        }
+      },
+      {
+        "id": "command-target-asset",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-16-command-target-asset.json",
+          "sha256": "954e73846f1c1e3648e42e98b4921494c6e69fd89ab028cf4131e5db50bda1f2",
+          "bytes": 2235
+        }
+      },
+      {
+        "id": "mandatory-agent-write-refusal",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-17-mandatory-agent-write-refusal.json",
+          "sha256": "efc320ddea3903ac7269a7c9aabe82cbdf5e2730a68e47d274f33caa4732bb66",
+          "bytes": 2803
+        }
+      },
+      {
+        "id": "safe-profile-availability-asset",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-18-safe-profile-availability-asset.json",
+          "sha256": "54885ca345b4c502894a6f31cf37f4a2e131eb146ea10a36d7f68666a4ebe79f",
+          "bytes": 2362
+        }
+      },
+      {
+        "id": "exercise-actual-outage",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-19-exercise-actual-outage.json",
+          "sha256": "bb9f6f176fe1baa7a419f3117f23298d8030ae8038f983ff90098ae8ba150fa8",
+          "bytes": 2324
+        }
+      },
+      {
+        "id": "controller-distinct-from-agent",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-20-controller-distinct-from-agent.json",
+          "sha256": "896d3723fd31d1e8a793f261196464112a7a550b67a115a538d96c5f1142d7ee",
+          "bytes": 2346
+        }
+      },
+      {
+        "id": "outage-agent-action-before-apply",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-21-outage-agent-action-before-apply.json",
+          "sha256": "e102c22bc9fb59248874515058a5708bf0bfd45aaf53d31116415fc8cd947aa1",
+          "bytes": 2433
+        }
+      },
+      {
+        "id": "outage-attempt-not-success",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-22-outage-attempt-not-success.json",
+          "sha256": "f628e4b73df14c84f9377bbf9a80f67dcadeeb6e6467ca28608b1fd0c3c85837",
+          "bytes": 2348
+        }
+      },
+      {
+        "id": "observed-safe-state",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-23-observed-safe-state.json",
+          "sha256": "e6867e71be71aafce1b60323c05396eefc16235b07971369af5299ba100ad8b7",
+          "bytes": 2257
+        }
+      },
+      {
+        "id": "alert-and-manual-fallback",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-24-alert-and-manual-fallback.json",
+          "sha256": "9a7f95b33dc627054526e4a2f32c56c083547413670ace187fadd2ec2ee139d8",
+          "bytes": 2294
+        }
+      },
+      {
+        "id": "unknown-cea-capacity",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-25-unknown-cea-capacity.json",
+          "sha256": "56e1d93de60712acc17227794f66426b8b1062676ae50db2596285af3e6690e4",
+          "bytes": 2337
+        }
+      },
+      {
+        "id": "cea-incident-vs-sabotage-window",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-26-cea-incident-vs-sabotage-window.json",
+          "sha256": "1c9cd11045414d27b8d1cf5a1f5db3238794a8013570b189c50e36f9c36d3b42",
+          "bytes": 2369
+        }
+      },
+      {
+        "id": "draft-packet-completeness",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-27-draft-packet-completeness.json",
+          "sha256": "e71ec647d716275ca42727983c7613f70bde73fbe8afda9d518fe84fba5b48f2",
+          "bytes": 2439
+        }
+      },
+      {
+        "id": "draft-packet-causal-order",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-28-draft-packet-causal-order.json",
+          "sha256": "9bdc18e091212f7e799302abba7f47ab5bb4daba349685dd132fd3625ef3bcd6",
+          "bytes": 2361
+        }
+      },
+      {
+        "id": "draft-packet-inclusive-deadline",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-29-draft-packet-inclusive-deadline.json",
+          "sha256": "f6a11edc82bd0537750d5edab7b593bf38196fa7941faa7858939b5cfc619f05",
+          "bytes": 2394
+        }
+      },
+      {
+        "id": "cea-owner-dependency-remains-ne",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-30-cea-owner-dependency-remains-ne.json",
+          "sha256": "791db8c5cf27d370627313ee3e022bb41aa5bfe99277d5400e017b4f12697ee4",
+          "bytes": 2337
+        }
+      },
+      {
+        "id": "recall-unavailable-owner-fixture",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-31-recall-unavailable-owner-fixture.json",
+          "sha256": "e50bb0bcaa354c6713a1665e3b79135d6e62a2f51649b075f87740a69cae7af4",
+          "bytes": 2346
+        }
+      },
+      {
+        "id": "complete-unambiguous-genealogy",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-32-complete-unambiguous-genealogy.json",
+          "sha256": "580c28c407e09d673a573568f4f4eb8996e2db1703701b94101a55808a574909",
+          "bytes": 2374
+        }
+      },
+      {
+        "id": "independent-descendant-traversal",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-33-independent-descendant-traversal.json",
+          "sha256": "fa7991f33886d700fe35cd887a339da279d1b0cabc105a4a611e11d824ab0200",
+          "bytes": 2793
+        }
+      },
+      {
+        "id": "detect-missed-descendant-notices",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-34-detect-missed-descendant-notices.json",
+          "sha256": "501f50da6a63fd32c8ca890ce913298a170d3281fa565935c214dca38f3859c9",
+          "bytes": 2382
+        }
+      },
+      {
+        "id": "recall-component-not-owner-integration",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-35-recall-component-not-owner-integration.json",
+          "sha256": "56eafcec584a6040badb95e02ed5014d1033a6cf261829645fa7be3315d5ebd4",
+          "bytes": 2381
+        }
+      },
+      {
+        "id": "sensor-feed-availability",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-36-sensor-feed-availability.json",
+          "sha256": "5414d1e0d7862260b23f5cad98226ef4607f3fb972c680bcd0e21f24fd434442",
+          "bytes": 2241
+        }
+      },
+      {
+        "id": "exact-lot-sensor-unit-scope",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-37-exact-lot-sensor-unit-scope.json",
+          "sha256": "9bcba88788358b2e7d049d78fa3aef86a15bd4f030e03ba370e5e91487100f2d",
+          "bytes": 2281
+        }
+      },
+      {
+        "id": "contradictory-same-time-values",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-38-contradictory-same-time-values.json",
+          "sha256": "5884af28049df658a6ecd30c23e49fc9db35a72b9c2e3518ec79e0a3997ce2ce",
+          "bytes": 2289
+        }
+      },
+      {
+        "id": "mandatory-shared-sensor-time-verdict",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-39-mandatory-shared-sensor-time-verdict.json",
+          "sha256": "7627ae39dc36a1fac451217c8fffaca518b053478093c9a7d9bfa7a517f261a8",
+          "bytes": 2742
+        }
+      },
+      {
+        "id": "every-in-window-range-bound",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-40-every-in-window-range-bound.json",
+          "sha256": "281f5fa64f3559b766d824b5476e4eb2ce60fc7346f46a01d9eb0a310f5f5025",
+          "bytes": 2655
+        }
+      },
+      {
+        "id": "statement-register-availability",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-41-statement-register-availability.json",
+          "sha256": "057062d5b3b290b7d4263c898e0886e1da599c52fc3ddce12eed016623e2e370",
+          "bytes": 2223
+        }
+      },
+      {
+        "id": "statement-policy-scope",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-42-statement-policy-scope.json",
+          "sha256": "5ac33b40fa8c34a22e0155b2c53c6761b922a3e465e2acf58420927250c7d577",
+          "bytes": 2225
+        }
+      },
+      {
+        "id": "statement-reference-required",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-43-statement-reference-required.json",
+          "sha256": "2b5dad65c2df529cca3655720b4b5503fea3eca28a09abe77350bb0b62399dbc",
+          "bytes": 2297
+        }
+      },
+      {
+        "id": "statement-reference-unique",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-44-statement-reference-unique.json",
+          "sha256": "e5840ba9dbfd057739a818344ec5b4054cc2c32c1f93675e25aafe73521622d1",
+          "bytes": 2223
+        }
+      },
+      {
+        "id": "same-lot-and-commodity-statement",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-45-same-lot-and-commodity-statement.json",
+          "sha256": "437990aaa3e282233a03f98fc651cbf72bfec48136e83bf4d1cf8e0faf6082df",
+          "bytes": 2282
+        }
+      },
+      {
+        "id": "compiled-control-selected",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-46-compiled-control-selected.json",
+          "sha256": "42fa277c79c77dcce327a2210d77396faa803c534f771f6bab1f0e3fc7a4c05e",
+          "bytes": 2323
+        }
+      },
+      {
+        "id": "compiled-fixture-subject-bound",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-47-compiled-fixture-subject-bound.json",
+          "sha256": "18c903d63ed75c5ede3c1314aec786ac8c9c7c4d17daa4279bb9d433cc702712",
+          "bytes": 2317
+        }
+      },
+      {
+        "id": "each-required-sensor-has-window-sample",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-48-each-required-sensor-has-window-sample.json",
+          "sha256": "96a433a0e83657c720c4acc310d355480e6d81fdff8ff205088b29fefd8a7205",
+          "bytes": 2465
+        }
+      },
+      {
+        "id": "carried-boundary-sample-range-checked",
+        "killed": true,
+        "status": "KILLED_BY_INTENDED_ASSERTION",
+        "record": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutation-49-carried-boundary-sample-range-checked.json",
+          "sha256": "aa17aa9f457c87ad58992a8fcf29d0d07b95af2a20598b3ec2cfe5625ccbeaa8",
+          "bytes": 2394
+        }
+      }
+    ],
+    "planned": 49,
+    "attempted": 49,
+    "killed": 49,
+    "unattempted": [],
+    "restoredGreen": {
+      "passed": true,
+      "command": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/restored-green/command.json",
+        "sha256": "826d715dbdb8302092e2db9f8334eec4154abebae38d7019181abc4900282392",
+        "bytes": 3613
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/restored-green/report.json",
+        "sha256": "beebbdfd8afc9de0d5b9d78fce25adf6ee4c27083c2fed83518375f121d6c7a3",
+        "bytes": 73910
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/restored-green/raw.log",
+        "sha256": "94067a585013e1128784558241dd5aa0bdac0523c2a874d575afc79e6a23f26b",
+        "bytes": 814
+      },
+      "counts": {
+        "numTotalTests": 180,
+        "numPassedTests": 180,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      }
+    },
+    "finalState": {
+      "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "status": "",
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+      "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+      "node": "v22.23.3",
+      "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+    },
+    "restoreErrors": [],
+    "fatal": null,
+    "interrupted": false,
+    "matrixComplete": true,
+    "guardCoverageComplete": true,
+    "coverageGapCount": 0,
+    "qualificationComplete": true,
+    "complete": true,
+    "allOriginalSourceHashesRestored": true,
+    "sourceRestoreChecks": [
+      {
+        "path": "tests/catalog/stations/environment/lotRelease.ts",
+        "sha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+        "exactRestore": true
+      },
+      {
+        "path": "tests/catalog/stations/environment/overlay.test.ts",
+        "sha256": "963bd1ed99f94c1032fcfe2bbf0e25ae2566beae5e9ba511afb7076e0fa3254d",
+        "exactRestore": true
+      },
+      {
+        "path": "tests/catalog/stations/environment/harness.ts",
+        "sha256": "bcdc892f822ece16002c13b7a2119c28b012f854193e03661fd0ad87aee70b8c",
+        "exactRestore": true
+      },
+      {
+        "path": "tests/catalog/stations/environment/lotGenealogy.ts",
+        "sha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+        "exactRestore": true
+      },
+      {
+        "path": "tests/catalog/stations/environment/fixtures.test.ts",
+        "sha256": "0c45c21c7d3a35d5a461d62d5879355c18c142882e7eaf4754be0ab23031f700",
+        "exactRestore": true
+      },
+      {
+        "path": "tests/catalog/stations/environment/sensorFeed.ts",
+        "sha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+        "exactRestore": true
+      },
+      {
+        "path": "tests/catalog/stations/environment/protocol.ts",
+        "sha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+        "exactRestore": true
+      },
+      {
+        "path": "tests/catalog/stations/environment/plantSimulator.ts",
+        "sha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+        "exactRestore": true
+      },
+      {
+        "path": "tests/catalog/stations/environment/ceaDrill.ts",
+        "sha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+        "exactRestore": true
+      },
+      {
+        "path": "tests/catalog/stations/environment/compiledPolicy.test.ts",
+        "sha256": "ceeecda7178f5325fe3e981e8657d4c742cd0aa492e565a6997c3ed9b9d7623e",
+        "exactRestore": true
+      }
+    ],
+    "limit": "Only intended assertion kills qualify. matrixComplete means every planned mutant and actual initial/restored own suite succeeded. Gaps are unplanned/unmeasured and never counted killed; complete and qualificationComplete additionally require no declared gaps. No production/full-suite or legal qualification is established by this local proof. Raw evidence retains actual pins and failures."
+  },
+  "rows": [
+    {
+      "id": "shared-invalid-input-refusal",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "All six helper entry points use the shared fail-closed result for malformed native fixture shapes.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "3048d391246c8f335c4a653bbf72623942bc6fed221fb2fc9b35f8967e1b4291",
+      "expectedMutatedSha256": "3048d391246c8f335c4a653bbf72623942bc6fed221fb2fc9b35f8967e1b4291",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/01-shared-invalid-input-refusal/command.json",
+        "sha256": "5c54c5cfddbf9334f3ebb92255c63840b20d5ee414b8cd34ca967d7359ce68ba",
+        "bytes": 23112
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ setpoint\\ refuses\\ malformed\\ input\\ null",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ setpoint\\ refuses\\ malformed\\ input\\ \\{\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ setpoint\\ refuses\\ malformed\\ input\\ undefined",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ setpoint\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ safe_state\\ refuses\\ malformed\\ input\\ null",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ safe_state\\ refuses\\ malformed\\ input\\ \\{\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ safe_state\\ refuses\\ malformed\\ input\\ undefined",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ safe_state\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ cea\\ refuses\\ malformed\\ input\\ null",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ cea\\ refuses\\ malformed\\ input\\ \\{\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ cea\\ refuses\\ malformed\\ input\\ undefined",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ cea\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ recall\\ refuses\\ malformed\\ input\\ null",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ recall\\ refuses\\ malformed\\ input\\ \\{\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ recall\\ refuses\\ malformed\\ input\\ undefined",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ recall\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ sensor\\ refuses\\ malformed\\ input\\ null",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ sensor\\ refuses\\ malformed\\ input\\ \\{\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ sensor\\ refuses\\ malformed\\ input\\ undefined",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ sensor\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ lot_statement\\ refuses\\ malformed\\ input\\ null",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ lot_statement\\ refuses\\ malformed\\ input\\ \\{\\}",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ lot_statement\\ refuses\\ malformed\\ input\\ undefined",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ lot_statement\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ setpoint\\ refuses\\ malformed\\ input\\ null": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ setpoint\\ refuses\\ malformed\\ input\\ \\{\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ setpoint\\ refuses\\ malformed\\ input\\ undefined": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ setpoint\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ safe_state\\ refuses\\ malformed\\ input\\ null": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ safe_state\\ refuses\\ malformed\\ input\\ \\{\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ safe_state\\ refuses\\ malformed\\ input\\ undefined": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ safe_state\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ cea\\ refuses\\ malformed\\ input\\ null": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ cea\\ refuses\\ malformed\\ input\\ \\{\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ cea\\ refuses\\ malformed\\ input\\ undefined": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ cea\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ recall\\ refuses\\ malformed\\ input\\ null": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ recall\\ refuses\\ malformed\\ input\\ \\{\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ recall\\ refuses\\ malformed\\ input\\ undefined": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ recall\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ sensor\\ refuses\\ malformed\\ input\\ null": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ sensor\\ refuses\\ malformed\\ input\\ \\{\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ sensor\\ refuses\\ malformed\\ input\\ undefined": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ sensor\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ lot_statement\\ refuses\\ malformed\\ input\\ null": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ lot_statement\\ refuses\\ malformed\\ input\\ \\{\\}": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ lot_statement\\ refuses\\ malformed\\ input\\ undefined": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ lot_statement\\ refuses\\ malformed\\ input\\ \\{\"context\":\\{\"tenantId\":\"environment\\-fixture\\-tenant\",\"workspaceId\":\"environment\\-fixture\\-workspace\",\"agentId\":\"environment\\-fixture\\-agent\",\"deploymentId\":\"environment\\-grid\\-operations\\-us\\-fixture\",\"controlId\":\"L1\\-ENV\\-01\",\"controlVersion\":\"0\\.1\\.0\",\"planDigest\":\"sha256:1111111111111111111111111111111111111111111111111111111111111111\"\\}\\}": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "0d7d25663617483d74b90612ce44ee6e0ba126774ebc75c62602b0cba0dfdb90",
+        "replacementSha256": "f500dcd0be086e917293e86897f9ee6a6c5f5b208ec9b24863f41723e054b1e1"
+      }
+    },
+    {
+      "id": "bounded-clean-identifiers",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "A consistently substituted blank/whitespace/Unicode Cc control-character/oversize asset must not become an accepted proposal. Root added explicit C1 inputs to the same complete-input regression.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "f42b263dca433801938245af0edcc346b9d8446aae1d54d3240f90dd87e3fc2e",
+      "expectedMutatedSha256": "f42b263dca433801938245af0edcc346b9d8446aae1d54d3240f90dd87e3fc2e",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/02-bounded-clean-identifiers/command.json",
+        "sha256": "0522f9a3565ec991e5a558b82715ab607a8d8c726eb1b6b25d5ed074ad67d4f0",
+        "bytes": 4101
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ complete\\ wrong\\-control\\ inputs\\ and\\ consistently\\ malformed\\ asset\\ identifiers"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ complete\\ wrong\\-control\\ inputs\\ and\\ consistently\\ malformed\\ asset\\ identifiers": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "264309d8dc5bd3d8725cae5073b9b395da24d5c7d23c8ddd0cd0ce699269cbf3",
+        "replacementSha256": "81718174276c0bb59e27e4f14b013e0632d69287006918ed92d4ca6915e11f79"
+      }
+    },
+    {
+      "id": "exact-helper-control-scope",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "Complete same-bound inputs for another valid control are rejected by this helper control scope, not by an unrelated missing field.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "eeb2fa821964598debb0a646e8768732ee5239b12df98de11b73949540688a07",
+      "expectedMutatedSha256": "eeb2fa821964598debb0a646e8768732ee5239b12df98de11b73949540688a07",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/03-exact-helper-control-scope/command.json",
+        "sha256": "e96a89780a4adf64be8e6b4a9b438c8f03ce9dd13a0a40b734dde7412ab3c63e",
+        "bytes": 4104
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ complete\\ wrong\\-control\\ inputs\\ and\\ consistently\\ malformed\\ asset\\ identifiers"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ complete\\ wrong\\-control\\ inputs\\ and\\ consistently\\ malformed\\ asset\\ identifiers": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "b3c8276c87f746a7258273e9d45d07255d3a4ff664b8734617da3f40f91ac43e",
+        "replacementSha256": "72fef902c8c8e1211b3d858abb8bf95f5e29f930451651f9ce99e943b23d10c0"
+      }
+    },
+    {
+      "id": "utc-millisecond-precision",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "Submillisecond input cannot be normalized to an apparent on-time event by Date.parse.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "311a358414996f643c5cdb587c99060c64c7ba4ce48cd8131e66c44079716eec",
+      "expectedMutatedSha256": "311a358414996f643c5cdb587c99060c64c7ba4ce48cd8131e66c44079716eec",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/04-utc-millisecond-precision/command.json",
+        "sha256": "dbc4892993592a952fcb60ee54dafc7497afe0e03a670f28d6904ef55e57c49d",
+        "bytes": 4073
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ impossible\\ or\\ lossy\\ timestamps:\\ 2026\\-10\\-18T12:00:00\\.0001Z"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ impossible\\ or\\ lossy\\ timestamps:\\ 2026\\-10\\-18T12:00:00\\.0001Z": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "1d4378c5f30f972cf07eaa9688faca0d83fded716dc9162fbfc00d730e2222f0",
+        "replacementSha256": "ccc4d5880f41d06c062889f638236c8912b0ec571db25bbb3ec1389edeb430f3"
+      }
+    },
+    {
+      "id": "finite-physical-values",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "NaN/Infinity must not reach a proposal, sensor gate or draft capacity claim. The custom schema retains the Zod refine interface so this proposed variant does not break module setup.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "2ffb0cd9c91e8ae7d8c0b3071713b394770a0c87a30d36edf7a2bc0eeccc51a9",
+      "expectedMutatedSha256": "2ffb0cd9c91e8ae7d8c0b3071713b394770a0c87a30d36edf7a2bc0eeccc51a9",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/05-finite-physical-values/command.json",
+        "sha256": "a9a192cad28a36f1bf097605587a2a486dffd92acad0688614bdf42a408b5eda",
+        "bytes": 5487
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ refuses\\ nonfinite\\ physical\\ values:\\ NaN",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ refuses\\ nonfinite\\ physical\\ values:\\ Infinity",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ refuses\\ nonfinite\\ physical\\ values:\\ \\-Infinity"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ refuses\\ nonfinite\\ physical\\ values:\\ NaN": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ refuses\\ nonfinite\\ physical\\ values:\\ Infinity": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ refuses\\ nonfinite\\ physical\\ values:\\ \\-Infinity": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "96ae246280d8fc98c8b52a5f371e35ad97f5a96790c1a58b4eb41009c65c534d",
+        "replacementSha256": "bdc9d78c84f8d8ba5c597fb5182a6d2ffa295a1fc9d0257f90592cea7013eaad"
+      }
+    },
+    {
+      "id": "positive-safe-duration",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "Zero, negative, fractional or unsafe-integer duration is an invalid fixture parameter.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "b75db70190af2dc3c2806ece2df3b87f961647ac2722e1ea6c1a1cb308dfb404",
+      "expectedMutatedSha256": "b75db70190af2dc3c2806ece2df3b87f961647ac2722e1ea6c1a1cb308dfb404",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/06-positive-safe-duration/command.json",
+        "sha256": "211f00e546e9072e801ff319f51d582b5b1594d0ece30175e71e76460b9c9519",
+        "bytes": 4100
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ string\\ flags,\\ invalid\\ durations,\\ inverted\\ ranges\\ and\\ unknown\\ schema\\ properties"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ string\\ flags,\\ invalid\\ durations,\\ inverted\\ ranges\\ and\\ unknown\\ schema\\ properties": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "e7765a8c2191b0ecda1f769eadeb0ef24afba17214d2fd95e70a1bf13937ddbb",
+        "replacementSha256": "e90ff7f48bf76de100799a75166138a700b4c950a48b9150ebde19d225df1fb4"
+      }
+    },
+    {
+      "id": "strict-boolean-flags",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "String availability claims must not coerce into a model outage, feed or statement-register observation.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "dae268b6cb87e12c714e731a8213b10382cf79796031c8d5243c341156841c2b",
+      "expectedMutatedSha256": "dae268b6cb87e12c714e731a8213b10382cf79796031c8d5243c341156841c2b",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/07-strict-boolean-flags/command.json",
+        "sha256": "572c8e4b08f41446f093f134da59c5e3e34c3418e1b56f465c95203efd2269ed",
+        "bytes": 4126
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ string\\ flags,\\ invalid\\ durations,\\ inverted\\ ranges\\ and\\ unknown\\ schema\\ properties"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ string\\ flags,\\ invalid\\ durations,\\ inverted\\ ranges\\ and\\ unknown\\ schema\\ properties": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "ddc06d3a5532b0cb497d6b0354510b1c2144e5825f0af1bce5bbcd380612bb87",
+        "replacementSha256": "203c0653b96160ca2290e5f3df19e2f6570723b83443ead48a1ba5b6d8acb31b"
+      }
+    },
+    {
+      "id": "range-order-schema",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "Inverted numeric limits remain an invalid fixture, rather than a purported known sensor result.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "89c4eaa175a758ba7f16376ec675a24ba461194051426f5039eb2d21381c4a6b",
+      "expectedMutatedSha256": "89c4eaa175a758ba7f16376ec675a24ba461194051426f5039eb2d21381c4a6b",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/08-range-order-schema/command.json",
+        "sha256": "cf04a63e5e4c57f162ccfa42d194a6d9cb3bd28bc26638190d59455d3ef6b8d9",
+        "bytes": 4097
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ string\\ flags,\\ invalid\\ durations,\\ inverted\\ ranges\\ and\\ unknown\\ schema\\ properties"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ string\\ flags,\\ invalid\\ durations,\\ inverted\\ ranges\\ and\\ unknown\\ schema\\ properties": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "03820dfd7fdc3b1b71afb0dca51fb0ddb53175154145e2d7b115db5b972bbf44",
+        "replacementSha256": "4b05687c81523f09604e103e73c389204841bb546bbaba01ff24cc2cee2b80a9"
+      }
+    },
+    {
+      "id": "strict-setpoint-extra-fields",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "A caller-provided operatorApproved field cannot lift the strict setpoint contract.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "b4240448f7563edd433db768a7792451fbc7831af52a0f134e5ae8f6bbe6e55e",
+      "expectedMutatedSha256": "b4240448f7563edd433db768a7792451fbc7831af52a0f134e5ae8f6bbe6e55e",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/09-strict-setpoint-extra-fields/command.json",
+        "sha256": "c15a5d1318c267190d55776d4994bf17b5e08bc581c3ad6f4a6e4550db9b6370",
+        "bytes": 4119
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ string\\ flags,\\ invalid\\ durations,\\ inverted\\ ranges\\ and\\ unknown\\ schema\\ properties"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ rejects\\ string\\ flags,\\ invalid\\ durations,\\ inverted\\ ranges\\ and\\ unknown\\ schema\\ properties": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "844b3bc3346d692277f741a79c8bce046c25356ce2ff676bea0758654f1d7fff",
+        "replacementSha256": "15c04de09599e58641a050123dcf36cdf4e56b09fbbbeb7d8a995834fceb90c4"
+      }
+    },
+    {
+      "id": "strict-cea-caller-clock",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "A caller clockAvailable flag remains invalid, even while the actual missing dependency still prevents a positive integration result.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "9aae96f0f6d1a1564912b85e204debce7e6166addaa46604e897fed8549c0486",
+      "expectedMutatedSha256": "9aae96f0f6d1a1564912b85e204debce7e6166addaa46604e897fed8549c0486",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/10-strict-cea-caller-clock/command.json",
+        "sha256": "b777481ba8b7c4270b1bbcee8feb0e224d53778a74b03421eebfe64df6edd846",
+        "bytes": 4176
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ requires\\ all\\ four\\ draft\\ packet\\ fields\\ and\\ refuses\\ unknown\\ capacity\\ or\\ caller\\ clock\\ claims"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ requires\\ all\\ four\\ draft\\ packet\\ fields\\ and\\ refuses\\ unknown\\ capacity\\ or\\ caller\\ clock\\ claims": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "6cad4e86fe0d4de2b3d528e459590af24cd163155464416df9b984ecc9a1c572",
+        "replacementSha256": "40660b5cd2fa798025f6b7d5726e9d1d1f62e05175b80fdec315f5da086a61c9"
+      }
+    },
+    {
+      "id": "same-subject-control-plan-binding",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/protocol.ts",
+      "guardedSemantic": "Shared exact tuple equality protects inventory, commands, safe profiles, packets, readings and registry records. One shared-body mutation exercises all named nested-binding cases.",
+      "specRequired": false,
+      "sourceSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "mutatedSha256": "4fff5b382139bf975f68477ed149aa6b7ab853d399f69289521aaab08cfc7c52",
+      "expectedMutatedSha256": "4fff5b382139bf975f68477ed149aa6b7ab853d399f69289521aaab08cfc7c52",
+      "restoredSha256": "55c195267082e4d238a79e83dc0173bd9736b47470680daa5d784b92101559a6",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/11-same-subject-control-plan-binding/command.json",
+        "sha256": "d60f910e199da64db0b451ca664bc6eb329255141b911fb34d3dff482aba29d7",
+        "bytes": 4997
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ compares\\ every\\ tenant,\\ workspace,\\ deployment,\\ agent,\\ control,\\ version\\ and\\ plan\\ binding",
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ binds\\ every\\ command,\\ safe\\ profile,\\ packet,\\ sensor\\ profile/reading\\ and\\ statement"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ compares\\ every\\ tenant,\\ workspace,\\ deployment,\\ agent,\\ control,\\ version\\ and\\ plan\\ binding": true,
+        "Environment\\ strict\\ local\\ input\\ boundaries\\ binds\\ every\\ command,\\ safe\\ profile,\\ packet,\\ sensor\\ profile/reading\\ and\\ statement": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "e75ccbc318b225db33aef563e610a7367891d7a380d42e12bfc480de4c239abf",
+        "replacementSha256": "35c04c723014ca9f1098c162259098217a3454645b3663afa6bb20a8e8b6f94e"
+      }
+    },
+    {
+      "id": "setpoint-inventory-unavailable",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "Absent inventory must refuse every attempted command, never report a proposal success.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "1290872df41342c309c2c6940604be78886e64c67d5e4231b0de698d0c1cc063",
+      "expectedMutatedSha256": "1290872df41342c309c2c6940604be78886e64c67d5e4231b0de698d0c1cc063",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/12-setpoint-inventory-unavailable/command.json",
+        "sha256": "431299bd307087fc3b39a1945408eeaf056adc3ce100bdb9557da687d1700e24",
+        "bytes": 4144
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ refuses\\ every\\ requested\\ write\\ when\\ inventory\\ or\\ the\\ exact\\ asset\\ is\\ unknown"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ refuses\\ every\\ requested\\ write\\ when\\ inventory\\ or\\ the\\ exact\\ asset\\ is\\ unknown": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "eec8eb6102927224bc6cc9361cfbf60ea303b74b8c526076a405efd7156ce5a1",
+        "replacementSha256": "1ed6e6a59a8883f62f1b62db43b5eee1336b108de726a733b7c02cd2694522b0"
+      }
+    },
+    {
+      "id": "outage-inventory-unavailable",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "An outage without inventory must not count as a safe fallback.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "a3a06730e4681927af839d9e50de54c31a550deb8fd8ebebae16e1ad7c5ac1c8",
+      "expectedMutatedSha256": "a3a06730e4681927af839d9e50de54c31a550deb8fd8ebebae16e1ad7c5ac1c8",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/13-outage-inventory-unavailable/command.json",
+        "sha256": "ac01c98142aa275179f84c0c2aeac10794b6f4475055927ed337a2d3790be2d1",
+        "bytes": 4159
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ a\\ safe\\ profile\\ for\\ this\\ asset,\\ an\\ exercised\\ outage\\ and\\ a\\ distinct\\ controller"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ a\\ safe\\ profile\\ for\\ this\\ asset,\\ an\\ exercised\\ outage\\ and\\ a\\ distinct\\ controller": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "e4c9d745b8d3e76a4ae4d9181413136a772884f4b09de2ee7096f5381931f851",
+        "replacementSha256": "d49a9a33da47b0289e8e8d461bad6403f3821619337f497302f6a8ada14271fa"
+      }
+    },
+    {
+      "id": "shared-unique-asset",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "The exact asset must exist once; duplicated or unresolved assets cannot authorize a proposal or simulated action.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "41bd0f2d0f932f7962338a4a961fc4a17caa3c7ab90fc690aadd964a1bed81a0",
+      "expectedMutatedSha256": "41bd0f2d0f932f7962338a4a961fc4a17caa3c7ab90fc690aadd964a1bed81a0",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/14-shared-unique-asset/command.json",
+        "sha256": "e05c16fbeca67357e37f8ee1a5b3d6ce510ca6b109aedb4a68d154fb214fb776",
+        "bytes": 4198
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ one\\ exact\\ asset\\ and\\ the\\ authenticated\\ agent\\ identity"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ one\\ exact\\ asset\\ and\\ the\\ authenticated\\ agent\\ identity": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "589d683f15e5340e3d15c7e382b94cfd1666932e3c5088fc91c105832360446a",
+        "replacementSha256": "562938e52d9006a241957fe6003c7f599c6dcc4f6b6a938e255c0c4113765e6b"
+      }
+    },
+    {
+      "id": "authenticated-command-actor",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "An asserted operator identity in an agent command is not authority; this validation is reused by both plant protocols.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "b6e2ca0f8d9a9409b01728f097e6c23d5b0899e74f2234e1e2ebaa2a17a2a9aa",
+      "expectedMutatedSha256": "b6e2ca0f8d9a9409b01728f097e6c23d5b0899e74f2234e1e2ebaa2a17a2a9aa",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/15-authenticated-command-actor/command.json",
+        "sha256": "4f3165add1f7c867cc089d08c3dec2340b37dcd75fa3022f56a42b877910a2ed",
+        "bytes": 4109
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ one\\ exact\\ asset\\ and\\ the\\ authenticated\\ agent\\ identity"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ one\\ exact\\ asset\\ and\\ the\\ authenticated\\ agent\\ identity": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "a9c4d7401cafc240cbc55afbb67994f07f3731f2bc424ddab5ab42f72b027b17",
+        "replacementSha256": "01b642a73d27fabe55257fefe6a506a38211f4cbb111af765c385737d87ef991"
+      }
+    },
+    {
+      "id": "command-target-asset",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "Command target must be the exact resolved asset.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "f0cf9b281236c9c4ef9362bfdbb034dc98692f8f9c9ac664942bfed7b3009626",
+      "expectedMutatedSha256": "f0cf9b281236c9c4ef9362bfdbb034dc98692f8f9c9ac664942bfed7b3009626",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/16-command-target-asset/command.json",
+        "sha256": "4ce432599528b4318f1c542f63ec2276dcab39068a89afe2b6814ab158de074c",
+        "bytes": 4089
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ one\\ exact\\ asset\\ and\\ the\\ authenticated\\ agent\\ identity"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ one\\ exact\\ asset\\ and\\ the\\ authenticated\\ agent\\ identity": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "803275e5cf4ed242c71d191a5e29a361c865a280bea8d2b215606fabda670a2d",
+        "replacementSha256": "3379eac3aae882be892e54688edf4b46343cde1e22e4d25143f8c6d2dbd3e90b"
+      }
+    },
+    {
+      "id": "mandatory-agent-write-refusal",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "Mandatory mutation: weakening this branch reaches actual plant.write and records an unauthorized identity/value change, rather than merely changing a displayed decision.",
+      "specRequired": true,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "8b1db365e9340a5331af2049ce06f61c60595df72d36abf540121ed51c7d6e85",
+      "expectedMutatedSha256": "8b1db365e9340a5331af2049ce06f61c60595df72d36abf540121ed51c7d6e85",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/17-mandatory-agent-write-refusal/command.json",
+        "sha256": "bbd2356adba978be316234a4a8961b978806b37d13edc99dbeb66fdc274f5ab2",
+        "bytes": 4983
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ refuses\\ direct\\ agent\\ writes\\ before\\ the\\ plant\\ apply\\ log\\ or\\ state\\ changes",
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ keeps\\ injected\\ OT\\ log\\ instructions\\ inert\\ and\\ refuses\\ their\\ explicit\\ write\\ attempt"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ refuses\\ direct\\ agent\\ writes\\ before\\ the\\ plant\\ apply\\ log\\ or\\ state\\ changes": true,
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ keeps\\ injected\\ OT\\ log\\ instructions\\ inert\\ and\\ refuses\\ their\\ explicit\\ write\\ attempt": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "4f82623cc21b5c1df495e7a90df0e2bd38eb9ff173c3ef09c1a1f14eebd68b41",
+        "replacementSha256": "6fa510b7a94920f9394ad89fe4acad39089aba4bf6f6e4d64abc6dfddf85ee66"
+      }
+    },
+    {
+      "id": "safe-profile-availability-asset",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "A missing or another-asset fixture safe profile must not yield a successful fallback.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "231ff039eada6a241e521bbc3e8e8b920119420cf203899d353f2e939d7f4b90",
+      "expectedMutatedSha256": "231ff039eada6a241e521bbc3e8e8b920119420cf203899d353f2e939d7f4b90",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/18-safe-profile-availability-asset/command.json",
+        "sha256": "49cc90eb84c20b9aa67c5d8d42169364a29a37f3bf8f2e909e6761c4cb836409",
+        "bytes": 4168
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ a\\ safe\\ profile\\ for\\ this\\ asset,\\ an\\ exercised\\ outage\\ and\\ a\\ distinct\\ controller"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ a\\ safe\\ profile\\ for\\ this\\ asset,\\ an\\ exercised\\ outage\\ and\\ a\\ distinct\\ controller": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "f2be8f307b662b4a5812d43a14c146b28ec36192a10420d9d96f695d9cd96a0e",
+        "replacementSha256": "b515bbb46cb824b5a6749a0d73d4b0c6f7d068848b10896dcde41555398ede79"
+      }
+    },
+    {
+      "id": "exercise-actual-outage",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "An available model cannot be counted as a successful outage test.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "73c9c5a31700f25396d2e64d22714feb6e7200d8cdba5375e34de5932965a357",
+      "expectedMutatedSha256": "73c9c5a31700f25396d2e64d22714feb6e7200d8cdba5375e34de5932965a357",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/19-exercise-actual-outage/command.json",
+        "sha256": "f14eb9df7535fce3b27bb3879c7d0793414c67ef85ad3e0826516857baf56b1b",
+        "bytes": 4141
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ a\\ safe\\ profile\\ for\\ this\\ asset,\\ an\\ exercised\\ outage\\ and\\ a\\ distinct\\ controller"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ a\\ safe\\ profile\\ for\\ this\\ asset,\\ an\\ exercised\\ outage\\ and\\ a\\ distinct\\ controller": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "a3c454fa6dc809bab875916801fec5eda8cf6fca50a39159b825523a514ff583",
+        "replacementSha256": "6708e6e27a5914ba53cf76190d230640f2120951c0f5966fc2e25f424ae23b43"
+      }
+    },
+    {
+      "id": "controller-distinct-from-agent",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "The agent cannot relabel itself as the deterministic safety controller.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "7565f9fd89fb388062c4d0776932963145bed0b7be0373c9dcf72f679cb7b937",
+      "expectedMutatedSha256": "7565f9fd89fb388062c4d0776932963145bed0b7be0373c9dcf72f679cb7b937",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/20-controller-distinct-from-agent/command.json",
+        "sha256": "b19dbafb28da1d55cd0074fdfa720f47a6ddd85b8d6a396d2cc6d921bb6d1700",
+        "bytes": 4165
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ a\\ safe\\ profile\\ for\\ this\\ asset,\\ an\\ exercised\\ outage\\ and\\ a\\ distinct\\ controller"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ requires\\ a\\ safe\\ profile\\ for\\ this\\ asset,\\ an\\ exercised\\ outage\\ and\\ a\\ distinct\\ controller": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "8f23d4b5553ccab4a46739cbd2de77639d95e1b05e46618cbbd039e2672cd3bb",
+        "replacementSha256": "0a67a3e15462c3f4c54ebcb61d9c971de5d169b5823c339e67f443c50e8a38ac"
+      }
+    },
+    {
+      "id": "outage-agent-action-before-apply",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "An adverse agent write must remain visible in writeLog even though the displayed outage result still fails. The no-agent-write assertion must kill this variant.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "85b0e9ff1e5ec1d439eedccc562a4b4235b30e8bf1563d5d27d73abb3f70a6d9",
+      "expectedMutatedSha256": "85b0e9ff1e5ec1d439eedccc562a4b4235b30e8bf1563d5d27d73abb3f70a6d9",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/21-outage-agent-action-before-apply/command.json",
+        "sha256": "a12ebb19cd5e05e2c805caa05f23991d6ebb09811b4d3817bc18ae3b979a5783",
+        "bytes": 4165
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ refuses\\ agent\\ actions\\ during\\ an\\ outage\\ without\\ hiding\\ the\\ controller\\ hold\\ observations"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ refuses\\ agent\\ actions\\ during\\ an\\ outage\\ without\\ hiding\\ the\\ controller\\ hold\\ observations": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "638bf604e6749d65ff9e7aac4e5fe62ca66a2040f33f1dab68a4b3a147d02f25",
+        "replacementSha256": "4fb0fa2a81a7933a4c81c3e05585b3f8b76d26374b322e0d18650c3607bf8f1a"
+      }
+    },
+    {
+      "id": "outage-attempt-not-success",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "A refused agent attempt during outage cannot turn the drill into a successful fallback.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "be2f49c428ef0c2d61cc67b7c6ec2c299c23fa7ca48d1e5c18f7b16b3c7b9c6a",
+      "expectedMutatedSha256": "be2f49c428ef0c2d61cc67b7c6ec2c299c23fa7ca48d1e5c18f7b16b3c7b9c6a",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/22-outage-attempt-not-success/command.json",
+        "sha256": "342be3b47a37e0782acec39215b7b81ec86a4cc1a372bab8ab8210faca0cdaa5",
+        "bytes": 4155
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ refuses\\ agent\\ actions\\ during\\ an\\ outage\\ without\\ hiding\\ the\\ controller\\ hold\\ observations"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ refuses\\ agent\\ actions\\ during\\ an\\ outage\\ without\\ hiding\\ the\\ controller\\ hold\\ observations": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "eaf7701b082c68dc3dcf7aaca58171b18cb8d34de519c83a7e6ad2ce3ce98e68",
+        "replacementSha256": "b0980618bcdb80d6c7d361f7315b3cf553999152800a10020bbc568153479bba"
+      }
+    },
+    {
+      "id": "observed-safe-state",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "A still-running state must fail even when alert and manual flags were set.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "009d59c3d27f7e8c3619386301274829927eedbe77c0c6c0468e0b6cc035a37c",
+      "expectedMutatedSha256": "009d59c3d27f7e8c3619386301274829927eedbe77c0c6c0468e0b6cc035a37c",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/23-observed-safe-state/command.json",
+        "sha256": "1f1279dc243f88007981006fb75d272b11020f4abcfd13a9e776b7126d5646c6",
+        "bytes": 4082
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ fails\\ an\\ unsafe\\ state\\ or\\ an\\ incomplete\\ alert/manual\\ fallback"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ fails\\ an\\ unsafe\\ state\\ or\\ an\\ incomplete\\ alert/manual\\ fallback": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "98c53ceba0c18dfd87886a3905a7010c28f8ed6bec72be19f5cda6b7e6f70939",
+        "replacementSha256": "ff03f01fa00000b60c8bbe35df2091a56d1ef77e18a785d826ff75412bcdd162"
+      }
+    },
+    {
+      "id": "alert-and-manual-fallback",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/plantSimulator.ts",
+      "guardedSemantic": "Both actually recorded alert and manual fallback are required; the test independently removes each.",
+      "specRequired": false,
+      "sourceSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "mutatedSha256": "0c75a43a4b2c4f05cb8860448a24978b8be19ea707a7918e024edb01d08cef2a",
+      "expectedMutatedSha256": "0c75a43a4b2c4f05cb8860448a24978b8be19ea707a7918e024edb01d08cef2a",
+      "restoredSha256": "32fbb5227f74432d6212359e2bbadaa4c3fd22c32233d171ef8ed09e99a58326",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/24-alert-and-manual-fallback/command.json",
+        "sha256": "9bf84411a642df1ceb963e31120f5380974b5007d849caa13a31c9b9c860a084",
+        "bytes": 4101
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ fails\\ an\\ unsafe\\ state\\ or\\ an\\ incomplete\\ alert/manual\\ fallback"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ synthetic\\ plant\\ protocols,\\ never\\ physical\\-system\\ results\\ fails\\ an\\ unsafe\\ state\\ or\\ an\\ incomplete\\ alert/manual\\ fallback": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "531e42193e93db08beef7c6f0cdf8b30d8c1a50951cd362516c423f225650698",
+        "replacementSha256": "0c5c83d1f9a611a00b23052a414821893bf91bcd1240d63adfc5ee8126e374e8"
+      }
+    },
+    {
+      "id": "unknown-cea-capacity",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/ceaDrill.ts",
+      "guardedSemantic": "Unknown capacity stays NE with no scoped successful component claim.",
+      "specRequired": false,
+      "sourceSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "mutatedSha256": "e2431ffc0bbad546b8921ea7060e24ca80d5aa2c13a64d2851e31b23dac53a5d",
+      "expectedMutatedSha256": "e2431ffc0bbad546b8921ea7060e24ca80d5aa2c13a64d2851e31b23dac53a5d",
+      "restoredSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/25-unknown-cea-capacity/command.json",
+        "sha256": "a264f2f1baf60f693949a5310a6282cfbfb95f836e009b9bea867d68cede6f6e",
+        "bytes": 4132
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ requires\\ all\\ four\\ draft\\ packet\\ fields\\ and\\ refuses\\ unknown\\ capacity\\ or\\ caller\\ clock\\ claims"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ requires\\ all\\ four\\ draft\\ packet\\ fields\\ and\\ refuses\\ unknown\\ capacity\\ or\\ caller\\ clock\\ claims": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "086e0d2743ea7fdd56bc0db6bc60e0f853325a7502bb25437e2ea8095be3bdea",
+        "replacementSha256": "6269228bc738f0a698a649c447de545f2cfd558237942d8d953dff58882af1ac"
+      }
+    },
+    {
+      "id": "cea-incident-vs-sabotage-window",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/ceaDrill.ts",
+      "guardedSemantic": "The two draft windows are computed from actual incident kind, never a case-name or interchangeable duration.",
+      "specRequired": false,
+      "sourceSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "mutatedSha256": "5ec916fdce984e5d170d98074984fbea58d182b3ae8a9abc3e0ec140d217eb36",
+      "expectedMutatedSha256": "5ec916fdce984e5d170d98074984fbea58d182b3ae8a9abc3e0ec140d217eb36",
+      "restoredSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/26-cea-incident-vs-sabotage-window/command.json",
+        "sha256": "0fbfd18363ff85871cb45e58c568a3e3c9572ce9e1b520526d2ea5c6c0716739",
+        "bytes": 4174
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ computes\\ the\\ distinct\\ synthetic\\ sabotage\\ deadline\\ without\\ inventing\\ an\\ F4\\ record"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ computes\\ the\\ distinct\\ synthetic\\ sabotage\\ deadline\\ without\\ inventing\\ an\\ F4\\ record": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "685e6074ce0876a695a17ead2684a6d100090533ef35239383c4d762f77c588d",
+        "replacementSha256": "97dc06332265635932e6c8b86214e9caf68a07d8a33c02382c7f2580b99df3b7"
+      }
+    },
+    {
+      "id": "draft-packet-completeness",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/ceaDrill.ts",
+      "guardedSemantic": "Every draft field must be present/nonblank and belong to this incident. This variant preserves the null guard, avoiding an invalid setup/runtime-exception kill.",
+      "specRequired": false,
+      "sourceSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "mutatedSha256": "51ab5a37f27f93f1de3c07b9a5cc841e66136e4a1b8e45dc6f4246a41ebdde58",
+      "expectedMutatedSha256": "51ab5a37f27f93f1de3c07b9a5cc841e66136e4a1b8e45dc6f4246a41ebdde58",
+      "restoredSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/27-draft-packet-completeness/command.json",
+        "sha256": "7e5d9ee2f99de7d90ac2e014fa40adba059886b080390197e012d3905a107827",
+        "bytes": 4175
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ requires\\ all\\ four\\ draft\\ packet\\ fields\\ and\\ refuses\\ unknown\\ capacity\\ or\\ caller\\ clock\\ claims"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ requires\\ all\\ four\\ draft\\ packet\\ fields\\ and\\ refuses\\ unknown\\ capacity\\ or\\ caller\\ clock\\ claims": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "ca68432ea907588dc1aab96b259e8055cbfb02ee0d8870195c6d4cdc15392d14",
+        "replacementSha256": "541d516711fc2731be4cf5e82d81ee14f9508a80288f507419c568099ff552d0"
+      }
+    },
+    {
+      "id": "draft-packet-causal-order",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/ceaDrill.ts",
+      "guardedSemantic": "A packet cannot precede its incident or occur after the observation clock.",
+      "specRequired": false,
+      "sourceSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "mutatedSha256": "bab658a6a19eeed7a06a42a2cf87a16d661e35ced15351310eaf01d47923cd34",
+      "expectedMutatedSha256": "bab658a6a19eeed7a06a42a2cf87a16d661e35ced15351310eaf01d47923cd34",
+      "restoredSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/28-draft-packet-causal-order/command.json",
+        "sha256": "79d513438a1168555c4d50938fb421a92aecedafafe4d6e1c39bb967c17c8259",
+        "bytes": 4179
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ rejects\\ a\\ draft\\ packet\\ one\\ millisecond\\ late,\\ before\\ the\\ incident\\ or\\ after\\ the\\ fixture\\ clock"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ rejects\\ a\\ draft\\ packet\\ one\\ millisecond\\ late,\\ before\\ the\\ incident\\ or\\ after\\ the\\ fixture\\ clock": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "be1f2dff914c809f83fe810eb3705db5490fd680a29ac8c5a8e9f619153256cc",
+        "replacementSha256": "f543dde7d996ca37f6c807ef7df4b54457768a3502c6d46bcc5e9c0c76fd4e78"
+      }
+    },
+    {
+      "id": "draft-packet-inclusive-deadline",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/ceaDrill.ts",
+      "guardedSemantic": "The native arithmetic component must fail6h+1ms while retaining the inclusive exact6h positive.",
+      "specRequired": false,
+      "sourceSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "mutatedSha256": "012b15bc80f581bb7896bb9d33f28190f406608a71e76a12e6fbf4e87df3e86d",
+      "expectedMutatedSha256": "012b15bc80f581bb7896bb9d33f28190f406608a71e76a12e6fbf4e87df3e86d",
+      "restoredSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/29-draft-packet-inclusive-deadline/command.json",
+        "sha256": "aad041928ffadd312ba5af6009823b879a94c37ee4a9756b3c87c9f9de54b54e",
+        "bytes": 4196
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ rejects\\ a\\ draft\\ packet\\ one\\ millisecond\\ late,\\ before\\ the\\ incident\\ or\\ after\\ the\\ fixture\\ clock"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ rejects\\ a\\ draft\\ packet\\ one\\ millisecond\\ late,\\ before\\ the\\ incident\\ or\\ after\\ the\\ fixture\\ clock": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "93b6add312a84fe85b84c25908418dca1bd3c007691b3849f1be9cd4f543ac63",
+        "replacementSha256": "60a976403f96653e7f8d2c2caa8399455d3291d764a15fa3aaee018e883dd387"
+      }
+    },
+    {
+      "id": "cea-owner-dependency-remains-ne",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/ceaDrill.ts",
+      "guardedSemantic": "A local timing pass cannot fabricate the missing P3-09/F4 integration.",
+      "specRequired": false,
+      "sourceSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "mutatedSha256": "09636702e0c848560a1d41fbab8efe589bd822e75a7085ab55927e84938a0e6a",
+      "expectedMutatedSha256": "09636702e0c848560a1d41fbab8efe589bd822e75a7085ab55927e84938a0e6a",
+      "restoredSha256": "8ad5d587696d683c96e235057a86b73077a2fffd332701b3e648fc953942b15a",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/30-cea-owner-dependency-remains-ne/command.json",
+        "sha256": "6203acd647afab72e51166b4dfe6d0c646154902e5a9e79febc81ac5334872dd",
+        "bytes": 4148
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ keeps\\ CEA\\ not\\ evaluated\\ while\\ computing\\ the\\ inclusive\\ synthetic\\ six\\-hour\\ deadline"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ keeps\\ CEA\\ not\\ evaluated\\ while\\ computing\\ the\\ inclusive\\ synthetic\\ six\\-hour\\ deadline": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "667bc70a6802b5e165c95951931222537335cdf2e863849b7335cb346aaa5a98",
+        "replacementSha256": "8e43709163fe8dfa362be1f85ff5e5ec4c76025b645aeeff834d7ad73c31ab96"
+      }
+    },
+    {
+      "id": "recall-unavailable-owner-fixture",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotGenealogy.ts",
+      "guardedSemantic": "Missing genealogy/P2-27 environment cannot produce successful recall integration.",
+      "specRequired": false,
+      "sourceSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "mutatedSha256": "82876a9cb12d898ddf689b10e2a33282d391a65f3ab3132d0d56bf23f2f97562",
+      "expectedMutatedSha256": "82876a9cb12d898ddf689b10e2a33282d391a65f3ab3132d0d56bf23f2f97562",
+      "restoredSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/31-recall-unavailable-owner-fixture/command.json",
+        "sha256": "736c4345f0f61912d184ce0caf452ff58c97b866b4fb7ca149df5523d9c9f86f",
+        "bytes": 4164
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ refuses\\ incomplete,\\ ambiguous\\ or\\ dangling\\ genealogy\\ and\\ fake\\ adapter\\ availability"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ refuses\\ incomplete,\\ ambiguous\\ or\\ dangling\\ genealogy\\ and\\ fake\\ adapter\\ availability": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "8bfac7688d9fc6bdd67db9073fd221334bd75dd577365a920958f5809aa184cf",
+        "replacementSha256": "b54c717423948d4c78db7edff7eaf0df342a78203a7ec750404d1bf8c6c31a80"
+      }
+    },
+    {
+      "id": "complete-unambiguous-genealogy",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotGenealogy.ts",
+      "guardedSemantic": "Incomplete flags, duplicated lot IDs, missing seed and dangling parents must stop independent closure derivation.",
+      "specRequired": false,
+      "sourceSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "mutatedSha256": "946e1930b23b7aefd7ad7be8c2bf4af37cc06f2bcd4070b207e0bfe51fc821b7",
+      "expectedMutatedSha256": "946e1930b23b7aefd7ad7be8c2bf4af37cc06f2bcd4070b207e0bfe51fc821b7",
+      "restoredSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/32-complete-unambiguous-genealogy/command.json",
+        "sha256": "5107b0a345cad95d38a84d0f9c8d48239eab9e13e5169257c32ec70633f9e3ea",
+        "bytes": 4192
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ refuses\\ incomplete,\\ ambiguous\\ or\\ dangling\\ genealogy\\ and\\ fake\\ adapter\\ availability"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ refuses\\ incomplete,\\ ambiguous\\ or\\ dangling\\ genealogy\\ and\\ fake\\ adapter\\ availability": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "1afe4030005079b187ccff345bbc2580e2393ed897fd076c1e18ca36e58e9cdd",
+        "replacementSha256": "5711e92a79903c8fbe1314722fca80b5c3bbc6e188af4c95b669e21f33daad9b"
+      }
+    },
+    {
+      "id": "independent-descendant-traversal",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotGenealogy.ts",
+      "guardedSemantic": "The component follows actual reverse-parent edges to the grandchild, excludes disconnected lots and terminates cycles.",
+      "specRequired": false,
+      "sourceSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "mutatedSha256": "ebfffbff9a5240578acbe6d35030a67082515f853552b1363e192ab24d9ed8d1",
+      "expectedMutatedSha256": "ebfffbff9a5240578acbe6d35030a67082515f853552b1363e192ab24d9ed8d1",
+      "restoredSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/33-independent-descendant-traversal/command.json",
+        "sha256": "243278fca851dad5c28dc34547b6c173065ea1b3fa16d89210be57f5c7f33816",
+        "bytes": 5107
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ computes\\ the\\ independent\\ synthetic\\ descendant\\ closure\\ but\\ keeps\\ P2\\-27\\ unavailable",
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ finds\\ a\\ missed\\ grandchild,\\ excludes\\ disconnected\\ lots\\ and\\ terminates\\ cyclic\\ paths"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ computes\\ the\\ independent\\ synthetic\\ descendant\\ closure\\ but\\ keeps\\ P2\\-27\\ unavailable": true,
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ finds\\ a\\ missed\\ grandchild,\\ excludes\\ disconnected\\ lots\\ and\\ terminates\\ cyclic\\ paths": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "b4bf60847972aa8c19bf92ec2461937c9853712014fe607ee8bf8b2020d964c4",
+        "replacementSha256": "3de0eb8f037f33b7bf0ec896c9da4775f23dc7be5dc41392e743a528e2fd91be"
+      }
+    },
+    {
+      "id": "detect-missed-descendant-notices",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotGenealogy.ts",
+      "guardedSemantic": "A missing shipment notice is measured against independently computed closure, not copied from input expectations.",
+      "specRequired": false,
+      "sourceSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "mutatedSha256": "e57b5801827d60f43751f9d9603f05e45c052a6cfb83f7b3c84ef14e8b745b9e",
+      "expectedMutatedSha256": "e57b5801827d60f43751f9d9603f05e45c052a6cfb83f7b3c84ef14e8b745b9e",
+      "restoredSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/34-detect-missed-descendant-notices/command.json",
+        "sha256": "897c7fd2f28d29d49df492ed18f17e07ffe61395d93ddf7dc8a672d45373aeeb",
+        "bytes": 4216
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ finds\\ a\\ missed\\ grandchild,\\ excludes\\ disconnected\\ lots\\ and\\ terminates\\ cyclic\\ paths"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ finds\\ a\\ missed\\ grandchild,\\ excludes\\ disconnected\\ lots\\ and\\ terminates\\ cyclic\\ paths": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "1011bc156d442a39be18071c3edca567038391da49f50155a1f54fe1f4bf4536",
+        "replacementSha256": "a78f82d7814a51fb80f5261bdf4d3d5824f824cd775654961b7719d35cb6a650"
+      }
+    },
+    {
+      "id": "recall-component-not-owner-integration",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotGenealogy.ts",
+      "guardedSemantic": "A complete synthetic closure still cannot stand for the absent P2-27 fixture/API or actual delivery.",
+      "specRequired": false,
+      "sourceSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "mutatedSha256": "91217996ba9bcf39e65eff161a786d7a0de06b0c6ec1dac0fd6125c3978eb518",
+      "expectedMutatedSha256": "91217996ba9bcf39e65eff161a786d7a0de06b0c6ec1dac0fd6125c3978eb518",
+      "restoredSha256": "665ef2476723b3f6c05abe0a4507270331f7be320051b78005e2edec3c12f5d7",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/35-recall-component-not-owner-integration/command.json",
+        "sha256": "517ef6a296a16718cf013afc561834bbc5a1121e3e0935a6bdba553b7eb51362",
+        "bytes": 4182
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ computes\\ the\\ independent\\ synthetic\\ descendant\\ closure\\ but\\ keeps\\ P2\\-27\\ unavailable"
+      ],
+      "requiredFailureMatches": {
+        "Missing\\ owner\\ integrations\\ and\\ separately\\ labelled\\ mathematical\\ components\\ computes\\ the\\ independent\\ synthetic\\ descendant\\ closure\\ but\\ keeps\\ P2\\-27\\ unavailable": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "05d60bcc9b949ef85a3e3b3c50742bf9038c7943d31cd2eedcc68761728f53fe",
+        "replacementSha256": "84c6fc6f52dc47598426370fb226589d7066dfb201f8f25b09c5e038458e6367"
+      }
+    },
+    {
+      "id": "sensor-feed-availability",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/sensorFeed.ts",
+      "guardedSemantic": "Unavailable readings cannot yield a sensor-gate success.",
+      "specRequired": false,
+      "sourceSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "mutatedSha256": "3d57ecaa2198c8eb403e51f8f6eb233acc05f9db4722c80b472f516009f74ad8",
+      "expectedMutatedSha256": "3d57ecaa2198c8eb403e51f8f6eb233acc05f9db4722c80b472f516009f74ad8",
+      "restoredSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/36-sensor-feed-availability/command.json",
+        "sha256": "43e064dfe1666a8250a37382c3aeda138adcb8d5f2056ccb0e109bdd9e6b240d",
+        "bytes": 4106
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ contradictory\\ readings,\\ unavailable\\ feeds\\ and\\ unknown\\ lot/sensor\\ units"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ contradictory\\ readings,\\ unavailable\\ feeds\\ and\\ unknown\\ lot/sensor\\ units": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "91b04400b91d5dae5836fe6257197738f1c270321797e58f640a1feb59ccde81",
+        "replacementSha256": "561dd19dc6af0d7c10b496efd0910b38c6e1eaa31027f3a35944f6e87a0acff5"
+      }
+    },
+    {
+      "id": "exact-lot-sensor-unit-scope",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/sensorFeed.ts",
+      "guardedSemantic": "Only this lot, uniquely configured sensors and their exact units may enter the local gate.",
+      "specRequired": false,
+      "sourceSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "mutatedSha256": "c08baa376d7c7a4d5d88f6b01c4b5bd4aacfdb8494193f6632bb7809fd00fe88",
+      "expectedMutatedSha256": "c08baa376d7c7a4d5d88f6b01c4b5bd4aacfdb8494193f6632bb7809fd00fe88",
+      "restoredSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/37-exact-lot-sensor-unit-scope/command.json",
+        "sha256": "c09262e25e4d94576d5b93fbdd87c8fc4aead4fff868aee604cdd94fd9588b8b",
+        "bytes": 4115
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ contradictory\\ readings,\\ unavailable\\ feeds\\ and\\ unknown\\ lot/sensor\\ units"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ contradictory\\ readings,\\ unavailable\\ feeds\\ and\\ unknown\\ lot/sensor\\ units": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "6c4a684d93963a30a00a62e2883b9ca98ca1b0c0ee75ef1048fac39b9b36036a",
+        "replacementSha256": "e90aa39f5cb6a449489b3087d5872c8844b059e66be1c9c76f1639a589ae57c3"
+      }
+    },
+    {
+      "id": "contradictory-same-time-values",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/sensorFeed.ts",
+      "guardedSemantic": "Differing same-sensor/same-instant values cannot be hidden by selecting a convenient record.",
+      "specRequired": false,
+      "sourceSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "mutatedSha256": "09bef1250c0ea50d9e548a71c67c820b94b54ac46721a10da072b8f18c951426",
+      "expectedMutatedSha256": "09bef1250c0ea50d9e548a71c67c820b94b54ac46721a10da072b8f18c951426",
+      "restoredSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/38-contradictory-same-time-values/command.json",
+        "sha256": "dd3549591b73f1ec01896163295c63ee0e2a034a3dd69ed79a05bae0fcc0ad1e",
+        "bytes": 4123
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ contradictory\\ readings,\\ unavailable\\ feeds\\ and\\ unknown\\ lot/sensor\\ units"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ contradictory\\ readings,\\ unavailable\\ feeds\\ and\\ unknown\\ lot/sensor\\ units": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "00448543b5f1b5401c9f8a224f6bc859980c2ad50d1be6c062200eb3cbcb74ce",
+        "replacementSha256": "b6afb17183908be2f16a04c1cd61187e0f17f6726b9d822f20e59eb1a4a875f6"
+      }
+    },
+    {
+      "id": "mandatory-shared-sensor-time-verdict",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/sensorFeed.ts",
+      "guardedSemantic": "Mandatory mutation: bypass the single shared temporal verdict. In-range stale data must falsely reach an actual gate log/effect and be killed; the same branch protects future readings and coverage/gaps.",
+      "specRequired": true,
+      "sourceSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "mutatedSha256": "cf110dbbe196fa9e546c281ac69cca209a1255152edfca786f38f30a7c180434",
+      "expectedMutatedSha256": "cf110dbbe196fa9e546c281ac69cca209a1255152edfca786f38f30a7c180434",
+      "restoredSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/39-mandatory-shared-sensor-time-verdict/command.json",
+        "sha256": "c38f3d4a5da0a1dc45c41ad17dbd4539e4804d5595cb5f5e2e2fda7ccdb9c16a",
+        "bytes": 4980
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ a\\ stale\\ reading\\ even\\ when\\ every\\ value\\ is\\ in\\ range",
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ requires\\ interval\\ coverage,\\ bounded\\ gaps,\\ no\\ future\\ reading\\ and\\ every\\ required\\ sensor"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ a\\ stale\\ reading\\ even\\ when\\ every\\ value\\ is\\ in\\ range": true,
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ requires\\ interval\\ coverage,\\ bounded\\ gaps,\\ no\\ future\\ reading\\ and\\ every\\ required\\ sensor": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "37a43b7f93eb7ab06ecc6b7016ebd70330509b7a6671febf19c1c1208636eadd",
+        "replacementSha256": "564f299195e304b23856d9e84781d101c493dc7401508d6c7fb02ccb133f7d1d"
+      }
+    },
+    {
+      "id": "every-in-window-range-bound",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/sensorFeed.ts",
+      "guardedSemantic": "Every range-relevant reading, including the carried left-boundary sample and earlier in-window breaches, must satisfy its configured inclusive limits.",
+      "specRequired": false,
+      "sourceSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "mutatedSha256": "bd57c3631c8590fda7c9bb6625217ed5ff32c8e1014ac4c5aacac7429f63cac4",
+      "expectedMutatedSha256": "bd57c3631c8590fda7c9bb6625217ed5ff32c8e1014ac4c5aacac7429f63cac4",
+      "restoredSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/40-every-in-window-range-bound/command.json",
+        "sha256": "f90208d6a260c628341697550cf83c43f0fc2fd9c6130c4bca5ac1a18337f4fa",
+        "bytes": 4942
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ denies\\ a\\ carried\\ boundary\\ reading\\ outside\\ the\\ configured\\ range",
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ denies\\ any\\ in\\-window\\ breach\\ rather\\ than\\ selecting\\ a\\ convenient\\ latest\\ value"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ denies\\ a\\ carried\\ boundary\\ reading\\ outside\\ the\\ configured\\ range": true,
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ denies\\ any\\ in\\-window\\ breach\\ rather\\ than\\ selecting\\ a\\ convenient\\ latest\\ value": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "5e0f2ab7e6faea185c31d841ee2b04b1334bd870b210b6e2d6f727a35009006b",
+        "replacementSha256": "e51da44109cd913c0bb977e884082f9730171e8ead325f86b2c79514170b1809"
+      }
+    },
+    {
+      "id": "statement-register-availability",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotRelease.ts",
+      "guardedSemantic": "A missing local register cannot create statement-gate success.",
+      "specRequired": false,
+      "sourceSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "mutatedSha256": "54a0162b5d74e80227ea6b591ac12f919c29dbb6f776888b272e3626c3d558d7",
+      "expectedMutatedSha256": "54a0162b5d74e80227ea6b591ac12f919c29dbb6f776888b272e3626c3d558d7",
+      "restoredSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/41-statement-register-availability/command.json",
+        "sha256": "9b61556357dfad0a99f6403877c842e165f0140d43e7fa23c957a2edbd60de7d",
+        "bytes": 4096
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ unavailable,\\ ambiguous\\ or\\ unselected\\ statement\\ coverage"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ unavailable,\\ ambiguous\\ or\\ unselected\\ statement\\ coverage": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "032ee6611158b1706e2aa4f21791e74cd662f89f514cc4065ebf2ad0d1f069ab",
+        "replacementSha256": "0e94e903d4054ab3c9d0f355b3183932b6bb8a53f933bb54cbf7c53d053319ba"
+      }
+    },
+    {
+      "id": "statement-policy-scope",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotRelease.ts",
+      "guardedSemantic": "Unknown or unselected synthetic coverage cannot be treated as a known covered lot.",
+      "specRequired": false,
+      "sourceSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "mutatedSha256": "638758ac53dc5bf81501868d3be3b66f1348970eb6435a01b91a5554af7dc38a",
+      "expectedMutatedSha256": "638758ac53dc5bf81501868d3be3b66f1348970eb6435a01b91a5554af7dc38a",
+      "restoredSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/42-statement-policy-scope/command.json",
+        "sha256": "8220a4d8874414e52d48652f1829baa544b7166eb533d2e28d4c679cccbf91ad",
+        "bytes": 4069
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ unavailable,\\ ambiguous\\ or\\ unselected\\ statement\\ coverage"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ unavailable,\\ ambiguous\\ or\\ unselected\\ statement\\ coverage": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "89005e4f8598ecfcc6edfda76e21099e2a25535674a94876aa16571311abb393",
+        "replacementSha256": "d18da519f6c79de1173480e474276e4aa3d5b395e11b351cfead19d92d54acf9"
+      }
+    },
+    {
+      "id": "statement-reference-required",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotRelease.ts",
+      "guardedSemantic": "A null or unresolved reference must refuse, never succeed with an empty reference log.",
+      "specRequired": false,
+      "sourceSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "mutatedSha256": "69806b3dc8abbbbb658c335940bfd49c44f78877d52e24e430c16ad55ebadb0b",
+      "expectedMutatedSha256": "69806b3dc8abbbbb658c335940bfd49c44f78877d52e24e430c16ad55ebadb0b",
+      "restoredSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/43-statement-reference-required/command.json",
+        "sha256": "ac57f4735d88ef713f454564312fcecad36131a9eb50bbbb85c63d2ab157245d",
+        "bytes": 4119
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ a\\ missing,\\ other\\-lot\\ or\\ other\\-commodity\\ statement\\ without\\ a\\ gate\\ effect"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ a\\ missing,\\ other\\-lot\\ or\\ other\\-commodity\\ statement\\ without\\ a\\ gate\\ effect": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "4aaae4e60da513a519b6632f40cb15e409435331722bbaaac20fefd0f7694b03",
+        "replacementSha256": "37d022013dd9fd5e82d6d44f8ca55f98129454ce36e04c9789bd72b381895f0b"
+      }
+    },
+    {
+      "id": "statement-reference-unique",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotRelease.ts",
+      "guardedSemantic": "A duplicate statement reference cannot silently select the first record.",
+      "specRequired": false,
+      "sourceSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "mutatedSha256": "f94de2979d493a912e330c0fd50c502c6ab215dab7366062e0015b9ed457b456",
+      "expectedMutatedSha256": "f94de2979d493a912e330c0fd50c502c6ab215dab7366062e0015b9ed457b456",
+      "restoredSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/44-statement-reference-unique/command.json",
+        "sha256": "178e0eb1b76155d03f80e09665935ddeefcd4ec72516c8d17b86020b77ba8ca4",
+        "bytes": 4081
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ unavailable,\\ ambiguous\\ or\\ unselected\\ statement\\ coverage"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ unavailable,\\ ambiguous\\ or\\ unselected\\ statement\\ coverage": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "f82f2f559c1d4676e65bcbeb8c4af5c903000c9ce1ec8edca72099d42bea17ec",
+        "replacementSha256": "ef3939ffed75457cff010964e9d3e3e01cfc74b32b0610fd29c828c3e1dbe17c"
+      }
+    },
+    {
+      "id": "same-lot-and-commodity-statement",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/lotRelease.ts",
+      "guardedSemantic": "Another lot or commodity cannot borrow the statement reference.",
+      "specRequired": false,
+      "sourceSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "mutatedSha256": "2f59cf27b6db8bdd96059ed574322e8520d50b4daf0430c1ef6282dd72e1ea62",
+      "expectedMutatedSha256": "2f59cf27b6db8bdd96059ed574322e8520d50b4daf0430c1ef6282dd72e1ea62",
+      "restoredSha256": "01bab1a5b0feabb7ee13ee4a1d10b79a88b3301f9656243c45ac57ec7cf2fac3",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/45-same-lot-and-commodity-statement/command.json",
+        "sha256": "5bfde6af7bda3e95e3d47803aed2554e7acdf2956c59c7ff188d33f694c302df",
+        "bytes": 4131
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ a\\ missing,\\ other\\-lot\\ or\\ other\\-commodity\\ statement\\ without\\ a\\ gate\\ effect"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ a\\ missing,\\ other\\-lot\\ or\\ other\\-commodity\\ statement\\ without\\ a\\ gate\\ effect": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "3a7b6569282710a6f67f91bb262be9c4cbac3984d326013f8162148ccd162e91",
+        "replacementSha256": "d1eb034953f9c331a3c0344f9e2eecbbb0d40e81c27ff48d8f00756b1d1b6c11"
+      }
+    },
+    {
+      "id": "compiled-control-selected",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/harness.ts",
+      "guardedSemantic": "Even with an exactly matching subject, US grid does not select ENV06. Weakening the not_applicable branch must stop the intended exception.",
+      "specRequired": false,
+      "sourceSha256": "bcdc892f822ece16002c13b7a2119c28b012f854193e03661fd0ad87aee70b8c",
+      "mutatedSha256": "8e9a30deb324d453198ba69c49e5d1d2bb513d6554e3e9f5e5c13d883094c039",
+      "expectedMutatedSha256": "8e9a30deb324d453198ba69c49e5d1d2bb513d6554e3e9f5e5c13d883094c039",
+      "restoredSha256": "bcdc892f822ece16002c13b7a2119c28b012f854193e03661fd0ad87aee70b8c",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/46-compiled-control-selected/command.json",
+        "sha256": "4a968f35231040f3427345c86f241aceeea84531857eeb81dc69aab7682e97ea",
+        "bytes": 4086
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ actual\\ compiled\\ policy\\ and\\ admission\\ \\(P3\\-16\\)\\ refuses\\ a\\ control\\ outside\\ the\\ actual\\ compiled\\ profile\\ requirements"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ actual\\ compiled\\ policy\\ and\\ admission\\ \\(P3\\-16\\)\\ refuses\\ a\\ control\\ outside\\ the\\ actual\\ compiled\\ profile\\ requirements": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "82a72e8ef579db3e71a4a903814d9b8475ea0d51a5fa21146afb5155002af672",
+        "replacementSha256": "5b191dfd8e66488160ffb5f0cbc3d52d28dcb7904245d70721ec3be120f161a1"
+      }
+    },
+    {
+      "id": "compiled-fixture-subject-bound",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/harness.ts",
+      "guardedSemantic": "Actual compiled tenant/workspace/deployment/agent membership is a distinct guard from local synthetic context equality.",
+      "specRequired": false,
+      "sourceSha256": "bcdc892f822ece16002c13b7a2119c28b012f854193e03661fd0ad87aee70b8c",
+      "mutatedSha256": "8acf2a84411aac10a067ef09335f1debaef4c6a5690ab30b0b3a11d5397b8488",
+      "expectedMutatedSha256": "8acf2a84411aac10a067ef09335f1debaef4c6a5690ab30b0b3a11d5397b8488",
+      "restoredSha256": "bcdc892f822ece16002c13b7a2119c28b012f854193e03661fd0ad87aee70b8c",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/47-compiled-fixture-subject-bound/command.json",
+        "sha256": "c66e7b29a71b82a0ced8f0cf3111b1e56c001a6837f29a0c9e484b30ba1bb6ee",
+        "bytes": 4106
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Environment\\ actual\\ compiled\\ policy\\ and\\ admission\\ \\(P3\\-16\\)\\ refuses\\ every\\ fixture\\ subject\\ outside\\ the\\ actual\\ compiled\\ deployment"
+      ],
+      "requiredFailureMatches": {
+        "Environment\\ actual\\ compiled\\ policy\\ and\\ admission\\ \\(P3\\-16\\)\\ refuses\\ every\\ fixture\\ subject\\ outside\\ the\\ actual\\ compiled\\ deployment": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "c92d23a5e4edb4fb2ec150101482e2e736081e4396f8b7a46e17106f72149c2b",
+        "replacementSha256": "e2cc338e3019f940e9d2c220e4fd75c54a2c53b3ad38f4ae5f43a3db9b7062dd"
+      }
+    },
+    {
+      "id": "each-required-sensor-has-window-sample",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/sensorFeed.ts",
+      "guardedSemantic": "Weakening per-sensor presence into one global any-sensor presence permits the second required sensor to have only an older anchor. The complete two-sensor half of the named regression must detect the false allow.",
+      "specRequired": false,
+      "sourceSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "mutatedSha256": "e31c9f4009081f73ec25760fcd0dd2d80da5adbc20b23b6e3d92ad47c98b6d94",
+      "expectedMutatedSha256": "e31c9f4009081f73ec25760fcd0dd2d80da5adbc20b23b6e3d92ad47c98b6d94",
+      "restoredSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/48-each-required-sensor-has-window-sample/command.json",
+        "sha256": "87985fea3c551496ebfa3b38878b441537421ed44c151d593760e6353ddff0c0",
+        "bytes": 4164
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ a\\ sensor\\ gate\\ when\\ a\\ required\\ sensor\\ has\\ no\\ sample\\ inside\\ the\\ requested\\ window"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ refuses\\ a\\ sensor\\ gate\\ when\\ a\\ required\\ sensor\\ has\\ no\\ sample\\ inside\\ the\\ requested\\ window": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "58805c15136aece3d7fbfb50522362887ca9b394c5032424b1cb83b2449a79b4",
+        "replacementSha256": "d439e330be901f0c7af7be8e1c09f1032c58958e0096c5118a5849a190f5dc58"
+      }
+    },
+    {
+      "id": "carried-boundary-sample-range-checked",
+      "sourceHead": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+      "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+      "path": "tests/catalog/stations/environment/sensorFeed.ts",
+      "guardedSemantic": "Omit the carried anchor from range coverage while keeping the source reference syntactically used. The out-of-limit pre-window sample that supplies interval coverage must cause deny; omitting it would falsely allow.",
+      "specRequired": false,
+      "sourceSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "mutatedSha256": "89d565a641c7f2081c7151fa7c4d2a48a7fed8c1fc33d864e261c1688e1d694e",
+      "expectedMutatedSha256": "89d565a641c7f2081c7151fa7c4d2a48a7fed8c1fc33d864e261c1688e1d694e",
+      "restoredSha256": "4700b92c8d810b0da1cbe94291c96f3fefce82e032be39253bd97825e4f0f52f",
+      "exactByteRestore": true,
+      "restoredState": {
+        "head": "e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf",
+        "int": "dcec5999b3ae634fd567f9d840252eb0e924eaac",
+        "status": "",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16-solo-mutations-e47ed",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16-solo-mutations-e47ed",
+        "node": "v22.23.3",
+        "nodeExecutable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "restorationError": null,
+      "mutationError": null,
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/mutations/49-carried-boundary-sample-range-checked/command.json",
+        "sha256": "55e2040ad561460291ca39918b52c68d2940ff073d2c530537c4d16f81ea1778",
+        "bytes": 4112
+      },
+      "intendedAssertionFailure": true,
+      "requiredFailurePatterns": [
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ denies\\ a\\ carried\\ boundary\\ reading\\ outside\\ the\\ configured\\ range"
+      ],
+      "requiredFailureMatches": {
+        "Synthetic\\ sensor\\ and\\ due\\-diligence\\ reference\\ gates\\ denies\\ a\\ carried\\ boundary\\ reading\\ outside\\ the\\ configured\\ range": true
+      },
+      "killed": true,
+      "status": "KILLED_BY_INTENDED_ASSERTION",
+      "substitution": {
+        "originalSha256": "cfe7313f3a4bc3959d5f537352b6c541e142f123429c26107197bf244c7e4d64",
+        "replacementSha256": "bc077f94307b3f6356c45651a018aac5c8407ad92182f5fbac9907f98013da3b"
+      }
+    }
+  ],
+  "nativeAssertionFailures": 79,
+  "summaryReference": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/isolated-mutations/e47edfcbeafd95edf9d11e0aa0fd98920b4a1ebf/attempt-1/summary.json",
+    "sha256": "0abc0404e4d1159dc4960ce099b946872e195df9a7741322bb47314671ab5814",
+    "bytes": 29606
+  },
+  "limits": "49 intentional one-file dirty probes on a separate clean same-HEAD clone; 79 actual AssertionErrors. Initial/restored180 pass. Negative exits are expected guards, not product failures or full-suite totals. All sources restored exactly."
+}

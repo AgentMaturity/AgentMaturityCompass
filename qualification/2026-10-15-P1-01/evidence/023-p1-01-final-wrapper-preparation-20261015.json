@@ -1,0 +1,13 @@
+{
+  "kind": "namespace-only-final-validation-wrapper",
+  "source": "/private/tmp/p1-01-run-command-prepared-20261015.py",
+  "sourceSha256": "4e3eac5c592c708ebce09ff8aa0814b0e5d7da4b2ada64b4aad1733fc1106736",
+  "prepared": "/private/tmp/p1-01-final-command-wrapper-prepared-20261015.py",
+  "preparedSha256": "b11d50594ab53fdf0703c91974f5362bc9bdefd53d17503c8055f50b0e494f77",
+  "behaviorChanged": false,
+  "changes": [
+    "Fresh BASE",
+    "Fresh JOURNAL"
+  ],
+  "executed": false
+}

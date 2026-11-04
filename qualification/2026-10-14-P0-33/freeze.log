@@ -1,0 +1,6 @@
+
+> agent-maturity-compass@1.2.0 check:freeze /Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014
+> node scripts/check-freeze.mjs
+
+ ELIFECYCLE  Command failed with exit code 1.
+Freeze exception P1-65 is not in the base baseline's allowedExceptionKeys (P0-02, P0-12, P0-13, P0-14, P0-26, P1-04, P1-08, P1-10, P1-15, P1-16, P1-17, P1-28, P1-40, P1-42, P1-43, P1-44, P1-45, P1-46); a PR cannot authorize itself.

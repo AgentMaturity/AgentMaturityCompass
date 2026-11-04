@@ -1,10 +1,13 @@
+import { digestField } from "../dataflow/tokenizer.js";
+import { AUTHZ_DECISION_AUDIT_TYPE, decisionEvidence, decisionReasons, pipelineDecision, recordlessDecision } from "../governor/decisionLog.js";
 import { sha256Hex } from "../utils/hash.js";
 import {
   LIVE_PROJECTION_VERSION,
   projectMatchingRuleIds,
   projectQuestionIds
 } from "../diagnostic/liveEvidenceProjection.js";
-import type { ToolExecution, ToolOutcome } from "./toolTypes.js";
+import type { RecordedToolCall, ToolOutcome } from "./toolTypes.js";
+import { nativeFilesystemTouch } from "../prompt/context/nativeFilesystemTouch.js";
 
 /**
  * What a governed tool call contributes to the evidence spine (P5.1/P5.2a).
@@ -39,17 +42,88 @@ import type { ToolExecution, ToolOutcome } from "./toolTypes.js";
  * distinction the published score has to make rests on it being accurate here.
  */
 
+/**
+ * P2-24: a call that ran under a break-glass record appends one BreakGlassActionV1 row; the signed record itself is
+ * never edited. Its post-hoc review covers these rows (src/governor/breakGlass.ts reads them back).
+ */
+function breakGlassAction(authorization: NonNullable<RecordedToolCall["authorization"]>, outcome: ToolOutcome,
+  call: Record<string, unknown>): ToolEvidenceRecord[] {
+  const breakGlassId = authorization.record.authority.breakGlassId;
+  if (breakGlassId === undefined || outcome.denied !== null) return [];
+  const action = { breakGlassId, executionId: authorization.record.executionId, authorizationDigest: authorization.digest, at: new Date().toISOString() };
+  return [{ eventType: "audit", payload: JSON.stringify({ auditType: "BREAK_GLASS_ACTION", action }),
+    meta: { ...call, auditType: "BREAK_GLASS_ACTION", breakGlassId, executionId: action.executionId } }];
+}
+
+/**
+ * P2-25: one AuthZEN decision-log entry for a call that reached the authorization stage: a call with a bound
+ * authorization record (allowed, or denied at any stage after it bound), or a call refused at the authorization stage
+ * before a record bound. Unbound calls the authorization stage never saw (reads, low-impact writes) make no decision.
+ */
+function authzDecision(execution: RecordedToolCall, outcome: ToolOutcome, call: Record<string, unknown>): ToolEvidenceRecord[] {
+  const denial = outcome.denied?.reason ?? null;
+  const entry = execution.authorization !== undefined
+    ? pipelineDecision({ record: execution.authorization.record, allowed: outcome.denied === null, denial })
+    : outcome.denied?.stage === "authorization" && execution.actionClass !== null
+      ? recordlessDecision({ agentId: execution.agentId, toolName: execution.name, actionClass: execution.actionClass, args: execution.arguments,
+        allowed: false, reasons: decisionReasons(denial).map((reason) => reason.text), policyDigest: null, resource: {} })
+      : null;
+  if (entry === null) return [];
+  const row = decisionEvidence(entry);
+  return [{ ...row, meta: { ...call, ...row.meta } }];
+}
+
 /** Audit types a governed tool call can produce. */
 export type ToolAuditType =
   | "TOOL_CALL_ALLOWED"
   | "TOOL_CALL_DENIED"
   | "TOOL_CALL_FAILED"
-  | "AUTHORIZATION_RECORD";
+  | "AUTHORIZATION_RECORD"
+  | "BREAK_GLASS_ACTION"
+  | typeof AUTHZ_DECISION_AUDIT_TYPE;
 
 export interface ToolEvidenceRecord {
   readonly eventType: "audit" | "metric" | "stdout";
   readonly payload: string;
   readonly meta: Record<string, unknown>;
+}
+
+/**
+ * What an fs.write or fs.edit call changed (P1-36): hashes and sizes of the bytes it read and wrote, and the digest of
+ * the redacted diff it returned. Never the content. `beforeSha256` is null for a created file; `replacements` is null
+ * for a write; `diffSha256` is null when no diff was shown.
+ */
+export interface FileChange {
+  readonly path: string;
+  readonly beforeSha256: string | null;
+  readonly afterSha256: string;
+  readonly bytesBefore: number;
+  readonly bytesAfter: number;
+  readonly replacements: number | null;
+  readonly diffSha256: string | null;
+  readonly diffTruncated: boolean;
+}
+
+const FILE_CHANGE_TOOLS: ReadonlySet<string> = new Set(["fs.write", "fs.edit"]);
+const fileChanges = new Map<string, FileChange>();
+
+/**
+ * Hand a call's file change to its audit row, keyed by the call's token.
+ *
+ * ponytail: a side channel because `ToolPipeline.bodyOutcome` copies only the outcome fields it knows and that file is
+ * not this change's to edit. Bounded so a composition with no recorder cannot grow it. Upgrade: carry `fileChange` on
+ * `ToolBodyResult`/`ToolOutcome` through `bodyOutcome` and delete this map.
+ */
+export function noteFileChange(token: string, change: FileChange): void {
+  fileChanges.set(token, change);
+  if (fileChanges.size > 256) fileChanges.delete(fileChanges.keys().next().value!);
+}
+
+function takeFileChange(execution: RecordedToolCall): FileChange | undefined {
+  if (!FILE_CHANGE_TOOLS.has(execution.name)) return undefined;
+  const change = fileChanges.get(execution.token);
+  fileChanges.delete(execution.token);
+  return change;
 }
 
 /**
@@ -60,7 +134,7 @@ export interface ToolEvidenceRecord {
  * `metric` row says what it cost. A single row carrying both would be counted
  * once by a gate that wanted either.
  */
-export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome): ToolEvidenceRecord[] {
+export function toolEvidenceFor(execution: RecordedToolCall, outcome: ToolOutcome): ToolEvidenceRecord[] {
   const auditType: ToolAuditType = outcome.denied !== null
     ? "TOOL_CALL_DENIED"
     : outcome.ok ? "TOOL_CALL_ALLOWED" : "TOOL_CALL_FAILED";
@@ -73,6 +147,8 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
   // borrowing a question it did not earn.
   const questionIds = projectQuestionIds(execution, outcome);
   const projectionRules = projectMatchingRuleIds(execution, outcome);
+  const fileChange = takeFileChange(execution);
+  const filesystemTouch = nativeFilesystemTouch(execution, outcome);
 
   const call = {
     trustTier: "OBSERVED" as const,
@@ -85,6 +161,7 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
     toolToken: execution.token,
     parentToken: execution.parentToken,
     callId: execution.callId,
+    ...(execution.ownerStep === undefined ? {} : { ownerStep: execution.ownerStep }),
     // The record this call ran (or was refused) under, on every row (P1-02).
     ...(execution.authorization === undefined ? {} : {
       authorizationId: execution.authorization.authorizationId,
@@ -103,7 +180,8 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
     eventType: "audit",
     payload: JSON.stringify({ auditType: "AUTHORIZATION_RECORD", record: execution.authorization.record }),
     meta: { ...call, auditType: "AUTHORIZATION_RECORD", executionId: execution.authorization.record.executionId }
-  }];
+  }, ...breakGlassAction(execution.authorization, outcome, call)];
+  const decision = authzDecision(execution, outcome, call);
 
   const audit: ToolEvidenceRecord = {
     eventType: "audit",
@@ -111,14 +189,15 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
       auditType,
       tool: execution.name,
       denied: outcome.denied,
-      // NOT the arguments. They are frozen and available on the tool_action
-      // row; repeating them here would put the same untrusted content in a
-      // second place with a second retention story.
-      outcome: outcome.ok ? "ok" : "not-ok"
+      // Retain only the bounded directory needed for instruction context, never filenames or arbitrary argument content.
+      outcome: outcome.ok ? "ok" : "not-ok",
+      ...(filesystemTouch === undefined ? {} : { nativeFilesystemTouch: filesystemTouch }),
+      ...(fileChange === undefined ? {} : { fileChange })
     }),
     meta: {
       ...common,
       auditType,
+      ...(filesystemTouch === undefined ? {} : { nativeFilesystemTouch: filesystemTouch }),
       ...(outcome.denied
         ? { denialStage: outcome.denied.stage, denialGuard: outcome.denied.guardLabel, denialReason: outcome.denied.reason }
         : {})
@@ -149,11 +228,14 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
   // ledger would put file contents and command results in a second place with
   // a second retention and DSAR story — the same reason the audit row does not
   // copy the arguments. The hash keeps the claim verifiable against the output
-  // the caller already has.
+  // the caller already has. Its form is the one the pipeline chose for this
+  // call's receipt (P2-02): `outputSha256`, or a keyed `outputDigest` in a
+  // workspace that opted in to protected-data redaction.
   const produced = outcome.bytes > 0 || outcome.output.length > 0;
   if (!produced) {
-    return [audit, metric, ...authorization];
+    return [audit, metric, ...authorization, ...decision];
   }
+  const outputDigest = digestField("output", outcome.outputDigest ?? { kind: "sha256", value: sha256Hex(outcome.output) });
 
   const stdout: ToolEvidenceRecord = {
     eventType: "stdout",
@@ -162,15 +244,15 @@ export function toolEvidenceFor(execution: ToolExecution, outcome: ToolOutcome):
       bytes: outcome.bytes,
       exitCode: outcome.exitCode,
       timedOut: outcome.timedOut,
-      outputSha256: sha256Hex(outcome.output)
+      ...outputDigest
     }),
     meta: {
       ...common,
       streamKind: "tool_output",
       bytes: outcome.bytes,
-      outputSha256: sha256Hex(outcome.output)
+      ...outputDigest
     }
   };
 
-  return [audit, metric, stdout, ...authorization];
+  return [audit, metric, stdout, ...authorization, ...decision];
 }

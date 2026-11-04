@@ -1,0 +1,15 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-LOG-02",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "ledger_tamper",
+    "events": 4,
+    "tamper": "rewrite"
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "event_hash_mismatch"
+  }
+}

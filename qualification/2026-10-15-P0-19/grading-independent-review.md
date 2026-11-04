@@ -1,0 +1,15 @@
+Independent P0-19 pure grader evidence review
+
+No material findings were found. The final test SHA is 13607bc9ffe886bb399792bad520c08f43e9920ec03362ed280d1ada4d438f04. Both retained normal runs passed all 59 distinct registered cases on Node 22.23.3 with zero pending or todo tests. Inventory has 143 packs and 1,212 scenarios: 1,188 keyword, 24 token-claim, and no built-in structured/executed declaration or callback. Inventory is not whole-scenario execution proof.
+
+All 137 private artifact index entries match their size and SHA-256. Nested immutable private artifact references also match. Historical phase modulePins record then-mutant file states on mutable module paths; those paths now contain restored bytes. Each differing historical hash matches its separately indexed immutable observed module copy. The appendable journal is excluded in favor of its immutable five-phase snapshot.
+
+All 41 retained before/after pins agree. Thirty-six tracked inputs match the measured source Git blobs, and the new test matches the final pin. Root then authorized one current check before its final build: all 41 live source/build/test files matched. Live input reads are finished; the remainder of review used private evidence only.
+
+The same 59-case corpus has three behavioral assertion failures when the ungradable branch is disabled, ten for the tool-call guard, one for the first secret global regex flag, twelve for reversed weakest-method selection, and eleven for keyword eligibility admission. Baseline and restored phases pass 59/59. The raw reports identify assertion errors in the test source, not parser, import or setup errors. All five module changes and patches are exact single changes; three private modules restore byte-exact. Reversing documented import normalization reproduces the original built grader hash.
+
+Unscored inconclusive unions stay distinct from explicit zero-score scoring projections. Measured zero stays a failed measurement. Finite synthetic callbacks exercise structured dispatch without claiming actual agent callbacks or tool execution. All sixteen method pairs are tested in both orders. Actual empty/whitespace branch-removal counterexamples become graded zero failures; the canned counterexample becomes graded50/2.5. No historical empty-50 runtime result is invented.
+
+The only initial-to-final test change removes the permanent Node 22 refusal line. All 59 behavioral assertions stayed unchanged; explicit Node 22 proofs remain and no Node 24 run is claimed. The harmless private-key header and regex patch remain private; they are not actual key material.
+
+No tests, builds, dependencies, runtime, product edits, applications or mutations were performed for this review. Only this private JSON/Markdown pair was written. The 47 echo/P2-27 deferral, frozen approval-theater gap, whole P0-19/P0-55, authenticated surfaces, provider/model/tool execution, full suite, coverage, Node 24, hosted CI, release and Done approval remain outside the proof. Sibling and root qualification evidence remains separate.

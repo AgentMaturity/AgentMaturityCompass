@@ -1,0 +1,6 @@
+bsdtar 3.5.3 - libarchive 3.7.4 zlib/1.2.12 liblzma/5.4.3 bz2lib/1.0.8 
+dotdot: contained (tar exit 1)
+absolute: contained (tar exit 0)
+symlink-abs: contained (tar exit 1)
+symlink-rel: contained (tar exit 1)
+hardlink: contained (tar exit 1)

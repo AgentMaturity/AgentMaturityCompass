@@ -1,9 +1,11 @@
+import { mean } from "../experiments/stats.js";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { effectiveTrustTier, readerTrustFor } from "../claims/evidenceProvenance.js";
 import { questionBank, questionIds } from "../diagnostic/questionBank.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { hashBinaryOrPath, openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import type { LayerName, TrustTier } from "../types.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 
@@ -879,10 +881,7 @@ export function parseOpenAIEvalResults(input: unknown): ParsedEvalImport {
 }
 
 function average(values: number[]): number | null {
-  if (values.length === 0) {
-    return null;
-  }
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return values.length === 0 ? null : mean(values);
 }
 
 function numericValuesFromRecord(record: Record<string, unknown>): number[] {
@@ -1539,7 +1538,7 @@ export function importEvalResults(params: {
   const questionCoverage = summarizeQuestionCoverage(parsed.cases);
   const sessionId = randomUUID();
   const eventIds: string[] = [];
-  const ledger = openLedger(workspace);
+  const ledger = openLedger(workspace, writerStore()); // P0-55: unsigned rows stay apart
   try {
     ledger.startSession({
       sessionId,
@@ -1840,12 +1839,9 @@ function emptyTrustTierBreakdown(): Record<TrustTier, number> {
   };
 }
 
-export function evalImportCoverageStatus(params: {
-  workspace: string;
-  agentId?: string;
-  sinceTs?: number;
-}): EvalCoverageStatus {
-  const ledger = openLedger(params.workspace);
+export function evalImportCoverageStatus(params: { workspace: string; agentId?: string; sinceTs?: number }): EvalCoverageStatus {
+  // Read where importEvalResults writes: under AMC_NO_SIGN=1 that is the unsigned store.
+  const ledger = openLedger(params.workspace, writerStore());
   try {
     const clauses = ["json_extract(meta_json, '$.source') = 'eval_import'"];
     const args: unknown[] = [];

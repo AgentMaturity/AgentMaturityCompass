@@ -1,0 +1,340 @@
+{
+  "schema": "p117-proposed-packet-static-review/1",
+  "recordedUtc": "2026-10-16T09:53:14.905671+00:00",
+  "sourceCommit": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+  "blockingFindings": [],
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "scope": "Closed core 26-file proposal before root materialization; static file review only.",
+  "packet": {
+    "root": "/private/tmp/p1-17-qualification-20261016/qualification-proposal",
+    "files": 26,
+    "bytes": 932656,
+    "oneMiBRemainingBytes": 115920,
+    "pins": [
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/README.md",
+        "bytes": 4513,
+        "sha256": "a09b15df446c0c0a388a9df5091fe146c54d07d1a5949b9b07b7d44f65263c97"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/commands.json",
+        "bytes": 59067,
+        "sha256": "bf88e6443d27e5b8985d8c88e4a35deb298ad226ba854b56b4998292e978efb0"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/evidence.json",
+        "bytes": 8739,
+        "sha256": "1fcd493f29a79962093692ac7e0ddaad61929b6418cdb14ea48b0736f36a81bc"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/fresh-public-observations.json",
+        "bytes": 228240,
+        "sha256": "b391473754a7b17c5c1a4d588861c00dc0f0b38c577f15fcc24d0487ddfb5559"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/fresh-source-binding.json",
+        "bytes": 3900,
+        "sha256": "e112a971185fe3bce44c913a5f4841b8e48ab4f413dc822f79ecfed9fbc12947"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/fresh.observer.json",
+        "bytes": 35105,
+        "sha256": "4d8b04754169770d703cbd054c20b83baa14c7e4e6e546e98a2ee9fc314ed2b6"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/fresh.raw.json",
+        "bytes": 23635,
+        "sha256": "f14bd65cc35185770b26602a9b648ace0f2b960a48c88e31b9583dc148376c7a"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-no-created-ts.observer.json",
+        "bytes": 40477,
+        "sha256": "ced3ad70e1b18804dbaabc383d422dd63ec7d46f26fb61b60874a576295fe8e7"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-no-created-ts.raw.json",
+        "bytes": 26422,
+        "sha256": "3a872410899c3b47c2fb9cd2e576721888f1dcb052e4c57b462d62db2106a475"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-no-signature.observer.json",
+        "bytes": 42872,
+        "sha256": "83761b8f338ad7fe3970009c03746ed2fca3a11295067a740eb6f836e0381df4"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-no-signature.raw.json",
+        "bytes": 27854,
+        "sha256": "c667c6db4ad807e12fcd8856c4e08802eb21a9382705603307ee797acb4651bf"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-nydfs-71.observer.json",
+        "bytes": 52304,
+        "sha256": "13296d007f9fa56280e872e9e385db4478598936ff376e5c182eb0776314f092"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-nydfs-71.raw.json",
+        "bytes": 32469,
+        "sha256": "16522524a40707f6ed9b8132f140c82824f9080db9e36139f503098cf7d1c687"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/primary-source-read-observations.json",
+        "bytes": 2213,
+        "sha256": "f66b884209589ff0cc0e39309ff55a153db54f3d824e0b19aeedc918c3263ee3"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/primary-source-texas-followup.json",
+        "bytes": 854,
+        "sha256": "ac954aedefe6cf22f3a94fd0830a6229861b468c7abbf03fdaaaf7deff87492b"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/receipt.json",
+        "bytes": 12913,
+        "sha256": "74639f76f7545b96fd2a359ee4fff2f56dfc59f8c4e5ac49300ba545ed050a50"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/regression-red.observer.json",
+        "bytes": 35028,
+        "sha256": "554afef634055310bfe36e5fb5e7a6637044dfb0278ed1aa353c3ef9daf039da"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/regression-red.raw.json",
+        "bytes": 23325,
+        "sha256": "ba4cb2f1c40e67826f3d1999429060201676703403bc7a235e8b69db231e9e55"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-created-ts.observer.json",
+        "bytes": 35105,
+        "sha256": "474c525dfd8b457158efa7c5d2aea16cca062db130d320a99a6f8a09028fc2e6"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-created-ts.raw.json",
+        "bytes": 23631,
+        "sha256": "16a0c9556c0db6b68de87f2af517de2cb08cc3eac75b8591b960a582e0309607"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-nydfs-72.observer.json",
+        "bytes": 35105,
+        "sha256": "62afa47a92b9c365d3ce2abf4cb6e2750dc1297b0bf939b3554982a054e0485a"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-nydfs-72.raw.json",
+        "bytes": 23635,
+        "sha256": "38af83ac85d134810a155b3e4cec0805439bfe41e9fa74d04dcbd9c668728c12"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-signature.observer.json",
+        "bytes": 35105,
+        "sha256": "5612dac141edfe32caf2adef76628d5d199685bf35d34c3b971775ad1b79c79d"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-signature.raw.json",
+        "bytes": 23634,
+        "sha256": "2f1d2109f3a2a30a1f39b1f469a18413f5d6cd3c4c5efe06ad1b877685048cfe"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/sensitivity.json",
+        "bytes": 83357,
+        "sha256": "40fba6d3a36d5da1446c2c1ef90340305862c485a01ae24cf97ac6a03b2312a4"
+      },
+      {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/source-inputs.json",
+        "bytes": 13154,
+        "sha256": "dd88550f567a6428fff565b703ade3e51a857060f923f3a6f1f10dff99d19ffb"
+      }
+    ]
+  },
+  "receipt": {
+    "fields": 13,
+    "canonicalTests": {
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "skipped": 0
+    },
+    "commandTriplesMatch": true,
+    "commands": 26,
+    "nonzeroCommands": 8,
+    "artifactHashesVerified": 25
+  },
+  "runs": [
+    {
+      "stem": "fresh",
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "rawObserverFullNameStatusMultisetsEqual": true,
+      "fileListsEqual": true,
+      "unhandledPendingTodoFailedHooks": 0,
+      "raw": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/fresh.raw.json",
+        "bytes": 23635,
+        "sha256": "f14bd65cc35185770b26602a9b648ace0f2b960a48c88e31b9583dc148376c7a"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/fresh.observer.json",
+        "bytes": 35105,
+        "sha256": "4d8b04754169770d703cbd054c20b83baa14c7e4e6e546e98a2ee9fc314ed2b6"
+      }
+    },
+    {
+      "stem": "mutant-nydfs-71",
+      "total": 68,
+      "passed": 62,
+      "failed": 6,
+      "rawObserverFullNameStatusMultisetsEqual": true,
+      "fileListsEqual": true,
+      "unhandledPendingTodoFailedHooks": 0,
+      "raw": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-nydfs-71.raw.json",
+        "bytes": 32469,
+        "sha256": "16522524a40707f6ed9b8132f140c82824f9080db9e36139f503098cf7d1c687"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-nydfs-71.observer.json",
+        "bytes": 52304,
+        "sha256": "13296d007f9fa56280e872e9e385db4478598936ff376e5c182eb0776314f092"
+      }
+    },
+    {
+      "stem": "mutant-no-signature",
+      "total": 68,
+      "passed": 65,
+      "failed": 3,
+      "rawObserverFullNameStatusMultisetsEqual": true,
+      "fileListsEqual": true,
+      "unhandledPendingTodoFailedHooks": 0,
+      "raw": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-no-signature.raw.json",
+        "bytes": 27854,
+        "sha256": "c667c6db4ad807e12fcd8856c4e08802eb21a9382705603307ee797acb4651bf"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-no-signature.observer.json",
+        "bytes": 42872,
+        "sha256": "83761b8f338ad7fe3970009c03746ed2fca3a11295067a740eb6f836e0381df4"
+      }
+    },
+    {
+      "stem": "mutant-no-created-ts",
+      "total": 68,
+      "passed": 66,
+      "failed": 2,
+      "rawObserverFullNameStatusMultisetsEqual": true,
+      "fileListsEqual": true,
+      "unhandledPendingTodoFailedHooks": 0,
+      "raw": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-no-created-ts.raw.json",
+        "bytes": 26422,
+        "sha256": "3a872410899c3b47c2fb9cd2e576721888f1dcb052e4c57b462d62db2106a475"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/mutant-no-created-ts.observer.json",
+        "bytes": 40477,
+        "sha256": "ced3ad70e1b18804dbaabc383d422dd63ec7d46f26fb61b60874a576295fe8e7"
+      }
+    },
+    {
+      "stem": "regression-red",
+      "total": 65,
+      "passed": 64,
+      "failed": 1,
+      "rawObserverFullNameStatusMultisetsEqual": true,
+      "fileListsEqual": true,
+      "unhandledPendingTodoFailedHooks": 0,
+      "raw": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/regression-red.raw.json",
+        "bytes": 23325,
+        "sha256": "ba4cb2f1c40e67826f3d1999429060201676703403bc7a235e8b69db231e9e55"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/regression-red.observer.json",
+        "bytes": 35028,
+        "sha256": "554afef634055310bfe36e5fb5e7a6637044dfb0278ed1aa353c3ef9daf039da"
+      }
+    },
+    {
+      "stem": "restored-nydfs-72",
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "rawObserverFullNameStatusMultisetsEqual": true,
+      "fileListsEqual": true,
+      "unhandledPendingTodoFailedHooks": 0,
+      "raw": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-nydfs-72.raw.json",
+        "bytes": 23635,
+        "sha256": "38af83ac85d134810a155b3e4cec0805439bfe41e9fa74d04dcbd9c668728c12"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-nydfs-72.observer.json",
+        "bytes": 35105,
+        "sha256": "62afa47a92b9c365d3ce2abf4cb6e2750dc1297b0bf939b3554982a054e0485a"
+      }
+    },
+    {
+      "stem": "restored-signature",
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "rawObserverFullNameStatusMultisetsEqual": true,
+      "fileListsEqual": true,
+      "unhandledPendingTodoFailedHooks": 0,
+      "raw": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-signature.raw.json",
+        "bytes": 23634,
+        "sha256": "2f1d2109f3a2a30a1f39b1f469a18413f5d6cd3c4c5efe06ad1b877685048cfe"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-signature.observer.json",
+        "bytes": 35105,
+        "sha256": "5612dac141edfe32caf2adef76628d5d199685bf35d34c3b971775ad1b79c79d"
+      }
+    },
+    {
+      "stem": "restored-created-ts",
+      "total": 68,
+      "passed": 68,
+      "failed": 0,
+      "rawObserverFullNameStatusMultisetsEqual": true,
+      "fileListsEqual": true,
+      "unhandledPendingTodoFailedHooks": 0,
+      "raw": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-created-ts.raw.json",
+        "bytes": 23631,
+        "sha256": "16a0c9556c0db6b68de87f2af517de2cb08cc3eac75b8591b960a582e0309607"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-17-qualification-20261016/qualification-proposal/restored-created-ts.observer.json",
+        "bytes": 35105,
+        "sha256": "474c525dfd8b457158efa7c5d2aea16cca062db130d320a99a6f8a09028fc2e6"
+      }
+    }
+  ],
+  "attribution": [
+    "The receipt counts only fresh 68. The 65/64/1 regression red and private causal/restoration runs remain separate.",
+    "All three TS source controls restore to 68/68; unchanged compiled child surfaces do not establish compiled mutant sensitivity.",
+    "The createdTs control has a decisive unstarted NOTIFIED assertion. Ordinary TRIGGER still refuses through another guard; later masked assertions are not credited.",
+    "Historical precommit pending flags are explicitly dated. Current evidence binds committed 3eb source. causalMutationsInR:false describes private operators, not the actual production/test repair."
+  ],
+  "metadataErrors": {
+    "pin": {
+      "path": "/private/tmp/p1-17-qualification-20261016/metadata-preparation-errors.json",
+      "bytes": 897,
+      "sha256": "28692d7442ea52d5d3249dd29ca10aa43c8e720a762b1b4bb8af165662388ccc"
+    },
+    "assessment": "The title alias correction is static. Exit 0 against a missing/empty parent gives no receipt-validation credit; actual folder validation remains pending."
+  },
+  "lexicalInspection": {
+    "result": "Delegated static inspection found no obvious private-key, token or secret-config bodies and no symlinks/nonregular members.",
+    "snapshotManifestSha256": "1da009c762e96ef6958184527197f1ecdeb1e6557bd633da798e634de3554fd5",
+    "limit": "Lexical inspection is not a universal non-sensitive-content guarantee."
+  },
+  "limits": [
+    "Root-planned peer reviews and metadata-error additions are outside this exact snapshot; root must check final size and artifact hashes.",
+    "Formal acceptance, PR/merge/release, current full-suite/coverage and unwaived quality 1268 duplicates/2733 dead-code remain open.",
+    "Local signatures do not establish legal currency, independent person identity or expert approval. New compiled route tests do not cover outer Studio authentication or compiled oversight/packet paths.",
+    "No AMC command, validator, SQL, product import, new runtime or repository write occurred. This review did not repeat private stream/process-closure audits."
+  ],
+  "reviewPreparationNote": "An initial in-memory comparison assumed test-level observer filepath fields were populated and stopped before any review writes. The final comparison uses unique fullName/status multisets and independently matching file lists."
+}

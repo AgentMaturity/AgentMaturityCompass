@@ -1,6 +1,8 @@
 """Tests for pre-built compliance policy packs."""
 from __future__ import annotations
 
+import re
+
 from amc.watch.prebuilt_policy_packs import (
     nist_ai_rmf_policy_pack,
     soc2_policy_pack,
@@ -60,9 +62,15 @@ def test_gdpr_pack_valid():
 def test_mitre_atlas_pack_valid():
     pack = mitre_atlas_policy_pack()
     assert pack.name == "MITRE ATLAS"
-    assert pack.version == "1.1"
+    assert pack.version == "1.2"
     rule_ids = {rule["id"] for rule in pack.rules}
     assert "ATLAS_T0051_PROMPT_INJECTION" in rule_ids and "ATLAS_T0054_JAILBREAK" in rule_ids
+    # Exfiltration via the inference API is AML.T0024 in ATLAS v2026.10; AML.T0025 is
+    # Exfiltration via Cyber Means.
+    assert "ATLAS_T0024_EXFILTRATION" in rule_ids and "ATLAS_T0025_EXFILTRATION" not in rule_ids
+    for rule in pack.rules:
+        cited = re.findall(r"AML\.T\d{4}", rule["remediation"])
+        assert cited == [f"AML.{rule['id'].split('_')[1]}"], rule["id"]
     assert len(pack.modules) >= 5
     assert len(pack.rules) >= 6
     assert pack.verify_digest()

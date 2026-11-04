@@ -1,0 +1,96 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 17377,
+  "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts"
+  ],
+  "testCount": 5,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-605351079",
+      "name": "tests/verifyRepairCli.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-605351079_0",
+      "name": "tests/verifyRepairCli.test.ts amc verify --repair",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-605351079_0_0",
+      "name": "tests/verifyRepairCli.test.ts amc verify --repair changes nothing on a healthy workspace and exits 0",
+      "fullName": "amc verify --repair changes nothing on a healthy workspace and exits 0",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-605351079_0_1",
+      "name": "tests/verifyRepairCli.test.ts amc verify --repair prints a plan for a tampered workspace, exits 1 and changes nothing",
+      "fullName": "amc verify --repair prints a plan for a tampered workspace, exits 1 and changes nothing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-605351079_0_2",
+      "name": "tests/verifyRepairCli.test.ts amc verify --repair refuses --apply without a TTY or --yes, exits 2 and moves nothing",
+      "fullName": "amc verify --repair refuses --apply without a TTY or --yes, exits 2 and moves nothing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-605351079_0_3",
+      "name": "tests/verifyRepairCli.test.ts amc verify --repair archives a tampered store with --apply --yes under a receipt signed as REPAIR_RECEIPT",
+      "fullName": "amc verify --repair archives a tampered store with --apply --yes under a receipt signed as REPAIR_RECEIPT",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-605351079_1",
+      "name": "tests/verifyRepairCli.test.ts amc verify messages",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-605351079_1_0",
+      "name": "tests/verifyRepairCli.test.ts amc verify messages no longer recommends cleaning and rebuilding when every signature fails",
+      "fullName": "amc verify messages no longer recommends cleaning and rebuilding when every signature fails",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

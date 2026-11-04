@@ -9,39 +9,60 @@
     "evidence": {
       "properties": {
         "correlationRatio": {
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "evidenceCoverage": {
-          "properties": {
-            "attestedShare": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
+          "anyOf": [
+            {
+              "properties": {
+                "attestedShare": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "observedShare": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "selfReportedShare": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "observedShare",
+                "attestedShare",
+                "selfReportedShare"
+              ],
+              "type": "object"
             },
-            "observedShare": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            "selfReportedShare": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
+            {
+              "type": "null"
             }
-          },
-          "required": [
-            "observedShare",
-            "attestedShare",
-            "selfReportedShare"
-          ],
-          "type": "object"
+          ]
         },
         "integrityIndex": {
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "trustLabel": {
           "enum": [
@@ -141,13 +162,9 @@
               "type": "string"
             },
             "maturityDeltaShort": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "number",
+                "null"
               ]
             },
             "reasons": {
@@ -158,13 +175,9 @@
               "type": "array"
             },
             "riskDeltaShort": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "number",
+                "null"
               ]
             },
             "status": {
@@ -189,29 +202,64 @@
             "fiveDimensions": {
               "properties": {
                 "d1": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "d2": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "d3": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "d4": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "d5": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -226,29 +274,64 @@
             "fiveLayers": {
               "properties": {
                 "culture": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "leadership": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "resilience": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "skills": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "strategicOps": {
-                  "maximum": 5,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 5,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -261,9 +344,16 @@
               "type": "object"
             },
             "overall": {
-              "maximum": 5,
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "maximum": 5,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "questions42": {
               "items": {
@@ -297,30 +387,65 @@
         "operatingHealth": {
           "properties": {
             "approvalsBacklogCount": {
-              "maximum": 9007199254740991,
-              "minimum": 0,
-              "type": "integer"
+              "anyOf": [
+                {
+                  "maximum": 9007199254740991,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "approvalsMedianAgeHours": {
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "assurance": {
               "properties": {
                 "exfilAttemptsDetected": {
-                  "maximum": 9007199254740991,
-                  "minimum": 0,
-                  "type": "integer"
+                  "anyOf": [
+                    {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "injectionFailures": {
-                  "maximum": 9007199254740991,
-                  "minimum": 0,
-                  "type": "integer"
+                  "anyOf": [
+                    {
+                      "maximum": 9007199254740991,
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "latestScore": {
-                  "maximum": 100,
-                  "minimum": 0,
-                  "type": "number"
+                  "anyOf": [
+                    {
+                      "maximum": 100,
+                      "minimum": 0,
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               },
               "required": [
@@ -391,9 +516,16 @@
               "type": "object"
             },
             "toolhubDenialRate": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           "required": [
@@ -448,34 +580,76 @@
         "valueDimensions": {
           "properties": {
             "brandValue": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "economicValue": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "emotionalValue": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "functionalValue": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "lifetimeValue": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "valueScore": {
-              "maximum": 100,
-              "minimum": 0,
-              "type": "number"
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           "required": [

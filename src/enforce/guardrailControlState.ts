@@ -84,7 +84,7 @@ export function guardrailControlHeadsDir(workspace: string): string {
   return join(guardrailControlRoot(workspace), "heads");
 }
 
-function withGuardrailControlLock<T>(workspace: string, operation: () => T): T {
+export function withGuardrailControlLock<T>(workspace: string, operation: () => T): T {
   try {
     return withControlFileLock({
       root: guardrailControlRoot(workspace),
@@ -103,7 +103,7 @@ export function isBoundGuardrailName(name: string): name is BoundGuardrailName {
   return Object.prototype.hasOwnProperty.call(GUARDRAIL_RUNTIME_BINDINGS, name);
 }
 
-function validateState(raw: unknown): GuardrailControlState {
+export function validateState(raw: unknown): GuardrailControlState {
   let parsed: GuardrailControlState;
   try {
     parsed = guardrailControlStateSchema.parse(raw);
@@ -145,7 +145,7 @@ function validateState(raw: unknown): GuardrailControlState {
   };
 }
 
-function readJournal(workspace: string, recoverPendingPublication = false): SignedControlJournalSnapshot<GuardrailControlState> {
+export function readJournal(workspace: string, recoverPendingPublication = false): SignedControlJournalSnapshot<GuardrailControlState> {
   try {
     return readSignedControlJournal({
       workspace,
@@ -181,7 +181,7 @@ function mirrorStatus(workspace: string, state: GuardrailControlState): string {
   }
 }
 
-function readGuardrailControlStateUnlocked(workspace: string, recoverPendingPublication = false): GuardrailControlSnapshot {
+export function readGuardrailControlStateUnlocked(workspace: string, recoverPendingPublication = false): GuardrailControlSnapshot {
   const path = guardrailControlStatePath(workspace);
   const signaturePath = artifactSigPath(path);
   const journal = readJournal(workspace, recoverPendingPublication);
@@ -263,7 +263,7 @@ export function inspectGuardrailControlStateReadOnly(workspace: string): Guardra
   }
 }
 
-function assertKnownBoundGuardrail(name: string): asserts name is BoundGuardrailName {
+export function assertKnownBoundGuardrail(name: string): asserts name is BoundGuardrailName {
   if (!AVAILABLE_GUARDRAILS.some((guardrail) => guardrail.name === name)) {
     throw new GuardrailControlError("UNKNOWN_GUARDRAIL", `Unknown guardrail: ${name}`);
   }
@@ -302,7 +302,7 @@ function commitState(workspace: string, state: GuardrailControlState): Guardrail
   return validated;
 }
 
-function nextBaseState(snapshot: GuardrailControlSnapshot): GuardrailControlState {
+export function nextBaseState(snapshot: GuardrailControlSnapshot): GuardrailControlState {
   return snapshot.state ?? {
     schemaVersion: GUARDRAIL_CONTROL_SCHEMA_VERSION,
     revision: 0,

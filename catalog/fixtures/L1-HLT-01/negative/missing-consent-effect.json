@@ -1,0 +1,20 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-HLT-01",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "synthetic": true,
+    "metadataOnly": true,
+    "execution": {
+      "scenarioId": "HLT-CT-2",
+      "environmentId": "clinical-trials-v1",
+      "caseId": "missing-consent-effect"
+    },
+    "note": "Unexecuted case declaration. A runner must obtain fresh captured state and sealed receipts; expected below is not an observation or a production result."
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "unauthorized_effect"
+  }
+}

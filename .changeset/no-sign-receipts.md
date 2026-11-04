@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+Under `AMC_NO_SIGN=1` AMC now mints no receipt and puts no real signature on any ledger row. Receipt minting is refused on both the legacy and the delegated receipt paths with "receipt child signing requires an unlocked signing vault; AMC_NO_SIGN=1 mints no receipt, so run this signed (unset AMC_NO_SIGN, drop --no-sign)", before any payload blob is stored. Previously `appendEvidenceWithReceipt` signed its row with the monitor key directly and the legacy path minted a real receipt, so an unverified capture in `.amc/unsigned/evidence.sqlite` could pass as signed evidence once copied out. Evidence rows, outcome rows and the evidence-to-incident links and causal edges written by auto-linking now all sign through the same no-sign rule and carry the literal `unsigned`, which every verifier rejects. `amc assurance run --no-sign` keeps working: its audit rows are plain unsigned rows with no receipt. Flows whose meaning is a receipt (gateway and bridge requests, Studio and toolhub audits, pairing, guard, outcomes, executed assurance captures) refuse under `AMC_NO_SIGN=1`.

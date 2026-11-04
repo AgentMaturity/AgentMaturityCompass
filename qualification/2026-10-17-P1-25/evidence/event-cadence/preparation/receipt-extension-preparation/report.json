@@ -1,0 +1,29 @@
+{
+  "schema": "p125ec-inert-receipt-helper-author-analysis/1",
+  "at": "2026-10-17T01:12:52.053051+00:00",
+  "blockers": [],
+  "helperExecuted": false,
+  "actualBaseReadOnlyCounts": {
+    "files": 1917,
+    "artifacts": 1916,
+    "nonindexPayloads": 1914,
+    "commands": 214,
+    "orderedPins": 2916
+  },
+  "actualSourceCheckpoint": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "knownSourceFresh23InventorySuppliesNoPredictedControlFailureTotals": true,
+  "adaptations": [
+    "B39 branch/prefix/actual protected161 schema, one source successor, sourceCommit field and actual98/21/12 fresh binding.",
+    "Preserve entire completed B38 base and all old command/input order; remove only B38 current-diagnostic clauses. No analogous new diagnostic is required.",
+    "Two same-checkpoint.ts controls require exact originals/live patches/manual failure messages+frames+masks, explicit in-place restoration and actual action end-before-test chronology, including prior restore action before apply2.",
+    "Require actual peer source/root/schema/blockers, all six identical23-case outcomes, actual hooks/no late/unhandled/signals, exact root preservation report. No fixed RED resource counts.",
+    "Direct full physical rechecks for161 active pins,196 distinct selected S/Q files,12 native identities and exact operation target identity against the bound fresh file.",
+    "Retain strict active C/source-control.py SHAa30fa847, private base retention, explicit public roles, hash-only marker inputs and active assembler, inert code, bytecode/native/private-stream/key/PEM/raw-original exclusions.",
+    "Require every eligible .patch.txt alongside logs/livepatches to be lossless; marker rejection precedes encoding. Full raw quality finding JSON remains private."
+  ],
+  "currentControlOutcomesNotReadOrFabricatedByAuthor": true,
+  "templateRuntimeFieldsRemainNullAndRootFlagsFalse": true,
+  "futureReceiptPrefixOwnershipAndAllocationUnclaimed": true,
+  "noSourceIndexQaPriorArtifactReservationOrProductActions": true,
+  "fullIssuePlanGlobalQualityAndAllHoldsRemainOpen": true
+}

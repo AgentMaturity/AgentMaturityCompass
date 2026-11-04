@@ -1,0 +1,11 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 1270,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [],
+  "testCount": 0,
+  "unhandledErrors": [],
+  "tasks": [],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

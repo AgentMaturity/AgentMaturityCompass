@@ -1,0 +1,1394 @@
+{
+  "kind": "P0-19 runner independent read-only package review",
+  "reviewedUtc": "2026-10-14T21:27:47.364053+00:00",
+  "findings": [],
+  "result": "No actionable package-integrity or assertion-weakening findings; strict current-source artifact-validity failure remains real and open.",
+  "normalSourceBoundary": {
+    "qualifiedBeforeCommit": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+    "sourceAtReceiptAndReview": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+    "test": {
+      "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "sha256": "56b9227f46e054c8cd800ebac9bba7d58c567751988a9779c9a3373d9508270b",
+      "lines": 217,
+      "cases": 11,
+      "onlyOwnedRepositoryFile": true,
+      "committedByThisAgent": false
+    },
+    "committedScope": "Three new tests and ten factual count references only; no production/old-helper/script/dependency/guard/archive change in the source commit.",
+    "runner36LiveSourcePinsMatchReceipt": true,
+    "sourceManifest": {
+      "path": "/private/tmp/p0-19-final-source-manifest-20261015.json",
+      "bytes": 9548,
+      "sha256": "28a39c05e1c491908fffb20539cabe04ded8644d619871f812e3dca48ba4b54e"
+    },
+    "protectedBasePins": 45
+  },
+  "receipt": {
+    "path": "/private/tmp/p0-19-runner-qualification-20261015.json",
+    "bytes": 86277,
+    "sha256": "31b84dcbc8af5522fb422f0183d351a3164047599e3e62ead572528c49121b7d"
+  },
+  "receiptMarkdown": {
+    "path": "/private/tmp/p0-19-runner-qualification-20261015.md",
+    "bytes": 3916,
+    "sha256": "1a22c5f8046cf3a4c4f5984383983284426d53bd88b540fa6564b6ae3dc4e9a1"
+  },
+  "artifacts": {
+    "index": {
+      "path": "/private/tmp/p0-19-runner-qualification-artifacts-20261015.json",
+      "bytes": 84102,
+      "sha256": "1d526ec971ab7dbeb76705798ec47e25d91823863c13d0dccc0ecd73d2061aa4"
+    },
+    "declared": 424,
+    "verified": 424,
+    "allHashesAndSizesMatch": true,
+    "largestPrivateBytes": 1127045,
+    "canonicalLimit": "Some retained private effect files exceed1MiB (largest1,127,045bytes). This review does not claim they meet canonical artifact limits; retain hashed private references or compact records when building canonical receipts."
+  },
+  "normalPhases": [
+    {
+      "phase": "runner-first",
+      "raw": {
+        "path": "/private/tmp/p0-19-runner-first-20261015.json",
+        "bytes": 8966,
+        "sha256": "0a1dae6956efc1cc6950ffb5619e47bdb18e23525c9dea45ac9685fd438fa8c7"
+      },
+      "counts": {
+        "numTotalTests": 11,
+        "numPassedTests": 8,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        {
+          "name": "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+          "failureMessagesSha256": "50004fe8c2c1627f872fee2faac05fd3569a79822b2c73883e2df0d13567bdf7"
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+          "failureMessagesSha256": "3580975b9611777e907860d658edce913b645fe440cbc20c622de6d4dcdc825f"
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts real text measurements retain pass/fail counts, plain-text digests and nonempty failure findings",
+          "failureMessagesSha256": "8b4140e71af488ce36d6ce17825348c9a2b0b810d8c353f4eee7f83535d6b1e7"
+        }
+      ]
+    },
+    {
+      "phase": "runner-payload-corrected",
+      "raw": {
+        "path": "/private/tmp/p0-19-runner-payload-corrected-20261015.json",
+        "bytes": 6562,
+        "sha256": "5e9fcadfbd23315058656777b3a6ddaf29202fce9449229ef1d496d1106a5a74"
+      },
+      "counts": {
+        "numTotalTests": 11,
+        "numPassedTests": 10,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        {
+          "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+          "failureMessagesSha256": "62ec26e7269ba8d435ab5478425f07d036a1d4f5a4f81036d7379b3adc845226"
+        }
+      ]
+    },
+    {
+      "phase": "runner-final-current",
+      "raw": {
+        "path": "/private/tmp/p0-19-runner-final-current-20261015.json",
+        "bytes": 6560,
+        "sha256": "0268c2d6030a63800fa50ec3cc654de7fb64130a77a1484129c7c153f33a0dcd"
+      },
+      "counts": {
+        "numTotalTests": 11,
+        "numPassedTests": 10,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        {
+          "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+          "failureMessagesSha256": "261763bf3ec6080feb5d41818d5af26cef8486c92ae40edaf052f6b34e9a1d7d"
+        }
+      ]
+    },
+    {
+      "phase": "runner-typed-current",
+      "raw": {
+        "path": "/private/tmp/p0-19-runner-typed-current-20261015.json",
+        "bytes": 6562,
+        "sha256": "65e19d23b66bad600d24c70f0b8c5b31191c4508c048aa802b9e30d5b5304398"
+      },
+      "counts": {
+        "numTotalTests": 11,
+        "numPassedTests": 10,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        {
+          "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+          "failureMessagesSha256": "f853cd5b8b6f6bd78911b6464250de7b99ca05bd2aed4865df49cbb89521b18e"
+        }
+      ]
+    }
+  ],
+  "normalFinalContract": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "pending": 0,
+    "todo": 0,
+    "status": "The current production source remains RED on the genuine measured artifact validity criterion. No expectation was weakened to make INVALID acceptable.",
+    "fixtures": "Three actual independently pre-pinned loopback producers each run 13 injection scenarios. Tool-only has 0 measured pass/fail; measured text has 10 pass/3 fail; measured failure has 0 pass/13 fail. The three workspaces contain 165 genuinely signed rows and three session seals.",
+    "observedBehavior": "All tool-report attribution, redacted canonical digests/counts/non-disclosure, ordinary text digests, HIGH audit, real zero-scoring, genuine rows/session/report/v1 signatures, stored hash/seal/status agreement, later verifiers, v1 insufficient/no-findings, tampered-score refusal/exact byte restoration, measured findings and unsigned-local red-team parity pass.",
+    "statusMeaning": "Artifact VALID/INVALID/UNSIGNED is distinct from measurement MEASURED/INSUFFICIENT_EVIDENCE and v1 score.status. The proposed fix preserves insufficient measurement and measured failures; VALID refers to healthy artifact verification, not positive grading or regulated eligibility.",
+    "trustMeaning": "Actual OBSERVED/OBSERVED_HARDENED request/reply capture is retained. A controlled loopback target, genuine signatures and independent operator pins do not prove a live model, executed tool, independent regulated evidence or a compliance pass."
+  },
+  "privateCombinedPhases": [
+    {
+      "phase": "baseline",
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/baseline.json",
+        "bytes": 10130,
+        "sha256": "628d1a2af505d1f3446e2754b323b92a636dd3ca975b68b8c700b3d3f6f7b442"
+      },
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 18,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ],
+      "originalEightAbortCasesPassed": true
+    },
+    {
+      "phase": "response-digest-changed",
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-changed.json",
+        "bytes": 11457,
+        "sha256": "422ee95c3f29f547bb744b36545ad43c0462a86d9a0f4600be8d913bb165719e"
+      },
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 17,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ],
+      "originalEightAbortCasesPassed": true
+    },
+    {
+      "phase": "response-digest-restored",
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-restored.json",
+        "bytes": 10137,
+        "sha256": "dc5aadae264080a576345b97cfd196b32b6e1f6c1c788846d473756902bb82d0"
+      },
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 18,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ],
+      "originalEightAbortCasesPassed": true
+    },
+    {
+      "phase": "v1-findings-changed",
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-changed.json",
+        "bytes": 11593,
+        "sha256": "cc19bf383bf7d7ad54fdb4dcff933749c44ab5615cbadaff5835faa496b4a1ba"
+      },
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 17,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+        "P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings"
+      ],
+      "originalEightAbortCasesPassed": true
+    },
+    {
+      "phase": "v1-findings-restored",
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-restored.json",
+        "bytes": 10134,
+        "sha256": "04041cdd5d52de5f16eb116cd4c825e994ad0fe1e7f927d8445eb93fa1f010a0"
+      },
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 18,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ],
+      "originalEightAbortCasesPassed": true
+    },
+    {
+      "phase": "seal-order-proposal-changed",
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed.json",
+        "bytes": 8862,
+        "sha256": "9b9e0ed5e010ad7a195ff69fec2625aaf7b112bf92cb17f881526ffeaf4def1b"
+      },
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 19,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [],
+      "originalEightAbortCasesPassed": true
+    },
+    {
+      "phase": "seal-order-proposal-restored",
+      "raw": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored.json",
+        "bytes": 10137,
+        "sha256": "a9f564beae7b8e4ab8d115260c68355c6e08b918e525d02df8b1ea160a46b0f4"
+      },
+      "counts": {
+        "numTotalTests": 19,
+        "numPassedTests": 18,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failedCases": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ],
+      "originalEightAbortCasesPassed": true
+    }
+  ],
+  "nineArtifactStateAndEffectsChecks": [
+    {
+      "phase": "baseline",
+      "effects": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/baseline-effects/runner-effects.json",
+        "bytes": 1118973,
+        "sha256": "7aa2308b5e1b8b4793ef091b4e451a200a63cc349487f804ec451fba2779b2a1"
+      },
+      "fixtures": [
+        {
+          "name": "tool-calls",
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+          "rows": 43,
+          "sealEndedTs": 1792012547639,
+          "finalEventHash": "c130dfda2bcf995eb58053c124ee3e34f2d541d85963e773595d2d4942b4d1e7",
+          "storedDBHashSealStatusMatchReport": true,
+          "postSealPinnedLedger": {
+            "ok": true,
+            "chainOk": true,
+            "anchored": true
+          },
+          "beforePinsCaptured": true,
+          "parentIndependentCryptoChecks": {
+            "name": "tool-calls",
+            "events": 43,
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+            "priorPins": true,
+            "reportAndRowsAndSealCrypto": true
+          },
+          "assuranceCalls": 13,
+          "redteamCalls": 13,
+          "scenarioCount": 13,
+          "passCount": 0,
+          "failCount": 0,
+          "capturedProducerEffectDelta": {
+            "added": [
+              "workspace/.amc/assurance/runs/e0e8c6c8-c192-4d40-9862-f993730122e6",
+              "workspace/.amc/assurance/runs/e0e8c6c8-c192-4d40-9862-f993730122e6/findings.json",
+              "workspace/.amc/assurance/runs/e0e8c6c8-c192-4d40-9862-f993730122e6/findings.json.sig",
+              "workspace/.amc/assurance/runs/e0e8c6c8-c192-4d40-9862-f993730122e6/run.json",
+              "workspace/.amc/assurance/runs/e0e8c6c8-c192-4d40-9862-f993730122e6/run.json.sig",
+              "workspace/.amc/assurance/runs/e0e8c6c8-c192-4d40-9862-f993730122e6/trace.refs.json",
+              "workspace/.amc/assurance/runs/e0e8c6c8-c192-4d40-9862-f993730122e6/trace.refs.json.sig",
+              "workspace/.amc/blob-keys",
+              "workspace/.amc/blob-keys/current.json",
+              "workspace/.amc/blob-keys/current.json.sig",
+              "workspace/.amc/blobs/blob_2yeyc2obruazsobgnlrprg7q3i.blob",
+              "workspace/.amc/blobs/blob_4g2ckzge2d7ywmp6ysu2hlwcyq.blob",
+              "workspace/.amc/blobs/blob_c2hbacd7ssfdg5mkzraupf526i.blob",
+              "workspace/.amc/blobs/blob_eqj4vfcvf3abdp3vju3aohszyi.blob",
+              "workspace/.amc/blobs/blob_fan2kyw4sgvbq2wakiseicvnka.blob",
+              "workspace/.amc/blobs/blob_gnensxdltqfougzhlwfpxep5oq.blob",
+              "workspace/.amc/blobs/blob_gqnfrjnunpujuqjqzrqwcedlbe.blob",
+              "workspace/.amc/blobs/blob_hc4gsbtwco2taum7spf4uclx7u.blob",
+              "workspace/.amc/blobs/blob_hid7xeo7ns3dvofrus2i2g7vvi.blob",
+              "workspace/.amc/blobs/blob_hliy5ftwstdtootjae6atdz3mm.blob",
+              "workspace/.amc/blobs/blob_isefds55mb5fi6zgc7vgp2t74a.blob",
+              "workspace/.amc/blobs/blob_iwjlbilrw66azqqglwueq5zkse.blob",
+              "workspace/.amc/blobs/blob_j2dvamczflu2y23h25ozehjtmq.blob",
+              "workspace/.amc/blobs/blob_k64o7nwvaexlkq6jpdvxazmgfi.blob",
+              "workspace/.amc/blobs/blob_lenmsetr5jp7sxmkgeaefazisa.blob",
+              "workspace/.amc/blobs/blob_o4kpc6v7rvm4bo27opcb5nrjya.blob",
+              "workspace/.amc/blobs/blob_paljruc3knuhspun5gz3cozx7i.blob",
+              "workspace/.amc/blobs/blob_rlj2wrzfoqqb2ukao7ozmpe4nu.blob",
+              "workspace/.amc/blobs/blob_rth3qvxouleaatsw63q7ctgcjm.blob",
+              "workspace/.amc/blobs/blob_tbld2sxsjpsgksdqmmltyvswte.blob",
+              "workspace/.amc/blobs/blob_tvaxot3katvhns7z74appkvite.blob",
+              "workspace/.amc/blobs/blob_uasueamawlrgmx57yvf7dyzpie.blob",
+              "workspace/.amc/blobs/blob_vzvqqnkoc74ce7ofy4fumaavpm.blob",
+              "workspace/.amc/blobs/blob_xypoewvty4y6yiw5l6lpsaitny.blob",
+              "workspace/.amc/blobs/blob_yuwy2hyzuj45h6btcgwgi7c5fm.blob",
+              "workspace/.amc/blobs/blob_z6cqzjmbx6orutzrslfaugy4ga.blob",
+              "workspace/.amc/blobs/index.jsonl",
+              "workspace/.amc/blobs/index.jsonl.sig",
+              "workspace/.amc/redteam",
+              "workspace/.amc/redteam/default",
+              "workspace/.amc/redteam/default/cbab0ff9-1cbc-4adc-bba9-7e4f1fbc2743.json",
+              "workspace/.amc/redteam/default/cbab0ff9-1cbc-4adc-bba9-7e4f1fbc2743.md",
+              "workspace/.amc/reports/assurance",
+              "workspace/.amc/reports/assurance/e0e8c6c8-c192-4d40-9862-f993730122e6.json",
+              "workspace/.amc/reports/assurance/e0e8c6c8-c192-4d40-9862-f993730122e6.md"
+            ],
+            "removed": [],
+            "changed": [
+              "workspace/.amc",
+              "workspace/.amc/assurance/runs",
+              "workspace/.amc/blobs",
+              "workspace/.amc/evidence.sqlite-shm",
+              "workspace/.amc/evidence.sqlite-wal",
+              "workspace/.amc/keys/auditor_ed25519.pub",
+              "workspace/.amc/keys/lease_ed25519.pub",
+              "workspace/.amc/keys/monitor_ed25519.pub",
+              "workspace/.amc/keys/session_ed25519.pub",
+              "workspace/.amc/reports",
+              "workspace/.amc/vault.amcvault",
+              "workspace/.amc/vault.amcvault.meta.json"
+            ]
+          }
+        },
+        {
+          "name": "measured-text",
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "MEASURED",
+          "rows": 56,
+          "sealEndedTs": 1792012547956,
+          "finalEventHash": "3a26eba9957ac68c159410cab4aa954a15c64bbabd6107fd5cddd5f5d223115b",
+          "storedDBHashSealStatusMatchReport": true,
+          "postSealPinnedLedger": {
+            "ok": true,
+            "chainOk": true,
+            "anchored": true
+          },
+          "beforePinsCaptured": true,
+          "parentIndependentCryptoChecks": {
+            "name": "measured-text",
+            "events": 56,
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "MEASURED",
+            "priorPins": true,
+            "reportAndRowsAndSealCrypto": true
+          },
+          "assuranceCalls": 13,
+          "redteamCalls": 0,
+          "scenarioCount": 13,
+          "passCount": 10,
+          "failCount": 3,
+          "capturedProducerEffectDelta": {
+            "added": [
+              "workspace/.amc/assurance/runs/15b487a2-c2e5-4d94-ad32-b18d22d767e5",
+              "workspace/.amc/assurance/runs/15b487a2-c2e5-4d94-ad32-b18d22d767e5/findings.json",
+              "workspace/.amc/assurance/runs/15b487a2-c2e5-4d94-ad32-b18d22d767e5/findings.json.sig",
+              "workspace/.amc/assurance/runs/15b487a2-c2e5-4d94-ad32-b18d22d767e5/run.json",
+              "workspace/.amc/assurance/runs/15b487a2-c2e5-4d94-ad32-b18d22d767e5/run.json.sig",
+              "workspace/.amc/assurance/runs/15b487a2-c2e5-4d94-ad32-b18d22d767e5/trace.refs.json",
+              "workspace/.amc/assurance/runs/15b487a2-c2e5-4d94-ad32-b18d22d767e5/trace.refs.json.sig",
+              "workspace/.amc/blob-keys",
+              "workspace/.amc/blob-keys/current.json",
+              "workspace/.amc/blob-keys/current.json.sig",
+              "workspace/.amc/blobs/blob_2whh4datwfftakgfssx4xctc4i.blob",
+              "workspace/.amc/blobs/blob_5kxumhmnbcnryjny6dr3osni5y.blob",
+              "workspace/.amc/blobs/blob_au2fpehlk6ech6m2sarpos4pgu.blob",
+              "workspace/.amc/blobs/blob_b7pq6fuudrwg7k3qtd63ps6dpi.blob",
+              "workspace/.amc/blobs/blob_bypxxwxur3zd2ae4wmgqjnoswa.blob",
+              "workspace/.amc/blobs/blob_ebseqdei4mjtxgsbvyp3fcb7uu.blob",
+              "workspace/.amc/blobs/blob_exsikzzwdzzwgay7opp6zshfvy.blob",
+              "workspace/.amc/blobs/blob_fbxil56n7ovbwwhogdgusvq4ky.blob",
+              "workspace/.amc/blobs/blob_gakq3wuphmv4yzry4yv6e3whay.blob",
+              "workspace/.amc/blobs/blob_gbykvgd6xxwuzurg2ddcfhgo6u.blob",
+              "workspace/.amc/blobs/blob_h2i2zkp4cz3hpxx2qf5b32mi4a.blob",
+              "workspace/.amc/blobs/blob_ho33q5db7ablkns2bjd4idxpiu.blob",
+              "workspace/.amc/blobs/blob_jwrivv2ilnutuusak723sto5hu.blob",
+              "workspace/.amc/blobs/blob_mzmpo63sksefdcywd26ule43fi.blob",
+              "workspace/.amc/blobs/blob_prrlhq672qj2cw77l2eiaplcbi.blob",
+              "workspace/.amc/blobs/blob_qihmdqf3v2yxj2oks2axye3oue.blob",
+              "workspace/.amc/blobs/blob_r4zvfdnbabsdcbpa3clvpmz4we.blob",
+              "workspace/.amc/blobs/blob_rnubsx3sdocnhgla6mipwx3hke.blob",
+              "workspace/.amc/blobs/blob_sna5izengk2bp76pil5c3cl6gy.blob",
+              "workspace/.amc/blobs/blob_svdnyf3wsax5xox63ui6a3dxji.blob",
+              "workspace/.amc/blobs/blob_ug7irk3jgmgcclfuj6amurflmu.blob",
+              "workspace/.amc/blobs/blob_uh7554gr7wr4a3saciot35jik4.blob",
+              "workspace/.amc/blobs/blob_w324grr7cvtmwd3jllwbr3m6my.blob",
+              "workspace/.amc/blobs/blob_wbkiw4zxxxzdlfqrp26mc5kwby.blob",
+              "workspace/.amc/blobs/blob_znqgequiqk5nfzsrvlj3srcsj4.blob",
+              "workspace/.amc/blobs/blob_zx3bdcq3ve3mfm6kp6nyayc2qm.blob",
+              "workspace/.amc/blobs/index.jsonl",
+              "workspace/.amc/blobs/index.jsonl.sig",
+              "workspace/.amc/reports/assurance",
+              "workspace/.amc/reports/assurance/15b487a2-c2e5-4d94-ad32-b18d22d767e5.json",
+              "workspace/.amc/reports/assurance/15b487a2-c2e5-4d94-ad32-b18d22d767e5.md"
+            ],
+            "removed": [],
+            "changed": [
+              "workspace/.amc",
+              "workspace/.amc/assurance/runs",
+              "workspace/.amc/blobs",
+              "workspace/.amc/evidence.sqlite-shm",
+              "workspace/.amc/evidence.sqlite-wal",
+              "workspace/.amc/keys/auditor_ed25519.pub",
+              "workspace/.amc/keys/lease_ed25519.pub",
+              "workspace/.amc/keys/monitor_ed25519.pub",
+              "workspace/.amc/keys/session_ed25519.pub",
+              "workspace/.amc/reports",
+              "workspace/.amc/vault.amcvault",
+              "workspace/.amc/vault.amcvault.meta.json"
+            ]
+          }
+        },
+        {
+          "name": "measured-failure",
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "MEASURED",
+          "rows": 66,
+          "sealEndedTs": 1792012548255,
+          "finalEventHash": "d99f0faca35aa0a58e2e28106c11560938c1a561a17ea37a6649a5c51c1e8d7e",
+          "storedDBHashSealStatusMatchReport": true,
+          "postSealPinnedLedger": {
+            "ok": true,
+            "chainOk": true,
+            "anchored": true
+          },
+          "beforePinsCaptured": true,
+          "parentIndependentCryptoChecks": {
+            "name": "measured-failure",
+            "events": 66,
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "MEASURED",
+            "priorPins": true,
+            "reportAndRowsAndSealCrypto": true
+          },
+          "assuranceCalls": 13,
+          "redteamCalls": 0,
+          "scenarioCount": 13,
+          "passCount": 0,
+          "failCount": 13,
+          "capturedProducerEffectDelta": {
+            "added": [
+              "workspace/.amc/assurance/runs/ed04faa0-f4cb-4f67-b6dc-b62d214db844",
+              "workspace/.amc/assurance/runs/ed04faa0-f4cb-4f67-b6dc-b62d214db844/findings.json",
+              "workspace/.amc/assurance/runs/ed04faa0-f4cb-4f67-b6dc-b62d214db844/findings.json.sig",
+              "workspace/.amc/assurance/runs/ed04faa0-f4cb-4f67-b6dc-b62d214db844/run.json",
+              "workspace/.amc/assurance/runs/ed04faa0-f4cb-4f67-b6dc-b62d214db844/run.json.sig",
+              "workspace/.amc/assurance/runs/ed04faa0-f4cb-4f67-b6dc-b62d214db844/trace.refs.json",
+              "workspace/.amc/assurance/runs/ed04faa0-f4cb-4f67-b6dc-b62d214db844/trace.refs.json.sig",
+              "workspace/.amc/blob-keys",
+              "workspace/.amc/blob-keys/current.json",
+              "workspace/.amc/blob-keys/current.json.sig",
+              "workspace/.amc/blobs/blob_2xeyazbfgkoupbezlwkzcqpdle.blob",
+              "workspace/.amc/blobs/blob_4ak2u6ymbw4mxqeluqxtmukybi.blob",
+              "workspace/.amc/blobs/blob_6rxgg5saampaeqo4ydug7wnf7u.blob",
+              "workspace/.amc/blobs/blob_a6o7qfiv7rxxqpmid4qaxjdohu.blob",
+              "workspace/.amc/blobs/blob_bytlwtedxfd2ikp5vu4odkdwq4.blob",
+              "workspace/.amc/blobs/blob_cohgln4mbyfbrrg3yfw3mjmy6i.blob",
+              "workspace/.amc/blobs/blob_dfhkmk4zx5jtww44wljy4mfgoy.blob",
+              "workspace/.amc/blobs/blob_dtg62jnq5lpmzxppnlrta5fkme.blob",
+              "workspace/.amc/blobs/blob_dxzjuud5tu7a6ujgnfovntvmaa.blob",
+              "workspace/.amc/blobs/blob_e3ibqb52qirnql6q7v4uateciq.blob",
+              "workspace/.amc/blobs/blob_hbcld3rijus4hhg6s4xsenooly.blob",
+              "workspace/.amc/blobs/blob_huq7l6hxlydrkebk52mjotk7pi.blob",
+              "workspace/.amc/blobs/blob_lne6qhkj7mbfca2drnw7ywqdcm.blob",
+              "workspace/.amc/blobs/blob_ndbndwma4pcsjh4dz75bs6hnae.blob",
+              "workspace/.amc/blobs/blob_ouuhmbdy5pvm6rnoe7uvcimolu.blob",
+              "workspace/.amc/blobs/blob_p5v4jjmxotsepy6outuxjvcs7u.blob",
+              "workspace/.amc/blobs/blob_poi2jcuoi3pdr5quh7vfncz3zq.blob",
+              "workspace/.amc/blobs/blob_qfwan3ad6manj4eb6rmci6xg4a.blob",
+              "workspace/.amc/blobs/blob_r5333vvkglbpld7thoa3f5vebe.blob",
+              "workspace/.amc/blobs/blob_r7e64bhcjvrbngz4txcvq5i3nq.blob",
+              "workspace/.amc/blobs/blob_smxyaldfi6bsizqgdmamx4zsbm.blob",
+              "workspace/.amc/blobs/blob_sphxijjs2xbohgcmiwphqzmts4.blob",
+              "workspace/.amc/blobs/blob_tdqmrsinixxuwp4xgz6uadbyfi.blob",
+              "workspace/.amc/blobs/blob_tnhh6yewl6noetegdo2jnvpyni.blob",
+              "workspace/.amc/blobs/blob_vbohmb6466lob3xmu2gfpkwsyq.blob",
+              "workspace/.amc/blobs/blob_yokcqy7aylodftdhx6q4ozptmi.blob",
+              "workspace/.amc/blobs/index.jsonl",
+              "workspace/.amc/blobs/index.jsonl.sig",
+              "workspace/.amc/reports/assurance",
+              "workspace/.amc/reports/assurance/ed04faa0-f4cb-4f67-b6dc-b62d214db844.json",
+              "workspace/.amc/reports/assurance/ed04faa0-f4cb-4f67-b6dc-b62d214db844.md"
+            ],
+            "removed": [],
+            "changed": [
+              "workspace/.amc",
+              "workspace/.amc/assurance/runs",
+              "workspace/.amc/blobs",
+              "workspace/.amc/evidence.sqlite-shm",
+              "workspace/.amc/evidence.sqlite-wal",
+              "workspace/.amc/keys/auditor_ed25519.pub",
+              "workspace/.amc/keys/lease_ed25519.pub",
+              "workspace/.amc/keys/monitor_ed25519.pub",
+              "workspace/.amc/keys/session_ed25519.pub",
+              "workspace/.amc/reports",
+              "workspace/.amc/vault.amcvault",
+              "workspace/.amc/vault.amcvault.meta.json"
+            ]
+          }
+        }
+      ],
+      "laterVerifiers": [
+        {
+          "name": "later-tool-run-verifier",
+          "result": {
+            "ok": true,
+            "errors": []
+          }
+        },
+        {
+          "name": "later-measured-measured-text",
+          "result": {
+            "ok": true,
+            "errors": []
+          }
+        },
+        {
+          "name": "later-measured-measured-failure",
+          "result": {
+            "ok": true,
+            "errors": []
+          }
+        }
+      ],
+      "actualTamperedVerifiers": [
+        {
+          "name": "tampered-inconclusive-pass",
+          "result": {
+            "ok": false,
+            "errors": [
+              "inconclusive row carries a score: injection/inj-ignore-previous",
+              "integrityIndex mismatch",
+              "reportJsonSha256 mismatch"
+            ]
+          }
+        },
+        {
+          "name": "tampered-inconclusive-score100",
+          "result": {
+            "ok": false,
+            "errors": [
+              "inconclusive row carries a score: injection/inj-ignore-previous",
+              "reportJsonSha256 mismatch"
+            ]
+          }
+        },
+        {
+          "name": "tampered-inconclusive-score5",
+          "result": {
+            "ok": false,
+            "errors": [
+              "inconclusive row carries a score: injection/inj-ignore-previous",
+              "reportJsonSha256 mismatch"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "phase": "seal-order-proposal-changed",
+      "effects": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed-effects/runner-effects.json",
+        "bytes": 1118946,
+        "sha256": "e57ddbfa013b25a3642ae83809391e8b80c3faa90ebe708f0174b234160e44e3"
+      },
+      "fixtures": [
+        {
+          "name": "tool-calls",
+          "status": "VALID",
+          "verificationPassed": true,
+          "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+          "rows": 43,
+          "sealEndedTs": 1792012653102,
+          "finalEventHash": "6a89bc90c976bec592ff9b6b620b475dee80bdcad4ae4dede93f1cd14330958c",
+          "storedDBHashSealStatusMatchReport": true,
+          "postSealPinnedLedger": {
+            "ok": true,
+            "chainOk": true,
+            "anchored": true
+          },
+          "beforePinsCaptured": true,
+          "parentIndependentCryptoChecks": {
+            "name": "tool-calls",
+            "events": 43,
+            "status": "VALID",
+            "verificationPassed": true,
+            "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+            "priorPins": true,
+            "reportAndRowsAndSealCrypto": true
+          },
+          "assuranceCalls": 13,
+          "redteamCalls": 13,
+          "scenarioCount": 13,
+          "passCount": 0,
+          "failCount": 0,
+          "capturedProducerEffectDelta": {
+            "added": [
+              "workspace/.amc/assurance/runs/45cfa25a-81c6-494f-b30a-3573ca84958f",
+              "workspace/.amc/assurance/runs/45cfa25a-81c6-494f-b30a-3573ca84958f/findings.json",
+              "workspace/.amc/assurance/runs/45cfa25a-81c6-494f-b30a-3573ca84958f/findings.json.sig",
+              "workspace/.amc/assurance/runs/45cfa25a-81c6-494f-b30a-3573ca84958f/run.json",
+              "workspace/.amc/assurance/runs/45cfa25a-81c6-494f-b30a-3573ca84958f/run.json.sig",
+              "workspace/.amc/assurance/runs/45cfa25a-81c6-494f-b30a-3573ca84958f/trace.refs.json",
+              "workspace/.amc/assurance/runs/45cfa25a-81c6-494f-b30a-3573ca84958f/trace.refs.json.sig",
+              "workspace/.amc/blob-keys",
+              "workspace/.amc/blob-keys/current.json",
+              "workspace/.amc/blob-keys/current.json.sig",
+              "workspace/.amc/blobs/blob_26olibcrfz3xxza6xrn6ppi3cu.blob",
+              "workspace/.amc/blobs/blob_2hsfwybghmqjhvxfknjap3dpzy.blob",
+              "workspace/.amc/blobs/blob_3opqkw7q53vu3rlidbgdlbsvcq.blob",
+              "workspace/.amc/blobs/blob_4ea55qobh3zbrpxeqvbhrvzsxm.blob",
+              "workspace/.amc/blobs/blob_5fyylffhrgtkeagqyka3tujoga.blob",
+              "workspace/.amc/blobs/blob_767nza5pxey6lzt6sy6k64wg3a.blob",
+              "workspace/.amc/blobs/blob_acu2yigdjdf265vuf6epapnrs4.blob",
+              "workspace/.amc/blobs/blob_aphwgh3xaouwhe4auuqc2kuypy.blob",
+              "workspace/.amc/blobs/blob_cq5obawuzpxu5x2syus2rzezne.blob",
+              "workspace/.amc/blobs/blob_gwpk7fu57ztyc5djuwmhdtldxe.blob",
+              "workspace/.amc/blobs/blob_hqdh3dxgky2fabcwxydkfsnrau.blob",
+              "workspace/.amc/blobs/blob_kwy6yd3per2iu3cb62zqnm7psu.blob",
+              "workspace/.amc/blobs/blob_mnadpbagiyy262n4pkry2t6fxq.blob",
+              "workspace/.amc/blobs/blob_nquglkgmflt6ujlcaku4u46mai.blob",
+              "workspace/.amc/blobs/blob_pm7lij2uwafz236ev4uzu25l2y.blob",
+              "workspace/.amc/blobs/blob_rjaqoracbztnfimwh2hw5q75wa.blob",
+              "workspace/.amc/blobs/blob_rvp2smvm63wwr45xv7ghaehi2i.blob",
+              "workspace/.amc/blobs/blob_soczns72lb5fbsojlwkzo52rdm.blob",
+              "workspace/.amc/blobs/blob_t2eimmim4q4wle4uq3jvwgwtr4.blob",
+              "workspace/.amc/blobs/blob_t5sukd2l2md4424r6ifusuf644.blob",
+              "workspace/.amc/blobs/blob_v4altjrahxpgprouu4lbnile3e.blob",
+              "workspace/.amc/blobs/blob_vhtslokk6ho77bponblvlaa5dm.blob",
+              "workspace/.amc/blobs/blob_w33h5ebduno52n4yyczgr4s4uu.blob",
+              "workspace/.amc/blobs/blob_xhkwlditwmyeohlutarwltraue.blob",
+              "workspace/.amc/blobs/blob_yfycsus56zbkrzpmx57weee2cq.blob",
+              "workspace/.amc/blobs/blob_yipjrmgn7it5keh3jfcf4kw4ze.blob",
+              "workspace/.amc/blobs/index.jsonl",
+              "workspace/.amc/blobs/index.jsonl.sig",
+              "workspace/.amc/redteam",
+              "workspace/.amc/redteam/default",
+              "workspace/.amc/redteam/default/c3befac9-4ce6-4b71-9e25-ffe8c7c9fb17.json",
+              "workspace/.amc/redteam/default/c3befac9-4ce6-4b71-9e25-ffe8c7c9fb17.md",
+              "workspace/.amc/reports/assurance",
+              "workspace/.amc/reports/assurance/45cfa25a-81c6-494f-b30a-3573ca84958f.json",
+              "workspace/.amc/reports/assurance/45cfa25a-81c6-494f-b30a-3573ca84958f.md"
+            ],
+            "removed": [],
+            "changed": [
+              "workspace/.amc",
+              "workspace/.amc/assurance/runs",
+              "workspace/.amc/blobs",
+              "workspace/.amc/evidence.sqlite-shm",
+              "workspace/.amc/evidence.sqlite-wal",
+              "workspace/.amc/keys/auditor_ed25519.pub",
+              "workspace/.amc/keys/lease_ed25519.pub",
+              "workspace/.amc/keys/monitor_ed25519.pub",
+              "workspace/.amc/keys/session_ed25519.pub",
+              "workspace/.amc/reports",
+              "workspace/.amc/vault.amcvault",
+              "workspace/.amc/vault.amcvault.meta.json"
+            ]
+          }
+        },
+        {
+          "name": "measured-text",
+          "status": "VALID",
+          "verificationPassed": true,
+          "evidenceStatus": "MEASURED",
+          "rows": 56,
+          "sealEndedTs": 1792012653439,
+          "finalEventHash": "b1c7e61496cff96d5b0fdaa5069312e8be1900f97e3b8bc39ad4181ef7576b71",
+          "storedDBHashSealStatusMatchReport": true,
+          "postSealPinnedLedger": {
+            "ok": true,
+            "chainOk": true,
+            "anchored": true
+          },
+          "beforePinsCaptured": true,
+          "parentIndependentCryptoChecks": {
+            "name": "measured-text",
+            "events": 56,
+            "status": "VALID",
+            "verificationPassed": true,
+            "evidenceStatus": "MEASURED",
+            "priorPins": true,
+            "reportAndRowsAndSealCrypto": true
+          },
+          "assuranceCalls": 13,
+          "redteamCalls": 0,
+          "scenarioCount": 13,
+          "passCount": 10,
+          "failCount": 3,
+          "capturedProducerEffectDelta": {
+            "added": [
+              "workspace/.amc/assurance/runs/1a85575f-ac2c-4384-afe4-19fbcbe0eea7",
+              "workspace/.amc/assurance/runs/1a85575f-ac2c-4384-afe4-19fbcbe0eea7/findings.json",
+              "workspace/.amc/assurance/runs/1a85575f-ac2c-4384-afe4-19fbcbe0eea7/findings.json.sig",
+              "workspace/.amc/assurance/runs/1a85575f-ac2c-4384-afe4-19fbcbe0eea7/run.json",
+              "workspace/.amc/assurance/runs/1a85575f-ac2c-4384-afe4-19fbcbe0eea7/run.json.sig",
+              "workspace/.amc/assurance/runs/1a85575f-ac2c-4384-afe4-19fbcbe0eea7/trace.refs.json",
+              "workspace/.amc/assurance/runs/1a85575f-ac2c-4384-afe4-19fbcbe0eea7/trace.refs.json.sig",
+              "workspace/.amc/blob-keys",
+              "workspace/.amc/blob-keys/current.json",
+              "workspace/.amc/blob-keys/current.json.sig",
+              "workspace/.amc/blobs/blob_6ynq2mikuuaa6xss53xn3q6nga.blob",
+              "workspace/.amc/blobs/blob_7fg4kz3ungyomsr2shpbvojwey.blob",
+              "workspace/.amc/blobs/blob_afitdzbce5ii3xpfybnmecmn4e.blob",
+              "workspace/.amc/blobs/blob_c3mbxsnftt3nvcrrof2wvnvcue.blob",
+              "workspace/.amc/blobs/blob_cwe3scrye4hzpha2j4pfwkq7bu.blob",
+              "workspace/.amc/blobs/blob_efnaciwxduhhyd2vepjx2lvrtq.blob",
+              "workspace/.amc/blobs/blob_emvpf37pzn2ryh3xvruiyi3wjm.blob",
+              "workspace/.amc/blobs/blob_ffjxlkskrosmuoygx4poptzmmu.blob",
+              "workspace/.amc/blobs/blob_ghlomdig7mrsmtplf5hcy5rvf4.blob",
+              "workspace/.amc/blobs/blob_jmuphlo5m3pn3lzxkc3hjlxq3e.blob",
+              "workspace/.amc/blobs/blob_lcbqygfcne34ge7s5q5nrhv7by.blob",
+              "workspace/.amc/blobs/blob_m5yx6pnfl4zurrebayebqden4m.blob",
+              "workspace/.amc/blobs/blob_maj6lvqgtkjjo53jjcpt2gexeu.blob",
+              "workspace/.amc/blobs/blob_mavvkyvtzbzb7tz3pearxnmijy.blob",
+              "workspace/.amc/blobs/blob_mqeu4xqn2k4cx6r5edv5anjuju.blob",
+              "workspace/.amc/blobs/blob_mtsmgbp4f2sl4hy6ddwuh44s4u.blob",
+              "workspace/.amc/blobs/blob_onvqd5pmxqjcvrnjwye6whis6e.blob",
+              "workspace/.amc/blobs/blob_quvvtjv7rjrb427q7az6fgb6da.blob",
+              "workspace/.amc/blobs/blob_r47nor46u6oerz6jt7gudlt5za.blob",
+              "workspace/.amc/blobs/blob_rl2pfzypg2ipygha4org7clpz4.blob",
+              "workspace/.amc/blobs/blob_s5w5jl3v26zeqfehnmtwfprgg4.blob",
+              "workspace/.amc/blobs/blob_sijdfxtn355vug7jqf72xvhjte.blob",
+              "workspace/.amc/blobs/blob_ttbj4ben2srskwr3laiu64yg34.blob",
+              "workspace/.amc/blobs/blob_uhpykggaswcbj2rdhcc3xniymq.blob",
+              "workspace/.amc/blobs/blob_xkc3axaiqvkk3najfz3i4ir22e.blob",
+              "workspace/.amc/blobs/blob_zbw4nkpqrianr4fvwtw4qycdei.blob",
+              "workspace/.amc/blobs/index.jsonl",
+              "workspace/.amc/blobs/index.jsonl.sig",
+              "workspace/.amc/reports/assurance",
+              "workspace/.amc/reports/assurance/1a85575f-ac2c-4384-afe4-19fbcbe0eea7.json",
+              "workspace/.amc/reports/assurance/1a85575f-ac2c-4384-afe4-19fbcbe0eea7.md"
+            ],
+            "removed": [],
+            "changed": [
+              "workspace/.amc",
+              "workspace/.amc/assurance/runs",
+              "workspace/.amc/blobs",
+              "workspace/.amc/evidence.sqlite-shm",
+              "workspace/.amc/evidence.sqlite-wal",
+              "workspace/.amc/keys/auditor_ed25519.pub",
+              "workspace/.amc/keys/lease_ed25519.pub",
+              "workspace/.amc/keys/monitor_ed25519.pub",
+              "workspace/.amc/keys/session_ed25519.pub",
+              "workspace/.amc/reports",
+              "workspace/.amc/vault.amcvault",
+              "workspace/.amc/vault.amcvault.meta.json"
+            ]
+          }
+        },
+        {
+          "name": "measured-failure",
+          "status": "VALID",
+          "verificationPassed": true,
+          "evidenceStatus": "MEASURED",
+          "rows": 66,
+          "sealEndedTs": 1792012653942,
+          "finalEventHash": "f7463313bc01e42d02ab2cba21096a4950736b8b62778f4d4f424676bdf77827",
+          "storedDBHashSealStatusMatchReport": true,
+          "postSealPinnedLedger": {
+            "ok": true,
+            "chainOk": true,
+            "anchored": true
+          },
+          "beforePinsCaptured": true,
+          "parentIndependentCryptoChecks": {
+            "name": "measured-failure",
+            "events": 66,
+            "status": "VALID",
+            "verificationPassed": true,
+            "evidenceStatus": "MEASURED",
+            "priorPins": true,
+            "reportAndRowsAndSealCrypto": true
+          },
+          "assuranceCalls": 13,
+          "redteamCalls": 0,
+          "scenarioCount": 13,
+          "passCount": 0,
+          "failCount": 13,
+          "capturedProducerEffectDelta": {
+            "added": [
+              "workspace/.amc/assurance/runs/c2dec111-b500-446e-b370-83a2d0642f45",
+              "workspace/.amc/assurance/runs/c2dec111-b500-446e-b370-83a2d0642f45/findings.json",
+              "workspace/.amc/assurance/runs/c2dec111-b500-446e-b370-83a2d0642f45/findings.json.sig",
+              "workspace/.amc/assurance/runs/c2dec111-b500-446e-b370-83a2d0642f45/run.json",
+              "workspace/.amc/assurance/runs/c2dec111-b500-446e-b370-83a2d0642f45/run.json.sig",
+              "workspace/.amc/assurance/runs/c2dec111-b500-446e-b370-83a2d0642f45/trace.refs.json",
+              "workspace/.amc/assurance/runs/c2dec111-b500-446e-b370-83a2d0642f45/trace.refs.json.sig",
+              "workspace/.amc/blob-keys",
+              "workspace/.amc/blob-keys/current.json",
+              "workspace/.amc/blob-keys/current.json.sig",
+              "workspace/.amc/blobs/blob_26ojtzcebgagsmmis47pvrw7bm.blob",
+              "workspace/.amc/blobs/blob_3cmyt6fapml3ox4s7yvspei3q4.blob",
+              "workspace/.amc/blobs/blob_4g4w4mbr5e66d3wk2a432iwm74.blob",
+              "workspace/.amc/blobs/blob_4vxvx6vmpoyi5pjyvm4sscr47i.blob",
+              "workspace/.amc/blobs/blob_63nw3kk36czbpp2hgbzqzn2jqy.blob",
+              "workspace/.amc/blobs/blob_csi6hw2tj4mzlwviewyfliykwu.blob",
+              "workspace/.amc/blobs/blob_fuh7u5e6w7ltbopsk66hxwo5gy.blob",
+              "workspace/.amc/blobs/blob_fvbeeafp6cgr4srkrfpx7swlmq.blob",
+              "workspace/.amc/blobs/blob_gdwnyrgjo4hjvm26yoevaykcpi.blob",
+              "workspace/.amc/blobs/blob_haxzwydwnyzwlcfkq4n7uwgmoa.blob",
+              "workspace/.amc/blobs/blob_hy5q3molqnxfna44yapkdn7fmm.blob",
+              "workspace/.amc/blobs/blob_i3on77foofpvmh7catmq4wcrxq.blob",
+              "workspace/.amc/blobs/blob_igbbbwfrddwoqmnj4lwe4qyvpi.blob",
+              "workspace/.amc/blobs/blob_k26ffa5tli37z7l6bqz2easfzu.blob",
+              "workspace/.amc/blobs/blob_l66vbe5jqwivik6avquujqua4e.blob",
+              "workspace/.amc/blobs/blob_l6hcuj3bcyn7727pwbvnshqr7i.blob",
+              "workspace/.amc/blobs/blob_neqe3qwapyoeydwrcpmhru3oxy.blob",
+              "workspace/.amc/blobs/blob_paumvcnnuf47ht2nc3sct3aeje.blob",
+              "workspace/.amc/blobs/blob_prvvp6mrqxujcgdwq7whdhocby.blob",
+              "workspace/.amc/blobs/blob_q7y75z7qhqg3km72llshaiibfi.blob",
+              "workspace/.amc/blobs/blob_ttsdz2xtzj65byyca2q66vopoy.blob",
+              "workspace/.amc/blobs/blob_uke3amjv4fo3nohzubalbm3scm.blob",
+              "workspace/.amc/blobs/blob_y2uvfpoohwryyo4sdrfenlrayy.blob",
+              "workspace/.amc/blobs/blob_yumimzr2eqx27pbjsuz2dqht5y.blob",
+              "workspace/.amc/blobs/blob_zhow627qvqcusaw3cmtsfdabhi.blob",
+              "workspace/.amc/blobs/blob_zlf567bae6qnm5zo7h7zdradei.blob",
+              "workspace/.amc/blobs/index.jsonl",
+              "workspace/.amc/blobs/index.jsonl.sig",
+              "workspace/.amc/reports/assurance",
+              "workspace/.amc/reports/assurance/c2dec111-b500-446e-b370-83a2d0642f45.json",
+              "workspace/.amc/reports/assurance/c2dec111-b500-446e-b370-83a2d0642f45.md"
+            ],
+            "removed": [],
+            "changed": [
+              "workspace/.amc",
+              "workspace/.amc/assurance/runs",
+              "workspace/.amc/blobs",
+              "workspace/.amc/evidence.sqlite-shm",
+              "workspace/.amc/evidence.sqlite-wal",
+              "workspace/.amc/keys/auditor_ed25519.pub",
+              "workspace/.amc/keys/lease_ed25519.pub",
+              "workspace/.amc/keys/monitor_ed25519.pub",
+              "workspace/.amc/keys/session_ed25519.pub",
+              "workspace/.amc/reports",
+              "workspace/.amc/vault.amcvault",
+              "workspace/.amc/vault.amcvault.meta.json"
+            ]
+          }
+        }
+      ],
+      "laterVerifiers": [
+        {
+          "name": "later-tool-run-verifier",
+          "result": {
+            "ok": true,
+            "errors": []
+          }
+        },
+        {
+          "name": "later-measured-measured-text",
+          "result": {
+            "ok": true,
+            "errors": []
+          }
+        },
+        {
+          "name": "later-measured-measured-failure",
+          "result": {
+            "ok": true,
+            "errors": []
+          }
+        }
+      ],
+      "actualTamperedVerifiers": [
+        {
+          "name": "tampered-inconclusive-pass",
+          "result": {
+            "ok": false,
+            "errors": [
+              "inconclusive row carries a score: injection/inj-ignore-previous",
+              "integrityIndex mismatch",
+              "reportJsonSha256 mismatch"
+            ]
+          }
+        },
+        {
+          "name": "tampered-inconclusive-score100",
+          "result": {
+            "ok": false,
+            "errors": [
+              "inconclusive row carries a score: injection/inj-ignore-previous",
+              "reportJsonSha256 mismatch"
+            ]
+          }
+        },
+        {
+          "name": "tampered-inconclusive-score5",
+          "result": {
+            "ok": false,
+            "errors": [
+              "inconclusive row carries a score: injection/inj-ignore-previous",
+              "reportJsonSha256 mismatch"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "phase": "seal-order-proposal-restored",
+      "effects": {
+        "path": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored-effects/runner-effects.json",
+        "bytes": 1118973,
+        "sha256": "958f5c9ed7c38c81980dbf8fdbc0121a1ede1f5ac3945bc218119e95e99301b2"
+      },
+      "fixtures": [
+        {
+          "name": "tool-calls",
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+          "rows": 43,
+          "sealEndedTs": 1792012659410,
+          "finalEventHash": "3a165cd7ffeb3ba037f74da75816eba265fec22ceac03e121b224c9e4e88e4ad",
+          "storedDBHashSealStatusMatchReport": true,
+          "postSealPinnedLedger": {
+            "ok": true,
+            "chainOk": true,
+            "anchored": true
+          },
+          "beforePinsCaptured": true,
+          "parentIndependentCryptoChecks": {
+            "name": "tool-calls",
+            "events": 43,
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+            "priorPins": true,
+            "reportAndRowsAndSealCrypto": true
+          },
+          "assuranceCalls": 13,
+          "redteamCalls": 13,
+          "scenarioCount": 13,
+          "passCount": 0,
+          "failCount": 0,
+          "capturedProducerEffectDelta": {
+            "added": [
+              "workspace/.amc/assurance/runs/7dbbfc0c-9bad-4904-bd9d-a61c4a8d4cad",
+              "workspace/.amc/assurance/runs/7dbbfc0c-9bad-4904-bd9d-a61c4a8d4cad/findings.json",
+              "workspace/.amc/assurance/runs/7dbbfc0c-9bad-4904-bd9d-a61c4a8d4cad/findings.json.sig",
+              "workspace/.amc/assurance/runs/7dbbfc0c-9bad-4904-bd9d-a61c4a8d4cad/run.json",
+              "workspace/.amc/assurance/runs/7dbbfc0c-9bad-4904-bd9d-a61c4a8d4cad/run.json.sig",
+              "workspace/.amc/assurance/runs/7dbbfc0c-9bad-4904-bd9d-a61c4a8d4cad/trace.refs.json",
+              "workspace/.amc/assurance/runs/7dbbfc0c-9bad-4904-bd9d-a61c4a8d4cad/trace.refs.json.sig",
+              "workspace/.amc/blob-keys",
+              "workspace/.amc/blob-keys/current.json",
+              "workspace/.amc/blob-keys/current.json.sig",
+              "workspace/.amc/blobs/blob_2fdwrep7hgx5x4mj2jiap7cgbm.blob",
+              "workspace/.amc/blobs/blob_5bkkf5zh5uoract4cfjld4igki.blob",
+              "workspace/.amc/blobs/blob_6th2r6lblgni3vv33l4nthoerq.blob",
+              "workspace/.amc/blobs/blob_af2aa26ufncnxqjhw5ejb7jo5i.blob",
+              "workspace/.amc/blobs/blob_ce63glxcxnh77xavltqyndnc6u.blob",
+              "workspace/.amc/blobs/blob_cybgzbla6ure5wa252fklhnc5u.blob",
+              "workspace/.amc/blobs/blob_d6f57g5p672rj3x2lppbovn55e.blob",
+              "workspace/.amc/blobs/blob_dokdop4523otcrmqynpmcpzjje.blob",
+              "workspace/.amc/blobs/blob_f3wfg3mo4ix5ir4qw4qqe5lcty.blob",
+              "workspace/.amc/blobs/blob_g2npfkqrumwjlanfbqzh554qqq.blob",
+              "workspace/.amc/blobs/blob_h7zkfsahdrfwu5d3igzowjmwfa.blob",
+              "workspace/.amc/blobs/blob_haq37wv3uwi3pd3eolsofqa42a.blob",
+              "workspace/.amc/blobs/blob_hrydla4yo7ihsrhgq663xmbrfm.blob",
+              "workspace/.amc/blobs/blob_k5nqpq46hz4vitaz7hj55vogvi.blob",
+              "workspace/.amc/blobs/blob_m4tpkdoyouusb24v7e3hgxkzd4.blob",
+              "workspace/.amc/blobs/blob_mipbdxkm2kty7pc4pamxjpxct4.blob",
+              "workspace/.amc/blobs/blob_mj63gik5ewex6fyv47xuwv2z6i.blob",
+              "workspace/.amc/blobs/blob_oneazemqdhs2tzvod4puf2gdbi.blob",
+              "workspace/.amc/blobs/blob_orq6qph6wykwl5txdpq5jl3v5i.blob",
+              "workspace/.amc/blobs/blob_qdv5os7htmjiunjthlgblsqvye.blob",
+              "workspace/.amc/blobs/blob_rswviwvw6vkh2j3d2zgacchd4m.blob",
+              "workspace/.amc/blobs/blob_tvtd3wzqsp5jnewaj2ufazcl3u.blob",
+              "workspace/.amc/blobs/blob_ycjieomc6xqhghmrhn2gtq6htm.blob",
+              "workspace/.amc/blobs/blob_ygc5467vflvljzgc62oyocjyme.blob",
+              "workspace/.amc/blobs/blob_yrqnwjhltckf47mz4zadbih4am.blob",
+              "workspace/.amc/blobs/blob_zvtavm2cp6awk35qvhxhrll2au.blob",
+              "workspace/.amc/blobs/index.jsonl",
+              "workspace/.amc/blobs/index.jsonl.sig",
+              "workspace/.amc/redteam",
+              "workspace/.amc/redteam/default",
+              "workspace/.amc/redteam/default/4de999e4-5169-49c7-852f-beca7ccd0e21.json",
+              "workspace/.amc/redteam/default/4de999e4-5169-49c7-852f-beca7ccd0e21.md",
+              "workspace/.amc/reports/assurance",
+              "workspace/.amc/reports/assurance/7dbbfc0c-9bad-4904-bd9d-a61c4a8d4cad.json",
+              "workspace/.amc/reports/assurance/7dbbfc0c-9bad-4904-bd9d-a61c4a8d4cad.md"
+            ],
+            "removed": [],
+            "changed": [
+              "workspace/.amc",
+              "workspace/.amc/assurance/runs",
+              "workspace/.amc/blobs",
+              "workspace/.amc/evidence.sqlite-shm",
+              "workspace/.amc/evidence.sqlite-wal",
+              "workspace/.amc/keys/auditor_ed25519.pub",
+              "workspace/.amc/keys/lease_ed25519.pub",
+              "workspace/.amc/keys/monitor_ed25519.pub",
+              "workspace/.amc/keys/session_ed25519.pub",
+              "workspace/.amc/reports",
+              "workspace/.amc/vault.amcvault",
+              "workspace/.amc/vault.amcvault.meta.json"
+            ]
+          }
+        },
+        {
+          "name": "measured-text",
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "MEASURED",
+          "rows": 56,
+          "sealEndedTs": 1792012659727,
+          "finalEventHash": "4b83be221431d6b9429d9dcebcbd14405525e13c96e3d77cba4e24b9f8434f5d",
+          "storedDBHashSealStatusMatchReport": true,
+          "postSealPinnedLedger": {
+            "ok": true,
+            "chainOk": true,
+            "anchored": true
+          },
+          "beforePinsCaptured": true,
+          "parentIndependentCryptoChecks": {
+            "name": "measured-text",
+            "events": 56,
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "MEASURED",
+            "priorPins": true,
+            "reportAndRowsAndSealCrypto": true
+          },
+          "assuranceCalls": 13,
+          "redteamCalls": 0,
+          "scenarioCount": 13,
+          "passCount": 10,
+          "failCount": 3,
+          "capturedProducerEffectDelta": {
+            "added": [
+              "workspace/.amc/assurance/runs/19ab0ae6-a023-4c26-adcc-856c2fad6993",
+              "workspace/.amc/assurance/runs/19ab0ae6-a023-4c26-adcc-856c2fad6993/findings.json",
+              "workspace/.amc/assurance/runs/19ab0ae6-a023-4c26-adcc-856c2fad6993/findings.json.sig",
+              "workspace/.amc/assurance/runs/19ab0ae6-a023-4c26-adcc-856c2fad6993/run.json",
+              "workspace/.amc/assurance/runs/19ab0ae6-a023-4c26-adcc-856c2fad6993/run.json.sig",
+              "workspace/.amc/assurance/runs/19ab0ae6-a023-4c26-adcc-856c2fad6993/trace.refs.json",
+              "workspace/.amc/assurance/runs/19ab0ae6-a023-4c26-adcc-856c2fad6993/trace.refs.json.sig",
+              "workspace/.amc/blob-keys",
+              "workspace/.amc/blob-keys/current.json",
+              "workspace/.amc/blob-keys/current.json.sig",
+              "workspace/.amc/blobs/blob_2k2enlu27h5il6wxdtwppjqy2q.blob",
+              "workspace/.amc/blobs/blob_42gn2gntgpmbqgp3ebu6xe3p34.blob",
+              "workspace/.amc/blobs/blob_67edhl6swebhu3ptam22yrmuzm.blob",
+              "workspace/.amc/blobs/blob_brokv6ycfhl6m5acuxlha5f5s4.blob",
+              "workspace/.amc/blobs/blob_g2a26i7exapnbu34rhpqhheml4.blob",
+              "workspace/.amc/blobs/blob_ilsvyoyxxxw4kons67a5t2c3qa.blob",
+              "workspace/.amc/blobs/blob_j66hsi6nvddlgbpxwnxa5mxsju.blob",
+              "workspace/.amc/blobs/blob_jvjag2njpmhn6r7c4c7njtjseq.blob",
+              "workspace/.amc/blobs/blob_l3imwuyevu6yneureevrxoarga.blob",
+              "workspace/.amc/blobs/blob_lq3skiqm7gfj7x73aszippis4u.blob",
+              "workspace/.amc/blobs/blob_lzkaqvyykihkpxwwspfu5iexgu.blob",
+              "workspace/.amc/blobs/blob_mz5te34lttovjxiidv4gqxqw5i.blob",
+              "workspace/.amc/blobs/blob_nouyzt657yyngdkpcpzmnac73y.blob",
+              "workspace/.amc/blobs/blob_nrjksjfwr5u34or4mrvphjhydq.blob",
+              "workspace/.amc/blobs/blob_oey3kt3zl4iun7fqvqnyejwnva.blob",
+              "workspace/.amc/blobs/blob_oxvoazsoibxmzkgj7ndhkpybci.blob",
+              "workspace/.amc/blobs/blob_pegntp6quqhumsbwyf5es5boeu.blob",
+              "workspace/.amc/blobs/blob_sm7onxovoogocrvxfmbjjktiq4.blob",
+              "workspace/.amc/blobs/blob_twjjr5q4ftp4xrdqt4k6kzhewy.blob",
+              "workspace/.amc/blobs/blob_u7q3vo7v2i72ge4kepnddlsg7m.blob",
+              "workspace/.amc/blobs/blob_vjm3xkb5xsua67ug2fil2qiwzu.blob",
+              "workspace/.amc/blobs/blob_wobx7kawpealthx7ejc3ilkbni.blob",
+              "workspace/.amc/blobs/blob_yb5tu5uznclfclbtqkmmncwhki.blob",
+              "workspace/.amc/blobs/blob_yf4f2rzzjaaufpwpvhbqujhjoq.blob",
+              "workspace/.amc/blobs/blob_zq46k24r4mban3pqy4zkll46dy.blob",
+              "workspace/.amc/blobs/blob_zvtirpoihyhfcecmkowob5heja.blob",
+              "workspace/.amc/blobs/index.jsonl",
+              "workspace/.amc/blobs/index.jsonl.sig",
+              "workspace/.amc/reports/assurance",
+              "workspace/.amc/reports/assurance/19ab0ae6-a023-4c26-adcc-856c2fad6993.json",
+              "workspace/.amc/reports/assurance/19ab0ae6-a023-4c26-adcc-856c2fad6993.md"
+            ],
+            "removed": [],
+            "changed": [
+              "workspace/.amc",
+              "workspace/.amc/assurance/runs",
+              "workspace/.amc/blobs",
+              "workspace/.amc/evidence.sqlite-shm",
+              "workspace/.amc/evidence.sqlite-wal",
+              "workspace/.amc/keys/auditor_ed25519.pub",
+              "workspace/.amc/keys/lease_ed25519.pub",
+              "workspace/.amc/keys/monitor_ed25519.pub",
+              "workspace/.amc/keys/session_ed25519.pub",
+              "workspace/.amc/reports",
+              "workspace/.amc/vault.amcvault",
+              "workspace/.amc/vault.amcvault.meta.json"
+            ]
+          }
+        },
+        {
+          "name": "measured-failure",
+          "status": "INVALID",
+          "verificationPassed": false,
+          "evidenceStatus": "MEASURED",
+          "rows": 66,
+          "sealEndedTs": 1792012660029,
+          "finalEventHash": "5164bdd5421c90b1f5544c9ea99b40258000b7abeb2a0384448e8ae79bf290ce",
+          "storedDBHashSealStatusMatchReport": true,
+          "postSealPinnedLedger": {
+            "ok": true,
+            "chainOk": true,
+            "anchored": true
+          },
+          "beforePinsCaptured": true,
+          "parentIndependentCryptoChecks": {
+            "name": "measured-failure",
+            "events": 66,
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "MEASURED",
+            "priorPins": true,
+            "reportAndRowsAndSealCrypto": true
+          },
+          "assuranceCalls": 13,
+          "redteamCalls": 0,
+          "scenarioCount": 13,
+          "passCount": 0,
+          "failCount": 13,
+          "capturedProducerEffectDelta": {
+            "added": [
+              "workspace/.amc/assurance/runs/6b3d03a6-23e6-4f70-aa9d-38bc0d710a70",
+              "workspace/.amc/assurance/runs/6b3d03a6-23e6-4f70-aa9d-38bc0d710a70/findings.json",
+              "workspace/.amc/assurance/runs/6b3d03a6-23e6-4f70-aa9d-38bc0d710a70/findings.json.sig",
+              "workspace/.amc/assurance/runs/6b3d03a6-23e6-4f70-aa9d-38bc0d710a70/run.json",
+              "workspace/.amc/assurance/runs/6b3d03a6-23e6-4f70-aa9d-38bc0d710a70/run.json.sig",
+              "workspace/.amc/assurance/runs/6b3d03a6-23e6-4f70-aa9d-38bc0d710a70/trace.refs.json",
+              "workspace/.amc/assurance/runs/6b3d03a6-23e6-4f70-aa9d-38bc0d710a70/trace.refs.json.sig",
+              "workspace/.amc/blob-keys",
+              "workspace/.amc/blob-keys/current.json",
+              "workspace/.amc/blob-keys/current.json.sig",
+              "workspace/.amc/blobs/blob_2c25tbmrecksccjn2jlufjidza.blob",
+              "workspace/.amc/blobs/blob_4r6vmglfkegcpblwssazsmyiti.blob",
+              "workspace/.amc/blobs/blob_5t7myf4kw5d6z6hu5tiz2iqp4i.blob",
+              "workspace/.amc/blobs/blob_6vawzjjlqh6ayxsyxplbtxfmdq.blob",
+              "workspace/.amc/blobs/blob_7kftik5fgt6dmea2sxtn2r73vu.blob",
+              "workspace/.amc/blobs/blob_7xwwktofyr5p4o3rel4qkksw7y.blob",
+              "workspace/.amc/blobs/blob_agwgy2w6ikxuplswuscajveehm.blob",
+              "workspace/.amc/blobs/blob_byrm33q23w27nqcjwdpbeqo7fe.blob",
+              "workspace/.amc/blobs/blob_fg6ay7bahfumvzqo3ucspyapxi.blob",
+              "workspace/.amc/blobs/blob_h4tlm2rxhzcl5kd3lpri4i7rsi.blob",
+              "workspace/.amc/blobs/blob_hidzmduimdrdzl77bbwdmzh6re.blob",
+              "workspace/.amc/blobs/blob_jo623bc4eclievjsn6g6q7xgk4.blob",
+              "workspace/.amc/blobs/blob_mkq5ieoyfbm4r7pmew6cwsrkhe.blob",
+              "workspace/.amc/blobs/blob_pnjn2sgya77idoqner6crlsjme.blob",
+              "workspace/.amc/blobs/blob_qdqbmhh5lja2rxh7q7a4akcaam.blob",
+              "workspace/.amc/blobs/blob_sgdty26it7uk7pyocatfk3irly.blob",
+              "workspace/.amc/blobs/blob_sktka2weythboxfqmn6dqwne7y.blob",
+              "workspace/.amc/blobs/blob_sxcwzbhex5gljrvklla6nzqpdi.blob",
+              "workspace/.amc/blobs/blob_sxepndpgm3jevkwffdsyo7z2ee.blob",
+              "workspace/.amc/blobs/blob_tbpikb5nuhkgfdfqys5z7uezna.blob",
+              "workspace/.amc/blobs/blob_urbdwx5cwiebtqv6dx73klv3ye.blob",
+              "workspace/.amc/blobs/blob_usnh4pgmss23iijogscexrswze.blob",
+              "workspace/.amc/blobs/blob_v3kazsbxej2no64uqwl4vfxsfm.blob",
+              "workspace/.amc/blobs/blob_w3v3oidrjmilfzaeaqn6ypujum.blob",
+              "workspace/.amc/blobs/blob_wrfzm6p5eiuruljke4nrkloxc4.blob",
+              "workspace/.amc/blobs/blob_zbmfnumfikehncqq362yqz36xu.blob",
+              "workspace/.amc/blobs/index.jsonl",
+              "workspace/.amc/blobs/index.jsonl.sig",
+              "workspace/.amc/reports/assurance",
+              "workspace/.amc/reports/assurance/6b3d03a6-23e6-4f70-aa9d-38bc0d710a70.json",
+              "workspace/.amc/reports/assurance/6b3d03a6-23e6-4f70-aa9d-38bc0d710a70.md"
+            ],
+            "removed": [],
+            "changed": [
+              "workspace/.amc",
+              "workspace/.amc/assurance/runs",
+              "workspace/.amc/blobs",
+              "workspace/.amc/evidence.sqlite-shm",
+              "workspace/.amc/evidence.sqlite-wal",
+              "workspace/.amc/keys/auditor_ed25519.pub",
+              "workspace/.amc/keys/lease_ed25519.pub",
+              "workspace/.amc/keys/monitor_ed25519.pub",
+              "workspace/.amc/keys/session_ed25519.pub",
+              "workspace/.amc/reports",
+              "workspace/.amc/vault.amcvault",
+              "workspace/.amc/vault.amcvault.meta.json"
+            ]
+          }
+        }
+      ],
+      "laterVerifiers": [
+        {
+          "name": "later-tool-run-verifier",
+          "result": {
+            "ok": true,
+            "errors": []
+          }
+        },
+        {
+          "name": "later-measured-measured-text",
+          "result": {
+            "ok": true,
+            "errors": []
+          }
+        },
+        {
+          "name": "later-measured-measured-failure",
+          "result": {
+            "ok": true,
+            "errors": []
+          }
+        }
+      ],
+      "actualTamperedVerifiers": [
+        {
+          "name": "tampered-inconclusive-pass",
+          "result": {
+            "ok": false,
+            "errors": [
+              "inconclusive row carries a score: injection/inj-ignore-previous",
+              "integrityIndex mismatch",
+              "reportJsonSha256 mismatch"
+            ]
+          }
+        },
+        {
+          "name": "tampered-inconclusive-score100",
+          "result": {
+            "ok": false,
+            "errors": [
+              "inconclusive row carries a score: injection/inj-ignore-previous",
+              "reportJsonSha256 mismatch"
+            ]
+          }
+        },
+        {
+          "name": "tampered-inconclusive-score5",
+          "result": {
+            "ok": false,
+            "errors": [
+              "inconclusive row carries a score: injection/inj-ignore-previous",
+              "reportJsonSha256 mismatch"
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "separateParentCryptoReview": {
+    "path": "/private/tmp/p0-19-runner-proposal-independent-review-20261015.json",
+    "bytes": 4921,
+    "sha256": "42e4bf1023cb987c678ae8271282b11cf7c609b4010cc0dbb4dd1d37baf597b2"
+  },
+  "cryptoReviewAttribution": "Root independently verified the nine actual reports, event rows and session seals under the before-captured public pins. This reviewer rechecked the exact effect/raw hashes, key fingerprint correspondence, stored-row status/hash/seal agreement and attribution; no new crypto or product runtime was invoked.",
+  "privateRestoration": {
+    "manifest": {
+      "path": "/private/tmp/p0-19-private-runner-3yl41gpg/compiled-final-hashes.json",
+      "bytes": 979489,
+      "sha256": "4e6f8d075914ae79888b74d59b9f9c0e1aacca1ffb9475c21931ad38763a68b2"
+    },
+    "all4529PrivateCompiledFilesIndependentlyRehashed": true,
+    "allHashesEqualInitialAndFinal": true,
+    "originalEightCaseTestAndHelpersByteEqual": true,
+    "finalNewPrivateTestAdaptation": "Only the metadata source-hash read points at the pinned source root; every behavior assertion/import is unchanged. Relative imports execute the copied compiled closure.",
+    "adapterPatchHash": "36c82036866dce514c89698b5b4b822aaa580bad26bc5cc3e3b314ec636b1b7a"
+  },
+  "privateMutationScope": [
+    {
+      "name": "response-digest",
+      "baselineSha256": "93a83500a155beaff2102ec7f6f2154ec9223126d16322ff0c5d5c62dfd71c42",
+      "mutantSha256": "55c875b35b79f2c294df6193ff3d60c9f257a5c23dd51f79f123176efbe42cd8",
+      "patchSha256": "1808057852a6a23d2fe0810da8d4c891a96834b1ebe778101fb59a782784e4f6",
+      "exactRestoration": true
+    },
+    {
+      "name": "v1-findings",
+      "baselineSha256": "a0e195ed6eee7c5bea9cedebd89d51a6774dd8ec922f3194ef93617f50f3c0e5",
+      "mutantSha256": "b34b1f863e9524c66b6abfa93031c86279e94e36ac4a16f9605a2ea15d5820a9",
+      "patchSha256": "41268911d0269e0aa1907eeb61de0305a4759c3bb7798381c9a17919df6bde94",
+      "exactRestoration": true
+    },
+    {
+      "name": "seal-order-proposal",
+      "baselineSha256": "a0e195ed6eee7c5bea9cedebd89d51a6774dd8ec922f3194ef93617f50f3c0e5",
+      "mutantSha256": "d5f40969ea83e812a8b9d795bccfd9a5287ee8090788c5ba03fa1394cc98373c",
+      "patchSha256": "02bb573753cf00b17ec0fc5ed552f3287a6cc1fb71bc82d12d36270412b3fcb7",
+      "exactRestoration": true
+    }
+  ],
+  "observerAndTypeHistory": {
+    "actualStatusRed": "The genuine measured artifact is INVALID/verificationPassed false although post-seal verifier and crypto are healthy. This strict criterion remains unchanged.",
+    "twoObserverFailures": "The initial payload helper read encrypted AMC_BLOB_V files as plaintext JSON. Those two SyntaxError failures are preserved as test observer mistakes, not app defects or killed mutations.",
+    "readerCorrection": "Only the new payload helper changed to actual loadBlobPlaintext and explicit missing/nonstring path refusal. All behavior assertions remain. The final test records runtime version/executable instead of refusing a future Node24 run.",
+    "typeFailure": "Root candidate typecheck exit2 reported nullable payload_path at lines52/55. The actual error log is retained; explicit narrowing guard fixes this new helper. Root owns the final typecheck outcome."
+  },
+  "ordinaryArchitecture": {
+    "raw": {
+      "path": "/private/tmp/p0-19-final-architecture-20261015.log",
+      "bytes": 95608,
+      "sha256": "417e9e9ab341cfac05409bb2ca04e9bf5922d84930a56244bd4a15e4e7293039"
+    },
+    "status": "passed",
+    "lineCountedPaths": 2178,
+    "prefixBranchCount": 2,
+    "failures": [],
+    "interpretation": "Ordinary unchanged architecture output is recorded exactly. No separate976-path interpretation is inferred from parent shorthand."
+  },
+  "pendingProposal": {
+    "sourcePatch": {
+      "path": "/private/tmp/p0-19-proposed-seal-order-repair-20261015.patch",
+      "bytes": 525,
+      "sha256": "c837b6e8c3a5a84588f10da907818ae4a2ed50db3b2da1fc329761918b2fa6d5"
+    },
+    "compiledPatch": {
+      "path": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal.patch",
+      "bytes": 703,
+      "sha256": "02bb573753cf00b17ec0fc5ed552f3287a6cc1fb71bc82d12d36270412b3fcb7"
+    },
+    "status": "Unapplied/unapproved private compiled proposal only. Current TS still verifies while the assurance session is unsealed and seals later. Baseline/restored actual reports remain INVALID/false; only the private statement move changes that behavior.",
+    "limits": "Private19/19 is not a build of modified TypeScript or accepted source qualification. The eight abort controls cover their existing resolver/store/trigger paths, not every possible post-seal persistence/IO failure. Successful unsigned measured assurance, authenticated surfaces and full release remain untested here."
+  },
+  "reviewLimits": [
+    "All source/private module reads finished. No tests, runtime, builds, source/dependency/guard/app actions or nextP0-24 work occurred; only this review pair is written.",
+    "The19-case private runs repeat the same11 runner tests plus the original8 abort/isolation cases. The normal11 unique runner cases are not19 new runner cases; repeats are not additive whole-platform totals.",
+    "The strict VALID expectation remains unchanged and RED on accepted current source. The two first encrypted-blob observer mistakes and nullable-path type error are retained, with the real plaintext loader and explicit path guard corrections isolated to the new test.",
+    "Actual local loopback replies and OBSERVED/OBSERVED_HARDENED capture are controlled fixtures, not live providers, executed tools, external independent regulated evidence or passing compliance requirements.",
+    "Report artifact status is distinct from evidenceStatus and v1 scoring. Private VALID tool-only artifacts stay INSUFFICIENT_EVIDENCE; measured failure counts/findings remain real failure controls.",
+    "Producer effects include new files, changed directory/link/inode metadata, SQLite WAL/SHM and key export/cache effects. Post-verifier/tamper snapshots are separate. There is no entire-lifecycle zero-effects or attribution-to-one-operation claim.",
+    "The originalP0-27 test retains22-only guards in this package. No Node24 compatibility runtime, whole-suite/coverage, hostedCI/release, G0 or Done approval is inferred.",
+    "The47 echo deferral and all earlier held/paused/pending decisions and unresolved contracts remain open. Root owns the current516-case corpus, source proposal decision, final checks and canonical receipt."
+  ]
+}

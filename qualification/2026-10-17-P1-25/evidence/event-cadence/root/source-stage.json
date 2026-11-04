@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-17T01:01:28.387079+00:00",
+  "stagedPaths": [
+    "tests/time/checkpointWindow.test.ts"
+  ],
+  "fullIndexBlobMatchesCandidate": true,
+  "bytes": 48568,
+  "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+  "ordinaryStageExit": 0,
+  "defaultStagedFullRangeWhitespaceExit": 0,
+  "noCommitCreditYet": true
+}

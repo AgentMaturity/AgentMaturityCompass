@@ -1,0 +1,32 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass
+
+ ✓ tests/reconciliationDefectsMcpHttp.test.ts (2 tests) 669ms
+     ✓ a non-EXECUTE call with schema-invalid arguments is refused without a remote call  355ms
+     ✓ a result received after grant disposal is reported as executed and discarded  310ms
+ ✓ tests/reconciliationDefectsMcp.test.ts (2 tests) 753ms
+     ✓ a discarded received result says the remote tool executed and was not replayed  469ms
+ ✓ tests/nativeMcpClient.test.ts (15 tests) 6606ms
+     ✓ valid schemas execute through the signed allowlist; invalid arguments never reach the server  476ms
+     ✓ a mounted capability cannot bypass the independent signed allowlist  330ms
+     ✓ wrong catalog pins and absent remote grants leave no mounted capability  308ms
+     ✓ catalog drift is refused before dispatch and list-change notifications revoke active grants  393ms
+     ✓ output schemas on earlier catalog pages are enforced  303ms
+     ✓ output schemas sharing an id stay independent of SDK cache state  303ms
+     ✓ remote errors retain structured details and timeouts retain their separate failure fact  2354ms
+     ✓ explicit secrets are child-only, scrubbed from results and catalog leakage refuses  321ms
+     ✓ cancellation disposes the connection and prevents later calls  348ms
+     ✓ a reviewed MCP-only policy is ready and late mounting still exposes and executes its pinned tool  322ms
+ ✓ tests/nativeMcpHttp.test.ts (15 tests) 7366ms
+     ✓ executes false SSE with pinned origin/session and private header redaction  412ms
+     ✓ redirects never send credentials to a second origin  344ms
+     ✓ catalog notifications dispose the grant without automatic reconnect  331ms
+     ✓ idle notifications outlive request timeout, then expire at the independently configured bound  2718ms
+     ✓ timeouts and remote error results retain distinct failure facts  1478ms
+
+ Test Files  4 passed (4)
+      Tests  34 passed (34)
+   Start at  20:30:40
+   Duration  10.40s (transform 8.18s, setup 80ms, import 11.50s, tests 15.40s, environment 0ms)
+
+JSON report written to /Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-50-node24-mcp-components-20261014T150040Z/current-four-files.json

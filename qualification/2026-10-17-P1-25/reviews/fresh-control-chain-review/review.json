@@ -1,0 +1,320 @@
+{
+  "schema": "p125-independent-fresh-control-chain-review/1",
+  "at": "2026-10-16T19:05:28.499793+00:00",
+  "blockers": [],
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+  "actualPhases": [
+    {
+      "phase": "p125-fresh-canonical",
+      "exit": 0,
+      "durationMs": 2042,
+      "ownedPgid": 12223,
+      "recordedOwnedGroupAbsentByESRCH": true,
+      "passed": 47,
+      "failed": 0,
+      "total": 47,
+      "uniqueObserverTestIds": 47,
+      "orderedCaseIdentitiesExact": true,
+      "hookTaskEntries": 28,
+      "individualHookValuesPassed": 29,
+      "expectedBodyAssertionErrors": 0,
+      "otherTaskHookUnhandledLateErrors": 0,
+      "separatePublicEvidence": 0
+    },
+    {
+      "phase": "p125-m1",
+      "exit": 1,
+      "durationMs": 1143,
+      "ownedPgid": 12415,
+      "recordedOwnedGroupAbsentByESRCH": true,
+      "passed": 46,
+      "failed": 1,
+      "total": 47,
+      "uniqueObserverTestIds": 47,
+      "orderedCaseIdentitiesExact": true,
+      "hookTaskEntries": 28,
+      "individualHookValuesPassed": 29,
+      "expectedBodyAssertionErrors": 1,
+      "otherTaskHookUnhandledLateErrors": 0,
+      "separatePublicEvidence": 0
+    },
+    {
+      "phase": "p125-m1-restored",
+      "exit": 0,
+      "durationMs": 1126,
+      "ownedPgid": 12479,
+      "recordedOwnedGroupAbsentByESRCH": true,
+      "passed": 47,
+      "failed": 0,
+      "total": 47,
+      "uniqueObserverTestIds": 47,
+      "orderedCaseIdentitiesExact": true,
+      "hookTaskEntries": 28,
+      "individualHookValuesPassed": 29,
+      "expectedBodyAssertionErrors": 0,
+      "otherTaskHookUnhandledLateErrors": 0,
+      "separatePublicEvidence": 0
+    },
+    {
+      "phase": "p125-m2",
+      "exit": 1,
+      "durationMs": 1203,
+      "ownedPgid": 12570,
+      "recordedOwnedGroupAbsentByESRCH": true,
+      "passed": 45,
+      "failed": 2,
+      "total": 47,
+      "uniqueObserverTestIds": 47,
+      "orderedCaseIdentitiesExact": true,
+      "hookTaskEntries": 28,
+      "individualHookValuesPassed": 29,
+      "expectedBodyAssertionErrors": 2,
+      "otherTaskHookUnhandledLateErrors": 0,
+      "separatePublicEvidence": 0
+    },
+    {
+      "phase": "p125-m2-restored",
+      "exit": 0,
+      "durationMs": 1133,
+      "ownedPgid": 12637,
+      "recordedOwnedGroupAbsentByESRCH": true,
+      "passed": 47,
+      "failed": 0,
+      "total": 47,
+      "uniqueObserverTestIds": 47,
+      "orderedCaseIdentitiesExact": true,
+      "hookTaskEntries": 28,
+      "individualHookValuesPassed": 29,
+      "expectedBodyAssertionErrors": 0,
+      "otherTaskHookUnhandledLateErrors": 0,
+      "separatePublicEvidence": 0
+    }
+  ],
+  "sameOrdered47IdentitiesInAllFive": true,
+  "cohortsSummed": false,
+  "bodyFailures": [
+    {
+      "phase": "p125-m1",
+      "file": "tests/time/verifyTimestamp.test.ts",
+      "name": "refuses a different expected digest for the unchanged genuine signed token",
+      "kind": "body AssertionError",
+      "sourceFrame": "at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts:127:63",
+      "rawFirstFailureLine": "AssertionError: expected { ok: true, attested: { \u2026(9) } } to match object { ok: false, \u2026(1) }",
+      "rawFailureMessageSha256": [
+        "e30634ca2cffc782b6aab6ebf53af0c42e96e14e8d0ce02f800666aa1232c48a"
+      ],
+      "observerErrorMessageSha256": "0bb0fad43c9c88f53d088ea5a114a0778ebf16dea85a89e87f60e3c94f37b839",
+      "observerStackSha256": "e30634ca2cffc782b6aab6ebf53af0c42e96e14e8d0ce02f800666aa1232c48a",
+      "observedSafeActualFields": {
+        "ok": true
+      }
+    },
+    {
+      "phase": "p125-m2",
+      "file": "tests/time/verifyTimestamp.test.ts",
+      "name": "refuses the genuine token under a different real root with the same permitted policy",
+      "kind": "body AssertionError",
+      "sourceFrame": "at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts:143:62",
+      "rawFirstFailureLine": "AssertionError: expected { ok: true, attested: { \u2026(9) } } to match object { Object (ok, code) }",
+      "rawFailureMessageSha256": [
+        "27bdf27ce1a7da7f65e64c607e864751db88e1f636950db824e45b257ef7d690"
+      ],
+      "observerErrorMessageSha256": "fcac3dfd87456559fc5537de32f10aa5fa7d25ce8bcf4ce688eddbfc40e1ccfd",
+      "observerStackSha256": "27bdf27ce1a7da7f65e64c607e864751db88e1f636950db824e45b257ef7d690",
+      "observedSafeActualFields": {
+        "ok": true
+      }
+    },
+    {
+      "phase": "p125-m2",
+      "file": "tests/time/verifyTimestamp.test.ts",
+      "name": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+      "kind": "body AssertionError",
+      "sourceFrame": "at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts:199:23",
+      "rawFirstFailureLine": "AssertionError: expected { evidence: { \u2026(4) }, findings: [] } to deeply equal { evidence: { \u2026(3) }, findings: [] }",
+      "rawFailureMessageSha256": [
+        "d6bc8b03136a50a96235c32b6f3f5c404e9f4c755c88ba0c33e25110a808069b"
+      ],
+      "observerErrorMessageSha256": "7425bc7d3c0265028536a24f3db089f9bd9c1ba2497fd43ffb247a41b80acac7",
+      "observerStackSha256": "d6bc8b03136a50a96235c32b6f3f5c404e9f4c755c88ba0c33e25110a808069b",
+      "observedSafeActualFields": {
+        "basis": "attested-upper-bound",
+        "anchorId": "p125-unrelated",
+        "claimedAt": "2026-10-15T23:59:00.000Z",
+        "genTime": "2026-10-16T00:00:00.000Z"
+      }
+    }
+  ],
+  "causalClassification": {
+    "m1": "Only wrong-imprint assertion failed at127:63; same-body genuine validAttestation returned before it. Actualok:true bypassed expectedfalse/TST_IMPRINT_MISMATCH. No later assertion in that body is claimed.",
+    "m2Primary": "Wrong unrelated nonempty-root refusal failed at143:62 after same-body genuine original-root positive. Actualok:true bypassed expectedfalse/TST_UNTRUSTED_TSA; remaining signature/ESS/imprint/nonce/EKU/genTime guards were not removed.",
+    "m2Secondary": "ArtifactTime comparison failed at199:23. Serializedactual separately observes attested-upper-bound,p125-unrelated and unchangedclaimedAt. Lines200integrityError-null and201-202warning assertions are masked; no directfailure-run credit.",
+    "maskedAssertions": [
+      "m2 secondary line200integrityError:null",
+      "m2 secondary line201warningTST_UNTRUSTED_TSA",
+      "m2 secondary line202warningtimebasisclaimed"
+    ],
+    "allThreeFailuresBodyAssertionErrors": true,
+    "otherTaskHookUnhandledLateErrors": 0
+  },
+  "restoration": {
+    "bothOriginalBackupsByteExact": true,
+    "operatorMutantBytesComputedMatchActualApplyRecords": true,
+    "bothRestoreRecordsMatchOriginal": true,
+    "currentSAndQTargetExactOriginal": true,
+    "m1Restored47PassedBeforeM2Apply": true,
+    "m2Restored47Passed": true,
+    "serializedApplyRedClassifyRestoreGreenOrderVerified": true,
+    "operations": [
+      {
+        "number": 1,
+        "apply": {
+          "schema": "p125-owned-source-control-operation/1",
+          "at": "2026-10-16T18:57:54.363861+00:00",
+          "operation": "apply",
+          "number": 1,
+          "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+          "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+          "target": "src/time/verifyTimestamp.ts",
+          "actualBytes": 16259,
+          "actualSha256": "3f9869d5a33305b03fe7c1421cccf6342226f2ba4b7f9734a83010a777767096",
+          "all44BoundInputsExactExceptOwnedTarget": true,
+          "allThreeNativePinsExact": true,
+          "sourceAndBorrowedCheckoutUnmodified": true,
+          "compiledOutputMutation": false,
+          "forceResetNoVerifyBaselineOrWaiver": false
+        },
+        "restore": {
+          "schema": "p125-owned-source-control-operation/1",
+          "at": "2026-10-16T18:58:23.684577+00:00",
+          "operation": "restore",
+          "number": 1,
+          "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+          "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+          "target": "src/time/verifyTimestamp.ts",
+          "actualBytes": 16478,
+          "actualSha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+          "all44BoundInputsExactExceptOwnedTarget": true,
+          "allThreeNativePinsExact": true,
+          "sourceAndBorrowedCheckoutUnmodified": true,
+          "compiledOutputMutation": false,
+          "forceResetNoVerifyBaselineOrWaiver": false
+        },
+        "savedOriginal": {
+          "path": "/private/tmp/p1-25-time-qualification-20261016/control-originals/m1-original.ts",
+          "bytes": 16478,
+          "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+          "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/control-originals/m1-original.ts",
+          "dev": 16777231,
+          "inode": 543130917,
+          "nlink": 1,
+          "regular": true
+        },
+        "actualMutantHashMatchesExactOperatorReconstruction": true,
+        "patchOnlyExactOperatorChangedLines": true,
+        "representation": "Reconstructed from saved original and exact operator after phase; matches actual apply mutant hash,not a retrospective live diff."
+      },
+      {
+        "number": 2,
+        "apply": {
+          "schema": "p125-owned-source-control-operation/1",
+          "at": "2026-10-16T18:59:33.855090+00:00",
+          "operation": "apply",
+          "number": 2,
+          "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+          "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+          "target": "src/time/verifyTimestamp.ts",
+          "actualBytes": 16393,
+          "actualSha256": "0b08cac16b8d1f4f2f70e54947607fff244422077037608ad2e493c83177fcce",
+          "all44BoundInputsExactExceptOwnedTarget": true,
+          "allThreeNativePinsExact": true,
+          "sourceAndBorrowedCheckoutUnmodified": true,
+          "compiledOutputMutation": false,
+          "forceResetNoVerifyBaselineOrWaiver": false
+        },
+        "restore": {
+          "schema": "p125-owned-source-control-operation/1",
+          "at": "2026-10-16T19:00:15.458592+00:00",
+          "operation": "restore",
+          "number": 2,
+          "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+          "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout",
+          "target": "src/time/verifyTimestamp.ts",
+          "actualBytes": 16478,
+          "actualSha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+          "all44BoundInputsExactExceptOwnedTarget": true,
+          "allThreeNativePinsExact": true,
+          "sourceAndBorrowedCheckoutUnmodified": true,
+          "compiledOutputMutation": false,
+          "forceResetNoVerifyBaselineOrWaiver": false
+        },
+        "savedOriginal": {
+          "path": "/private/tmp/p1-25-time-qualification-20261016/control-originals/m2-original.ts",
+          "bytes": 16478,
+          "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+          "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/control-originals/m2-original.ts",
+          "dev": 16777231,
+          "inode": 543131159,
+          "nlink": 1,
+          "regular": true
+        },
+        "actualMutantHashMatchesExactOperatorReconstruction": true,
+        "patchOnlyExactOperatorChangedLines": true,
+        "representation": "Root captured actual git diff while only owned target was mutated; changed lines match exact operator."
+      }
+    ]
+  },
+  "currentFinitePreservation": {
+    "relativePathsPerRoot": 44,
+    "sourceFreshFileChecks": 88,
+    "compiledPathsPerRoot": 5,
+    "otherPathsPerRoot": 39,
+    "allCurrentBytesHashRegularSingleLinkExact": true,
+    "all44SourceFreshPairsHaveDistinctPhysicalIdentityNow": true,
+    "nativePins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1,
+        "regular": true
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1,
+        "regular": true
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543125595,
+        "nlink": 1,
+        "regular": true
+      }
+    ],
+    "threeNativeIdentitiesDistinctSingleLinkExact": true,
+    "currentOperatorTargetRegularDistinctSourceFresh": true,
+    "noCompiledMutantOrSQLiteExecutionCredit": true,
+    "scope": "Finite currently observed path/hash/stat identity,plus actual guarded-operation records; not all repository/descendant/ignored-file proof."
+  },
+  "authority": "Actual --root and raw paths are Q; borrowed Rcwd is runner metadata. Source/compiled parity is binding/preservation,not compiled sensitivity. Root fresh helper did not run Vitest; sourceS47 and helper smoke are separate,not added.",
+  "rootFinalQChecksIncluded": false,
+  "pendingSeparateEvidence": [
+    "Root final Qcounts/gates/freeze and final broad preservation if requested later; no prediction or waiting here.",
+    "Broader wholeP125/dependencyapproval/schema/client/checkpoint/issuance/CLI/algorithm/globalquality/CI/release acceptance remains open.",
+    "Missing current reservation retains last-known binding; sourcecontrol ownership release is not inferred. All held work and F37skip unchanged."
+  ],
+  "reviewerBoundary": "Read-only existing artifacts and finite byte/hash/stat inspection only. No helper/product/parser/compiler/test/native/SQL/network/processprobe or Git executed by reviewer; no Q/S/R/checkout/index writes. Reviewer authored the original test; separate independent static/generation reviews remain earlier authority."
+}

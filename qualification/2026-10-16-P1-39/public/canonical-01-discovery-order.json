@@ -1,0 +1,147 @@
+{
+  "schema": "amc-p139-oauth-first/1",
+  "label": "discovery-order",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-hk70Uz",
+  "observations": {
+    "explicitOrder": [
+      "POST /mcp/v1",
+      "GET /explicit-prm",
+      "GET /.well-known/oauth-authorization-server/issuer/path",
+      "GET /.well-known/openid-configuration/issuer/path",
+      "GET /issuer/path/.well-known/openid-configuration"
+    ],
+    "fallbackOrder": [
+      "GET /.well-known/oauth-protected-resource/mcp/v1",
+      "GET /.well-known/oauth-protected-resource"
+    ],
+    "explicitResourceMatches": true,
+    "issuerMatches": true,
+    "fallbackResourceMatches": true
+  },
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 401,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/explicit-prm",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 404,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/openid-configuration/issuer/path",
+      "status": 404,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/issuer/path/.well-known/openid-configuration",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-protected-resource/mcp/v1",
+      "status": 404,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-protected-resource",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "clients": [],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "productionCallbackServerCloseObserved": false,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

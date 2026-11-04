@@ -1,0 +1,43 @@
+
+ RUN  v4.1.11 /private/tmp/p0-21-causal-qualification-20261015/closure
+
+ ✓ tests/transparencyReport.test.ts (15 tests) 39ms
+ ✓ tests/noCertificationFromSelfAssessment.test.ts (7 tests) 2527ms
+     ✓ MCP sector-pack and trust-score text say self-assessment and evidence standing  2487ms
+ ✓ tests/selfReportedLevelCap.test.ts (5 tests) 17ms
+ ✓ tests/logisticsIndustryPack.test.ts (2 tests) 6ms
+ ❯ tests/scoreUnits.test.ts (4 tests | 1 failed) 7ms
+     ✓ a Likert answer is an integer 1-5 and nothing else 1ms
+     ✓ percent, level and fraction reject values outside their range 0ms
+     ✓ conversions are explicit 0ms
+     × percentToLevel is the one level table: L2 starts at 30 2ms
+ ✓ tests/domainAssessmentUnits.test.ts (4 tests) 12ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/scoreUnits.test.ts > typed score units (P0-21) > percentToLevel is the one level table: L2 starts at 30
+AssertionError: percent 30: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/scoreUnits.test.ts:47:58
+     45|     ];
+     46|     for (const [p, expected] of table) {
+     47|       expect(percentToLevel(percent(p)), `percent ${p}`).toBe(expected…
+       |                                                          ^
+     48|     }
+     49|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 5 passed (6)
+      Tests  1 failed | 36 passed (37)
+   Start at  10:50:59
+   Duration  3.88s (transform 2.27s, setup 73ms, import 634ms, tests 2.61s, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/raw.json

@@ -1,0 +1,102 @@
+import { type EnforceResourceKind } from "../enforce/resourceManifest.js";
+export interface OptimizerSplit {
+    searchTestIds: string[];
+    validationTestIds: string[];
+    blockedReason: string | null;
+}
+export interface OptimizerLeakageCheck {
+    id: string;
+    status: "passed" | "blocked";
+    reason: string;
+    evidenceRefs: string[];
+}
+export interface OptimizerCandidateMetrics {
+    scoreGain: number;
+    risk: number;
+    cost: number;
+    latencyMs: number;
+    confidence: number;
+    regressionImpact: number;
+}
+export interface GovernedOptimizerCandidate {
+    candidateId: string;
+    sourceProposalId: string;
+    candidateWorkspace: string;
+    resourceKind: EnforceResourceKind | "unknown";
+    resourceId: string | null;
+    resourcePath: string | null;
+    rollbackPointer: string | null;
+    patchSummary: string;
+    split: OptimizerSplit;
+    leakageChecks: OptimizerLeakageCheck[];
+    metrics: OptimizerCandidateMetrics;
+    paretoFront: boolean;
+    rank: number | null;
+    decision: "accepted" | "rejected";
+    decisionReason: string;
+    receiptId: string;
+    liveResourceMutated: false;
+}
+export interface OptimizerCandidateReceipt {
+    schemaVersion: "2026-05-22";
+    receiptId: string;
+    receiptType: "optimizer.candidate";
+    candidateId: string;
+    sourceProposalId: string;
+    decision: "accepted" | "rejected";
+    reason: string;
+    createdAt: string;
+    candidateWorkspace: string;
+    resourceKind: EnforceResourceKind | "unknown";
+    resourceId: string | null;
+    rollbackPointer: string | null;
+    liveResourceMutated: false;
+    commitRequiresLifecycleReceipt: true;
+    gates: OptimizerLeakageCheck[];
+}
+export interface OptimizerValidationReceipt {
+    receiptId: string;
+    status: "passed" | "blocked";
+    createdAt: string;
+    gates: Array<{
+        id: string;
+        status: "passed" | "blocked";
+        reason: string;
+    }>;
+}
+export interface GovernedOptimizerRun {
+    schemaVersion: "2026-05-22";
+    optimizerRunId: string;
+    workspace: string;
+    agentId: string;
+    sourceRcaReportId: string;
+    sourceRunId: string;
+    createdAt: string;
+    candidateCount: number;
+    acceptedCandidateId: string | null;
+    candidates: GovernedOptimizerCandidate[];
+    receipts: OptimizerCandidateReceipt[];
+    validationReceipt: OptimizerValidationReceipt;
+    signaturePath: string | null;
+}
+export declare function writeGovernedOptimizerRun(input: {
+    workspace: string;
+    agentId?: string;
+    rcaSelector?: string;
+}): {
+    run: GovernedOptimizerRun;
+    path: string;
+    signaturePath: string | null;
+};
+export declare function listGovernedOptimizerRuns(input: {
+    workspace: string;
+    agentId?: string;
+    limit?: number;
+    redacted?: boolean;
+}): GovernedOptimizerRun[];
+export declare function loadGovernedOptimizerRun(input: {
+    workspace: string;
+    agentId?: string;
+    selector: string;
+    redacted?: boolean;
+}): GovernedOptimizerRun;

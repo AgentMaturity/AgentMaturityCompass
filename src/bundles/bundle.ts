@@ -12,7 +12,7 @@ import { pathExists, ensureDir, writeFileAtomic, readUtf8 } from "../utils/fs.js
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { loadRunReport, generateReport } from "../diagnostic/runner.js";
-import { getAuthenticatedKeyHistory, getPrivateKeyPem, signHexDigest } from "../crypto/keys.js";
+import { getAuthenticatedKeyHistory, getSigningKey, signHexDigest } from "../crypto/keys.js";
 import { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from "../crypto/keyHistoryEnvelope.js";
 import { verifyLedgerIntegrity } from "../ledger/ledger.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
@@ -20,6 +20,7 @@ import { extractValidatedTarGzipArchive, type TarArchiveLimits } from "../securi
 import { admitKey, buildVerifierReport, checkDigestSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from "../trust/index.js";
 import { carriedLedgerAnchoring } from "../trust/signatureCheck.js";
 import { assertNotExample } from "../claims/eligibility/exampleMode.js";
+import { attestBundleRoot } from "../attest/bundleAttestation.js";
 
 /**
  * Extraction limits for AMC archives.
@@ -512,7 +513,7 @@ function gatherManifest(root: string): BundleManifest["files"] {
 
 function createManifestSignature(workspace: string, manifestBytes: Buffer): BundleManifestSignature {
   const manifestSha256 = sha256Hex(manifestBytes);
-  const signature = signHexDigest(manifestSha256, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(manifestSha256, getSigningKey(workspace, "artifact-seal"));
   return {
     manifestSha256,
     signature,
@@ -638,6 +639,7 @@ export function exportEvidenceBundle(params: {
   runId: string;
   outFile: string;
   agentId?: string;
+  attest?: boolean; // P1-27: add the AIBOM and a DSSE-signed in-toto statement, both listed in the manifest
 }): { outFile: string; manifest: BundleManifest; fileCount: number; eventCount: number; sessionCount: number } {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const agentPaths = getAgentPaths(params.workspace, agentId);
@@ -653,9 +655,7 @@ export function exportEvidenceBundle(params: {
     ensureDir(join(root, "metadata"));
 
     const reportJsonPath = join(agentPaths.runsDir, `${params.runId}.json`);
-    if (!pathExists(reportJsonPath)) {
-      throw new Error(`Run JSON not found: ${reportJsonPath}`);
-    }
+    if (!pathExists(reportJsonPath)) throw new Error(`Run JSON not found: ${reportJsonPath}`);
     writeFileAtomic(join(root, "run.json"), readFileSync(reportJsonPath));
 
     const reportMdPath = join(agentPaths.reportsDir, `${params.runId}.md`);
@@ -668,9 +668,7 @@ export function exportEvidenceBundle(params: {
     if (latestOutcome) {
       ensureDir(join(root, "outcomes"));
       writeFileAtomic(join(root, "outcomes", "report.json"), readFileSync(latestOutcome.json));
-      if (latestOutcome.md) {
-        writeFileAtomic(join(root, "outcomes", "report.md"), readFileSync(latestOutcome.md), 0o644);
-      }
+      if (latestOutcome.md) writeFileAtomic(join(root, "outcomes", "report.md"), readFileSync(latestOutcome.md), 0o644);
     }
 
     const latestExperiment = findLatestExperimentReport(agentPaths.rootDir);
@@ -770,6 +768,7 @@ export function exportEvidenceBundle(params: {
       0o644
     );
 
+    if (params.attest) attestBundleRoot({ workspace: params.workspace, root, agentId });
     const manifest: BundleManifest = {
       schemaVersion: 1,
       runId: report.runId,

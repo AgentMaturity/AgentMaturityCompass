@@ -4,6 +4,7 @@ import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { savePluginSignedFile, verifyPluginSignedFile } from "./pluginPublication.js";
 import { resolvePluginInstallPath } from "./pluginIdentifiers.js";
 import {
   installedPluginsLockSchema,
@@ -92,11 +93,7 @@ export function savePluginRegistriesConfig(workspace: string, config: PluginRegi
   path: string;
   sigPath: string;
 } {
-  ensurePluginsStore(workspace);
-  const path = pluginsRegistriesPath(workspace);
-  writeFileAtomic(path, YAML.stringify(pluginRegistryConfigSchema.parse(config)), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+  return savePluginSignedFile(workspace, ".amc/plugins/registries.yaml", "BUNDLE", Buffer.from(YAML.stringify(pluginRegistryConfigSchema.parse(config))));
 }
 
 export function initPluginRegistriesConfig(workspace: string): {
@@ -115,18 +112,14 @@ export function loadPluginRegistriesConfig(workspace: string): PluginRegistryCon
 }
 
 export function verifyPluginRegistriesConfig(workspace: string) {
-  return verifySignedFileWithAuditor(workspace, pluginsRegistriesPath(workspace));
+  return verifyPluginSignedFile(workspace, ".amc/plugins/registries.yaml", "BUNDLE");
 }
 
 export function saveInstalledPluginsLock(workspace: string, lock: InstalledPluginsLock): {
   path: string;
   sigPath: string;
 } {
-  ensurePluginsStore(workspace);
-  const path = pluginsInstalledLockPath(workspace);
-  writeFileAtomic(path, JSON.stringify(installedPluginsLockSchema.parse(lock), null, 2), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return { path, sigPath };
+  return savePluginSignedFile(workspace, ".amc/plugins/installed.lock.json", "INSTALLED_LOCK", Buffer.from(JSON.stringify(installedPluginsLockSchema.parse(lock), null, 2)));
 }
 
 export function loadInstalledPluginsLock(workspace: string): InstalledPluginsLock {
@@ -138,7 +131,7 @@ export function loadInstalledPluginsLock(workspace: string): InstalledPluginsLoc
 }
 
 export function verifyInstalledPluginsLock(workspace: string) {
-  return verifySignedFileWithAuditor(workspace, pluginsInstalledLockPath(workspace));
+  return verifyPluginSignedFile(workspace, ".amc/plugins/installed.lock.json", "INSTALLED_LOCK");
 }
 
 export function loadPluginOverrides(workspace: string): PluginOverrides {

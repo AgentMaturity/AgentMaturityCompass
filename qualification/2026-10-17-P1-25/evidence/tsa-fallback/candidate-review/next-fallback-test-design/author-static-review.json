@@ -1,0 +1,23 @@
+{
+  "schema": "p125-next-fallback-author-static-review/1",
+  "at": "2026-10-16T22:00:46.733035+00:00",
+  "blockers": [],
+  "independentPeerReviewClaim": false,
+  "fullCandidateAndSealedRoutingRead": true,
+  "fixedLiteralBodies": 4,
+  "futureOnly": true,
+  "sourceAllocation": false,
+  "sourceOrExistingTestChanges": false,
+  "executedOrParsedOrCompiled": false,
+  "cryptoOrNetworkExecutionByAuthor": false,
+  "sourceApiFit": "Actual public loadTimeConfig/timestampDigest/requestTimestamp and verifyTimestampToken, existing zod/type shapes and qualified local fixture pattern reused. No mocks or new dependencies.",
+  "genuineFixture": "Existing exact public token/root/input pins; the future test itself performs genuine positive verification before the deterministic other-digest refusal. This author did not execute verification.",
+  "timeouts": "Real default10000, omitted timeoutMs, ordinary test default30000. No timer/signal/retry/forced teardown or measured-duration bound introduced.",
+  "resources": "Single lexical fixture owner keeps primary error identity, natural lifecycle promises, strict unhandled owned-error accounting and only owned temp cleanup. Runtime feasibility remains unproven.",
+  "limits": [
+    "Exact Node22 caught abort message is a strict unexecuted expectation; requestTimestamp exposes no typed client error.",
+    "Matching fresh nonce and successful grant/fallback need a separately owned real signer; no such capability is fabricated.",
+    "New client Q H0dbS9 and final client metadata/source/date must be rebound by root before allocation; the earlier181-root route does not release ownership.",
+    "No future runtime/control/green-restoration result or whole-issue/plan completion is claimed."
+  ]
+}

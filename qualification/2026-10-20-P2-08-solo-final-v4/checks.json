@@ -1,0 +1,453 @@
+{
+  "item": "P2-08",
+  "productH": "55c8b83d87336aac74129c8b61dd649072d8d706",
+  "scope": "Actual clean unchanged product H checks; unfiltered final-Q full pending",
+  "required23": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "build"
+      ],
+      "exitCode": 0,
+      "durationMs": 32025,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/00-build.log",
+        "sha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+        "bytes": 375
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "typecheck"
+      ],
+      "exitCode": 0,
+      "durationMs": 27661,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/01-typecheck.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "typecheck:tests"
+      ],
+      "exitCode": 0,
+      "durationMs": 42545,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/02-typecheck-tests.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "lint"
+      ],
+      "exitCode": 0,
+      "durationMs": 3112,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/03-lint.log",
+        "sha256": "b7096a28a4ef9fc9c2b3964e45ba643cee6913af3b85795f8e22294d36c7ec33",
+        "bytes": 200
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:counts"
+      ],
+      "exitCode": 0,
+      "durationMs": 749,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/04-check-counts.log",
+        "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+        "bytes": 81
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:docs-drift"
+      ],
+      "exitCode": 0,
+      "durationMs": 401,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/05-check-docs-drift.log",
+        "sha256": "9883fbd8b1cc62eeb984e98399d6aac676f46407887696016afb940a08f02cd1",
+        "bytes": 121
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:freeze",
+        "--",
+        "--base-ref",
+        "int"
+      ],
+      "exitCode": 0,
+      "durationMs": 1757,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/06-int.log",
+        "sha256": "8d42bbd1e67429a82770b9dd948515eb5be4475b8081e388fc71793c1423081a",
+        "bytes": 116
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:citations"
+      ],
+      "exitCode": 0,
+      "durationMs": 460,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/07-check-citations.log",
+        "sha256": "81f675216150883385813ad7802c2768d1c1f0f6b7f1c24356bddc993fef8fdb",
+        "bytes": 373
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:architecture-boundaries"
+      ],
+      "exitCode": 0,
+      "durationMs": 1761,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/08-check-architecture-boundaries.log",
+        "sha256": "dfc34f01d4322d63e54435cab6fd5fb01c16795fee44d2c7efc5665d032d99be",
+        "bytes": 103685
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:threat-model"
+      ],
+      "exitCode": 0,
+      "durationMs": 202,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/09-check-threat-model.log",
+        "sha256": "f90f862e445c974b501980fd492fdbab3b80ddfb8f0f0e4b888fbb61d240463c",
+        "bytes": 134
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:api-ref"
+      ],
+      "exitCode": 0,
+      "durationMs": 171,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/10-check-api-ref.log",
+        "sha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+        "bytes": 42
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:schemas"
+      ],
+      "exitCode": 0,
+      "durationMs": 570,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/11-check-schemas.log",
+        "sha256": "7e8480a16d9658750e5ae578fa1ef0b25789a098d283a740b59ae28f16dd4365",
+        "bytes": 65
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:gates"
+      ],
+      "exitCode": 0,
+      "durationMs": 291,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/12-check-gates.log",
+        "sha256": "faa08f454f67bacd69d6b9df6483af36bfc20e1bd992ed51e371b37080f80971",
+        "bytes": 659
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:qualification"
+      ],
+      "exitCode": 0,
+      "durationMs": 1136,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/13-check-qualification.log",
+        "sha256": "630aea7a2f21ba3780227af3db7cea084b94ce1790224c1fa1f33b36a79138aa",
+        "bytes": 66
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:catalog-currency"
+      ],
+      "exitCode": 0,
+      "durationMs": 400,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/14-check-catalog-currency.log",
+        "sha256": "c998646f1719e95c33b9197899711c71c2d4cd765786b6b61728f01d12634b0f",
+        "bytes": 161
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:catalog-changelog",
+        "--",
+        "--base-ref",
+        "int"
+      ],
+      "exitCode": 0,
+      "durationMs": 871,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/15-int.log",
+        "sha256": "fdc3a6a93f7c37fb5ddcba407ebac1934617acfbd6c0ee41eb5ff8ea5b8a880c",
+        "bytes": 146
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:catalog-admission"
+      ],
+      "exitCode": 0,
+      "durationMs": 2508,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/16-check-catalog-admission.log",
+        "sha256": "a612de0dcf4681752241fae00c422737031e53599f2f214c3f1e31e6b5ecf7b9",
+        "bytes": 8372
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:industry-guides"
+      ],
+      "exitCode": 0,
+      "durationMs": 375,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/17-check-industry-guides.log",
+        "sha256": "fe7769497169b293a18815397791f4f5320699fac4a414665e0aff857ae3dd95",
+        "bytes": 137
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:regulatory-calendar"
+      ],
+      "exitCode": 0,
+      "durationMs": 201,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/18-check-regulatory-calendar.log",
+        "sha256": "f59a1f720450af8a2c2868cbe94c8cac3e08e8e309027f4494efe1c3072472d1",
+        "bytes": 150
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:clean-source"
+      ],
+      "exitCode": 0,
+      "durationMs": 57959,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/19-check-clean-source.log",
+        "sha256": "7a5f7e8d41ddfbe566aa0002b7bb32521856f7f927b1df34862f7385854b9171",
+        "bytes": 803
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:duplicates"
+      ],
+      "exitCode": 0,
+      "durationMs": 622,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/20-check-duplicates.log",
+        "sha256": "c2d66a74e627394267159797814a19d0c4d4e2f0d56cdb3a9c8be321f19e242d",
+        "bytes": 85
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:dead-code"
+      ],
+      "exitCode": 0,
+      "durationMs": 3275,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/21-check-dead-code.log",
+        "sha256": "da055cae1129abafc1678f6b111188a027f1d717eddcf8068f0d7c3f13ca6503",
+        "bytes": 84
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "release:notes",
+        "--",
+        "--check"
+      ],
+      "exitCode": 0,
+      "durationMs": 182,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-required23-v9/22---check.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "extras": [
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "audit:runtime"
+      ],
+      "exitCode": 0,
+      "durationMs": 691,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-extras-v6/00-audit-runtime.log",
+        "sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955",
+        "bytes": 31
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:third-party-notices"
+      ],
+      "exitCode": 0,
+      "durationMs": 168,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-extras-v6/01-check-third-party-notices.log",
+        "sha256": "2c07f358b97ffd4d746cf8aeb10d25e8396fbc3d764aaa64a03975ced114e6cf",
+        "bytes": 55
+      }
+    },
+    {
+      "command": [
+        "npm",
+        "run",
+        "-s",
+        "check:packed-install"
+      ],
+      "exitCode": 0,
+      "durationMs": 59710,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-extras-v6/02-check-packed-install.log",
+        "sha256": "e8cf2477e7371d11689297adc575919b603ad7d2fc3393bd951c981815b86b38",
+        "bytes": 1528
+      }
+    }
+  ],
+  "localSoftwareToken": {
+    "check": {
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/keys/pkcs11Softhsm.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-softhsm-v5/vitest.json"
+      ],
+      "exitCode": 0,
+      "durationMs": 665,
+      "log": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-softhsm-v5/00---outputFile--Users-sid-AgentMaturityCompass-worktrees-codex-7f-evidence-p2-08-solo-20261020-publication-repaired-final-softhsm-v5-vitest-json.log",
+        "sha256": "7f5819d6824bebe4089575651f87217a384cf68498bdeb0b636a3558a4069d0b",
+        "bytes": 871
+      }
+    },
+    "native": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-repaired-final-softhsm-v5/vitest.json",
+      "sha256": "7ab1bee226fbd6f7cfceb52573d4e2ff0f1b6898a868eca25fe00e26b1b69483",
+      "bytes": 1754
+    },
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "pending": 0,
+    "scope": "local software token, not hardware HSM or hosted CI"
+  },
+  "full": {
+    "state": "PENDING_ON_METADATA_ONLY_CHILD_Q",
+    "nativeTotals": null
+  },
+  "developmentRepairOnly": {
+    "restoredWholePassed": 226,
+    "restoredWholeFailed": 0,
+    "restoredWholePending": 0,
+    "guardAudit": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-post-full-repair-seven-guards-audit-v1.json",
+      "sha256": "848cf8b3163ad7da07a1bf6d2fb8ff27dd471c8ec4fafa2871166e52201aa6a3",
+      "bytes": 1361
+    }
+  }
+}

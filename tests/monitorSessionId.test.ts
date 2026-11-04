@@ -75,8 +75,8 @@ describe("a governed child runs under the session it was announced with", () => 
   });
 
   it("reports the real exit code rather than assuming success", async () => {
-    // `runAdapterCommand`'s SANDBOX branch returns a hardcoded `exitCode: 0`,
-    // which is how a crashed foreign agent reports success. The truth was always
+    // `runAdapterCommand`'s SANDBOX branch returned a hardcoded `exitCode: 0`
+    // before WP36, which is how a crashed foreign agent reported success. The truth was always
     // in the ledger as `runtime_exit_code`; this hands it back to the caller.
     const dir = workspace();
     const script = fakeCli(dir, 'echo "partial"; exit 3');

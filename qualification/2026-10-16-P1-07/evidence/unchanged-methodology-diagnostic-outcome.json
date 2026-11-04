@@ -1,0 +1,36 @@
+{
+  "phase": "p107-unchanged-methodology-diagnostic",
+  "tests": {
+    "numTotalTests": 30,
+    "numPassedTests": 30,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "files": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/publicMethodology.test.ts",
+      "tests": 4
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/fullDiagnostic.test.ts",
+      "tests": 12
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/quickscoreShare.test.ts",
+      "tests": 8
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/traceEvidenceMapper.test.ts",
+      "tests": 6
+    }
+  ],
+  "unhandledErrors": [],
+  "taskErrors": [],
+  "failedHooks": [],
+  "hooksPassed": 8,
+  "raw": {
+    "bytes": 9541,
+    "sha256": "4f7464de623a05b6400f761d307d04cb43c19eef0cd2e3d15e1fb16d3a92367d"
+  },
+  "boundary": "These are unchanged regression fixtures; absent new lifecycle instrumentation is not inferred."
+}

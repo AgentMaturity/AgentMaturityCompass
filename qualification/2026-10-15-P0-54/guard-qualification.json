@@ -1,0 +1,921 @@
+{
+  "scope": "Only the new tests/a4GuardQualification.test.ts was authored. All runtime fixtures, scanner mutation and evidence are private. No production scanner, original test, allowlist, live src/a4 path, metrics, dependency, archive, manifest, freeze baseline, tracker or ref was edited by this child.",
+  "capturedUtc": "2026-10-14T19:33:32.767961+00:00",
+  "worktree": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-54-current-qualification",
+  "sourceHeadAtReceipt": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+  "sourceHeadInBothPhases": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+  "ownedTest": {
+    "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/tests/a4GuardQualification.test.ts",
+    "sha256": "b402f8aed22f144c7421000bbb76ae5e72afdc9654d70b41aa6986d10cc451bb",
+    "lines": 112,
+    "cases": 8
+  },
+  "phases": [
+    {
+      "name": "guard-first",
+      "command": {
+        "name": "guard-first",
+        "cmd": "pnpm exec vitest run tests/a4GuardQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-54-guard-first-20261015.json",
+        "exit": 0,
+        "durationMs": 1748,
+        "startedUtc": "2026-10-14T19:31:09.294109+00:00",
+        "log": "/private/tmp/p0-54-guard-first-20261015.log",
+        "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+      },
+      "raw": "/private/tmp/p0-54-guard-first-20261015.json",
+      "rawSha256": "bebdc10e228d74d706c74d47b220179a8c66b7ad49baac7be685c6ffff7cb1f9",
+      "logSha256": "bf8af4b00d97a8acd638e7d9f4cf8213c04b367d070176e8efc329b94ff4d68b",
+      "counts": {
+        "numTotalTests": 8,
+        "numPassedTests": 8,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "success": true,
+      "assertions": [
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard R1 refuses unmarked random output in the guarded A4 root",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard R3 refuses path-presence scoring in the guarded A4 root",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard R2 globally refuses fabricated-result identifiers under A4",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard R4 globally refuses certification output under A4",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard harmless governance state passes without an allowlist exception",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard certification detection regex and a warning comment remain harmless",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard the approved preceding ID marker permits A4 identifier randomness",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard the approved trailing fuzz-input marker permits an A4 attack input",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ]
+    },
+    {
+      "name": "guard-without-a4-mutant",
+      "command": {
+        "name": "guard-without-a4-mutant",
+        "cmd": "env AMC_P0_54_SCANNER=/private/tmp/amc-p0-54-scanner-mutant-d5fbi4f5/check-no-fabrication.mjs pnpm exec vitest run tests/a4GuardQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-54-guard-without-a4-mutant-20261015.json",
+        "exit": 1,
+        "durationMs": 1718,
+        "startedUtc": "2026-10-14T19:31:27.000853+00:00",
+        "log": "/private/tmp/p0-54-guard-without-a4-mutant-20261015.log",
+        "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+      },
+      "raw": "/private/tmp/p0-54-guard-without-a4-mutant-20261015.json",
+      "rawSha256": "722088be530f0a0be57a1a24ae7452af051c9747967de2795128aa3f08309ea1",
+      "logSha256": "cf2fc78691b87a6d56632f2f92f1d005ffe83f0415142db9c88bcd366ef7b332",
+      "counts": {
+        "numTotalTests": 8,
+        "numPassedTests": 6,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "success": false,
+      "assertions": [
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard R1 refuses unmarked random output in the guarded A4 root",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected +0 to be 1 // Object.is equality"
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard R3 refuses path-presence scoring in the guarded A4 root",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected +0 to be 1 // Object.is equality"
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard R2 globally refuses fabricated-result identifiers under A4",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard R4 globally refuses certification output under A4",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard harmless governance state passes without an allowlist exception",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard certification detection regex and a warning comment remain harmless",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard the approved preceding ID marker permits A4 identifier randomness",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "P0-54 actual A4-root no-fabrication guard the approved trailing fuzz-input marker permits an A4 attack input",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ]
+    }
+  ],
+  "mutation": {
+    "authoredScript": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/scripts/check-no-fabrication.mjs",
+    "authoredSha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc",
+    "privateCopy": "/private/tmp/amc-p0-54-scanner-mutant-d5fbi4f5/check-no-fabrication.mjs",
+    "privateCopySha256": "7c1e72f1849c1a39d068da1f66397c508cf70dadc33f9f9f3ffdfae0473284d9",
+    "mutation": "Remove only the a4 entry from GUARDED_ROOTS; all other bytes preserved.",
+    "deletedBytes": 6,
+    "nodeModulesLink": "/private/tmp/amc-p0-54-scanner-mutant-d5fbi4f5/node_modules",
+    "nodeModulesTarget": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/node_modules",
+    "ownedTest": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/tests/a4GuardQualification.test.ts",
+    "testSha256": "b402f8aed22f144c7421000bbb76ae5e72afdc9654d70b41aa6986d10cc451bb"
+  },
+  "mutationManifestSha256": "cb8d86c575d3ac8e0889ec16f225809070211ada1333936508633abba53875cd",
+  "privateByteComparisonPassed": true,
+  "sourceUnchangedAfterMutation": true,
+  "sameEightFixtureContentsAcrossPhases": true,
+  "scans": {
+    "guard-without-a4-mutant": {
+      "originalEvidenceRoot": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-54-guard-kd9eHz",
+      "retainedEvidenceRoot": "/private/tmp/p0-54-guard-evidence-20261015/guard-without-a4-mutant",
+      "inputsSha256": "432a60bf23170c22a03ecef8d2b6cbfbb9479546198f57ec98493df809347ac8",
+      "inputs": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "authoredScript": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/scripts/check-no-fabrication.mjs",
+        "script": "/private/tmp/amc-p0-54-scanner-mutant-d5fbi4f5/check-no-fabrication.mjs",
+        "scannerSha256": "7c1e72f1849c1a39d068da1f66397c508cf70dadc33f9f9f3ffdfae0473284d9",
+        "inputs": [
+          {
+            "path": "scripts/check-no-fabrication.mjs",
+            "sha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc"
+          },
+          {
+            "path": "scripts/no-fabrication-allowlist.json",
+            "sha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937"
+          },
+          {
+            "path": "tests/checkNoFabrication.test.ts",
+            "sha256": "344b6f2dd9103b7a6f2a887978f3db8ce6cc4d75448d6acc8afdf9b8f65b9528"
+          },
+          {
+            "path": "src/diagnostic/evidenceEmitters.ts",
+            "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+          },
+          {
+            "path": "docs/security/channel-map.json",
+            "sha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e"
+          },
+          {
+            "path": "src/mode/mode.ts",
+            "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0"
+          },
+          {
+            "path": "src/cli.ts",
+            "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+          },
+          {
+            "path": "src/cli/resultCommandRegistry.ts",
+            "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406"
+          },
+          {
+            "path": "src/repl/replParser.ts",
+            "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805"
+          }
+        ]
+      },
+      "cases": [
+        {
+          "name": "fuzz-marker",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-without-a4-mutant/fuzz-marker/actual.json",
+          "actualManifestSha256": "f20e0932595ca8928496e4e94e355be3147a9d9a3f9f7b5f3296ca5ee7868af1",
+          "sourceSha256": "72659612d445a7213667d572189414a50068b55a411b7f9f54cb0b8139a0060a",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "29e53e06cf85b3715b93e709c3764c5b70409b6881979827f99d44182cd0dd2b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "harmless-detection",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-without-a4-mutant/harmless-detection/actual.json",
+          "actualManifestSha256": "1e2a741201f63c8a016e60b414c3538e8cd2a9366c0db619b1dcede30cacd225",
+          "sourceSha256": "07722d6f8fd9ae27f642abaf8b6a31174216418a3d3dc6e07ff6537994629a77",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "29e53e06cf85b3715b93e709c3764c5b70409b6881979827f99d44182cd0dd2b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "harmless-state",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-without-a4-mutant/harmless-state/actual.json",
+          "actualManifestSha256": "f5e2517bf2627ada35f9a653a8a794b676c9c7a4b2a6ad22e322ec0c3b6dc9c3",
+          "sourceSha256": "d505cc0d595be3060f0e0af6dccc1b05eb7f3709adb9cb8f9bf68bdde8327808",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "29e53e06cf85b3715b93e709c3764c5b70409b6881979827f99d44182cd0dd2b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "id-marker",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-without-a4-mutant/id-marker/actual.json",
+          "actualManifestSha256": "5801c3bf6098a33fd39b2f794e99a7c69f70f7a6d0ac053e870bad3fd0f73a82",
+          "sourceSha256": "c27382cbe1eaf0a67ed8c9698d90ede483e4ef6bc46efcc0b49574b4bd9c61e5",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "29e53e06cf85b3715b93e709c3764c5b70409b6881979827f99d44182cd0dd2b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "r1-random",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-without-a4-mutant/r1-random/actual.json",
+          "actualManifestSha256": "8c9f59c482518b727a8f730a1df99bf80579fb27a90ce35222f498029148203c",
+          "sourceSha256": "08f57ba6a4ff8e9e47c49f67497cfbf92faeb83f36fddfb25d747783ff410777",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "29e53e06cf85b3715b93e709c3764c5b70409b6881979827f99d44182cd0dd2b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "r2-global",
+          "exit": 1,
+          "report": {
+            "ok": false,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 1,
+                "allowlisted": 0,
+                "failing": 1
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": [
+              "src/a4/witness.ts:1 R2 identifier pseudoRandomScore names a fabricated result; examples live only in src/claims/eligibility/exampleMode.ts"
+            ]
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-without-a4-mutant/r2-global/actual.json",
+          "actualManifestSha256": "adc1edbaf153983bc3f21741a255489b6980be3d031012b3c41d745e56648b88",
+          "sourceSha256": "d3c772e08f5b088caa63c6c7217270d13fc5ca13ad783a9584e1ed6a927fd0d2",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "5f6f7a5695ce8787df89d5b6177f06c42ef077fe58ca773b6c00d9b078418195",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "r3-path",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-without-a4-mutant/r3-path/actual.json",
+          "actualManifestSha256": "07c974336ae076078e371c01b561a76f8fda7fff85927dbfbc81b68f2744cf4a",
+          "sourceSha256": "ddc55595ec0772a23028d5bad2c6aa484944e9b6e6a25b2df96180c471c8c8b7",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "29e53e06cf85b3715b93e709c3764c5b70409b6881979827f99d44182cd0dd2b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "r4-global",
+          "exit": 1,
+          "report": {
+            "ok": false,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 1,
+                "allowlisted": 0,
+                "failing": 1
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": [
+              "src/a4/witness.ts:1 R4 certification wording \"Certified\"; AMC output is evidence of conformity"
+            ]
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-without-a4-mutant/r4-global/actual.json",
+          "actualManifestSha256": "7f6fa6d45d01860499ebdcc5bf4c440c7d258d8b7bf75a772da8330c19aeb10d",
+          "sourceSha256": "3a1d9deda2a6dd40c77be1e0856a60604532d7e13941d4e4bd334ce56cb59a31",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "15d85c9d78f2eef3d009e7b3f74f2ceda5c4f91452642526b38d5e741c9c5ee3",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    "guard-first": {
+      "originalEvidenceRoot": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-54-guard-ueXn1o",
+      "retainedEvidenceRoot": "/private/tmp/p0-54-guard-evidence-20261015/guard-first",
+      "inputsSha256": "69cdf9f3db47fdace7bc63bc2c20c71fbaa97727bb2558a24d13b3a408d99a33",
+      "inputs": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "authoredScript": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/scripts/check-no-fabrication.mjs",
+        "script": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/scripts/check-no-fabrication.mjs",
+        "scannerSha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc",
+        "inputs": [
+          {
+            "path": "scripts/check-no-fabrication.mjs",
+            "sha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc"
+          },
+          {
+            "path": "scripts/no-fabrication-allowlist.json",
+            "sha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937"
+          },
+          {
+            "path": "tests/checkNoFabrication.test.ts",
+            "sha256": "344b6f2dd9103b7a6f2a887978f3db8ce6cc4d75448d6acc8afdf9b8f65b9528"
+          },
+          {
+            "path": "src/diagnostic/evidenceEmitters.ts",
+            "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+          },
+          {
+            "path": "docs/security/channel-map.json",
+            "sha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e"
+          },
+          {
+            "path": "src/mode/mode.ts",
+            "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0"
+          },
+          {
+            "path": "src/cli.ts",
+            "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+          },
+          {
+            "path": "src/cli/resultCommandRegistry.ts",
+            "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406"
+          },
+          {
+            "path": "src/repl/replParser.ts",
+            "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805"
+          }
+        ]
+      },
+      "cases": [
+        {
+          "name": "fuzz-marker",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 1,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-first/fuzz-marker/actual.json",
+          "actualManifestSha256": "075a12af0bac050be0f64a2a9fdf6841162e21f3e7325eba989210e6f7f95ff7",
+          "sourceSha256": "72659612d445a7213667d572189414a50068b55a411b7f9f54cb0b8139a0060a",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "47ec5a9fde65c142cedee9c91c08bef15b7f73c4249a5a609f9e8e31504a4fca",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "harmless-detection",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-first/harmless-detection/actual.json",
+          "actualManifestSha256": "2781a48cd8e706be5db825289093e834787fc0ba1faf0d94260a8d4d3ea34b81",
+          "sourceSha256": "07722d6f8fd9ae27f642abaf8b6a31174216418a3d3dc6e07ff6537994629a77",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "29e53e06cf85b3715b93e709c3764c5b70409b6881979827f99d44182cd0dd2b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "harmless-state",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-first/harmless-state/actual.json",
+          "actualManifestSha256": "fbd49c03d3cdcc0329692132b37107431662f6de209b705de6f19d367a5661e3",
+          "sourceSha256": "d505cc0d595be3060f0e0af6dccc1b05eb7f3709adb9cb8f9bf68bdde8327808",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "29e53e06cf85b3715b93e709c3764c5b70409b6881979827f99d44182cd0dd2b",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "id-marker",
+          "exit": 0,
+          "report": {
+            "ok": true,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 1,
+            "pending": 0,
+            "failures": []
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-first/id-marker/actual.json",
+          "actualManifestSha256": "a4eb0e523d579db5405705c3497cc1460102001390689a7f7ab9bcdb42e2d32a",
+          "sourceSha256": "c27382cbe1eaf0a67ed8c9698d90ede483e4ef6bc46efcc0b49574b4bd9c61e5",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "47ec5a9fde65c142cedee9c91c08bef15b7f73c4249a5a609f9e8e31504a4fca",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "r1-random",
+          "exit": 1,
+          "report": {
+            "ok": false,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 1,
+                "allowlisted": 0,
+                "failing": 1
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": [
+              "src/a4/witness.ts:1 R1 Math.random in a guarded root; mark ids with // amc-allow-random: id and attack inputs with // amc-allow-random: fuzz-input"
+            ]
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-first/r1-random/actual.json",
+          "actualManifestSha256": "63bbd7f675c046b0d866c8cbd1ecd87d30fed08ee975ff37550d5ef6f1452e52",
+          "sourceSha256": "08f57ba6a4ff8e9e47c49f67497cfbf92faeb83f36fddfb25d747783ff410777",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "bc03e1179b1c808188c7f02b7a1f2a7659b52205237d115e83cd096ed05feb8c",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "r2-global",
+          "exit": 1,
+          "report": {
+            "ok": false,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 1,
+                "allowlisted": 0,
+                "failing": 1
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": [
+              "src/a4/witness.ts:1 R2 identifier pseudoRandomScore names a fabricated result; examples live only in src/claims/eligibility/exampleMode.ts"
+            ]
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-first/r2-global/actual.json",
+          "actualManifestSha256": "015d825ad77c3e80e0912dc86f0bf293e60c90a389cc2374f63fe82134d46bf6",
+          "sourceSha256": "d3c772e08f5b088caa63c6c7217270d13fc5ca13ad783a9584e1ed6a927fd0d2",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "5f6f7a5695ce8787df89d5b6177f06c42ef077fe58ca773b6c00d9b078418195",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "r3-path",
+          "exit": 1,
+          "report": {
+            "ok": false,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 1,
+                "allowlisted": 0,
+                "failing": 1
+              },
+              "R4": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": [
+              "src/a4/witness.ts:3 R3 path-presence check on \"src/ledger\": file existence is not evidence"
+            ]
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-first/r3-path/actual.json",
+          "actualManifestSha256": "2fc33b6845978505547ad6043fc1dfc0b4478cccdb3d864a194ae5f86bca8896",
+          "sourceSha256": "ddc55595ec0772a23028d5bad2c6aa484944e9b6e6a25b2df96180c471c8c8b7",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "6b9b1bfaa408c85e77573af94503266e0157dfeda5ca69b431a040c21686d6a9",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "r4-global",
+          "exit": 1,
+          "report": {
+            "ok": false,
+            "strict": true,
+            "rules": {
+              "R1": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R2": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R3": {
+                "found": 0,
+                "allowlisted": 0,
+                "failing": 0
+              },
+              "R4": {
+                "found": 1,
+                "allowlisted": 0,
+                "failing": 1
+              }
+            },
+            "markers": 0,
+            "pending": 0,
+            "failures": [
+              "src/a4/witness.ts:1 R4 certification wording \"Certified\"; AMC output is evidence of conformity"
+            ]
+          },
+          "actualManifest": "/private/tmp/p0-54-guard-evidence-20261015/guard-first/r4-global/actual.json",
+          "actualManifestSha256": "e2fc1224483726181e3a6f6a36853b1102fd9097715298d0458542d26aa3f1d4",
+          "sourceSha256": "3a1d9deda2a6dd40c77be1e0856a60604532d7e13941d4e4bd334ce56cb59a31",
+          "allowlistSha256": "e83222eb1e0bdb376f5ef15c16148b70795e2cba881e0519ce1e4075e68f6c83",
+          "stdoutSha256": "15d85c9d78f2eef3d009e7b3f74f2ceda5c4f91452642526b38d5e741c9c5ee3",
+          "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    }
+  },
+  "installedTypeScript": {
+    "version": "6.0.3",
+    "packageJsonSha256": "9332e97c30d3e53ed54910b89207ed657fb444066484df6e5b6965bf130865e9"
+  },
+  "meaning": "The unmodified authored scanner passes all eight assertions. Removing only A4 from the guarded-root list makes the unchanged R1/R3 refusal assertions fail because actual scanner exit becomes zero with no findings. R2/R4 remain global and continue refusing the same A4 inputs. All harmless and approved-marker inputs still pass. The two mutation failures demonstrate sensitivity; they are not production failures.",
+  "markerMetrics": "The ID and fuzz-input controls each report one marker with the authored scanner and zero with the A4-only removal. Marker counts are retained as actual output; approved positive cases assert clean refusal-rule counts and no allowlist exceptions. Unmarked R1 provides the paired baseline refusal.",
+  "boundaries": "This witness qualifies the scoped no-fabrication guard addition. It does not prove A4 route behavior, store/identity correctness, whole P0-11 or P0-16 acceptance, the D-22 shared-CLI exception, P0-41 metric duty, whole G0 or release readiness. Root owns the remaining classification/map/mode/static/freeze checks and final commit.",
+  "graph": {
+    "query": "scanSource GUARDED_ROOTS",
+    "log": "/private/tmp/p0-52-graph-navigation-w8xr443v/p0-54-guard-query.log",
+    "sha256": "ea01bf5239db1ee9d8778b734388bfeb1f4de24eb8de5453f295fae86cbcee3b",
+    "limit": "Existing 36,459-node graph returned 21 nodes and showed 12 under the budget. It predates this scanner and A4 implementation; direct source was used as current proof. No graph refresh, watcher or server."
+  },
+  "sourceCorrection": "R2 is global in the actual scanner, like R4. Only R1 and A4 path-call R3 rely on the GUARDED_ROOTS A4 entry. The earlier preflight R1-R3 scope wording is superseded by the actual source and these retained outputs.",
+  "testTypes": "Root owns the final test typecheck. This child did not claim a typecheck result for this new file.",
+  "gitStatusAtReceipt": "?? tests/a4GuardQualification.test.ts\n?? tests/a4OwnerModeQualification.test.ts",
+  "independentlyCheckedRetainedFixtureInputs": 16
+}

@@ -68,6 +68,8 @@ export interface ApprovalSeamInit {
   readonly newApprovalId?: () => string;
   /** Reports the engine request id the moment it exists, so a UI can render the prompt. */
   readonly onRaised?: (event: { readonly approvalId: string; readonly approvalRequestId: string }) => void;
+  /** Who started the session whose calls this seam asks about (P1-78), recorded on every engine request it raises. */
+  readonly initiator?: string;
 }
 
 interface Settled {
@@ -106,6 +108,7 @@ export class ApprovalSeam {
   private readonly newApprovalId: () => string;
 
   private readonly onRaised: ApprovalSeamInit["onRaised"];
+  private readonly initiator: string | undefined;
 
   constructor(init: ApprovalSeamInit) {
     this.session = init.session;
@@ -117,6 +120,7 @@ export class ApprovalSeam {
     this.poll = init.poll ?? DEFAULT_POLL_SCHEDULE;
     this.newApprovalId = init.newApprovalId ?? ((): string => `apr_${randomUUID()}`);
     this.onRaised = init.onRaised;
+    this.initiator = init.initiator;
   }
 
   /** The answerers currently ahead of the engine, in dispatch order. */
@@ -223,6 +227,7 @@ export class ApprovalSeam {
     const verdict = await decideThroughApprovalsEngine({
       workspace: this.workspace,
       agentId: this.agentId,
+      ...(this.initiator === undefined ? {} : { initiator: this.initiator }),
       approvalId,
       ask,
       runtime: this.runtime,

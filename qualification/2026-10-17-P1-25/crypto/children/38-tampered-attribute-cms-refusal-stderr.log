@@ -1,0 +1,4 @@
+CMS Verification failure
+806146F601000000:error:02000068:rsa routines:ossl_rsa_verify:bad signature:crypto/rsa/rsa_sign.c:441:
+806146F601000000:error:1C880004:Provider routines:rsa_verify_directly:RSA lib:providers/implementations/signature/rsa_sig.c:1063:
+806146F601000000:error:1700009E:CMS routines:CMS_SignerInfo_verify:verification failure:crypto/cms/cms_sd.c:1004:

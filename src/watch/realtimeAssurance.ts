@@ -1,3 +1,6 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull, weightedMean } from "../utils/ratio.js";
+import { mean, populationVariance } from "../experiments/stats.js";
 /**
  * Real-Time Assurance Engine
  *
@@ -16,6 +19,7 @@ import type { MonitoringEvent } from "./continuousMonitor.js";
 import { sha256Hex } from "../utils/hash.js";
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
 import { openLedger } from "../ledger/ledger.js";
+import { writerStore } from "../ledger/ledgerConnection.js";
 import { dispatchAlert, type AlertPayload } from "../drift/alerts.js";
 
 /* ── Types ───────────────────────────────────────────────────────── */
@@ -40,7 +44,9 @@ export interface RealtimeAssuranceResult {
   checksRun: number;
   violations: RealtimeAssuranceViolation[];
   passedChecks: string[];
-  score: number; // 0-100, percentage of checks passed
+  score: number | null; // 0-100, null when no checks ran
+  outcome: EvidenceOutcome;
+  sampleSize: number;
   durationMs: number;
 }
 
@@ -91,8 +97,8 @@ const costSpikeCheck: RealtimeAssuranceCheck = {
     const recentCosts = ctx.recentTraces.map((t) => t.totalCostUsd).filter((c) => c > 0);
     if (recentCosts.length === 0) return violations;
 
-    const avgCost = recentCosts.reduce((a, b) => a + b, 0) / recentCosts.length;
-    const stdDev = Math.sqrt(recentCosts.reduce((sum, c) => sum + Math.pow(c - avgCost, 2), 0) / recentCosts.length);
+    const avgCost = mean(recentCosts);
+    const stdDev = Math.sqrt(populationVariance(recentCosts, avgCost));
     const threshold = avgCost + 3 * Math.max(stdDev, avgCost * 0.5);
 
     if (trace.totalCostUsd > threshold && trace.totalCostUsd > 0.01) {
@@ -543,7 +549,9 @@ export class RealtimeAssuranceEngine extends EventEmitter {
       checksRun: this.checks.length,
       violations: allViolations,
       passedChecks,
-      score: this.checks.length > 0 ? (passedChecks.length / this.checks.length) * 100 : 100,
+      score: ratioOrNull(passedChecks.length * 100, this.checks.length),
+      outcome: this.checks.length > 0 ? "measured" : "not_evaluated",
+      sampleSize: this.checks.length,
       durationMs: Date.now() - startTime,
     };
 
@@ -595,7 +603,9 @@ export class RealtimeAssuranceEngine extends EventEmitter {
     totalChecks: number;
     totalResults: number;
     totalViolations: number;
-    avgScore: number;
+    avgScore: number | null;
+    outcome: EvidenceOutcome;
+    sampleSize: number;
     violationsBySeverity: Record<AssuranceCheckSeverity, number>;
     violationsByCheck: Record<string, number>;
   } {
@@ -607,15 +617,16 @@ export class RealtimeAssuranceEngine extends EventEmitter {
       byCheck[v.checkId] = (byCheck[v.checkId] ?? 0) + 1;
     }
 
-    const avgScore = this.results.length > 0
-      ? this.results.reduce((sum, r) => sum + r.score, 0) / this.results.length
-      : 100;
+    const measured = this.results.filter(result => result.score !== null);
+    const avgScore = weightedMean(measured.map(result => [result.score, 1]));
 
     return {
       totalChecks: this.checks.length,
       totalResults: this.results.length,
       totalViolations: this.violations.length,
       avgScore,
+      outcome: avgScore === null ? "not_evaluated" : "measured",
+      sampleSize: measured.length,
       violationsBySeverity: bySeverity,
       violationsByCheck: byCheck,
     };
@@ -660,7 +671,7 @@ export class RealtimeAssuranceEngine extends EventEmitter {
 
   private async recordViolationsToLedger(violations: RealtimeAssuranceViolation[]): Promise<void> {
     try {
-      const ledger = openLedger(this.config.workspace);
+      const ledger = openLedger(this.config.workspace, writerStore());
       const sessionId = `rt-assurance-${randomUUID()}`;
       ledger.startSession({
         sessionId,

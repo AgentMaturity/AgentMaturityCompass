@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:qualification /Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014
+> node scripts/check-qualification-receipts.mjs
+
+Qualification receipts valid: 25 receipt(s) under qualification.

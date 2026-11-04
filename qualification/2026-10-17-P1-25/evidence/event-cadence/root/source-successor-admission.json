@@ -1,0 +1,77 @@
+{
+  "at": "2026-10-17T00:56:26.365324+00:00",
+  "sourceHead": "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+  "sourceBranch": "codex/p1-25-cadence-qualification",
+  "scopeReview": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/review-v2.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/review-v2.json",
+    "bytes": 13290,
+    "sha256": "cd938738e1a50c8129e3bd677dfe0a53f7eacb84bd2bbaa76439b42a0f870f3a",
+    "dev": 16777231,
+    "inode": 543829006,
+    "nlink": 1
+  },
+  "scopeSeal": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/seal-v2.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/seal-v2.json",
+    "bytes": 2240,
+    "sha256": "a5805c9e89c6c29a6e97207413a6ddce81bcfb7e153b13630feb1686f28fdaed",
+    "dev": 16777231,
+    "inode": 543829007,
+    "nlink": 1
+  },
+  "scopeObservedEarlierF11And436OwnReceiptStaged": true,
+  "actualLaterMetadataCommitOnlyChanges436AdmittedReceiptPaths": true,
+  "currentSourceCleanIndexEmpty": true,
+  "old": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+    "bytes": 34549,
+    "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+    "dev": 16777231,
+    "inode": 543658576,
+    "nlink": 1
+  },
+  "original": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+    "bytes": 34549,
+    "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+    "dev": 16777231,
+    "inode": 543829328,
+    "nlink": 1
+  },
+  "candidate": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.source.txt",
+    "bytes": 48568,
+    "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+    "dev": 16777231,
+    "inode": 543817801,
+    "nlink": 1
+  },
+  "protectedPinset": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/protected-inputs.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/protected-inputs.json",
+    "bytes": 78167,
+    "sha256": "fba2c86d4c578b729658d50dc26a102d7b00f8b80a4ca392a29071d4b1066c11",
+    "dev": 16777231,
+    "inode": 543829325,
+    "nlink": 1
+  },
+  "allOtherProtectedInputsMustRemainExact": true,
+  "freezeExit": 0,
+  "d15": "none",
+  "hosted": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/hosted-source-admission.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/hosted-source-admission.json",
+    "bytes": 11070,
+    "sha256": "de1dbb1cbbf9bb1fb07f4b5b15e40c85546c1431ed48cecbf93680bad6ac20af",
+    "dev": 16777231,
+    "inode": 543829245,
+    "nlink": 1
+  },
+  "rootReadCandidateFullDiff": true,
+  "onlyThisOwnTestWriteAdmitted": true,
+  "noProductAcceptanceCredit": true
+}

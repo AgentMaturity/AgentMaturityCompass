@@ -145,25 +145,57 @@ export async function copySpec(output) {
   mkdirSync(dirname(indexTarget), { recursive: true });
   copyFileSync(indexPath, indexTarget);
   for (const row of index.schemas) {
-    const source = resolve(specRoot, "schemas/v1", row.name);
-    assertInside(resolve(specRoot, "schemas/v1"), source, `Schema ${row.name}`);
+    // A name is a file in v1/, or `v2/<file>` for a v2 record.
+    const path = row.name.startsWith("v2/") ? row.name : `v1/${row.name}`;
+    const source = resolve(specRoot, "schemas", path);
+    assertInside(resolve(specRoot, "schemas"), source, `Schema ${row.name}`);
     const bytes = readFileSync(source);
-    if (sha256(bytes) !== row.sha256) throw new Error(`spec/schemas/v1/${row.name} does not match spec/schemas/index.json: run npm run gen:schemas`);
+    if (sha256(bytes) !== row.sha256) throw new Error(`spec/schemas/${path} does not match spec/schemas/index.json: run npm run gen:schemas`);
     const url = new URL(row.$id);
     if (url.origin !== "https://agentmaturity.co") throw new Error(`Schema $id is not served by this site: ${row.$id}`);
-    for (const target of new Set([resolve(output, "spec/schemas/v1", row.name), resolve(output, url.pathname.slice(1))])) {
+    for (const target of new Set([resolve(output, "spec/schemas", path), resolve(output, url.pathname.slice(1))])) {
       assertInside(output, target, `Schema target ${row.$id}`);
       mkdirSync(dirname(target), { recursive: true });
       writeFileSync(target, bytes);
     }
   }
   const { marked } = await import(pathToFileURL(resolve(repositoryRoot, "node_modules/marked/lib/marked.esm.js")).href);
-  for (const [source, target, title] of [["README.md", "index.html", "AMC public contracts"],
-    ["ACCEPTANCE_RULES.md", "acceptance-rules.html", "AMC acceptance rules"]]) {
-    const html = marked.parse(readFileSync(resolve(specRoot, source), "utf8")).replace(/href="ACCEPTANCE_RULES\.md"/g, 'href="acceptance-rules.html"');
-    writeFileSync(resolve(output, "spec", target), `<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title><link rel="stylesheet" href="../brand.css"></head><body><main>\n${html}</main></body></html>\n`, "utf8");
+  const pages = specPages(specRoot);
+  for (const [source, target] of pages) {
+    const markdown = readFileSync(resolve(specRoot, source), "utf8");
+    const title = escapeHtml(/^# (.+)$/m.exec(markdown)?.[1] ?? "AMC specification");
+    const depth = target.split("/").length - 1;
+    const html = rewriteSpecLinks(marked.parse(markdown), source, pages);
+    const file = resolve(output, "spec", target);
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, `<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${title}</title><link rel="stylesheet" href="${"../".repeat(depth + 1)}brand.css"></head><body><main>\n${html}</main></body></html>\n`, "utf8");
   }
   return index.schemas.map(row => row.$id);
+}
+
+const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/** P1-30: every spec page rendered under /spec/: [source under spec/, target under <out>/spec/]. */
+export function specPages(specRoot) {
+  const pages = new Map([["README.md", "index.html"], ["ACCEPTANCE_RULES.md", "acceptance-rules.html"], ["CHANGELOG.md", "changelog.html"]]);
+  for (const dir of ["core", "annex", "rfcs"]) {
+    const full = resolve(specRoot, dir);
+    if (!existsSync(full)) continue;
+    for (const name of readdirSync(full).filter((file) => file.endsWith(".md")).sort()) {
+      pages.set(`${dir}/${name}`, `${dir}/${name === "README.md" ? "index.html" : name.replace(/\.md$/, ".html")}`);
+    }
+  }
+  return pages;
+}
+
+/** Relative links to a rendered spec page point at its HTML; other repository files point at GitHub. */
+export function rewriteSpecLinks(html, source, pages) {
+  return html.replace(/href="([^"#:]+?\.md)(#[^"]*)?"/g, (_whole, href, hash = "") => {
+    const target = new URL(href, `https://spec.invalid/${source}`).pathname.slice(1);
+    const page = pages.get(target);
+    if (page) return `href="${relative(dirname(`/${pages.get(source)}`), `/${page}`) || page}${hash}"`;
+    return `href="https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/${target}${hash}"`;
+  });
 }
 
 async function readDocsBuildManifest() {
@@ -241,7 +273,9 @@ function sourceRevision() {
   return revision;
 }
 
-export async function buildPagesSite({ output = defaultOutput, explicit = false } = {}) {
+// D-12 (AMC-1543): the TypeDoc reference was never reviewed, so Pages leaves it out unless explicitly asked for.
+export async function buildPagesSite({ output = defaultOutput, explicit = false,
+  apiReference = process.env.AMC_PAGES_API_REFERENCE === "1" } = {}) {
   // A source version bump must not deploy installer URLs for unpublished assets.
   verifyPublishedInstallerVersion(repositoryRoot);
   const resolvedOutput = resolve(output);
@@ -278,15 +312,31 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false 
   const brandManifestPath = resolve(resolvedOutput, "brand-assets.json");
   writeFileSync(brandManifestPath, `${JSON.stringify(brandManifest, null, 2)}\n`, "utf8");
 
+  if (!apiReference) {
+    return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest, apiOutput: null };
+  }
   // The reference is built from the public source entries into this same staged
   // artifact, never copied from a possibly stale website/api directory.
   const apiOutput = resolve(resolvedOutput, "api");
   // Invoke the pinned renderer directly so the timeout owns it, rather than
   // TypeDoc's bin launcher which forks another process.
+  // TypeDoc only discovers .git directories, not linked-worktree .git files.
+  // Its entry points share src/ as their source root. Keep module names stable
+  // while supplying the repository-relative path in explicitly pinned links.
+  // (--basePath would root {path} at the repository too, but it renames every
+  // module page.) The src/ prefix holds only while every entry point is under
+  // src/, so an entry point outside it refuses the build instead of linking wrong.
+  const typeDocOptions = JSON.parse(readFileSync(resolve(repositoryRoot, "typedoc.json"), "utf8"));
+  const outsideSrc = typeDocOptions.entryPoints.filter((entry) => !entry.startsWith("src/"));
+  if (revision && outsideSrc.length > 0) {
+    throw new Error(`TypeDoc source links assume entry points under src/; move or re-root: ${outsideSrc.join(", ")}`);
+  }
   execFileSync(process.execPath, [resolve(repositoryRoot, "node_modules/typedoc/dist/cli.js"),
     "--options", resolve(repositoryRoot, "typedoc.json"), "--out", apiOutput,
-    "--json", resolve(apiOutput, "reflection.json"), ...(revision ? ["--gitRevision", revision] : [])],
-  { cwd: repositoryRoot, stdio: "inherit", timeout: 120_000 });
+    "--json", resolve(apiOutput, "reflection.json"),
+    ...(revision ? ["--gitRevision", revision, "--disableGit", "--sourceLinkTemplate",
+      typeDocOptions.sourceLinkTemplate.replace("{path}", "src/{path}")] : [])],
+  { cwd: repositoryRoot, stdio: "inherit", timeout: 300_000 });
 
   return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest, apiOutput };
 }

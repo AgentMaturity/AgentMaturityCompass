@@ -1,0 +1,64 @@
+{
+  "schema": "amc-p207-local-oidc/2",
+  "label": "rotation-real-clock",
+  "synthetic": true,
+  "issuer": "http://127.0.0.1:63580/fdff0689-bdfe-45c1-8801-9fc428e4df39",
+  "requests": [
+    {
+      "id": 1,
+      "connectionId": 1,
+      "method": "GET",
+      "path": "/fdff0689-bdfe-45c1-8801-9fc428e4df39/jwks",
+      "bodyBytes": 0,
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requestEnded": true,
+      "responseClosed": true,
+      "responseStatus": 200,
+      "responseBodyBytes": 410,
+      "responseDelayMs": null,
+      "headers": {
+        "accept": "application/json"
+      }
+    },
+    {
+      "id": 2,
+      "connectionId": 2,
+      "method": "GET",
+      "path": "/fdff0689-bdfe-45c1-8801-9fc428e4df39/jwks",
+      "bodyBytes": 0,
+      "bodySha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "requestEnded": true,
+      "responseClosed": true,
+      "responseStatus": 200,
+      "responseBodyBytes": 810,
+      "responseDelayMs": null,
+      "headers": {
+        "accept": "application/json"
+      }
+    }
+  ],
+  "observations": [
+    {
+      "initialFetches": 1,
+      "totalAfterRotationAndSuppressedUnknown": 2,
+      "actualCacheElapsedMs": 4,
+      "claimClockAdvancedSeconds": 86400
+    }
+  ],
+  "handlerErrors": [],
+  "transportErrors": [],
+  "transportErrorClassifications": [],
+  "lifecycle": {
+    "inProcessServer": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0,
+    "connectionCount": 2,
+    "childProcessCreated": false,
+    "signalsSent": false,
+    "exactOptInRestored": true
+  },
+  "failed": false,
+  "originalError": null,
+  "cleanupError": null
+}

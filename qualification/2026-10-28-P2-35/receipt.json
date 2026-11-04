@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-35",
+  "date": "2026-10-28",
+  "commit": "6e4e23d48066dddf746a8a00f484f750db18efcf",
+  "branch": "rtd/w4-p2-35",
+  "node": "v22.23.3",
+  "pnpm": "not recorded",
+  "os": "macOS 26.6.2",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run gen:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 <36 files: tests/a4 (all, incl. P2-34/P2-36 files), tests/crypto, tests/studioApiAuthorization, tests/a4GuardQualification, tests/keys/a4SigningProbe, tests/keys/a4ActivateSigningProbe, tests/enforce/egressAllowlist>",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 <10 files: pinned suites: apiRouterResponseParity, openapiContracts, studioApiAuthorization, threatModelMap, nativeSecondSharingRestoration, amc1472OutcomeOnboarding, architectureBoundaries; first-CI watch list: questionScoreExplainability, spineProjectionEndToEnd, evaluation/scoreConsistency.property>",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": null,
+  "artifacts": [],
+  "notes": "P2-35 on rtd/w4-p2-35, base e95619acb, vitest with 2 workers. Tested commit as recorded: 6e4e23d48 (first slice 596013810); commit gives 6e4e23d48 in full. date: the receipt recorded none; the folder and README.md give 2026-10-28, the day of the receipt's commits. Rows 1-12 write the recorded check names and exit codes as the npm scripts they name (gen-counts --write as scripts/gen-counts.mjs --write); flags were not recorded. Row 6: 0 after `quality:baseline dead-code --shrink` removed the two sign-kind export findings the new test resolves. Rows 13 and 14 write the two recorded related-test sets as vitest commands; their command lines were not recorded. Row 13: 438 passed, 0 failed. Row 14: 248 passed, 0 failed, 0 expectations changed. New tests: tests/a4/{guards,recordFixtures,routerAdmission,storeDedupe,verifiedLane,hypotheses,leases,twoProcessRace,scenario01..16}.test.ts, tests/crypto/signKindLists.test.ts, tests/studioApiAuthorization.test.ts (A4 rows); journey harness tests/a4/a4Journey.ts; second process tests/fixtures/a4/a4Child.mjs on dist/. Mutations: tests/a4/DEBT.md § Mutation checks: 40 guards broken in src one at a time and restored; 37 turned a named test red; 3 are equivalent with the reason recorded (S1 consumeGate QUORUM_MET and E1 verifyAndConsumeEffect count, each shadowed by an earlier identical refusal; Q1 the quorum now path, distinguishable only in a millisecond commit window). Red/green: Tests-only item: no product code changed, so there is no red-before-fix run; each guard's red run is its mutation check. Not run: full suite (npm test); Assemble's native path (a stub-provider build session); a WORKSPACE_ROUTER session fixture (cross-plane over HTTP, hosted single-user); freeze or kill switch mid-effect; freeze-first rollback for high/critical; the a4-record fixtures through P1-06's packages/verifier (it has no a4-record kind). Pending for Sid: the D-23 / P1-62 end-to-end qualification: one project Aspire to Activate on a non-stub provider on macOS and Linux ARM64, signed deployment and rollback receipts. Follow-ups: Proposed P2-41: hold refusal code (A4_NOT_READY ON_HOLD vs the design's A4_ON_HOLD) and tampered readiness (409 vs BLOCKED); Proposed P2-42: Adapt's proposal exceeds SPEC_ROOM_FOR_BUILD (240 KiB) on the shipped catalog for every station measured: POST …/stages/adapt/propose is 413 INPUT_TOO_LARGE; tests cross Adapt on the synthetic five-control catalog. tests is null: both sets include tests/studioApiAuthorization, so they overlap and are not summed, and their skipped counts were not recorded. Not recorded: pnpm and the command durations (durationMs 0 means not recorded). os and arch split the recorded 'macOS 26.6.2 arm64'."
+}

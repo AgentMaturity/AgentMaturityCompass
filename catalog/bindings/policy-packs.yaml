@@ -1,0 +1,62 @@
+# Built-in policy packs (src/policyPacks/builtInPacks.ts) to catalog binding parameters (P1-53).
+# Each setting path is read from listPolicyPacks() output; {actionClass} expands over every action class and
+# name[*] collects a list. A non-null parameter is one the compiler enforces (docs/catalog/COMPILER.md); a null
+# parameter is a pack setting the catalog has no parameter for yet, with the reason. P1-10 may start from a pack for
+# an archetype and risk tier and then apply stricter catalog parameters; nothing applies this map yet.
+# AI-proposed and pending review (docs/catalog/CONSOLIDATION.md).
+id: policy-packs
+packs:
+  - code-agent.low
+  - code-agent.medium
+  - code-agent.high
+  - research-agent.low
+  - research-agent.medium
+  - research-agent.high
+  - support-agent.low
+  - support-agent.medium
+  - support-agent.high
+  - devops-agent.medium
+  - devops-agent.high
+  - security-agent.high
+  - mcp-safety
+  - security-agent.critical
+settings:
+  - setting: approvalPolicy.approvalPolicy.actionClasses.{actionClass}.requiredApprovals
+    parameter: approvals.{actionClass}.requiredApprovals
+    reason: Approval class quorum; the catalog keeps the larger count (strictness max).
+  - setting: approvalPolicy.approvalPolicy.actionClasses.{actionClass}.requireDistinctUsers
+    parameter: approvals.{actionClass}.requireDistinctUsers
+    reason: Separation of approvers; true wins.
+  - setting: approvalPolicy.approvalPolicy.actionClasses.{actionClass}.rolesAllowed
+    parameter: approvals.{actionClass}.rolesAllowed
+    reason: Roles that may approve; the catalog keeps the intersection.
+  - setting: approvalPolicy.approvalPolicy.actionClasses.{actionClass}.ttlMinutes
+    parameter: approvals.{actionClass}.ttlMinutes
+    reason: Approval lifetime; the catalog keeps the shorter one (strictness min).
+  - setting: tools.tools.allowedTools[*].name
+    parameter: toolPipeline.visibleTools
+    reason: The pack's tool allowlist; the catalog keeps the intersection of visible tools.
+  - setting: tools.tools.denyByDefault
+    parameter: null
+    reason: No catalog parameter; the compiled tool pipeline already exposes only visibleTools.
+  - setting: budgets.budgets.perAgent.default.daily.maxToolExecutes.{actionClass}
+    parameter: null
+    reason: Budgets have no catalog parameter or enforcement point binding yet; P1-10 owns adding one.
+  - setting: budgets.budgets.perAgent.default.daily.maxLlmRequests
+    parameter: null
+    reason: Budgets have no catalog parameter or enforcement point binding yet; P1-10 owns adding one.
+  - setting: budgets.budgets.perAgent.default.daily.maxCostUsd
+    parameter: null
+    reason: Budgets have no catalog parameter or enforcement point binding yet; P1-10 owns adding one.
+  - setting: actionPolicy.defaultMode
+    parameter: null
+    reason: The action policy is not a catalog binding point; only approvals and the tool pipeline are.
+  - setting: actionPolicy.actions[*].actionClass
+    parameter: null
+    reason: The action policy is not a catalog binding point; only approvals and the tool pipeline are.
+  - setting: actionPolicy.actions[*].requireExecTicket
+    parameter: null
+    reason: The action policy is not a catalog binding point; only approvals and the tool pipeline are.
+  - setting: actionPolicy.actions[*].requireTrustTierAtLeast
+    parameter: null
+    reason: The action policy is not a catalog binding point; only approvals and the tool pipeline are.

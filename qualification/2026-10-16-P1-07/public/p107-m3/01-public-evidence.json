@@ -1,0 +1,697 @@
+{
+  "schema": "amc-p107-native-evidence/1",
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56",
+  "noModelLoop": true,
+  "noClockOrGateEdits": true,
+  "backend": "sqlite",
+  "nativeCalls": [
+    {
+      "sessionId": "85e8b677-0696-484f-a004-f03eeb6b4791",
+      "callId": "p107-session-1-allowed",
+      "allowed": true,
+      "outcome": "OK",
+      "denied": false,
+      "timedOut": false,
+      "outputMatchesAllowed": true,
+      "deniedCanaryAbsent": true
+    },
+    {
+      "sessionId": "85e8b677-0696-484f-a004-f03eeb6b4791",
+      "callId": "p107-session-1-denied",
+      "allowed": false,
+      "outcome": "DENIED",
+      "denied": true,
+      "timedOut": false,
+      "outputMatchesAllowed": false,
+      "deniedCanaryAbsent": true
+    },
+    {
+      "sessionId": "cbe228ae-86d8-4920-a1ab-088b18209f67",
+      "callId": "p107-session-2-allowed",
+      "allowed": true,
+      "outcome": "OK",
+      "denied": false,
+      "timedOut": false,
+      "outputMatchesAllowed": true,
+      "deniedCanaryAbsent": true
+    },
+    {
+      "sessionId": "cbe228ae-86d8-4920-a1ab-088b18209f67",
+      "callId": "p107-session-2-denied",
+      "allowed": false,
+      "outcome": "DENIED",
+      "denied": true,
+      "timedOut": false,
+      "outputMatchesAllowed": false,
+      "deniedCanaryAbsent": true
+    }
+  ],
+  "sessions": [
+    {
+      "sessionId": "85e8b677-0696-484f-a004-f03eeb6b4791",
+      "ended": true,
+      "sealPresent": true,
+      "sealSignatureValid": true
+    },
+    {
+      "sessionId": "cbe228ae-86d8-4920-a1ab-088b18209f67",
+      "ended": true,
+      "sealPresent": true,
+      "sealSignatureValid": true
+    }
+  ],
+  "auditRows": [
+    {
+      "id": "f7145793-53c4-4dfa-b7ec-e4156c355353",
+      "sessionId": "85e8b677-0696-484f-a004-f03eeb6b4791",
+      "callId": "p107-session-1-allowed",
+      "ts": 1792174564680,
+      "eventHash": "2c1463d9fe261ecff73e31c65f71585d0e43a887ecee94afc01a6cfe38997c1f",
+      "auditType": "TOOL_CALL_ALLOWED",
+      "emitterId": "tool-call-allowed",
+      "writerSignatureValid": true,
+      "envelopePresent": true,
+      "envelopeSessionMatches": true,
+      "envelopeSynthetic": false,
+      "effectiveTrustTier": "OBSERVED",
+      "projectedToQuestion": true,
+      "projectionVersionMatches": true,
+      "allowlistRulePresent": true,
+      "denialGuard": null,
+      "denialStage": null,
+      "emitterAdmitted": true,
+      "registered": true
+    },
+    {
+      "id": "b943759c-5109-43cd-ad15-a8d80419ce02",
+      "sessionId": "85e8b677-0696-484f-a004-f03eeb6b4791",
+      "callId": "p107-session-1-denied",
+      "ts": 1792174564696,
+      "eventHash": "3659d0bc80d5bee197331749f5af5d8d9d16da2319cf44a2118ac7354ffb60bf",
+      "auditType": "TOOL_CALL_DENIED",
+      "emitterId": "tool-call-denied",
+      "writerSignatureValid": true,
+      "envelopePresent": true,
+      "envelopeSessionMatches": true,
+      "envelopeSynthetic": false,
+      "effectiveTrustTier": "OBSERVED",
+      "projectedToQuestion": true,
+      "projectionVersionMatches": true,
+      "allowlistRulePresent": true,
+      "denialGuard": "tool-allowlist",
+      "denialStage": "guard",
+      "emitterAdmitted": false,
+      "registered": false
+    },
+    {
+      "id": "760b2436-8383-4c66-96ce-3b2ca5071e50",
+      "sessionId": "cbe228ae-86d8-4920-a1ab-088b18209f67",
+      "callId": "p107-session-2-allowed",
+      "ts": 1792174564724,
+      "eventHash": "77e15f17c7a1c6b6918b92af46595fe02e8934d70fccab503db6c8ff6756d55d",
+      "auditType": "TOOL_CALL_ALLOWED",
+      "emitterId": "tool-call-allowed",
+      "writerSignatureValid": true,
+      "envelopePresent": true,
+      "envelopeSessionMatches": true,
+      "envelopeSynthetic": false,
+      "effectiveTrustTier": "OBSERVED",
+      "projectedToQuestion": true,
+      "projectionVersionMatches": true,
+      "allowlistRulePresent": true,
+      "denialGuard": null,
+      "denialStage": null,
+      "emitterAdmitted": true,
+      "registered": true
+    },
+    {
+      "id": "bd6d56b6-2ef1-4ecc-8fa6-8256d587b0e4",
+      "sessionId": "cbe228ae-86d8-4920-a1ab-088b18209f67",
+      "callId": "p107-session-2-denied",
+      "ts": 1792174564739,
+      "eventHash": "01272ee22494525ce68222b4b0c4755e9f64d4db1c90475c3bff727ae49e9b91",
+      "auditType": "TOOL_CALL_DENIED",
+      "emitterId": "tool-call-denied",
+      "writerSignatureValid": true,
+      "envelopePresent": true,
+      "envelopeSessionMatches": true,
+      "envelopeSynthetic": false,
+      "effectiveTrustTier": "OBSERVED",
+      "projectedToQuestion": true,
+      "projectionVersionMatches": true,
+      "allowlistRulePresent": true,
+      "denialGuard": "tool-allowlist",
+      "denialStage": "guard",
+      "emitterAdmitted": false,
+      "registered": false
+    }
+  ],
+  "roots": [
+    {
+      "v": 1,
+      "sessionId": "85e8b677-0696-484f-a004-f03eeb6b4791",
+      "lifecycle": "closed",
+      "runtime": "amc",
+      "agentId": "default",
+      "startedTs": 1792174564640,
+      "endedTs": 1792174564701,
+      "eventCount": 12,
+      "turnCount": 1,
+      "sealCount": 1,
+      "sealEventHashes": [
+        "fa8380b5b221c0d6f91780bc35748a723230867925f4e976492452c80c38160d"
+      ],
+      "sessionMerkleRoot": "316149ed3e57ca96974f0cd95a2ad5b5a1ea2d01b19cf7b3b8148e13e4d564ac",
+      "openEventHash": "70f89f6e6cab67d43940a14cf7a6e5a48206810b23d1c55bbf687664da0c6f4b",
+      "closeEventHash": "3682a794bb6e29463a3b66825b6320cc3f76353124f7c261fa675daf4b924b72",
+      "monitorKeyFingerprint": "d545e4bdf27f84d3bea0fa3d16f2e5fbb423ea80b3ed125dd6f6dc3d94cd4fbd"
+    },
+    {
+      "v": 1,
+      "sessionId": "cbe228ae-86d8-4920-a1ab-088b18209f67",
+      "lifecycle": "closed",
+      "runtime": "amc",
+      "agentId": "default",
+      "startedTs": 1792174564702,
+      "endedTs": 1792174564744,
+      "eventCount": 12,
+      "turnCount": 1,
+      "sealCount": 1,
+      "sealEventHashes": [
+        "5e281a89405375f3406df372fdd53acc222fe4fc4f8d172e44b198aa7bbc5ef1"
+      ],
+      "sessionMerkleRoot": "64e4036538028c3ee63bdf32d24ebfc267a4d0c2ecb6833438d04fa60ad7294a",
+      "openEventHash": "765cf00e3f77f9e8122ecbc37b933e314ec1a367ca81971a71d24b94dd7df341",
+      "closeEventHash": "ca38e984eb3a6b395c4d2bb171048863b84044dc2cc11a77b42d0f11fc18dc93",
+      "monitorKeyFingerprint": "d545e4bdf27f84d3bea0fa3d16f2e5fbb423ea80b3ed125dd6f6dc3d94cd4fbd"
+    }
+  ],
+  "trustBoundary": "monitor public key captured before calls in this owned fixture; no external identity attestation",
+  "limitation": "two real sessions establish mapped native evidence; actual UTC-day continuity controls the earned level",
+  "environment": {
+    "helper": "scripts/clean-source-check.mjs#cleanSourceRuntimeEnvironment",
+    "privateHome": true,
+    "signingEnabled": true,
+    "storageOverrideAbsent": true,
+    "trustOverridesAbsent": true,
+    "loaderOverridesAbsent": true
+  },
+  "nativeBefore": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543031862,
+    "nlink": 1
+  },
+  "blobKeySetup": {
+    "keyVersion": 1,
+    "algorithm": "AES-256-GCM",
+    "signatureValid": true
+  },
+  "beforePins": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/allowed.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/allowed.txt",
+      "bytes": 40,
+      "sha256": "490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab",
+      "dev": 16777231,
+      "inode": 543050725,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/denied.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/denied.txt",
+      "bytes": 38,
+      "sha256": "512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84",
+      "dev": 16777231,
+      "inode": 543050726,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml",
+      "bytes": 348,
+      "sha256": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+      "dev": 16777231,
+      "inode": 543050728,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml.sig",
+      "bytes": 247,
+      "sha256": "827f3848a34d163ce357a377c77804094e6089dad33fe0c37117cc3b117cec94",
+      "dev": 16777231,
+      "inode": 543050731,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json",
+      "bytes": 476,
+      "sha256": "d965277bde9a5b3b3089d002b6e55d6b66fdd45f28bec16b4b93850e813c819a",
+      "dev": 16777231,
+      "inode": 543050755,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json.sig",
+      "bytes": 862,
+      "sha256": "e798a7dc34fd62bd366cc0d8b4f2a3df6924a554419c8ee64950f16d7603c551",
+      "dev": 16777231,
+      "inode": 543050762,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json",
+      "bytes": 91,
+      "sha256": "73aab983d6ea717271e5558a4810d35b8cedd40413361b22da28f26fbd87f708",
+      "dev": 16777231,
+      "inode": 543050722,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json.sig",
+      "bytes": 247,
+      "sha256": "9c0a80c89177e4256a28bb6efe6f63ded0dd4c5ca1455da89db8dedb1fd06cf2",
+      "dev": 16777231,
+      "inode": 543050723,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/monitor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/monitor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "d545e4bdf27f84d3bea0fa3d16f2e5fbb423ea80b3ed125dd6f6dc3d94cd4fbd",
+      "dev": 16777231,
+      "inode": 543050697,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/auditor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/auditor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "72b5fd35a72a5d8bcffe6ef3aa39ac22417a2d1e59209ee7d4de97a3655100d9",
+      "dev": 16777231,
+      "inode": 543050698,
+      "nlink": 1
+    }
+  ],
+  "policy": {
+    "signatureValid": true,
+    "digest": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+    "firewallMode": "block",
+    "firewallMirrorTrusted": true
+  },
+  "monitorFingerprint": "d545e4bdf27f84d3bea0fa3d16f2e5fbb423ea80b3ed125dd6f6dc3d94cd4fbd",
+  "readiness": [
+    {
+      "ready": true,
+      "blockerCount": 0,
+      "confined": false,
+      "confinementVerdict": "unconfined",
+      "actualProbeResult": "permitted",
+      "sandboxBackendAvailable": true
+    },
+    {
+      "ready": true,
+      "blockerCount": 0,
+      "confined": false,
+      "confinementVerdict": "unconfined",
+      "actualProbeResult": "permitted",
+      "sandboxBackendAvailable": true
+    }
+  ],
+  "ledgerReadOnly": true,
+  "ledger": {
+    "ok": true,
+    "errorCount": 0,
+    "errors": [],
+    "chainOk": true,
+    "governanceOk": true,
+    "anchored": true,
+    "expectedFingerprintMatches": true,
+    "monitorFingerprintMatches": true,
+    "closedSessionIds": [
+      "85e8b677-0696-484f-a004-f03eeb6b4791",
+      "cbe228ae-86d8-4920-a1ab-088b18209f67"
+    ],
+    "openSessionCount": 0,
+    "releasedSessionCount": 0,
+    "interruptedSessionCount": 0
+  },
+  "rowCount": 24,
+  "allWriterSignaturesValid": true,
+  "evaluation": {
+    "level": 1,
+    "perLevel": [
+      {
+        "pass": true,
+        "matchedEventIds": [
+          "f7145793-53c4-4dfa-b7ec-e4156c355353",
+          "6d3a58e8-41c2-45ae-ac7e-71196b8cff0d",
+          "70eb21da-551e-4d17-9903-92de04345a75",
+          "b943759c-5109-43cd-ad15-a8d80419ce02",
+          "db530548-8879-4154-ac2c-5b06ff67de2d",
+          "760b2436-8383-4c66-96ce-3b2ca5071e50",
+          "00e12781-58e1-49b5-9359-857a9abc3a97",
+          "33e3d567-60d5-417b-b6c9-17c050328884",
+          "bd6d56b6-2ef1-4ecc-8fa6-8256d587b0e4",
+          "47080e31-05fb-4ec7-bc7a-1c93a63ab9b3"
+        ],
+        "reason": "gate level 0 satisfied",
+        "distinctSessions": 2,
+        "distinctDays": 1,
+        "level": 0,
+        "status": "pass"
+      },
+      {
+        "pass": true,
+        "matchedEventIds": [
+          "f7145793-53c4-4dfa-b7ec-e4156c355353",
+          "6d3a58e8-41c2-45ae-ac7e-71196b8cff0d",
+          "70eb21da-551e-4d17-9903-92de04345a75",
+          "db530548-8879-4154-ac2c-5b06ff67de2d",
+          "760b2436-8383-4c66-96ce-3b2ca5071e50",
+          "00e12781-58e1-49b5-9359-857a9abc3a97",
+          "33e3d567-60d5-417b-b6c9-17c050328884",
+          "47080e31-05fb-4ec7-bc7a-1c93a63ab9b3"
+        ],
+        "reason": "gate level 1 satisfied",
+        "distinctSessions": 2,
+        "distinctDays": 1,
+        "level": 1,
+        "status": "pass"
+      },
+      {
+        "pass": false,
+        "matchedEventIds": [],
+        "reason": "not evaluated at gate 2: L2 evidence map names unregistered or inadmissible emitters: tool-call-denied",
+        "distinctSessions": 0,
+        "distinctDays": 0,
+        "level": 2,
+        "status": "not_evaluated"
+      },
+      {
+        "pass": false,
+        "matchedEventIds": [],
+        "reason": "not evaluated at gate 3: L3 not evaluable on runtime evidence: needs tool-interface reconstruction, per-step scope decisions and status-aware validation metrics",
+        "distinctSessions": 0,
+        "distinctDays": 0,
+        "level": 3,
+        "status": "not_evaluated"
+      },
+      {
+        "pass": false,
+        "matchedEventIds": [],
+        "reason": "not evaluated at gate 4: L4 needs continuity, anchoring (P1-25, P1-26) and a sampling record; no registered emitter produces them yet",
+        "distinctSessions": 0,
+        "distinctDays": 0,
+        "level": 4,
+        "status": "not_evaluated"
+      },
+      {
+        "pass": false,
+        "matchedEventIds": [],
+        "reason": "not evaluated at gate 5: L5 needs a scoped attestation signed by a key with purpose attestation in the pinned trust list (P0-09, P3-04); no registry issues one yet",
+        "distinctSessions": 0,
+        "distinctDays": 0,
+        "level": 5,
+        "status": "not_evaluated"
+      }
+    ],
+    "actualUtcDays": 1,
+    "actualSessions": 2,
+    "minima": {
+      "events": 4,
+      "sessions": 2,
+      "days": 2
+    },
+    "expectedLevelFromActualContinuity": 1
+  },
+  "afterPins": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/allowed.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/allowed.txt",
+      "bytes": 40,
+      "sha256": "490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab",
+      "dev": 16777231,
+      "inode": 543050725,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/denied.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/denied.txt",
+      "bytes": 38,
+      "sha256": "512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84",
+      "dev": 16777231,
+      "inode": 543050726,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml",
+      "bytes": 348,
+      "sha256": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+      "dev": 16777231,
+      "inode": 543050728,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml.sig",
+      "bytes": 247,
+      "sha256": "827f3848a34d163ce357a377c77804094e6089dad33fe0c37117cc3b117cec94",
+      "dev": 16777231,
+      "inode": 543050731,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json",
+      "bytes": 476,
+      "sha256": "d965277bde9a5b3b3089d002b6e55d6b66fdd45f28bec16b4b93850e813c819a",
+      "dev": 16777231,
+      "inode": 543050755,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json.sig",
+      "bytes": 862,
+      "sha256": "e798a7dc34fd62bd366cc0d8b4f2a3df6924a554419c8ee64950f16d7603c551",
+      "dev": 16777231,
+      "inode": 543050762,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json",
+      "bytes": 91,
+      "sha256": "73aab983d6ea717271e5558a4810d35b8cedd40413361b22da28f26fbd87f708",
+      "dev": 16777231,
+      "inode": 543050722,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json.sig",
+      "bytes": 247,
+      "sha256": "9c0a80c89177e4256a28bb6efe6f63ded0dd4c5ca1455da89db8dedb1fd06cf2",
+      "dev": 16777231,
+      "inode": 543050723,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/monitor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/monitor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "d545e4bdf27f84d3bea0fa3d16f2e5fbb423ea80b3ed125dd6f6dc3d94cd4fbd",
+      "dev": 16777231,
+      "inode": 543050697,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/auditor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/auditor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "72b5fd35a72a5d8bcffe6ef3aa39ac22417a2d1e59209ee7d4de97a3655100d9",
+      "dev": 16777231,
+      "inode": 543050698,
+      "nlink": 1
+    }
+  ],
+  "nativeAfter": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543031862,
+    "nlink": 1
+  },
+  "guardEmitterCloseInvoked": true,
+  "poolBeforeClose": {
+    "key": "ledger:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/evidence.sqlite",
+    "dbPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/evidence.sqlite",
+    "maxSize": 4,
+    "idle": 3,
+    "active": 0,
+    "pooledConnections": 3,
+    "initialized": true
+  },
+  "protectedInputCount": 10,
+  "finalProtectedPins": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/allowed.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/allowed.txt",
+      "bytes": 40,
+      "sha256": "490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab",
+      "dev": 16777231,
+      "inode": 543050725,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/denied.txt",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/workspace/denied.txt",
+      "bytes": 38,
+      "sha256": "512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84",
+      "dev": 16777231,
+      "inode": 543050726,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml",
+      "bytes": 348,
+      "sha256": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+      "dev": 16777231,
+      "inode": 543050728,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/tools.yaml.sig",
+      "bytes": 247,
+      "sha256": "827f3848a34d163ce357a377c77804094e6089dad33fe0c37117cc3b117cec94",
+      "dev": 16777231,
+      "inode": 543050731,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json",
+      "bytes": 476,
+      "sha256": "d965277bde9a5b3b3089d002b6e55d6b66fdd45f28bec16b4b93850e813c819a",
+      "dev": 16777231,
+      "inode": 543050755,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/firewall/policy.json.sig",
+      "bytes": 862,
+      "sha256": "e798a7dc34fd62bd366cc0d8b4f2a3df6924a554419c8ee64950f16d7603c551",
+      "dev": 16777231,
+      "inode": 543050762,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json",
+      "bytes": 91,
+      "sha256": "73aab983d6ea717271e5558a4810d35b8cedd40413361b22da28f26fbd87f708",
+      "dev": 16777231,
+      "inode": 543050722,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json.sig",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/blob-keys/current.json.sig",
+      "bytes": 247,
+      "sha256": "9c0a80c89177e4256a28bb6efe6f63ded0dd4c5ca1455da89db8dedb1fd06cf2",
+      "dev": 16777231,
+      "inode": 543050723,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/monitor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/monitor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "d545e4bdf27f84d3bea0fa3d16f2e5fbb423ea80b3ed125dd6f6dc3d94cd4fbd",
+      "dev": 16777231,
+      "inode": 543050697,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/auditor_ed25519.pub",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/workspace/.amc/keys/auditor_ed25519.pub",
+      "bytes": 113,
+      "sha256": "72b5fd35a72a5d8bcffe6ef3aa39ac22417a2d1e59209ee7d4de97a3655100d9",
+      "dev": 16777231,
+      "inode": 543050698,
+      "nlink": 1
+    }
+  ],
+  "protectedInputsUnchanged": true,
+  "finalNativePin": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 543031862,
+    "nlink": 1
+  },
+  "nativeUnchanged": true,
+  "ownership": [
+    {
+      "sessionId": "85e8b677-0696-484f-a004-f03eeb6b4791",
+      "opened": true,
+      "turnOpen": false,
+      "turnEndAttempted": true,
+      "turnEnded": true,
+      "turnSealAttempted": true,
+      "turnSealed": true,
+      "toolsetAcquired": true,
+      "toolsetCloseAttempted": true,
+      "toolsetClosed": true,
+      "sessionCloseAttempted": true,
+      "sessionClosed": true,
+      "storeClosed": true,
+      "fallbackStoreCloseAttempted": false
+    },
+    {
+      "sessionId": "cbe228ae-86d8-4920-a1ab-088b18209f67",
+      "opened": true,
+      "turnOpen": false,
+      "turnEndAttempted": true,
+      "turnEnded": true,
+      "turnSealAttempted": true,
+      "turnSealed": true,
+      "toolsetAcquired": true,
+      "toolsetCloseAttempted": true,
+      "toolsetClosed": true,
+      "sessionCloseAttempted": true,
+      "sessionClosed": true,
+      "storeClosed": true,
+      "fallbackStoreCloseAttempted": false
+    }
+  ],
+  "bodyFailed": true,
+  "bodyError": {
+    "name": "AssertionError",
+    "message": "expected [] to deeply equal [ …(4) ]",
+    "stack": "AssertionError: expected [] to deeply equal [ …(4) ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:364:55\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:182:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+  },
+  "cleanupErrors": [],
+  "environmentRestored": true,
+  "vaultLocked": true,
+  "poolClosed": true
+}

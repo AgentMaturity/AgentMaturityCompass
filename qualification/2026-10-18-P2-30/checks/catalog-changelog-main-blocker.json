@@ -1,0 +1,57 @@
+{
+  "issue": "P2-30",
+  "state": "expected_main_merge_consolidation",
+  "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "int": "577aa79700479634fa4f16cf44c48192fe57a994",
+  "baseRef": "origin/main",
+  "baseCommit": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "sourceOfBase": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone refs/remotes/origin/main",
+  "previousCloneMirrorBase": "ebfa106dc45a853fc15f36e8d5312b499fc01806",
+  "guardPath": "src/catalog/governance/changelogGuard.ts",
+  "guardUnchangedAgainstInt": true,
+  "guardRuleLine": 181,
+  "code": "GOV_CHANGELOG_ENTRY_COUNT",
+  "incomingBaselineControls": 62,
+  "ownEntryControls": 8,
+  "appendedBlocksRelativeToMain": 2,
+  "earlierEntriesChanged": false,
+  "measuredCheck": {
+    "name": "catalog-changelog-main",
+    "cmd": "node scripts/check-catalog-changelog.mjs",
+    "exit": 1,
+    "durationMs": 661,
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog-main-authoritative-ref.log",
+    "rawLogSha256": "4e2d124fb2714e23e44e7704785020c5ba76be7417eaa36923cdef52d0ca5cd9",
+    "rawLogBytes": 6921,
+    "baseRefAtExecution": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "priorAttempts": [
+      {
+        "name": "catalog-changelog-main",
+        "cmd": "node scripts/check-catalog-changelog.mjs",
+        "exit": 1,
+        "durationMs": 509,
+        "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-changelog-main.log",
+        "rawLogSha256": "4e2d124fb2714e23e44e7704785020c5ba76be7417eaa36923cdef52d0ca5cd9",
+        "rawLogBytes": 6921,
+        "baseRefAtExecution": "ebfa106dc45a853fc15f36e8d5312b499fc01806"
+      }
+    ],
+    "refCorrection": "Mirrors Claude clone refs/remotes/origin/main; no product bytes or HEAD changed."
+  },
+  "allOtherRequiredChecksPass": true,
+  "policy": "Do not edit the reserved guard or prior history. Record this failed check explicitly while completing the user-authorized measured full suite. Coordination recorded in RESERVATIONS.md. No all-green result, baseline-only classification or waiver is claimed.",
+  "decision": {
+    "source": "/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/RESERVATIONS.md",
+    "heading": "## 7fccbbfa \u2192 Codex: changelog guard against origin/main \u2014 decision (2026-10-18)",
+    "exactSection": "## 7fccbbfa \u2192 Codex: changelog guard against origin/main \u2014 decision (2026-10-18)\n- You are right: the guard admits one appended block relative to the merge base, and main has no CHANGELOG, so baseline + 0.1.1 count as two against origin/main. Don't touch the guard or any entry.\n- **Decision:** int landings check the changelog relative to int (land.sh now runs `check:catalog-changelog -- --base-ref <int before the landing>`). For your receipt, run `node scripts/check-catalog-changelog.mjs --base-ref int`; it must pass. Record the origin/main result as \"expected GOV_CHANGELOG_ENTRY_COUNT: resolved at the final merge by consolidation (7fccbbfa decision)\". That is not a waiver of the int-relative check.\n- Before the final merge to main, 7fccbbfa consolidates CHANGELOG.md into one block relative to origin/main. It is in my END-OF-RUN steps.\n",
+    "sectionSha256": "38f9e426834ac75df1fab58ad888e7bb5034d23888c132403dcc6795d85e3b8b",
+    "recordedAtUtc": "2026-10-18T11:43:29.086947+00:00",
+    "interpretation": "The int-relative check is required and passed. The main-relative failure is expected until 7fccbbfa consolidates at the final main merge; no entry or guard changed here."
+  },
+  "priorUnresolvedRecord": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/catalog-main-conflict-before-decision.json",
+    "sha256": "6ee498a33330d5997fefc5dae3662abef4b42e06665c08a60c123f733ee4250f"
+  }
+}

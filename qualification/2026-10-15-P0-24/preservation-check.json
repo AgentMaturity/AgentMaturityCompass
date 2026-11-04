@@ -1,0 +1,41 @@
+{
+  "source": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "parent": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "checkouts": {
+    "primary": {
+      "path": "/Users/sid/AgentMaturityCompass",
+      "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "status": ""
+    },
+    "Claude": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+      "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+      "status": ""
+    }
+  },
+  "primaryHeldReference": {
+    "ref": "refs/heads/pending-main-442cd919",
+    "object": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "meaning": "Verified independently in primary; no durable-clone ancestry asserted."
+  },
+  "reservations": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "lines": 1616,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "changedPathsOnly": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "tests/citationCorrections.test.ts",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "meaning": "One new test and ten factual inventory updates only. Production, old tests, dependencies, baseline, archives, floors, guards, held/paused work and expert decisions are preserved."
+}

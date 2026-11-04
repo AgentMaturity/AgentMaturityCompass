@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T00:00:28.390554+00:00",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "key": "P0-30",
+  "oldIssue": "AMC-1516",
+  "guard": "S7-M11-profile-import-gate-221",
+  "reviewer": "root independent exact-text review",
+  "findings": [],
+  "checks": [
+    "Reconstructed the prescribed emitted baseline plus exact compiled guard deletion from the live unchanged source-bound JS and pinned readiness recipe.",
+    "Saved expected body exactly equals that independent reconstruction.",
+    "Actual emitted body differs only by one newline and indentation before the same && authority condition. No other text change was accepted.",
+    "Actual, prescribed and diff hashes match the frozen author references."
+  ],
+  "runtimeAuthorization": "Proceed with the same original eighteen-case corpus in the isolated parser-emitted phase only. Actual TypeScript exit2/TS2345 remains a diagnostic failure; this is emitted-JavaScript guard sensitivity, not successful mutant compilation, source-build validation or old whole-batch completion.",
+  "earlierAttempts": "Both stopped attempts remain unqualified, with no mutant-test kill claimed.",
+  "operations": {
+    "productImports": 0,
+    "compilerRuns": 0,
+    "testRuns": 0,
+    "sourceChanges": 0,
+    "readOnlyStandardLibraryComparison": true
+  },
+  "evidence": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/expected-target.js",
+      "bytes": 15242,
+      "sha256": "17c5f3504830309bfc4024260776e2f9939b26e2f114b6809bae3d2171c6c43d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/actual-target.js",
+      "bytes": 15258,
+      "sha256": "0b6d363c415c21c74f0a034fecc02b8c58abec1705b66b40824416f82428b361"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/expected-actual.diff",
+      "bytes": 593,
+      "sha256": "dab93cbf4b228fdd98fd5d8103c03c22081064429ac58a7da1b736783307ce43"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-1517-readiness-20261015.json",
+      "bytes": 46924,
+      "sha256": "9d2532f772e119416606fa32464c04b3b75aaad76a573bb7236c054a044c608e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/standard/externalEvidenceProfile.js",
+      "bytes": 15307,
+      "sha256": "a78855df54d8090b0fcb6f93d0c9d634c8dbf43bbad34853d18a5ee1ef28b9e2"
+    }
+  ]
+}

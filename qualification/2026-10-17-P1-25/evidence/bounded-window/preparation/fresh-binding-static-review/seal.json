@@ -1,0 +1,62 @@
+{
+  "schema": "p125w-fresh-binder-independent-static-seal/1",
+  "at": "2026-10-17T00:11:32.211030+00:00",
+  "preferredAuthorHelper": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/bind-fresh.py.source.txt",
+    "bytes": 4948,
+    "sha256": "aa3eca5d09af75a3c12cc3062a81ae72d091b9da03f49d8c18a04bac05a64898",
+    "dev": 16777231,
+    "inode": 543748138,
+    "nlink": 1
+  },
+  "preferredAuthorSeal": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/seal.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-preparation/seal.json",
+    "bytes": 1618,
+    "sha256": "8b54e2f44fd03d55921bf35fd8a29e8f3e58b9bdf6cc7464e7b7fb5b10d89a58",
+    "dev": 16777231,
+    "inode": 543748143,
+    "nlink": 1
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/runtime-preflight.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/runtime-preflight.json",
+      "bytes": 1208,
+      "sha256": "25a779f1077766c69b3d3b16e77f2507c394df6879a27e06f519767e418a967c",
+      "dev": 16777231,
+      "inode": 543750040,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/input-pins.json",
+      "bytes": 6458,
+      "sha256": "927e74e278473cc70450328cb3029e07806fea455dbbb44fe0dd495f47fcfb6a",
+      "dev": 16777231,
+      "inode": 543750041,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/review.json",
+      "bytes": 3553,
+      "sha256": "75af934d5381c9a4ea37fde5cbffe89805cfb4b37ffef00c77cfe88342bd1b8d",
+      "dev": 16777231,
+      "inode": 543750042,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-binding-static-review/README.md",
+      "bytes": 751,
+      "sha256": "e0980c37443a2ac124392714c6233ada5ebe0926c4a27d762a3a262516ccc286",
+      "dev": 16777231,
+      "inode": 543750043,
+      "nlink": 1
+    }
+  ],
+  "blockers": [],
+  "staticOnly": true
+}

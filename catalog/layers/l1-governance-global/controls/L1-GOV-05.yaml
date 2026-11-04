@@ -1,0 +1,219 @@
+id: "L1-GOV-05"
+version: "0.1.0"
+support: "experimental"
+layer: 1
+family: "explanation-request-reaches-human"
+stations:
+  - "governance"
+title: "Explanation requests reach an authorized human reviewer"
+statement: "Route a decision-explanation request to an authorized human reviewer within the explicitly selected
+  profile window. An automatic reply, an unauthorized recipient or a late route does not satisfy the duty.
+  Routing does not establish the content or sufficiency of an explanation."
+riskRationale: "A nominal response can hide that nobody with authority reviewed the request, while a prompt
+  response without a routing record is not evidence of human handling."
+mandatory: true
+applicability:
+  predicate:
+    all:
+      - fact: "domains"
+        includesAny:
+          - "governance.public-services"
+          - "governance.law-rights-democracy"
+      - fact: "jurisdictions"
+        includesAny:
+          - "US"
+          - "US-CA"
+          - "US-NY"
+          - "EU"
+      - fact: "roles"
+        includesAny:
+          - "deployer"
+      - fact: "entityTypes"
+        includesAny:
+          - "federal_agency"
+          - "state_agency"
+          - "public_service_provider"
+          - "law_firm"
+      - fact: "useCases"
+        includesAny:
+          - "explanation_request"
+  reasons:
+    - "Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected
+      domain and local fixture establish neither legal applicability nor production enforcement."
+  exclusions: []
+citations:
+  - key: "governance-omb-m25-21-human-review"
+    registerId: "us-omb-m-25-21"
+    instrument: "Accelerating Federal Use of AI through Innovation, Governance, and Public Trust"
+    clause: "Human oversight, timely human review and appeal"
+    edition: "Edition not read in P3-14; existing S5 locator only"
+    jurisdiction: "US"
+    statusType: "binding-now"
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: "No effective or compliance date is asserted by this unread draft. Instrument-level S5 status does not
+      establish clause-specific applicability or timing."
+    url: "https://www.whitehouse.gov/wp-content/uploads/2025/02/M-25-21-Accelerating-Federal-Use-of-AI-through-Inno\
+      vation-Governance-and-Public-Trust.pdf"
+    retrieval:
+      state: "unverified"
+      reason: "Not fetched or hashed in P3-14. Existing S5 entries are navigation only; primary-source text, scope and
+        dates require verification before any review."
+    appliesWhen:
+      fact: "jurisdictions"
+      includesAny:
+        - "US"
+    legalReview: null
+    note: "Experimental, unreviewed candidate. The status value follows existing S5 instrument metadata and does not
+      establish verified legal applicability."
+  - key: "governance-eu-ai-act-explanation"
+    registerId: "eu-ai-act"
+    instrument: "Regulation (EU) 2024/1689 (AI Act)"
+    clause: "Article 86: candidate explanation-right mapping; routing alone does not establish explanation content,
+      scope or timing."
+    edition: "Primary source not read in P3-14; official discovery locator only"
+    jurisdiction: "EU"
+    statusType: "binding-now"
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: "No effective or compliance date is asserted by this unread draft. Instrument-level S5 status does not
+      establish clause-specific applicability or timing."
+    url: "https://eur-lex.europa.eu/eli/reg/2024/1689/oj/eng"
+    retrieval:
+      state: "unverified"
+      reason: "Not fetched or hashed in P3-14. Existing S5 entries are navigation only; primary-source text, scope and
+        dates require verification before any review."
+    appliesWhen:
+      fact: "jurisdictions"
+      includesAny:
+        - "EU"
+    legalReview: null
+    note: "Experimental, unreviewed candidate. Instrument-level status is not a claim that this provision applies
+      now. Verify exact text, scope and all dates; no assessment quality, production behavior or legal
+      sufficiency is established."
+  - key: "governance-eu-gdpr-art22"
+    registerId: "eu-gdpr"
+    instrument: "Regulation (EU) 2016/679 (GDPR)"
+    clause: "Article 22: candidate automated-decision and human-review mapping; specific applicability and
+      safeguards remain unverified."
+    edition: "Primary source not read in P3-14; official discovery locator only"
+    jurisdiction: "EU"
+    statusType: "binding-now"
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: "No effective or compliance date is asserted by this unread draft. Instrument-level S5 status does not
+      establish clause-specific applicability or timing."
+    url: "https://publications.europa.eu/resource/celex/32016R0679"
+    retrieval:
+      state: "unverified"
+      reason: "Not fetched or hashed in P3-14. Existing S5 entries are navigation only; primary-source text, scope and
+        dates require verification before any review."
+    appliesWhen:
+      fact: "jurisdictions"
+      includesAny:
+        - "EU"
+    legalReview: null
+    note: "Experimental, unreviewed candidate. Instrument-level status is not a claim that this provision applies
+      now. Verify exact text, scope and all dates; no assessment quality, production behavior or legal
+      sufficiency is established."
+binding:
+  kind: "manual"
+  points: []
+  mechanism: "The request owner records the request, delegated reviewer authority and completed routing in the
+    system of record. The local router tests a synthetic 24-hour window; it establishes no statutory deadline or
+    production routing integration."
+  parameters: []
+  manualDuty:
+    duty: "Assign requests to reviewers with authority, record timely routing, and arrange independent assessment of
+      the explanation supplied to the requester."
+    ownerRole: "senior_manager"
+    cadence: "For each explanation request, using the deployment-selected window after legal review of applicable
+      duties."
+    evidenceOfPerformance: "A request and human routing record bound to the case, reviewer authority, deployment,
+      agent and plan; explanation content is separately assessed."
+tests:
+  - id: "L1-GOV-05-T1"
+    type: "drill"
+    oracle:
+      kind: "system_of_record"
+      observes: "Test-only reference-agent effects, captures, refusals and local reason codes. Synthetic local
+        outcomes are separate from the envelope evidence result and never stand in for an agency, law firm or
+        defense deployment."
+    fixtures:
+      positive:
+        - "L1-GOV-05/positive/oracle-authoritative-human.json"
+      negative:
+        - "L1-GOV-05/negative/oracle-auto-reply.json"
+        - "L1-GOV-05/negative/oracle-unauthorized-reviewer.json"
+        - "L1-GOV-05/negative/oracle-late-route.json"
+        - "L1-GOV-05/negative/oracle-routing-log-unavailable.json"
+    passCriteria: "Each local reference-agent case matches its separately declared synthetic result. Missing
+      authorities or system records cause no effect. No local outcome supplies an observed production producer
+      or a positive regulated result."
+    attempts: 1
+  - id: "L1-GOV-05-T2"
+    type: "drill"
+    oracle:
+      kind: "system_of_record"
+      observes: "P1-11 evaluateControl admission, rejection and evidence/result dimensions for the actual admitted
+        questionnaire producer. The producer caps all records at self_reported."
+    fixtures:
+      positive:
+        - "L1-GOV-05/positive/evidence-valid.json"
+      negative:
+        - "L1-GOV-05/negative/evidence-stale.json"
+        - "L1-GOV-05/negative/evidence-replayed.json"
+        - "L1-GOV-05/negative/evidence-contradictory.json"
+        - "L1-GOV-05/negative/evidence-cross-tenant.json"
+        - "L1-GOV-05/negative/evidence-empty.json"
+        - "L1-GOV-05/negative/evidence-violation.json"
+    passCriteria: "The valid self-reported example cannot pass. Stale, replayed, contradictory, cross-tenant and
+      empty examples exercise their actual evidence rules; an admitted self-reported violation fails
+      conservatively. Empty production evidence remains not_evaluated with enforcement none."
+    attempts: 1
+evidence:
+  - id: "L1-GOV-05-E1"
+    producer: "amc.questionnaire"
+    bindingFields:
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    freshness:
+      maxAgeDays: 30
+    sampling:
+      method: "all"
+      ratePercent: null
+      minItems: 1
+    retention:
+      mode: "regime_max"
+    residency:
+      mode: "inherit_deployment"
+invalidatedBy:
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "corpus_version"
+  - "policy_version"
+  - "deployment_version"
+owner:
+  role: "senior_manager"
+clock: null
+levels:
+  - "L1"
+crosswalk: []
+review:
+  status: "pending"
+  expert: null
+  credential: null
+  reviewedAt: null
+  nextReview: null
+provenance:
+  draftedBy: "ai"
+  draftedAt: "2026-10-18"
+  approvedBy: null

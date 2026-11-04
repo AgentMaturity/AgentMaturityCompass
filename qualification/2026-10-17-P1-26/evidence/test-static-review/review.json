@@ -1,0 +1,263 @@
+{
+  "schema": "p126-two-pure-test-independent-static-review/1",
+  "at": "2026-10-16T20:31:51.541605+00:00",
+  "verdict": "No concrete static blocker found in the sealed two-file candidate for the bounded pure-helper contract. Root admission, compilation and runtime remain separate.",
+  "blockers": [],
+  "allReadsFinished": true,
+  "candidate": {
+    "authorSeal": {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/seal.json",
+      "bytes": 2803,
+      "sha256": "d89c5bb154dfb07c06e7c91ba60eef4e6a6d80d7880994594f872cfc196fae89",
+      "readScope": "reviewed author seal"
+    },
+    "files": [
+      {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/rfc9162.test.ts",
+        "bytes": 18552,
+        "sha256": "bd5b0eca45ad2ff59a19a50c9947225c316fbce078bad94d249cdd9981ea3999",
+        "readScope": "full source"
+      },
+      {
+        "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/legacyAmbiguity.test.ts",
+        "bytes": 3053,
+        "sha256": "6accfff0a621a3dac27bf63ad2cfcfdc18bfb0a8f99647a0f65fb2a5dc5f7349",
+        "readScope": "full source"
+      }
+    ],
+    "declaredLiteralCases": 13,
+    "actualStaticLiteralCaseInventory": [
+      {
+        "file": "rfc9162.test.ts",
+        "cases": [
+          {
+            "name": "empty, leaf and node hashes preserve byte domains and child order",
+            "line": 239
+          },
+          {
+            "name": "ports eight leaf inputs and all nine known roots from constants.go",
+            "line": 255
+          },
+          {
+            "name": "ports the five exact happy-path inclusion JSON vectors",
+            "line": 266
+          },
+          {
+            "name": "ports the five exact happy-path consistency JSON vectors",
+            "line": 281
+          },
+          {
+            "name": "matches an independent recursive root at every size from 1 through 64",
+            "line": 294
+          },
+          {
+            "name": "verifies every inclusion index against independent roots for sizes 1 through 64",
+            "line": 300
+          },
+          {
+            "name": "verifies every consistency pair through size 64 against independent roots",
+            "line": 310
+          },
+          {
+            "name": "incremental and rebuilt frontiers match independent RFC roots through size 64",
+            "line": 320
+          },
+          {
+            "name": "refuses the exact size-2 inclusion witness when only declared size changes to 3",
+            "line": 331
+          },
+          {
+            "name": "rejects malformed, changed, extra, missing and wrong-index inclusion inputs",
+            "line": 340
+          },
+          {
+            "name": "rejects malformed consistency proofs, changed roots, invalid sizes and boundary mismatches",
+            "line": 368
+          }
+        ],
+        "count": 11
+      },
+      {
+        "file": "legacyAmbiguity.test.ts",
+        "cases": [
+          {
+            "name": "legacy three/four roots collide while RFC roots differ and both proof APIs remain usable",
+            "line": 11
+          },
+          {
+            "name": "RFC entry verification needs index and size and derives sides rather than trusting flags",
+            "line": 37
+          }
+        ],
+        "count": 2
+      }
+    ],
+    "matrixNamesAndLinesExact": true,
+    "executed": false
+  },
+  "inputVerification": {
+    "authorRows": 47,
+    "allBytesAndSha256Match": true,
+    "authorSealedOutputs": 6,
+    "allSixOutputsMatch": true,
+    "individualInputRows": "verified-author-inputs.json",
+    "fullContentReadBoundary": "Both complete candidate bodies, README/matrix/author-review/seal/input pins, three complete pure production modules, typed configs and relevant earlier caller/contract spans were read. Rehashing an input does not imply a fresh full-content review of every broad historical graph/caller file."
+  },
+  "provenance": {
+    "commit": "c39fbf350a405f68571bf4c42a6a518eb0a46a4b",
+    "originalJsonObjectsCompared": [
+      {
+        "sourcePath": "testdata/inclusion/0/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": true,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/0/happy-path.json",
+          "bytes": 216,
+          "sha256": "c572c07efd1183529a7139b88d7b9785969067bcc6fa7cac54c9b14ac7f5ef01",
+          "readScope": "exact complete JSON object equality"
+        }
+      },
+      {
+        "sourcePath": "testdata/inclusion/1/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": false,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/1/happy-path.json",
+          "bytes": 372,
+          "sha256": "d345b72a74b4647f68f92e9bcd05c19f7fd3080858bc6ff25979270d9d9b0083",
+          "readScope": "exact complete JSON object equality"
+        }
+      },
+      {
+        "sourcePath": "testdata/inclusion/2/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": false,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/2/happy-path.json",
+          "bytes": 372,
+          "sha256": "4eede9de7ed9989bcc2f53cb8ae770cecf5c56dbfae25e2d38d9e551e7226722",
+          "readScope": "exact complete JSON object equality"
+        }
+      },
+      {
+        "sourcePath": "testdata/inclusion/3/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": false,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/3/happy-path.json",
+          "bytes": 268,
+          "sha256": "be604298d4ed651d66dd96dc769fdd6c60f3b04db1080afaff4b10a1070d2e23",
+          "readScope": "exact complete JSON object equality"
+        }
+      },
+      {
+        "sourcePath": "testdata/inclusion/4/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": false,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/4/happy-path.json",
+          "bytes": 372,
+          "sha256": "0d5679d8a828eebda5d498ca0187a568c805e4d1be17f373ec5058c99b74a9cc",
+          "readScope": "exact complete JSON object equality"
+        }
+      },
+      {
+        "sourcePath": "testdata/consistency/0/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": true,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/0/happy-path.json",
+          "bytes": 209,
+          "sha256": "5aae6059f25e905b9ba2eb20471d584e50f31ba5dc8a1797547fb38af25d032e",
+          "readScope": "exact complete JSON object equality"
+        }
+      },
+      {
+        "sourcePath": "testdata/consistency/1/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": false,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/1/happy-path.json",
+          "bytes": 365,
+          "sha256": "3d94a9f4a5ecd5ec6338beba1a523798a8553553cadb8247ed5d9e3ba9b3cea6",
+          "readScope": "exact complete JSON object equality"
+        }
+      },
+      {
+        "sourcePath": "testdata/consistency/2/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": false,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/2/happy-path.json",
+          "bytes": 365,
+          "sha256": "084d20811521ec2017cb0cf8d4ebe9aa987e7415e559374f51f5647635b12636",
+          "readScope": "exact complete JSON object equality"
+        }
+      },
+      {
+        "sourcePath": "testdata/consistency/3/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": false,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/3/happy-path.json",
+          "bytes": 313,
+          "sha256": "2254557f34595bcbeff662da226507648be8cbf570653f54d053806024d12f8c",
+          "readScope": "exact complete JSON object equality"
+        }
+      },
+      {
+        "sourcePath": "testdata/consistency/4/happy-path.json",
+        "allOriginalFieldsExact": true,
+        "nullProofPreserved": false,
+        "sourcePin": {
+          "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/4/happy-path.json",
+          "bytes": 365,
+          "sha256": "e57266a3bff16d997c57a1a30b6f9283cf8dd150d165201016cb4d9774cde020",
+          "readScope": "exact complete JSON object equality"
+        }
+      }
+    ],
+    "constantsGoRawInputCount": 8,
+    "constantsGoKnownRootCount": 9,
+    "allConstantStringsExact": true,
+    "copyrightAndLicenseHeader": "2019/2025 Google Apache notices retained with exact upstream commit/path comments. Full licence copy remains root-owned separately admitted path.",
+    "codePort": "Data objects and literals only; independent reference code is locally authored, with no upstream module or new dependency imported.",
+    "noSignedCommitOrUniversalLicenseClaim": true
+  },
+  "staticFlow": {
+    "imports": "Relative ../../src paths correctly resolve from prospective tests/transparency/ in S or Q. They do not borrow held R source authority. Built-in crypto and existing Vitest are the only non-relative imports.",
+    "types": "Source APIs consume the exact candidate string/readonly array/numeric objects. Parameters<typeof verifyEntryInclusion>[0] preserves algorithm literal type. Existing test tsconfig disables noUncheckedIndexedAccess; explicit assertions also protect selected leaf access. No casts/any/mocks or compiler execution.",
+    "oracle": "referenceRoot uses only node:crypto plus byte concatenation and an independent power-of-two boundary expression. Expected roots/leaves are precomputed from synthetic raw32 data without AMC leaf/node/root/proof/frontier calls. All64 synthetic first bytes are distinct because the index step67 is invertible modulo256 over this finite range.",
+    "coverageRows": "64 roots,2080 inclusion positions,2144 consistency pairs and65 frontier sizes are static loop rows within13 bodies, never runtime pass totals.",
+    "sharedAlgorithmRisk": "Generated proofs are checked against independent roots and exact external paths are compared separately, limiting generator/verifier self-agreement. This remains finite vector/property evidence, not proof of all inputs.",
+    "adapter": "Raw vendor bytes, already hashed vector inputs and synthetic raw32 entry digests remain distinct. Legacy test documents3/4 ambiguity and checks both RFC proofs, a cross-tree refusal, missing index/size, malformed entry and ignored display flags.",
+    "negativeBoundaries": "Malformed lowercase64hex verification inputs, unsafe/range numbers, changed hashes, a concrete wrong index, extra/missing paths and equal/empty extension cases use real exports. No stronger0/0canonical-root negative or universal alternate-size claim is introduced.",
+    "lifecycle": "Candidate bodies own no files/workspaces/servers/requests/sockets/processes/native handles/env/clock mutations. There are no body cleanup paths, deadline overrides, retries or guard edits. Existing global fixture behavior remains root-owned runtime evidence, not a universal lifecycle claim.",
+    "publicEvidence": "No secret, tenant, token, signed authority or fixture credential is generated/read; assertion operands are deterministic public synthetic bytes/hash literals. No persisted public record or runtime outcome is invented."
+  },
+  "controls": {
+    "M1": {
+      "test": "empty, leaf and node hashes preserve byte domains and child order",
+      "requiredUnchangedPositiveLine": 240,
+      "primaryLiteralLeafAssertionLine": 241,
+      "meaning": "Literal empty leaf is asserted after the unchanged empty-root positive. A swapped leaf prefix changes the leaf while expected literal stays fixed. Later node/vector/adapter/frontier failures require actual review."
+    },
+    "M2": {
+      "test": "refuses the exact size-2 inclusion witness when only declared size changes to 3",
+      "proofShapeLine": 335,
+      "validPositiveLine": 336,
+      "primaryRefusalLine": 337,
+      "meaning": "Exact leaf,proof,root are reused; onlytreeSize changes2\u21923. No direct inclusionSides assertion precedes the verifier witness. Missing path sensitivity in another body is additional potential evidence; actual firstframes and masks remain unobserved."
+    },
+    "actualFailureCountsOrIdentities": null,
+    "mutantCreatedOrExecuted": false,
+    "exactRecipes": "Prior contract-review/controls.json and patches remain unchanged; source hash053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35."
+  },
+  "adoptionNotes": [
+    "Source basefc2e64eb is the recorded pre-metadata-repair base; root must use the actual later commit and exact unchanged helper/test pins for admission. This report does not require a globally clean tree during unrelated authorized metadata repair.",
+    "Do not republish these candidate bodies as executable .test.ts under qualification evidence. Retain inert filenames or the established exact lossless JSON representation with explicit original hashes.",
+    "No source repair is recommended from static analysis; actual RED must precede any proposed production repair."
+  ],
+  "remaining": "Whole P1-26 remains open: signed migration/defaults/caller authority, C2SP notes, recorded Rekorv2/SCITT/P1-25 integration, public-entry approval, library decision, docs/dependency review/changeset/full suite/global quality. All held decisions, F37 skip and reservations remain protected.",
+  "execution": "Static source/text/JSON comparisons and hashes only. No TypeScript parser/compiler, AMC/product/helper/test/native/SQL/network/runtime execution, source/index/Git/QA writes or Claude contact."
+}

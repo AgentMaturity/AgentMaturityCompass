@@ -1,0 +1,94 @@
+{
+  "at": "2026-10-16T18:47:28.255017+00:00",
+  "sourceHead": "4f53ff7e5fa4363ccadad1995c679888b222173e",
+  "sourceClean": true,
+  "indexEmpty": true,
+  "nativePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 542501039,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    }
+  ],
+  "sourceCompiledPairs": [
+    {
+      "name": "time/verifyTimestamp",
+      "source": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+        "bytes": 16478,
+        "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89"
+      },
+      "compiled": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/verifyTimestamp.js",
+        "bytes": 14777,
+        "sha256": "914d44693865680b1e3123255dfe4f393930ccbf2f418b3b8302b9c3cc942afa"
+      }
+    },
+    {
+      "name": "time/der",
+      "source": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/der.ts",
+        "bytes": 5959,
+        "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6"
+      },
+      "compiled": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/der.js",
+        "bytes": 5518,
+        "sha256": "1ed3e62994bc5d7aad45e721ca73234c5c1e4069a81fa271adb3e7f894c2a89e"
+      }
+    },
+    {
+      "name": "time/timeEvidence",
+      "source": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "bytes": 3278,
+        "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8"
+      },
+      "compiled": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/timeEvidence.js",
+        "bytes": 2973,
+        "sha256": "4157ecf0aa60813bea6335f4a26fb13f7cb5b4ed4c3b86c6515b90b8295c1829"
+      }
+    },
+    {
+      "name": "trust/trustList",
+      "source": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+        "bytes": 10386,
+        "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+      },
+      "compiled": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/trust/trustList.js",
+        "bytes": 10052,
+        "sha256": "4500847b46e4575d84d347fc8afacd1d35896019024590e80515bbd922783819"
+      }
+    },
+    {
+      "name": "trust/verifierReport",
+      "source": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/verifierReport.ts",
+        "bytes": 6887,
+        "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2"
+      },
+      "compiled": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/trust/verifierReport.js",
+        "bytes": 6231,
+        "sha256": "ab5306a3b3bde8cbf4776dc72638d8a213ace2c717d7c2194bcbb24ee73b37ae"
+      }
+    }
+  ],
+  "boundary": "Five actual source/compiled pairs; pins are physical preservation/binding evidence. Eventual Vitest imports source; no compiled sensitivity claim."
+}

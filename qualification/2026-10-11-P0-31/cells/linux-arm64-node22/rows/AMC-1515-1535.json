@@ -1,0 +1,107 @@
+{
+  "schema": "p031-installed-rows/v1",
+  "startedAt": "2026-10-11T11:13:12.180Z",
+  "node": "v22.23.3",
+  "npm": "10.9.9",
+  "platform": "linux",
+  "arch": "arm64",
+  "osRelease": "6.8.0-117-generic",
+  "tarballSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "harnessSha256": {
+    "run-rows.mjs": "8f03a3eed09ccaaf19e34f3a27c3dff27f8dba0ba4041e82166bab1a5fb95768",
+    "fixtures.mjs": "2974ff6ee103808feb216166b251269601cba6bf8aaeef217cf1b2c06766c9bd",
+    "mcp-stdio-fixture.mjs": "a09692f75c229a1c793b6c9300cabba416a5b57f1fa2733ce5f2c5a8cc5b00dc",
+    "chat-pty.py": "4eb8cba86c742044a2463ba8ccc9e2c9cef816d4f7517baf743117d27fbeb819"
+  },
+  "row": "AMC-1515/1535",
+  "status": "passed",
+  "checks": [
+    {
+      "name": "stdio: completed remote call is recorded as completed",
+      "ok": true,
+      "exit": 0,
+      "decision": {
+        "approvalId": "apprreq_cb566ce4fbee481b8daf609bec86cc09",
+        "toolName": "mcp_p031fixture_edb465624291e405",
+        "requiredApprovals": 1,
+        "decisionExit": 0
+      },
+      "remoteCalls": 1,
+      "toolResult": "{\"isError\":false,\"output\":\"{\\\"content\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"remote side effect committed\\\"}]}\",\"type\":\"amc.tool-result\",\"version\":1}",
+      "coldVerified": true
+    },
+    {
+      "name": "stdio: result received after grant disposal is reported executed, not replayed",
+      "ok": true,
+      "exit": 0,
+      "decision": {
+        "approvalId": "apprreq_cc7629c9dd51436faf6d0dd66245160f",
+        "toolName": "mcp_p031fixture_edb465624291e405",
+        "requiredApprovals": 1,
+        "decisionExit": 0
+      },
+      "remoteCalls": 1,
+      "toolResult": "{\"isError\":true,\"output\":\"MCP call failed or catalog changed; review and mount again; the remote tool executed and its received result was discarded. It was not replayed. Inspect the remote service before another invocation.\",\"type\":\"amc.tool-result\",\"version\":1}",
+      "coldVerified": true
+    },
+    {
+      "name": "stdio: schema-invalid arguments are refused before any remote call",
+      "ok": true,
+      "exit": 0,
+      "decision": {
+        "approvalId": "apprreq_97d6634debdf4ae5b28f00dfe99ff059",
+        "toolName": "mcp_p031fixture_edb465624291e405",
+        "requiredApprovals": 1,
+        "decisionExit": 0
+      },
+      "remoteCalls": 0,
+      "toolResult": "{\"isError\":true,\"output\":\"MCP arguments do not match the reviewed tool schema\",\"type\":\"amc.tool-result\",\"version\":1}",
+      "coldVerified": true
+    },
+    {
+      "name": "http: completed remote call is recorded as completed",
+      "ok": true,
+      "exit": 0,
+      "decision": {
+        "approvalId": "apprreq_ca2a6f48e76d43308e974de5cf76eacb",
+        "toolName": "mcp_p031fixture_edb465624291e405",
+        "requiredApprovals": 1,
+        "decisionExit": 0
+      },
+      "remoteCalls": 1,
+      "toolResult": "{\"isError\":false,\"output\":\"{\\\"content\\\":[{\\\"type\\\":\\\"text\\\",\\\"text\\\":\\\"remote side effect committed\\\"}]}\",\"type\":\"amc.tool-result\",\"version\":1}",
+      "coldVerified": true
+    },
+    {
+      "name": "http: result received after grant disposal is reported executed, not replayed",
+      "ok": true,
+      "exit": 0,
+      "decision": {
+        "approvalId": "apprreq_13f1ad20bdb2476c83e3a3491ce1af68",
+        "toolName": "mcp_p031fixture_edb465624291e405",
+        "requiredApprovals": 1,
+        "decisionExit": 0
+      },
+      "remoteCalls": 1,
+      "toolResult": "{\"isError\":true,\"output\":\"MCP call failed or catalog changed; review and mount again; the remote tool executed and its received result was discarded. It was not replayed. Inspect the remote service before another invocation.\",\"type\":\"amc.tool-result\",\"version\":1}",
+      "coldVerified": true
+    },
+    {
+      "name": "http: schema-invalid arguments are refused before any remote call",
+      "ok": true,
+      "exit": 0,
+      "decision": {
+        "approvalId": "apprreq_ec75e8f215584de9a5119a76b1d194a8",
+        "toolName": "mcp_p031fixture_edb465624291e405",
+        "requiredApprovals": 1,
+        "decisionExit": 0
+      },
+      "remoteCalls": 0,
+      "toolResult": "{\"isError\":true,\"output\":\"MCP arguments do not match the reviewed tool schema\",\"type\":\"amc.tool-result\",\"version\":1}",
+      "coldVerified": true
+    }
+  ],
+  "note": "SIMULATE is not reachable for a native MCP call from the installed CLI, SDK or ACP (the native seam requests EXECUTE only); validation-before-simulation is covered in-process by tests/reconciliationDefectsMcp.test.ts and tests/reconciliationDefectsMcpHttp.test.ts.",
+  "durationMs": 106153
+}

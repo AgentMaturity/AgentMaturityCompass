@@ -1,0 +1,156 @@
+{
+  "schema": "p119-oracle-producer-v4-independent-static-delta-review/1",
+  "capturedUtc": "2026-10-15T22:45:17.939541+00:00",
+  "conclusion": "No concrete blocking API, type, setup, lifecycle or expected-value defect found in the closed V3-to-V4 producer/test delta. Ten literal definitions remain intended cases until the root runner collects and executes them.",
+  "scope": "Closed helper, suite and exact V3-to-V4 text patches; public policy API source and closed interface addendum. No new oracle body read as an expected-value oracle, source import, product execution, parser, typecheck, tests, SQL, network or R writes.",
+  "exactInputs": {
+    "v3ToV4PatchesMatchFullTextDeltas": true,
+    "helperExpectedBytes": 33264,
+    "testExpectedBytes": 5398,
+    "definedLiteralCases": 10,
+    "v1V2V3Preserved": true
+  },
+  "checks": [
+    {
+      "topic": "Genuine default capture before weaker overwrite",
+      "locations": [
+        "financeOracleQualification.ts:69-84",
+        "financeOracleQualification.ts:94-98",
+        "financeOracleQualification.ts:306-324",
+        "src/approvals/approvalPolicyEngine.ts:44-114,155-165"
+      ],
+      "assessment": "The actual defaultApprovalPolicy export and initApprovalPolicy(workspace, policy) public signature exist. initApprovalPolicy always schema-validates, writes and auditor-signs the supplied policy, so its second call can create the deliberately different fresh test-owned required1 policy. Default policy bytes/signature and a structuredClone of its FINANCIAL rule are copied before that overwrite. The parent compares the captured default rule to an independent fixed literal and pins the saved default byte hash, not the weaker current byte hash."
+    },
+    {
+      "topic": "Actual one-decision authority rather than forged report",
+      "locations": [
+        "financeOracleQualification.ts:127-143",
+        "financeOracle.test.ts:73-81",
+        "src/approvals/approvalEngine.ts:207-245"
+      ],
+      "assessment": "The weaker mode changes only the fresh fixture policy requiredApprovals to 1 before requesting authority. createApprovalForIntent takes the signed policy rule when no quorumFloor is supplied. The producer strictly requires that request count, signs only the genuine bound OWNER decision, verifies execution approval through the public API, and strictly checks one distinct decision. Existing real preimage, pipeline, journal, recorder, consume and seal assertions remain. The ninth test requires authorization false but input/provider/count/payload/cold-ledger/action-chain true, so a generic setup refusal does not satisfy it."
+    },
+    {
+      "topic": "Unsupported expectation is pinned deliberately",
+      "locations": [
+        "financeOracleQualification.ts:275-279",
+        "financeOracleQualification.ts:319-324",
+        "financeOracle.test.ts:83-90"
+      ],
+      "assessment": "expected.errorSubstring is constructed before the case file is hashed and pinned, with a genuine completed producer. The test requires fail verdict, complete independent sixteen-ID protocol, inputs false and the explicit unsupported-fields diagnostic. Child nonzero/stream errors still throw before any output is accepted. It does not independently instrument internal cold-CLI launch count; early refusal ordering is an implementation/interface contract rather than a new measured lifecycle claim."
+    },
+    {
+      "topic": "Stream and cleanup changes",
+      "locations": [
+        "financeOracleQualification.ts:220-249",
+        "financeOracleQualification.ts:393-411"
+      ],
+      "assessment": "New stdout/stderr error listeners append capture errors, and unchanged requireClosed refuses them after actual natural close and stream closure. No signal, timeout, retry, detach, deadline extension or early successful negative is introduced. Existing aggregated body/cleanup failures and failed-root retention remain. Removal of internal type exports does not change the exported withOracleFixture or OracleOutput API."
+    },
+    {
+      "topic": "Public artifact and secret boundary",
+      "locations": [
+        "financeOracleQualification.ts:314-318"
+      ],
+      "assessment": "The added public base64 is only saved default policy bytes and its public auditor signature, with separate default/actual hashes/rules. It does not include private role keys, provider tokens or passphrase. Existing private configuration/raw-stream retention boundary remains."
+    }
+  ],
+  "limits": [
+    "No test or parser executed. Static API compatibility does not establish ten passing cases, child closure, native behavior or full P1-19 qualification.",
+    "The fixed default rule comparison intentionally assumes the current exact four-field default FINANCIAL rule. A future default shape change must fail explicitly.",
+    "The source review separately disclosed strict TTL sensitivity because the product reads Date.now twice; no grace or retry is added by this test delta.",
+    "The genuine weaker-policy case exercises the composite external policy/rule refusal. It is not an independent mutation matrix proving each individual rule field is necessary.",
+    "No normative F01-F38, full tool route, controls, authenticated external persons, real tenant isolation or formal Done claim is made."
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v3/tests/helpers/financeOracleQualification.ts",
+      "bytes": 30699,
+      "sha256": "9ffa86ac0ba2fefc0d92b7f0553886c43d19bcc4bb1eb41716e5c339ed6f137b",
+      "device": 16777231,
+      "inode": 541766827,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v3/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 4470,
+      "sha256": "d6eb1814e0106dfc5773e6791a8c7856e43e717e3573cf3ced82029a18cf9ed5",
+      "device": 16777231,
+      "inode": 541766828,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/tests/helpers/financeOracleQualification.ts",
+      "bytes": 33264,
+      "sha256": "71a0979b2408cd6eb77261d184c2248387f5a938e0f95ef315ce465e511d9923",
+      "device": 16777231,
+      "inode": 541766974,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 5398,
+      "sha256": "080f70bc5ce81013b55735343a3ed7a504a5649f911bc5d05e499af96d3c863d",
+      "device": 16777231,
+      "inode": 541766975,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/financeOracleQualification.ts.v3-to-v4.patch",
+      "bytes": 11268,
+      "sha256": "f35a35587f2c84508d6191ec096ed29512856d60ff5ae3581d3b88ca7329945f",
+      "device": 16777231,
+      "inode": 541767541,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/financeOracle.test.ts.v3-to-v4.patch",
+      "bytes": 1191,
+      "sha256": "bbd8098cec54549b284d8f8b5c68dc878478eaeb518a294fb1181bdbacea4f0f",
+      "device": 16777231,
+      "inode": 541767542,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/README.md",
+      "bytes": 9629,
+      "sha256": "0bac80154048a3e5901ee2732e7770a3612d7c8a7ece27674b26ce29d6d25fe2",
+      "device": 16777231,
+      "inode": 541767378,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/interface-addendum.json",
+      "bytes": 2005,
+      "sha256": "937865aa4653c63da62a43f875cc7692efab111e411dad5c7bbe2aa79d6281c3",
+      "device": 16777231,
+      "inode": 541767459,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5",
+      "device": 16777231,
+      "inode": 539133630,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+      "bytes": 2472,
+      "sha256": "fb7f5bbe8f1711d994e20a982a73c817a6f0651873b9ad091cc9b3d19f2d1456",
+      "device": 16777231,
+      "inode": 539133631,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalEngine.ts",
+      "bytes": 21065,
+      "sha256": "a2257cea092960d8815e6608e4d2cd416cba5d429eabb6e3a1147d7902e91b06",
+      "device": 16777231,
+      "inode": 539133628,
+      "nlink": 1
+    }
+  ],
+  "allReadsAndWritesFinished": true
+}

@@ -1,0 +1,16 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass
+
+ ✓ tests/verifyRepairCli.test.ts (5 tests) 5525ms
+     ✓ changes nothing on a healthy workspace and exits 0  1008ms
+     ✓ prints a plan for a tampered workspace, exits 1 and changes nothing  944ms
+     ✓ refuses --apply without a TTY or --yes, exits 2 and moves nothing  951ms
+     ✓ archives a tampered store with --apply --yes under a receipt signed as REPAIR_RECEIPT  1723ms
+     ✓ no longer recommends cleaning and rebuilding when every signature fails  864ms
+
+ Test Files  1 passed (1)
+      Tests  5 passed (5)
+   Start at  11:24:50
+   Duration  7.94s (transform 1.70s, setup 20ms, import 2.27s, tests 5.52s, environment 0ms)
+
+JSON report written to /private/tmp/p0-45-qualification-20261015/command-original-cli/raw-producer.json

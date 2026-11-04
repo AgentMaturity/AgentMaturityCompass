@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "key": "WP32",
+  "date": "2026-10-31",
+  "commit": "c7e999dd1bd46a9fd095a70e9d3cdf55eb90ed92",
+  "branch": "rtd/gap-trustrule",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build && npm pack --ignore-scripts --pack-destination <scratch>/pack-1 --json",
+      "exit": 0,
+      "durationMs": 66000
+    },
+    {
+      "cmd": "node scripts/installed-crash-recovery-check.mjs --artifact <scratch>/pack-1/agent-maturity-compass-1.2.0.tgz --artifact-sha256 de977cc3718a09027728d9533ed6d32e53560ef91a726a93c9b6eee6e1f3578e --cli-sha256 215ba894e139eb5085014905f9d365eb91a846682bf84eed137a8c36dbf9526b --source c7e999dd1bd46a9fd095a70e9d3cdf55eb90ed92 --source-tree <worktree> --out <scratch>/crash-1",
+      "exit": 0,
+      "durationMs": 77000
+    },
+    {
+      "cmd": "npx vitest run tests/governorRunIntegrityRule.test.ts <41 files touching the changed modules> --maxWorkers=2",
+      "exit": 1,
+      "durationMs": 479440
+    },
+    {
+      "cmd": "npx vitest run tests/assurance/executed/runnerReplay.test.ts --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 24800
+    },
+    {
+      "cmd": "npx vitest run <41 files touching the changed modules> --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 260470
+    },
+    {
+      "cmd": "npx vitest run <21 files importing tests/helpers/actionPolicyFixtures.ts> --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 227400
+    }
+  ],
+  "tests": {
+    "total": 1220,
+    "passed": 1220,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "6325f675502ca6eeed03576018fcd5d219e701505e0b778e7b7527db3fe1c677"
+    },
+    {
+      "path": "lifecycle/installed-crash-receipt.json",
+      "sha256": "502d5125d10915f2ac20666c7ccce91665703e08b4f690b3a1a66a7a4c86d9eb"
+    }
+  ],
+  "notes": "The installed crash-recovery lane passed (ok: true, five checks) under an owner-signed Action Policy waiver: READ_ONLY and WRITE_LOW at requireRunIntegrityAtLeast 0 over the sealed baseline run, CONFIG_RESIGNED audit event 43263a39-e427-4c98-9741-2730ac056314. It proves the governed EXECUTE, signed-approval and crash-recovery path, not maturity. The first vitest run exited 1: three tests in tests/assurance/executed/runnerReplay.test.ts failed under the 42-file parallel load (no executed captures retained); the file passed 17/17 alone on the same commit, and also passed in the untouched-base run and the post-change run. Test totals count it once, from the rerun: 1220 tests in 104 files."
+}

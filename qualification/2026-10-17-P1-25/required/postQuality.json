@@ -1,0 +1,38 @@
+{
+  "at": "2026-10-16T19:01:53.491982+00:00",
+  "sourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+  "quality": "RED",
+  "waiver": false,
+  "baselineAdopted": false,
+  "rows": [
+    {
+      "phase": "p125-duplicates",
+      "exit": 1,
+      "durationMs": 624,
+      "pgid": 11628,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-duplicates/stdout-stderr.log",
+        "bytes": 2064,
+        "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29"
+      },
+      "findingCount": 1268,
+      "status": "failed"
+    },
+    {
+      "phase": "p125-dead-code",
+      "exit": 1,
+      "durationMs": 2806,
+      "pgid": 11649,
+      "groupAbsentByESRCH": true,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-dead-code/stdout-stderr.log",
+        "bytes": 1207,
+        "sha256": "ac0b3f8267fa0fa6ae81a88f85239c55077fbc6ba9e9664393058d2567b4bd8f"
+      },
+      "findingCount": 2724,
+      "status": "failed"
+    }
+  ],
+  "preChangeComparison": "Same1268duplicate/2724deadcode findings. Counts are observed source-tool outcomes, not a waiver or issue-completion criterion."
+}

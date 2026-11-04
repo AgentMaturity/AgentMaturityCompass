@@ -1,0 +1,45 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline
+
+ ❯ tests/publicDocsGraph.test.ts (6 tests | 1 failed) 147ms
+     ✓ allows the generated API entry without admitting arbitrary non-guide paths 3ms
+     ✓ every promoted guide has a repository Markdown source 2ms
+     × every local guide edge resolves to another promoted guide 92ms
+     ✓ intentionally internal planning docs have no incoming public edges 29ms
+     ✓ linked user workflow guides are promoted instead of becoming dead ends 1ms
+     ✓ every promoted guide appears in one category and the open category stays bounded 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/publicDocsGraph.test.ts > AMC public Docs graph > every local guide edge resolves to another promoted guide
+AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   {
++     "href": "MCP_INDUSTRY_PACKS.md",
++     "source": "MCP_SERVER",
++     "target": "MCP_INDUSTRY_PACKS",
++   },
++ ]
+
+ ❯ tests/publicDocsGraph.test.ts:70:21
+     68|     }
+     69|
+     70|     expect(defects).toEqual([]);
+       |                     ^
+     71|   });
+     72|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 5 passed (6)
+   Start at  15:28:07
+   Duration  635ms (transform 89ms, setup 97ms, import 36ms, tests 147ms, environment 0ms)
+
+JSON report written to /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/publicDocsGraph-report.json

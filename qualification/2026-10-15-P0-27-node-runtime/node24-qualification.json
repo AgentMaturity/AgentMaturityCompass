@@ -1,0 +1,543 @@
+{
+  "scope": "P0-27 Node 24 compatibility qualification for the two authored runtime guards in tests/assuranceSessionQualification.test.ts. The eight existing behavior cases and all product sources remain unchanged.",
+  "outcome": "Exact candidate 75cbdf8a passes all eight actual child behavior cases on local Darwin Node 24.21.0, with zero failed, pending, or todo tests.",
+  "source": {
+    "head": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+    "parent": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+    "changed": [
+      "tests/assuranceSessionQualification.test.ts"
+    ],
+    "testSha256": "0bb79da9302aca099af50fb73de3d48d612cf65919d3f247f5405670da943e3b",
+    "testLines": 200,
+    "allOtherCommittedSourcesUnchanged": true,
+    "status": "clean"
+  },
+  "privateWorkspace": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+  "isolation": {
+    "home": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-home",
+    "store": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-store",
+    "dependencyPolicy": "Frozen pnpm 10.33 install with an independent store, package-import-method copy, and side-effects-cache=false. No shared native rebuild.",
+    "nativeObjectsDistinct": true
+  },
+  "phases": [
+    {
+      "phase": "node24-clone",
+      "major": "24",
+      "cwd": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+      "cmd": "git clone --shared --branch codex/p0-27-node-runtime-compatibility /Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass /private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "exit": 0,
+      "durationMs": 1217,
+      "startedUtc": "2026-10-14T21:33:11.731785+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-clone-20261015.log",
+      "head": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+    },
+    {
+      "phase": "node24-frozen-install",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "/opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs install --frozen-lockfile --store-dir /private/tmp/p0-27-runtime-compatibility-20261015/node24-store --package-import-method copy --side-effects-cache=false",
+      "exit": 0,
+      "durationMs": 4752,
+      "startedUtc": "2026-10-14T21:34:09.871378+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-frozen-install-20261015.log",
+      "head": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+    },
+    {
+      "phase": "node24-native-before-build",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /private/tmp/p0-27-runtime-native-abi-proof-20261015.mjs /private/tmp/p0-27-runtime-compatibility-20261015/node24-source /private/tmp/p0-27-runtime-compatibility-20261015/node24-native-abi-before.json",
+      "exit": 0,
+      "durationMs": 46,
+      "startedUtc": "2026-10-14T21:35:02.557623+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-native-before-build-20261015.log",
+      "head": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+    },
+    {
+      "phase": "node24-baseline-build",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs run build",
+      "exit": 0,
+      "durationMs": 27816,
+      "startedUtc": "2026-10-14T21:35:02.671520+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-baseline-build-20261015.log",
+      "head": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+    },
+    {
+      "phase": "node24-unchanged-parent-guard",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs exec vitest run tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-runtime-compatibility-20261015/node24-unchanged-parent-guard.json",
+      "exit": 1,
+      "durationMs": 1479,
+      "startedUtc": "2026-10-14T21:36:15.692370+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-unchanged-parent-guard-20261015.log",
+      "head": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+    },
+    {
+      "phase": "node24-unchanged-child-guard",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "python3 /private/tmp/p0-27-runtime-compatibility-20261015/node24-child-guard-witness.py",
+      "exit": 0,
+      "durationMs": 69,
+      "startedUtc": "2026-10-14T21:37:20.850597+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-unchanged-child-guard-20261015.log",
+      "head": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+    },
+    {
+      "phase": "node24-candidate-local-fetch",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "git fetch --no-tags /Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass 75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+      "exit": 0,
+      "durationMs": 72,
+      "startedUtc": "2026-10-14T21:39:27.349229+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-candidate-local-fetch-20261015.log",
+      "head": "f10d97257bc1fc7cb04f5cda98624b38793e456a"
+    },
+    {
+      "phase": "node24-candidate-checkout",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "git checkout --detach 75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+      "exit": 0,
+      "durationMs": 233,
+      "startedUtc": "2026-10-14T21:39:27.461341+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-candidate-checkout-20261015.log",
+      "head": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd"
+    },
+    {
+      "phase": "node24-candidate-build",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs run build",
+      "exit": 0,
+      "durationMs": 29085,
+      "startedUtc": "2026-10-14T21:39:27.864596+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-candidate-build-20261015.log",
+      "head": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd"
+    },
+    {
+      "phase": "node24-candidate-native-before-runtime",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /private/tmp/p0-27-runtime-native-abi-proof-20261015.mjs /private/tmp/p0-27-runtime-compatibility-20261015/node24-source /private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-native-before-runtime.json",
+      "exit": 0,
+      "durationMs": 128,
+      "startedUtc": "2026-10-14T21:41:28.514188+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-candidate-native-before-runtime-20261015.log",
+      "head": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd"
+    },
+    {
+      "phase": "node24-candidate-eight-cases",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /opt/homebrew/lib/node_modules/pnpm/bin/pnpm.cjs exec vitest run tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-eight-cases.json",
+      "exit": 0,
+      "durationMs": 6265,
+      "startedUtc": "2026-10-14T21:41:44.893575+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-candidate-eight-cases-20261015.log",
+      "head": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd"
+    },
+    {
+      "phase": "node24-candidate-native-after-runtime",
+      "major": "24",
+      "cwd": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+      "cmd": "env AMC_HOME=/private/tmp/p0-27-runtime-compatibility-20261015/node24-home /opt/homebrew/opt/node@24/bin/node /private/tmp/p0-27-runtime-native-abi-proof-20261015.mjs /private/tmp/p0-27-runtime-compatibility-20261015/node24-source /private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-native-after-runtime.json",
+      "exit": 0,
+      "durationMs": 42,
+      "startedUtc": "2026-10-14T21:42:02.945047+00:00",
+      "log": "/private/tmp/p0-27-compat-node24-candidate-native-after-runtime-20261015.log",
+      "head": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd"
+    }
+  ],
+  "preservedOriginalGuardBaselines": {
+    "parent": {
+      "raw": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-unchanged-parent-guard.json",
+      "exit": 1,
+      "total": 8,
+      "passed": 0,
+      "failed": 0,
+      "pending": 8,
+      "todo": 0,
+      "message": "expected 24 to be 22 // Object.is equality"
+    },
+    "child": {
+      "raw": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-original-child-guard/actual.json",
+      "observerExit": 0,
+      "childExit": 1,
+      "helperSha256": "1c05b424385bc2fea494533e6c66d436b5704f3be0b4bf38099d51c96f4f81e3",
+      "noProductStateOrResultMarker": true,
+      "message": "24 !== 22"
+    },
+    "interpretation": "Both original guards refuse before product behavior. The suite has eight pending cases, not eight failed behavior assertions; the child observer successfully records the intended exit-1 guard refusal. These are not ABI failures or killed product mutations."
+  },
+  "candidateRuntime": {
+    "raw": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-eight-cases.json",
+    "exit": 0,
+    "total": 8,
+    "passed": 8,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "childWitnesses": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-child-witness-summary.json",
+    "evidenceRoot": "/private/tmp/p0-27-session-evidence-IvBpIP",
+    "cases": [
+      {
+        "case": "first-row-fault",
+        "caseName": "first-row-fault",
+        "node": "v24.21.0",
+        "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+        "success": true,
+        "result": "/private/tmp/p0-27-session-evidence-IvBpIP/first-row-fault/result.json",
+        "operatorPin": "/private/tmp/p0-27-session-evidence-IvBpIP/first-row-fault/monitor-before-artifacts.json",
+        "monitorFingerprint": "dcb15fe69cdc889de65ff0188da2beba98d104b71d98a41bfa1f50aa3366ba41",
+        "transportDenyPreloadConfigured": true,
+        "providerCredentialKeysPresent": [],
+        "ownedFixtureStateRemovedByOriginalAfterAll": true,
+        "originalError": {
+          "name": "SqliteError",
+          "message": "P0_27_FIRST_ROW_FAULT",
+          "code": "SQLITE_CONSTRAINT_TRIGGER",
+          "reason": null,
+          "cause": null
+        },
+        "pinRecordWrittenBeforeRecordedEvents": true,
+        "firstRowFault": {
+          "rowsEqual": true,
+          "blobSnapshotsEqual": true,
+          "inTransaction": false,
+          "healthyRetryRowCount": 1,
+          "healthyRetryRowAndSealCryptoPassed": true
+        }
+      },
+      {
+        "case": "seal-fault",
+        "caseName": "seal-fault",
+        "node": "v24.21.0",
+        "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+        "success": true,
+        "result": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-fault/result.json",
+        "operatorPin": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-fault/monitor-before-artifacts.json",
+        "monitorFingerprint": "466c362bfa3914eba4d91acce418b4bd4eb00f837124bb37c3fb5a1de10e75c0",
+        "transportDenyPreloadConfigured": true,
+        "providerCredentialKeysPresent": [],
+        "ownedFixtureStateRemovedByOriginalAfterAll": true,
+        "originalError": {
+          "name": "AgentResponderUnavailableError",
+          "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "code": "AGENT_RESPONDER_UNAVAILABLE",
+          "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "cause": {
+            "name": "SqliteError",
+            "message": "P0_27_ABORT_SEAL_FAULT",
+            "code": "SQLITE_CONSTRAINT_TRIGGER",
+            "reason": null,
+            "cause": null
+          }
+        },
+        "pinRecordWrittenBeforeRecordedEvents": true,
+        "abort": {
+          "eventCount": 2,
+          "auditTypes": [
+            "ASSURANCE_RUN_STARTED",
+            "ASSURANCE_RUN_ABORTED"
+          ],
+          "assuranceRunCount": 0,
+          "sealed": false,
+          "integrityOk": false,
+          "chainOk": false,
+          "anchored": true
+        },
+        "sealFault": {
+          "originalResolverErrorPreserved": true,
+          "actualSqliteCausePreserved": true,
+          "unsealedSessionFieldsAllNull": true,
+          "chainErrors": [
+            "Session 3304b56c-e6cf-40c2-afbb-17a849ae56ff missing seal"
+          ],
+          "sameErrorObjectRetained": null
+        }
+      },
+      {
+        "case": "seal-helper-identity",
+        "caseName": "seal-helper-identity",
+        "node": "v24.21.0",
+        "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+        "success": true,
+        "result": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-helper-identity/result.json",
+        "operatorPin": "/private/tmp/p0-27-session-evidence-IvBpIP/seal-helper-identity/monitor-before-artifacts.json",
+        "monitorFingerprint": "dfc478c0a0123a6f195ecc5211f11f8f0fc13ef82329137605afe77be7fdb3c4",
+        "transportDenyPreloadConfigured": true,
+        "providerCredentialKeysPresent": [],
+        "ownedFixtureStateRemovedByOriginalAfterAll": true,
+        "originalError": {
+          "name": "AgentResponderUnavailableError",
+          "message": "No real agent target available: owned unavailable fixture",
+          "code": "AGENT_RESPONDER_UNAVAILABLE",
+          "reason": "owned unavailable fixture",
+          "cause": {
+            "name": "SqliteError",
+            "message": "P0_27_ABORT_SEAL_FAULT",
+            "code": "SQLITE_CONSTRAINT_TRIGGER",
+            "reason": null,
+            "cause": null
+          }
+        },
+        "pinRecordWrittenBeforeRecordedEvents": true,
+        "abort": {
+          "eventCount": 2,
+          "auditTypes": [
+            "ASSURANCE_RUN_STARTED",
+            "ASSURANCE_RUN_ABORTED"
+          ],
+          "assuranceRunCount": 0,
+          "sealed": false,
+          "integrityOk": false,
+          "chainOk": false,
+          "anchored": true
+        },
+        "sealFault": {
+          "originalResolverErrorPreserved": true,
+          "actualSqliteCausePreserved": true,
+          "unsealedSessionFieldsAllNull": true,
+          "chainErrors": [
+            "Session 7f04c084-2ecb-435a-9473-c58592a658f4 missing seal"
+          ],
+          "sameErrorObjectRetained": true
+        }
+      },
+      {
+        "case": "signed-sandbox",
+        "caseName": "signed-abort",
+        "node": "v24.21.0",
+        "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+        "success": true,
+        "result": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-sandbox/result.json",
+        "operatorPin": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-sandbox/monitor-before-artifacts.json",
+        "monitorFingerprint": "51f5ba14578db7cf34fbdc32a6ea4bb4e8b004b19dccc332ed3005f868616897",
+        "transportDenyPreloadConfigured": true,
+        "providerCredentialKeysPresent": [],
+        "ownedFixtureStateRemovedByOriginalAfterAll": true,
+        "originalError": {
+          "name": "AgentResponderUnavailableError",
+          "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "code": "AGENT_RESPONDER_UNAVAILABLE",
+          "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "cause": null
+        },
+        "pinRecordWrittenBeforeRecordedEvents": true,
+        "abort": {
+          "eventCount": 3,
+          "auditTypes": [
+            "ASSURANCE_RUN_STARTED",
+            "SANDBOX_EXECUTION_ENABLED",
+            "ASSURANCE_RUN_ABORTED"
+          ],
+          "assuranceRunCount": 0,
+          "sealed": true,
+          "integrityOk": true,
+          "chainOk": true,
+          "anchored": true
+        },
+        "signedCrypto": {
+          "rowCount": 3,
+          "rowAndSessionSealVerificationPassedInsideActualChild": true
+        }
+      },
+      {
+        "case": "signed-supervise",
+        "caseName": "signed-abort",
+        "node": "v24.21.0",
+        "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+        "success": true,
+        "result": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-supervise/result.json",
+        "operatorPin": "/private/tmp/p0-27-session-evidence-IvBpIP/signed-supervise/monitor-before-artifacts.json",
+        "monitorFingerprint": "e0fd64c4973695102c32c0d0a1cf8599be190902606443b1df355e4c3e22d233",
+        "transportDenyPreloadConfigured": true,
+        "providerCredentialKeysPresent": [],
+        "ownedFixtureStateRemovedByOriginalAfterAll": true,
+        "originalError": {
+          "name": "AgentResponderUnavailableError",
+          "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "code": "AGENT_RESPONDER_UNAVAILABLE",
+          "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "cause": null
+        },
+        "pinRecordWrittenBeforeRecordedEvents": true,
+        "abort": {
+          "eventCount": 2,
+          "auditTypes": [
+            "ASSURANCE_RUN_STARTED",
+            "ASSURANCE_RUN_ABORTED"
+          ],
+          "assuranceRunCount": 0,
+          "sealed": true,
+          "integrityOk": true,
+          "chainOk": true,
+          "anchored": true
+        },
+        "signedCrypto": {
+          "rowCount": 2,
+          "rowAndSessionSealVerificationPassedInsideActualChild": true
+        }
+      },
+      {
+        "case": "store-guard",
+        "caseName": "store-guard",
+        "node": "v24.21.0",
+        "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+        "success": true,
+        "result": "/private/tmp/p0-27-session-evidence-IvBpIP/store-guard/result.json",
+        "operatorPin": "/private/tmp/p0-27-session-evidence-IvBpIP/store-guard/monitor-before-artifacts.json",
+        "monitorFingerprint": "b69e96a27650ee46a4001218c30ffad0364a7ee7d2b08ec4bcc070274f93c49e",
+        "transportDenyPreloadConfigured": true,
+        "providerCredentialKeysPresent": [],
+        "ownedFixtureStateRemovedByOriginalAfterAll": true,
+        "originalError": null,
+        "pinRecordWrittenBeforeRecordedEvents": true,
+        "unsignedStoreRefusal": {
+          "dbWalShmSnapshotsEqual": true,
+          "semanticRowsEqual": true,
+          "unsignedPathExists": false
+        }
+      },
+      {
+        "case": "unsigned-false",
+        "caseName": "unsigned-abort",
+        "node": "v24.21.0",
+        "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+        "success": true,
+        "result": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-false/result.json",
+        "operatorPin": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-false/monitor-before-artifacts.json",
+        "monitorFingerprint": "11d77e70521a7e24b869cb6d783ea31775d4be440ac89078819b44f2d3ad1700",
+        "transportDenyPreloadConfigured": true,
+        "providerCredentialKeysPresent": [],
+        "ownedFixtureStateRemovedByOriginalAfterAll": true,
+        "originalError": {
+          "name": "AgentResponderUnavailableError",
+          "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "code": "AGENT_RESPONDER_UNAVAILABLE",
+          "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "cause": null
+        },
+        "pinRecordWrittenBeforeRecordedEvents": true,
+        "unsignedIsolation": {
+          "noSignArgument": false,
+          "signedDbWalShmSnapshotsEqual": true,
+          "signedSemanticRowsEqual": true,
+          "unsignedAbortRowCount": 2,
+          "unsignedSessionSealedWithLiteralUnsigned": true,
+          "assuranceRunCount": 0,
+          "signedBeforeAndAfterOperationalCryptoControls": [
+            1,
+            1
+          ],
+          "signedIntegrityOk": true
+        }
+      },
+      {
+        "case": "unsigned-true",
+        "caseName": "unsigned-abort",
+        "node": "v24.21.0",
+        "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+        "success": true,
+        "result": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-true/result.json",
+        "operatorPin": "/private/tmp/p0-27-session-evidence-IvBpIP/unsigned-true/monitor-before-artifacts.json",
+        "monitorFingerprint": "f440bfeac68e8b0cc65a2bf20291ce813b6501ece690aeb77c29ef940d506b92",
+        "transportDenyPreloadConfigured": true,
+        "providerCredentialKeysPresent": [],
+        "ownedFixtureStateRemovedByOriginalAfterAll": true,
+        "originalError": {
+          "name": "AgentResponderUnavailableError",
+          "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "code": "AGENT_RESPONDER_UNAVAILABLE",
+          "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+          "cause": null
+        },
+        "pinRecordWrittenBeforeRecordedEvents": true,
+        "unsignedIsolation": {
+          "noSignArgument": true,
+          "signedDbWalShmSnapshotsEqual": true,
+          "signedSemanticRowsEqual": true,
+          "unsignedAbortRowCount": 2,
+          "unsignedSessionSealedWithLiteralUnsigned": true,
+          "assuranceRunCount": 0,
+          "signedBeforeAndAfterOperationalCryptoControls": [
+            1,
+            1
+          ],
+          "signedIntegrityOk": true
+        }
+      }
+    ]
+  },
+  "native24": {
+    "capturedUtc": "2026-10-14T21:42:02.982Z",
+    "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+    "node": "v24.21.0",
+    "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+    "modulesAbi": "137",
+    "packageVersion": "12.11.1",
+    "packagePath": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source/node_modules/better-sqlite3/package.json",
+    "native": {
+      "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "realpath": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "sha256": "c6fac315df023cf5efec45a3511e6515c6b0f7461a4a284b1b7a79c7ef8febe7",
+      "device": 16777231,
+      "inode": 537203733,
+      "links": 1,
+      "bytes": 1931952
+    },
+    "smoke": {
+      "witness": 1
+    },
+    "limits": "Genuine native SQLite ABI smoke only, no application/agent/model or cross-runtime behavior acceptance. Fresh isolated dependency stores; no source edit or shared ABI rebuild."
+  },
+  "protectedNative22": {
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "realpath": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 537153698,
+      "links": 1,
+      "bytes": 1931552
+    },
+    "recheckCount": 9,
+    "recheckPaths": [
+      "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-baseline-build.json",
+      "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-candidate-build.json",
+      "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-candidate-checkout.json",
+      "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-candidate-native.json",
+      "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-clone.json",
+      "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-eight-cases.json",
+      "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-final-native.json",
+      "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-guards.json",
+      "/private/tmp/p0-27-runtime-compatibility-20261015/node22-native-recheck-after-node24-install-and-smoke.json"
+    ],
+    "allMatchExactly": true
+  },
+  "inputConservation": {
+    "trackedFileCount": 7737,
+    "compiledFileCount": 4529,
+    "allTrackedBytesEqualBeforeAfterRuntime": true,
+    "allCompiledBytesEqualBeforeAfterRuntime": true,
+    "originalBaseProtectedSourceConfigLockWorkflowPinsEqual": 17,
+    "onlyCommittedChangeFromF10": "tests/assuranceSessionQualification.test.ts, two runtime guard lines",
+    "candidateTestLines": 200,
+    "candidateTestSha256": "0bb79da9302aca099af50fb73de3d48d612cf65919d3f247f5405670da943e3b",
+    "beforePins": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-before-runtime-pins.json",
+    "afterPins": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-candidate-after-runtime-pins.json"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-qualification-artifact-index.json",
+    "sha256": "78817445e497638102ba7105ef3e8a3943a112d8e11a8bc6c72d9f36cc63d4a4",
+    "count": 87
+  },
+  "boundaries": "No managed tree, production source, old behavior assertion, dependency declaration, CLI/registry/REPL/API/Studio/A4 path, frozen archive, reservation, tracker, or Claude work was edited by this lane. The local shared clone changed only its detached HEAD to the exact authorized candidate. P0-19 seal-order repair remains unapproved and unapplied. No external transport/model request was made.",
+  "limits": "This is eight local Darwin runtime cases plus native SQLite smoke. It does not establish full Node 24 compatibility, hosted CI, a release, live behavior, model quality, independent assurance, regulatory acceptance, or universal race/no-effects guarantees. The independent Node 22 candidate lane and final source/freeze checks belong to the parent.",
+  "state": "Runtime and source/compiled input reads are finished. The receipt uses retained private evidence."
+}

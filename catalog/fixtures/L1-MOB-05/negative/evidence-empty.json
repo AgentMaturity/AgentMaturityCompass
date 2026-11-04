@@ -1,0 +1,32 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-05",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-09-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "mobility-fixture-tenant",
+      "workspaceId": "mobility-fixture-workspace",
+      "deploymentId": "mobility-fleet-software-fixture",
+      "agentId": "mobility-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

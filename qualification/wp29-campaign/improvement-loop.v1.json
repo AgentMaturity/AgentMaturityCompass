@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "comparison-campaign/1",
+  "id": "wp29-improvement-loop",
+  "description": "Preregistered preparation only. No model has been called and no results, superiority or release acceptance are claimed.",
+  "cohort": "improvement-loop",
+  "evidenceClass": "model-quality",
+  "executor": "runExecutedExperimentAsync",
+  "targets": [
+    "amc",
+    "harness2"
+  ],
+  "repetitions": 6,
+  "order": "rotate-targets-by-repetition",
+  "tasks": [
+    {
+      "id": "held-out-quality",
+      "scenario": "success"
+    },
+    {
+      "id": "governance-preservation",
+      "scenario": "success"
+    },
+    {
+      "id": "bounded-search-cost",
+      "scenario": "success"
+    }
+  ],
+  "manifest": null,
+  "preparationInputs": [
+    {
+      "path": "../../qualification/wp29-campaign/reviewed-sources.v1.json",
+      "sha256": "f82a6490a648100423d2607b140b2ed890052b9724d423c428644eec49610666"
+    },
+    {
+      "path": "../../src/experiments/stats.ts",
+      "sha256": "e7d641654d78e9eb5e62115c08b8436c0d19c816fc6b780f070c80812a6c9e73"
+    },
+    {
+      "path": "../../src/experiments/experimentGatePolicy.ts",
+      "sha256": "706285587f286ad86d555cf0ddd23aa2a054c170f3484d1e51604815be351d08"
+    },
+    {
+      "path": "../../src/experiments/executedExperiment.ts",
+      "sha256": "85a3631b6df84399067813aaf18c3978d64c10af72c701b979bb787ca08b4a89"
+    },
+    {
+      "path": "../../src/experiments/trialExecutor.ts",
+      "sha256": "2681f2724c6f39254307ce1447f5cd34614699cad98126c8cc542245f8ec7e48"
+    },
+    {
+      "path": "../../src/benchmarks/comparisonCampaign.ts",
+      "sha256": "aa99f6d94f8e6bada0f50fab9c53fef04c82aa9b88beee976a0e4eb1e2789c72"
+    },
+    {
+      "path": "../../src/benchmarks/comparisonCampaignAnalysis.ts",
+      "sha256": "ea9bb0bb557859a7e3c185a2e9463b500e931987b4bbc312f140763b00a38e88"
+    },
+    {
+      "path": "../../src/benchmarks/comparisonCampaignEvidence.ts",
+      "sha256": "a6dd9e9449e096bbfcbe5b888b67cf16a226fea829ce6f345b14dbb363f3435d"
+    },
+    {
+      "path": "../../src/benchmarks/harnessComparison.ts",
+      "sha256": "f9f37d60484e0497624df73a7ecf0343bee9402d1c6478d52ac6a0720ca71114"
+    },
+    {
+      "path": "../../src/benchmarks/harnessComparisonSchema.ts",
+      "sha256": "c89ba633e5afbf2090db3a272519a3a23b9eebfcef518ee335102216f89ac7ea"
+    },
+    {
+      "path": "../../src/benchmarks/harnessComparisonReport.ts",
+      "sha256": "bd1e3054b9241301114a82d21c5ac4d47eea47815d8ff2905cf059bdea5fd322"
+    }
+  ],
+  "blockers": [
+    "Harness2 is an optimization orchestrator. A matched installed execution substrate, proposer/executor/judge identities, signed baseline/candidate artifacts, held-out partition and independent evaluators are unavailable.",
+    "Predeclare equal aggregate search/evaluation token, monetary and wall-time envelopes and retain unchanged baseline eligibility before any optimization trial. No task-runner or simulated-probe substitution is accepted.",
+    "The three objective slots are planning identifiers, not executable casebook fixtures. Replace them with independently graded held-out tasks before binding a cohort."
+  ],
+  "workspaceTaskIds": [],
+  "requireComponentsUsed": true,
+  "behavioralGate": {
+    "minRepetitions": 3,
+    "minPassRateLowerBound": 0.5
+  },
+  "comparisons": [
+    {
+      "baseline": "amc",
+      "candidate": "harness2",
+      "policy": {
+        "minUpliftSuccessRate": 0,
+        "minUpliftValuePoints": 0,
+        "valueUnit": "points",
+        "denyIfRegression": true,
+        "minPairedCases": 3,
+        "requireIntervalAboveZero": false
+      }
+    }
+  ]
+}

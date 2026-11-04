@@ -41,7 +41,8 @@ let previousPassphrase: string | undefined;
 function workspace(initialize = true): string {
   const root = mkdtempSync(join(tmpdir(), "amc-1479-policy-fixture-"));
   roots.push(root);
-  if (initialize) initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite compares the workspace bytes before and after a read, without the creation marker.
+  if (initialize) initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated", witnessing: false });
   return root;
 }
 
@@ -101,7 +102,8 @@ function fixtureSuite(): PolicyFixtureSuite {
         expect: {
           outcome: "simulate",
           matched: true,
-          failClosed: true,
+          // A trusted evaluator: the fresh agent's missing run is the rule's run-integrity condition, not a source failure.
+          failClosed: false,
           matchedRuleIds: ["action:READ_ONLY"],
           matchedControlIds: ["action:READ_ONLY"],
         },

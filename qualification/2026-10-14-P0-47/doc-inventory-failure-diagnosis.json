@@ -1,0 +1,520 @@
+{
+  "scope": "Read-only diagnosis of exactly six documentation/inventory/API/capability failures at immutable 7a81; no tests/builds/source edits performed by this reviewer. Root may own concurrent later repairs.",
+  "versions": {
+    "current_7a81": {
+      "checkout": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass",
+      "head": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1"
+    },
+    "p0_33_7d5": {
+      "checkout": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014",
+      "head": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b"
+    },
+    "claude_990": {
+      "checkout": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+      "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4"
+    }
+  },
+  "actual_full_report": {
+    "path": "/private/tmp/p0-47-full-correctness-20261014.json",
+    "sha256": "3d659821bae47f08a2fe5a09c281d04e79eeb45ce8eb36afaba13d028a64c30a",
+    "counts": {
+      "numTotalTests": 23111,
+      "numPassedTests": 23060,
+      "numFailedTests": 51,
+      "numPendingTests": 0,
+      "numTodoTests": 0
+    },
+    "root_reported_functions_coverage": 71.96,
+    "required_functions_coverage": 75
+  },
+  "actual_six_suites": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/compareBadgeDocs.test.ts",
+      "assertions": 2,
+      "passed": 1,
+      "failed": [
+        {
+          "fullName": "compare badge DevRel docs documents compare badge generation in public onboarding docs",
+          "failureMessages": [
+            "AssertionError: expected '<p align=\"center\">\\n  <img src=\"websi\u2026' to contain 'model-compare-badge.svg'\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/compareBadgeDocs.test.ts:62:31\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/evidencePathsExist.test.ts",
+      "assertions": 3,
+      "passed": 2,
+      "failed": [
+        {
+          "fullName": "evidence paths keeps the frozen list honest \u2014 every entry really is absent",
+          "failureMessages": [
+            "AssertionError: expected [ 'src/adversarial', \u2026(123) ] to deeply equal [ 'src/adversarial', \u2026(124) ]\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/evidencePathsExist.test.ts:61:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/llmResponsesCapabilities.test.ts",
+      "assertions": 16,
+      "passed": 15,
+      "failed": [
+        {
+          "fullName": "explicit Responses protocol and required capabilities explicit unknown or unsupported requirements refuse before reading session/credentials or transport",
+          "failureMessages": [
+            "TypeError: The \"paths[0]\" argument must be of type string. Received undefined\n    at resolve (node:path:1272:7)\n    at new LlmRuntime (/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/src/llm/adapter/llmRuntime.ts:182:22)\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/llmResponsesCapabilities.test.ts:87:21\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/publicDocsArtifact.test.ts",
+      "assertions": 4,
+      "passed": 3,
+      "failed": [
+        {
+          "fullName": "public Docs Pages artifact builds a deterministic allowlisted artifact with source, renderer, and font hashes",
+          "failureMessages": [
+            "AssertionError: expected '{\"schemaVersion\":\"2.0\",\"id\":0,\"name\":\u2026' to contain '/blob/0123456789abcdef0123456789abcde\u2026'\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/publicDocsArtifact.test.ts:156:24\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/publicDocsGraph.test.ts",
+      "assertions": 6,
+      "passed": 5,
+      "failed": [
+        {
+          "fullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+          "failureMessages": [
+            "AssertionError: expected [ { \u2026(3) }, \u2026(19) ] to deeply equal []\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+      "assertions": 35,
+      "passed": 34,
+      "failed": [
+        {
+          "fullName": "source-literal enumeration every source literal in src is classified",
+          "failureMessages": [
+            "AssertionError: expected [ 'carried', \u2026(12) ] to deeply equal []\n    at /Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts:89:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "case": "compareBadgeDocs",
+      "owner": "P0-15 truthful comparison follow-up",
+      "cause": "README names the real run-diff compare-badge.svg and no longer advertises unsupported model-compare-badge.svg. Current doc test still requires the old model badge. The actual CLI badge case passed (1/2).",
+      "supported_patch": {
+        "commit": "eb8dda3fd11da5104e3eb450b9af3b5ba4febab9",
+        "paths": [
+          "tests/compareBadgeDocs.test.ts"
+        ],
+        "exact_change": "Replace the old model-badge positive assertion with the existing positive writes compare-badge.svg beside the report assertion and negative model-compare-badge.svg assertion; leave all other current assertions/path names unchanged."
+      },
+      "exclusions": [
+        "Do not copy the candidate test whole file: its later docs/archive/AUDIT_50_AGENTS_BATCH5.md path is absent on main; main docs/AUDIT_50_AGENTS_BATCH5.md remains tracked.",
+        "Do not copy CLI source: its bytes differ across versions."
+      ],
+      "guard_integrity": "Retains executed CLI SVG-output probe and all other onboarding documentation checks; strengthens truthful absence of per-model badge advertising."
+    },
+    {
+      "case": "evidencePathsExist",
+      "owner": "P1-12 effective-policy receipt follow-up",
+      "cause": "The knownAbsentCapabilities list has 125 entries; src/policy is the sole present entry, with tracked src/policy/effectivePolicyReceipt.ts. Exactly 124 listed entries are absent. The two P0-47 archives are not the cause.",
+      "supported_patch": {
+        "historical_commit": "1a13acfc4c724530ae728c909caa487196b3dab6",
+        "paths": [
+          "scripts/evidence-paths.json"
+        ],
+        "exact_change": "Delete only the src/policy entry from knownAbsentCapabilities. Leave tests/evidencePathsExist.test.ts unchanged."
+      },
+      "exclusions": [
+        "Historical candidate also removes src/ops/riskManager.ts; that path is still absent on this baseline and is not needed to fix this failure.",
+        "Do not copy candidate repointed test list or src/score/agentProtocolSecurity.ts: current scorer bytes differ."
+      ],
+      "guard_integrity": "The strict every-entry-absent equality, new-phantom-path script check, and shipped/referenced repointed source checks remain unchanged."
+    },
+    {
+      "case": "publicDocsArtifact",
+      "owner": "P0-33 API requested-revision qualification fix",
+      "cause": "Linked Git worktrees use a .git file; the current TypeDoc invocation supplies --gitRevision but relies on repository discovery, so reflection URLs omit the requested source revision. Current serialized-reflection revision guard failed.",
+      "supported_patch": {
+        "commit": "e3c173766eaf9f73fd35ec43bd90032a5dac948a",
+        "paths": [
+          "scripts/build-pages-site.mjs",
+          "tests/publicDocsArtifact.test.ts"
+        ],
+        "exact_change": "Use only the existing TypeDocOptions read and --gitRevision/--disableGit/--sourceLinkTemplate hunk. Substitute src/{path} into the configured template because current entry points share src/. Add the existing four-line source URL startsWith assertion immediately after the current serialized /blob/${revision}/ assertion. Preserve current first build variable and all surrounding checks.",
+        "production_patch_readonly_apply_check": "passed",
+        "test_patch_readonly_apply_check": "Full historical test hunk does not apply because its context uses withApi from the later D-12 API flag; transplant only the additional four-line assertion into current first-build test."
+      },
+      "exclusions": [
+        "No D-12 opt-in/API suppression, copySpecV2, Pi TypeDoc entry, timeout, package exports, font or artifact manifest changes.",
+        "No whole-file copy of candidate script/test/typedoc.json; all differ."
+      ],
+      "guard_integrity": "Preserves mandatory current API build, requested revision, public symbols/exports, deterministic allowlist/source hashes, pinned renderer lockfile integrity and font checks; adds an exact repository-relative workspace.ts URL guard."
+    },
+    {
+      "case": "publicDocsGraph",
+      "owner": "P0-11 and P1-01/05/07/11/17/26/35/39/67, P2-07 authored documentation follow-ups",
+      "cause": "Exactly 20 local guide edges resolve outside PUBLIC_DOC_IDS, including two ../spec targets. Eighteen should remain repository links; CI and SSO_OIDC are existing reviewable guides to promote. The current graph test is byte-identical to both preserved checkouts.",
+      "supported_patch": {
+        "commit": "527bc8b81e4edf9eea8f5f80b9de8fa409d03824",
+        "paths": [
+          "docs/CLAIM_KINDS.md",
+          "docs/COMPLIANCE.md",
+          "docs/COMPLIANCE_FRAMEWORKS.md",
+          "docs/IDENTITY.md",
+          "docs/MCP_SERVER.md",
+          "docs/NATIVE_MCP.md",
+          "docs/NATIVE_SANDBOX_UBUNTU.md",
+          "docs/NATIVE_STUDIO_TASKS.md",
+          "docs/OPEN_STANDARD.md",
+          "docs/SCORING_METHODOLOGY.md",
+          "docs/THREAT_MODEL.md",
+          "docs/TOOLHUB.md",
+          "docs/TRANSPARENCY_MERKLE.md",
+          "website/docs/docs.js"
+        ],
+        "exact_change": "The existing 16 insertions/16 deletions convert 18 non-promoted local links into explicit GitHub repository source links and add only SSO_OIDC/CI to PUBLIC_DOC_IDS. Do not modify publicDocsGraph.test.ts.",
+        "readonly_apply_check": "passed on current candidate"
+      },
+      "exclusions": [
+        "Do not overlay the later candidate docs roster/archive migration.",
+        "Promoting a guide does not establish qualified OIDC runtime or live deployment; current SSO_OIDC explicitly retains its unqualified/follow-up boundaries."
+      ],
+      "guard_integrity": "No graph allowlist/test weakening. Source links stay accessible without pretending draft/catalog/archive/spec files are promoted guides. All local-edge, no-internal-edge, source-existence and category guards remain."
+    },
+    {
+      "case": "evidenceBinding",
+      "owner": "P0-18 producer table, P0-23/P1-11 result envelopes, P1-12 policy, P1-10 catalog, P1-57/59 A4, P2-01 legal-hold metadata",
+      "cause": "Thirteen unclassified literal labels appear in current source. Five self-report-shaped labels must map to manual; eight labels name internal result envelope/registry/applicability metadata rather than ledger-event sources. Core compliance evidenceBinding.ts bytes are identical across all versions, but evidenceProvenance.ts is not.",
+      "supported_patch": {
+        "commits": [
+          "5800527f358056755ab94fd85d05bd7b092f6fe6",
+          "35026dc21f2726699462961ea452c2760799594a",
+          "e010e1399f195ea139dcd9e735d9efca33ebdf12"
+        ],
+        "paths": [
+          "src/claims/evidenceProvenance.ts",
+          "tests/compliance/evidenceBinding.test.ts"
+        ],
+        "manual_labels": [
+          "user",
+          "inferred",
+          "carried",
+          "numeric_self_answer",
+          "default"
+        ],
+        "reviewed_non_evidence_labels": [
+          "compliance_report",
+          "diagnostic_report",
+          "path_presence",
+          "predicate",
+          "reviewer_exception",
+          "record",
+          "legacy",
+          "legacy-unverified"
+        ],
+        "exact_change": "Reuse only these five manual producer keys, extend the existing test.each manual row list by those five names, and add only these eight reviewed non-evidence labels with source-site comment. Preserve enumeration scanner, >50 count guard, exact empty-unclassified assertion and all control/trust tests."
+      },
+      "source_sites": {
+        "user": [
+          "src/a4/a4RouterStages.ts:272"
+        ],
+        "inferred": [
+          "src/a4/stages/aspire.ts:336"
+        ],
+        "carried": [
+          "src/a4/stages/assemble.ts:201",
+          "src/a4/stages/adapt.ts:127"
+        ],
+        "numeric_self_answer": [
+          "src/api/resultRouteRegistry.ts:59"
+        ],
+        "default": [
+          "src/policy/effectivePolicyReceipt.ts:47",
+          "src/policy/effectivePolicyReceipt.ts:108"
+        ],
+        "compliance_report": [
+          "src/studio/studioClaimOutput.ts:28"
+        ],
+        "diagnostic_report": [
+          "src/studio/studioClaimOutput.ts:9",
+          "src/api/resultRouteRegistry.ts:58"
+        ],
+        "path_presence": [
+          "src/api/resultRouteRegistry.ts:83",
+          "src/api/resultRouteRegistry.ts:84"
+        ],
+        "predicate": [
+          "src/catalog/compiler/applicability.ts:67",
+          "src/catalog/compiler/applicability.ts:70"
+        ],
+        "reviewer_exception": [
+          "src/catalog/compiler/applicability.ts:73"
+        ],
+        "record/legacy/legacy-unverified": [
+          "src/residency/legalHoldRegistry.ts:142",
+          "src/residency/legalHoldRegistry.ts:189",
+          "src/residency/legalHoldRegistry.ts:196",
+          "src/residency/legalHoldRegistry.ts:201",
+          "src/residency/legalHoldRegistry.ts:378"
+        ]
+      },
+      "exclusions": [
+        "Do not whitelist candidate-only workspace-key-revocations, source_unavailable or value_contract absent from this current enumeration.",
+        "Do not merely put self-report labels in the test allowlist: that would leave production fallback as amc-runtime."
+      ],
+      "guard_integrity": "Manual mapping prevents self-report-shaped labels becoming AMC runtime proof; only reviewed metadata labels bypass producer classification. Unknown future literals still fail the exhaustive source guard."
+    },
+    {
+      "case": "llmResponsesCapabilities",
+      "owner": "P2-01 authored LLM workspace/admission follow-up; not a P0-47 snapshot adapter",
+      "cause": "The current LlmRuntime constructor eagerly resolves init.session.workspace. The unsupported/unknown-capability probe intentionally has no workspace, so construction throws paths[0] undefined before the capability refusal can execute. Test bytes are identical across all three heads.",
+      "supported_patch": {
+        "commit": "4939bce218e84c5bc22dde8a91a12b7c5e79f6f6",
+        "paths": [
+          "src/llm/adapter/llmRuntime.ts"
+        ],
+        "exact_change": "Remove resolve import, private cached workspace and constructor resolve. Read this.init.session.workspace only at loadProcessorRegistrySnapshot, admitProtectedModelRequest and checkEgress use sites, with existing comments. Keep unsupported capability test untouched.",
+        "parent_source_identity": "4939bce21 parent source SHA256 equals current main5ea and 7a81: 16f508efb7b0b2897794654333f058e1edc9143e11e47e6b13f1f347467f607f",
+        "readonly_apply_check": "passed on current candidate"
+      },
+      "exclusions": [
+        "Do not add workspace to the probe stub or invent process.cwd().",
+        "Do not overlay later P2-02 detector or P0-59 budget/refusal changes in candidate LlmRuntime."
+      ],
+      "guard_integrity": "Unchanged capability probe retains no-session/readEvents/no-credentials/no-transport early-refusal assertions. Existing checkEgress.ts:105 refuses missing scope as workspace_scope_required; processorRegistry.ts:170 returns invalid/workspace_invalid, not missing. No workspace is fabricated."
+    }
+  ],
+  "public_doc_bad_edges": [
+    [
+      "CLAIM_KINDS",
+      "migration/LEGACY_RESULTS.md"
+    ],
+    [
+      "COMPLIANCE",
+      "catalog/CONTROL_RECORD.md#status-dimensions"
+    ],
+    [
+      "COMPLIANCE_FRAMEWORKS",
+      "catalog/CONTROL_RECORD.md#status-dimensions"
+    ],
+    [
+      "IDENTITY",
+      "SSO_OIDC.md"
+    ],
+    [
+      "IDENTITY",
+      "adr/014-saml-library.md"
+    ],
+    [
+      "MCP_SERVER",
+      "REGULATORY_INCIDENT_CLOCKS.md"
+    ],
+    [
+      "NATIVE_MCP",
+      "adr/010-mcp-2026-07-28.md"
+    ],
+    [
+      "NATIVE_SANDBOX_UBUNTU",
+      "adr/008-native-shell-containment.md"
+    ],
+    [
+      "NATIVE_SANDBOX_UBUNTU",
+      "SANDBOX.md#shell-egress-allowlist"
+    ],
+    [
+      "NATIVE_STUDIO_TASKS",
+      "catalog/COMPILER.md#activation-and-enforcement"
+    ],
+    [
+      "OPEN_STANDARD",
+      "../spec/README.md"
+    ],
+    [
+      "OPEN_STANDARD",
+      "../spec/ACCEPTANCE_RULES.md"
+    ],
+    [
+      "OPEN_STANDARD",
+      "../spec/README.md"
+    ],
+    [
+      "SCORING_METHODOLOGY",
+      "CI.md"
+    ],
+    [
+      "SCORING_METHODOLOGY",
+      "methodology/CHANGELOG.md"
+    ],
+    [
+      "THREAT_MODEL",
+      "security/THREAT_MODEL.md"
+    ],
+    [
+      "THREAT_MODEL",
+      "archive/THREAT_MODEL-2026-02.md"
+    ],
+    [
+      "TOOLHUB",
+      "SANDBOX.md#shell-egress-allowlist"
+    ],
+    [
+      "TRANSPARENCY_MERKLE",
+      "PUBLIC_ANCHORING.md"
+    ],
+    [
+      "TRANSPARENCY_MERKLE",
+      "TRUST_LIST.md"
+    ]
+  ],
+  "file_sha256": {
+    "README.md": {
+      "current_7a81": "eee3efd43af33e4e9ed8dcdbeff8e590111d051dfde879f308d35ee8bfd60665",
+      "p0_33_7d5": "36c105229320f88a1ef9ecc9106e5bec84b5e11d7ccbe26e9fe40afb56b842a8",
+      "claude_990": "0910c215e07741fbb32b4752f1c215f3e1d19a5dee7dfc57bc14bf3420e9159d"
+    },
+    "tests/compareBadgeDocs.test.ts": {
+      "current_7a81": "d133d1a9524cdf6b1d535b26bd43afe159da3be9f58b573154f2fd77edfc6e8f",
+      "p0_33_7d5": "37a1771fa8e5e6f147b4bf7cb5761446e549aa24ff4a2d6a9870c18ba195932c",
+      "claude_990": "37a1771fa8e5e6f147b4bf7cb5761446e549aa24ff4a2d6a9870c18ba195932c"
+    },
+    "src/cli.ts": {
+      "current_7a81": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "p0_33_7d5": "c4627270c37e5fe7e9314df604c01c0155f566df90e32a29ac690cb26113e5cb",
+      "claude_990": "c4627270c37e5fe7e9314df604c01c0155f566df90e32a29ac690cb26113e5cb"
+    },
+    "scripts/evidence-paths.json": {
+      "current_7a81": "8066f27d0aef0c9366b32f2027600cb053cf4c8e8a4b9122bca78a6af198ce61",
+      "p0_33_7d5": "f366d6f3172058d14554aa1b4714265d02f218fa308386cdd1adbfa5a07d19e2",
+      "claude_990": "f366d6f3172058d14554aa1b4714265d02f218fa308386cdd1adbfa5a07d19e2"
+    },
+    "tests/evidencePathsExist.test.ts": {
+      "current_7a81": "a7739551e9191e4ca2abf8a1d27499c4ae0ede837ca9fa99749d6a3bb7674947",
+      "p0_33_7d5": "4b523cf8a267929879c1cca44a68b07d7910381c3da820bcc77c7db074613c0c",
+      "claude_990": "4b523cf8a267929879c1cca44a68b07d7910381c3da820bcc77c7db074613c0c"
+    },
+    "src/policy/effectivePolicyReceipt.ts": {
+      "current_7a81": "f4f57e8bdaa0f3dea812d327e4907b2c6766d286cd2cd66001a33dbd64a6358a",
+      "p0_33_7d5": "f4f57e8bdaa0f3dea812d327e4907b2c6766d286cd2cd66001a33dbd64a6358a",
+      "claude_990": "f4f57e8bdaa0f3dea812d327e4907b2c6766d286cd2cd66001a33dbd64a6358a"
+    },
+    "src/score/agentProtocolSecurity.ts": {
+      "current_7a81": "aedb9d6a7ac3137242c749a974c8de284da2c2313bd01d328b90a7827792a112",
+      "p0_33_7d5": "0e7d41a6d4b1c9e98a42df984b3f7a05b23b1de0232e245d8c7b0cbbd4d3dbf6",
+      "claude_990": "0e7d41a6d4b1c9e98a42df984b3f7a05b23b1de0232e245d8c7b0cbbd4d3dbf6"
+    },
+    "scripts/build-pages-site.mjs": {
+      "current_7a81": "1ca7faf9bb9e37c892f1f3840cf2b23657a2c839fb5bb2f4694098d2e88b14f2",
+      "p0_33_7d5": "216f75fccec9f8d629fb37c8fb215bc7b05a8035982aaaf011c6f9e020e7ccea",
+      "claude_990": "e1ac39f9bb153a895cd27fbcd6df7311a746f6c18c93198aec8fb34c03371f8e"
+    },
+    "tests/publicDocsArtifact.test.ts": {
+      "current_7a81": "148aa551296ce4ecb7bbe8556f6cb1624e42c50d6b27392329c762f541a890e9",
+      "p0_33_7d5": "7049872b587b67be69e2468e0465c866b7258dcef5e84a4bcd50bccd53ae6168",
+      "claude_990": "e6d120b7ebbcab18fd303be40639e1df8417a154cc95f7e89d986606f32f87dc"
+    },
+    "typedoc.json": {
+      "current_7a81": "c2a2a00dc9d674225dfb15b42fed1b7dcd2cd51eae9540a38fe952a1e3cb3f06",
+      "p0_33_7d5": "bf3085ea0b486f138c74e1105b4279e07b4df95ef81463fa487235ab689ea1f2",
+      "claude_990": "bf3085ea0b486f138c74e1105b4279e07b4df95ef81463fa487235ab689ea1f2"
+    },
+    "website/docs/docs.js": {
+      "current_7a81": "405c1c55741df4d2d597b3dc97590ef8d25b7ffb2415fafac13d8ded4e320b8c",
+      "p0_33_7d5": "7561ba0b1e04cecfb16814ff90f037e1dd96546130e74f8e3bb14b37d010894b",
+      "claude_990": "7561ba0b1e04cecfb16814ff90f037e1dd96546130e74f8e3bb14b37d010894b"
+    },
+    "tests/publicDocsGraph.test.ts": {
+      "current_7a81": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+      "p0_33_7d5": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104",
+      "claude_990": "162cad72bc0a32b5398478750926d6a30fe69f3f4e88413a9eb216b52d7df104"
+    },
+    "docs/CI.md": {
+      "current_7a81": "a11d3205337c5868d31aebf38d9cc864a3e66e55c8a24280dc0a50bc9a5dfb6e",
+      "p0_33_7d5": "a11d3205337c5868d31aebf38d9cc864a3e66e55c8a24280dc0a50bc9a5dfb6e",
+      "claude_990": "a11d3205337c5868d31aebf38d9cc864a3e66e55c8a24280dc0a50bc9a5dfb6e"
+    },
+    "docs/SSO_OIDC.md": {
+      "current_7a81": "75b5bfcc6511a898a98719bacaa023a328a41927d7284a5463a6a169e612533f",
+      "p0_33_7d5": "e29cf25c646a7b37f92609a7427c79d3fc34e640e96be09b54f1d922a8492e79",
+      "claude_990": "e29cf25c646a7b37f92609a7427c79d3fc34e640e96be09b54f1d922a8492e79"
+    },
+    "src/claims/evidenceProvenance.ts": {
+      "current_7a81": "8500cb76d7dabbdf1198cfe4a44b4abfba18c66f9d47d15022526d05578ff4e8",
+      "p0_33_7d5": "0a11f57f0638db632c31ba58e9c725c9317252d0eaa63f024ab3436edff8b18a",
+      "claude_990": "0a11f57f0638db632c31ba58e9c725c9317252d0eaa63f024ab3436edff8b18a"
+    },
+    "src/compliance/evidenceBinding.ts": {
+      "current_7a81": "e8756dd77213e02343c3eb3e68fc56ed59bf0cb44f605ead8d958cc49e2d8eec",
+      "p0_33_7d5": "e8756dd77213e02343c3eb3e68fc56ed59bf0cb44f605ead8d958cc49e2d8eec",
+      "claude_990": "e8756dd77213e02343c3eb3e68fc56ed59bf0cb44f605ead8d958cc49e2d8eec"
+    },
+    "tests/compliance/evidenceBinding.test.ts": {
+      "current_7a81": "905ed8c2f7a15106ec3610366577fdf72aecbe3a2c663065b3c600319f0a713f",
+      "p0_33_7d5": "11cc4db84af2d1e73659fe393a91755f8f8dbb27ebfd53bad2f18001f051e48d",
+      "claude_990": "11cc4db84af2d1e73659fe393a91755f8f8dbb27ebfd53bad2f18001f051e48d"
+    },
+    "src/llm/adapter/llmRuntime.ts": {
+      "current_7a81": "16f508efb7b0b2897794654333f058e1edc9143e11e47e6b13f1f347467f607f",
+      "p0_33_7d5": "093fb673e04beffbebe9ce3b64c2c215b13fa387446d136705bfc76915d60140",
+      "claude_990": "093fb673e04beffbebe9ce3b64c2c215b13fa387446d136705bfc76915d60140"
+    },
+    "tests/llmResponsesCapabilities.test.ts": {
+      "current_7a81": "825ef823769d403314efe461abb056dfed6fc138edbd11ea63412a811f16c376",
+      "p0_33_7d5": "825ef823769d403314efe461abb056dfed6fc138edbd11ea63412a811f16c376",
+      "claude_990": "825ef823769d403314efe461abb056dfed6fc138edbd11ea63412a811f16c376"
+    }
+  },
+  "exact_authored_patches": [
+    {
+      "commit": "eb8dda3fd11da5104e3eb450b9af3b5ba4febab9",
+      "paths": [
+        "tests/compareBadgeDocs.test.ts"
+      ],
+      "patch": "diff --git a/tests/compareBadgeDocs.test.ts b/tests/compareBadgeDocs.test.ts\nindex 3cebb58c2..b65e08466 100644\n--- a/tests/compareBadgeDocs.test.ts\n+++ b/tests/compareBadgeDocs.test.ts\n@@ -59,7 +59,9 @@ describe(\"compare badge DevRel docs\", () => {\n     const read = (path: string): string => readFileSync(join(process.cwd(), path), \"utf8\");\n \n     expect(read(\"README.md\")).toContain(\"amc compare <run-a> <run-b> --output compare.json --badge\");\n-    expect(read(\"README.md\")).toContain(\"model-compare-badge.svg\");\n+    // P0-15: model comparison is not evaluated, so the README no longer advertises a per-model badge.\n+    expect(read(\"README.md\")).toContain(\"writes compare-badge.svg beside the report\");\n+    expect(read(\"README.md\")).not.toContain(\"model-compare-badge.svg\");\n     expect(read(\"docs/GETTING_STARTED.md\")).toContain(\"Compare scored runs and write a comparison SVG badge\");\n     expect(read(\"docs/QUICKSTART.md\")).toContain(\"Compare scored runs with badge output\");\n     expect(read(\"docs/AUDIT_50_AGENTS_BATCH5.md\")).toContain(\"compare-badge docs/runtime behavior are resolved\");\n",
+      "patch_sha256": "bb03773bbec25ca6e78bab7a80da23430c30ab9b1f38a6445c7d242a16f4d66d"
+    },
+    {
+      "commit": "527bc8b81e4edf9eea8f5f80b9de8fa409d03824",
+      "paths": [
+        "docs",
+        "website/docs/docs.js"
+      ],
+      "patch": "diff --git a/docs/CLAIM_KINDS.md b/docs/CLAIM_KINDS.md\nindex 415c29039..98b21e9b9 100644\n--- a/docs/CLAIM_KINDS.md\n+++ b/docs/CLAIM_KINDS.md\n@@ -13,7 +13,7 @@ AMC output is evidence of conformity. It is not a certificate.\n | `observed` | Observed | AMC observed the behaviour at runtime or in an executed test, backed by `OBSERVED` or `OBSERVED_HARDENED` evidence. |\n | `independently_reviewed` | Independently reviewed | Approved by a reviewer who is independent of the producer and whose key is pinned. |\n \n-Results stored by AMC 1.x are labelled \"Legacy (1.x), self-reported\" or \"Legacy (1.x), synthetic example\", followed by the legacy notice they are read under, for example \"(notice AMC-LEGACY-2026-001 v1)\". See [migration/LEGACY_RESULTS.md](migration/LEGACY_RESULTS.md).\n+Results stored by AMC 1.x are labelled \"Legacy (1.x), self-reported\" or \"Legacy (1.x), synthetic example\", followed by the legacy notice they are read under, for example \"(notice AMC-LEGACY-2026-001 v1)\". See [migration/LEGACY_RESULTS.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/migration/LEGACY_RESULTS.md).\n \n JSON consumers read `claimKind`. The label text is public output too, so changing its wording is a breaking change for text parsers.\n \ndiff --git a/docs/COMPLIANCE.md b/docs/COMPLIANCE.md\nindex 49b327c2e..54df53dc3 100644\n--- a/docs/COMPLIANCE.md\n+++ b/docs/COMPLIANCE.md\n@@ -8,7 +8,7 @@ AMC compliance reports are **evidence-linked signals**, not legal certifications\n   - required evidence event types with minimum OBSERVED ratio\n   - required assurance pack score thresholds\n   - required absence of denylisted audit events\n-- Produces, per category, the five status dimensions (`dimensions`: applicability, evidence, result, enforcement, review), a derived `claimKind`, the `admitted` and `rejected` evidence refs with reasons, `notEvaluatedReasons`, and `result` and `evidence` copied from the dimensions. The decision table is in [catalog/CONTROL_RECORD.md](catalog/CONTROL_RECORD.md#status-dimensions).\n+- Produces, per category, the five status dimensions (`dimensions`: applicability, evidence, result, enforcement, review), a derived `claimKind`, the `admitted` and `rejected` evidence refs with reasons, `notEvaluatedReasons`, and `result` and `evidence` copied from the dimensions. The decision table is in [catalog/CONTROL_RECORD.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/catalog/CONTROL_RECORD.md#status-dimensions).\n - Keeps a derived `status` for one more minor release: `SATISFIED` (result `pass`), `MISSING` (`fail`) or `NOT_EVALUATED` (`not_evaluated`). It never emits `PARTIAL` or `UNKNOWN`; those appear only in reports written by earlier versions.\n - Includes exact evidence references (event IDs/hashes, run context) and a \"what to collect next\" checklist.\n \ndiff --git a/docs/COMPLIANCE_FRAMEWORKS.md b/docs/COMPLIANCE_FRAMEWORKS.md\nindex 94610d33e..97d84654f 100644\n--- a/docs/COMPLIANCE_FRAMEWORKS.md\n+++ b/docs/COMPLIANCE_FRAMEWORKS.md\n@@ -292,7 +292,7 @@ Specific audit event types that indicate non-compliance:\n \n ## Compliance Status\n \n-Each control category carries five status dimensions and a claim kind (see [COMPLIANCE.md](COMPLIANCE.md#evidence-binding-and-not-evaluated) for the binding rules and [catalog/CONTROL_RECORD.md](catalog/CONTROL_RECORD.md#status-dimensions) for the decision table), and a `status` derived from its result:\n+Each control category carries five status dimensions and a claim kind (see [COMPLIANCE.md](COMPLIANCE.md#evidence-binding-and-not-evaluated) for the binding rules and [catalog/CONTROL_RECORD.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/catalog/CONTROL_RECORD.md#status-dimensions) for the decision table), and a `status` derived from its result:\n \n - **SATISFIED** (pass): every evidence requirement passed on admitted, control-bound AMC runtime evidence and a compiled plan records that the control applies\n - **MISSING** (fail): an admitted record shows a requirement failed\ndiff --git a/docs/IDENTITY.md b/docs/IDENTITY.md\nindex 6cec91ef6..b62b3d4d2 100644\n--- a/docs/IDENTITY.md\n+++ b/docs/IDENTITY.md\n@@ -56,4 +56,4 @@ Token admission requires finite expiry and issuance claims, a non-empty subject,\n \n No new settings or CLI paths are introduced, so existing signed identity YAML is preserved. Private-network or HTTP identity endpoints and previously accepted EdDSA tokens now fail OIDC admission. See [SSO OIDC](SSO_OIDC.md) for the exact loopback-development exception, key rotation and remaining browser/session boundaries.\n \n-Standard SAML remains separate work. [ADR 014](adr/014-saml-library.md) is a proposed library direction awaiting review; this OIDC implementation does not change the compact SAML runtime or SCIM behavior.\n+Standard SAML remains separate work. [ADR 014](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/014-saml-library.md) is a proposed library direction awaiting review; this OIDC implementation does not change the compact SAML runtime or SCIM behavior.\ndiff --git a/docs/MCP_SERVER.md b/docs/MCP_SERVER.md\nindex 191a26cd0..d1cf2b7e8 100644\n--- a/docs/MCP_SERVER.md\n+++ b/docs/MCP_SERVER.md\n@@ -243,7 +243,7 @@ Output: { incidentId, station, now, clocks[], events[], notes[] } \u2014 the same l\n         `amc incident clocks <id> --station <station> --json`\n ```\n \n-Each clock shows its instrument, article, trigger, due date, status (`NOT_STARTED`, `PENDING`, `DUE_SOON`, `OVERDUE`, `SATISFIED`, `SATISFIED_LATE`), source and review status. Trigger and notice times come from the signed clock events recorded with `amc incident clocks --trigger|--notified` or `POST /api/v1/incidents/:id/clock-events`; a row whose signature fails is refused by its event id. The tool records nothing. Durations are agent-drafted and experimental until an expert signs off; they are not legal advice, and AMC does not file notices. See [REGULATORY_INCIDENT_CLOCKS.md](REGULATORY_INCIDENT_CLOCKS.md).\n+Each clock shows its instrument, article, trigger, due date, status (`NOT_STARTED`, `PENDING`, `DUE_SOON`, `OVERDUE`, `SATISFIED`, `SATISFIED_LATE`), source and review status. Trigger and notice times come from the signed clock events recorded with `amc incident clocks --trigger|--notified` or `POST /api/v1/incidents/:id/clock-events`; a row whose signature fails is refused by its event id. The tool records nothing. Durations are agent-drafted and experimental until an expert signs off; they are not legal advice, and AMC does not file notices. See [REGULATORY_INCIDENT_CLOCKS.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/REGULATORY_INCIDENT_CLOCKS.md).\n \n **Example prompt:** *\"Which regulatory deadlines are open on incident_\u2026 for the wealth station?\"*\n \ndiff --git a/docs/NATIVE_MCP.md b/docs/NATIVE_MCP.md\nindex 5a4119ae7..76e6643bb 100644\n--- a/docs/NATIVE_MCP.md\n+++ b/docs/NATIVE_MCP.md\n@@ -66,7 +66,7 @@ AMC uses the installed MCP TypeScript SDK Streamable HTTP transport with a const\n \n Response bodies are bounded to 4 MiB each and 32 MiB per mount, outgoing messages to 1 MiB, requests to 1024, concurrent requests to 8 and incoming server messages to 256. POST requests use `timeoutMs`; the optional GET notification stream has an independent `notificationLifetimeMs`, defaulting to eight hours and accepting an integer from 1 through 86,400,000 milliseconds (24 hours). A short request timeout does not expire an otherwise healthy idle notification stream. Expiry closes the mount and requires an explicit new reviewed connection; it never silently renews authority. These limits bound retained state and network activity; they do not impose a remote server sandbox. Local cancellation and DELETE acknowledgment do not prove that an already dispatched remote side effect stopped.\n \n-Primary contracts: [MCP 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28) for stateless servers and [MCP Streamable HTTP 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports) for initialize-era servers. The 2026-07-28 client, its version negotiation and the OAuth client are AMC's own code ([ADR 010](adr/010-mcp-2026-07-28.md)); the installed SDK implements versions up to 2025-11-25 only. The qualification below predates them and does not cover them. Implementation uses the installed `@modelcontextprotocol/sdk` transport, 1.32.1 since 2026-10-06 (1.30.0 and earlier fall in advisory GHSA-6qxp-vccf-f47h); the installed-candidate acceptance below ran on 1.30.0. The HTTP source passes 28 focused HTTP/stdio cases and both type gates. Fresh installed candidate `0af82e28` separately passed 15 checkpoint groups through native CLI and the public TypeScript SDK/ACP: real credential references, exact authenticated approvals, two tool effects, catalogue/grant/redirect/auth refusals, cancellation, five remote terminations and six independent verification receipts. The dated receipt is in the checkout at `AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/README.md`. This covers macOS ARM64 and loopback HTTP/SSE with a scripted provider; live vendor TLS, OAuth and model-quality results are not inferred.\n+Primary contracts: [MCP 2026-07-28](https://modelcontextprotocol.io/specification/2026-07-28) for stateless servers and [MCP Streamable HTTP 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports) for initialize-era servers. The 2026-07-28 client, its version negotiation and the OAuth client are AMC's own code ([ADR 010](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/010-mcp-2026-07-28.md)); the installed SDK implements versions up to 2025-11-25 only. The qualification below predates them and does not cover them. Implementation uses the installed `@modelcontextprotocol/sdk` transport, 1.32.1 since 2026-10-06 (1.30.0 and earlier fall in advisory GHSA-6qxp-vccf-f47h); the installed-candidate acceptance below ran on 1.30.0. The HTTP source passes 28 focused HTTP/stdio cases and both type gates. Fresh installed candidate `0af82e28` separately passed 15 checkpoint groups through native CLI and the public TypeScript SDK/ACP: real credential references, exact authenticated approvals, two tool effects, catalogue/grant/redirect/auth refusals, cancellation, five remote terminations and six independent verification receipts. The dated receipt is in the checkout at `AMC_OS/RESEARCH/2026-09-08-dsh-pi/installed-native-http-mcp-acceptance/README.md`. This covers macOS ARM64 and loopback HTTP/SSE with a scripted provider; live vendor TLS, OAuth and model-quality results are not inferred.\n \n ## Protocol versions\n \ndiff --git a/docs/NATIVE_SANDBOX_UBUNTU.md b/docs/NATIVE_SANDBOX_UBUNTU.md\nindex 56e56b267..13523142e 100644\n--- a/docs/NATIVE_SANDBOX_UBUNTU.md\n+++ b/docs/NATIVE_SANDBOX_UBUNTU.md\n@@ -74,7 +74,7 @@ nativeSandbox:\n \n Create the intended directory first, keep the `WRITE_HIGH` action class and existing argv restrictions, then explicitly run `amc tools sign` and `amc tools verify`. Directory names are exact relative workspace paths, not `/**` patterns. No grant is borrowed from `fs.write` or `fs.edit`. An empty list produces a read-only host workspace.\n \n-`kind: os-native` means the same on Linux and also confines the shell with Seatbelt on macOS; `linux-bwrap` stays Linux-only. The optional `readDeny` masks exact workspace paths (a path under the system runtime roots is refused), and `maxProcesses` (default 256) sets RLIMIT_NPROC inside the sandbox to your process count at launch plus that allowance. A signed `egress` allowlist is refused on Linux for now: its relay needs a seccomp change that waits for review of [ADR-008](adr/008-native-shell-containment.md), so the Linux shell keeps all networking denied. See [Sandbox mode](SANDBOX.md#shell-egress-allowlist).\n+`kind: os-native` means the same on Linux and also confines the shell with Seatbelt on macOS; `linux-bwrap` stays Linux-only. The optional `readDeny` masks exact workspace paths (a path under the system runtime roots is refused), and `maxProcesses` (default 256) sets RLIMIT_NPROC inside the sandbox to your process count at launch plus that allowance. A signed `egress` allowlist is refused on Linux for now: its relay needs a seccomp change that waits for review of [ADR-008](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/adr/008-native-shell-containment.md), so the Linux shell keeps all networking denied. See [Sandbox mode](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SANDBOX.md#shell-egress-allowlist).\n \n Do not configure shell mounts through `bash.allow.paths`: those rules require a path in each call, while the native shell's public arguments are `command` and `timeoutMs`. Old path rules are not silently migrated or bypassed. The new signed requirement refuses legacy ToolHub, non-Linux and replacement shell implementations. Native admission binds the selected immutable shell and policy digest; a policy change before launch requires a fresh call. [ToolHub's policy reference](TOOLHUB.md) explains the complete signed entry. The installed native CLI at `9d963469` passed the acceptance described below; the earlier backend fixture result remains a separate component receipt.\n \ndiff --git a/docs/NATIVE_STUDIO_TASKS.md b/docs/NATIVE_STUDIO_TASKS.md\nindex cdda9ba49..f966b2491 100644\n--- a/docs/NATIVE_STUDIO_TASKS.md\n+++ b/docs/NATIVE_STUDIO_TASKS.md\n@@ -18,7 +18,7 @@ The selected agent remains attached to the task after creation. Its tools and ap\n \n Workspace tools require valid signed configuration and an approval policy with a nonzero quorum for high-impact writes. A task's pending approval links open the existing approval inbox, where authorized reviewers see the real request and its digest. Task output cannot approve itself. Existing roles, distinct-reviewer rules and quorum remain in force. Merely displaying an approval card does not authorize an effect.\n \n-Under an active compiled plan whose `identity-binding` requires an agent lease (`L0-IDN-01`), Studio mints a signed lease for each workspace-tools runtime it starts or resumes, hands it to that runtime alone and revokes it when the runtime stops and at archive. Such a task does not start when the active plan does not verify or no lease can be minted, for example because the lease signing key is unavailable; the task shows the reason. See [compiled-plan enforcement](catalog/COMPILER.md#activation-and-enforcement).\n+Under an active compiled plan whose `identity-binding` requires an agent lease (`L0-IDN-01`), Studio mints a signed lease for each workspace-tools runtime it starts or resumes, hands it to that runtime alone and revokes it when the runtime stops and at archive. Such a task does not start when the active plan does not verify or no lease can be minted, for example because the lease signing key is unavailable; the task shows the reason. See [compiled-plan enforcement](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/catalog/COMPILER.md#activation-and-enforcement).\n \n The browser cannot create grants, change budgets, load arbitrary plugins or install MCP servers. Native CLI and SDK configuration remain available to operators for those capabilities. See [native shell confinement](NATIVE_SANDBOX_UBUNTU.md) before enabling shell execution.\n \ndiff --git a/docs/OPEN_STANDARD.md b/docs/OPEN_STANDARD.md\nindex 6852e6512..32971dd0e 100644\n--- a/docs/OPEN_STANDARD.md\n+++ b/docs/OPEN_STANDARD.md\n@@ -2,7 +2,7 @@\n \n Open Compass Standard provides signed JSON Schemas for AMC artifacts so external tools can validate payloads without linking AMC internals.\n \n-Every schema is generated from the zod schema AMC itself parses with, so it states what AMC enforces. The same files are committed under [`spec/schemas/v1/`](../spec/README.md) and served at their `$id` (`https://agentmaturity.co/spec/schemas/v1/<name>.schema.json`); `amc standard generate` writes identical bytes. [`spec/ACCEPTANCE_RULES.md`](../spec/ACCEPTANCE_RULES.md) lists the checks a verifier runs beyond shape.\n+Every schema is generated from the zod schema AMC itself parses with, so it states what AMC enforces. The same files are committed under [`spec/schemas/v1/`](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/README.md) and served at their `$id` (`https://agentmaturity.co/spec/schemas/v1/<name>.schema.json`); `amc standard generate` writes identical bytes. [`spec/ACCEPTANCE_RULES.md`](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/ACCEPTANCE_RULES.md) lists the checks a verifier runs beyond shape.\n \n Generated bundle location:\n - `.amc/standard/schemas/*.json`\n@@ -22,7 +22,7 @@ Generated bundle location:\n - `registry.bench.schema.json`\n - `registry.passport.schema.json`\n \n-Public record contracts in the same folder: `evidence-event`, `receipt`, `legacy-receipt`, `authorization-record`, `control-result`, `claim-envelope`, `scoped-attestation`, `trust-list`, `verifier-report` and `signature-envelope` (see [spec/README.md](../spec/README.md) for which AMC emits today).\n+Public record contracts in the same folder: `evidence-event`, `receipt`, `legacy-receipt`, `authorization-record`, `control-result`, `claim-envelope`, `scoped-attestation`, `trust-list`, `verifier-report` and `signature-envelope` (see [spec/README.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/spec/README.md) for which AMC emits today).\n \n ## What changed in P1-01\n \ndiff --git a/docs/SCORING_METHODOLOGY.md b/docs/SCORING_METHODOLOGY.md\nindex 304884e73..11040ecfc 100644\n--- a/docs/SCORING_METHODOLOGY.md\n+++ b/docs/SCORING_METHODOLOGY.md\n@@ -331,7 +331,7 @@ ChemGraph-style agentic computational chemistry workflow rows are relevant to AM\n \n | Version | Date | Summary | Migration |\n |---------|------|---------|-----------|\n-| `2026.10.08-r226` | `2026-10-08` | Rebuilds the diagnostic gates from runtime evidence and makes levels cumulative (P1-07): a level is the highest n for which gates L1 to Ln all pass, only rows a registered emitter admits by provenance count above L0, and above L1 a question's evidence map, not the row's own tag, binds rows to it. L2 is evaluated for AMC-5.29, AMC-SCI-2, AMC-OPDISC-6 and AMC-2.15; L3 has no admissible emitter yet; L4 and L5 are not evaluated. The `STRICT_EVIDENCE_BINDING` opt-out is removed. Bands, layer and overall arithmetic, and trust-label thresholds are unchanged and now come from one module; the published formulas match the code. | Reports, badges, methodology receipts, and signed outputs generated under `2026.08.27-r225` remain valid as r225 scores and must not be rewritten. Re-score under `2026.10.08-r226` before comparing or publishing. Scores DROP wherever seeded, untagged or unregistered evidence counted, or a higher gate passed without the lower ones; a question may rise from L0 to L1 where it has two admitted rows but no `stdout` row. Results from 1.x carry the P1-35 relabel notice. See [methodology/CHANGELOG.md](methodology/CHANGELOG.md). |\n+| `2026.10.08-r226` | `2026-10-08` | Rebuilds the diagnostic gates from runtime evidence and makes levels cumulative (P1-07): a level is the highest n for which gates L1 to Ln all pass, only rows a registered emitter admits by provenance count above L0, and above L1 a question's evidence map, not the row's own tag, binds rows to it. L2 is evaluated for AMC-5.29, AMC-SCI-2, AMC-OPDISC-6 and AMC-2.15; L3 has no admissible emitter yet; L4 and L5 are not evaluated. The `STRICT_EVIDENCE_BINDING` opt-out is removed. Bands, layer and overall arithmetic, and trust-label thresholds are unchanged and now come from one module; the published formulas match the code. | Reports, badges, methodology receipts, and signed outputs generated under `2026.08.27-r225` remain valid as r225 scores and must not be rewritten. Re-score under `2026.10.08-r226` before comparing or publishing. Scores DROP wherever seeded, untagged or unregistered evidence counted, or a higher gate passed without the lower ones; a question may rise from L0 to L1 where it has two admitted rows but no `stdout` row. Results from 1.x carry the P1-35 relabel notice. See [methodology/CHANGELOG.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/methodology/CHANGELOG.md). |\n | `2026.08.27-r225` | `2026-08-27` | Corrects the trust tier of evidence AMC executes itself. The native agent loop wrote no trust tier at all, and an absent tier reads back as `SELF_REPORTED`, so AMC's own governed, hash-chained runs were graded as unverified agent claims while a foreign CLI observed through the gateway was graded `OBSERVED` \u2014 the reverse of the ordering this document describes. Native rows now carry `OBSERVED`; they do **not** carry `OBSERVED_HARDENED`, whose documented meaning is sandbox execution with cryptographic attestation. `trustTier` is now validated where it is written. And trace correlation now reads the `agent_stdout`/`agent_stderr` events that `amc adapters run` writes, alongside the `stdout`/`stderr` that `wrap` and `supervise` write; the supported observation path previously contributed no traces and its correlation ratio was structurally zero. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged. | Reports, badges, methodology receipts, and signed outputs generated under `2026.08.25-r224` remain historical artifacts and must not be rewritten. Re-score under `2026.08.27-r225` before comparing or publishing. Scores may move in **either** direction, unlike r224: a correlation ratio below 0.8 caps AMC-1.7 at L2 and AMC-2.3, AMC-2.5 and AMC-3.3.1 at L3, so a workspace observed through `amc adapters run` whose trace receipts verify may score **higher** as those caps lift, while one whose newly-counted traces do not verify may cross below 0.8 for the first time and score **lower**. Both are corrections: the r224 ratio measured only part of the evidence. Outstanding badges issued under r224 remain verifiable by their embedded version and manifest hash, and should be re-issued before being presented as current. |\n | `2026.08.25-r224` | `2026-08-25` | Corrects two evidence-gating behaviours to match what this document already described. `requiredEvidenceTypes` now requires every named evidence type to be **present**, where it previously only filtered which events were counted \u2014 a gate naming stdout, audit, and metric was satisfied by stdout alone. And evidence now counts only toward the question it was tagged to at every level, where levels 0-2 previously fell back to scoring a question against every event in the window, including events tagged to other questions. Both corrections make scores stricter. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged. | Reports, badges, methodology receipts, and signed outputs generated under `2026.07.29-r223` remain historical artifacts and must not be rewritten. Re-score under `2026.08.25-r224` before comparing or publishing; a workspace may score **lower** than it did under r223 because evidence that previously counted no longer does. Treat a drop as a correction rather than a regression. Outstanding badges issued under r223 remain verifiable by their embedded version and manifest hash, and should be re-issued before being presented as current. |\n | `2026.07.29-r223` | `2026-07-29` | Aligns the public badge methodology assurance hash with the diagnostic methodology-versioning receipt by centralizing the canonical source-review boundary and gate selection and including the existing OpenAI Simple Evals boundary in both surfaces. Scoring ranges, thresholds, maturity labels, and claim-eligibility rules are unchanged. | Reports, badges, methodology receipts, and signed outputs generated under `2026.07.10-r222` remain historical artifacts and must not be rewritten. Regenerate them under `2026.07.29-r223` before comparing or publishing `amc_methodology_assurance`; r223 uses one canonical assurance hash across public and diagnostic surfaces, while r222 remains verifiable by its embedded version and manifest hash. |\ndiff --git a/docs/THREAT_MODEL.md b/docs/THREAT_MODEL.md\nindex 7fa0d973d..eb942c3c2 100644\n--- a/docs/THREAT_MODEL.md\n+++ b/docs/THREAT_MODEL.md\n@@ -1,3 +1,3 @@\n # AMC Threat Model (moved)\n \n-The current threat model, channel map and failure policy are in [docs/security/THREAT_MODEL.md](security/THREAT_MODEL.md); the February 2026 version is archived at [docs/archive/THREAT_MODEL-2026-02.md](archive/THREAT_MODEL-2026-02.md).\n+The current threat model, channel map and failure policy are in [docs/security/THREAT_MODEL.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/security/THREAT_MODEL.md); the February 2026 version is archived at [docs/archive/THREAT_MODEL-2026-02.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/archive/THREAT_MODEL-2026-02.md).\ndiff --git a/docs/TOOLHUB.md b/docs/TOOLHUB.md\nindex 98bbb5d15..8fc60af8b 100644\n--- a/docs/TOOLHUB.md\n+++ b/docs/TOOLHUB.md\n@@ -197,7 +197,7 @@ A native `bash` tool accepts `command` and optional `timeoutMs`; it does not sup\n       - '(^|\\s)wget(\\s|$)'\n ```\n \n-Merge this into the reviewed `allowedTools` list, preserve existing command restrictions, then run `amc tools sign` and `amc tools verify`. Each mount must be an existing, exact relative workspace directory: no glob, symlink, escape, or `.amc` authority directory. An empty list grants no host writes. The OS backend continues to deny socket networking and apply its own filesystem restrictions. `kind: os-native` selects Bubblewrap on Linux and Seatbelt on macOS; the optional `egress.allowHosts`, `readDeny` and `maxProcesses` fields are described in [Sandbox mode](SANDBOX.md#shell-egress-allowlist).\n+Merge this into the reviewed `allowedTools` list, preserve existing command restrictions, then run `amc tools sign` and `amc tools verify`. Each mount must be an existing, exact relative workspace directory: no glob, symlink, escape, or `.amc` authority directory. An empty list grants no host writes. The OS backend continues to deny socket networking and apply its own filesystem restrictions. `kind: os-native` selects Bubblewrap on Linux and Seatbelt on macOS; the optional `egress.allowHosts`, `readDeny` and `maxProcesses` fields are described in [Sandbox mode](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/SANDBOX.md#shell-egress-allowlist).\n \n `nativeSandbox` is an enforcement requirement, not metadata granting every caller permission. Only the immutable native shell binding (Bubblewrap on Linux; Seatbelt on macOS unless the kind is `linux-bwrap`) can satisfy it. ToolHub's legacy executors, callers on other platforms and replacement tools refuse the requirement. Admission pins the verified policy digest and the selected tool; changing the signed policy before launch refuses the call. The native session records the actual confinement outcome.\n \ndiff --git a/docs/TRANSPARENCY_MERKLE.md b/docs/TRANSPARENCY_MERKLE.md\nindex bf862e587..b59779156 100644\n--- a/docs/TRANSPARENCY_MERKLE.md\n+++ b/docs/TRANSPARENCY_MERKLE.md\n@@ -28,7 +28,7 @@ New workspaces grow `rfc9162-sha256` trees. A workspace created before P1-26 kee\n \n ## Which tree a workspace grows\n \n-The choice is sticky and fails closed. A log grows the legacy tree only while all of these hold: the signed current root verifies and says `amc-legacy-v1` (or has no `algorithm`), no migration record exists, and the log seal, whose signature verifies and whose `lastHash` is the log's last entry, names `merkleAlgorithm: amc-legacy-v1` (or predates the field). Anything missing, unverifiable or naming `rfc9162-sha256` means RFC 9162. The seal is re-signed on every append with the tree in use, so deleting files, restoring an older signed root or editing the cached frontier cannot move a migrated log back. Only a full rollback of the log itself could, and a public anchor ([PUBLIC_ANCHORING.md](PUBLIC_ANCHORING.md)) makes that detectable. These signatures use the workspace's own auditor keys, so they are a local audit trail; portable verdicts use pinned trust ([TRUST_LIST.md](TRUST_LIST.md)).\n+The choice is sticky and fails closed. A log grows the legacy tree only while all of these hold: the signed current root verifies and says `amc-legacy-v1` (or has no `algorithm`), no migration record exists, and the log seal, whose signature verifies and whose `lastHash` is the log's last entry, names `merkleAlgorithm: amc-legacy-v1` (or predates the field). Anything missing, unverifiable or naming `rfc9162-sha256` means RFC 9162. The seal is re-signed on every append with the tree in use, so deleting files, restoring an older signed root or editing the cached frontier cannot move a migrated log back. Only a full rollback of the log itself could, and a public anchor ([PUBLIC_ANCHORING.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/PUBLIC_ANCHORING.md)) makes that detectable. These signatures use the workspace's own auditor keys, so they are a local audit trail; portable verdicts use pinned trust ([TRUST_LIST.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/TRUST_LIST.md)).\n \n ## Migration\n \ndiff --git a/website/docs/docs.js b/website/docs/docs.js\nindex df747ff04..e41866985 100644\n--- a/website/docs/docs.js\n+++ b/website/docs/docs.js\n@@ -214,7 +214,7 @@ const PUBLIC_DOC_IDS = new Set([\n   // Security, runtime policy, and identity\n   'SECURITY', 'SECURITY_ARCHITECTURE_OVERVIEW', 'SECURITY_DEPLOYMENT', 'THREAT_MODEL',\n   'HARDENING', 'RED_TEAMING_GUIDE', 'SHIELD_ENFORCE_REFERENCE', 'ENCRYPTION_AT_REST',\n-  'HARDWARE_TRUST', 'ZERO_KEYS', 'VAULT', 'KEY_HISTORY', 'RBAC', 'IDENTITY', 'SUPPLY_CHAIN', 'PLUGIN_SUPPLY_CHAIN',\n+  'HARDWARE_TRUST', 'ZERO_KEYS', 'VAULT', 'KEY_HISTORY', 'RBAC', 'IDENTITY', 'SSO_OIDC', 'SUPPLY_CHAIN', 'PLUGIN_SUPPLY_CHAIN',\n \n   // Governance and policy\n   'GOVERNANCE', 'MODEL_GOVERNANCE', 'CONTROL_PROJECTION', 'CONTROL_SIMULATION', 'ACTION_EVIDENCE_LOGIC', 'SCOPE_TEMPLATES', 'POLICY_PACKS', 'PROMPT_POLICY', 'APPROVALS',\n@@ -223,7 +223,7 @@ const PUBLIC_DOC_IDS = new Set([\n   // Operations and deployment\n   'OPERATIONS', 'BACKUPS', 'DEPLOYMENT', 'DEPLOYMENT_CHECKLIST', 'CLOUD_REFERENCE_ARCHITECTURES',\n   'MIGRATION_RUNBOOK', 'CI_TEMPLATES', 'SINGLE_BINARY', 'INCIDENT_RESPONSE_READINESS',\n-  'DRIFT_ALERTS', 'CONTINUOUS_MONITORING', 'DOCTOR',\n+  'DRIFT_ALERTS', 'CONTINUOUS_MONITORING', 'DOCTOR', 'CI',\n   'runbooks/amc-service-down', 'runbooks/evidence-corruption', 'runbooks/score-dispute',\n \n   // Trust evidence and portable proof\n",
+      "patch_sha256": "deca01b1abfb29bf55dff3db342c12058960bf245dc0dc2f7607b0732c5151d4"
+    },
+    {
+      "commit": "e3c173766eaf9f73fd35ec43bd90032a5dac948a",
+      "paths": [
+        "scripts/build-pages-site.mjs",
+        "tests/publicDocsArtifact.test.ts"
+      ],
+      "patch": "diff --git a/scripts/build-pages-site.mjs b/scripts/build-pages-site.mjs\nindex 3ec81aecf..d3e94b3e9 100644\n--- a/scripts/build-pages-site.mjs\n+++ b/scripts/build-pages-site.mjs\n@@ -290,9 +290,15 @@ export async function buildPagesSite({ output = defaultOutput, explicit = false,\n   const apiOutput = resolve(resolvedOutput, \"api\");\n   // Invoke the pinned renderer directly so the timeout owns it, rather than\n   // TypeDoc's bin launcher which forks another process.\n+  // TypeDoc only discovers .git directories, not linked-worktree .git files.\n+  // Its entry points share src/ as their source root. Keep module names stable\n+  // while supplying the repository-relative path in explicitly pinned links.\n+  const typeDocOptions = JSON.parse(readFileSync(resolve(repositoryRoot, \"typedoc.json\"), \"utf8\"));\n   execFileSync(process.execPath, [resolve(repositoryRoot, \"node_modules/typedoc/dist/cli.js\"),\n     \"--options\", resolve(repositoryRoot, \"typedoc.json\"), \"--out\", apiOutput,\n-    \"--json\", resolve(apiOutput, \"reflection.json\"), ...(revision ? [\"--gitRevision\", revision] : [])],\n+    \"--json\", resolve(apiOutput, \"reflection.json\"),\n+    ...(revision ? [\"--gitRevision\", revision, \"--disableGit\", \"--sourceLinkTemplate\",\n+      typeDocOptions.sourceLinkTemplate.replace(\"{path}\", \"src/{path}\")] : [])],\n   { cwd: repositoryRoot, stdio: \"inherit\", timeout: 120_000 });\n \n   return { output: resolvedOutput, manifestPath, manifest, brandManifestPath, brandManifest, apiOutput };\ndiff --git a/tests/publicDocsArtifact.test.ts b/tests/publicDocsArtifact.test.ts\nindex 7b7def4e3..3553f407e 100644\n--- a/tests/publicDocsArtifact.test.ts\n+++ b/tests/publicDocsArtifact.test.ts\n@@ -159,6 +159,10 @@ describe(\"public Docs Pages artifact\", () => {\n     const serialized = JSON.stringify(reflection);\n     for (const symbol of [\"initWorkspace\", \"InitWorkspaceOptions\", \"AMCNativeClient\"]) expect(serialized).toContain(`\"name\":\"${symbol}\"`);\n     expect(serialized).toContain(`/blob/${revision}/`);\n+    const sourceUrls = [...serialized.matchAll(/\"url\":\"([^\"]+)\"/g)].map(match => match[1]!);\n+    expect(sourceUrls.some(url => url.startsWith(\n+      `https://github.com/AgentMaturity/AgentMaturityCompass/blob/${revision}/src/workspace.ts#L`\n+    ))).toBe(true);\n     expect(pnpmIntegrityFor(\"typedoc\", String(pkg.devDependencies.typedoc), root)).not.toBeNull();\n     const initPage = readFileSync(resolve(withApi, \"api/functions/index.initWorkspace.html\"), \"utf8\");\n     expect(initPage).toContain(\"interfaces/index.InitWorkspaceOptions.html\");\n",
+      "patch_sha256": "19158be49fbbe44c88c4e3e360856501af0f2548c330ebbbf5dc7bc94f0a059b"
+    },
+    {
+      "commit": "4939bce218e84c5bc22dde8a91a12b7c5e79f6f6",
+      "paths": [
+        "src/llm/adapter/llmRuntime.ts"
+      ],
+      "patch": "diff --git a/src/llm/adapter/llmRuntime.ts b/src/llm/adapter/llmRuntime.ts\nindex 0d1d307a6..c6c340ba6 100644\n--- a/src/llm/adapter/llmRuntime.ts\n+++ b/src/llm/adapter/llmRuntime.ts\n@@ -38,7 +38,6 @@\n  * row records both the provider's facts and the retry verdict the route's frozen\n  * policy reached.\n  */\n-import { resolve } from \"node:path\";\n import type { CredentialsService } from \"../../credentials/credentialsService.js\";\n import { credentialRefName } from \"../../credentials/credentialRef.js\";\n import type { RecordedCredential } from \"../../session/requestOutcomeMeta.js\";\n@@ -172,14 +171,11 @@ export class LlmRuntime {\n \n   private readonly transport: HttpTransport;\n \n-  private readonly workspace: string;\n-\n   private readonly now: () => number;\n \n   constructor(init: LlmRuntimeInit) {\n     this.init = init;\n     this.transport = init.transport ?? fetchTransport;\n-    this.workspace = resolve(init.session.workspace);\n     this.now = init.now ?? Date.now;\n   }\n \n@@ -229,10 +225,11 @@ export class LlmRuntime {\n       assertRequest: (request) => {\n         assertRequestCapabilities(route.capabilities, request);\n         // Opt-in: no .amc/dataflow/processors.yaml (and no .sig) means this workspace has not adopted protected-data admission.\n-        if (loadProcessorRegistrySnapshot(this.workspace).state === \"missing\") return;\n+        // The workspace is read per use and never fabricated: a session without one reads as an invalid registry, not a missing one.\n+        if (loadProcessorRegistrySnapshot(this.init.session.workspace).state === \"missing\") return;\n         const detection = detectProtectedRequest(request);\n         if (detection.classes.length === 0) return;\n-        const admission = admitProtectedModelRequest(this.workspace, route.providerId, route.baseUrl, detection);\n+        const admission = admitProtectedModelRequest(this.init.session.workspace, route.providerId, route.baseUrl, detection);\n         const evidence = {\n           classes: [...detection.classes],\n           counts: { ...detection.counts },\n@@ -346,8 +343,9 @@ export class LlmRuntime {\n \n     let response: HttpResponse;\n     try {\n-      // The same gate covers injected transports and fetch, before either can transmit the pinned bytes.\n-      checkEgress({ workspace: this.workspace, channel: \"provider\", url: request.url });\n+      // The same gate covers injected transports and fetch, before either can transmit the pinned bytes. checkEgress\n+      // resolves the session's workspace itself and refuses a missing one as workspace_scope_required.\n+      checkEgress({ workspace: this.init.session.workspace, channel: \"provider\", url: request.url });\n       dispatchAttempted = true;\n       response = await this.transport({ ...request, redirect: \"error\" });\n     } catch (error: unknown) {\n",
+      "patch_sha256": "e1788897d58782c015f281fda8a14551c503c27d8034ed4f1c96b86b7959ce75"
+    }
+  ],
+  "freeze_ownership_and_limits": [
+    "Reviewed patches do not edit CLI/station inventory or freeze baseline/checks, nor original archives or meta-freeze manifest. The LLM path has no plan-edit landed archive record. Existing freeze is CLI/station count based and requires accepted-base authority; run unchanged check:freeze against accepted main. No exception approval is inferred.",
+    "Source patches remain authored candidates and need current-head qualification; source/test identity limits are recorded above. No claim of current six-suite pass or full P0-47 completion is made. The 51 failures and global/per-file coverage remain real until independently resolved and rerun.",
+    "Existing Claude authored commits are reused only as reviewed bounded patches in the root-owned isolated branch. Clean source trees or archived commit existence do not clear other-session reservations. No other checkout was altered and no cross-session implementation resumed.",
+    "No production-byte identity exists for whole candidate CLI, scorer, TypeDoc builder/config, evidenceProvenance or LlmRuntime. Whole-file overlay/test reuse is unsupported; exact local hunks are the review boundary."
+  ]
+}

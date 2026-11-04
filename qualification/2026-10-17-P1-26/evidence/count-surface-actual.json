@@ -1,0 +1,150 @@
+{
+  "at": "2026-10-16T20:40:35.996604+00:00",
+  "surfaces": [
+    {
+      "relativePath": "README.md",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+        "bytes": 59828,
+        "sha256": "3b39cfb5d8279b295afe74fd89db694e2d2f210b430be3644935619368d5f44a"
+      },
+      "actualAfter": {
+        "bytes": 59828,
+        "sha256": "8952f99d0c69024745a3c361a0d3f8c83b90ed07d8a654e7c65c7710b13e1139"
+      },
+      "numericSpans": 2,
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "94da70f37fc7181a806b93b80c027042f7c215d8b5d65727eaff2d608ecc6ba6"
+      },
+      "actualAfter": {
+        "bytes": 16220,
+        "sha256": "e326da4767b404a0be570ddb4ff8e43ff7730be5bd9be87aa1e57156e4762123"
+      },
+      "numericSpans": 1,
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "website/index.html",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+        "bytes": 43520,
+        "sha256": "3eb4d3313271913abb81ac391084aec461628132be9687ab4c927e232de8d4a4"
+      },
+      "actualAfter": {
+        "bytes": 43520,
+        "sha256": "4bd7e2f981a5eca31bb60e4bb00a3c07567cd0aa1ab291eadc3b590b26686beb"
+      },
+      "numericSpans": 1,
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "website/lite.html",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+        "bytes": 11197,
+        "sha256": "d71d1fbd6d0a13fa42cd7be83b4d25c6a5eeec21dd1343d7a723582221196370"
+      },
+      "actualAfter": {
+        "bytes": 11197,
+        "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc"
+      },
+      "numericSpans": 1,
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+        "bytes": 44169,
+        "sha256": "413ed4eaba823bd0c0a1ad77422662f4ee8d5a221b9a95d19a2f95e113726433"
+      },
+      "actualAfter": {
+        "bytes": 44169,
+        "sha256": "ae50801c6b0b67be2cf7d80bc2658577c0dcddfb9545a68cf370d235a863d7c9"
+      },
+      "numericSpans": 1,
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "def5e0e91b20400671f5c40d2069cdabd090afb5b2cac40d4663bf74e8104a8f"
+      },
+      "actualAfter": {
+        "bytes": 1951,
+        "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2"
+      },
+      "numericSpans": 1,
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "af0c5f47077494b8cc2106d63c5849223f210f470263de8b09a59d5479f92065"
+      },
+      "actualAfter": {
+        "bytes": 3075,
+        "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010"
+      },
+      "numericSpans": 2,
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "97ca78747fcbab5faa9630ba4bff8cb1e8b3aec265976c38ce247c75df053db9"
+      },
+      "actualAfter": {
+        "bytes": 3880,
+        "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b"
+      },
+      "numericSpans": 1,
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "5c0a952587cf63ed23e58262bff6d9dba08286715defd2fee2dd56d25423dad5"
+      },
+      "actualAfter": {
+        "bytes": 2489,
+        "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30"
+      },
+      "numericSpans": 1,
+      "allOtherAuthoredBytesExact": true
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "before": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "e300a8c31c72767655c974f4642a9a8ebc45588416043b6ee7ed90c0548e87f2"
+      },
+      "actualAfter": {
+        "bytes": 107509,
+        "sha256": "10bc89bdcc14e2e13a50808a261cb98c67f887d52410b75bb9ede761c7e6f664"
+      },
+      "numericSpans": 4,
+      "allOtherAuthoredBytesExact": true
+    }
+  ],
+  "all10ActualWholeFileHashesMatchProposal": true,
+  "numericSpans": 15,
+  "allOtherAuthoredBytesExact": true,
+  "generatorPhase": "p126-gen-counts-corrected",
+  "priorWrongScriptRetained": "count-generator-command-correction.json"
+}

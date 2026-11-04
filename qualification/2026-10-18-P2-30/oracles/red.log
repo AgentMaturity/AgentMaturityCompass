@@ -1,0 +1,24 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts (0 test)
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts [ tests/catalog/stations/technology/fixtures.test.ts ]
+Error: Cannot find module './harness.js' imported from /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/catalog/stations/technology/fixtures.test.ts
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:2:1
+      1| import { describe, expect, it } from "vitest";
+      2| import {
+       | ^
+      3|   evaluateFixture, evaluateProduction, plan, runTechnologyOracle, tech…
+      4|   type TechnologyOracleSpec
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  no tests
+   Start at  10:02:34
+   Duration  443ms (transform 97ms, setup 113ms, import 0ms, tests 0ms, environment 0ms)
+

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+
+ Test Files  1 passed (1)
+      Tests  4 passed (4)
+   Start at  16:59:09
+   Duration  1.52s (transform 649ms, setup 70ms, import 783ms, tests 475ms, environment 0ms)
+

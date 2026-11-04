@@ -1,0 +1,164 @@
+{
+  "kind": "amc.reference-deployment/1",
+  "kubeContext": "kind-amc-p206",
+  "namespace": "default",
+  "release": "amc-rd",
+  "images": {
+    "a": "amc-studio@sha256:9fd815115d9a97a51f805bf777a3abd49fdc8df624a0ab54126d1de935756716",
+    "b": "amc-studio@sha256:13df09badf0852bb39d642c71734248a341a789933f2b5c65dc7d6de4f760e67"
+  },
+  "ha": false,
+  "targets": {
+    "schema": "amc.recovery-targets/1",
+    "rpoSeconds": 3600,
+    "rtoSeconds": 1800,
+    "backupCadenceSeconds": 3600,
+    "agreedBy": "nobody: engineering placeholder for a local kind run, not agreed with a partner",
+    "agreedOn": "2026-10-29",
+    "partner": "none",
+    "status": "engineering-placeholder"
+  },
+  "targetsSha256": "a0fe18566e02aabea88b6bed1e5a944bcdca5259c2651fc386b0a851b640f3ad",
+  "matrixSha256": "28987bce8c3b7a47fcfc9eff9bf1c622d4733f8e38790a88e25c5b50b07cd314",
+  "verdict": {
+    "pass": false,
+    "failures": [
+      "INS-1",
+      "UPG-1",
+      "RB-1",
+      "BR-1",
+      "BR-3",
+      "CR-2"
+    ],
+    "notRun": [
+      "UPG-2",
+      "RB-2",
+      "BR-2",
+      "CR-1",
+      "CR-3",
+      "CR-4",
+      "CR-5",
+      "CR-6",
+      "OV-1",
+      "OV-2",
+      "TS-1",
+      "TS-2",
+      "TS-3",
+      "TS-4",
+      "TS-5"
+    ],
+    "unknown": []
+  },
+  "results": [
+    {
+      "id": "INS-1",
+      "status": "failed",
+      "reason": "failed criteria: Ready within the 300 s startup budget"
+    },
+    {
+      "id": "INS-2",
+      "status": "passed",
+      "reason": null
+    },
+    {
+      "id": "UPG-1",
+      "status": "failed",
+      "reason": "failed criteria: workload fixture seeded on N-1"
+    },
+    {
+      "id": "UPG-2",
+      "status": "not_run",
+      "reason": "needs a test image whose migration throws (not built by this harness yet)"
+    },
+    {
+      "id": "RB-1",
+      "status": "failed",
+      "reason": "failed criteria: values-only upgrade to revision N; helm rollback from N to N-1; governed turn passes after the rollback"
+    },
+    {
+      "id": "RB-2",
+      "status": "not_run",
+      "reason": "UPG-1 did not record a pre-upgrade revision and backup"
+    },
+    {
+      "id": "BR-1",
+      "status": "failed",
+      "reason": "failed criteria: amc backup create during a governed turn"
+    },
+    {
+      "id": "BR-2",
+      "status": "not_run",
+      "reason": "recovery targets are \"engineering-placeholder\", not partner-agreed: RPO and RTO cannot be judged"
+    },
+    {
+      "id": "BR-3",
+      "status": "failed",
+      "reason": "failed criteria: restore into another tenant's workspace: refused with an error, tenant unchanged"
+    },
+    {
+      "id": "CR-1",
+      "status": "not_run",
+      "reason": "needs a consequential fixture action with a system of record (P1-19 finance fixture) and the P1-03/P2-12 resume semantics wired into this harness"
+    },
+    {
+      "id": "CR-2",
+      "status": "failed",
+      "reason": "failed criteria: drain evicts Studio within 180 s (PodDisruptionBudget allows it); Ready again after uncordon (single-node procedure); governed turn passes after the drain"
+    },
+    {
+      "id": "CR-3",
+      "status": "not_run",
+      "reason": "filling the volume needs a size-limited storage class; kind's local-path volumes share the node disk"
+    },
+    {
+      "id": "CR-4",
+      "status": "not_run",
+      "reason": "the chart runs the file KeyProvider; blocking a networked KeyProvider (SoftHSM or a KMS) is not wired into the chart"
+    },
+    {
+      "id": "CR-5",
+      "status": "not_run",
+      "reason": "HA mode is not part of this topology (--ha not given)"
+    },
+    {
+      "id": "CR-6",
+      "status": "not_run",
+      "reason": "no scraper or OTLP endpoint is deployed by this harness, so an outage cannot be staged yet"
+    },
+    {
+      "id": "OV-1",
+      "status": "not_run",
+      "reason": "bundle export plus the standalone verifier on a network-less host, with tampered, forged-embedded-key, unpinned-issuer and revoked-key fixtures, is not wired into this harness yet"
+    },
+    {
+      "id": "OV-2",
+      "status": "not_run",
+      "reason": "WORM export needs an object-lock bucket (or a stand-in) reachable from the cluster"
+    },
+    {
+      "id": "TS-1",
+      "status": "not_run",
+      "reason": "needs a second tenant release (one release per namespace) and per-tenant fixtures; route list from src/studio/openapi.ts"
+    },
+    {
+      "id": "TS-2",
+      "status": "not_run",
+      "reason": "needs a second tenant release (one release per namespace) and per-tenant fixtures; lease and agent token replay"
+    },
+    {
+      "id": "TS-3",
+      "status": "not_run",
+      "reason": "needs a second tenant release (one release per namespace) and per-tenant fixtures; the cross-tenant evidence fixture"
+    },
+    {
+      "id": "TS-4",
+      "status": "not_run",
+      "reason": "needs a second tenant release (one release per namespace) and per-tenant fixtures; kind's default CNI (kindnet) does not enforce NetworkPolicy, so a policy-enforcing CNI is needed"
+    },
+    {
+      "id": "TS-5",
+      "status": "not_run",
+      "reason": "needs a second tenant release (one release per namespace) and per-tenant fixtures; guard-event and stream scoping"
+    }
+  ]
+}

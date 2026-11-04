@@ -270,8 +270,8 @@ export function registerLateStageCliCommands({
     .action(async (opts: { gateway?: string; vault?: boolean; demo?: boolean; json?: boolean }) => {
       const { DEMO_AGENT_ID, runDemo, runDemoWithoutUserVault, shouldRunNoVaultDemo, startDemoUpstream } = await import("./demo/demoRun.js");
       const { EXAMPLE_BANNER, exampleEnvelope } = await import("./claims/eligibility/exampleMode.js");
-      const { issueLeaseForCli } = await import("./leases/leaseCli.js");
-      const { ensureLeaseRevocationStore } = await import("./leases/leaseCli.js");
+      const { issueLeaseForCli, ensureLeaseRevocationStore } = await import("./leases/leaseCli.js");
+      const { withWorkspaceScope } = await import("./enforce/evidenceEmitter.js");
 
       if (shouldRunNoVaultDemo(opts)) {
         if (opts.gateway) {
@@ -330,9 +330,9 @@ export function registerLateStageCliCommands({
         const lease = issueLeaseForCli({
           workspace,
           workspaceId: wsId,
-          agentId: DEMO_AGENT_ID,
+          agentId: DEMO_AGENT_ID, claimKind: "synthetic_example",
           ttl: "15m",
-          scopes: "gateway:llm,proxy:connect,toolhub:intent,toolhub:execute,governor:check,receipt:verify",
+          scopes: "gateway:llm,receipt:verify", // proxy, toolhub and governor ignore claimKind: a synthetic lease never reaches them
           routes: "/local",
           models: "*",
           rpm: 60,
@@ -345,7 +345,7 @@ export function registerLateStageCliCommands({
         console.log(chalk.gray(`  Gateway: ${gatewayUrl}`));
         console.log(chalk.gray("  Simulating a multi-turn AI agent through the AMC gateway...\n"));
 
-        const result = await runDemo(gatewayUrl, lease.token, DEMO_AGENT_ID);
+        const result = await withWorkspaceScope(workspace, () => runDemo(gatewayUrl, lease.token, DEMO_AGENT_ID));
 
         console.log(chalk.green(`\n✓ Demo complete in ${(result.durationMs / 1000).toFixed(1)}s`));
         console.log(chalk.gray(`  ${result.requestsSent} requests sent through gateway`));
@@ -1114,71 +1114,22 @@ export function registerLateStageCliCommands({
     });
 
   // ── Blocker #3: top-level `amc badge` command ──────────────────────────────────
+  // A badge shows only what AMC recorded for the agent: no flag sets its level or score (P0-28).
   program
     .command("badge")
-    .description("Generate maturity badge for README/docs (markdown, HTML, or URL)")
+    .description("Print the agent's passport badge line, from what AMC recorded (no level or score override)")
     .option("--agent <agentId>", "agent ID (default: 'default')")
-    .option("--level <0-5>", "override level (instead of reading from latest score)")
-    .option("--score <0-100>", "override score (instead of reading from latest score)")
-    .option("--format <format>", "output format: markdown | html | url | svg", "markdown")
-    .action(async (opts: { agent?: string; level?: string; score?: string; format?: string }) => {
-      const { generateBadgeSvg, scoreToLevel } = await import("./cert/badgeGenerator.js");
+    .action((opts: { agent?: string }) => {
       const agentId = opts.agent ?? "default";
-      const format = (opts.format ?? "markdown").toLowerCase();
-
-      let level: number;
-      let score: number;
-
-      if (opts.level != null) {
-        level = Number(opts.level);
-        score = opts.score != null ? Number(opts.score) : level * 20;
-      } else if (opts.score != null) {
-        score = Number(opts.score);
-        level = scoreToLevel(score);
-      } else {
-        // Try reading from latest quickscore cache
-        try {
-          const out = passportBadgeCli({ workspace: process.cwd(), agentId: resolveAgentId(process.cwd(), agentId) });
-          console.log(out.badge);
-          printClaimResult(unverifiedClaim("passport:badge", 1), { stderr: true });
-          return;
-        } catch {
-          // No cached passport — inform user to specify level
-          console.error(chalk.yellow("No cached score found for agent '" + agentId + "'. Specify --level or --score."));
-          console.log(chalk.gray("\nExamples:"));
-          console.log(chalk.gray("  amc badge --level 3              # Generate L3 badge"));
-          console.log(chalk.gray("  amc badge --score 72.5           # Badge from score"));
-          console.log(chalk.gray("  amc quickscore && amc badge      # Score first, then badge"));
-          console.log(chalk.gray("  amc badge --format html --level 4 # HTML img tag"));
-          console.log(chalk.gray("  amc badge --format url --level 3  # Raw shields.io URL"));
-          console.log(chalk.gray("  amc badge --format svg --level 3  # Full SVG output"));
-          process.exitCode = 1;
-          return;
-        }
+      try {
+        const out = passportBadgeCli({ workspace: process.cwd(), agentId: resolveAgentId(process.cwd(), agentId) });
+        console.log(out.badge);
+        printClaimResult(unverifiedClaim("passport:badge", 1), { stderr: true });
+      } catch (error) {
+        console.error(chalk.yellow(`No badge for agent '${agentId}': ${toErrorMessage(error)}`));
+        console.error(chalk.gray("Record an assessment first (amc run), then run amc badge again."));
+        process.exitCode = 1;
       }
-
-      const badgeColor = level >= 4 ? "brightgreen" : level >= 3 ? "green" : level >= 2 ? "yellow" : "red";
-      const shieldsUrl = `https://img.shields.io/badge/AMC-L${level}_(${score.toFixed(1)})-${badgeColor}?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTEyIDJMMiA3bDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDEybDEwIDUgMTAtNXptMCA5bC04LjUtNC4yNUwyIDIxbDEwIDUgMTAtNXoiLz48L3N2Zz4=`;
-
-      switch (format) {
-        case "url":
-          console.log(shieldsUrl);
-          break;
-        case "html":
-          console.log(`<a href="https://github.com/AgentMaturity/AgentMaturityCompass"><img src="${shieldsUrl}" alt="AMC L${level}" /></a>`);
-          break;
-        case "svg": {
-          const svg = generateBadgeSvg(score, level, agentId);
-          console.log(svg);
-          break;
-        }
-        case "markdown":
-        default:
-          console.log(`[![AMC L${level}](${shieldsUrl})](https://github.com/AgentMaturity/AgentMaturityCompass)`);
-          break;
-      }
-      // A level or score given on the command line is the caller's own statement. stderr keeps the badge pipeable.
-      printClaimResult(unverifiedClaim("badge", 1), { stderr: true });
     });
 
   /* ── Runtime Observability: watch, monitor, costs, guide, rate, integrations ── */
@@ -1298,7 +1249,7 @@ export function registerLateStageCliCommands({
         console.log(`Total Calls:      ${report.totalCalls}`);
         console.log(`Avg Cost/Call:    $${report.avgCostPerCall.toFixed(6)}`);
         console.log(`Projected/Month:  $${report.projectedMonthlyCostUsd.toFixed(2)}`);
-        console.log(`Error Rate:       ${(report.errorRate * 100).toFixed(1)}%`);
+        console.log(`Error Rate:       ${report.errorRate === null ? "not measured" : `${(report.errorRate * 100).toFixed(1)}%`}`);
         if (Object.keys(report.costByModel).length > 0) {
           console.log(chalk.cyan("\nBy Model:"));
           for (const [model, data] of Object.entries(report.costByModel)) {
@@ -1472,43 +1423,30 @@ export function registerLateStageCliCommands({
 
   enterprise
     .command("status")
-    .description("Show current license status, tier, and enabled features")
+    .description("Show whether enterprise licence verification is configured, and the licence it verifies")
     .action(async () => {
       const { enterpriseStatusCli } = await import("./enterprise/enterpriseCli.js");
       const result = enterpriseStatusCli({ workspace: process.cwd() });
       console.log(chalk.bold.white(`\n  Enterprise Status\n`));
-      console.log(`  Tier:      ${chalk.hex("#00ff41")(result.tierLabel)} (${result.tier})`);
-      console.log(`  License:   ${result.licenseValid ? chalk.green("valid") : chalk.red(result.licenseStatus)}`);
-      if (result.org) {
-        console.log(`  Org:       ${chalk.white(result.org)}`);
+      console.log(`  Licence verification: ${result.verificationConfigured ? chalk.green("configured") : chalk.yellow("not configured")}`);
+      if (result.verificationConfigured) {
+        console.log(`  License:   ${result.licenseValid ? chalk.green(result.licenseStatus) : chalk.red(result.licenseStatus)}`);
       }
-      if (result.expiresAt) {
-        console.log(`  Expires:   ${chalk.gray(result.expiresAt)}`);
+      if (result.licenseValid) {
+        console.log(`  Tier:      ${chalk.hex("#00ff41")(result.tierLabel)} (${result.tier})`);
+        if (result.org) console.log(`  Org:       ${chalk.white(result.org)}`);
+        if (result.expiresAt) console.log(`  Expires:   ${chalk.gray(result.expiresAt)}`);
+        if (result.graceDaysRemaining > 0) console.log(`  Grace:     ${chalk.hex("#f59e0b")(`${result.graceDaysRemaining} days remaining`)}`);
       }
-      if (result.graceDaysRemaining > 0) {
-        console.log(`  Grace:     ${chalk.hex("#f59e0b")(`${result.graceDaysRemaining} days remaining`)}`);
-      }
-      console.log(`  Features:  ${result.features.length > 0 ? result.features.join(", ") : chalk.gray("none")}`);
-      if (result.errors.length > 0) {
-        for (const err of result.errors) {
-          console.log(`  ${chalk.red("error:")} ${err}`);
-        }
-      }
-      console.log();
+      for (const err of result.errors) console.log(`  ${chalk.yellow("note:")} ${err}`);
+      console.log(chalk.gray("  An enterprise licence gates no AMC feature and never changes a result.\n"));
     });
 
   enterprise
     .command("activate <key>")
-    .description("Activate an enterprise license key (format: AMC-ENT-XXXX-XXXX-XXXX)")
+    .description("Activate a signed enterprise licence key, verified against a key pinned in the AMC trust list")
     .action(async (key: string) => {
-      const { validateLicenseKeyFormat } = await import("./enterprise/license.js");
       const { enterpriseActivateCli } = await import("./enterprise/enterpriseCli.js");
-      const formatCheck = validateLicenseKeyFormat(key);
-      if (!formatCheck.valid) {
-        console.error(chalk.red(`\n  Invalid key format: ${formatCheck.errors.join(", ")}\n`));
-        process.exit(1);
-        return;
-      }
       const result = enterpriseActivateCli({ workspace: process.cwd(), key });
       if (result.success) {
         console.log(chalk.green(`\n  License activated — tier: ${result.tier}`));
@@ -1517,7 +1455,7 @@ export function registerLateStageCliCommands({
         }
         console.log(chalk.gray(`  Stored: ${result.path}\n`));
       } else {
-        console.error(chalk.red(`\n  Activation failed: ${result.errors.join(", ")}\n`));
+        console.error(chalk.red(`\n  Activation refused: ${result.errors.join(", ")}\n`));
         process.exit(1);
       }
     });

@@ -30,7 +30,10 @@
  *   - tools are offered and no tool result is in the history yet  → one
  *     `tool_use` call of the first offered tool, with the last user text as its
  *     only argument. That is what makes `amc agent-loop run --stub` a genuine
- *     MULTI-STEP turn rather than one request and a period.
+ *     MULTI-STEP turn rather than one request and a period. A user text that is
+ *     exactly `{"tool": "<an offered tool>", "arguments": {...}}` asks for that
+ *     call instead: a scripted call, still governed like any other (the SDK
+ *     quickstart's fs.write, P1-40).
  *   - otherwise → one text block quoting what it was asked.
  *
  * FAULT INJECTION IS OPT-IN AND NAMED. `failFirst` makes the first N dispatches
@@ -45,6 +48,7 @@ import type { LlmRouteConfig } from "../llm/adapter/adapterRegistry.js";
 import { bodyFromChunks, readBodyText } from "../llm/adapter/transport.js";
 import type { HttpResponse, HttpTransport } from "../llm/adapter/transport.js";
 import { toolCallId } from "../llm/streamChunk.js";
+import { isContextSnapshot } from "../prompt/assembly/interpolate.js";
 import type { StreamChunk } from "../llm/streamChunk.js";
 
 export const STUB_PROVIDER_ID = "stub";
@@ -163,7 +167,8 @@ function lastUserText(request: EchoedRequest): string {
     const message = request.messages[index];
     if (message === undefined || message.role !== "user") continue;
     for (const block of [...message.content].reverse()) {
-      if (block?.type === "text" && typeof block.text === "string") return block.text;
+      // What the USER said: the runtime-context snapshot every native surface now appends is skipped (GAP-WP39).
+      if (block?.type === "text" && typeof block.text === "string" && !isContextSnapshot(block.text)) return block.text;
     }
   }
   return "";
@@ -176,18 +181,47 @@ function hasToolResult(request: EchoedRequest): boolean {
   );
 }
 
+/** The call a user text spells out as `{"tool", "arguments"}`, when it names an offered tool; the newest wins. */
+function directedCall(request: EchoedRequest): { readonly name: string; readonly args: string } | null {
+  for (const message of [...request.messages].reverse()) {
+    if (message.role !== "user") continue;
+    for (const block of [...message.content].reverse()) {
+      if (block?.type !== "text" || typeof block.text !== "string") continue;
+      let asked: unknown;
+      try { asked = JSON.parse(block.text); } catch { continue; } // plain text, not a directive
+      if (typeof asked !== "object" || asked === null) continue;
+      const { tool, arguments: args } = asked as { tool?: unknown; arguments?: unknown };
+      if (typeof tool === "string" && typeof args === "object" && args !== null && !Array.isArray(args)
+        && request.tools.some((offered) => offered.name === tool)) return { name: tool, args: JSON.stringify(args) };
+    }
+  }
+  return null;
+}
+
+/**
+ * True when the newest user message is itself a directive with no tool result after it. An inherited
+ * history (a fork, GAP-WP17) already holds earlier tool results; a fresh directive still asks for its call.
+ */
+function pendingDirective(request: EchoedRequest): boolean {
+  const last = request.messages.map((message, at) => ({ message, at }))
+    .filter(({ message }) => message.role === "user" && message.content.some((block) => block?.type === "text"
+      && typeof block.text === "string" && !isContextSnapshot(block.text))).at(-1);
+  if (last === undefined || directedCall({ ...request, messages: [last.message] }) === null) return false;
+  return !request.messages.slice(last.at + 1).some((message) => message.content.some((block) => block?.type === "tool_result"));
+}
+
 /** Zero, and true: no model ran, so nothing was consumed. See the module header. */
 const STUB_USAGE = Object.freeze({ inputTokens: 0, outputTokens: 0 });
 
 function* stubChunks(request: EchoedRequest): Generator<StreamChunk> {
   const asked = lastUserText(request);
   const tool = request.tools[0];
-  if (tool !== undefined && !hasToolResult(request)) {
+  if (tool !== undefined && (!hasToolResult(request) || pendingDirective(request))) {
     const id = toolCallId(`stub-call-${request.messages.length}`);
-    const args = JSON.stringify({ text: asked });
+    const { name, args } = directedCall(request) ?? { name: tool.name, args: JSON.stringify({ text: asked }) };
     yield { type: "block-start", index: 0, blockKind: "tool_use" };
-    yield { type: "tool-call-delta", index: 0, id, name: tool.name, argumentsDelta: args };
-    yield { type: "block-end", index: 0, block: { kind: "tool_use", id, name: tool.name, arguments: args } };
+    yield { type: "tool-call-delta", index: 0, id, name, argumentsDelta: args };
+    yield { type: "block-end", index: 0, block: { kind: "tool_use", id, name, arguments: args } };
     yield { type: "usage", usage: STUB_USAGE };
     yield { type: "finish", reason: { kind: "tool_calls" } };
     return;

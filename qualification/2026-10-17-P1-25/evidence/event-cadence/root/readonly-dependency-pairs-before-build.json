@@ -1,0 +1,60 @@
+{
+  "at": "2026-10-17T00:56:26.365324+00:00",
+  "pairs": [
+    {
+      "sourceRelativePath": "src/credentials/credentialsPaths.ts",
+      "compiledRelativePath": "dist/credentials/credentialsPaths.js",
+      "currentlySelectedSource": false,
+      "currentlySelectedCompiled": false,
+      "currentSourceObservation": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+        "bytes": 4710,
+        "sha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+        "dev": 16777231,
+        "inode": 542459661,
+        "nlink": 1
+      },
+      "currentCompiledObservation": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/credentials/credentialsPaths.js",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/credentials/credentialsPaths.js",
+        "bytes": 3271,
+        "sha256": "d3b0f6ee002740b3436c5584952f23fd40eef82906983d2a6077221585e17945",
+        "dev": 16777231,
+        "inode": 543743198,
+        "nlink": 1
+      },
+      "futureFreshHashesAdopted": false
+    },
+    {
+      "sourceRelativePath": "src/transparency/anchors/anchor.ts",
+      "compiledRelativePath": "dist/transparency/anchors/anchor.js",
+      "currentlySelectedSource": false,
+      "currentlySelectedCompiled": false,
+      "currentSourceObservation": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/anchors/anchor.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/anchors/anchor.ts",
+        "bytes": 11596,
+        "sha256": "40ff44361f223e7e6451e8e4882963c8be115899c1ab43d752d4e8de95c21aa8",
+        "dev": 16777231,
+        "inode": 542461117,
+        "nlink": 1
+      },
+      "currentCompiledObservation": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/transparency/anchors/anchor.js",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/transparency/anchors/anchor.js",
+        "bytes": 10758,
+        "sha256": "d1639b4b54dc319325c7ca69c97644ce283001588cd1c38dc200fc4caaa502ea",
+        "dev": 16777231,
+        "inode": 543743663,
+        "nlink": 1
+      },
+      "futureFreshHashesAdopted": false
+    }
+  ],
+  "compiledPinsObservationOnlyUntilNormalOwnBuildAndActualFreshBinding": true,
+  "noOtherRootDependencyEdits": true,
+  "priorSelectedPathCount": 94,
+  "priorCompiledPairCount": 19,
+  "futureHashesOrQAdopted": false
+}

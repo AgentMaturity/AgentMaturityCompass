@@ -1,0 +1,399 @@
+{
+  "kind": "actual Node24 foreign-runner qualification with stdout-spy removal output probe",
+  "sourceRef": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "fixture": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+  "node": "v24.21.0",
+  "pnpm": "10.33.0",
+  "gitNoLazyFetch": true,
+  "initialGitStatus": "",
+  "work": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z",
+  "originalTestSha256": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+  "mutatedTestSha256": "381ff272a889797db9c22a76e6048c3bd9cbb01427674032e3053e65eaa14ccb",
+  "exactSpyRemovalDiff": "--- a/tests/foreignSubagentRunner.test.ts\n+++ b/tests/foreignSubagentRunner.test.ts\n@@ -171,12 +171,10 @@\n     // pipeline until the job times out with no log at all (every CI build-test\n     // run from 2026-09-16 to 2026-10-05 died this way), so the tee is swallowed\n     // here. The assertion is about what the runner records, not what it prints.\n-    const write = vi.spyOn(process.stdout, \"write\").mockImplementation(() => true);\n     let result: Awaited<ReturnType<typeof runner>>;\n     try {\n       result = await runner(ctx());\n     } finally {\n-      write.mockRestore();\n     }\n \n     expect(result.ok).toBe(false);\n",
+  "removedAssertions": [],
+  "sourceHashesBefore": {
+    "src/agent/foreignSubagentRunner.ts": "5b382e8e5a26391e3c87283cc0aaccf76287bbcf926cfb2d66993b0ab45c8213",
+    "src/agent/subagentSpawn.ts": "8ca28be736ebf31fbdf3f2de90acbd2173c17ffa0339263eba3c8ac7a4fea41c",
+    "src/ledger/monitor.ts": "2fa631a7fca5c2e7e8279f985a84d456a991e5bc775750f1568f53a35a95c589",
+    "src/workspace.ts": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+    "tests/foreignSubagentRunner.test.ts": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+  },
+  "phases": [
+    {
+      "label": "build",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "startedAt": "2026-10-14T14:35:51.863892+00:00",
+      "endedAt": "2026-10-14T14:36:19.386062+00:00",
+      "durationSeconds": 27.522,
+      "exitCode": 0,
+      "testSha256": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/build.log",
+      "logSha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "logBytes": 807
+    },
+    {
+      "label": "normal-all-before",
+      "argv": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/foreignSubagentRunner.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/normal-all-before.json"
+      ],
+      "startedAt": "2026-10-14T14:36:19.386541+00:00",
+      "endedAt": "2026-10-14T14:36:46.350774+00:00",
+      "durationSeconds": 26.964,
+      "exitCode": 0,
+      "testSha256": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/normal-all-before.log",
+      "logSha256": "c0449050fe4951b3246fd57359faf32f25c53865f49a0dbc6b3133ca077a74e3",
+      "logBytes": 1339,
+      "report": {
+        "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/normal-all-before.json",
+        "sha256": "b3a4d130e3087710aa6c3a11fae2a485ab9e15fc5ee6f43b8f61de0305df3de0",
+        "success": true,
+        "numTotalTests": 12,
+        "numPassedTests": 12,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "actualCases": [
+        {
+          "fullName": "a foreign child answers through the same seam returns the child's own words, folded from its recorded output",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child answers through the same seam passes the goal to the foreign command",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child answers through the same seam refuses when the child exits non-zero, rather than returning partial words",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child answers through the same seam refuses a child that said nothing",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed or it does not run refuses to spawn without a lease",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed or it does not run keeps the child's lease out of the recorded output",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child does not hang its parent refuses on the deadline, and says it was the deadline",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a truncated answer is not an answer refuses rather than reporting the part that fit",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child stops when its parent gives up kills the process on the signal rather than running to completion",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child cannot be continued refuses a continuable request instead of pretending",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed by the same chokepoint as an in-process one runs through spawnSubagent with a signed packet and an announced session",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed by the same chokepoint as an in-process one settles a crashed foreign child as failed, not as a silent success",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ],
+      "filteredPendingNote": null
+    },
+    {
+      "label": "spy-removed-selected",
+      "argv": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/foreignSubagentRunner.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/spy-removed-selected.json",
+        "--testNamePattern",
+        "a truncated answer is not an answer"
+      ],
+      "startedAt": "2026-10-14T14:36:46.351904+00:00",
+      "endedAt": "2026-10-14T14:36:49.648656+00:00",
+      "durationSeconds": 3.297,
+      "exitCode": 0,
+      "testSha256": "381ff272a889797db9c22a76e6048c3bd9cbb01427674032e3053e65eaa14ccb",
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/spy-removed-selected.log",
+      "logSha256": "e6e9316715d6b1957efc72c344afe0530816b3fff1cfcd4b39080bd63bb2941b",
+      "logBytes": 5243457,
+      "report": {
+        "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/spy-removed-selected.json",
+        "sha256": "5c753c093bd182bd0a822538bce42dff3ef469dc2272a5ec087f9318da619896",
+        "success": true,
+        "numTotalTests": 12,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 11,
+        "numTodoTests": 0
+      },
+      "actualCases": [
+        {
+          "fullName": "a foreign child answers through the same seam returns the child's own words, folded from its recorded output",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child answers through the same seam passes the goal to the foreign command",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child answers through the same seam refuses when the child exits non-zero, rather than returning partial words",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child answers through the same seam refuses a child that said nothing",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed or it does not run refuses to spawn without a lease",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed or it does not run keeps the child's lease out of the recorded output",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child does not hang its parent refuses on the deadline, and says it was the deadline",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a truncated answer is not an answer refuses rather than reporting the part that fit",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child stops when its parent gives up kills the process on the signal rather than running to completion",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child cannot be continued refuses a continuable request instead of pretending",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed by the same chokepoint as an in-process one runs through spawnSubagent with a signed packet and an announced session",
+          "status": "skipped",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed by the same chokepoint as an in-process one settles a crashed foreign child as failed, not as a silent success",
+          "status": "skipped",
+          "failureMessages": []
+        }
+      ],
+      "filteredPendingNote": "11 other cases are intentionally filtered and pending; this selected probe is not a zero-pending or whole-file qualification."
+    },
+    {
+      "label": "restored-all-after",
+      "argv": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/foreignSubagentRunner.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/restored-all-after.json"
+      ],
+      "startedAt": "2026-10-14T14:36:49.658784+00:00",
+      "endedAt": "2026-10-14T14:37:16.189177+00:00",
+      "durationSeconds": 26.53,
+      "exitCode": 0,
+      "testSha256": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/restored-all-after.log",
+      "logSha256": "0f1f2c091fba4facac751b56f99321ea575f3bce330422dc3adbffa65e34262e",
+      "logBytes": 1340,
+      "report": {
+        "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/restored-all-after.json",
+        "sha256": "380e9b3de908ec0a0ff4e90041b7b04a3f5da21e6337cb60447c6af49357310d",
+        "success": true,
+        "numTotalTests": 12,
+        "numPassedTests": 12,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "actualCases": [
+        {
+          "fullName": "a foreign child answers through the same seam returns the child's own words, folded from its recorded output",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child answers through the same seam passes the goal to the foreign command",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child answers through the same seam refuses when the child exits non-zero, rather than returning partial words",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child answers through the same seam refuses a child that said nothing",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed or it does not run refuses to spawn without a lease",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed or it does not run keeps the child's lease out of the recorded output",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child does not hang its parent refuses on the deadline, and says it was the deadline",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a truncated answer is not an answer refuses rather than reporting the part that fit",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child stops when its parent gives up kills the process on the signal rather than running to completion",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child cannot be continued refuses a continuable request instead of pretending",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed by the same chokepoint as an in-process one runs through spawnSubagent with a signed packet and an announced session",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "fullName": "a foreign child is governed by the same chokepoint as an in-process one settles a crashed foreign child as failed, not as a silent success",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ],
+      "filteredPendingNote": null
+    }
+  ],
+  "status": "QUALIFIED_SCOPED_FOREIGN_RUNNER",
+  "giantLineObservation": {
+    "rawLogBytes": 5243457,
+    "maxLineBytes": 5242950,
+    "longestLineXBytes": 5242880,
+    "linesAtLeast1MiB": 1,
+    "linesAtLeast4MiB": 1,
+    "longestLineSha256": "ea7cfc125f39621709153c3603c93c2b31445460151c6e924bd77c9b34105976",
+    "lineContentsNotEmitted": true
+  },
+  "spyRemovalRefusalAssertionsRetained": true,
+  "testRestoredBeforeGreen": true,
+  "all12NormalBeforeAndAfterPassed": true,
+  "stdoutProbeInterpretation": "The adverse condition is an actual giant CI log line with the stdout spy absent. Recorded-output/refusal assertions remain; a passing selected test is not an intentionally failed behavioral assertion. Filtered11pending cases are reported honestly.",
+  "probeSelectedBehaviorPassed": true,
+  "testRestoredByteExactly": true,
+  "sourceHashesAfter": {
+    "src/agent/foreignSubagentRunner.ts": "5b382e8e5a26391e3c87283cc0aaccf76287bbcf926cfb2d66993b0ab45c8213",
+    "src/agent/subagentSpawn.ts": "8ca28be736ebf31fbdf3f2de90acbd2173c17ffa0339263eba3c8ac7a4fea41c",
+    "src/ledger/monitor.ts": "2fa631a7fca5c2e7e8279f985a84d456a991e5bc775750f1568f53a35a95c589",
+    "src/workspace.ts": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+    "tests/foreignSubagentRunner.test.ts": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+  },
+  "sourceUnchanged": true,
+  "finalHead": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "finalGitStatus": "",
+  "limits": [
+    "Only12foreign-runner cases and one actual stdout-spy-removal output probe; no whole-suite or coverage qualification.",
+    "No production edits, runtime cap changes, fixture dependency install, root worktree actions or preexisting artifact cleanup.",
+    "Actual5MiB child input and4MiB recorded cap retained. Giant line contents are retained only in file logs, never emitted to tool outputs."
+  ],
+  "privateRawCopies": [
+    {
+      "path": "/private/tmp/p0-48-node24-foreign-build-20261014.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/build.log"
+    },
+    {
+      "path": "/private/tmp/p0-48-node24-foreign-normal-all-before-20261014.log",
+      "sha256": "c0449050fe4951b3246fd57359faf32f25c53865f49a0dbc6b3133ca077a74e3",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/normal-all-before.log"
+    },
+    {
+      "path": "/private/tmp/p0-48-node24-foreign-normal-all-before-20261014.json",
+      "sha256": "b3a4d130e3087710aa6c3a11fae2a485ab9e15fc5ee6f43b8f61de0305df3de0",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/normal-all-before.json"
+    },
+    {
+      "path": "/private/tmp/p0-48-node24-foreign-spy-removed-selected-20261014.log",
+      "sha256": "e6e9316715d6b1957efc72c344afe0530816b3fff1cfcd4b39080bd63bb2941b",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/spy-removed-selected.log"
+    },
+    {
+      "path": "/private/tmp/p0-48-node24-foreign-spy-removed-selected-20261014.json",
+      "sha256": "5c753c093bd182bd0a822538bce42dff3ef469dc2272a5ec087f9318da619896",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/spy-removed-selected.json"
+    },
+    {
+      "path": "/private/tmp/p0-48-node24-foreign-restored-all-after-20261014.log",
+      "sha256": "0f1f2c091fba4facac751b56f99321ea575f3bce330422dc3adbffa65e34262e",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/restored-all-after.log"
+    },
+    {
+      "path": "/private/tmp/p0-48-node24-foreign-restored-all-after-20261014.json",
+      "sha256": "380e9b3de908ec0a0ff4e90041b7b04a3f5da21e6337cb60447c6af49357310d",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-48-node24-foreign-20261014T143551Z/restored-all-after.json"
+    }
+  ],
+  "builtRuntimeHashes": {
+    "dist/agent/foreignSubagentRunner.js": "edc4c983ea864038f2bb9a279df48f0b28f2b649cabcb4030c01be5cce3d6fa1",
+    "dist/ledger/monitor.js": "9c6f7a7feb50c976e22dd20ef04f9fd6ed8d6fd5be8ece45a4bcba122c955fb9",
+    "dist/agent/subagentSpawn.js": "f33cbe5c831f02a354196630bb8e0d1defddda73f44ae33a442b97783b664c1e"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "argv": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "cwd": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+  "pid": 34100,
+  "exit": 2,
+  "startedUtc": "2026-10-15T07:51:26.006440+00:00",
+  "endedUtc": "2026-10-15T07:51:26.036900+00:00",
+  "stdout": {
+    "path": "/private/tmp/p0-41-staged-validation-20261015/stdout.log",
+    "bytes": 89,
+    "sha256": "b4a943a17307423ccec8d3d2058490d7683a1879630a4657ea85de594fbceeff"
+  },
+  "stderr": {
+    "path": "/private/tmp/p0-41-staged-validation-20261015/stderr.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "stagedAddedOnlyCount": 160,
+  "prefix": "qualification/2026-10-15-P0-41/",
+  "note": "No ignore/trim/no-verify option or source/guard change. Any whitespace diagnostics must be tied to immutable copied bytes before commit."
+}

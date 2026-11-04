@@ -1,0 +1,116 @@
+{
+  "schema": "p125g-exact-new-scope-static-admission-review/1",
+  "at": "2026-10-16T22:45:09.770357+00:00",
+  "sourceCommit": "da61205c0817267133451bac11e57bd0318fe44f",
+  "branch": "codex/p1-25-grant-qualification",
+  "blockers": [],
+  "allReadsFinished": true,
+  "sourceAllocationByReviewer": false,
+  "runtimeOrProductExecuted": false,
+  "ownership": {
+    "currentRegistryAuthorities": 3,
+    "registeredLogicalRootUnion": 170,
+    "physicalRoots": 183,
+    "allPrior182Retained": true,
+    "newOwnedFreshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+    "newPathAbsenceChecks": 366,
+    "presentNewPaths": [],
+    "newTargetHistoryAuthorities": 16,
+    "newTargetHistoriesAllEmpty": true,
+    "targetedStatusNonempty": [],
+    "prior182SelectedSourceDeltas": [],
+    "selectedPresentSourcePins": 837,
+    "sourceVariantCounts": {
+      "src/time/tsaClient.ts": 2,
+      "src/time/checkpoint.ts": 3,
+      "src/time/timeEvidence.ts": 1,
+      "src/time/verifyTimestamp.ts": 1,
+      "src/trust/verifierReport.ts": 3,
+      "src/assurance/certificate.ts": 6,
+      "src/session/sessionService.ts": 8,
+      "docs/TRUSTED_TIME.md": 2,
+      "tests/time/tsaClient.test.ts": 1,
+      "tests/time/verifyTimestamp.test.ts": 1
+    },
+    "absenceStatusAndHistoryDoNotReleaseOwnership": true
+  },
+  "scope": {
+    "soleNewTest": "tests/time/tsaGrant.test.ts",
+    "soleNewEvidencePrefix": "qualification/2026-10-17-P1-25/evidence/tsa-grant",
+    "onlyFutureOwnedMetadataSuccessors": [
+      "qualification/2026-10-17-P1-25/README.md",
+      "qualification/2026-10-17-P1-25/receipt.json",
+      "qualification/2026-10-17-P1-25/assembly-inputs.json"
+    ],
+    "noMetadataSourceEditsYet": true,
+    "noNewDateNestedReceiptOrSchema": true
+  },
+  "candidatePins": {
+    "candidate": {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/next-grant-test-proposal/tsaGrant.test.ts.source.txt",
+      "bytes": 27505,
+      "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc"
+    },
+    "sealedCandidateOutputs": 5,
+    "authorInputs": 32,
+    "currentExact": 31,
+    "onlyExpectedHistoricalOwnMetadata": [
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md"
+    ],
+    "historicalOriginalMatchesPreservedOld613AndGitD8": true,
+    "independentStaticReviewBlockers": [],
+    "runtimeFitProven": false
+  },
+  "preservation": {
+    "currentProtectedInputs": 135,
+    "priorOther125ByteExact": true,
+    "threeOwnDa612SuccessorsExact": true,
+    "sevenNewUniqueQualifiedPinsExact": true,
+    "all135CurrentInputsExact": true,
+    "held36Exact": true,
+    "native8RegularDistinctSingleLinkBytesAndPhysicalPinsExact": true,
+    "heldR18HeadIndexExact": true,
+    "sourceCleanIndexEmpty": true,
+    "priorFallbackBranchRetainedAtMetadataCommit": true,
+    "metadataOnlyD8ToDa612ChangedPaths": 287,
+    "allPriorRootsAndClaudeSourceVariantsPreserved": true
+  },
+  "currentPacket": {
+    "committedAndWorkingFiles": 897,
+    "artifacts": 896,
+    "commands": 110,
+    "orderedAssemblyInputs": 1137,
+    "nonIndexPayloads": 894,
+    "all897GitBlobsAndWorkingBytesExact": true,
+    "currentThreeMetadataPinsRemainProtected": true
+  },
+  "graphBoundary": {
+    "existingScopedTsaQuery": "No matching nodes found.",
+    "staleGraphSourceRevision": "d69d7037c20161ae65c1030efa4e39598c1beb21",
+    "generatedAt": "2026-09-08T21:14:45.370785+00:00",
+    "navigationVersionPin": "0.9.56",
+    "installedVersionPreviouslyObserved": "0.9.74",
+    "noFreshnessOrCurrentSourceCredit": true,
+    "graphCommandRefreshWatcherRun": false
+  },
+  "qaHandsOff": {
+    "currentBytes": 1012480,
+    "currentSha256": "57f07c865b0bedbefba906ea861e9a4fbeee35fd4142dcca15cc7a6a369355a7",
+    "recordedAppendBytes": 3051,
+    "qaWrittenOrCopied": false
+  },
+  "missingReservationLimitation": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "noReservationProbeSearchRecreationAppendOrClaudeMessage": true,
+  "allHoldsF37QualityAndProviderArchiveRetained": true,
+  "observationPin": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/scope-review/observations.json",
+    "bytes": 1107015,
+    "sha256": "9cc6e8bdcf8448fe93b5d5451f142862106dc6cb80cbbd68b86e3eb6c0e63607"
+  },
+  "largeObservationsPrivateOnly": true,
+  "verdict": "No concrete overlap observed for the exact new test and evidence prefix. This is bounded read-only admission evidence only. Root retains actual hosted/D15/freeze allocation, execution and any later exact metadata-successor admission. No ownership is released and no whole-issue or plan completion is inferred."
+}

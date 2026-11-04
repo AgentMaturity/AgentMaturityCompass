@@ -4,7 +4,9 @@ import { join } from "node:path";
 import { versions } from "node:process";
 import { studioStatus } from "../studio/studioSupervisor.js";
 import { vaultStatusNow } from "../vault/vaultCli.js";
-import { verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
+import { loadActionPolicy, verifyActionPolicySignature } from "../governor/actionPolicyEngine.js";
+import { DEFAULT_RUN_INTEGRITY_AT_LEAST, runIntegrityAtLeast } from "../governor/actionPolicySchema.js";
+import { actionPolicyDeclaredAbsent } from "../governor/actionPolicyStore.js";
 import { verifyToolhubConfig } from "../toolhub/toolhubCli.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
@@ -16,11 +18,12 @@ import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
 import { adaptersDetectCli } from "../adapters/adapterCli.js";
 import { pathAllowedByPatterns } from "../toolhub/toolhubValidators.js";
 import { checkNotaryTrust, loadTrustConfig, verifyTrustConfigSignature } from "../trust/trustConfig.js";
-import { signDigestWithPolicy } from "../crypto/signing/signer.js";
+import { signDigestWithPolicyAsync } from "../crypto/signing/signer.js";
 import { verifyKeyHistoryChain } from "../crypto/keys.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
 import { nativeModuleCheck } from "./nativeModuleProbe.js";
 import { requestDoctorStatus, doctorCarrierCheck } from "./doctorLiveProbe.js";
+import { adoptWorkspaceRecordHead, type RecordLocation } from "../storage/workspaceRecordStore.js";
 
 export type DoctorStatus = "PASS" | "FAIL" | "WARN" | "INFO";
 
@@ -133,6 +136,37 @@ function pushRuntimeFirewallCheck(checks: DoctorCheck[], workspace: string, stri
   });
 }
 
+/** Every workspace record store (WP37): residency, governor canary, false-positive and lab registers. */
+const WORKSPACE_RECORD_STORES: readonly RecordLocation[] = [
+  { area: ["compliance", "residency"], kind: "policies", idField: "policyId" }, { area: ["compliance", "residency"], kind: "tenants", idField: "tenantId" },
+  { area: ["governor"], kind: "rollback-packs", idField: "packId" }, { area: ["governor"], kind: "emergency-overrides", idField: "overrideId" },
+  { area: ["assurance"], kind: "false-positives", idField: "reportId" }, { area: ["lab"], kind: "experiments", idField: "experimentId" },
+  { area: ["lab"], kind: "probe-results" }
+];
+
+/**
+ * The explicit, one-time anchoring of record stores written before head anchors existed (WP37 review): each such
+ * store is anchored at its chain tip, signed, with a ledger audit row, and reads clean afterwards; a verified anchor
+ * without a ledger row gets one. A store whose anchor was removed after it was anchored is never anchored again and
+ * fails.
+ */
+function pushWorkspaceRecordHeadCheck(checks: DoctorCheck[], workspace: string): void {
+  const rows = WORKSPACE_RECORD_STORES.map((at) => ({ store: [...at.area, at.kind].join("/"), result: adoptWorkspaceRecordHead(workspace, at) }));
+  const named = (status: string) => rows.flatMap(({ store, result }) => result.status !== status ? []
+    : [result.status === "adopted" ? `${store} at ${result.head.slice(0, 16)}…` : "reason" in result ? `${store} (${result.reason})` : store]);
+  const deleted = named("deleted"), refused = named("refused"), adopted = named("adopted"), recorded = named("recorded");
+  const parts = [deleted.length > 0 ? `head anchor removed after anchoring: ${deleted.join(", ")}` : "",
+    refused.length > 0 ? `history not anchored: ${refused.join(", ")}` : "", adopted.length > 0 ? `existing history anchored once: ${adopted.join(", ")}` : "",
+    recorded.length > 0 ? `ledger row recorded: ${recorded.join(", ")}` : ""];
+  checks.push({
+    id: "workspace-record-heads",
+    status: deleted.length > 0 ? "FAIL" : refused.length > 0 ? "WARN" : adopted.length + recorded.length > 0 ? "INFO" : "PASS",
+    message: parts.some(Boolean) ? `Workspace record stores: ${parts.filter(Boolean).join("; ")}` : "Workspace record stores carry signed head anchors",
+    ...(deleted.length > 0 ? { fixHint: "A removed head anchor hides whether the newest record was deleted: investigate the named store and restore its <kind>.head.json from a backup; doctor never anchors it again." }
+      : refused.length > 0 ? { fixHint: "Run: export AMC_VAULT_PASSPHRASE='<the passphrase chosen or shown at amc init>', then rerun amc doctor" } : {})
+  });
+}
+
 function safeDoctorError(error: unknown, workspace: string): string {
   const raw = error instanceof Error ? error.message : String(error);
   return raw.replaceAll(workspace, ".").replace(/\s+/g, " ").trim().slice(0, 240) || "unknown error";
@@ -220,8 +254,31 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
   );
 
   pushRuntimeFirewallCheck(checks, workspace, strict);
+  pushWorkspaceRecordHeadCheck(checks, workspace);
 
-  pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", verifyActionPolicySignature(workspace));
+  // AXR-02: never configured, native agent calls meet no Action Policy; said as such rather than as a missing signature.
+  // Removed after signing (no signed absence declaration), every governed call is denied until it is restored.
+  const actionPolicySig = verifyActionPolicySignature(workspace);
+  if (actionPolicySig.reason === "action policy missing" && !existsSync(actionPolicySig.sigPath)) {
+    checks.push(!actionPolicyDeclaredAbsent(workspace)
+      ? { id: "sig-action-policy", status: "FAIL", message: "action policy removed after signing: restore it from backup or run amc policy action init",
+        fixHint: "Restore .amc/action-policy.yaml and its .sig from backup, or create and sign a new one with: amc policy action init" }
+      : { id: "sig-action-policy", status: "WARN", message: "action policy: not configured (native agent calls are not checked against an Action Policy)",
+        fixHint: "Create and sign one with: amc policy action init" });
+  } else pushSignatureCheck(checks, "sig-action-policy", "action-policy.yaml", actionPolicySig);
+  // G3: an owner waiver below the run-integrity default, said where an operator who never reads a decision looks.
+  if (actionPolicySig.valid) {
+    try {
+      const waived = loadActionPolicy(workspace).actions.filter((rule) => runIntegrityAtLeast(rule) < DEFAULT_RUN_INTEGRITY_AT_LEAST)
+        .map((rule) => `${rule.actionClass}=${runIntegrityAtLeast(rule)}`);
+      if (waived.length > 0) checks.push({ id: "action-policy-run-integrity-waiver", status: "WARN",
+        message: `action policy: owner waiver — requireRunIntegrityAtLeast below ${DEFAULT_RUN_INTEGRITY_AT_LEAST} on ${waived.join(", ")}; EXECUTE for those classes does not rest on a HIGH TRUST run`,
+        fixHint: `Remove requireRunIntegrityAtLeast from those rules (or set ${DEFAULT_RUN_INTEGRITY_AT_LEAST}), then re-sign: amc fix-signatures` });
+    } catch (error) {
+      checks.push({ id: "action-policy-parse", status: "WARN", message: `action policy: signed but does not parse (${safeDoctorError(error, workspace)}); every governed class is denied`,
+        fixHint: "Fix .amc/action-policy.yaml, then re-sign: amc fix-signatures" });
+    }
+  }
   pushSignatureCheck(checks, "sig-tools", "tools.yaml", verifyToolhubConfig(workspace));
   pushSignatureCheck(checks, "sig-budgets", "budgets.yaml", verifyBudgetsConfigSignature(workspace));
   pushSignatureCheck(checks, "sig-approval-policy", "approval-policy.yaml", verifyApprovalPolicySignature(workspace));
@@ -239,9 +296,9 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
     fixHint: "To deliberately contact the configured notary and sign a diagnostic digest, run: amc doctor --live-probes"
   });
   if (trustSig.valid && trustMode === "NOTARY" && liveProbes) {
-    const trust = await checkNotaryTrust(workspace).catch((error) => ({
+    const trust = await checkNotaryTrust(workspace).catch(() => ({
       ok: false,
-      reasons: [String(error)]
+      reasons: ["NOTARY_HEALTH_CHECK_FAILED"]
     }));
     const notaryOk = Boolean(trust.ok);
     checks.push({
@@ -252,7 +309,7 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
     });
     try {
       const digest = randomBytes(32).toString("hex");
-      signDigestWithPolicy({
+      await signDigestWithPolicyAsync({
         workspace,
         kind: "MERKLE_ROOT",
         digestHex: digest
@@ -262,11 +319,11 @@ export async function runDoctorRules(workspace: string, options: DoctorOptions =
         status: "PASS",
         message: "Notary signing smoke test succeeded"
       });
-    } catch (error) {
+    } catch {
       checks.push({
         id: "notary-sign-smoke",
         status: "FAIL",
-        message: `Notary signing smoke test failed: ${String(error)}`,
+        message: "Notary signing smoke test failed",
         fixHint: "Ensure notary is reachable, fingerprint is pinned, and auth secret is valid."
       });
     }

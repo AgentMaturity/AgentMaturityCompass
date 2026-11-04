@@ -1,6 +1,6 @@
 import { constants, closeSync, fchmodSync, fstatSync, fsyncSync, ftruncateSync, lstatSync, openSync, realpathSync, unlinkSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
-import { authenticateUser, createSession, revokeSessionByToken, verifyTrackedSessionToken } from "../auth/authApi.js";
+import { authenticateUser, createSessionAsync, revokeSessionByToken, verifyTrackedSessionToken } from "../auth/authApi.js";
 import type { UserRole } from "../auth/roles.js";
 
 export const NATIVE_APPROVAL_PASSWORD_BYTES = 4096;
@@ -14,6 +14,8 @@ export interface NativeApprovalLoginOptions {
   readonly username: string;
   readonly tokenFile: string;
   readonly ttlMinutes?: number;
+  /** Mint an `a4_comment` credential: Studio admits it only for A4 reads and comments (the A4 MCP tools' identity). */
+  readonly a4CommentOnly?: boolean;
 }
 export interface NativeApprovalLoginReceipt {
   readonly schemaVersion: 1;
@@ -24,6 +26,7 @@ export interface NativeApprovalLoginReceipt {
   readonly issuedTs: number;
   readonly expiresTs: number;
   readonly tokenFile: string;
+  readonly scope: "a4_comment" | null;
 }
 
 function fail(code: string, message: string): never { throw new NativeApprovalLoginError(code, message); }
@@ -97,11 +100,12 @@ export async function loginNativeApprovals(
     owned = { dev: created.dev, ino: created.ino };
     if (!created.isFile()) fail("TOKEN_FILE_INVALID", "The new token output is not a regular file.");
     fchmodSync(fd, 0o600);
-    const issued = createSession({ workspace, user: authenticated.user, ttlMs: validated.ttlMinutes * 60_000 });
+    const scope = options.a4CommentOnly === true ? "a4_comment" as const : undefined;
+    const issued = await createSessionAsync({ workspace, user: authenticated.user, ttlMs: validated.ttlMinutes * 60_000, scope });
     token = issued.token;
-    const tracked = verifyTrackedSessionToken({ workspace, token });
+    const tracked = verifyTrackedSessionToken({ workspace, token, acceptScope: scope });
     if (!tracked.ok || tracked.payload === null || tracked.authSource !== "LOCAL_USER"
-      || tracked.payload.userId !== authenticated.user.userId || tracked.payload.username !== authenticated.user.username) {
+      || tracked.payload.userId !== authenticated.user.userId || tracked.payload.username !== authenticated.user.username || tracked.payload.scope !== scope) {
       fail("SESSION_REFUSED", "The newly issued tracked local session could not be confirmed; no login file is accepted.");
     }
     bytes = Buffer.from(`${token}\n`, "utf8");
@@ -115,7 +119,7 @@ export async function loginNativeApprovals(
     const receipt: NativeApprovalLoginReceipt = {
       schemaVersion: 1, authSource: "LOCAL_USER", userId: tracked.payload.userId,
       username: tracked.payload.username, roles: [...tracked.payload.roles], issuedTs: tracked.payload.issuedTs,
-      expiresTs: tracked.payload.expiresTs, tokenFile
+      expiresTs: tracked.payload.expiresTs, tokenFile, scope: scope ?? null
     };
     closeSync(fd); fd = undefined;
     return receipt;
@@ -126,7 +130,7 @@ export async function loginNativeApprovals(
         revokeSessionByToken({ workspace, token });
         // The existing revoker handles storage failures internally. Confirm the
         // revocation instead of claiming successful cleanup merely on return.
-        const after = verifyTrackedSessionToken({ workspace, token });
+        const after = verifyTrackedSessionToken({ workspace, token, acceptScope: "a4_comment" });
         if (after.ok || (after.error !== "session revoked" && after.error !== "session expired")) rollbackFailed = true;
       } catch { rollbackFailed = true; }
     }

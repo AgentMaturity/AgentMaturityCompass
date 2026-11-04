@@ -1,0 +1,440 @@
+{
+  "schema": "amc-private-citation-qualification-runtime-observer/1",
+  "pid": 7637,
+  "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/checkCitationsCli.test.ts",
+    "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/lintCitations.test.ts",
+    "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/compliance/mappingPackRefs.test.ts"
+  ],
+  "testCount": 32,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "593688280",
+      "name": "tests/citations/checkCitationsCli.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/checkCitationsCli.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "593688280_0",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "593688280_0_0",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+      "fullName": "check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "593688280_0_1",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+      "fullName": "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "593688280_0_2",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+      "fullName": "check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "593688280_0_3",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+      "fullName": "check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "593688280_0_4",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI refuses --update-baseline without --reason",
+      "fullName": "check-citations CLI refuses --update-baseline without --reason",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "593688280_0_5",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI rejects an unknown flag",
+      "fullName": "check-citations CLI rejects an unknown flag",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "593688280_0_6",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+      "fullName": "check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "593688280_0_7",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+      "fullName": "check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "593688280_0_8",
+      "name": "tests/citations/checkCitationsCli.test.ts check-citations CLI prints a JSON summary with per-rule totals",
+      "fullName": "check-citations CLI prints a JSON summary with per-rule totals",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1181401797",
+      "name": "tests/citations/lintCitations.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/lintCitations.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1181401797_0",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_0",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures covers the thirteen issue fixtures",
+      "fullName": "lintCitations fixtures covers the thirteen issue fixtures",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_1",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+      "fullName": "lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_2",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures SR 11-7 reference whose record is in-force",
+      "fullName": "lintCitations fixtures SR 11-7 reference whose record is in-force",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_3",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+      "fullName": "lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_4",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures malformed ATLAS id AML.T48",
+      "fullName": "lintCitations fixtures malformed ATLAS id AML.T48",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_5",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures prompt injection labelled AML.T0048",
+      "fullName": "lintCitations fixtures prompt injection labelled AML.T0048",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_6",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+      "fullName": "lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_7",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+      "fullName": "lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_8",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures mapping packId pii_detection_leakage",
+      "fullName": "lintCitations fixtures mapping packId pii_detection_leakage",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_9",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures related.packs host_hardening",
+      "fullName": "lintCitations fixtures related.packs host_hardening",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_10",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures statusType binding",
+      "fullName": "lintCitations fixtures statusType binding",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_11",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures superseded record without supersededBy",
+      "fullName": "lintCitations fixtures superseded record without supersededBy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_12",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures url on a host outside the shared list",
+      "fullName": "lintCitations fixtures url on a host outside the shared list",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_13",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures record with neither retrievedAt nor contentSha256",
+      "fullName": "lintCitations fixtures record with neither retrievedAt nor contentSha256",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_14",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures names the replacement when a citation is superseded",
+      "fullName": "lintCitations fixtures names the replacement when a citation is superseded",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_15",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures suggests the registered id for a near-miss pack reference",
+      "fullName": "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_16",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+      "fullName": "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_0_17",
+      "name": "tests/citations/lintCitations.test.ts lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+      "fullName": "lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1181401797_1",
+      "name": "tests/citations/lintCitations.test.ts shared official host list",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_1_0",
+      "name": "tests/citations/lintCitations.test.ts shared official host list contains every register host and every pack-catalogue host",
+      "fullName": "shared official host list contains every register host and every pack-catalogue host",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_1_1",
+      "name": "tests/citations/lintCitations.test.ts shared official host list is the list the pack catalogue validates against",
+      "fullName": "shared official host list is the list the pack catalogue validates against",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1181401797_2",
+      "name": "tests/citations/lintCitations.test.ts framework reference tables",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1181401797_2_0",
+      "name": "tests/citations/lintCitations.test.ts framework reference tables records where each filled table came from",
+      "fullName": "framework reference tables records where each filled table came from",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-771207666",
+      "name": "tests/compliance/mappingPackRefs.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/compliance/mappingPackRefs.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-771207666_0",
+      "name": "tests/compliance/mappingPackRefs.test.ts built-in compliance mapping pack references",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-771207666_0_0",
+      "name": "tests/compliance/mappingPackRefs.test.ts built-in compliance mapping pack references every requires_assurance_pack packId is a registered assurance pack id (exact match)",
+      "fullName": "built-in compliance mapping pack references every requires_assurance_pack packId is a registered assurance pack id (exact match)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-771207666_0_1",
+      "name": "tests/compliance/mappingPackRefs.test.ts built-in compliance mapping pack references every related.packs entry resolves after ignoring case, - and _",
+      "fullName": "built-in compliance mapping pack references every related.packs entry resolves after ignoring case, - and _",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

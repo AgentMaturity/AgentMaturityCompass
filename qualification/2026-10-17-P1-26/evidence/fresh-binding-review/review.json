@@ -1,0 +1,142 @@
+{
+  "schema": "p126-independent-actual-fresh-binding-review/1",
+  "at": "2026-10-16T20:50:13.728933+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+  "verdict": "Actual finite binding matches root records and the prospective65path/eightpair selection; helper closure is natural and retained. No product or test rerun performed.",
+  "selected": {
+    "matchedActualPaths": 65,
+    "regularSingleLinkSAndQFiles": 130,
+    "distinctPhysicalIdentities": 130,
+    "allActualBytesAndPhysicalPinsMatch": true,
+    "sourceFreshBytesEqual": true,
+    "compiledPairs": [
+      {
+        "sourceRelativePath": "src/transparency/rfc9162.ts",
+        "compiledRelativePath": "dist/transparency/rfc9162.js"
+      },
+      {
+        "sourceRelativePath": "src/transparency/merkle.ts",
+        "compiledRelativePath": "dist/transparency/merkle.js"
+      },
+      {
+        "sourceRelativePath": "src/transparency/merkleFrontier.ts",
+        "compiledRelativePath": "dist/transparency/merkleFrontier.js"
+      },
+      {
+        "sourceRelativePath": "src/transparency/merkleIndexStore.ts",
+        "compiledRelativePath": "dist/transparency/merkleIndexStore.js"
+      },
+      {
+        "sourceRelativePath": "src/transparency/logChain.ts",
+        "compiledRelativePath": "dist/transparency/logChain.js"
+      },
+      {
+        "sourceRelativePath": "src/transparency/sessionAnchor.ts",
+        "compiledRelativePath": "dist/transparency/sessionAnchor.js"
+      },
+      {
+        "sourceRelativePath": "src/transparency/sessionAnchorProof.ts",
+        "compiledRelativePath": "dist/transparency/sessionAnchorProof.js"
+      },
+      {
+        "sourceRelativePath": "src/transparency/sessionAnchorVerify.ts",
+        "compiledRelativePath": "dist/transparency/sessionAnchorVerify.js"
+      }
+    ],
+    "compiledMeaning": "Actual post-build JavaScript preservation only; no declaration pairs, source/compiled semantic-equivalence or compiled-mutant credit.",
+    "noProspectiveCountOrCompiledHashAdoption": true
+  },
+  "protected": {
+    "preferredManifest": {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/protected-inputs-after-metadata-repair.json",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/protected-inputs-after-metadata-repair.json",
+      "bytes": 31630,
+      "sha256": "3daf1deac107320055200ca014d74348068797122547951e1663995466af5e2a",
+      "dev": 16777231,
+      "inode": 543332179,
+      "nlink": 1,
+      "readScope": "actual preferred113protectionmanifest"
+    },
+    "all113ByteHashPinsMatch": true,
+    "nativeCount": 6,
+    "sixDistinctRegularSingleLinkPhysicals": true,
+    "freshNative": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543396326,
+      "nlink": 1,
+      "readScope": "native file bytes/physical identity only, never loaded"
+    },
+    "all6NativeHashesMatch": true,
+    "runnerPhysicalUnchanged": true,
+    "frozenHarnessBytesUnchanged": true,
+    "heldRHeadStatusIndexExact": true,
+    "RDoesNotNeedClean": true
+  },
+  "gitObservation": {
+    "SAndQHead": "32435b41d59e651ad2b259a59703cd137e5c925a",
+    "SAndQCleanIndexEmptyBeforeAfter": true,
+    "RHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "R18StatusRowsIndexEmptyBeforeAfter": true,
+    "readOnlyGitCommandsOnly": true,
+    "boundary": "Selected-time start/end snapshots only; not continuous isolation or ownership release."
+  },
+  "helper": {
+    "commandPin": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/command.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/command.json",
+      "bytes": 1496,
+      "sha256": "45e2c650828854e07805c619028cb0e790d0ab16aeca68efd3dffd52e3844f11",
+      "dev": 16777231,
+      "inode": 543401417,
+      "nlink": 1,
+      "readScope": "full actual command"
+    },
+    "exit": 0,
+    "durationMs": 46635,
+    "pidAndOwnedPgid": 33805,
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "argvAndBindingExact": true,
+    "logFullRead": true,
+    "logPin": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/stdout-stderr.log",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p126-fresh-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "ad479b234b966e8bcae15d0daf422306fcdf123ef64fc382c4b99f3d538c6f04",
+      "dev": 16777231,
+      "inode": 543344229,
+      "nlink": 1,
+      "readScope": "full helper log"
+    },
+    "completedLabels": [
+      "git clone (committed tree only)",
+      "git checkout pinned commit",
+      "pnpm install --frozen-lockfile",
+      "pnpm run build",
+      "amc doctor",
+      "amc init (isolated workspace)",
+      "keyless native tool turn",
+      "signed evidence and request reconstruction (1 expected turns)",
+      "process A: leave a completed turn open for resume",
+      "process B: resume and seal the same session",
+      "signed evidence and request reconstruction (2 expected turns)"
+    ],
+    "environment": "Outer frozen wrapper inherits environment with privateHOME/NodePATH/GIT_NO_LAZY_FETCH. The unchanged helper constructs its separately scrubbed runtime/install environment; no new isolation claim.",
+    "smokeScope": "Retained helper/source show frozen install/build/doctor plus keyless one-turn and real cross-process two-turn signed evidence/request reconstruction. No generated private workspace/keys/ledger bodies were inspected by this review.",
+    "vitestCredit": false,
+    "publicAnchoringCredit": false,
+    "closureLimit": "Owned process-group absence is read from retained records; no fresh process probe and no universal descendant claim."
+  },
+  "sourceAuthority": "Wrapper cwd/headbf3 and borrowed physicalRrunner are distinct from actual S/Qcommit32435 and explicit--dir/--root source authority.",
+  "pending": "Fresh canonical54 and controls/restorations are outside this binding review; no future pass/failure/count/duration is predicted.",
+  "remaining": "All fullP126/P125/integration/library/public-entry decisions, global qualityRED and heldwork/F37/Claude/reservations remain unchanged.",
+  "execution": "Local full binding/helper-log/command/source reads, bytes/stat comparisons and read-only GitHEAD/status/index observations only. No product/test/compiler/native/SQL/network/process-probe/source/index/QA action."
+}

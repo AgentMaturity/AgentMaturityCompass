@@ -1,3 +1,4 @@
+import { nearestRank } from "../experiments/stats.js";
 /**
  * Latency Accounting
  *
@@ -112,10 +113,7 @@ export function recordLatency(params: {
 // ---------------------------------------------------------------------------
 
 function percentile(values: number[], p: number): number {
-  if (values.length === 0) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  const idx = Math.ceil((p / 100) * sorted.length) - 1;
-  return sorted[Math.max(0, idx)] ?? 0;
+  return nearestRank(values, p / 100);
 }
 
 export function computeLatencyBuckets(windowMs = 86400000): LatencyBucket[] {

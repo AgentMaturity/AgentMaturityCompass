@@ -1,0 +1,202 @@
+{
+  "schema": "p139-docs-count-ownership-summary/1",
+  "registered": 170,
+  "retained": 4,
+  "observed": 174,
+  "rootUnionAdded": [],
+  "rootUnionRemoved": [],
+  "selectedPaths": [
+    "docs/adr/010-mcp-2026-07-28.md",
+    "docs/NATIVE_MCP.md",
+    ".changeset/p1-39-typed-outcome-qualification.md",
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "SScopedStatus": {
+    "argv": [
+      "git",
+      "status",
+      "--porcelain=v1",
+      "--untracked-files=all",
+      "--",
+      "docs/adr/010-mcp-2026-07-28.md",
+      "docs/NATIVE_MCP.md",
+      ".changeset/p1-39-typed-outcome-qualification.md",
+      "README.md",
+      "CONTRIBUTING.md",
+      "website/index.html",
+      "website/lite.html",
+      "website/i18n.js",
+      "docs/content/show-hn-draft.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "exit": 0,
+    "stdout": "",
+    "stderr": ""
+  },
+  "dirtySelectedRoots": [
+    {
+      "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "status": {
+        "argv": [
+          "git",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=all",
+          "--",
+          "docs/adr/010-mcp-2026-07-28.md",
+          "docs/NATIVE_MCP.md",
+          ".changeset/p1-39-typed-outcome-qualification.md",
+          "README.md",
+          "CONTRIBUTING.md",
+          "website/index.html",
+          "website/lite.html",
+          "website/i18n.js",
+          "docs/content/show-hn-draft.md",
+          "docs/content/reddit-launch-drafts.md",
+          "docs/internal/competitive-landscape.md",
+          "docs/internal/mirofish-simulation-council.md",
+          "whitepaper/AMC_WHITEPAPER_v1.md"
+        ],
+        "exit": 0,
+        "stdout": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n",
+        "stderr": ""
+      },
+      "pins": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/adr/010-mcp-2026-07-28.md",
+          "bytes": 11893,
+          "sha256": "117bc7bd2ee6b6277005b87196e1a827d0e178a6fa9ec0af65ad2bbb9e7227e4",
+          "relativePath": "docs/adr/010-mcp-2026-07-28.md",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/adr/010-mcp-2026-07-28.md",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/NATIVE_MCP.md",
+          "bytes": 14206,
+          "sha256": "c8080ec475b437cc1795fcfc79462239baad84f1f558983e898a0d11d0e818db",
+          "relativePath": "docs/NATIVE_MCP.md",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/NATIVE_MCP.md",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+          "bytes": 59828,
+          "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6",
+          "relativePath": "README.md",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b",
+          "relativePath": "CONTRIBUTING.md",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+          "bytes": 43520,
+          "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886",
+          "relativePath": "website/index.html",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+          "bytes": 11197,
+          "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5",
+          "relativePath": "website/lite.html",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+          "bytes": 44169,
+          "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc",
+          "relativePath": "website/i18n.js",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f",
+          "relativePath": "docs/content/show-hn-draft.md",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4",
+          "relativePath": "docs/content/reddit-launch-drafts.md",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f",
+          "relativePath": "docs/internal/competitive-landscape.md",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778",
+          "relativePath": "docs/internal/mirofish-simulation-council.md",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+          "symlink": false
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25",
+          "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+          "symlink": false
+        }
+      ]
+    }
+  ],
+  "readErrors": [],
+  "reservationUnchanged": true,
+  "reservationPin": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "newChangesetHistoryEmpty": true,
+  "appendOnlyDocsIdenticalAcrossSAndClaude": true,
+  "exactPreservedVariant": "Append only to both identical existing documents. Do not copy S whole count/channel files over Claude.",
+  "ClaudeCountLiteralOnly": [
+    "website/lite.html",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md"
+  ],
+  "ClaudeCountOtherAuthoredDeltas": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/i18n.js",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "rootSoleCountWriter": true,
+  "ownershipReleaseInferred": false
+}

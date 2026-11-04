@@ -536,12 +536,16 @@ const platforms = [
 
 rmSync(outRoot, { recursive: true, force: true });
 
-run("npm", ["run", "build"], { stdio: "inherit", timeoutMs: 300_000 });
-run("npm", ["run", "release:verify-version"], { stdio: "inherit", timeoutMs: 60_000 });
-mkdirSync(packWorkRoot, { recursive: true });
-run("npm", ["pack", "--ignore-scripts", "--pack-destination", packWorkRoot], { stdio: "inherit", timeoutMs: 180_000 });
+// P0-34: a release packages the gated npm tarball (AMC_DESKTOP_NPM_TARBALL) as is; only a local run builds and packs.
+const gatedTarball = process.env.AMC_DESKTOP_NPM_TARBALL;
+if (!gatedTarball) {
+  run("npm", ["run", "build"], { stdio: "inherit", timeoutMs: 300_000 });
+  run("npm", ["run", "release:verify-version"], { stdio: "inherit", timeoutMs: 60_000 });
+  mkdirSync(packWorkRoot, { recursive: true });
+  run("npm", ["pack", "--ignore-scripts", "--pack-destination", packWorkRoot], { stdio: "inherit", timeoutMs: 180_000 });
+}
 
-const packedTarball = latestPackedTarball(packWorkRoot);
+const packedTarball = gatedTarball ? resolve(gatedTarball) : latestPackedTarball(packWorkRoot);
 mkdirSync(stagingRoot, { recursive: true });
 mkdirSync(packRoot, { recursive: true });
 mkdirSync(archivesRoot, { recursive: true });

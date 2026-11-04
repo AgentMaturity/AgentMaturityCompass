@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-05",
+  "date": "2026-10-16",
+  "commit": "00e93601502ec6fd6f2e1e605cc767e3ed87fada",
+  "branch": "codex/p1-05-qualification",
+  "node": "22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS 26.6.2 (25G83), Darwin25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/usr/bin/sw_vers",
+      "exit": 0,
+      "durationMs": 17
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/enforce/egressAllowlist.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-allowlist-original.producer.json",
+      "exit": 0,
+      "durationMs": 797
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/sandbox/seatbeltNativeProfile.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-seatbelt-profile-original.producer.json",
+      "exit": 0,
+      "durationMs": 901
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 44315
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/baseline --config /private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/baseline/vitest.config.ts tests/enforce/egressAllowlist.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-allowlist-baseline.producer.json",
+      "exit": 0,
+      "durationMs": 632
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/private-address-check-removed --config /private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/private-address-check-removed/vitest.config.ts tests/enforce/egressAllowlist.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-address-mutant.producer.json",
+      "exit": 1,
+      "durationMs": 755
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 42200
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 446
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 413
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1903
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/containment/escapeSuite.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-real-escape-original.producer.json",
+      "exit": 0,
+      "durationMs": 6761
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/baseline --config /private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/baseline/vitest.config.ts tests/containment/escapeSuite.test.ts -t 'direct TCP to a healthy owned listener' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-network-baseline.producer.json",
+      "exit": 0,
+      "durationMs": 4201
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/network-deny-removed --config /private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/network-deny-removed/vitest.config.ts tests/containment/escapeSuite.test.ts -t 'direct TCP to a healthy owned listener' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-network-mutant.producer.json",
+      "exit": 1,
+      "durationMs": 4063
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/enforce/egressAllowlist.test.ts tests/sandbox/seatbeltNativeProfile.test.ts tests/containment/escapeSuite.test.ts tests/nativeShellPlatformGate.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/egressRedirectBoundary.test.ts tests/gatewayCredentialIsolation.test.ts tests/gatewayAndSupervise.test.ts tests/networkEgressGuard.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-related-native-egress.producer.json",
+      "exit": 0,
+      "durationMs": 8933
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/eslint/bin/eslint.js src tests --max-warnings=0",
+      "exit": 1,
+      "durationMs": 101
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 776
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 182
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1953
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3543
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 522
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 3720
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 56205
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-budoFw/checkout --config /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-budoFw/checkout/vitest.config.ts tests/enforce/egressAllowlist.test.ts tests/sandbox/seatbeltNativeProfile.test.ts tests/containment/escapeSuite.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-fresh-clone-tests.producer.json",
+      "exit": 0,
+      "durationMs": 7489
+    }
+  ],
+  "tests": {
+    "total": 242,
+    "passed": 242,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "33433279c49ebd76850c24d3b7b577e1994fd787b01afc62fa48078a047fd82c"
+    },
+    {
+      "path": "evidence.json",
+      "sha256": "3af20890177c0747f9c9d363418e0aa33bae58b9b2ce0ec446c503f33335cd4b"
+    }
+  ],
+  "notes": "Bounded checkpoint; formal P1-05 acceptance open. Tests242/242 refer only to the related nine-file invocation; original160/26/9, fresh195 and mutation repetitions are separate. Private causal mutants intentionally exited1 (52 address body failures;1selected TCP body failure,8unselected). Counts initially1 then generated exact1658\u21921661 and checked0. Nonexistent ESLint-path setup failed1; actual pnpm run lint0. Source quality remains red/unwaived: duplicates1268 and dead-code2737. All recorded child phases naturally closed0/1 with positive owned-group ESRCH; no outer signal/retry/baseline adoption. Product source unchanged; all held/paused/formal gaps retained. See README/evidence for masking, callback-versus-signed-ledger, successful-fixture deletion, LinuxADR/hostedCI/5000/global limits. No PR/merge/release/Done claim."
+}

@@ -137,3 +137,37 @@ export interface FixtureEnvelope {
   setup: Record<string, unknown>;       // read by the harness for the binding point
   expected: { result: "allow" | "deny" | "pass" | "fail" | "not_evaluated"; reasonCode: string | null };
 }
+/** One questionnaire item (P1-53): a self-reported question, never a control and never a citation. */
+export interface QuestionnaireItem {
+  id: string;                           // keep the rubric id, e.g. "HC-1"
+  station: Station;
+  source: "domain_rubric" | "deep_template" | "deep_handwritten";
+  dimension: string;
+  text: string;
+  legacyRef: { text: string; verified: false };   // copied verbatim, never trusted as a citation
+  evidenceRequired: string;             // kept so DomainQuestion keeps its shape
+  levelDescriptors: { l1: string; l3: string; l5: string };
+  weight: number;                       // integer, as today
+  mapsTo: string[];                     // catalog control ids; empty until a reviewer maps it
+  claimKind: "self_reported";           // answers are evidence from producer amc.questionnaire, capped at L1
+}
+export interface Questionnaire {
+  id: string;                           // the file name under questionnaires/, without .yaml
+  title: string;
+  items: QuestionnaireItem[];
+}
+/**
+ * How a built-in policy pack setting maps onto a catalog binding parameter (P1-53, catalog/bindings/policy-packs.yaml).
+ * `{actionClass}` in a path expands over every action class; `[*]` collects a list. A null parameter is a setting the
+ * compiler has no parameter for yet, with the reason.
+ */
+interface PolicyPackSettingBinding {
+  setting: string;
+  parameter: string | null;
+  reason: string;
+}
+export interface PolicyPackBindingMap {
+  id: "policy-packs";
+  packs: string[];
+  settings: PolicyPackSettingBinding[];
+}

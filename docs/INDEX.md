@@ -12,7 +12,7 @@
 
 # AMC Documentation
 
-Use this page to reach the shortest evidence-backed path for your task. AMC's public documentation is organized for users; implementation plans, audit working papers, and internal roadmaps remain in Git history without being promoted as product guidance.
+Use this page to reach the shortest evidence-backed path for your task. AMC's public documentation is organized for users. Implementation plans and internal roadmaps are not promoted as product guidance, and retired guides, audit working papers and persona transcripts are kept in `docs/archive/` as historical records, not evidence.
 
 ## Start Here
 

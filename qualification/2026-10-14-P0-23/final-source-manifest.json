@@ -1,0 +1,101 @@
+{
+  "base": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "files": {
+    "src/mcp/mcpClaimOutput.ts": {
+      "sha256": "5585b461f2abe8e240cb5547e422e81e1eb758bb887119f22250bdc4aaf644ac",
+      "lines": 44
+    },
+    "tests/mcpClaimLabels.test.ts": {
+      "sha256": "eccea41c533bfa66365c1a745cb3451da2a049f9ac04df8fca3fc55a43d6d1fc",
+      "lines": 374
+    },
+    "tests/apiClaimLabels.test.ts": {
+      "sha256": "0b3ce0a7a268fc6564d53bcc11f6acbe946cc22e49b97250b798396e7e9ccdd1",
+      "lines": 286
+    },
+    "tests/studioClaimLabels.test.ts": {
+      "sha256": "d43f02d76f6727a6fb4d437d1452d0657079acadd0fe1fbc988c9bb3b630955d",
+      "lines": 308
+    },
+    "tests/industryPackCli.test.ts": {
+      "sha256": "66539767422adcbb6d47232433da927b7fa9f1616e503b1a46b7f22b7f3f5ad0",
+      "lines": 133
+    },
+    "tests/claimBadge.test.ts": {
+      "sha256": "39c58ec2a1969c44b33bef597da2afcef2f2291cca2b59127212e3143d3e87bc",
+      "lines": 75
+    },
+    "docs/CLAIM_KINDS.md": {
+      "sha256": "af3ba70e70583ba42cfe81b9f7a5275f6a74097c33ed741feda9e8fc5c1e0e52",
+      "lines": 199
+    },
+    ".changeset/p0-23-mcp-stored-run-claims.md": {
+      "sha256": "7568fbf70acb03d6941af4aeb12f8809d4e5647cde95e9fe8e13add79e38a080",
+      "lines": 5
+    },
+    "README.md": {
+      "sha256": "3f73cf9613ca94fe0106a9613f65545eab6298e5a7a26e88f60a06aff45aec03",
+      "lines": 941
+    },
+    "CONTRIBUTING.md": {
+      "sha256": "f135171ce1f8b39abe209895a02401fd9ec4cf82a0df2be3683f5fb20889f563",
+      "lines": 485
+    },
+    "website/index.html": {
+      "sha256": "d8ce57ba9bd412b9b26e167e30e333bede5e559d1c39473b133444aa0ec50026",
+      "lines": 461
+    },
+    "website/lite.html": {
+      "sha256": "a0ec372111bfc05506cba5e4fe80e4a5fe04a9348cb27c1622edf4dc68515a3c",
+      "lines": 195
+    },
+    "website/i18n.js": {
+      "sha256": "e90e53254a30796fd5adf49cb881ac178a43bfe56707b844ba8fb581ef03491a",
+      "lines": 568
+    },
+    "docs/content/show-hn-draft.md": {
+      "sha256": "9d221c8cc7b78242061738ab0652481a0eaf3e57ad604191694dbdc2b33fb63d",
+      "lines": 35
+    },
+    "docs/content/reddit-launch-drafts.md": {
+      "sha256": "6933bd3d4693c53a031649e23cbf445d6b3b9027793612d1c33dd14f9b681f5d",
+      "lines": 52
+    },
+    "docs/internal/competitive-landscape.md": {
+      "sha256": "49c2f15ee5c453ddf33618315150760e49b492f0ba1344a0729940d8847d0951",
+      "lines": 71
+    },
+    "docs/internal/mirofish-simulation-council.md": {
+      "sha256": "aacdb31b9ab2810e02f73e96c3239335912cac7c147cc5d7ff0bf510cf111dd9",
+      "lines": 32
+    },
+    "whitepaper/AMC_WHITEPAPER_v1.md": {
+      "sha256": "de472d0d1ada4cce37199bb5b63451d07dfaacec6f6c1b426f599e7ad036e48f",
+      "lines": 1216
+    }
+  },
+  "protectedEqualAcceptedMain": {
+    "src/api/index.ts": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+    "src/api/accessPolicy.ts": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+    "src/api/resultRouteRegistry.ts": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+    "src/studio/studioServer.ts": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+    "src/studio/openapi.ts": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+    "website/openapi.yaml": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+    "src/console/assets/app.js": "6bdee3f49798480be259852993fdead87c6dc6faa2333751318ec25da1ed058a",
+    "src/console/assets/components/claimBadge.js": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+    "src/mcp/amcMcpServer.ts": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+    "src/mcp/a4Tools.ts": "4614662d0246743ea1949aa9fcb93f88b6f9268fb5bdafe2f4747148d953ebca",
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "scripts/line-budgets.json": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+    "scripts/quality/coverage-baseline.json": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc"
+  },
+  "status": "P0-23 bounded MCP source candidate; API/OpenAPI3 and Studio4 held failures remain active, plus P0-22 two array failures"
+}

@@ -1,0 +1,39 @@
+{
+  "schema": "p125f-focused182-scope-review-seal/1",
+  "at": "2026-10-16T22:11:12.280257+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/scope-review/README.md",
+      "bytes": 3542,
+      "sha256": "121bb060af25aba8d79ba966b987994323f029902411f05b9629e708b25a9257"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/scope-review/review.json",
+      "bytes": 5946,
+      "sha256": "904dbb37976003293763a78496c76db8c2f8bc8fe5b5df9ad7b00ac8f58de38c"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/scope-review/observations.json",
+      "bytes": 1449259,
+      "sha256": "073f99369bda5ea75501ecffce6cfa6b446f8a2f4c4093b2e677d4c71c440686"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/scope-review/candidate45-metadata-history.json",
+      "bytes": 1492,
+      "sha256": "34817d597b07cdd866368e00bec5e97fde3c952dc255d01581f35b3a8648a995"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/scope-review/pending-reservation-entry.md",
+      "bytes": 1311,
+      "sha256": "979a4251a324bc1d8259542f612b1cd2656426626e2ea252b8d8b470ed41ce00"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/scope-review/pins.json",
+      "bytes": 40063,
+      "sha256": "5c744afed92e134f46eb3331ffe04e541232b7323ff06a52597b12798783e4fa"
+    }
+  ],
+  "blockers": [],
+  "sourceAllocationOrRuntimeClaim": false,
+  "rootOwnsActualAdmissionAndAllLaterWork": true
+}

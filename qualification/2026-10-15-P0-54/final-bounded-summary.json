@@ -1,0 +1,23 @@
+{
+  "source": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "counts": {
+    "numTotalTests": 343,
+    "numPassedTests": 343,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": true
+  },
+  "files": 6,
+  "components": {
+    "originalGuardAndParityCases": 280,
+    "newA4GuardCases": 8,
+    "newOwnerModeCases": 55
+  },
+  "rawReportSha256": "1a4baa269fdb2ba01a93fade91406b9eac21d42afaf64a4e0de9329f1b8cefc9",
+  "privateMutationScopes": {
+    "scanner": "8 actual cases: original8/8, A4-only private mutant6/8; only R1/R3 fail, R2/R4 and four positives pass.",
+    "ownerMode": "Standalone41 helper checks:41/41 baseline,40/41 one-entry mutant,41/41 restored; these are not extra registered tests."
+  },
+  "limits": "Selected Node22 guard/helper qualification. No routed authorization, actual A4 command registration/execution, A4 effects, Node24, whole-suite/coverage/hosted/release acceptance."
+}

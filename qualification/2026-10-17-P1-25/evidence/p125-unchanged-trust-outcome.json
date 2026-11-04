@@ -1,0 +1,448 @@
+{
+  "schema": "p125-observed-run-audit/1",
+  "phase": "p125-unchanged-trust",
+  "actualExit": 0,
+  "durationMs": 1470,
+  "ownedPgid": 9523,
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "tests": {
+    "numTotalTests": 30,
+    "numPassedTests": 30,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "exactOrderedFileNameOccurrenceStateJoin": true,
+  "uniqueObserverTestIds": 30,
+  "unhandledErrors": [],
+  "taskErrors": [],
+  "hooks": [
+    {
+      "kind": "file",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts",
+      "hooks": {
+        "afterAll": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists a list signed by a pinned root parses, with the spec's signed bytes",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists a list signed by an unpinned root gives TRUST_LIST_SIGNATURE_INVALID",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists a purpose added after signing invalidates the list",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists a signature whose public key does not hash to its key id is refused",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists an expired list gives TRUST_LIST_EXPIRED",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses duplicate key id",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses empty purposes",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses duplicate purposes",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses revokedAt without a reason",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses validTo not after validFrom",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a PEM whose sha256 is not the key id",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an RSA key",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a private key in place of the public key",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a non-canonical (CRLF) PEM",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an unknown entry field",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an unknown list field",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a non-UTC time",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an evidence-authority key without authority",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a bad list id",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists accepts an evidence-authority key that carries its authority, and a dated revocation with a reason",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an unknown signature field",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists accepts 4,096 distinct entries and refuses 4,097 on the size limit",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts trust-list files a reordered JSON file still verifies",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts trust-list files refuses a __proto__ field at any level, which a parsed object would otherwise drop",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts trust-list files refuses files over 1 MiB and symlinks",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "file",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+      "name": "tests/trust/verifierReport.test.ts",
+      "hooks": {
+        "afterAll": "pass"
+      }
+    }
+  ],
+  "rows": [
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists a list signed by a pinned root parses, with the spec's signed bytes",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists a list signed by an unpinned root gives TRUST_LIST_SIGNATURE_INVALID",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists a purpose added after signing invalidates the list",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists a signature whose public key does not hash to its key id is refused",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists an expired list gives TRUST_LIST_EXPIRED",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses duplicate key id",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses empty purposes",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses duplicate purposes",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses revokedAt without a reason",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses validTo not after validFrom",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a PEM whose sha256 is not the key id",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an RSA key",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a private key in place of the public key",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a non-canonical (CRLF) PEM",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an unknown entry field",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an unknown list field",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a non-UTC time",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an evidence-authority key without authority",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a bad list id",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists accepts an evidence-authority key that carries its authority, and a dated revocation with a reason",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an unknown signature field",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists accepts 4,096 distinct entries and refuses 4,097 on the size limit",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "trust-list files a reordered JSON file still verifies",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "trust-list files refuses a __proto__ field at any level, which a parsed object would otherwise drop",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "fullName": "trust-list files refuses files over 1 MiB and symlinks",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 trusts only intact artifacts whose every signature is admitted, and leaves P1-06 dimensions not evaluated",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 is untrusted on integrity errors, refused or missing signatures, and unanchored ledgers",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 records allow flags as overrides and never turns them into trust",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 labels workspace self-trust as a self-check",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 parses the documented example and refuses unknown fields",
+      "state": "passed",
+      "failureMessages": []
+    }
+  ],
+  "publicEvidence": [],
+  "artifacts": [
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-unchanged-trust/command.json",
+      "bytes": 2784,
+      "sha256": "65ca89232655771b627d7ba984439d286ede7ab13963fa848e71f5f8653660d9"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-unchanged-trust/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "80b3529346b904ef50bb1a0e85957585381b27f5ee73e3c4856cd4b301976ce4"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-unchanged-trust/raw.json",
+      "bytes": 9018,
+      "sha256": "0a1f127d30799575292913f413a7ac4561348ab20e75b17c6a34b5daec8bb10b"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-unchanged-trust/observer.json",
+      "bytes": 13594,
+      "sha256": "7ac45bc64775577c5a319518926848b6a672fb90554513e9583e892cbd20f3fd"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-unchanged-trust/stdout-stderr.log",
+      "bytes": 547,
+      "sha256": "1f5f47083f8ad98caf022d526aead6bd997eea8143d33b6f6315325b28de0ec1"
+    }
+  ],
+  "boundary": "Actual observed scoped run only; canonical, fresh-source, full-suite and mutation credit require separate binding and review."
+}

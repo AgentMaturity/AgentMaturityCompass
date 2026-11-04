@@ -1,0 +1,3790 @@
+{
+  "schema": "amc.p049.ordered-installed-api-case-audit/1",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+    "commit": "076e4c79486f4b1669e0593bc374e56fcb9636e1",
+    "branch": "codex/p1-28-qualification",
+    "scope": "Existing installed dependency; no production or dependency change."
+  },
+  "corpus": {
+    "distinctRows": 39,
+    "rows": [
+      {
+        "id": "short-single-ipv4",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/8"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "short-single-mapped",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/8"
+        ],
+        "address": "::ffff:8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "short-single-native",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/8"
+        ],
+        "address": "::1",
+        "expected": false
+      },
+      {
+        "id": "short-multi-ipv4",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/8",
+          "fe80::/10"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "short-multi-mapped",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/8",
+          "fe80::/10"
+        ],
+        "address": "::ffff:8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "short-multi-native",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/8",
+          "fe80::/10"
+        ],
+        "address": "::1",
+        "expected": false
+      },
+      {
+        "id": "mapped104-single-inside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/104"
+        ],
+        "address": "10.0.0.1",
+        "expected": true
+      },
+      {
+        "id": "mapped104-single-outside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/104"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "mapped104-single-mapped-inside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/104"
+        ],
+        "address": "::ffff:10.0.0.1",
+        "expected": true
+      },
+      {
+        "id": "mapped104-single-native-outside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/104"
+        ],
+        "address": "::1",
+        "expected": false
+      },
+      {
+        "id": "mapped104-multi-inside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/104",
+          "fe80::/10"
+        ],
+        "address": "10.0.0.1",
+        "expected": true
+      },
+      {
+        "id": "mapped104-multi-outside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/104",
+          "fe80::/10"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "mapped104-multi-mapped-inside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/104",
+          "fe80::/10"
+        ],
+        "address": "::ffff:10.0.0.1",
+        "expected": true
+      },
+      {
+        "id": "mapped104-multi-native-outside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/104",
+          "fe80::/10"
+        ],
+        "address": "::1",
+        "expected": false
+      },
+      {
+        "id": "mapped104-multi-native-inside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/104",
+          "fe80::/10"
+        ],
+        "address": "fe80::1",
+        "expected": true
+      },
+      {
+        "id": "plain-v4-mapped-inside",
+        "kind": "compile",
+        "trust": [
+          "10.0.0.0/8"
+        ],
+        "address": "::ffff:10.0.0.1",
+        "expected": true
+      },
+      {
+        "id": "plain-v4-outside",
+        "kind": "compile",
+        "trust": [
+          "10.0.0.0/8"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "native-v6-inside",
+        "kind": "compile",
+        "trust": [
+          "2001:db8::/32"
+        ],
+        "address": "2001:db8::1",
+        "expected": true
+      },
+      {
+        "id": "native-v6-outside",
+        "kind": "compile",
+        "trust": [
+          "2001:db8::/32"
+        ],
+        "address": "::1",
+        "expected": false
+      },
+      {
+        "id": "native-broad-single-ipv4",
+        "kind": "compile",
+        "trust": [
+          "::/1"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "native-broad-single-mapped",
+        "kind": "compile",
+        "trust": [
+          "::/1"
+        ],
+        "address": "::ffff:8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "native-broad-single-native",
+        "kind": "compile",
+        "trust": [
+          "::/1"
+        ],
+        "address": "::1",
+        "expected": true
+      },
+      {
+        "id": "native-broad-multi-ipv4",
+        "kind": "compile",
+        "trust": [
+          "::/1",
+          "fc00::/7"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "native-broad-multi-mapped",
+        "kind": "compile",
+        "trust": [
+          "::/1",
+          "fc00::/7"
+        ],
+        "address": "::ffff:8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "native-broad-multi-native",
+        "kind": "compile",
+        "trust": [
+          "::/1",
+          "fc00::/7"
+        ],
+        "address": "::1",
+        "expected": true
+      },
+      {
+        "id": "mixed-short-valid-inside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/8",
+          "10.0.0.0/8"
+        ],
+        "address": "10.0.0.1",
+        "expected": true
+      },
+      {
+        "id": "mixed-short-valid-outside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.0/8",
+          "10.0.0.0/8"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "mapped95-refuses",
+        "kind": "compile",
+        "trust": [
+          "::ffff:0.0.0.0/95"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "mapped96-all-v4",
+        "kind": "compile",
+        "trust": [
+          "::ffff:0.0.0.0/96"
+        ],
+        "address": "8.8.8.8",
+        "expected": true
+      },
+      {
+        "id": "mapped97-lower-half",
+        "kind": "compile",
+        "trust": [
+          "::ffff:0.0.0.0/97"
+        ],
+        "address": "8.8.8.8",
+        "expected": true
+      },
+      {
+        "id": "mapped97-upper-half",
+        "kind": "compile",
+        "trust": [
+          "::ffff:0.0.0.0/97"
+        ],
+        "address": "200.0.0.1",
+        "expected": false
+      },
+      {
+        "id": "bare-mapped-literal-inside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.1"
+        ],
+        "address": "10.0.0.1",
+        "expected": true
+      },
+      {
+        "id": "bare-mapped-literal-outside",
+        "kind": "compile",
+        "trust": [
+          "::ffff:10.0.0.1"
+        ],
+        "address": "8.8.8.8",
+        "expected": false
+      },
+      {
+        "id": "xff-short-single-untrusted",
+        "kind": "proxy",
+        "trust": [
+          "::ffff:10.0.0.0/8"
+        ],
+        "remoteAddress": "127.0.0.1",
+        "forwardedFor": "9.9.9.9",
+        "expected": "127.0.0.1"
+      },
+      {
+        "id": "xff-short-multi-untrusted",
+        "kind": "proxy",
+        "trust": [
+          "::ffff:10.0.0.0/8",
+          "fe80::/10"
+        ],
+        "remoteAddress": "127.0.0.1",
+        "forwardedFor": "9.9.9.9",
+        "expected": "127.0.0.1"
+      },
+      {
+        "id": "xff-short-mapped-untrusted",
+        "kind": "proxy",
+        "trust": [
+          "::ffff:10.0.0.0/8"
+        ],
+        "remoteAddress": "::ffff:8.8.8.8",
+        "forwardedFor": "9.9.9.9",
+        "expected": "::ffff:8.8.8.8"
+      },
+      {
+        "id": "xff-valid-single-trusted",
+        "kind": "proxy",
+        "trust": [
+          "::ffff:10.0.0.0/104"
+        ],
+        "remoteAddress": "10.0.0.1",
+        "forwardedFor": "203.0.113.9",
+        "expected": "203.0.113.9"
+      },
+      {
+        "id": "xff-valid-multi-trusted",
+        "kind": "proxy",
+        "trust": [
+          "::ffff:10.0.0.0/104",
+          "fe80::/10"
+        ],
+        "remoteAddress": "10.0.0.1",
+        "forwardedFor": "203.0.113.9",
+        "expected": "203.0.113.9"
+      },
+      {
+        "id": "xff-native-v6-trusted",
+        "kind": "proxy",
+        "trust": [
+          "fe80::/10"
+        ],
+        "remoteAddress": "fe80::1",
+        "forwardedFor": "2001:db8::1",
+        "expected": "2001:db8::1"
+      }
+    ]
+  },
+  "runs": [
+    {
+      "phase": "p049-original-regression",
+      "mode": "original",
+      "runtime": {
+        "node": "v22.23.3",
+        "platform": "darwin",
+        "arch": "arm64"
+      },
+      "totals": {
+        "total": 39,
+        "passed": 39,
+        "failed": 0
+      },
+      "sourceUsedSha256": "aa7efd29bbd61cbcc1bdafde9e674db28ead077864f33bfad3cdd19bb5a3778c",
+      "actualMutations": [],
+      "cases": [
+        {
+          "id": "short-single-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-single-mapped",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-single-native",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-multi-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-multi-mapped",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-multi-native",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-mapped-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "::ffff:10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-native-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-mapped-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "::ffff:10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-native-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-native-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "fe80::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "plain-v4-mapped-inside",
+          "kind": "compile",
+          "trust": [
+            "10.0.0.0/8"
+          ],
+          "address": "::ffff:10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "plain-v4-outside",
+          "kind": "compile",
+          "trust": [
+            "10.0.0.0/8"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-v6-inside",
+          "kind": "compile",
+          "trust": [
+            "2001:db8::/32"
+          ],
+          "address": "2001:db8::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-v6-outside",
+          "kind": "compile",
+          "trust": [
+            "2001:db8::/32"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-single-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::/1"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-single-mapped",
+          "kind": "compile",
+          "trust": [
+            "::/1"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-single-native",
+          "kind": "compile",
+          "trust": [
+            "::/1"
+          ],
+          "address": "::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-multi-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::/1",
+            "fc00::/7"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-multi-mapped",
+          "kind": "compile",
+          "trust": [
+            "::/1",
+            "fc00::/7"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-multi-native",
+          "kind": "compile",
+          "trust": [
+            "::/1",
+            "fc00::/7"
+          ],
+          "address": "::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mixed-short-valid-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "10.0.0.0/8"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mixed-short-valid-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "10.0.0.0/8"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped95-refuses",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/95"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped96-all-v4",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/96"
+          ],
+          "address": "8.8.8.8",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped97-lower-half",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/97"
+          ],
+          "address": "8.8.8.8",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped97-upper-half",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/97"
+          ],
+          "address": "200.0.0.1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "bare-mapped-literal-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.1"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "bare-mapped-literal-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.1"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-short-single-untrusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "remoteAddress": "127.0.0.1",
+          "forwardedFor": "9.9.9.9",
+          "expected": "127.0.0.1",
+          "actual": "127.0.0.1",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-short-multi-untrusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "remoteAddress": "127.0.0.1",
+          "forwardedFor": "9.9.9.9",
+          "expected": "127.0.0.1",
+          "actual": "127.0.0.1",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-short-mapped-untrusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "remoteAddress": "::ffff:8.8.8.8",
+          "forwardedFor": "9.9.9.9",
+          "expected": "::ffff:8.8.8.8",
+          "actual": "::ffff:8.8.8.8",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-valid-single-trusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "remoteAddress": "10.0.0.1",
+          "forwardedFor": "203.0.113.9",
+          "expected": "203.0.113.9",
+          "actual": "203.0.113.9",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-valid-multi-trusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "remoteAddress": "10.0.0.1",
+          "forwardedFor": "203.0.113.9",
+          "expected": "203.0.113.9",
+          "actual": "203.0.113.9",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-native-v6-trusted",
+          "kind": "proxy",
+          "trust": [
+            "fe80::/10"
+          ],
+          "remoteAddress": "fe80::1",
+          "forwardedFor": "2001:db8::1",
+          "expected": "2001:db8::1",
+          "actual": "2001:db8::1",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        }
+      ],
+      "resultPin": {
+        "path": "/private/tmp/p0-49-qualification-20261017/original-regression.actual.json",
+        "physicalPath": "/private/tmp/p0-49-qualification-20261017/original-regression.actual.json",
+        "bytes": 22756,
+        "sha256": "e5717e6eec5b392a10a7536ae6a5cddc041d1467bba353180d871664c573416c",
+        "dev": 16777231,
+        "inode": 545123569,
+        "nlink": 1
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/command.json",
+        "bytes": 1496,
+        "sha256": "c227f08829cf940e6f2c74e9526c2e412ec6c38c05569af0c8cf14b2249e3949",
+        "dev": 16777231,
+        "inode": 545123571,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/stdout-stderr.log",
+        "bytes": 392,
+        "sha256": "f9551b94a1eaa261c0e92fb8870750917cd7ade7239733da58b3cf888684b2cb",
+        "dev": 16777231,
+        "inode": 545123567,
+        "nlink": 1
+      },
+      "ownedGroupPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/owned-group-after-exit.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/owned-group-after-exit.json",
+        "bytes": 259,
+        "sha256": "6ce2b1b3cabac19e2872fd27d115ccddcd298db8ceadbaadc5bb6224449056e0",
+        "dev": 16777231,
+        "inode": 545123570,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-range-guard-control",
+      "mode": "range-guard-control",
+      "runtime": {
+        "node": "v22.23.3",
+        "platform": "darwin",
+        "arch": "arm64"
+      },
+      "totals": {
+        "total": 39,
+        "passed": 30,
+        "failed": 9
+      },
+      "sourceUsedSha256": "04e400488ce15fdaa1174b5be50b1a1834b7f6507770d3fd9fba62a69ef49db1",
+      "actualMutations": [
+        {
+          "from": "if (!subnetisipv4 && !(subnetrange >= 96 && subnetip.isIPv4MappedAddress())) {",
+          "to": "if (!subnetisipv4 && !subnetip.isIPv4MappedAddress()) {",
+          "originalCharacterOffset": 6738
+        },
+        {
+          "from": "if (subnetkind !== 'ipv4' && !(subnetrange >= 96 && subnetip.isIPv4MappedAddress())) {",
+          "to": "if (subnetkind !== 'ipv4' && !subnetip.isIPv4MappedAddress()) {",
+          "originalCharacterOffset": 5187
+        }
+      ],
+      "cases": [
+        {
+          "id": "short-single-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "failed",
+          "error": {
+            "name": "AssertionError",
+            "message": "short-single-ipv4\n\ntrue !== false\n",
+            "stack": "AssertionError [ERR_ASSERTION]: short-single-ipv4\n\ntrue !== false\n\n    at main (file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:106:14)\n    at file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:131:7\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+          }
+        },
+        {
+          "id": "short-single-mapped",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "failed",
+          "error": {
+            "name": "AssertionError",
+            "message": "short-single-mapped\n\ntrue !== false\n",
+            "stack": "AssertionError [ERR_ASSERTION]: short-single-mapped\n\ntrue !== false\n\n    at main (file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:106:14)\n    at file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:131:7\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+          }
+        },
+        {
+          "id": "short-single-native",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-multi-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "failed",
+          "error": {
+            "name": "AssertionError",
+            "message": "short-multi-ipv4\n\ntrue !== false\n",
+            "stack": "AssertionError [ERR_ASSERTION]: short-multi-ipv4\n\ntrue !== false\n\n    at main (file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:106:14)\n    at file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:131:7\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+          }
+        },
+        {
+          "id": "short-multi-mapped",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "failed",
+          "error": {
+            "name": "AssertionError",
+            "message": "short-multi-mapped\n\ntrue !== false\n",
+            "stack": "AssertionError [ERR_ASSERTION]: short-multi-mapped\n\ntrue !== false\n\n    at main (file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:106:14)\n    at file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:131:7\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+          }
+        },
+        {
+          "id": "short-multi-native",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-mapped-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "::ffff:10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-native-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-mapped-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "::ffff:10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-native-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-native-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "fe80::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "plain-v4-mapped-inside",
+          "kind": "compile",
+          "trust": [
+            "10.0.0.0/8"
+          ],
+          "address": "::ffff:10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "plain-v4-outside",
+          "kind": "compile",
+          "trust": [
+            "10.0.0.0/8"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-v6-inside",
+          "kind": "compile",
+          "trust": [
+            "2001:db8::/32"
+          ],
+          "address": "2001:db8::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-v6-outside",
+          "kind": "compile",
+          "trust": [
+            "2001:db8::/32"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-single-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::/1"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-single-mapped",
+          "kind": "compile",
+          "trust": [
+            "::/1"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-single-native",
+          "kind": "compile",
+          "trust": [
+            "::/1"
+          ],
+          "address": "::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-multi-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::/1",
+            "fc00::/7"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-multi-mapped",
+          "kind": "compile",
+          "trust": [
+            "::/1",
+            "fc00::/7"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-multi-native",
+          "kind": "compile",
+          "trust": [
+            "::/1",
+            "fc00::/7"
+          ],
+          "address": "::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mixed-short-valid-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "10.0.0.0/8"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mixed-short-valid-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "10.0.0.0/8"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "failed",
+          "error": {
+            "name": "AssertionError",
+            "message": "mixed-short-valid-outside\n\ntrue !== false\n",
+            "stack": "AssertionError [ERR_ASSERTION]: mixed-short-valid-outside\n\ntrue !== false\n\n    at main (file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:106:14)\n    at file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:131:7\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+          }
+        },
+        {
+          "id": "mapped95-refuses",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/95"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "failed",
+          "error": {
+            "name": "AssertionError",
+            "message": "mapped95-refuses\n\ntrue !== false\n",
+            "stack": "AssertionError [ERR_ASSERTION]: mapped95-refuses\n\ntrue !== false\n\n    at main (file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:106:14)\n    at file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:131:7\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+          }
+        },
+        {
+          "id": "mapped96-all-v4",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/96"
+          ],
+          "address": "8.8.8.8",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped97-lower-half",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/97"
+          ],
+          "address": "8.8.8.8",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped97-upper-half",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/97"
+          ],
+          "address": "200.0.0.1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "bare-mapped-literal-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.1"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "bare-mapped-literal-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.1"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-short-single-untrusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "remoteAddress": "127.0.0.1",
+          "forwardedFor": "9.9.9.9",
+          "expected": "127.0.0.1",
+          "actual": "9.9.9.9",
+          "actualType": "string",
+          "state": "failed",
+          "error": {
+            "name": "AssertionError",
+            "message": "xff-short-single-untrusted\n+ actual - expected\n\n+ '9.9.9.9'\n- '127.0.0.1'\n",
+            "stack": "AssertionError [ERR_ASSERTION]: xff-short-single-untrusted\n+ actual - expected\n\n+ '9.9.9.9'\n- '127.0.0.1'\n\n    at main (file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:106:14)\n    at file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:131:7\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+          }
+        },
+        {
+          "id": "xff-short-multi-untrusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "remoteAddress": "127.0.0.1",
+          "forwardedFor": "9.9.9.9",
+          "expected": "127.0.0.1",
+          "actual": "9.9.9.9",
+          "actualType": "string",
+          "state": "failed",
+          "error": {
+            "name": "AssertionError",
+            "message": "xff-short-multi-untrusted\n+ actual - expected\n\n+ '9.9.9.9'\n- '127.0.0.1'\n",
+            "stack": "AssertionError [ERR_ASSERTION]: xff-short-multi-untrusted\n+ actual - expected\n\n+ '9.9.9.9'\n- '127.0.0.1'\n\n    at main (file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:106:14)\n    at file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:131:7\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+          }
+        },
+        {
+          "id": "xff-short-mapped-untrusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "remoteAddress": "::ffff:8.8.8.8",
+          "forwardedFor": "9.9.9.9",
+          "expected": "::ffff:8.8.8.8",
+          "actual": "9.9.9.9",
+          "actualType": "string",
+          "state": "failed",
+          "error": {
+            "name": "AssertionError",
+            "message": "xff-short-mapped-untrusted\n+ actual - expected\n\n+ '9.9.9.9'\n- '::ffff:8.8.8.8'\n",
+            "stack": "AssertionError [ERR_ASSERTION]: xff-short-mapped-untrusted\n+ actual - expected\n\n+ '9.9.9.9'\n- '::ffff:8.8.8.8'\n\n    at main (file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:106:14)\n    at file:///private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs:131:7\n    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)\n    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5)"
+          }
+        },
+        {
+          "id": "xff-valid-single-trusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "remoteAddress": "10.0.0.1",
+          "forwardedFor": "203.0.113.9",
+          "expected": "203.0.113.9",
+          "actual": "203.0.113.9",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-valid-multi-trusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "remoteAddress": "10.0.0.1",
+          "forwardedFor": "203.0.113.9",
+          "expected": "203.0.113.9",
+          "actual": "203.0.113.9",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-native-v6-trusted",
+          "kind": "proxy",
+          "trust": [
+            "fe80::/10"
+          ],
+          "remoteAddress": "fe80::1",
+          "forwardedFor": "2001:db8::1",
+          "expected": "2001:db8::1",
+          "actual": "2001:db8::1",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        }
+      ],
+      "resultPin": {
+        "path": "/private/tmp/p0-49-qualification-20261017/range-guard-control.actual.json",
+        "physicalPath": "/private/tmp/p0-49-qualification-20261017/range-guard-control.actual.json",
+        "bytes": 29105,
+        "sha256": "45bfcf1b00494b816c8cc17c0f7f4ea878e8137c968e89f9278811beee3a6523",
+        "dev": 16777231,
+        "inode": 545123589,
+        "nlink": 1
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/command.json",
+        "bytes": 1518,
+        "sha256": "d1ce7593006a183eff98b994063e4be0fdcb44626c644c783a1e2c3f797ea5e6",
+        "dev": 16777231,
+        "inode": 545123591,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/stdout-stderr.log",
+        "bytes": 403,
+        "sha256": "2daeb1e2e4b12c5bbc78ee5721d830fbb4dcc1e8b54196e756c3e3ff8281f2be",
+        "dev": 16777231,
+        "inode": 545123587,
+        "nlink": 1
+      },
+      "ownedGroupPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/owned-group-after-exit.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/owned-group-after-exit.json",
+        "bytes": 259,
+        "sha256": "4967a4a909caf5738b587d04c5cd96e6cf833590bf93686a3d5b78befc57402d",
+        "dev": 16777231,
+        "inode": 545123590,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-original-after-control",
+      "mode": "original",
+      "runtime": {
+        "node": "v22.23.3",
+        "platform": "darwin",
+        "arch": "arm64"
+      },
+      "totals": {
+        "total": 39,
+        "passed": 39,
+        "failed": 0
+      },
+      "sourceUsedSha256": "aa7efd29bbd61cbcc1bdafde9e674db28ead077864f33bfad3cdd19bb5a3778c",
+      "actualMutations": [],
+      "cases": [
+        {
+          "id": "short-single-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-single-mapped",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-single-native",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-multi-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-multi-mapped",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "short-multi-native",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-mapped-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "::ffff:10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-single-native-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-mapped-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "::ffff:10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-native-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped104-multi-native-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "address": "fe80::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "plain-v4-mapped-inside",
+          "kind": "compile",
+          "trust": [
+            "10.0.0.0/8"
+          ],
+          "address": "::ffff:10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "plain-v4-outside",
+          "kind": "compile",
+          "trust": [
+            "10.0.0.0/8"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-v6-inside",
+          "kind": "compile",
+          "trust": [
+            "2001:db8::/32"
+          ],
+          "address": "2001:db8::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-v6-outside",
+          "kind": "compile",
+          "trust": [
+            "2001:db8::/32"
+          ],
+          "address": "::1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-single-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::/1"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-single-mapped",
+          "kind": "compile",
+          "trust": [
+            "::/1"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-single-native",
+          "kind": "compile",
+          "trust": [
+            "::/1"
+          ],
+          "address": "::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-multi-ipv4",
+          "kind": "compile",
+          "trust": [
+            "::/1",
+            "fc00::/7"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-multi-mapped",
+          "kind": "compile",
+          "trust": [
+            "::/1",
+            "fc00::/7"
+          ],
+          "address": "::ffff:8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "native-broad-multi-native",
+          "kind": "compile",
+          "trust": [
+            "::/1",
+            "fc00::/7"
+          ],
+          "address": "::1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mixed-short-valid-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "10.0.0.0/8"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mixed-short-valid-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "10.0.0.0/8"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped95-refuses",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/95"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped96-all-v4",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/96"
+          ],
+          "address": "8.8.8.8",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped97-lower-half",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/97"
+          ],
+          "address": "8.8.8.8",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "mapped97-upper-half",
+          "kind": "compile",
+          "trust": [
+            "::ffff:0.0.0.0/97"
+          ],
+          "address": "200.0.0.1",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "bare-mapped-literal-inside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.1"
+          ],
+          "address": "10.0.0.1",
+          "expected": true,
+          "actual": true,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "bare-mapped-literal-outside",
+          "kind": "compile",
+          "trust": [
+            "::ffff:10.0.0.1"
+          ],
+          "address": "8.8.8.8",
+          "expected": false,
+          "actual": false,
+          "actualType": "boolean",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-short-single-untrusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "remoteAddress": "127.0.0.1",
+          "forwardedFor": "9.9.9.9",
+          "expected": "127.0.0.1",
+          "actual": "127.0.0.1",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-short-multi-untrusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/8",
+            "fe80::/10"
+          ],
+          "remoteAddress": "127.0.0.1",
+          "forwardedFor": "9.9.9.9",
+          "expected": "127.0.0.1",
+          "actual": "127.0.0.1",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-short-mapped-untrusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/8"
+          ],
+          "remoteAddress": "::ffff:8.8.8.8",
+          "forwardedFor": "9.9.9.9",
+          "expected": "::ffff:8.8.8.8",
+          "actual": "::ffff:8.8.8.8",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-valid-single-trusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/104"
+          ],
+          "remoteAddress": "10.0.0.1",
+          "forwardedFor": "203.0.113.9",
+          "expected": "203.0.113.9",
+          "actual": "203.0.113.9",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-valid-multi-trusted",
+          "kind": "proxy",
+          "trust": [
+            "::ffff:10.0.0.0/104",
+            "fe80::/10"
+          ],
+          "remoteAddress": "10.0.0.1",
+          "forwardedFor": "203.0.113.9",
+          "expected": "203.0.113.9",
+          "actual": "203.0.113.9",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        },
+        {
+          "id": "xff-native-v6-trusted",
+          "kind": "proxy",
+          "trust": [
+            "fe80::/10"
+          ],
+          "remoteAddress": "fe80::1",
+          "forwardedFor": "2001:db8::1",
+          "expected": "2001:db8::1",
+          "actual": "2001:db8::1",
+          "actualType": "string",
+          "state": "passed",
+          "error": null
+        }
+      ],
+      "resultPin": {
+        "path": "/private/tmp/p0-49-qualification-20261017/original-after-control.actual.json",
+        "physicalPath": "/private/tmp/p0-49-qualification-20261017/original-after-control.actual.json",
+        "bytes": 22756,
+        "sha256": "26afa3b83bfaa34c836dde5def8b7ac73ab5df2f204bd07cac533da31541f64d",
+        "dev": 16777231,
+        "inode": 545123609,
+        "nlink": 1
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/command.json",
+        "bytes": 1508,
+        "sha256": "3ad5a571e72d77924eabe1eb7ed60b7315e0eb3b60e656437c01519ba0a83e5a",
+        "dev": 16777231,
+        "inode": 545123611,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/stdout-stderr.log",
+        "bytes": 398,
+        "sha256": "d462220b90a57b311d0d71cafa6bf8c6385dcaa5716d24db971baeb2253f2f53",
+        "dev": 16777231,
+        "inode": 545123607,
+        "nlink": 1
+      },
+      "ownedGroupPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/owned-group-after-exit.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/owned-group-after-exit.json",
+        "bytes": 259,
+        "sha256": "50518b8c09d22f7f7b8be2cf61b4ad03173387afc1a6f038ffc937ac57be66dc",
+        "dev": 16777231,
+        "inode": 545123610,
+        "nlink": 1
+      }
+    }
+  ],
+  "inputManifest": {
+    "schema": "p049-installed-regression-inputs/1",
+    "sourceRoot": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+    "meaning": "Exact current filesystem input identities only; no runtime/admission, dependency-authority, registry-integrity or formal issue completion claim.",
+    "inputs": [
+      {
+        "relativePath": "package.json",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/package.json",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/package.json",
+          "bytes": 8659,
+          "sha256": "55bebd8dd3ef5e8e312c6dc1bfd0e081aa121e26af403a9c55e56746bc429dca",
+          "dev": 16777231,
+          "inode": 544287769,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "pnpm-lock.yaml",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+          "bytes": 155511,
+          "sha256": "b59f117baf11dfdec0ebe5520beeb0d53a1e2de33040a07ac4e31006328b24ce",
+          "dev": 16777231,
+          "inode": 544288209,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "node_modules/proxy-addr/package.json",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/proxy-addr/package.json",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/proxy-addr/package.json",
+          "bytes": 1281,
+          "sha256": "b2e305ca817ae4e8b088e07f38c5df1d7ad77aa3473809e4c37a9a1c83600225",
+          "dev": 16777231,
+          "inode": 544311100,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "node_modules/proxy-addr/index.js",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/proxy-addr/index.js",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/proxy-addr/index.js",
+          "bytes": 7340,
+          "sha256": "aa7efd29bbd61cbcc1bdafde9e674db28ead077864f33bfad3cdd19bb5a3778c",
+          "dev": 16777231,
+          "inode": 544311097,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "node_modules/forwarded/package.json",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/forwarded/package.json",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/forwarded/package.json",
+          "bytes": 1150,
+          "sha256": "550a78f64b6a76bc353d6a10152af5750613d0d910f8478943176c1a6196158a",
+          "dev": 16777231,
+          "inode": 544313385,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "node_modules/forwarded/index.js",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/forwarded/index.js",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/forwarded/index.js",
+          "bytes": 1578,
+          "sha256": "4ca8df355d325042545f4a522017926ec460fcb836f10174f2c80bbc4d47aa69",
+          "dev": 16777231,
+          "inode": 544313382,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "node_modules/ipaddr.js/package.json",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/ipaddr.js/package.json",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/ipaddr.js/package.json",
+          "bytes": 719,
+          "sha256": "fc1071893728a0e78fa40ce0dbe04c5a1021179fdcb5b229f274e3556d6a87cd",
+          "dev": 16777231,
+          "inode": 544313478,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "node_modules/ipaddr.js/lib/ipaddr.js",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/ipaddr.js/lib/ipaddr.js",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/node_modules/ipaddr.js/lib/ipaddr.js",
+          "bytes": 19333,
+          "sha256": "d82a21a6872925dfe73e9aa10e9eb47baba398987560e36db107f44d92f069b0",
+          "dev": 16777231,
+          "inode": 544313494,
+          "nlink": 1
+        }
+      }
+    ],
+    "vectorPin": {
+      "path": "/private/tmp/p0-49-qualification-20261017/regression-preparation/vectors.json",
+      "physicalPath": "/private/tmp/p0-49-qualification-20261017/regression-preparation/vectors.json",
+      "bytes": 8371,
+      "sha256": "278b0e9daa6fdc282f75bb0f339a8680114f9056f2c9f91eac745e5699a2e2f5",
+      "dev": 16777231,
+      "inode": 545122890,
+      "nlink": 1
+    }
+  },
+  "actualPrivateOutcomePin": {
+    "path": "/private/tmp/p0-49-qualification-20261017/regression-outcome.actual.json",
+    "physicalPath": "/private/tmp/p0-49-qualification-20261017/regression-outcome.actual.json",
+    "bytes": 69352,
+    "sha256": "4883e3075d7203066538c61cbba4d16cfcbf660fb8b01b6d280b8b43f0e7fb92",
+    "dev": 16777231,
+    "inode": 545123758,
+    "nlink": 1
+  },
+  "admissionPin": {
+    "path": "/private/tmp/p0-49-qualification-20261017/regression-admission.actual.json",
+    "physicalPath": "/private/tmp/p0-49-qualification-20261017/regression-admission.actual.json",
+    "bytes": 14375,
+    "sha256": "3d7a5926ce051d44499f49a083609025b477a318c57d8bfe62ddebfea5d842a8",
+    "dev": 16777231,
+    "inode": 545123556,
+    "nlink": 1
+  },
+  "registryBindingPin": {
+    "path": "/private/tmp/p0-49-qualification-20261017/registry-release-installed-binding.actual.json",
+    "physicalPath": "/private/tmp/p0-49-qualification-20261017/registry-release-installed-binding.actual.json",
+    "bytes": 10196,
+    "sha256": "7d004bc83b2df83a7b89979e9576c6032f4e866941dc9015731059c7c3f661b4",
+    "dev": 16777231,
+    "inode": 545123056,
+    "nlink": 1
+  },
+  "officialRelease": {
+    "version": "2.0.8",
+    "advisory": "https://github.com/jshttp/proxy-addr/security/advisories/GHSA-jqcg-44mw-7w3h",
+    "upstreamCommit": "a11ad82545698af5c33e59f3ed0b52eab79bf610",
+    "registryTarballSha256": "ffcc8055b78b0852b2889a426ad3a3003b60bc79df704faca194157efa2b2587",
+    "registryLockAndTarballSri": "sha512-5nnx0yGyVUcY6t9RnWcARWtwT9F1D8O9rt08htPvnd49W1IgZtmLkhu9WfMzQj1cFxjHIO6connUNVW5k7AVyQ==",
+    "allFivePublishedMembersEqualInstalled": true
+  },
+  "existingD15Row": {
+    "schema": "amc.private.p049.existing-d15-archive-read/1",
+    "at": "2026-10-17T11:48:43.428Z",
+    "manifestPin": {
+      "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18181,
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "dev": 16777231,
+      "inode": 544300961,
+      "nlink": 1
+    },
+    "row": {
+      "path": "pnpm-lock.yaml",
+      "issue": "P0-49",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+      "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
+    },
+    "archivePin": {
+      "path": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+      "bytes": 155411,
+      "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "dev": 16777231,
+      "inode": 544300885,
+      "nlink": 1
+    },
+    "hashMatches": true,
+    "manifestRows": 57,
+    "scope": "This P0-49 row only. Whole D15 acceptance remains open on the explicitly held P2-07 missing row/archive.",
+    "sourceOrArchiveMutation": false,
+    "forceStaging": false
+  },
+  "commandEvidence": [
+    {
+      "phase": "p049-graph-navigation",
+      "command": {
+        "phase": "p049-graph-navigation",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "python3 -B -c 'import subprocess,sys\nr=subprocess.run(['\"'\"'/Users/sid/.local/share/uv/tools/graphifyy/bin/python3'\"'\"','\"'\"'-B'\"'\"','\"'\"'-m'\"'\"','\"'\"'graphify'\"'\"','\"'\"'query'\"'\"','\"'\"'proxy trust forwarded express'\"'\"','\"'\"'--budget'\"'\"','\"'\"'1000'\"'\"'],cwd='\"'\"'/Users/sid/AgentMaturityCompass'\"'\"')\nsys.exit(r.returncode)'",
+        "exit": 0,
+        "durationMs": 1331,
+        "startedUtc": "2026-10-17T11:45:44.726342+00:00",
+        "endedUtc": "2026-10-17T11:45:46.070445+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-graph-navigation/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 88871,
+          "ownedPgid": 88871,
+          "observedPgidAfterLaunch": 88871,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "python3",
+            "-B",
+            "-c",
+            "import subprocess,sys\nr=subprocess.run(['/Users/sid/.local/share/uv/tools/graphifyy/bin/python3','-B','-m','graphify','query','proxy trust forwarded express','--budget','1000'],cwd='/Users/sid/AgentMaturityCompass')\nsys.exit(r.returncode)"
+          ],
+          "startedUtc": "2026-10-17T11:45:44.726342+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-graph-navigation/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-graph-navigation/command.json",
+        "bytes": 1740,
+        "sha256": "0ee6afc2ad1f642b996e2ef00dec697ae53878684d6ac266428a4b4fd1bde461",
+        "dev": 16777231,
+        "inode": 545122483,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-graph-navigation/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-graph-navigation/stdout-stderr.log",
+        "bytes": 3594,
+        "sha256": "9a40643bc4df69876e061b3948486f8adf0bbaffbcb69ba22496f43c22aa95f0",
+        "dev": 16777231,
+        "inode": 545122479,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-lock-resolution-read",
+      "command": {
+        "phase": "p049-lock-resolution-read",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "rg -n -A 7 -B 2 'proxy-addr:|proxy-addr@2\\.0\\.8|express@5\\.2\\.1|@modelcontextprotocol/sdk@1\\.31\\.0' /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "exit": 0,
+        "durationMs": 32,
+        "startedUtc": "2026-10-17T11:47:23.603553+00:00",
+        "endedUtc": "2026-10-17T11:47:23.650897+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-lock-resolution-read/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89034,
+          "ownedPgid": 89034,
+          "observedPgidAfterLaunch": 89034,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "rg",
+            "-n",
+            "-A",
+            "7",
+            "-B",
+            "2",
+            "proxy-addr:|proxy-addr@2\\.0\\.8|express@5\\.2\\.1|@modelcontextprotocol/sdk@1\\.31\\.0",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/pnpm-lock.yaml"
+          ],
+          "startedUtc": "2026-10-17T11:47:23.603553+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-lock-resolution-read/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-lock-resolution-read/command.json",
+        "bytes": 1516,
+        "sha256": "b64fbc0cf0d1e72bceaa8f60c1c5677e02dab514b7174a16d694c1d41133d2c6",
+        "dev": 16777231,
+        "inode": 545122681,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-lock-resolution-read/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-lock-resolution-read/stdout-stderr.log",
+        "bytes": 2394,
+        "sha256": "bd813c0ca3f723ee76aacc4473b4d58fd723fc093c2f042887a6848790058e87",
+        "dev": 16777231,
+        "inode": 545122678,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-registry-release-metadata",
+      "command": {
+        "phase": "p049-registry-release-metadata",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm view proxy-addr@2.0.8 dist.integrity dist.tarball --json",
+        "exit": 0,
+        "durationMs": 599,
+        "startedUtc": "2026-10-17T11:49:10.296708+00:00",
+        "endedUtc": "2026-10-17T11:49:10.915700+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-registry-release-metadata/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89254,
+          "ownedPgid": 89254,
+          "observedPgidAfterLaunch": 89254,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "view",
+            "proxy-addr@2.0.8",
+            "dist.integrity",
+            "dist.tarball",
+            "--json"
+          ],
+          "startedUtc": "2026-10-17T11:49:10.296708+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-registry-release-metadata/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-registry-release-metadata/command.json",
+        "bytes": 1303,
+        "sha256": "46e632c89c833fdc44fc466ac860dcd87db5716cf037db94890bd1309001e67d",
+        "dev": 16777231,
+        "inode": 545122839,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-registry-release-metadata/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-registry-release-metadata/stdout-stderr.log",
+        "bytes": 204,
+        "sha256": "fe84b0e96d52564ddf1b936dc0309b7785bf4e105a27aba7322511622eff08b8",
+        "dev": 16777231,
+        "inode": 545122813,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-release-tarball-quoted-read",
+      "command": {
+        "phase": "p049-release-tarball-quoted-read",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "curl --fail --location --proto =https --proto-redir =https --no-clobber --output /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz https://registry.npmjs.org/proxy-addr/-/proxy-addr-2.0.8.tgz",
+        "exit": 0,
+        "durationMs": 57,
+        "startedUtc": "2026-10-17T11:50:23.894333+00:00",
+        "endedUtc": "2026-10-17T11:50:23.964261+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-quoted-read/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89404,
+          "ownedPgid": 89404,
+          "observedPgidAfterLaunch": 89404,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "curl",
+            "--fail",
+            "--location",
+            "--proto",
+            "=https",
+            "--proto-redir",
+            "=https",
+            "--no-clobber",
+            "--output",
+            "/private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz",
+            "https://registry.npmjs.org/proxy-addr/-/proxy-addr-2.0.8.tgz"
+          ],
+          "startedUtc": "2026-10-17T11:50:23.894333+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-quoted-read/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-quoted-read/command.json",
+        "bytes": 1571,
+        "sha256": "f4c9ec47ca84fb94bb573c8549f4abfb24ee5ba8aabffb283ef70ff66a2a7c1e",
+        "dev": 16777231,
+        "inode": 545122952,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-quoted-read/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-quoted-read/stdout-stderr.log",
+        "bytes": 317,
+        "sha256": "2a5a862a1b1dd8ae5998edcc1bc9415bb3570b86ef7e41cb27530203b672cf63",
+        "dev": 16777231,
+        "inode": 545122948,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-release-tarball-list",
+      "command": {
+        "phase": "p049-release-tarball-list",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "tar -tf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz",
+        "exit": 0,
+        "durationMs": 6,
+        "startedUtc": "2026-10-17T11:50:50.739315+00:00",
+        "endedUtc": "2026-10-17T11:50:50.760224+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-list/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89449,
+          "ownedPgid": 89449,
+          "observedPgidAfterLaunch": 89449,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "tar",
+            "-tf",
+            "/private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz"
+          ],
+          "startedUtc": "2026-10-17T11:50:50.739315+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-list/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-list/command.json",
+        "bytes": 1264,
+        "sha256": "d96d05d46b047cdd44e6fca0087b2e792d097780e9b3e7b480174c4fd033c4ba",
+        "dev": 16777231,
+        "inode": 545122999,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-list/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-tarball-list/stdout-stderr.log",
+        "bytes": 91,
+        "sha256": "b10c0475fcf532d75f3cd335fd3a2c02b7c8c01a4ce540cbfee70e014fdc72fa",
+        "dev": 16777231,
+        "inode": 545122996,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-release-content-index",
+      "command": {
+        "phase": "p049-release-content-index",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/index.js",
+        "exit": 0,
+        "durationMs": 6,
+        "startedUtc": "2026-10-17T11:50:57.882494+00:00",
+        "endedUtc": "2026-10-17T11:50:57.904316+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-index/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89457,
+          "ownedPgid": 89457,
+          "observedPgidAfterLaunch": 89457,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "tar",
+            "-xOf",
+            "/private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz",
+            "package/index.js"
+          ],
+          "startedUtc": "2026-10-17T11:50:57.882494+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-index/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-index/command.json",
+        "bytes": 1305,
+        "sha256": "72f2a4320aa5af9e63cd35a5828c28623d0cf0e083f6e4c84e5aef70073b340f",
+        "dev": 16777231,
+        "inode": 545123020,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-index/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-index/stdout-stderr.log",
+        "bytes": 7340,
+        "sha256": "aa7efd29bbd61cbcc1bdafde9e674db28ead077864f33bfad3cdd19bb5a3778c",
+        "dev": 16777231,
+        "inode": 545123017,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-release-content-package",
+      "command": {
+        "phase": "p049-release-content-package",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/package.json",
+        "exit": 0,
+        "durationMs": 3,
+        "startedUtc": "2026-10-17T11:50:58.036882+00:00",
+        "endedUtc": "2026-10-17T11:50:58.051335+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-package/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89462,
+          "ownedPgid": 89462,
+          "observedPgidAfterLaunch": 89462,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "tar",
+            "-xOf",
+            "/private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz",
+            "package/package.json"
+          ],
+          "startedUtc": "2026-10-17T11:50:58.036882+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-package/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-package/command.json",
+        "bytes": 1317,
+        "sha256": "9778c1090735c7cb373789204a16e320c24103a93e643ad1249816ec48865c6c",
+        "dev": 16777231,
+        "inode": 545123029,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-package/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-package/stdout-stderr.log",
+        "bytes": 1281,
+        "sha256": "b2e305ca817ae4e8b088e07f38c5df1d7ad77aa3473809e4c37a9a1c83600225",
+        "dev": 16777231,
+        "inode": 545123026,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-release-content-history",
+      "command": {
+        "phase": "p049-release-content-history",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/HISTORY.md",
+        "exit": 0,
+        "durationMs": 4,
+        "startedUtc": "2026-10-17T11:50:58.181922+00:00",
+        "endedUtc": "2026-10-17T11:50:58.197459+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-history/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89467,
+          "ownedPgid": 89467,
+          "observedPgidAfterLaunch": 89467,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "tar",
+            "-xOf",
+            "/private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz",
+            "package/HISTORY.md"
+          ],
+          "startedUtc": "2026-10-17T11:50:58.181922+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-history/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-history/command.json",
+        "bytes": 1313,
+        "sha256": "c34215042907fb4c1391fdcddd42aecca77d5bebf633e044ef70b270ccd374df",
+        "dev": 16777231,
+        "inode": 545123036,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-history/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-history/stdout-stderr.log",
+        "bytes": 2480,
+        "sha256": "334e0c327b7eb9ead1e05ab99770e1466ab3b21945537af36be7b2aa90fd8c4e",
+        "dev": 16777231,
+        "inode": 545123033,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-release-content-license",
+      "command": {
+        "phase": "p049-release-content-license",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/LICENSE",
+        "exit": 0,
+        "durationMs": 3,
+        "startedUtc": "2026-10-17T11:50:58.328629+00:00",
+        "endedUtc": "2026-10-17T11:50:58.343383+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-license/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89472,
+          "ownedPgid": 89472,
+          "observedPgidAfterLaunch": 89472,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "tar",
+            "-xOf",
+            "/private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz",
+            "package/LICENSE"
+          ],
+          "startedUtc": "2026-10-17T11:50:58.328629+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-license/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-license/command.json",
+        "bytes": 1307,
+        "sha256": "43782c70e1ae9981db23a1118f8692748b6c6a55aa6530e52036dac424aa40f8",
+        "dev": 16777231,
+        "inode": 545123043,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-license/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-license/stdout-stderr.log",
+        "bytes": 1094,
+        "sha256": "a7996721249a136fbcfc1c201bcb5f414f38a701d4a24f28abe65e16cfcce813",
+        "dev": 16777231,
+        "inode": 545123040,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-release-content-readme",
+      "command": {
+        "phase": "p049-release-content-readme",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "tar -xOf /private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz package/README.md",
+        "exit": 0,
+        "durationMs": 3,
+        "startedUtc": "2026-10-17T11:50:58.472279+00:00",
+        "endedUtc": "2026-10-17T11:50:58.486890+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-readme/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89477,
+          "ownedPgid": 89477,
+          "observedPgidAfterLaunch": 89477,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "tar",
+            "-xOf",
+            "/private/tmp/p0-49-qualification-20261017/proxy-addr-2.0.8.tgz",
+            "package/README.md"
+          ],
+          "startedUtc": "2026-10-17T11:50:58.472279+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-readme/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-readme/command.json",
+        "bytes": 1309,
+        "sha256": "8f265c2aee3ff623dcfb764f0f2929e2a803dfae6a4dc332bd1465b1aa564335",
+        "dev": 16777231,
+        "inode": 545123050,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-readme/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-release-content-readme/stdout-stderr.log",
+        "bytes": 4131,
+        "sha256": "1ecfed574adf9661f916ede92c5304beebdd3effed4d076f543a5e77669595b8",
+        "dev": 16777231,
+        "inode": 545123047,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-current-ownership-read",
+      "command": {
+        "phase": "p049-current-ownership-read",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "python3 -B /private/tmp/p0-49-qualification-20261017/audit-ownership.py /private/tmp/p0-49-qualification-20261017/ownership-observations.actual.json",
+        "exit": 0,
+        "durationMs": 13794,
+        "startedUtc": "2026-10-17T11:53:22.175333+00:00",
+        "endedUtc": "2026-10-17T11:53:35.983882+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-current-ownership-read/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 89774,
+          "ownedPgid": 89774,
+          "observedPgidAfterLaunch": 89774,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "python3",
+            "-B",
+            "/private/tmp/p0-49-qualification-20261017/audit-ownership.py",
+            "/private/tmp/p0-49-qualification-20261017/ownership-observations.actual.json"
+          ],
+          "startedUtc": "2026-10-17T11:53:22.175333+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-current-ownership-read/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-current-ownership-read/command.json",
+        "bytes": 1431,
+        "sha256": "0b2c8755f962ae4efcbb8c1d3045bc7cd0001aba996a4efc8c307c6669934822",
+        "dev": 16777231,
+        "inode": 545123270,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-current-ownership-read/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-current-ownership-read/stdout-stderr.log",
+        "bytes": 201,
+        "sha256": "12ac00cda4d0a3b1eaaad325c99fd32dd3600ae84e719e56eabfdaca3a92382d",
+        "dev": 16777231,
+        "inode": 545123258,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-pre-runtime-freeze",
+      "command": {
+        "phase": "p049-pre-runtime-freeze",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+        "exit": 0,
+        "durationMs": 1784,
+        "startedUtc": "2026-10-17T11:56:08.445479+00:00",
+        "endedUtc": "2026-10-17T11:56:10.241944+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-runtime-freeze/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 90532,
+          "ownedPgid": 90532,
+          "observedPgidAfterLaunch": 90532,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+            "run",
+            "check:freeze"
+          ],
+          "startedUtc": "2026-10-17T11:56:08.445479+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-runtime-freeze/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-runtime-freeze/command.json",
+        "bytes": 1357,
+        "sha256": "b44c8f7df793a4317ea7657b4a2e337bece3426aa701e7ed006a28840a2261e1",
+        "dev": 16777231,
+        "inode": 545123472,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-runtime-freeze/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-runtime-freeze/stdout-stderr.log",
+        "bytes": 263,
+        "sha256": "cb213c8efc74ec5a9aceab64262d04ddfe7f3f3fa21c63e0d59d304cc380793e",
+        "dev": 16777231,
+        "inode": 545123469,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-original-regression",
+      "command": {
+        "phase": "p049-original-regression",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs original /private/tmp/p0-49-qualification-20261017/original-regression.actual.json",
+        "exit": 0,
+        "durationMs": 65,
+        "startedUtc": "2026-10-17T11:57:18.615501+00:00",
+        "endedUtc": "2026-10-17T11:57:18.694685+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 90668,
+          "ownedPgid": 90668,
+          "observedPgidAfterLaunch": 90668,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs",
+            "original",
+            "/private/tmp/p0-49-qualification-20261017/original-regression.actual.json"
+          ],
+          "startedUtc": "2026-10-17T11:57:18.615501+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/command.json",
+        "bytes": 1496,
+        "sha256": "c227f08829cf940e6f2c74e9526c2e412ec6c38c05569af0c8cf14b2249e3949",
+        "dev": 16777231,
+        "inode": 545123571,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-regression/stdout-stderr.log",
+        "bytes": 392,
+        "sha256": "f9551b94a1eaa261c0e92fb8870750917cd7ade7239733da58b3cf888684b2cb",
+        "dev": 16777231,
+        "inode": 545123567,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-range-guard-control",
+      "command": {
+        "phase": "p049-range-guard-control",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs range-guard-control /private/tmp/p0-49-qualification-20261017/range-guard-control.actual.json",
+        "exit": 1,
+        "durationMs": 65,
+        "startedUtc": "2026-10-17T11:57:27.487470+00:00",
+        "endedUtc": "2026-10-17T11:57:27.566935+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 90688,
+          "ownedPgid": 90688,
+          "observedPgidAfterLaunch": 90688,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs",
+            "range-guard-control",
+            "/private/tmp/p0-49-qualification-20261017/range-guard-control.actual.json"
+          ],
+          "startedUtc": "2026-10-17T11:57:27.487470+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/command.json",
+        "bytes": 1518,
+        "sha256": "d1ce7593006a183eff98b994063e4be0fdcb44626c644c783a1e2c3f797ea5e6",
+        "dev": 16777231,
+        "inode": 545123591,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-range-guard-control/stdout-stderr.log",
+        "bytes": 403,
+        "sha256": "2daeb1e2e4b12c5bbc78ee5721d830fbb4dcc1e8b54196e756c3e3ff8281f2be",
+        "dev": 16777231,
+        "inode": 545123587,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-original-after-control",
+      "command": {
+        "phase": "p049-original-after-control",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs original /private/tmp/p0-49-qualification-20261017/original-after-control.actual.json",
+        "exit": 0,
+        "durationMs": 62,
+        "startedUtc": "2026-10-17T11:57:35.878121+00:00",
+        "endedUtc": "2026-10-17T11:57:35.954443+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 90707,
+          "ownedPgid": 90707,
+          "observedPgidAfterLaunch": 90707,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/private/tmp/p0-49-qualification-20261017/check-installed-proxy.mjs",
+            "original",
+            "/private/tmp/p0-49-qualification-20261017/original-after-control.actual.json"
+          ],
+          "startedUtc": "2026-10-17T11:57:35.878121+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/command.json",
+        "bytes": 1508,
+        "sha256": "3ad5a571e72d77924eabe1eb7ed60b7315e0eb3b60e656437c01519ba0a83e5a",
+        "dev": 16777231,
+        "inode": 545123611,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-original-after-control/stdout-stderr.log",
+        "bytes": 398,
+        "sha256": "d462220b90a57b311d0d71cafa6bf8c6385dcaa5716d24db971baeb2253f2f53",
+        "dev": 16777231,
+        "inode": 545123607,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-runtime-audit",
+      "command": {
+        "phase": "p049-runtime-audit",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run audit:runtime",
+        "exit": 0,
+        "durationMs": 772,
+        "startedUtc": "2026-10-17T11:57:44.676907+00:00",
+        "endedUtc": "2026-10-17T11:57:45.471450+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-runtime-audit/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 90720,
+          "ownedPgid": 90720,
+          "observedPgidAfterLaunch": 90720,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+            "run",
+            "audit:runtime"
+          ],
+          "startedUtc": "2026-10-17T11:57:44.676907+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-runtime-audit/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-runtime-audit/command.json",
+        "bytes": 1348,
+        "sha256": "db203111ddf764bea8a6d721fecaa5717ea0fce591c162355d6a69012f9ec970",
+        "dev": 16777231,
+        "inode": 545123625,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-runtime-audit/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-runtime-audit/stdout-stderr.log",
+        "bytes": 190,
+        "sha256": "df34a2d3d89007b745a11ef3ffcfd508069f1a78cec1f8a35deb1a9d9b564644",
+        "dev": 16777231,
+        "inode": 545123620,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-pre-packet-status",
+      "command": {
+        "phase": "p049-pre-packet-status",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "git --no-optional-locks -c core.fsmonitor=false -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass status --porcelain=v1 -z --untracked-files=all",
+        "exit": 0,
+        "durationMs": 161,
+        "startedUtc": "2026-10-17T11:59:06.369341+00:00",
+        "endedUtc": "2026-10-17T11:59:06.559405+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-packet-status/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 90919,
+          "ownedPgid": 90919,
+          "observedPgidAfterLaunch": 90919,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "git",
+            "--no-optional-locks",
+            "-c",
+            "core.fsmonitor=false",
+            "-C",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+            "status",
+            "--porcelain=v1",
+            "-z",
+            "--untracked-files=all"
+          ],
+          "startedUtc": "2026-10-17T11:59:06.369341+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-packet-status/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-packet-status/command.json",
+        "bytes": 1473,
+        "sha256": "7084bf5a499d477b60a94c9d3103354dceb79efb3f9d831ff0ee1a64e8cbfe07",
+        "dev": 16777231,
+        "inode": 545123767,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-packet-status/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-pre-packet-status/stdout-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "dev": 16777231,
+        "inode": 545123762,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p049-packet-qualification",
+      "command": {
+        "phase": "p049-packet-qualification",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:qualification",
+        "exit": 0,
+        "durationMs": 1179,
+        "startedUtc": "2026-10-17T12:00:07.625575+00:00",
+        "endedUtc": "2026-10-17T12:00:08.817796+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-qualification/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 91071,
+          "ownedPgid": 91071,
+          "observedPgidAfterLaunch": 91071,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+            "run",
+            "check:qualification"
+          ],
+          "startedUtc": "2026-10-17T12:00:07.625575+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-qualification/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-qualification/command.json",
+        "bytes": 1375,
+        "sha256": "a4b52fdad0e3f09d7f5cf88b1106f3edcd1c2562fe3c72bdeeae5e6da7ad8b55",
+        "dev": 16777231,
+        "inode": 545123846,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-qualification/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-qualification/stdout-stderr.log",
+        "bytes": 235,
+        "sha256": "9147366cc01fb0a81b5c504fb24876bbfe845b1f33a92a05e92cefaa05bba789",
+        "dev": 16777231,
+        "inode": 545123841,
+        "nlink": 1
+      },
+      "actualLog": "\n> agent-maturity-compass@1.2.0 check:qualification /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\n> node scripts/check-qualification-receipts.mjs\n\nQualification receipts valid: 32 receipt(s) under qualification.\n"
+    },
+    {
+      "phase": "p049-packet-freeze",
+      "command": {
+        "phase": "p049-packet-freeze",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+        "exit": 0,
+        "durationMs": 1553,
+        "startedUtc": "2026-10-17T12:00:38.610224+00:00",
+        "endedUtc": "2026-10-17T12:00:40.175082+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-freeze/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 91124,
+          "ownedPgid": 91124,
+          "observedPgidAfterLaunch": 91124,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+            "run",
+            "check:freeze"
+          ],
+          "startedUtc": "2026-10-17T12:00:38.610224+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-freeze/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-freeze/command.json",
+        "bytes": 1347,
+        "sha256": "a24b51d9ecfdd36c14e93a741319fa2f4b3fbc620bda14b599bd60bcafd99377",
+        "dev": 16777231,
+        "inode": 545123881,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-freeze/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-freeze/stdout-stderr.log",
+        "bytes": 263,
+        "sha256": "cb213c8efc74ec5a9aceab64262d04ddfe7f3f3fa21c63e0d59d304cc380793e",
+        "dev": 16777231,
+        "inode": 545123877,
+        "nlink": 1
+      },
+      "actualLog": "\n> agent-maturity-compass@1.2.0 check:freeze /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\n> node scripts/check-freeze.mjs\n\nFreeze guard passed: {\"cliCommandPaths\":1236,\"cliInventoryPaths\":1236,\"stationPacks\":41,\"stationPackQuestions\":632}\n"
+    },
+    {
+      "phase": "p049-packet-counts",
+      "command": {
+        "phase": "p049-packet-counts",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+        "exit": 0,
+        "durationMs": 461,
+        "startedUtc": "2026-10-17T12:00:51.487210+00:00",
+        "endedUtc": "2026-10-17T12:00:51.961286+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-counts/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 91197,
+          "ownedPgid": 91197,
+          "observedPgidAfterLaunch": 91197,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+            "run",
+            "check:counts"
+          ],
+          "startedUtc": "2026-10-17T12:00:51.487210+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-counts/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-counts/command.json",
+        "bytes": 1346,
+        "sha256": "1fe146978e927ea063d3cd2305c2686ed5af08fa68034cab60760aad990593ce",
+        "dev": 16777231,
+        "inode": 545123893,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-counts/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-counts/stdout-stderr.log",
+        "bytes": 234,
+        "sha256": "76c51ab596f111ff669ac4817122c0bd108da5145276cd983913634b8c82bc1e",
+        "dev": 16777231,
+        "inode": 545123890,
+        "nlink": 1
+      },
+      "actualLog": "\n> agent-maturity-compass@1.2.0 check:counts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\n> node scripts/gen-counts.mjs --check\n\nPublished source counts match the repository; this check does not execute tests.\n"
+    },
+    {
+      "phase": "p049-packet-docs-drift",
+      "command": {
+        "phase": "p049-packet-docs-drift",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:docs-drift",
+        "exit": 0,
+        "durationMs": 331,
+        "startedUtc": "2026-10-17T12:00:52.067179+00:00",
+        "endedUtc": "2026-10-17T12:00:52.411602+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-docs-drift/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 91216,
+          "ownedPgid": 91216,
+          "observedPgidAfterLaunch": 91216,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+            "run",
+            "check:docs-drift"
+          ],
+          "startedUtc": "2026-10-17T12:00:52.067179+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-docs-drift/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-docs-drift/command.json",
+        "bytes": 1362,
+        "sha256": "021169ae5c9594b6012dda38931828789dc227084cb1b6479528fcef4956eae5",
+        "dev": 16777231,
+        "inode": 545123900,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-docs-drift/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-docs-drift/stdout-stderr.log",
+        "bytes": 200,
+        "sha256": "103ad96554c03c339cc3f40d71c36b9a77af70c704b646cd457480b4b621aa03",
+        "dev": 16777231,
+        "inode": 545123897,
+        "nlink": 1
+      },
+      "actualLog": "\n> agent-maturity-compass@1.2.0 check:docs-drift /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\n> node scripts/docs-drift-check.mjs\n\nDocs drift check passed (336 files scanned).\n"
+    },
+    {
+      "phase": "p049-packet-dead-code",
+      "command": {
+        "phase": "p049-packet-dead-code",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+        "exit": 1,
+        "durationMs": 3308,
+        "startedUtc": "2026-10-17T12:00:52.518640+00:00",
+        "endedUtc": "2026-10-17T12:00:55.841488+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-dead-code/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 91232,
+          "ownedPgid": 91232,
+          "observedPgidAfterLaunch": 91232,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+            "run",
+            "check:dead-code"
+          ],
+          "startedUtc": "2026-10-17T12:00:52.518640+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-dead-code/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-dead-code/command.json",
+        "bytes": 1359,
+        "sha256": "8fdab458ec04e0928c8ee4bd4220ff9cd5a0bfc0eefbe0444388c4a0274f9b4e",
+        "dev": 16777231,
+        "inode": 545123915,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-dead-code/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-dead-code/stdout-stderr.log",
+        "bytes": 1202,
+        "sha256": "24ab7ccfd610290e50b17e0d3d2964dccbb9c5c36aa732b081706c12176bb2f6",
+        "dev": 16777231,
+        "inode": 545123904,
+        "nlink": 1
+      },
+      "actualLog": "\n> agent-maturity-compass@1.2.0 check:dead-code /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\n> node scripts/source-quality.mjs dead-code\n\n{\n  \"status\": \"failed\",\n  \"tool\": \"knip\",\n  \"version\": \"6.39.0\",\n  \"findingCount\": 2710,\n  \"representativeFindings\": [\n    \"[\\\"examples/score-history-example.ts\\\",\\\"files\\\",{\\\"name\\\":\\\"examples/score-history-example.ts\\\"}]\",\n    \"[\\\"package.json\\\",\\\"binaries\\\",{\\\"name\\\":\\\"graphify\\\"}]\",\n    \"[\\\"package.json\\\",\\\"devDependencies\\\",{\\\"name\\\":\\\"date-fns\\\"}]\",\n    \"[\\\"scripts/make-legacy-fixtures.mjs\\\",\\\"files\\\",{\\\"name\\\":\\\"scripts/make-legacy-fixtures.mjs\\\"}]\",\n    \"[\\\"scripts/program-metrics.mjs\\\",\\\"files\\\",{\\\"name\\\":\\\"scripts/program-metrics.mjs\\\"}]\",\n    \"[\\\"scripts/vendor/build-workspace.mjs\\\",\\\"files\\\",{\\\"name\\\":\\\"scripts/vendor/build-workspace.mjs\\\"}]\",\n    \"[\\\"src/a4/a4Binder.ts\\\",\\\"files\\\",{\\\"name\\\":\\\"src/a4/a4Binder.ts\\\"}]\",\n    \"[\\\"src/a4/a4Blobs.ts\\\",\\\"exports\\\",{\\\"name\\\":\\\"destroyProjectKey\\\"}]\",\n    \"[\\\"src/a4/a4Conformance.ts\\\",\\\"exports\\\",{\\\"name\\\":\\\"checkControlResults\\\"}]\",\n    \"[\\\"src/a4/a4Conformance.ts\\\",\\\"exports\\\",{\\\"name\\\":\\\"recheckedConformance\\\"}]\"\n  ]\n}\n ELIFECYCLE  Command failed with exit code 1.\n"
+    },
+    {
+      "phase": "p049-packet-duplicates",
+      "command": {
+        "phase": "p049-packet-duplicates",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+        "exit": 1,
+        "durationMs": 665,
+        "startedUtc": "2026-10-17T12:00:55.951824+00:00",
+        "endedUtc": "2026-10-17T12:00:56.628989+00:00",
+        "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-duplicates/stdout-stderr.log",
+        "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+        "ownedProcess": {
+          "pid": 91259,
+          "ownedPgid": 91259,
+          "observedPgidAfterLaunch": 91259,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/bin/pnpm",
+            "--dir",
+            "/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass",
+            "run",
+            "check:duplicates"
+          ],
+          "startedUtc": "2026-10-17T12:00:55.951824+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-duplicates/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-duplicates/command.json",
+        "bytes": 1362,
+        "sha256": "45806fb9b0e971dfb6241d23b908b6acb2be5d8d46f94221ce3ce03206ed292a",
+        "dev": 16777231,
+        "inode": 545123924,
+        "nlink": 1
+      },
+      "logPin": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-duplicates/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p049-packet-duplicates/stdout-stderr.log",
+        "bytes": 2059,
+        "sha256": "5e1ca57231153917f3cec9259f759eecd5e5ec46609ffc3bc9d2ea465eadc85c",
+        "dev": 16777231,
+        "inode": 545123919,
+        "nlink": 1
+      },
+      "actualLog": "\n> agent-maturity-compass@1.2.0 check:duplicates /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\n> node scripts/source-quality.mjs duplicates\n\n{\n  \"status\": \"failed\",\n  \"tool\": \"jscpd\",\n  \"version\": \"5.4.0\",\n  \"findingCount\": 1268,\n  \"statistics\": {\n    \"clones\": 1268,\n    \"duplicatedLines\": 14771,\n    \"duplicatedTokens\": 95635,\n    \"lines\": 527385,\n    \"newClones\": 0,\n    \"newDuplicatedLines\": 0,\n    \"percentage\": 2.8008001744456137,\n    \"percentageTokens\": 2.9093467803857673,\n    \"sources\": 2146,\n    \"tokens\": 3287164\n  },\n  \"representativeFindings\": [\n    \"[[\\\"a4/a4Router.ts\\\",\\\"a4/a4RouterStages.ts\\\"],\\\"typescript\\\",\\\"fbe506ebc7c545b7dcbf8bb34ca36814d6c2a7268dcea84a0126d45dcbf500de\\\"]\",\n    \"[[\\\"a4/a4Router.ts\\\",\\\"api/nativeTasksRouter.ts\\\"],\\\"typescript\\\",\\\"2d212c944cd82cd8804351171f9dd363da57ad9b7faccc2e163cdabb3c10b1a1\\\"]\",\n    \"[[\\\"a4/a4Router.ts\\\",\\\"mcp/a4Tools.ts\\\"],\\\"typescript\\\",\\\"df7ee641bc3ded1aec920ce188369e3c83b53b537e2a80387db9ef467a4a89aa\\\"]\",\n    \"[[\\\"a4/a4RouterStages.ts\\\",\\\"a4/spec/adapt.ts\\\"],\\\"typescript\\\",\\\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\\\"]\",\n    \"[[\\\"a4/a4RouterStages.ts\\\",\\\"a4/spec/aspire.ts\\\"],\\\"typescript\\\",\\\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\\\"]\",\n    \"[[\\\"a4/a4RouterStages.ts\\\",\\\"a4/spec/assemble.ts\\\"],\\\"typescript\\\",\\\"56f2a3c5a731cc1a8b5645868aca9dd7a802103a02ab2b2b5544a7bdbe97b020\\\"]\",\n    \"[[\\\"a4/adaptContextPlugin.ts\\\",\\\"a4/spec/assemble.ts\\\"],\\\"typescript\\\",\\\"324a2b47f6016f4093a5592c7ab29c67ba6eb9678640c4f1318bca92b62895ed\\\"]\",\n    \"[[\\\"a4/adaptPolicy.ts\\\",\\\"a4/stages/assemble.ts\\\"],\\\"typescript\\\",\\\"cdf8e0a57471dcc73b0808ed9fe7c69923343f7ab0ec1f773048e799d5e241d7\\\"]\",\n    \"[[\\\"a4/assembleBuild.ts\\\",\\\"a4/stages/adapt.ts\\\"],\\\"typescript\\\",\\\"d873f32d3eb5d538f041c3ebdf2e06ebc2edb70cec8839efc1ae78ee961c7c15\\\"]\",\n    \"[[\\\"a4/assembleResolve.ts\\\",\\\"a4/assembleResolve.ts\\\"],\\\"typescript\\\",\\\"58209a897c4b1182be8679b674d36d6b86046e208a3418b47250e958f32a0afe\\\"]\"\n  ]\n}\n ELIFECYCLE  Command failed with exit code 1.\n"
+    }
+  ],
+  "earlierFailedOuterShellReadPin": {
+    "path": "/private/tmp/p0-49-qualification-20261017/outer-shell-failed-release-read.actual.json",
+    "physicalPath": "/private/tmp/p0-49-qualification-20261017/outer-shell-failed-release-read.actual.json",
+    "bytes": 1132,
+    "sha256": "461bf159c4571af8e7c4ecdc3a3b94a64efc699a3e7c98fa3f7eabba443792ad",
+    "dev": 16777231,
+    "inode": 545122942,
+    "nlink": 1
+  },
+  "ownershipPeerPin": {
+    "path": "/private/tmp/p0-49-qualification-20261017/ownership-actual-independent-fs-review.json",
+    "physicalPath": "/private/tmp/p0-49-qualification-20261017/ownership-actual-independent-fs-review.json",
+    "bytes": 7938,
+    "sha256": "ba9f001217029d66664d25b5ec5baf780554f78657674d527b3e13ef29294838",
+    "dev": 16777231,
+    "inode": 545123598,
+    "nlink": 1
+  },
+  "hostedAdmissionPin": {
+    "path": "/private/tmp/p0-49-qualification-20261017/hosted-admission.actual.json",
+    "physicalPath": "/private/tmp/p0-49-qualification-20261017/hosted-admission.actual.json",
+    "bytes": 9011,
+    "sha256": "8886a04cecfbd2ad588f1bd209d9f66d9f291baec59b4de808ce0a92b07945a7",
+    "dev": 16777231,
+    "inode": 545123486,
+    "nlink": 1
+  },
+  "preservation": {
+    "nineteenAdmittedSourcesAndFiftyOneProtectedFixturesAndSeventeenNativeFullPinsExact": true,
+    "held3752PinsExactAtOwnershipEndpoints": true
+  },
+  "limits": "39 distinct scalar direct-library vectors; repeated runs are not117 unique tests. Six request-object fixtures are not live sockets/HTTP or Express/Studio authentication. The two-conjunct in-memory control is not historical2.0.7. No whole-suite/CI/release/global-quality or completeissue/plan acceptance. Wrapper commandcwd/head is heldR; target source above is U. Global19suite failures and quality2710/1268 plus all held decisions remain open.",
+  "actualOutcomeIndependentPeerPin": {
+    "path": "/private/tmp/p0-49-qualification-20261017/regression-actual-independent-outcome-review.json",
+    "physicalPath": "/private/tmp/p0-49-qualification-20261017/regression-actual-independent-outcome-review.json",
+    "bytes": 12682,
+    "sha256": "7c7c9065aed6c18a55c34df2258d7c82f54079e5d90441ff6b0379cfba64d76f",
+    "dev": 16777231,
+    "inode": 545123793,
+    "nlink": 1
+  },
+  "postPacketCheckSummary": {
+    "qualificationReceipts": 32,
+    "freeze": {
+      "cliPaths": 1236,
+      "packs": 41,
+      "questions": 632
+    },
+    "counts": "passed; no tests executed",
+    "docsDriftFiles": 336,
+    "deadCode": {
+      "exit": 1,
+      "findings": 2710
+    },
+    "duplicates": {
+      "exit": 1,
+      "occurrences": 1268
+    },
+    "noWaivers": true
+  }
+}

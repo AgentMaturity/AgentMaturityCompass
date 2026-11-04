@@ -1,0 +1,219 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 37459,
+  "cwd": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+    "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/standardSchemaCaveat.test.ts"
+  ],
+  "testCount": 16,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-1008297338",
+      "name": "tests/externalEvidenceProfile.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1008297338_0",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_0",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent",
+      "fullName": "external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_1",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time",
+      "fullName": "external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_2",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile rejects corrupt id without accepting a trust claim",
+      "fullName": "external evidence profile rejects corrupt id without accepting a trust claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_3",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile rejects corrupt parent without accepting a trust claim",
+      "fullName": "external evidence profile rejects corrupt parent without accepting a trust claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_4",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile rejects corrupt tool without accepting a trust claim",
+      "fullName": "external evidence profile rejects corrupt tool without accepting a trust claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_5",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile rejects corrupt duration without accepting a trust claim",
+      "fullName": "external evidence profile rejects corrupt duration without accepting a trust claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_6",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile rejects corrupt calendar without accepting a trust claim",
+      "fullName": "external evidence profile rejects corrupt calendar without accepting a trust claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_7",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile rejects corrupt digest without accepting a trust claim",
+      "fullName": "external evidence profile rejects corrupt digest without accepting a trust claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_8",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile rejects corrupt unicode without accepting a trust claim",
+      "fullName": "external evidence profile rejects corrupt unicode without accepting a trust claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_9",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile a signing key cannot promote imports or self-admit",
+      "fullName": "external evidence profile a signing key cannot promote imports or self-admit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_10",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile independent authority is scoped to producer and capture method",
+      "fullName": "external evidence profile independent authority is scoped to producer and capture method",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_11",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse",
+      "fullName": "external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_12",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+      "fullName": "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_13",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile the verifier never raises a producer's own lower declaration",
+      "fullName": "external evidence profile the verifier never raises a producer's own lower declaration",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1008297338_0_14",
+      "name": "tests/externalEvidenceProfile.test.ts external evidence profile future fields/versions and duplicate tool settlements refuse",
+      "fullName": "external evidence profile future fields/versions and duplicate tool settlements refuse",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "763947385",
+      "name": "tests/standardSchemaCaveat.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/standardSchemaCaveat.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "763947385_0",
+      "name": "tests/standardSchemaCaveat.test.ts published standard schemas",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "763947385_0_0",
+      "name": "tests/standardSchemaCaveat.test.ts published standard schemas are the generated spec schemas, with no permissiveness caveat",
+      "fullName": "published standard schemas are the generated spec schemas, with no permissiveness caveat",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

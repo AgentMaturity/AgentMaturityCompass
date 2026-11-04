@@ -1,0 +1,128 @@
+{
+  "schema": "p125pc-twelve-normal-source-checks-intent/1",
+  "at": "2026-10-17T01:49:59.155039+00:00",
+  "checks": [
+    {
+      "phase": "p125pc-test-types",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "typecheck:tests"
+      ]
+    },
+    {
+      "phase": "p125pc-source-types",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "typecheck"
+      ]
+    },
+    {
+      "phase": "p125pc-source-lint",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "lint"
+      ]
+    },
+    {
+      "phase": "p125pc-source-build",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "build"
+      ]
+    },
+    {
+      "phase": "p125pc-source-counts",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:counts"
+      ]
+    },
+    {
+      "phase": "p125pc-source-gates",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:gates"
+      ]
+    },
+    {
+      "phase": "p125pc-source-threat-model",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:threat-model"
+      ]
+    },
+    {
+      "phase": "p125pc-source-architecture",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:architecture-boundaries"
+      ]
+    },
+    {
+      "phase": "p125pc-source-docs-drift",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:docs-drift"
+      ]
+    },
+    {
+      "phase": "p125pc-source-freeze",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:freeze"
+      ]
+    },
+    {
+      "phase": "p125pc-source-notices",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:third-party-notices"
+      ]
+    },
+    {
+      "phase": "p125pc-source-qualification",
+      "argv": [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:qualification"
+      ]
+    }
+  ],
+  "noCompilerQualityFreezeOrTimeoutChanges": true,
+  "noProspectivePassCredit": true
+}

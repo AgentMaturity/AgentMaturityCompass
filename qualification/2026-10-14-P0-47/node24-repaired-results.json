@@ -1,0 +1,372 @@
+{
+  "task": "P0-47 Node24 after reviewed parity repair",
+  "createdAt": "2026-10-14T13:32:25.801942+00:00",
+  "workspace": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+  "sourceSHA": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "node": {
+    "version": "v24.21.0",
+    "execPath": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+    "modules": "137"
+  },
+  "pnpm": "10.33.0",
+  "statusBefore": "",
+  "scopedPath": "/opt/homebrew/opt/node@24/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+  "builtDistSource": "accepted main; both candidate commits change tests, metadata and archives only",
+  "files": [
+    {
+      "path": "tests/apiRouterResponseParity.test.ts",
+      "sha256": "17a06cd5a85a6f82fc54c82a09a7ca1e5ef992341438f1352ca37ce7f106317c"
+    },
+    {
+      "path": "tests/archiveFilesParity.test.ts",
+      "sha256": "ad554970e1f70923313ac5a05484b8988a8c0639ef542ef08203182ae710a2c9"
+    },
+    {
+      "path": "tests/assuranceScenarioContextParity.test.ts",
+      "sha256": "0c2220eb87d67d239523f5cb4db805c3cb9c49cce586c02fc95757fbbc8535da"
+    },
+    {
+      "path": "tests/auditEvidenceAccountingParity.test.ts",
+      "sha256": "19e73c8492efa38f8d0cb2eca129937b2023d26051940ed531e7a9002eac3abd"
+    },
+    {
+      "path": "tests/controlHttpResponsesParity.test.ts",
+      "sha256": "eb78cebc58ba83070d181e81826218ab1154ffc0807bd185d5123d6afd9978a6"
+    },
+    {
+      "path": "tests/diagnosticResponseScoringParity.test.ts",
+      "sha256": "09c6da4e448b05ec5d972d4afff6f4e9d67a46d037a5aa50956f1325923f59a9"
+    },
+    {
+      "path": "tests/explainabilityContractParity.test.ts",
+      "sha256": "c53222bdc8afa8d90496ec7f7a1696640fa4487067e342eb3175adee5408e189"
+    },
+    {
+      "path": "tests/liveDriftEvidenceFieldsParity.test.ts",
+      "sha256": "b7be0456731e606b3b541e4678ba6ab9e864ab42c05143e700347057080673f2"
+    },
+    {
+      "path": "tests/liveDriftProofStatsParity.test.ts",
+      "sha256": "bf0b8ed6baa42418e1d1d0004e83b9dae92ebfcd0a61a607a9bd533eb78137be"
+    },
+    {
+      "path": "tests/metricCoverageSummaryParity.test.ts",
+      "sha256": "760f3cf90d8083027c3e23ce5a8ee785df7086d14d562cebdf6f6e4d954c6e06"
+    },
+    {
+      "path": "tests/metricParameterContractParity.test.ts",
+      "sha256": "ee6d067eea61d70709be898efff83537ff226ed8edff2cd53a84b15f303e9370"
+    },
+    {
+      "path": "tests/metricRowPublicContract.test.ts",
+      "sha256": "d9ce68af8dc229679d72d1142be26d0cf68a25d7fa854e0d0ee46c67a2c68ce7"
+    },
+    {
+      "path": "tests/mobileFetchSdk.test.ts",
+      "sha256": "2412d3386d7fc09123b73c2f1a34f00508c926d9c12203fefae81f3c1cada12d"
+    },
+    {
+      "path": "tests/nativeSecondSharingRestoration.test.ts",
+      "sha256": "1160171a6e4deba51b816a04e820abc7f948d197f79c4e1839eabde8dff42dc1"
+    },
+    {
+      "path": "tests/pdfRenderingParity.test.ts",
+      "sha256": "b789c9191916f8d7ddc981d9c3a6e4f155a37a62b7f69351e4855dd7663c55e3"
+    },
+    {
+      "path": "tests/planEditsManifest.test.ts",
+      "sha256": "e86550ef5de6de0167fae124ac40019bd76381ef7cd71f51e3fd0df60e38b27d"
+    },
+    {
+      "path": "tests/privateModuleHelperVisibility.test.ts",
+      "sha256": "682c8c0317ddf4327746fa9f8801cc43574b6016c21b4f4cd79329b0c0eb15a3"
+    },
+    {
+      "path": "tests/privateStoreLocatorVisibility.test.ts",
+      "sha256": "ec8f85b6aa1a9b80fb69fc63216b88f086845097f3c13e7541135a03028b073f"
+    },
+    {
+      "path": "tests/providerDriftDescriptorParity.test.ts",
+      "sha256": "14f45f14e4a57ba90792a91ddca41aed0f426fc88358becf8eed4573fde54bf6"
+    },
+    {
+      "path": "tests/providerDriftRowContractsParity.test.ts",
+      "sha256": "a33259774bbd429e20976a959f1689069738ac0a5b4f9ce3dce97d8319103382"
+    },
+    {
+      "path": "tests/signedArtifactVerificationParity.test.ts",
+      "sha256": "b4440597565e3bd2beb4046714ab08d04ca31f1b503b785825cef7c4e73cbeb4"
+    },
+    {
+      "path": "tests/studioRouteRoleContextParity.test.ts",
+      "sha256": "14a842b3872cab223d6587c344a409a22d41f3405aeb4d11ed5a7d42c8539eca"
+    },
+    {
+      "path": "tests/studioVaultSigningContextParity.test.ts",
+      "sha256": "31efea65532fcdfa6272c0bbe2160c019596c72e1506194233c58b74faf772ec"
+    },
+    {
+      "path": "tests/watchReceiptSharingRestoration.test.ts",
+      "sha256": "59a9869b6bb7f1082e89b944178f0fef6085d3f1a99148f33f20336eb54b6869"
+    },
+    {
+      "path": "tests/watchReceiptValidationParity.test.ts",
+      "sha256": "c36039caa34fc0cf0c1a71e0ae991d0bd5fc7e572a46cef3453ba6edd0c81819"
+    },
+    {
+      "path": "tests/workspacePathRedactionParity.test.ts",
+      "sha256": "bb360e5ac73f0e4162c4c0cb4e65f1b8157d1fa8be77b750e6f57ab063aaf62d"
+    }
+  ],
+  "committedCandidatePaths": [
+    "tests/explainabilityContractParity.test.ts",
+    "tests/planEditsManifest.test.ts",
+    "tests/signedArtifactVerificationParity.test.ts",
+    "unused-code/2026-10-02-native/explainability-contracts/restoration.json",
+    "unused-code/2026-10-02-native/signed-artifacts/restoration-map.json",
+    "unused-code/plan-edits/P1-16/src/audit/binderArtifact.ts.landed",
+    "unused-code/plan-edits/P2-01/src/session/spill/spillStore.ts.landed",
+    "unused-code/plan-edits/manifest.json"
+  ],
+  "preservedPriorEvidence": [
+    {
+      "path": "/private/tmp/p0-47-node24-results-20261014.json",
+      "bytes": 153355,
+      "sha256": "708d3f6e493209100cb307724259304761a43f966afeec953268617131cea706"
+    },
+    {
+      "path": "/private/tmp/p0-47-node24-results-20261014.md",
+      "bytes": 24036,
+      "sha256": "d634cc5322d42eddd15913c3cbdf8cacef29d33a53db9d3334b890c63cccde62"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/helper-manifest.log",
+      "bytes": 683,
+      "sha256": "985ce56163ab588ea17bd14327846de8ca1ec2e40535d58be2f9a78c390c02e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/helper-manifest.json",
+      "bytes": 6437,
+      "sha256": "950dfc6a1cd56e7d38538c88a94337b15df9d5324571fb9a7216589d6a5cf8b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/linked-parity.log",
+      "bytes": 975184,
+      "sha256": "7708fa0fdf74abffbf2a83e1a57c7a8413b6ec373470dcdb7b7452ee755d3283"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/linked-parity.json",
+      "bytes": 2714881,
+      "sha256": "cb9a342bf0a223e3585f89c11936e70ea74321247f905d21421068e8d6e28ab1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/typecheck-tests.log",
+      "bytes": 163,
+      "sha256": "219e5745d25bac5fc20231e80786c1131657c1674214118996182c3ad85b6075"
+    }
+  ],
+  "unchangedFreezeBefore": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    }
+  ],
+  "phases": [
+    {
+      "name": "repaired-linked-parity",
+      "argv": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/apiRouterResponseParity.test.ts",
+        "tests/archiveFilesParity.test.ts",
+        "tests/assuranceScenarioContextParity.test.ts",
+        "tests/auditEvidenceAccountingParity.test.ts",
+        "tests/controlHttpResponsesParity.test.ts",
+        "tests/diagnosticResponseScoringParity.test.ts",
+        "tests/explainabilityContractParity.test.ts",
+        "tests/liveDriftEvidenceFieldsParity.test.ts",
+        "tests/liveDriftProofStatsParity.test.ts",
+        "tests/metricCoverageSummaryParity.test.ts",
+        "tests/metricParameterContractParity.test.ts",
+        "tests/metricRowPublicContract.test.ts",
+        "tests/mobileFetchSdk.test.ts",
+        "tests/nativeSecondSharingRestoration.test.ts",
+        "tests/pdfRenderingParity.test.ts",
+        "tests/planEditsManifest.test.ts",
+        "tests/privateModuleHelperVisibility.test.ts",
+        "tests/privateStoreLocatorVisibility.test.ts",
+        "tests/providerDriftDescriptorParity.test.ts",
+        "tests/providerDriftRowContractsParity.test.ts",
+        "tests/signedArtifactVerificationParity.test.ts",
+        "tests/studioRouteRoleContextParity.test.ts",
+        "tests/studioVaultSigningContextParity.test.ts",
+        "tests/watchReceiptSharingRestoration.test.ts",
+        "tests/watchReceiptValidationParity.test.ts",
+        "tests/workspacePathRedactionParity.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/repaired-linked-parity.json"
+      ],
+      "startedAt": "2026-10-14T13:32:26.092896+00:00",
+      "finishedAt": "2026-10-14T13:34:03.674949+00:00",
+      "elapsedSeconds": 97.581,
+      "exitCode": 0,
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/repaired-linked-parity.log",
+      "logSha256": "1f5b3a6e4a202034981b6bb3dfb5aaf99110b6e2457747b4791e4e8e841e3b56",
+      "logBytes": 12741,
+      "headAfter": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+      "statusAfter": "",
+      "success": true,
+      "counts": {
+        "numTotalTestSuites": 382,
+        "numPassedTestSuites": 382,
+        "numFailedTestSuites": 0,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 7118,
+        "numPassedTests": 7118,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "fileCount": 26,
+      "failures": [],
+      "helperManifest": [
+        {
+          "file": "tests/planEditsManifest.test.ts",
+          "status": "passed",
+          "assertionCounts": {
+            "passed": 16,
+            "failed": 0,
+            "pending": 0,
+            "skipped": 0,
+            "todo": 0
+          },
+          "cases": [
+            {
+              "name": "committed plan-edits manifest (D-15) validates: schema, sorted unique paths, archives under plan-edits/<issue>/, archive sha256, 40-hex base",
+              "status": "passed"
+            },
+            {
+              "name": "committed plan-edits manifest (D-15) archives equal the blob at an ancestor baseCommit, or the pinned build for dist/ outputs",
+              "status": "passed"
+            },
+            {
+              "name": "committed plan-edits manifest (D-15) rejects malformed manifests",
+              "status": "passed"
+            },
+            {
+              "name": "landedSource helper returns live bytes for an unregistered path and archive bytes for a registered one",
+              "status": "passed"
+            },
+            {
+              "name": "landedSource helper normalizes ./, backslashes and absolute paths before the lookup",
+              "status": "passed"
+            },
+            {
+              "name": "landedSource helper throws when an archive no longer matches its manifest sha256",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs archives the base bytes, not the working tree, and writes a sorted manifest the helper accepts",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs refuses a path that is already registered and prints the existing entry",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs refuses a bad issue key, a path outside the repository and a path absent at the base",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs archives package.json at the base, so the package-entries pin keeps reading the landed manifest",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs runs when invoked through a symlinked script path",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs fails provenance, not skips, when a baseCommit is not an ancestor of HEAD",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs warns when the manifest has uncommitted entries from another issue",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs pinned build outputs under dist/ registering a source also archives its pinned build outputs from disk",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs pinned build outputs under dist/ rejects missing and unrelated base commits even when a dist archive matches its compiled pin",
+              "status": "passed"
+            },
+            {
+              "name": "scripts/snapshot-plan-edit.mjs pinned build outputs under dist/ refuses a rebuilt output that no longer matches its pin and writes nothing",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "report": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/repaired-linked-parity.json",
+      "reportSha256": "235fdc83ac2da7734cfd03a194e972ff7216af238c5d56fb29fab0a8ad73cb63",
+      "reportBytes": 2628373
+    },
+    {
+      "name": "repaired-typecheck-tests",
+      "argv": [
+        "pnpm",
+        "run",
+        "typecheck:tests"
+      ],
+      "startedAt": "2026-10-14T13:34:03.739838+00:00",
+      "finishedAt": "2026-10-14T13:34:35.866942+00:00",
+      "elapsedSeconds": 32.127,
+      "exitCode": 0,
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/repaired-typecheck-tests.log",
+      "logSha256": "219e5745d25bac5fc20231e80786c1131657c1674214118996182c3ad85b6075",
+      "logBytes": 163,
+      "headAfter": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+      "statusAfter": "",
+      "outputExcerpt": "\n> agent-maturity-compass@1.2.0 typecheck:tests /Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass\n> tsc -p tsconfig.tests.json --noEmit\n\n"
+    },
+    {
+      "name": "repaired-freeze",
+      "argv": [
+        "pnpm",
+        "run",
+        "check:freeze"
+      ],
+      "startedAt": "2026-10-14T13:34:35.909834+00:00",
+      "finishedAt": "2026-10-14T13:34:37.244720+00:00",
+      "elapsedSeconds": 1.335,
+      "exitCode": 0,
+      "log": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-47-node24-qualification-20261014/repaired-freeze.log",
+      "logSha256": "4d3e03b8758401e9a3bab731ade4eb655de0c7690b550195bcb965da543b8951",
+      "logBytes": 270,
+      "headAfter": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+      "statusAfter": "",
+      "outputExcerpt": "\n> agent-maturity-compass@1.2.0 check:freeze /Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass\n> node scripts/check-freeze.mjs\n\nFreeze guard passed: {\"cliCommandPaths\":1236,\"cliInventoryPaths\":1236,\"stationPacks\":41,\"stationPackQuestions\":632}\n"
+    }
+  ],
+  "limits": [
+    "no full suite or full coverage",
+    "no source mutations, cleanup, commits or publication",
+    "other fixtures and Claude work untouched"
+  ],
+  "priorEvidenceUnchanged": true,
+  "freezeFilesUnchanged": true,
+  "statusAfter": "",
+  "sourceAfter": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "allRequestedChecksPassed": true
+}

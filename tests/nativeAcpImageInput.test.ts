@@ -25,6 +25,7 @@ import type { EvidenceEvent } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { createNativeAcpImageFixture, IMAGE_PNG_BASE64 } from "./fixtures/nativeAcpImageRuntime.js";
+import { paddedPng } from "./helpers/paddedPng.js";
 
 type Frame = { id?: number; result?: Record<string, unknown>; error?: { code: number; message: string; data?: unknown };
   method?: string; params?: { sessionId: string; update: { sessionUpdate: string; content?: { type: string; text?: string; data?: string; mimeType?: string } } } };
@@ -118,7 +119,9 @@ describe("ACP signed images: public wire and lifecycle (not executed)", () => {
     const encoded = JSON.parse(h.sent[0]!.body.toString("utf8"));
     expect(encoded.messages[0].content).toEqual([
       { type: "text", text: "Describe\n[linked resource: https://never-fetch.invalid/info]" },
-      { type: "image", source: { type: "base64", media_type: "image/png", data: IMAGE_PNG_BASE64 }, cache_control: { type: "ephemeral" } }
+      // GAP-WP39: the runtime-context snapshot follows the user's input, and carries the cache breakpoint.
+      { type: "image", source: { type: "base64", media_type: "image/png", data: IMAGE_PNG_BASE64 } },
+      { type: "text", text: expect.stringMatching(/^Current runtime context\. /), cache_control: { type: "ephemeral" } }
     ]);
     const rows = h.sessions.get(sessionId)!.readEvents();
     const queued = rows.find(row => row.event_type === "loop/inbox" && JSON.parse(row.meta_json).payloadFormat === NATIVE_IMAGE_INPUT_FORMAT)!;
@@ -137,7 +140,8 @@ describe("ACP signed images: public wire and lifecycle (not executed)", () => {
     const { h, sessionId } = await opened();
     expect((await h.call("session/prompt", prompt(sessionId))).error).toBeUndefined();
     expect(JSON.parse(h.sent[0]!.body.toString("utf8")).messages[0].content).toEqual([
-      { type: "image", source: { type: "base64", media_type: "image/png", data: IMAGE_PNG_BASE64 }, cache_control: { type: "ephemeral" } }
+      { type: "image", source: { type: "base64", media_type: "image/png", data: IMAGE_PNG_BASE64 } },
+      { type: "text", text: expect.stringMatching(/^Current runtime context\. /), cache_control: { type: "ephemeral" } }
     ]);
     expect((await h.call("session/prompt", prompt(sessionId, [{ type: "text", text: "Continue" }]))).error).toBeUndefined();
     expect(h.sent).toHaveLength(2); expect(h.sent[1]!.body.toString("utf8")).toContain(IMAGE_PNG_BASE64);
@@ -291,7 +295,7 @@ describe("ACP signed images: public wire and lifecycle (not executed)", () => {
     // Every row stays within the signed per-event cap; a legitimate local session
     // can still outgrow the ACP aggregate replay bound, and loading it must refuse
     // the whole replay rather than truncate it.
-    const bytes = Buffer.alloc(OUTGROW_BYTES); Buffer.from(IMAGE_PNG_BASE64, "base64").copy(bytes);
+    const bytes = paddedPng(Buffer.from(IMAGE_PNG_BASE64, "base64"), OUTGROW_BYTES);
     const result = await h.sessions.get(sessionId)!.prompt("Local image within the signed event cap", [{ filename: "first.png", mediaType: "image/png", bytes }]);
     expect(result.ok).toBe(true);
     await h.call("_amc/session/release", { sessionId }); await h.close();
@@ -313,7 +317,7 @@ describe("ACP signed images: public wire and lifecycle (not executed)", () => {
       expect(projectSessionUpdates(root, writer.readEvents(), 0, { includeUser: true }).updates).toEqual([
         { sessionUpdate: "user_message_chunk", content: { type: "text", text: "Original text attachment" } }
       ]);
-      const bytes = Buffer.alloc(OUTGROW_BYTES); Buffer.from(IMAGE_PNG_BASE64, "base64").copy(bytes);
+      const bytes = paddedPng(Buffer.from(IMAGE_PNG_BASE64, "base64"), OUTGROW_BYTES);
       for (let i = 0; i < OUTGROW_ROWS; i++) writer.recordUserAttachment({ filename: `history-${i}.png`, content: bytes, mimeType: "image/png", kind: "image" });
       writer.endStep({ stopReason: "complete", usage: null }); writer.endTurn({ reason: "complete" }); writer.sealTurn();
       const rows = writer.readEvents();

@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:no-fabrication
+> node scripts/check-no-fabrication.mjs
+
+check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 303, R4 10; 16 random marker(s); 0 pending entries.

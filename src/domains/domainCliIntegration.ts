@@ -1,3 +1,4 @@
+import { resolve, sep } from "node:path";
 import type { AssurancePackDefinition, AssurancePromptContext } from "../assurance/validators.js";
 import { listAssurancePacks } from "../assurance/packs/index.js";
 import { INDUSTRY_EVIDENCE_MISSING, INDUSTRY_EVIDENCE_SYNTHETIC } from "../assurance/packs/industryPackManifest.js";
@@ -13,6 +14,7 @@ import {
 } from "../claims/eligibility/exampleMode.js";
 import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "../claims/eligibility/types.js";
 import { writeFileAtomic } from "../utils/fs.js";
+import { isWithin, physicalPathWithMissingSuffix } from "../utils/pathSafety.js";
 import { assessDomain, type DomainAssessmentInput, type DomainAssessmentResult } from "./domainAssessmentEngine.js";
 import { loadDomainEvidence } from "./domainEvidence.js";
 import { getDomainModuleActivations } from "./domainModuleMap.js";
@@ -181,7 +183,18 @@ export function buildDomainReportForAgent(params: {
     : renderNotEvaluatedDomainReport(assessment.domainName, assessment.reasons, claim);
 
   if (params.outputPath) {
-    writeFileAtomic(params.outputPath, reportMarkdown);
+    let outputPath = params.outputPath;
+    if (params.example) {
+      outputPath = resolve(outputPath);
+      const physicalOutput = physicalPathWithMissingSuffix(outputPath);
+      const physicalStateRoot = physicalPathWithMissingSuffix(resolve(params.workspace ?? process.cwd(), ".amc"));
+      if (outputPath.split(sep).some((segment) => segment.toLowerCase() === ".amc")
+        || physicalOutput.split(sep).some((segment) => segment.toLowerCase() === ".amc")
+        || isWithin(physicalStateRoot, physicalOutput)) {
+        throw new Error("synthetic_example reports cannot be written to .amc/");
+      }
+    }
+    writeFileAtomic(outputPath, reportMarkdown);
   }
 
   return { assessment, reportMarkdown, reportObject, outputPath: params.outputPath };

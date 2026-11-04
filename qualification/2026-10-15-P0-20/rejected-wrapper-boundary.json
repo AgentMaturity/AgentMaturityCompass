@@ -1,0 +1,35 @@
+{
+  "base": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "capturedUtc": "2026-10-14T20:08:52.519691+00:00",
+  "authorization": "Current human requested serial qualification and remaining-failure fixes. This narrow candidate repairs reproduced P0-20 industry verification exits70; historic generic reservations, idle sessions and preflight absence are not blanket permission or release evidence. Preserve explicit held export-request/key-purpose candidates and shared surfaces.",
+  "sourcePath": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/src/audit/auditCli.ts",
+  "beforeSha256": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee",
+  "afterSha256": "4e646870a7f58245e9e517c130571e66b09ad0c89f693c1fb75be8a11b91c1a5",
+  "exactMinimalWrapperDiff": true,
+  "protectedEqualBase": {
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/cli/claimLabelHooks.ts": "d139a1fa4cf327e82f9e97c45ba1474d4dde6fd89aeb177cbc62d1fbbec7d03d",
+    "src/studio/studioServer.ts": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+    "src/audit/auditApi.ts": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+    "src/audit/binderVerifier.ts": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a",
+    "src/audit/binderSigner.ts": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+    "src/crypto/signing/signerVault.ts": "ae59a131cbd76f813d8160356bd73f62b1830321e34153fd2fb9e92cecd3bcaa",
+    "src/domains/industryPackAudit.ts": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+    "src/domains/domainApplyCli.ts": "e381955cf4f1ac136c86d39be33eac29e47c6a8cb83f9781c4abdd78c9d8d84b",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "docs/program/metrics.json": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed"
+  },
+  "canonicalNeedsSnapshot": {
+    "argv": [
+      "node",
+      "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/needs-snapshot.mjs",
+      "--paths",
+      "src/audit/auditCli.ts"
+    ],
+    "priorObservedExit": 0,
+    "priorObservedStdout": "none",
+    "meaning": "No required snapshot identified; not an ownership or freeze waiver."
+  },
+  "bounds": "Add existing canonical self_reported verification fields only. Crypto/trust/key admission, audit overall L1 cap, errors, API/Studio/ordinary binder behavior remain unchanged. Held P1-78/P1-08 stay separate; no guards/floors/archives or release status changes. P0-52 narrow ownership question remains pending."
+}

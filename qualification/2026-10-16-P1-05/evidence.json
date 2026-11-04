@@ -1,0 +1,2367 @@
+{
+  "schema": "amc.p105.bounded-qualification-evidence.v1",
+  "state": "bounded checkpoint; formal acceptance open",
+  "sourceCheckpoint": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+  "repository": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "productionSourceChanged": false,
+  "formalAcceptanceClosed": false,
+  "sourceCommit": "00e93601502ec6fd6f2e1e605cc767e3ed87fada",
+  "primaryNativeRun": {
+    "phase": "p105-real-escape-original",
+    "total": 9,
+    "passed": 9,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "exit": 0,
+    "durationMs": 6761,
+    "pidPgid": 88791,
+    "positiveESRCH": true
+  },
+  "separatePureRuns": [
+    {
+      "phase": "p105-allowlist-original",
+      "total": 160,
+      "passed": 160,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0
+    },
+    {
+      "phase": "p105-seatbelt-profile-original",
+      "total": 26,
+      "passed": 26,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0
+    }
+  ],
+  "counting": "195 distinct cases in three separate original runs; private mutation repetitions are separate and not additional unique cases.",
+  "privateAddressControl": {
+    "baseline": {
+      "total": 160,
+      "passed": 160,
+      "failed": 0,
+      "exit": 0
+    },
+    "mutant": {
+      "total": 160,
+      "passed": 108,
+      "bodyAssertionErrors": 52,
+      "exit": 1
+    },
+    "restoredRuntimeClaimed": false,
+    "sourceInSharedRepositoryChanged": false,
+    "firstFailureMaskingPreserved": true
+  },
+  "closedChecks": {
+    "completeTestTypecheck": {
+      "exit": 0,
+      "durationMs": 42200
+    },
+    "freeze": {
+      "exit": 0,
+      "cliCommandPaths": 1236,
+      "cliInventoryPaths": 1236,
+      "stationPacks": 41,
+      "stationPackQuestions": 632
+    },
+    "countMaintenance": {
+      "initialCheckExit": 1,
+      "generatorExit": 0,
+      "surfaces": 10,
+      "from": 1658,
+      "to": 1661,
+      "exactLiteralReplacementOnly": true,
+      "encodedComparisonCorrectionRetained": true
+    },
+    "repositoryLint": {
+      "exit": 0,
+      "durationMs": 3543
+    },
+    "counts": {
+      "exit": 0
+    },
+    "docsDrift": {
+      "exit": 0
+    },
+    "architecture": {
+      "exit": 0
+    },
+    "cleanSource": {
+      "exit": 0,
+      "durationMs": 56205
+    },
+    "freshCloneTests": {
+      "exit": 0,
+      "total": 195,
+      "passed": 195
+    }
+  },
+  "pending": {},
+  "limits": [
+    "Actual local macOS backend assertions; no Ubuntu/macOS15 hosted two-OS proof",
+    "Inherited environment is not isolation",
+    "Successful native fixture trees/observations intentionally deleted; assertions and streams rather than retained independent kernel/crypto/effect packets",
+    "No exact observed cat count or 5000-attempt exercise",
+    "Native callbacks are not persisted signed NATIVE ledger rows or full agentToolset/governor integration",
+    "Linux relay/seccomp held pending ADR008; shared source unchanged",
+    "Synthetic-home readDeny and owned local TCP narrower than literal specification rows",
+    "No global-quality, full-suite, coverage, PR, merge, release or Done claim",
+    "All earlier formal gaps, ownership boundaries and paused P2-02 preserved"
+  ],
+  "selectedClosedCommands": [
+    {
+      "phase": "p105-host-version",
+      "metadata": {
+        "phase": "p105-host-version",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/usr/bin/sw_vers",
+        "exit": 0,
+        "durationMs": 17,
+        "startedUtc": "2026-10-15T21:02:16.489793+00:00",
+        "endedUtc": "2026-10-15T21:02:16.521508+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-host-version/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 87343,
+          "ownedPgid": 87343,
+          "observedPgidAfterLaunch": 87343,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/usr/bin/sw_vers"
+          ],
+          "startedUtc": "2026-10-15T21:02:16.489793+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-host-version/command.json",
+          "bytes": 1135,
+          "sha256": "41ce4babd4f3b42bf5f536943d9f5f5dfdfec48681be41cf4af1c2811e7f1c8d"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-host-version/stdout-stderr.log",
+          "bytes": 65,
+          "sha256": "cd5d6399b3785b04ceaae75045a9ca9f80f0bbc3526eff9d0c36b170ed1ec348"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-host-version/owned-process.json",
+          "bytes": 394,
+          "sha256": "995df7a8009cbcf9f888c54b694188368ccfe1035c44054ff702c11e08074cf7"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-host-version/owned-group-after-exit.json",
+          "bytes": 259,
+          "sha256": "19256f708ab9c7f65a427e083af838aa14fc6765f726b9e2c18dad57f38a7639"
+        }
+      ]
+    },
+    {
+      "phase": "p105-allowlist-original",
+      "metadata": {
+        "phase": "p105-allowlist-original",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/enforce/egressAllowlist.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-allowlist-original.producer.json",
+        "exit": 0,
+        "durationMs": 797,
+        "startedUtc": "2026-10-15T21:05:11.374558+00:00",
+        "endedUtc": "2026-10-15T21:05:12.203026+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-allowlist-original/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 87760,
+          "ownedPgid": 87760,
+          "observedPgidAfterLaunch": 87760,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "tests/enforce/egressAllowlist.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-allowlist-original.producer.json"
+          ],
+          "startedUtc": "2026-10-15T21:05:11.374558+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p105-allowlist-original.producer.json",
+            "bytes": 50030,
+            "sha256": "a837a5ccade0584c5afcedf6343cb9669da9d0bc52e019ee28f7a5775b746342"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-allowlist-original/raw.json",
+            "bytes": 50030,
+            "sha256": "a837a5ccade0584c5afcedf6343cb9669da9d0bc52e019ee28f7a5775b746342"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-allowlist-original/observer.json",
+            "bytes": 65549,
+            "sha256": "85674257ac85070691c4226f18c6bb999c7f055d9ba8acc8583c691e34af5a55"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-allowlist-original/command.json",
+          "bytes": 2589,
+          "sha256": "16fbe45a55d529287594773efa0e5e4083ce91ffd3947a404f10d9a9f43ea04f"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-allowlist-original/stdout-stderr.log",
+          "bytes": 422,
+          "sha256": "4ff25d96aeea9d50917980992e62ffc6002b95d00a7ae71a4d222a94440eafb7"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-allowlist-original/owned-process.json",
+          "bytes": 744,
+          "sha256": "e3af54e82cdf00453653675765ac4ecf598c1bcb6c7072c5b427e8de11430494"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-allowlist-original/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "3dcf910d49df8af2c40f0e52cd6cb3a46316f049da3489486b29a84b291a4ae1"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-allowlist-original/raw.json",
+          "bytes": 50030,
+          "sha256": "a837a5ccade0584c5afcedf6343cb9669da9d0bc52e019ee28f7a5775b746342"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-allowlist-original/observer.json",
+          "bytes": 65549,
+          "sha256": "85674257ac85070691c4226f18c6bb999c7f055d9ba8acc8583c691e34af5a55"
+        }
+      ]
+    },
+    {
+      "phase": "p105-seatbelt-profile-original",
+      "metadata": {
+        "phase": "p105-seatbelt-profile-original",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/sandbox/seatbeltNativeProfile.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-seatbelt-profile-original.producer.json",
+        "exit": 0,
+        "durationMs": 901,
+        "startedUtc": "2026-10-15T21:06:00.079707+00:00",
+        "endedUtc": "2026-10-15T21:06:00.994387+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-seatbelt-profile-original/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 87880,
+          "ownedPgid": 87880,
+          "observedPgidAfterLaunch": 87880,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "tests/sandbox/seatbeltNativeProfile.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-seatbelt-profile-original.producer.json"
+          ],
+          "startedUtc": "2026-10-15T21:06:00.079707+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p105-seatbelt-profile-original.producer.json",
+            "bytes": 10816,
+            "sha256": "84e6555e25642c0ee2f82d1589bab80bd24d7dc3cd97a8ad934b0a5d4dc6faac"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-seatbelt-profile-original/raw.json",
+            "bytes": 10816,
+            "sha256": "84e6555e25642c0ee2f82d1589bab80bd24d7dc3cd97a8ad934b0a5d4dc6faac"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-seatbelt-profile-original/observer.json",
+            "bytes": 16436,
+            "sha256": "f488c24e1e4e837c13caf5f0bd8062bd78d9395bee8c3c7c10ba5bebc7fa5e0b"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-seatbelt-profile-original/command.json",
+          "bytes": 2650,
+          "sha256": "19a3c5d4773058439cf567edae8ae88a716349eb96498e1682462b706881b085"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-seatbelt-profile-original/stdout-stderr.log",
+          "bytes": 430,
+          "sha256": "cab133e18a80100b9e59c8107504fcaea35d7b77c22a834e8571dc10f8530caf"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-seatbelt-profile-original/owned-process.json",
+          "bytes": 757,
+          "sha256": "736b3efee3bd8d132a7a54401c0695db2a28f7c5fc7cabf9260b3df9427eb580"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-seatbelt-profile-original/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "66fb7472fd26db9ce212f2978721294c29f7aa98ffb4b614465b68df3d501f63"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-seatbelt-profile-original/raw.json",
+          "bytes": 10816,
+          "sha256": "84e6555e25642c0ee2f82d1589bab80bd24d7dc3cd97a8ad934b0a5d4dc6faac"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-seatbelt-profile-original/observer.json",
+          "bytes": 16436,
+          "sha256": "f488c24e1e4e837c13caf5f0bd8062bd78d9395bee8c3c7c10ba5bebc7fa5e0b"
+        }
+      ]
+    },
+    {
+      "phase": "p105-first-test-typecheck",
+      "metadata": {
+        "phase": "p105-first-test-typecheck",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+        "exit": 0,
+        "durationMs": 44315,
+        "startedUtc": "2026-10-15T21:06:23.700631+00:00",
+        "endedUtc": "2026-10-15T21:07:08.032707+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-first-test-typecheck/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 87930,
+          "ownedPgid": 87930,
+          "observedPgidAfterLaunch": 87930,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/typescript/bin/tsc",
+            "-p",
+            "tsconfig.tests.json",
+            "--noEmit"
+          ],
+          "startedUtc": "2026-10-15T21:06:23.700631+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-first-test-typecheck/command.json",
+          "bytes": 1330,
+          "sha256": "ec1d8c03634e167dd0e9dca91c4fd3d601cc5bcec2e8de8ef47387a0aaa636bc"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-first-test-typecheck/stdout-stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-first-test-typecheck/owned-process.json",
+          "bytes": 488,
+          "sha256": "a3b611bdd59275bb92b01ea466fc8ffe380f7c6767257647cad521bba6fdee9d"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-first-test-typecheck/owned-group-after-exit.json",
+          "bytes": 262,
+          "sha256": "8a62cf40fc2b642113c3951b829d5ea2b5a43e799e5a135d072698427a04ee30"
+        }
+      ]
+    },
+    {
+      "phase": "p105-private-allowlist-baseline",
+      "metadata": {
+        "phase": "p105-private-allowlist-baseline",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/baseline --config /private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/baseline/vitest.config.ts tests/enforce/egressAllowlist.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-allowlist-baseline.producer.json",
+        "exit": 0,
+        "durationMs": 632,
+        "startedUtc": "2026-10-15T21:08:44.910024+00:00",
+        "endedUtc": "2026-10-15T21:08:45.558123+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-allowlist-baseline/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 88290,
+          "ownedPgid": 88290,
+          "observedPgidAfterLaunch": 88290,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/baseline",
+            "--config",
+            "/private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/baseline/vitest.config.ts",
+            "tests/enforce/egressAllowlist.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-allowlist-baseline.producer.json"
+          ],
+          "startedUtc": "2026-10-15T21:08:44.910024+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p105-private-allowlist-baseline.producer.json",
+            "bytes": 50033,
+            "sha256": "0b60ca30d87129996efae2d2425694bf0a468c476e664b8ebd2f4fb5b0d5a421"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-allowlist-baseline/raw.json",
+            "bytes": 50033,
+            "sha256": "0b60ca30d87129996efae2d2425694bf0a468c476e664b8ebd2f4fb5b0d5a421"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-allowlist-baseline/observer.json",
+            "bytes": 65587,
+            "sha256": "8459d4fddecc657d32d5f3cf3759e07b7f67fc587408169062f19072b868a893"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-allowlist-baseline/command.json",
+          "bytes": 3079,
+          "sha256": "b24594f5fb4dfca05a5105b76c09bf5e05b1c8d72564962f5259624b4266f653"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-allowlist-baseline/stdout-stderr.log",
+          "bytes": 447,
+          "sha256": "5ffef32e24447ebcd2b6cf03ecf810645197b7d952e869b10d9b45cd15a3e99d"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-allowlist-baseline/owned-process.json",
+          "bytes": 975,
+          "sha256": "856aec5b602d183b54c5adb8a24a7732a007dba0739dd26a13ec095aa9e30d57"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-allowlist-baseline/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "03ad3e2b76e40d72e5d0a12b96897e8b74a0144e44e24678e3bbb329b97768a0"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-allowlist-baseline/raw.json",
+          "bytes": 50033,
+          "sha256": "0b60ca30d87129996efae2d2425694bf0a468c476e664b8ebd2f4fb5b0d5a421"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-allowlist-baseline/observer.json",
+          "bytes": 65587,
+          "sha256": "8459d4fddecc657d32d5f3cf3759e07b7f67fc587408169062f19072b868a893"
+        }
+      ]
+    },
+    {
+      "phase": "p105-private-address-mutant",
+      "metadata": {
+        "phase": "p105-private-address-mutant",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/private-address-check-removed --config /private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/private-address-check-removed/vitest.config.ts tests/enforce/egressAllowlist.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-address-mutant.producer.json",
+        "exit": 1,
+        "durationMs": 755,
+        "startedUtc": "2026-10-15T21:08:52.178395+00:00",
+        "endedUtc": "2026-10-15T21:08:52.950641+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-address-mutant/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 88326,
+          "ownedPgid": 88326,
+          "observedPgidAfterLaunch": 88326,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/private-address-check-removed",
+            "--config",
+            "/private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-copies/private-address-check-removed/vitest.config.ts",
+            "tests/enforce/egressAllowlist.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-address-mutant.producer.json"
+          ],
+          "startedUtc": "2026-10-15T21:08:52.178395+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p105-private-address-mutant.producer.json",
+            "bytes": 117679,
+            "sha256": "00cee65e1ae138dd6451afc50c34ccb0851645969b82e9231def7ed7faf98be7"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-address-mutant/raw.json",
+            "bytes": 117679,
+            "sha256": "00cee65e1ae138dd6451afc50c34ccb0851645969b82e9231def7ed7faf98be7"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-address-mutant/observer.json",
+            "bytes": 168757,
+            "sha256": "2c37b6c1c462f8bda5e0df4048e25f86f49dd4cfa205febca0494c2b15102da9"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-address-mutant/command.json",
+          "bytes": 3138,
+          "sha256": "00b8e82bdb003bc099176b04f147a61b2bfb08920fbb111f23dee0b82c5c2f87"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-address-mutant/stdout-stderr.log",
+          "bytes": 22596,
+          "sha256": "48fa09668034c49bb1072ceb48b29fcd5c5c35294fbe89c9685e18e54153241e"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-address-mutant/owned-process.json",
+          "bytes": 1013,
+          "sha256": "fbba9762b2a2420155f51894f1d8849866eb7da750dbe1917b1f4c89da3b020a"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-address-mutant/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "5c36825d283d8663bcc52698de85ac4d42e3fc5a88cb07e8dfd972305526ef06"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-address-mutant/raw.json",
+          "bytes": 117679,
+          "sha256": "00cee65e1ae138dd6451afc50c34ccb0851645969b82e9231def7ed7faf98be7"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-address-mutant/observer.json",
+          "bytes": 168757,
+          "sha256": "2c37b6c1c462f8bda5e0df4048e25f86f49dd4cfa205febca0494c2b15102da9"
+        }
+      ]
+    },
+    {
+      "phase": "p105-complete-test-typecheck",
+      "metadata": {
+        "phase": "p105-complete-test-typecheck",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+        "exit": 0,
+        "durationMs": 42200,
+        "startedUtc": "2026-10-15T21:10:30.726321+00:00",
+        "endedUtc": "2026-10-15T21:11:12.946026+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-complete-test-typecheck/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 88521,
+          "ownedPgid": 88521,
+          "observedPgidAfterLaunch": 88521,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/typescript/bin/tsc",
+            "-p",
+            "tsconfig.tests.json",
+            "--noEmit"
+          ],
+          "startedUtc": "2026-10-15T21:10:30.726321+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-complete-test-typecheck/command.json",
+          "bytes": 1336,
+          "sha256": "b6cbcc1e765f140f69e194746e312b18b0ba36389a6324c672edf0b5d1784a60"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-complete-test-typecheck/stdout-stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-complete-test-typecheck/owned-process.json",
+          "bytes": 488,
+          "sha256": "111b1f1eebcb995c75d409920640cfb3b334092e2141d3afe691774e6ba8a015"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-complete-test-typecheck/owned-group-after-exit.json",
+          "bytes": 262,
+          "sha256": "0d8315dd380744fd9d1b5ebbd0acee9e0d652261ff6aabb3ac6b7081975fbad3"
+        }
+      ]
+    },
+    {
+      "phase": "p105-counts-before-generation",
+      "metadata": {
+        "phase": "p105-counts-before-generation",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+        "exit": 1,
+        "durationMs": 446,
+        "startedUtc": "2026-10-15T21:11:38.411425+00:00",
+        "endedUtc": "2026-10-15T21:11:38.882282+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts-before-generation/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 88666,
+          "ownedPgid": 88666,
+          "observedPgidAfterLaunch": 88666,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/gen-counts.mjs",
+            "--check"
+          ],
+          "startedUtc": "2026-10-15T21:11:38.411425+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts-before-generation/command.json",
+          "bytes": 1264,
+          "sha256": "71b955ecf7cbac0179f9d9f480f9788c3cddfb4eee555e8e4a8a45bb224dea1d"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts-before-generation/stdout-stderr.log",
+          "bytes": 1228,
+          "sha256": "f40ec084250498c53b0e14ea80fb88b837afbb35402254fbb9cd899e83cb87e5"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts-before-generation/owned-process.json",
+          "bytes": 449,
+          "sha256": "adfc1ab826e0cbbe7605a790a1059d76ea0715c4b9cf455d4ba703ba1ae295a5"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts-before-generation/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "be3596c20925a26370d0270be3c35831c1210d6072195890e21f065ae304453e"
+        }
+      ]
+    },
+    {
+      "phase": "p105-count-generation",
+      "metadata": {
+        "phase": "p105-count-generation",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+        "exit": 0,
+        "durationMs": 413,
+        "startedUtc": "2026-10-15T21:11:50.129747+00:00",
+        "endedUtc": "2026-10-15T21:11:50.557596+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-count-generation/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 88711,
+          "ownedPgid": 88711,
+          "observedPgidAfterLaunch": 88711,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/gen-counts.mjs",
+            "--write"
+          ],
+          "startedUtc": "2026-10-15T21:11:50.129747+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-count-generation/command.json",
+          "bytes": 1248,
+          "sha256": "2d37eefa84d4a5641bb84c67ba75bf6960800fac645c885501acfe1a3efc86bf"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-count-generation/stdout-stderr.log",
+          "bytes": 20,
+          "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-count-generation/owned-process.json",
+          "bytes": 449,
+          "sha256": "94e1ddefa0f85c413032a5a8816e35e63c94dda770322a9f709acd2582922054"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-count-generation/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "4a36a5f0c7d9ff76b986635c4d09c6c6875757807961d5fac73cfc960e434d0e"
+        }
+      ]
+    },
+    {
+      "phase": "p105-freeze",
+      "metadata": {
+        "phase": "p105-freeze",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+        "exit": 0,
+        "durationMs": 1903,
+        "startedUtc": "2026-10-15T21:11:59.027668+00:00",
+        "endedUtc": "2026-10-15T21:12:00.942558+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-freeze/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 88729,
+          "ownedPgid": 88729,
+          "observedPgidAfterLaunch": 88729,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/check-freeze.mjs"
+          ],
+          "startedUtc": "2026-10-15T21:11:59.027668+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-freeze/command.json",
+          "bytes": 1214,
+          "sha256": "0bff953cba9a9fc9e78d445638770b432c03b33cae180f3ab58abd26c0d9f8ad"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-freeze/stdout-stderr.log",
+          "bytes": 116,
+          "sha256": "bf2c6aa2a9a9bc0f0d1679f94040946347d7e819a28bc7e33bc7235806bb6253"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-freeze/owned-process.json",
+          "bytes": 440,
+          "sha256": "b256dc966b56a8b09e740ed0326b0e3df1993c174dbe4810dc839e311ade5421"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-freeze/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "da2edb7e7a93d121dc248f405553332fffa867369d51996d02ce1ac05ca8d165"
+        }
+      ]
+    },
+    {
+      "phase": "p105-real-escape-original",
+      "metadata": {
+        "phase": "p105-real-escape-original",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/containment/escapeSuite.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-real-escape-original.producer.json",
+        "exit": 0,
+        "durationMs": 6761,
+        "startedUtc": "2026-10-15T21:12:28.004070+00:00",
+        "endedUtc": "2026-10-15T21:12:34.778130+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-real-escape-original/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 88791,
+          "ownedPgid": 88791,
+          "observedPgidAfterLaunch": 88791,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "tests/containment/escapeSuite.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-real-escape-original.producer.json"
+          ],
+          "startedUtc": "2026-10-15T21:12:28.004070+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p105-real-escape-original.producer.json",
+            "bytes": 4332,
+            "sha256": "d95b9d134d2e6e3fc0beeffad0af5c9034b4ec56c4df88c21abba1ae90c90fa5"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-real-escape-original/raw.json",
+            "bytes": 4332,
+            "sha256": "d95b9d134d2e6e3fc0beeffad0af5c9034b4ec56c4df88c21abba1ae90c90fa5"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-real-escape-original/observer.json",
+            "bytes": 5663,
+            "sha256": "785a0bdbb8abdab83dcbd031ffd022ea332e8b4e0b5d78f3bb7bf33abddcb87b"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-real-escape-original/command.json",
+          "bytes": 2601,
+          "sha256": "8a4b362c5739270ccf15b98e0052cce0e43823b94ff3e3bff5a2c277294192e3"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-real-escape-original/stdout-stderr.log",
+          "bytes": 1086,
+          "sha256": "5aaa202b4b6233caca8b9dcc4074c6eaa36ea241b7281b8277efe46f7392ba4e"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-real-escape-original/owned-process.json",
+          "bytes": 746,
+          "sha256": "378e26dce76bb4b3d581d8088e86bdaafe33729042e570e554a04b34f588bf59"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-real-escape-original/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "7a64bc55b8bc2dcb0e37f2dcd14a132291bba59c64201cfa29182d0d02240113"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-real-escape-original/raw.json",
+          "bytes": 4332,
+          "sha256": "d95b9d134d2e6e3fc0beeffad0af5c9034b4ec56c4df88c21abba1ae90c90fa5"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-real-escape-original/observer.json",
+          "bytes": 5663,
+          "sha256": "785a0bdbb8abdab83dcbd031ffd022ea332e8b4e0b5d78f3bb7bf33abddcb87b"
+        }
+      ]
+    },
+    {
+      "phase": "p105-private-network-baseline",
+      "metadata": {
+        "phase": "p105-private-network-baseline",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/baseline --config /private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/baseline/vitest.config.ts tests/containment/escapeSuite.test.ts -t 'direct TCP to a healthy owned listener' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-network-baseline.producer.json",
+        "exit": 0,
+        "durationMs": 4201,
+        "startedUtc": "2026-10-15T21:13:42.042700+00:00",
+        "endedUtc": "2026-10-15T21:13:46.256287+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-baseline/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 88983,
+          "ownedPgid": 88983,
+          "observedPgidAfterLaunch": 88983,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/baseline",
+            "--config",
+            "/private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/baseline/vitest.config.ts",
+            "tests/containment/escapeSuite.test.ts",
+            "-t",
+            "direct TCP to a healthy owned listener",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-network-baseline.producer.json"
+          ],
+          "startedUtc": "2026-10-15T21:13:42.042700+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p105-private-network-baseline.producer.json",
+            "bytes": 4127,
+            "sha256": "aa245f3cef230ab6b4f1924fa7b5556ce41fc59177362bf7b051df54f252f2d1"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-baseline/raw.json",
+            "bytes": 4127,
+            "sha256": "aa245f3cef230ab6b4f1924fa7b5556ce41fc59177362bf7b051df54f252f2d1"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-baseline/observer.json",
+            "bytes": 5681,
+            "sha256": "249ea089113a5f6d3b1d0c54e100ee9dac4c78ca3d4f4066e6971f744d3846ee"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-baseline/command.json",
+          "bytes": 3147,
+          "sha256": "bc7e5781675b9317e34545f258d10683627b52f9fe2f7ba9cd0e441f9edd3318"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-baseline/stdout-stderr.log",
+          "bytes": 554,
+          "sha256": "b5e2e42d557d98793bda082976e66424058287fbc70aa1359fb8e73477f76b58"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-baseline/owned-process.json",
+          "bytes": 1017,
+          "sha256": "132fca9f75af3209daa91e3ae71fd4db237cacb143a361ebd680a1a30353c2a0"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-baseline/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "b2f43d0b8a2c429b09d0b8add72814fb42990d667ffb76e6eba17230e7625346"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-baseline/raw.json",
+          "bytes": 4127,
+          "sha256": "aa245f3cef230ab6b4f1924fa7b5556ce41fc59177362bf7b051df54f252f2d1"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-baseline/observer.json",
+          "bytes": 5681,
+          "sha256": "249ea089113a5f6d3b1d0c54e100ee9dac4c78ca3d4f4066e6971f744d3846ee"
+        }
+      ]
+    },
+    {
+      "phase": "p105-private-network-mutant",
+      "metadata": {
+        "phase": "p105-private-network-mutant",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/network-deny-removed --config /private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/network-deny-removed/vitest.config.ts tests/containment/escapeSuite.test.ts -t 'direct TCP to a healthy owned listener' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-network-mutant.producer.json",
+        "exit": 1,
+        "durationMs": 4063,
+        "startedUtc": "2026-10-15T21:14:13.276758+00:00",
+        "endedUtc": "2026-10-15T21:14:17.353520+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-mutant/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 89092,
+          "ownedPgid": 89092,
+          "observedPgidAfterLaunch": 89092,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/network-deny-removed",
+            "--config",
+            "/private/tmp/p1-05-containment-qualification-20261016/network-mutation-copies/network-deny-removed/vitest.config.ts",
+            "tests/containment/escapeSuite.test.ts",
+            "-t",
+            "direct TCP to a healthy owned listener",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-private-network-mutant.producer.json"
+          ],
+          "startedUtc": "2026-10-15T21:14:13.276758+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p105-private-network-mutant.producer.json",
+            "bytes": 4579,
+            "sha256": "3770408b9fbb59c977b7c2410361dac59252e2479244104017e53f7dfae0912e"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-mutant/raw.json",
+            "bytes": 4579,
+            "sha256": "3770408b9fbb59c977b7c2410361dac59252e2479244104017e53f7dfae0912e"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-mutant/observer.json",
+            "bytes": 6814,
+            "sha256": "81723995d3d014223a7b03595eb6c610a20aedb06f0a37167a6c700696171447"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-mutant/command.json",
+          "bytes": 3181,
+          "sha256": "d1271a75f12cf6021b604801cb34dc184ac261d08f6d396aea190035500f6b8a"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-mutant/stdout-stderr.log",
+          "bytes": 1881,
+          "sha256": "e6a199f249494de984cd4bca4ead5d96a46687dd92492c456c3c039e23555b81"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-mutant/owned-process.json",
+          "bytes": 1039,
+          "sha256": "8c46b4b73b539bdb074670e6f7e43f1fc88e13b8c0c2ffa985835fd429c5c3bb"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-mutant/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "a23ac7c649733c8e080bb00e54f69fb4fba79151c540d33a35e253dc59563734"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-mutant/raw.json",
+          "bytes": 4579,
+          "sha256": "3770408b9fbb59c977b7c2410361dac59252e2479244104017e53f7dfae0912e"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-private-network-mutant/observer.json",
+          "bytes": 6814,
+          "sha256": "81723995d3d014223a7b03595eb6c610a20aedb06f0a37167a6c700696171447"
+        }
+      ]
+    },
+    {
+      "phase": "p105-related-native-egress",
+      "metadata": {
+        "phase": "p105-related-native-egress",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/enforce/egressAllowlist.test.ts tests/sandbox/seatbeltNativeProfile.test.ts tests/containment/escapeSuite.test.ts tests/nativeShellPlatformGate.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/egressRedirectBoundary.test.ts tests/gatewayCredentialIsolation.test.ts tests/gatewayAndSupervise.test.ts tests/networkEgressGuard.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-related-native-egress.producer.json",
+        "exit": 0,
+        "durationMs": 8933,
+        "startedUtc": "2026-10-15T21:14:44.651344+00:00",
+        "endedUtc": "2026-10-15T21:14:53.598693+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-related-native-egress/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 89191,
+          "ownedPgid": 89191,
+          "observedPgidAfterLaunch": 89191,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "tests/enforce/egressAllowlist.test.ts",
+            "tests/sandbox/seatbeltNativeProfile.test.ts",
+            "tests/containment/escapeSuite.test.ts",
+            "tests/nativeShellPlatformGate.test.ts",
+            "tests/nativeSandboxPolicyBinding.test.ts",
+            "tests/egressRedirectBoundary.test.ts",
+            "tests/gatewayCredentialIsolation.test.ts",
+            "tests/gatewayAndSupervise.test.ts",
+            "tests/networkEgressGuard.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-related-native-egress.producer.json"
+          ],
+          "startedUtc": "2026-10-15T21:14:44.651344+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p105-related-native-egress.producer.json",
+            "bytes": 82590,
+            "sha256": "debf749ac4fce1a8ae0066f6576c2f1bd1cac1fd141bee7da47a6b480d03cec6"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-related-native-egress/raw.json",
+            "bytes": 82590,
+            "sha256": "debf749ac4fce1a8ae0066f6576c2f1bd1cac1fd141bee7da47a6b480d03cec6"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-related-native-egress/observer.json",
+            "bytes": 114006,
+            "sha256": "239f98a2d174a29eca079cc9560eda55242590c516a0f6bd0a1ea21343a739cd"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-related-native-egress/command.json",
+          "bytes": 3248,
+          "sha256": "2b4e8017e795484f801da6b12c79c7a41133694011576de1c97c1f265150be2f"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-related-native-egress/stdout-stderr.log",
+          "bytes": 2817,
+          "sha256": "228a591a1f3189b1c7b95da600aba479d51c1ff71278127d79893b4c57c3737e"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-related-native-egress/owned-process.json",
+          "bytes": 1077,
+          "sha256": "338aef631dfb2e69041136427a3c7ae24f40f4e061e40ff589fdf677c1bd2f68"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-related-native-egress/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "08b2ca6d456b5f36494f4c266d613b4be3bf8c2ef92d36b7293ea339a724d9d7"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-related-native-egress/raw.json",
+          "bytes": 82590,
+          "sha256": "debf749ac4fce1a8ae0066f6576c2f1bd1cac1fd141bee7da47a6b480d03cec6"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-related-native-egress/observer.json",
+          "bytes": 114006,
+          "sha256": "239f98a2d174a29eca079cc9560eda55242590c516a0f6bd0a1ea21343a739cd"
+        }
+      ]
+    },
+    {
+      "phase": "p105-lint",
+      "metadata": {
+        "phase": "p105-lint",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/eslint/bin/eslint.js src tests --max-warnings=0",
+        "exit": 1,
+        "durationMs": 101,
+        "startedUtc": "2026-10-15T21:15:28.500899+00:00",
+        "endedUtc": "2026-10-15T21:15:28.626781+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-lint/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 89328,
+          "ownedPgid": 89328,
+          "observedPgidAfterLaunch": 89328,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/eslint/bin/eslint.js",
+            "src",
+            "tests",
+            "--max-warnings=0"
+          ],
+          "startedUtc": "2026-10-15T21:15:28.500899+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-lint/command.json",
+          "bytes": 1290,
+          "sha256": "ad1c75450761850a3b5cdf090956db28a42d24de0c6c9812453fb69e0a158b0c"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-lint/stdout-stderr.log",
+          "bytes": 738,
+          "sha256": "644f2a597dfe271925941ab8686ba6e414d34776a43fca9697e5d858df901a04"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-lint/owned-process.json",
+          "bytes": 485,
+          "sha256": "cab2a9b16fd9cd24f22fb916aa3ac903ecd49cd41a8fbfeffa823c0a0c9b9ac0"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-lint/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "5dd1cb665aa3a88f25b21a5181369ff99f8ae9bd71593d62b31023777808767b"
+        }
+      ]
+    },
+    {
+      "phase": "p105-counts",
+      "metadata": {
+        "phase": "p105-counts",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+        "exit": 0,
+        "durationMs": 776,
+        "startedUtc": "2026-10-15T21:15:28.769436+00:00",
+        "endedUtc": "2026-10-15T21:15:29.558340+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 89336,
+          "ownedPgid": 89336,
+          "observedPgidAfterLaunch": 89336,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/gen-counts.mjs",
+            "--check"
+          ],
+          "startedUtc": "2026-10-15T21:15:28.769436+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts/command.json",
+          "bytes": 1228,
+          "sha256": "79701904f17ae7a9612351a579ad8f57eb1d7b4905ecb1de9528a32713ef95f4"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts/stdout-stderr.log",
+          "bytes": 81,
+          "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts/owned-process.json",
+          "bytes": 449,
+          "sha256": "ec7594634c936312a0d07a767fdd5b43e5991ef416b093856aed61ec60eada54"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-counts/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "709adab8cc0cec1a437bb5605cae6add03c9c7f755bf10f433dc75ccf3c907fd"
+        }
+      ]
+    },
+    {
+      "phase": "p105-docs-drift",
+      "metadata": {
+        "phase": "p105-docs-drift",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+        "exit": 0,
+        "durationMs": 182,
+        "startedUtc": "2026-10-15T21:15:29.697785+00:00",
+        "endedUtc": "2026-10-15T21:15:29.893958+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-docs-drift/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 89342,
+          "ownedPgid": 89342,
+          "observedPgidAfterLaunch": 89342,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/docs-drift-check.mjs"
+          ],
+          "startedUtc": "2026-10-15T21:15:29.697785+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-docs-drift/command.json",
+          "bytes": 1229,
+          "sha256": "ee4d58dac66179d396ac0d4b0ff9bd03cdfddc16306e46eb32280f16950a8581"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-docs-drift/stdout-stderr.log",
+          "bytes": 45,
+          "sha256": "5407ecd8d6d4e86e27cada4e5cfb641626af7a5f0c2e7c6ac879cd34ecbd8d92"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-docs-drift/owned-process.json",
+          "bytes": 444,
+          "sha256": "1c226bcb7b6c8538295ffa4dbe879014fbc84aaf663c6c7e4ddc9696aec0be22"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-docs-drift/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "2151e6870605660d32f23ed927c771305feb2b26c3714eb299533a38cb09f34d"
+        }
+      ]
+    },
+    {
+      "phase": "p105-architecture",
+      "metadata": {
+        "phase": "p105-architecture",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+        "exit": 0,
+        "durationMs": 1953,
+        "startedUtc": "2026-10-15T21:15:30.112220+00:00",
+        "endedUtc": "2026-10-15T21:15:32.077392+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-architecture/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 89348,
+          "ownedPgid": 89348,
+          "observedPgidAfterLaunch": 89348,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/architecture-boundaries-check.mjs"
+          ],
+          "startedUtc": "2026-10-15T21:15:30.112220+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-architecture/command.json",
+          "bytes": 1260,
+          "sha256": "897c4c2b4a2ccc8df7d197b69c2ca2ab204c4fa2536fa1d3e27015775f439818"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-architecture/stdout-stderr.log",
+          "bytes": 95563,
+          "sha256": "82a63ce073880bd938710d401f544080dc613009f56e8757705766144c8f556e"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-architecture/owned-process.json",
+          "bytes": 457,
+          "sha256": "bbdb45843c0f350a89071e7c2cc57d1507c69b3f6d907e1b1c1077db3f4f92c2"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-architecture/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "2263d2d8b0f0f166376f6a9678ea2767db97726e80587b27ad91d13664e91712"
+        }
+      ]
+    },
+    {
+      "phase": "p105-repository-lint",
+      "metadata": {
+        "phase": "p105-repository-lint",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "pnpm run lint",
+        "exit": 0,
+        "durationMs": 3543,
+        "startedUtc": "2026-10-15T21:15:48.326885+00:00",
+        "endedUtc": "2026-10-15T21:15:51.882232+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-repository-lint/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 89378,
+          "ownedPgid": 89378,
+          "observedPgidAfterLaunch": 89378,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "pnpm",
+            "run",
+            "lint"
+          ],
+          "startedUtc": "2026-10-15T21:15:48.326885+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-repository-lint/command.json",
+          "bytes": 1143,
+          "sha256": "3e853fd4f8ed4992736263a1706071aa4888ae31169c726b0ea1814b564700df"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-repository-lint/stdout-stderr.log",
+          "bytes": 443,
+          "sha256": "d08987d08f71a61edb2971955d0b863717bb9862df09fb5e1d629ddec3d48dec"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-repository-lint/owned-process.json",
+          "bytes": 397,
+          "sha256": "593edaf7d8538d120527543eac0766ac5c3cddd6946cc7e3f83f09a245d028fa"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-repository-lint/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "968bc1e6eb591f33c8a3b22e8498af2aafb6fb60befc24759be14ea4aa42b6dd"
+        }
+      ]
+    },
+    {
+      "phase": "p105-duplicates",
+      "metadata": {
+        "phase": "p105-duplicates",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+        "exit": 1,
+        "durationMs": 522,
+        "startedUtc": "2026-10-15T21:16:03.093175+00:00",
+        "endedUtc": "2026-10-15T21:16:03.628729+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-duplicates/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 89417,
+          "ownedPgid": 89417,
+          "observedPgidAfterLaunch": 89417,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/source-quality.mjs",
+            "duplicates"
+          ],
+          "startedUtc": "2026-10-15T21:16:03.093175+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-duplicates/command.json",
+          "bytes": 1250,
+          "sha256": "14f6626934d0303a2839a3a5c19d681f8619cccfba4bf5dada819927fff15986"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-duplicates/stdout-stderr.log",
+          "bytes": 1844,
+          "sha256": "e89958992b1915489dc140123df6b67c6ecd9e6f8721114a5808ab3c0e7c753b"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-duplicates/owned-process.json",
+          "bytes": 456,
+          "sha256": "abcdc934634c1684b4891ff3c51c09a8bb34a8763c96dee1dde5fde2ff86dfef"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-duplicates/owned-group-after-exit.json",
+          "bytes": 260,
+          "sha256": "867a96592584638a42dc710eb19284b115889d2fd83ccaca1e20bc17b8803c3c"
+        }
+      ]
+    },
+    {
+      "phase": "p105-dead-code",
+      "metadata": {
+        "phase": "p105-dead-code",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+        "exit": 1,
+        "durationMs": 3720,
+        "startedUtc": "2026-10-15T21:16:07.727008+00:00",
+        "endedUtc": "2026-10-15T21:16:11.458559+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-dead-code/stdout-stderr.log",
+        "head": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "headAfter": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+        "ownedProcess": {
+          "pid": 89435,
+          "ownedPgid": 89435,
+          "observedPgidAfterLaunch": 89435,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/source-quality.mjs",
+            "dead-code"
+          ],
+          "startedUtc": "2026-10-15T21:16:07.727008+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-dead-code/command.json",
+          "bytes": 1247,
+          "sha256": "f48f51fc506e7112637551f16e4b9ab77e2be13c1d7fbb579a807fd491a07b06"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-dead-code/stdout-stderr.log",
+          "bytes": 962,
+          "sha256": "b7c2e29dddd7d854db191ce65f5b50f0d1a139084fd6b40080bf502176558dd3"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-dead-code/owned-process.json",
+          "bytes": 455,
+          "sha256": "d45ce80c1140ede61c7db2ae6baed1e3d5c00e2152bdcb49caa0c1a441e0bae4"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-dead-code/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "ae0217d916f38080c099eec602db3cd7c184436f4001d855f5c3f7f7cd670236"
+        }
+      ]
+    },
+    {
+      "phase": "p105-clean-source",
+      "metadata": {
+        "phase": "p105-clean-source",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+        "exit": 0,
+        "durationMs": 56205,
+        "startedUtc": "2026-10-15T21:17:31.637259+00:00",
+        "endedUtc": "2026-10-15T21:18:27.855946+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-clean-source/stdout-stderr.log",
+        "head": "00e93601502ec6fd6f2e1e605cc767e3ed87fada",
+        "headAfter": "00e93601502ec6fd6f2e1e605cc767e3ed87fada",
+        "ownedProcess": {
+          "pid": 89656,
+          "ownedPgid": 89656,
+          "observedPgidAfterLaunch": 89656,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/clean-source-check.mjs",
+            "--keep"
+          ],
+          "startedUtc": "2026-10-15T21:17:31.637259+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-clean-source/command.json",
+          "bytes": 1256,
+          "sha256": "0127891b6195de3192cc3987cde3d11eb8139dc6dee574bacfed7637f8246bdb"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-clean-source/stdout-stderr.log",
+          "bytes": 852,
+          "sha256": "05f582391b02b89d07e21612bb5ce804a15c5e471da1b3b0587048f3ae8880fc"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-clean-source/owned-process.json",
+          "bytes": 456,
+          "sha256": "8de7c977554c1fd5b0ed9d695ecee571c0371fcac5abc4c6bdb94444494ec076"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-clean-source/owned-group-after-exit.json",
+          "bytes": 262,
+          "sha256": "cd0bdd4fd3610a1c03da84291fe71732aa84ade7ea51d94d2a2af435966b8c21"
+        }
+      ]
+    },
+    {
+      "phase": "p105-fresh-clone-tests",
+      "metadata": {
+        "phase": "p105-fresh-clone-tests",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-budoFw/checkout --config /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-budoFw/checkout/vitest.config.ts tests/enforce/egressAllowlist.test.ts tests/sandbox/seatbeltNativeProfile.test.ts tests/containment/escapeSuite.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-fresh-clone-tests.producer.json",
+        "exit": 0,
+        "durationMs": 7489,
+        "startedUtc": "2026-10-15T21:18:43.854619+00:00",
+        "endedUtc": "2026-10-15T21:18:51.357117+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-fresh-clone-tests/stdout-stderr.log",
+        "head": "00e93601502ec6fd6f2e1e605cc767e3ed87fada",
+        "headAfter": "00e93601502ec6fd6f2e1e605cc767e3ed87fada",
+        "ownedProcess": {
+          "pid": 90048,
+          "ownedPgid": 90048,
+          "observedPgidAfterLaunch": 90048,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "node_modules/vitest/vitest.mjs",
+            "run",
+            "--root",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-budoFw/checkout",
+            "--config",
+            "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-budoFw/checkout/vitest.config.ts",
+            "tests/enforce/egressAllowlist.test.ts",
+            "tests/sandbox/seatbeltNativeProfile.test.ts",
+            "tests/containment/escapeSuite.test.ts",
+            "--reporter=default",
+            "--reporter=json",
+            "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p105-fresh-clone-tests.producer.json"
+          ],
+          "startedUtc": "2026-10-15T21:18:43.854619+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH",
+            "AMC_P021_RUNTIME_OBSERVER_PATH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": true,
+        "artifacts": {
+          "rawProducer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/p105-fresh-clone-tests.producer.json",
+            "bytes": 64285,
+            "sha256": "c34e35289b7b2c38f507b75102d09fb0fc0db64bf18e6b40ea6145b65e71a0a7"
+          },
+          "rawSnapshot": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-fresh-clone-tests/raw.json",
+            "bytes": 64285,
+            "sha256": "c34e35289b7b2c38f507b75102d09fb0fc0db64bf18e6b40ea6145b65e71a0a7"
+          },
+          "observer": {
+            "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-fresh-clone-tests/observer.json",
+            "bytes": 86875,
+            "sha256": "11172cb8c7f9d3f4e6ecd621099003bbad694d79f4fd83afe9a237b2565ca0fb"
+          },
+          "reporter": {
+            "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+            "bytes": 2110,
+            "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+          }
+        },
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "pins": [
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-fresh-clone-tests/command.json",
+          "bytes": 3191,
+          "sha256": "9dc80cac3b2489aeaaf5d4db50cce2af0dfa58a27b5f19b2be06f67f373e62e3"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-fresh-clone-tests/stdout-stderr.log",
+          "bytes": 765,
+          "sha256": "2c12c804e7f1eab40cce24886585aeccacc8a08102d05f07f01323b7d9bdad7a"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-fresh-clone-tests/owned-process.json",
+          "bytes": 1056,
+          "sha256": "d90d2ea474431963430c35e6d8958e65243af6d507badc7d58f3f46ca198976e"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-fresh-clone-tests/owned-group-after-exit.json",
+          "bytes": 261,
+          "sha256": "885eb78bb31160908b2067c4250a294681c348dd22cecf589e33b3ea20f2aac5"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-fresh-clone-tests/raw.json",
+          "bytes": 64285,
+          "sha256": "c34e35289b7b2c38f507b75102d09fb0fc0db64bf18e6b40ea6145b65e71a0a7"
+        },
+        {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p105-fresh-clone-tests/observer.json",
+          "bytes": 86875,
+          "sha256": "11172cb8c7f9d3f4e6ecd621099003bbad694d79f4fd83afe9a237b2565ca0fb"
+        }
+      ]
+    }
+  ],
+  "closedReviewPins": [
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/allowlist-audit/audit.json",
+      "bytes": 6332,
+      "sha256": "d33c01a3e25bbbdacaf6a25a7df2d17c8d7c5b6e2afb32659c439ccfcd18e227"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/allowlist-audit/scope-addendum.json",
+      "bytes": 1302,
+      "sha256": "1c2852e124b5bf28f76443b38c9a91ace1542b230070658e4c1ea08a0f5e3761"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/profile-audit/audit.json",
+      "bytes": 6465,
+      "sha256": "2185141a775d6f2e7ccc9c465cd63ac9a5eaa1bb1bd377dc4cec6cc7f678ffd1"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/real-escape-audit/audit.json",
+      "bytes": 6778,
+      "sha256": "12f9ff281cd3a3e059ae734f8753c78d6fdd86e4c45b1f6eada5abf8d0ea5d43"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-audit/audit.json",
+      "bytes": 5899,
+      "sha256": "d6a0a48bf02ad65ecafbbd5431b66faf5b3c5f39f91dfab86c87013a9bf9afd8"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/network-mutation-audit/audit.json",
+      "bytes": 4826,
+      "sha256": "becfa60da228cf2b99919a4adb4840c46da3b49cfd543b4db7e3c64e47ffa6c3"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/related-and-checks-audit/audit.json",
+      "bytes": 56896,
+      "sha256": "12e12f80beaf87b2a975bb71b9eb5e3d8086cbe332e11805501b875f19b50256"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/escape-peer-review/review.json",
+      "bytes": 5869,
+      "sha256": "b85e635254e2cbe855c0cd2d1883ceba892acddfc65c9ddcd37ba265e70d11c0"
+    }
+  ],
+  "contextPins": [
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/admission.json",
+      "bytes": 1963,
+      "sha256": "57242949d0d3b072d7bf1755af421a98a5aad0bdb4ccde603bce309c07e1fe43"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/initial-guard-pins.json",
+      "bytes": 1091,
+      "sha256": "38deae495c204428b2fe82e9eb3addc5a6922a5a633ac1483c59ec16466935fa"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/first-kernel-admission.json",
+      "bytes": 702,
+      "sha256": "d5998d9c6c2bb85219336e6743ee7716c61d8935707b37f85e48caca577f876d"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/allowlist-application.json",
+      "bytes": 595,
+      "sha256": "159a9c903e5df81c53f906df6b21b6504fd472ac7ca433cdd6d9d48f57aa941c"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/seatbelt-application.json",
+      "bytes": 608,
+      "sha256": "3176036595d678a3689f663e621b16cacf768261bfa3d5328ded6af1c234996a"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/escape-application.json",
+      "bytes": 1214,
+      "sha256": "3711156e28a4410c50b6c12f359bfbfca65a8f5991928ae298711f33e5746ec5"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/count-generation-admission.json",
+      "bytes": 3816,
+      "sha256": "8ba8a0f9671a57cc69e2e9814fbe10bb1f70861d4a35466a8fd5545f4b495318"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/count-generation-delta.json",
+      "bytes": 3075,
+      "sha256": "f69f6636885eb45dd4748db872c1741cd21090d86213fc53213e9d4bd9053bb3"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/host-prerequisites.json",
+      "bytes": 1180,
+      "sha256": "05112ec906c0d812c1f7339fd09c01a5a27202d0ad8527c16414a4130365b022"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/source-candidate-admission.json",
+      "bytes": 2613,
+      "sha256": "7bc12641c5a63ce7bf5d18a1eb24823f5e8e32edc21af39c949b40431831d50e"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/source-candidate-commit.json",
+      "bytes": 2623,
+      "sha256": "c0f03a3f2bf022eb762202442a2e8dd0f3c40fb2c2cfd7e4fd1e8a20028f591e"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/staging-attempt-review.json",
+      "bytes": 404,
+      "sha256": "c40033dddaa577c03e7c07e0283efc7cd7276bd60c7447d8e2a631c68b238783"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/count-generation-delta.json",
+      "bytes": 3075,
+      "sha256": "f69f6636885eb45dd4748db872c1741cd21090d86213fc53213e9d4bd9053bb3"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/clean-source-checkpoint.json",
+      "bytes": 2912,
+      "sha256": "be75c1e034a2833f083c60e65e6384c015ebfb61153c75f638aaccfade90cba4"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/final-preservation.json",
+      "bytes": 5610,
+      "sha256": "f438b9937bda5b62a72e6de2afcaf773ed46b9710c99227c471a182829c65ca2"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/allowlist-mutation-inputs.json",
+      "bytes": 181122,
+      "sha256": "24b1a300a590cac124cc4a75bad6d3c81133d0062713aba444322907a03cc1c9"
+    },
+    {
+      "path": "/private/tmp/p1-05-containment-qualification-20261016/network-mutation-inputs.json",
+      "bytes": 6815205,
+      "sha256": "b73d761c7fce7bf4a14b365c33f9efe5d8443ed6ad5a76508bc4f4031d8b19e6"
+    }
+  ],
+  "draftOnly": false,
+  "allAuthoringReadsAndWritesFinished": true,
+  "createdUtc": "2026-10-15T21:20:41.702985+00:00",
+  "related": {
+    "total": 242,
+    "passed": 242,
+    "failed": 0,
+    "skipped": 0,
+    "files": 9,
+    "includesNew195": true
+  },
+  "freshClone": {
+    "logicalOwnedRoot": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-budoFw",
+    "physicalOwnedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-budoFw",
+    "clone": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-budoFw/checkout",
+    "head": "00e93601502ec6fd6f2e1e605cc767e3ed87fada",
+    "status": "",
+    "candidatePathsExact": [
+      {
+        "path": "tests/enforce/egressAllowlist.test.ts",
+        "bytes": 10451,
+        "sha256": "8b86b7fa5722439bdb88d776a11ccef88576f6303d11159abb2ed8d3ab35f968"
+      },
+      {
+        "path": "tests/sandbox/seatbeltNativeProfile.test.ts",
+        "bytes": 11813,
+        "sha256": "4a6a891b72b9f1c5211e907d3823f7b54fee866899aa7ff6112597f722cd4aaa"
+      },
+      {
+        "path": "tests/containment/escapeSuite.test.ts",
+        "bytes": 12949,
+        "sha256": "b6f7bdfe8e8afb84718fdbf650c54f6befbf086752da286668b1d27d942eb018"
+      },
+      {
+        "path": "tests/helpers/nativeContainment.ts",
+        "bytes": 10585,
+        "sha256": "bfb0c3b8b86b1989b4e61904ac4f331a88415e3068c014abe8896f434f144902"
+      },
+      {
+        "path": "README.md",
+        "bytes": 59828,
+        "sha256": "09010298b327e9db49b4ae861aee004e784e572a14af12a9d1c5bfd3ef6cf332"
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "b920792b85d4e426c0077ea112ab9e9cf2642900bc01631cd093cfc6e1cb555f"
+      },
+      {
+        "path": "website/index.html",
+        "bytes": 43520,
+        "sha256": "79bdeca6e453f946595c9b718477e750949b9fbd202a4b4fb10bdb1ef274b014"
+      },
+      {
+        "path": "website/lite.html",
+        "bytes": 11197,
+        "sha256": "d34563eeb2e47d2db3304ab27044855671233926f33d296e66cb85de518d1676"
+      },
+      {
+        "path": "website/i18n.js",
+        "bytes": 44169,
+        "sha256": "182b11485d97a90311f4a980d471cb251e81a29ba51a88531fec8aeb36767cf3"
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "3bb431265645f8383ae090337b69f99116af7557af8feb4391b05d9fde497655"
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "004897b34ccc93eec163b3895971f0d19987ae26512d0aa59c79a08711452c2a"
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "4f8aaa6cb612067147f1b4f39891565981da30b695b0d21a01a4da082f93a990"
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "a1fd9aff279a45b8072f39d871b3e097f8c1d62e4aa6011d08200a87ff8d63db"
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "604d27c7f88e5fbdd6a2d02699e668d3777be5dc346ee67ff9ece45e30421d1a"
+      }
+    ],
+    "nodeRunnerUsedForNextTests": "pinned R/node_modules/vitest/vitest.mjs",
+    "scope": "Actual private frozen install/build/doctor/native stub lifecycle; hosted CI/global acceptance not claimed",
+    "tests": 195,
+    "passed": 195,
+    "failed": 0,
+    "skipped": 0,
+    "runner": "Pinned R Vitest entry against physical clone source/config/dependencies; not independent clone-runner execution"
+  },
+  "privateNetworkControl": {
+    "baseline": {
+      "selectedPassed": 1,
+      "unselected": 8,
+      "exit": 0
+    },
+    "mutant": {
+      "selectedFailed": 1,
+      "unselected": 8,
+      "exit": 1
+    },
+    "bodyFailure": "escapeSuite.test.ts105:50 connected=true expectedfalse; earlier applied receipt assertions passed; later permission/no-extra-connection assertions masked",
+    "retainedPublicWitness": "healthy origin HTTP200, directConnections1\u21922, attempted/connectedtrue, real applied receipt exit0/failureNull/treeExitProven; callback label still denied despite private removed rule",
+    "RSourceUnchanged": true
+  },
+  "quality": {
+    "duplicates": {
+      "exit": 1,
+      "findings": 1268
+    },
+    "deadCode": {
+      "exit": 1,
+      "findings": 2737
+    },
+    "waiversOrBaselineAdoptions": false,
+    "noInferredDebtRepairsFromCountDelta": true
+  },
+  "sourceCandidate": {
+    "capturedUtc": "2026-10-15T21:17:33.188143+00:00",
+    "head": "00e93601502ec6fd6f2e1e605cc767e3ed87fada",
+    "parent": "91c92891eda5472a43a14ea05f71fd77ef934c6e",
+    "candidatePaths": [
+      {
+        "path": "tests/enforce/egressAllowlist.test.ts",
+        "bytes": 10451,
+        "sha256": "8b86b7fa5722439bdb88d776a11ccef88576f6303d11159abb2ed8d3ab35f968"
+      },
+      {
+        "path": "tests/sandbox/seatbeltNativeProfile.test.ts",
+        "bytes": 11813,
+        "sha256": "4a6a891b72b9f1c5211e907d3823f7b54fee866899aa7ff6112597f722cd4aaa"
+      },
+      {
+        "path": "tests/containment/escapeSuite.test.ts",
+        "bytes": 12949,
+        "sha256": "b6f7bdfe8e8afb84718fdbf650c54f6befbf086752da286668b1d27d942eb018"
+      },
+      {
+        "path": "tests/helpers/nativeContainment.ts",
+        "bytes": 10585,
+        "sha256": "bfb0c3b8b86b1989b4e61904ac4f331a88415e3068c014abe8896f434f144902"
+      },
+      {
+        "path": "README.md",
+        "bytes": 59828,
+        "sha256": "09010298b327e9db49b4ae861aee004e784e572a14af12a9d1c5bfd3ef6cf332"
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "b920792b85d4e426c0077ea112ab9e9cf2642900bc01631cd093cfc6e1cb555f"
+      },
+      {
+        "path": "website/index.html",
+        "bytes": 43520,
+        "sha256": "79bdeca6e453f946595c9b718477e750949b9fbd202a4b4fb10bdb1ef274b014"
+      },
+      {
+        "path": "website/lite.html",
+        "bytes": 11197,
+        "sha256": "d34563eeb2e47d2db3304ab27044855671233926f33d296e66cb85de518d1676"
+      },
+      {
+        "path": "website/i18n.js",
+        "bytes": 44169,
+        "sha256": "182b11485d97a90311f4a980d471cb251e81a29ba51a88531fec8aeb36767cf3"
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "3bb431265645f8383ae090337b69f99116af7557af8feb4391b05d9fde497655"
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "004897b34ccc93eec163b3895971f0d19987ae26512d0aa59c79a08711452c2a"
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "4f8aaa6cb612067147f1b4f39891565981da30b695b0d21a01a4da082f93a990"
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "a1fd9aff279a45b8072f39d871b3e097f8c1d62e4aa6011d08200a87ff8d63db"
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "604d27c7f88e5fbdd6a2d02699e668d3777be5dc346ee67ff9ece45e30421d1a"
+      }
+    ],
+    "workingStatus": "",
+    "ordinaryCommit": true,
+    "pushMergeRelease": false,
+    "formalP105Done": false,
+    "sourceChanges": 0
+  },
+  "preservation": {
+    "capturedUtc": "2026-10-15T21:19:41.906426+00:00",
+    "protectedFilePins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/seatbeltNativeShell.ts",
+        "bytes": 12224,
+        "sha256": "087961b03749d3d8c2c5af9428573f670e6d17f2f24f0a23ced159bb6220844f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/nativeSandboxBinding.ts",
+        "bytes": 7003,
+        "sha256": "316f08828ae1c68d540ab11935f01629db99236d03fa030bb01530da6caf466d"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/nativeSandboxPolicy.ts",
+        "bytes": 4221,
+        "sha256": "57ee432a15576f8d62c795acfd06776e49b7f3b019fed7f8bf35cca69573559e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/egress/shellEgressProxy.ts",
+        "bytes": 6819,
+        "sha256": "78927f47b6f98ac04a68d862e78f72ac238a1cab0e4ce97bebbd12c5d2abe550"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/bwrapBackend.ts",
+        "bytes": 14615,
+        "sha256": "dadcb2049afa2d8e5fcae366c2db4fb26e0c1503971b975e7a87cbc0bc35aa21"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/sandbox/processCap.ts",
+        "bytes": 2402,
+        "sha256": "c7b3cc7f51d51bc240c5aabc1172b18b6452356edb90e285bb1f7877ecf1bdfb"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/enforce/egressAllowlist.ts",
+        "bytes": 8093,
+        "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolsSchema.ts",
+        "bytes": 8719,
+        "sha256": "20b0bb72942c67d7ca36a9070edc30cba11eab0693ddf6077e6ed98bea63bc05"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+        "bytes": 14760,
+        "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/builtin/bashTool.ts",
+        "bytes": 6113,
+        "sha256": "1c6277340a2cc336186485ed6b15fb4a014d3082924ca644134513196df9f7df"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+        "bytes": 32498,
+        "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/guards/policyGuards.ts",
+        "bytes": 10949,
+        "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/enforce/shellCommandPlan.ts",
+        "bytes": 6259,
+        "sha256": "e1e465e1c195db9330ea728663276553e5e021f6d50dfbf07344cc0a6110df46"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/exec/runProcess.ts",
+        "bytes": 6066,
+        "sha256": "6b935b66b4daf959551a63da5b7a9d24f88a48abcf834235f9e375a8e45caf96"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+        "bytes": 636550,
+        "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      },
+      {
+        "path": "/private/tmp/p1-03-journal-qualification-20261016/post-typecheck-halt-run-prepared.py",
+        "bytes": 12312,
+        "sha256": "90501440d5e16ff4584faa673e5c02bbae6a306a2052421fd2243dce062044fd"
+      },
+      {
+        "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "bytes": 2110,
+        "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "bytes": 275376,
+        "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+      }
+    ],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "inode": 539175547,
+      "nlink": 1
+    },
+    "refs": [
+      {
+        "root": "/Users/sid/AgentMaturityCompass",
+        "ref": "HEAD",
+        "value": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass",
+        "ref": "pending-main-442cd919",
+        "value": "3b4a673c8f6fc11a947279054979e977f95b34d1"
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+        "ref": "HEAD",
+        "value": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4"
+      }
+    ],
+    "productDiffFrom91c": "",
+    "active": false,
+    "halted": false
+  },
+  "formalGaps": [
+    "ADR008 Sid comment and Linux relay/seccomp implementation",
+    "Linux socket-file refusal and complete literal attack rows",
+    "Persisted signed NATIVE rows and full agentToolset/governor route",
+    "5000attempt exercise, independent survivor oracle and retained successful packets",
+    "Ubuntu24.04/macOS15 hosted jobs,Node24 and full-suite/global coverage/quality",
+    "Earlier user decisions and held scopes remain open; no PR/merge/release/Done"
+  ],
+  "nonProductCorrections": [
+    "Initial nonexistent ESLint invocation failed1; actual repository pnpm run lint passed0",
+    "Initial count check1; normal generator then check0; all10surfaces exact1658\u21921661 including encoded badge",
+    "First delta comparison omitted URL encoding; corrected comparison passes with no additional source edit",
+    "git add returned1 ignored-parent warning while staging all14 reviewed blobs; exact index verified then ordinary commit, no force/reset/cleanup"
+  ]
+}

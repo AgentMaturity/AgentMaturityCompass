@@ -1,0 +1,9 @@
+{
+  "boundary": "Python source parsing failed before any script statement executed; no product/generator/check execution or filesystem observation supplied.",
+  "exit": 1,
+  "toolChunkId": "a2d897",
+  "error": "SyntaxError: invalid syntax",
+  "line": 32,
+  "expression": "replacement=b'1%2C692'ifkind=='encoded-badge'else b'1,692'",
+  "correction": "Added required whitespace before if kind. Initial nonzero history is preserved."
+}

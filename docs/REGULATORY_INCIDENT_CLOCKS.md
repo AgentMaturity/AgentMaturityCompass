@@ -59,6 +59,20 @@ row. They do not prove that a claimed time is true or who reviewed: a holder
 of the workspace keys can write any claim, and the reviewer id is stored as
 stated (binding reviewers to authenticated identities is P1-20).
 
+## Clock runtime (P2-26)
+
+When a detector or a person opens an incident, `startIncidentClocks`
+(`src/incidents/clockRuntime.ts`) records once which clocks apply, in the
+signed, append-only `incident_clock_runs` ledger table (migration 15). See
+[REGULATORY_RUNTIME.md](REGULATORY_RUNTIME.md) for the applicability rules,
+the detectors and the notice drafts.
+
+| Surface | Command or route | What it does |
+|---|---|---|
+| CLI | `amc incident show <id> --clocks [--packet <dir>]` | Prints the recorded clocks and notice drafts, or writes `<id>.<clockId>.notice.md` drafts |
+| API | `GET /api/v1/incidents/:id/clocks` (no `station`) | The recorded clock run, the clocks at `now` and the notice drafts as JSON |
+| Inbox | `GET /api/v1/operator/inbox` | `NEEDS_CLASSIFICATION`, `DUE_SOON` and `OVERDUE` clocks of open incidents |
+
 ## What this gives an on-call operator
 
 1. **Clocks per station.** Given an AMC `Incident` and the station it belongs

@@ -1,0 +1,1588 @@
+{
+  "kind": "P0-27 actual assurance session bounded qualification",
+  "createdUtc": "2026-10-14T20:45:36.025970+00:00",
+  "sourceAtQualification": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "ownedRoot": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+  "writeScope": "Only NEW tests/assuranceSessionQualification.test.ts and private /private/tmp/p0-27-* evidence; no production, original test, ledger, shared CLI, dependency, archive or guard edits.",
+  "test": {
+    "path": "tests/assuranceSessionQualification.test.ts",
+    "bytes": 16295,
+    "sha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608"
+  },
+  "registeredRun": {
+    "raw": {
+      "path": "/private/tmp/p0-27-session-first-20261015.json",
+      "bytes": 4147,
+      "sha256": "774f6afd4bec208e8b4ca19aed37517c274f8adafcbbc745901df1988e6bc8ce"
+    },
+    "files": 1,
+    "actualReporterSuites": {
+      "total": 2,
+      "passed": 2,
+      "failed": 0,
+      "pending": 0
+    },
+    "counts": {
+      "total": 8,
+      "passed": 8,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0
+    },
+    "success": true,
+    "exit": 0,
+    "durationMs": 6047
+  },
+  "phases": [
+    {
+      "name": "session-first",
+      "cmd": "pnpm exec vitest run tests/assuranceSessionQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-session-first-20261015.json",
+      "exit": 0,
+      "durationMs": 6047,
+      "startedUtc": "2026-10-14T20:34:27.974214+00:00",
+      "log": "/private/tmp/p0-27-session-first-20261015.log",
+      "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+    },
+    {
+      "name": "session-private-guards",
+      "cmd": "python3 /private/tmp/p0-27-private-runner-guards-20261015.py",
+      "exit": 0,
+      "durationMs": 4758,
+      "startedUtc": "2026-10-14T20:38:49.868625+00:00",
+      "log": "/private/tmp/p0-27-session-private-guards-20261015.log",
+      "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+    },
+    {
+      "name": "session-private-guards-exact-inputs",
+      "cmd": "python3 /private/tmp/p0-27-private-runner-exact-inputs-20261015.py",
+      "exit": 0,
+      "durationMs": 4909,
+      "startedUtc": "2026-10-14T20:40:39.127058+00:00",
+      "log": "/private/tmp/p0-27-session-private-guards-exact-inputs-20261015.log",
+      "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+    }
+  ],
+  "actualCases": [
+    {
+      "case": "first-row-fault",
+      "success": true,
+      "error": {
+        "name": "SqliteError",
+        "message": "P0_27_FIRST_ROW_FAULT",
+        "code": "SQLITE_CONSTRAINT_TRIGGER",
+        "reason": null,
+        "cause": null
+      },
+      "verdict": null,
+      "chain": null,
+      "resultSha256": "344f5888ca195ff30b22b786ac37b3ecbd9f9c803a8d6fab46c7d5406589febd",
+      "bytes": 2952,
+      "request": {
+        "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+        "caseName": "first-row-fault",
+        "caseDir": "/private/tmp/p0-27-session-evidence-89CZNg/first-row-fault",
+        "mode": "supervise",
+        "noSign": false
+      },
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "runnerModule": "file:///Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/dist/assurance/assuranceRunner.js"
+      },
+      "providerCredentialKeysPresent": [],
+      "transportBlocked": true,
+      "publicMonitorPin": {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/first-row-fault/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "308df534f971ca5827a49161d995993ff422bc0a21a53085f3f40b58fb74d1ac"
+      }
+    },
+    {
+      "case": "seal-fault",
+      "success": true,
+      "error": {
+        "name": "AgentResponderUnavailableError",
+        "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "code": "AGENT_RESPONDER_UNAVAILABLE",
+        "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "cause": {
+          "name": "SqliteError",
+          "message": "P0_27_ABORT_SEAL_FAULT",
+          "code": "SQLITE_CONSTRAINT_TRIGGER",
+          "reason": null,
+          "cause": null
+        }
+      },
+      "verdict": false,
+      "chain": {
+        "ok": false,
+        "errors": [
+          "Session c8f885ee-d585-4f36-8ad2-49822139048a missing seal"
+        ]
+      },
+      "resultSha256": "4bf206027dafe419c4959d9143d70b3b0af805e5b84c1a1eadb24a3ab3126135",
+      "bytes": 9192,
+      "request": {
+        "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+        "caseName": "seal-fault",
+        "caseDir": "/private/tmp/p0-27-session-evidence-89CZNg/seal-fault",
+        "mode": "supervise",
+        "noSign": false
+      },
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "runnerModule": "file:///Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/dist/assurance/assuranceRunner.js"
+      },
+      "providerCredentialKeysPresent": [],
+      "transportBlocked": true,
+      "publicMonitorPin": {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-fault/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "de1a903b88691a1e749a27b683eb5a954468e86b3630d3d57c70dd5ca591d412"
+      }
+    },
+    {
+      "case": "seal-helper-identity",
+      "success": true,
+      "error": {
+        "name": "AgentResponderUnavailableError",
+        "message": "No real agent target available: owned unavailable fixture",
+        "code": "AGENT_RESPONDER_UNAVAILABLE",
+        "reason": "owned unavailable fixture",
+        "cause": {
+          "name": "SqliteError",
+          "message": "P0_27_ABORT_SEAL_FAULT",
+          "code": "SQLITE_CONSTRAINT_TRIGGER",
+          "reason": null,
+          "cause": null
+        }
+      },
+      "verdict": false,
+      "chain": {
+        "ok": false,
+        "errors": [
+          "Session 531992e1-1d1e-4e2c-a148-b4a54fdee802 missing seal"
+        ]
+      },
+      "resultSha256": "645b1db80e712d2332934d182ed18e5560933e4477d373009c3f9c924e197af3",
+      "bytes": 9022,
+      "request": {
+        "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+        "caseName": "seal-helper-identity",
+        "caseDir": "/private/tmp/p0-27-session-evidence-89CZNg/seal-helper-identity",
+        "mode": "supervise",
+        "noSign": false
+      },
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "runnerModule": "file:///Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/dist/assurance/assuranceRunner.js"
+      },
+      "providerCredentialKeysPresent": [],
+      "transportBlocked": true,
+      "publicMonitorPin": {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-helper-identity/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "4efa7f0466bec55c129a7f29ded7bc6b525feb1039c12b40addbb675f93508e8"
+      }
+    },
+    {
+      "case": "signed-sandbox",
+      "success": true,
+      "error": {
+        "name": "AgentResponderUnavailableError",
+        "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "code": "AGENT_RESPONDER_UNAVAILABLE",
+        "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "cause": null
+      },
+      "verdict": true,
+      "chain": {
+        "ok": true,
+        "errors": []
+      },
+      "resultSha256": "0cd2b78ca728fd82a9ac8e39669bb4ed31a548eef7a0d2c9705cd223a1f5b674",
+      "bytes": 19989,
+      "request": {
+        "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+        "caseName": "signed-abort",
+        "caseDir": "/private/tmp/p0-27-session-evidence-89CZNg/signed-sandbox",
+        "mode": "sandbox",
+        "noSign": false
+      },
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "runnerModule": "file:///Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/dist/assurance/assuranceRunner.js"
+      },
+      "providerCredentialKeysPresent": [],
+      "transportBlocked": true,
+      "publicMonitorPin": {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-sandbox/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "20d19a061cdc078153f5d98035c46503a42641d478fb2c5be8bf71527252cb87"
+      }
+    },
+    {
+      "case": "signed-supervise",
+      "success": true,
+      "error": {
+        "name": "AgentResponderUnavailableError",
+        "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "code": "AGENT_RESPONDER_UNAVAILABLE",
+        "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "cause": null
+      },
+      "verdict": true,
+      "chain": {
+        "ok": true,
+        "errors": []
+      },
+      "resultSha256": "d5825807e56a02356cadf3f1ee6010cf5b2a9c9cf151751ef10044ee931e17e2",
+      "bytes": 12756,
+      "request": {
+        "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+        "caseName": "signed-abort",
+        "caseDir": "/private/tmp/p0-27-session-evidence-89CZNg/signed-supervise",
+        "mode": "supervise",
+        "noSign": false
+      },
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "runnerModule": "file:///Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/dist/assurance/assuranceRunner.js"
+      },
+      "providerCredentialKeysPresent": [],
+      "transportBlocked": true,
+      "publicMonitorPin": {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-supervise/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "fe1639684d2ac8bd4d9f29c83f481f451f7e508ea2d1a54c1d1f0ff7c2d0b188"
+      }
+    },
+    {
+      "case": "store-guard",
+      "success": true,
+      "error": null,
+      "verdict": null,
+      "chain": null,
+      "resultSha256": "59d5c16b1096a4e8c6ec30faebe9c17bd5347dda7ff12ed924a1dcfd8f13d9da",
+      "bytes": 2946,
+      "request": {
+        "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+        "caseName": "store-guard",
+        "caseDir": "/private/tmp/p0-27-session-evidence-89CZNg/store-guard",
+        "mode": "supervise",
+        "noSign": false
+      },
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "runnerModule": "file:///Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/dist/assurance/assuranceRunner.js"
+      },
+      "providerCredentialKeysPresent": [],
+      "transportBlocked": true,
+      "publicMonitorPin": {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/store-guard/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "d2e32f397f7d4ad28f1c6502b74be8700121f0aa5c927296b94a5d8fc9b76119"
+      }
+    },
+    {
+      "case": "unsigned-false",
+      "success": true,
+      "error": {
+        "name": "AgentResponderUnavailableError",
+        "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "code": "AGENT_RESPONDER_UNAVAILABLE",
+        "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "cause": null
+      },
+      "verdict": true,
+      "chain": {
+        "ok": true,
+        "errors": []
+      },
+      "resultSha256": "6b710b602091c8da0a49106a7f1ddcf02921f7e39666748d9d0e73fd95e0cc7f",
+      "bytes": 18120,
+      "request": {
+        "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+        "caseName": "unsigned-abort",
+        "caseDir": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-false",
+        "mode": "supervise",
+        "noSign": false
+      },
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "runnerModule": "file:///Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/dist/assurance/assuranceRunner.js"
+      },
+      "providerCredentialKeysPresent": [],
+      "transportBlocked": true,
+      "publicMonitorPin": {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-false/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "adcb513be32ed473b2eb009d218c349345a517875d804d6607c858a5fdbf3382"
+      }
+    },
+    {
+      "case": "unsigned-true",
+      "success": true,
+      "error": {
+        "name": "AgentResponderUnavailableError",
+        "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "code": "AGENT_RESPONDER_UNAVAILABLE",
+        "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+        "cause": null
+      },
+      "verdict": true,
+      "chain": {
+        "ok": true,
+        "errors": []
+      },
+      "resultSha256": "f93e4335cd2edaafa0f91fd54a9530e564c7c9a605891580e9186b6d3ae5e6f1",
+      "bytes": 18114,
+      "request": {
+        "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+        "caseName": "unsigned-abort",
+        "caseDir": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-true",
+        "mode": "supervise",
+        "noSign": true
+      },
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "runnerModule": "file:///Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/dist/assurance/assuranceRunner.js"
+      },
+      "providerCredentialKeysPresent": [],
+      "transportBlocked": true,
+      "publicMonitorPin": {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-true/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "4145eef8ce2e82b20e21995ad579c13f03218a1df4e02afd9fdce05884ed6cfa"
+      }
+    }
+  ],
+  "caseSemantics": {
+    "signed-supervise and signed-sandbox": "Actual runAssurance fails at the real credential-free resolver with AgentResponderUnavailableError/AGENT_RESPONDER_UNAVAILABLE. Original error is retained, ASSURANCE_RUN_ABORTED is written and the actual session seal is verified independently against the monitor public key pinned before artifacts. Ledger chain and admitted ledger-row trust verification pass; assurance_runs stays empty.",
+    "unsigned-false and unsigned-true": "AMC_NO_SIGN=1 routes actual rows and seal into the unsigned store regardless of the noSign input. Literal unsigned values are asserted. Signed DB/WAL/SHM bytes, modes, inodes, link counts and signed rows are exactly unchanged across the unsigned call. Real signed operational controls before and after pass independent cryptographic and trust verification.",
+    "first-row-fault": "Owned SQLite BEFORE INSERT trigger aborts the actual first-row helper transaction. Session, evidence and assurance row sets and blob inventory roll back; db.inTransaction is false. Removing only the owned trigger permits a genuine retry and signed seal.",
+    "seal-fault": "Owned SQLite BEFORE UPDATE trigger blocks actual abort sealing. Original real resolver error retains its code/reason and has the genuine SQLite cause. ABORTED row persists; the session lacks its seal and actual ledger/chain verdicts remain false.",
+    "seal-helper-identity": "The existing abort helper returns the same independently constructed typed error object and attaches the genuine trigger cause. This narrow identity control does not claim a provider response or healthy seal.",
+    "store-guard": "Unsigned store opening without AMC_NO_SIGN=1 refuses before creating that store; original signed bytes and rows stay unchanged."
+  },
+  "normalRetainedEvidence": {
+    "root": "/private/tmp/p0-27-session-evidence-89CZNg",
+    "helperSha256": "1c05b424385bc2fea494533e6c66d436b5704f3be0b4bf38099d51c96f4f81e3",
+    "fileCount": 42,
+    "files": [
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/actual-session-helper.mjs",
+        "bytes": 11921,
+        "sha256": "1c05b424385bc2fea494533e6c66d436b5704f3be0b4bf38099d51c96f4f81e3"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/deny-transport.mjs",
+        "bytes": 428,
+        "sha256": "4aa113629cf1cb068a83257ec103037e670f393c1ba519d92bdda424afaacff1"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/first-row-fault/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "308df534f971ca5827a49161d995993ff422bc0a21a53085f3f40b58fb74d1ac"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/first-row-fault/request.json",
+        "bytes": 213,
+        "sha256": "cc972255a3b04ec7b7646c193624167eb1cf1ba41544154a04f8bf2ffed59fac"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/first-row-fault/result.json",
+        "bytes": 2952,
+        "sha256": "344f5888ca195ff30b22b786ac37b3ecbd9f9c803a8d6fab46c7d5406589febd"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/first-row-fault/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/first-row-fault/stdout.log",
+        "bytes": 59,
+        "sha256": "54cc0088872d8894c68f3a92cfd9e92cac9b64725819484234b92fd854d0b324"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-fault/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "de1a903b88691a1e749a27b683eb5a954468e86b3630d3d57c70dd5ca591d412"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-fault/request.json",
+        "bytes": 203,
+        "sha256": "580d59ed4b509f7fd09b8aa75273ed25ade9e05154050b647a6570f8c60f5c4c"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-fault/result.json",
+        "bytes": 9192,
+        "sha256": "4bf206027dafe419c4959d9143d70b3b0af805e5b84c1a1eadb24a3ab3126135"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-fault/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-fault/stdout.log",
+        "bytes": 54,
+        "sha256": "c3214993a2391974b683800295ca617ee189cfd3814278f1cca5b115f7e377f8"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-helper-identity/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "4efa7f0466bec55c129a7f29ded7bc6b525feb1039c12b40addbb675f93508e8"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-helper-identity/request.json",
+        "bytes": 223,
+        "sha256": "fd38119bcfea812cc313bd5af719e173384aef8d6f04b567c631b0d2649c33ad"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-helper-identity/result.json",
+        "bytes": 9022,
+        "sha256": "645b1db80e712d2332934d182ed18e5560933e4477d373009c3f9c924e197af3"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-helper-identity/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/seal-helper-identity/stdout.log",
+        "bytes": 64,
+        "sha256": "0d3813ccec6d2815a68baa4bd4219ebe9dae80eba188ed8e5beb03861a5c15ec"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-sandbox/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "20d19a061cdc078153f5d98035c46503a42641d478fb2c5be8bf71527252cb87"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-sandbox/request.json",
+        "bytes": 207,
+        "sha256": "ada6cb6ba6c00e280f81b7d7afd6db05bc3b43feafc219827afd0cccd9c33cd7"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-sandbox/result.json",
+        "bytes": 19989,
+        "sha256": "0cd2b78ca728fd82a9ac8e39669bb4ed31a548eef7a0d2c9705cd223a1f5b674"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-sandbox/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-sandbox/stdout.log",
+        "bytes": 56,
+        "sha256": "b8d278a8d5bc44aeef58489136c43b901e0526adfa2f2aff561c669598f845c2"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-supervise/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "fe1639684d2ac8bd4d9f29c83f481f451f7e508ea2d1a54c1d1f0ff7c2d0b188"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-supervise/request.json",
+        "bytes": 211,
+        "sha256": "9d6f06e01e6fa5294f528385a740fd3f08e9d1db0303557a7282c456d6435c34"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-supervise/result.json",
+        "bytes": 12756,
+        "sha256": "d5825807e56a02356cadf3f1ee6010cf5b2a9c9cf151751ef10044ee931e17e2"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-supervise/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/signed-supervise/stdout.log",
+        "bytes": 56,
+        "sha256": "b8d278a8d5bc44aeef58489136c43b901e0526adfa2f2aff561c669598f845c2"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/store-guard/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "d2e32f397f7d4ad28f1c6502b74be8700121f0aa5c927296b94a5d8fc9b76119"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/store-guard/request.json",
+        "bytes": 205,
+        "sha256": "b6a806a7d96c3c649f89f549277c34ba35171bb99b9731436b82b3b8430030ef"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/store-guard/result.json",
+        "bytes": 2946,
+        "sha256": "59d5c16b1096a4e8c6ec30faebe9c17bd5347dda7ff12ed924a1dcfd8f13d9da"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/store-guard/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/store-guard/stdout.log",
+        "bytes": 55,
+        "sha256": "c412dc3cf8aace1e13bd0c7426335aa3ea3f8551f53133ca1d27310ea3a47804"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-false/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "adcb513be32ed473b2eb009d218c349345a517875d804d6607c858a5fdbf3382"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-false/request.json",
+        "bytes": 211,
+        "sha256": "71c401d16939958789b02cf1fd8268c91f27697963b706b26ceb68d7291f9859"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-false/result.json",
+        "bytes": 18120,
+        "sha256": "6b710b602091c8da0a49106a7f1ddcf02921f7e39666748d9d0e73fd95e0cc7f"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-false/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-false/stdout.log",
+        "bytes": 58,
+        "sha256": "32fa3f3df558deb617a4663910e4ac5e5f3299cef964c3c4638124a583b4c4a8"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-true/monitor-before-artifacts.json",
+        "bytes": 694,
+        "sha256": "4145eef8ce2e82b20e21995ad579c13f03218a1df4e02afd9fdce05884ed6cfa"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-true/request.json",
+        "bytes": 209,
+        "sha256": "882178cd4a0a57812dc9cd8f71661a8fd33777cf00b08b2a1b8c2e77a32ddcf8"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-true/result.json",
+        "bytes": 18114,
+        "sha256": "f93e4335cd2edaafa0f91fd54a9530e564c7c9a605891580e9186b6d3ae5e6f1"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-true/stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/tmp/p0-27-session-evidence-89CZNg/unsigned-true/stdout.log",
+        "bytes": 58,
+        "sha256": "32fa3f3df558deb617a4663910e4ac5e5f3299cef964c3c4638124a583b4c4a8"
+      }
+    ]
+  },
+  "privateCausalMatrices": [
+    {
+      "root": "/private/tmp/p0-27-private-runner-guards-c_4oyuey",
+      "kind": "Private compiled-runner causal guards, standalone cases not registered tests",
+      "summary": {
+        "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/guards-summary.json",
+        "bytes": 18692,
+        "sha256": "2a17cd40a9551c949b6f995fbb933bb1cd73be5bbf1f53b71444826ff69ca877"
+      },
+      "phases": [
+        {
+          "phase": "baseline",
+          "counts": {
+            "total": 2,
+            "passed": 2,
+            "failed": 0
+          },
+          "durationMs": 1347,
+          "moduleSha256": "b0c3539d50c79a59a5f22342ac1702802e78cc2d1c42cd4a5b8cfe0e8f4e8d5d",
+          "privateModuleRestoredExactly": true,
+          "cases": [
+            {
+              "case": "signed-abort",
+              "exit": 0,
+              "durationMs": 659,
+              "result": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/signed-abort/result.json",
+              "resultSha256": "44b040005cc3c202b907ea72224de5e45ab6391a391becdf82ef8c6ef94dc839",
+              "success": true,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-guards-c_4oyuey/active.mjs"
+            },
+            {
+              "case": "unsigned-abort",
+              "exit": 0,
+              "durationMs": 670,
+              "result": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/unsigned-abort/result.json",
+              "resultSha256": "8e6fc87a61c1ad4f3d5a694fd60da4883419188bf4866b9f633172d87b40cf63",
+              "success": true,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-guards-c_4oyuey/active.mjs"
+            }
+          ]
+        },
+        {
+          "phase": "abort-seal-removed",
+          "counts": {
+            "total": 1,
+            "passed": 0,
+            "failed": 1
+          },
+          "durationMs": 975,
+          "moduleSha256": "a7f8bb31e8676178809406ca68c0e44a9c1f9097ee442232681c42955ebb08fc",
+          "privateModuleRestoredExactly": true,
+          "cases": [
+            {
+              "case": "signed-abort",
+              "exit": 1,
+              "durationMs": 644,
+              "result": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed/signed-abort/result.json",
+              "resultSha256": "84efe7deff3873ceb58245337344cf40b44cd14a0178e87193b8f1d6b71cce79",
+              "success": false,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-guards-c_4oyuey/active.mjs",
+              "postFailureDiagnosticExit": 0,
+              "actualPostFailure": {
+                "rows": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed/signed-abort/post-failure-rows.json",
+                "sha256": "a1c1504136f6870473b7d6342bbda5484e5fd2a9e4536dc86e8d43ded11d68de",
+                "mainUnsignedRows": 0,
+                "assuranceSessions": [
+                  {
+                    "id": "e97ceb1d-e0d9-477b-8db4-aa1370738ae8",
+                    "endedTs": null,
+                    "seal": null
+                  }
+                ],
+                "auditTypes": [
+                  "ASSURANCE_RUN_STARTED"
+                ],
+                "assuranceRuns": 0
+              },
+              "failure": {
+                "name": "AssertionError",
+                "code": "ERR_ASSERTION",
+                "reason": null,
+                "cause": null,
+                "messageSha256": "3bec950429f91db3456b3f7a0b3ede91c19793e10b30c9f4a9bda88c40b75cd5"
+              }
+            }
+          ]
+        },
+        {
+          "phase": "unsigned-store-removed",
+          "counts": {
+            "total": 1,
+            "passed": 0,
+            "failed": 1
+          },
+          "durationMs": 1011,
+          "moduleSha256": "32339a2c9d6937eaaddced316940ea71a6a03238e8df1156adde071197728141",
+          "privateModuleRestoredExactly": true,
+          "cases": [
+            {
+              "case": "unsigned-abort",
+              "exit": 1,
+              "durationMs": 671,
+              "result": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed/unsigned-abort/result.json",
+              "resultSha256": "99a053ef4f92940a1c001e07ea8ceb94d490cc9e73a1b8ad08b9117f4f657d0a",
+              "success": false,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-guards-c_4oyuey/active.mjs",
+              "postFailureDiagnosticExit": 0,
+              "actualPostFailure": {
+                "rows": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed/unsigned-abort/post-failure-rows.json",
+                "sha256": "71182a925c13121a0052ac4a8f09969e24d62baac438a089b717aae823e35144",
+                "mainUnsignedRows": 2,
+                "assuranceSessions": [
+                  {
+                    "id": "e3217712-6a25-424c-b402-fa9fe45e326e",
+                    "endedTs": 1792010332852,
+                    "seal": "unsigned"
+                  }
+                ],
+                "auditTypes": [
+                  null,
+                  "ASSURANCE_RUN_STARTED",
+                  "ASSURANCE_RUN_ABORTED"
+                ],
+                "assuranceRuns": 0
+              },
+              "failure": {
+                "name": "AssertionError",
+                "code": "ERR_ASSERTION",
+                "reason": null,
+                "cause": null,
+                "messageSha256": "67fdb94b1d10636bcd36c359778cf1c85529c2a5ff2a1c338e56973bbad0f3cb"
+              }
+            }
+          ]
+        },
+        {
+          "phase": "restored",
+          "counts": {
+            "total": 2,
+            "passed": 2,
+            "failed": 0
+          },
+          "durationMs": 1378,
+          "moduleSha256": "b0c3539d50c79a59a5f22342ac1702802e78cc2d1c42cd4a5b8cfe0e8f4e8d5d",
+          "privateModuleRestoredExactly": true,
+          "cases": [
+            {
+              "case": "signed-abort",
+              "exit": 0,
+              "durationMs": 675,
+              "result": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/signed-abort/result.json",
+              "resultSha256": "4171c11f35ae0f2c0665d9ad5b2711d54f19c90c8203b44fc5575e91ee46bc37",
+              "success": true,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-guards-c_4oyuey/active.mjs"
+            },
+            {
+              "case": "unsigned-abort",
+              "exit": 0,
+              "durationMs": 683,
+              "result": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/unsigned-abort/result.json",
+              "resultSha256": "cbe5ea2a04702da2de8a2c440bbeaf549ee214fc09a4e56a94b2061eb99d5423",
+              "success": true,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-guards-c_4oyuey/active.mjs"
+            }
+          ]
+        }
+      ],
+      "normalization": "Only static relative imports are routed to exact original built file URLs; private baseline/mutants share byte-equal routing. Bare dependencies resolve through owned node_modules symlink.",
+      "privateModuleRestoredExactly": true,
+      "liveInputsUnchanged": true,
+      "retainedFiles": [
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed.observed.mjs",
+          "bytes": 36786,
+          "sha256": "a7f8bb31e8676178809406ca68c0e44a9c1f9097ee442232681c42955ebb08fc"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed.patch",
+          "bytes": 291,
+          "sha256": "9708c2b3d6f7572a7a4a6cc410e8e5335d572b1b01692b08492bf64034ba3a15"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed/signed-abort/diagnostic.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed/signed-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "48abd978910a6a126ddc0a33e730bc59e7e3c6801fb32c8e04e9925dc39d31d2"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed/signed-abort/post-failure-rows.json",
+          "bytes": 1784,
+          "sha256": "a1c1504136f6870473b7d6342bbda5484e5fd2a9e4536dc86e8d43ded11d68de"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed/signed-abort/request.json",
+          "bytes": 328,
+          "sha256": "db34d0bf651b9af3f482c3e085cee20583e33859703b8c55d8011ba028391a2f"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed/signed-abort/result.json",
+          "bytes": 946,
+          "sha256": "84efe7deff3873ceb58245337344cf40b44cd14a0178e87193b8f1d6b71cce79"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed/signed-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/abort-seal-removed/signed-abort/stdout.log",
+          "bytes": 191,
+          "sha256": "1a3340c228c53002d5cd97992bb97f880cd25bad7ce2d026c1323fdf6e0bcc06"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/active.mjs",
+          "bytes": 36854,
+          "sha256": "b0c3539d50c79a59a5f22342ac1702802e78cc2d1c42cd4a5b8cfe0e8f4e8d5d"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/actual-session-helper.mjs",
+          "bytes": 11921,
+          "sha256": "1c05b424385bc2fea494533e6c66d436b5704f3be0b4bf38099d51c96f4f81e3"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline.mjs",
+          "bytes": 36854,
+          "sha256": "b0c3539d50c79a59a5f22342ac1702802e78cc2d1c42cd4a5b8cfe0e8f4e8d5d"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/signed-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "6c488df004cb887095c145e2a25d94283dcc09edfc4bc3601a6515d1dae5ee78"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/signed-abort/request.json",
+          "bytes": 318,
+          "sha256": "f18e49d138a9a559f59b66bfef414926a58bd5bcaac65be7e0690e169f9818cb"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/signed-abort/result.json",
+          "bytes": 12714,
+          "sha256": "44b040005cc3c202b907ea72224de5e45ab6391a391becdf82ef8c6ef94dc839"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/signed-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/signed-abort/stdout.log",
+          "bytes": 56,
+          "sha256": "b8d278a8d5bc44aeef58489136c43b901e0526adfa2f2aff561c669598f845c2"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/unsigned-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "52faad496d6d2aea020dc1fa0a7dae516982c4a30afb5bc8f76bb244e31d8a54"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/unsigned-abort/request.json",
+          "bytes": 322,
+          "sha256": "9ae095c6775ebc6c1e7f75c5f4e14ced876bebfc5899704c15b738ddf085108e"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/unsigned-abort/result.json",
+          "bytes": 18174,
+          "sha256": "8e6fc87a61c1ad4f3d5a694fd60da4883419188bf4866b9f633172d87b40cf63"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/unsigned-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/baseline/unsigned-abort/stdout.log",
+          "bytes": 58,
+          "sha256": "32fa3f3df558deb617a4663910e4ac5e5f3299cef964c3c4638124a583b4c4a8"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/deny-transport.mjs",
+          "bytes": 428,
+          "sha256": "4aa113629cf1cb068a83257ec103037e670f393c1ba519d92bdda424afaacff1"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/guards-summary.json",
+          "bytes": 18692,
+          "sha256": "2a17cd40a9551c949b6f995fbb933bb1cd73be5bbf1f53b71444826ff69ca877"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/read-owned-failure-rows.mjs",
+          "bytes": 592,
+          "sha256": "cd8100c218d49c632e95ff9b18d53fda47b00295dbe9c0a50ea7164a3719be65"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/signed-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "ce5f0c5a2ae60cc9eed3c9af23f5090ffae93320e5e63c7491a613ee5f483818"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/signed-abort/request.json",
+          "bytes": 318,
+          "sha256": "63b6687b1ab6f84c8504e784372f72ddce10ed2267d33c7215940e655429ff50"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/signed-abort/result.json",
+          "bytes": 12714,
+          "sha256": "4171c11f35ae0f2c0665d9ad5b2711d54f19c90c8203b44fc5575e91ee46bc37"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/signed-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/signed-abort/stdout.log",
+          "bytes": 56,
+          "sha256": "b8d278a8d5bc44aeef58489136c43b901e0526adfa2f2aff561c669598f845c2"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/unsigned-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "5fbcf8694219a2df24c9b9420949053993560cc8c1a83e87bb76ab8b47ac0f0e"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/unsigned-abort/request.json",
+          "bytes": 322,
+          "sha256": "0f30da17432fb3234bd12f724a63fd25df31723830975c01628fc41cb97ca4e1"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/unsigned-abort/result.json",
+          "bytes": 18174,
+          "sha256": "cbe5ea2a04702da2de8a2c440bbeaf549ee214fc09a4e56a94b2061eb99d5423"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/unsigned-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/restored/unsigned-abort/stdout.log",
+          "bytes": 58,
+          "sha256": "32fa3f3df558deb617a4663910e4ac5e5f3299cef964c3c4638124a583b4c4a8"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed.observed.mjs",
+          "bytes": 36814,
+          "sha256": "32339a2c9d6937eaaddced316940ea71a6a03238e8df1156adde071197728141"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed.patch",
+          "bytes": 594,
+          "sha256": "d993c40987f4500300938625e4c938a9758b09a89cba16c555d5bd51b3958605"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed/unsigned-abort/diagnostic.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed/unsigned-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "5abff41e73ec20db48956649549ec55b8c0027719f560b6709bd0bd90be6920f"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed/unsigned-abort/post-failure-rows.json",
+          "bytes": 4794,
+          "sha256": "71182a925c13121a0052ac4a8f09969e24d62baac438a089b717aae823e35144"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed/unsigned-abort/request.json",
+          "bytes": 336,
+          "sha256": "eaeaf3a63501ca94e9077176ffa795c49481d5be078e38625ee8c729146b70b5"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed/unsigned-abort/result.json",
+          "bytes": 3604,
+          "sha256": "99a053ef4f92940a1c001e07ea8ceb94d490cc9e73a1b8ad08b9117f4f657d0a"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed/unsigned-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-guards-c_4oyuey/unsigned-store-removed/unsigned-abort/stdout.log",
+          "bytes": 1165,
+          "sha256": "aebd3e0eb2da2b2b9c2c8f60051e3d0b07b6d8c7ec14de5c10c79c718dfbfe07"
+        }
+      ]
+    },
+    {
+      "root": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj",
+      "kind": "Private compiled-runner causal guards, standalone cases not registered tests",
+      "summary": {
+        "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/guards-summary.json",
+        "bytes": 18789,
+        "sha256": "579ae57022b66d52951e7fa696af084e94165fedf1648c6a636b9e2fb97aaad7"
+      },
+      "phases": [
+        {
+          "phase": "baseline",
+          "counts": {
+            "total": 2,
+            "passed": 2,
+            "failed": 0
+          },
+          "durationMs": 1477,
+          "moduleSha256": "b0c3539d50c79a59a5f22342ac1702802e78cc2d1c42cd4a5b8cfe0e8f4e8d5d",
+          "privateModuleRestoredExactly": true,
+          "cases": [
+            {
+              "case": "signed-abort",
+              "exit": 0,
+              "durationMs": 681,
+              "result": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/signed-abort/result.json",
+              "resultSha256": "117a6082b8c3899092ccb29502a8c2318f3a9aeed27cb9a66a84518565ef18eb",
+              "success": true,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/active.mjs"
+            },
+            {
+              "case": "unsigned-abort",
+              "exit": 0,
+              "durationMs": 778,
+              "result": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/unsigned-abort/result.json",
+              "resultSha256": "02f3029b9e2866ad20730faca4176e7c825164a338a40d13042775ab4d634acf",
+              "success": true,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/active.mjs"
+            }
+          ]
+        },
+        {
+          "phase": "abort-seal-removed",
+          "counts": {
+            "total": 1,
+            "passed": 0,
+            "failed": 1
+          },
+          "durationMs": 1006,
+          "moduleSha256": "a7f8bb31e8676178809406ca68c0e44a9c1f9097ee442232681c42955ebb08fc",
+          "privateModuleRestoredExactly": true,
+          "cases": [
+            {
+              "case": "signed-abort",
+              "exit": 1,
+              "durationMs": 673,
+              "result": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed/signed-abort/result.json",
+              "resultSha256": "12fcfbe6bf27be6a3517eac104674c51737089d079bc532fa7b671dba94174a6",
+              "success": false,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/active.mjs",
+              "postFailureDiagnosticExit": 0,
+              "actualPostFailure": {
+                "rows": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed/signed-abort/post-failure-rows.json",
+                "sha256": "5ec5af5855bf20e3dc0424f36b048924a8c40ad5f7131e8eea06634296d06e28",
+                "mainUnsignedRows": 0,
+                "assuranceSessions": [
+                  {
+                    "id": "3089a2db-602e-4779-a837-0b4610fee215",
+                    "endedTs": null,
+                    "seal": null
+                  }
+                ],
+                "auditTypes": [
+                  "ASSURANCE_RUN_STARTED"
+                ],
+                "assuranceRuns": 0
+              },
+              "failure": {
+                "name": "AssertionError",
+                "code": "ERR_ASSERTION",
+                "reason": null,
+                "cause": null,
+                "messageSha256": "3bec950429f91db3456b3f7a0b3ede91c19793e10b30c9f4a9bda88c40b75cd5"
+              }
+            }
+          ]
+        },
+        {
+          "phase": "unsigned-store-removed",
+          "counts": {
+            "total": 1,
+            "passed": 0,
+            "failed": 1
+          },
+          "durationMs": 1003,
+          "moduleSha256": "32339a2c9d6937eaaddced316940ea71a6a03238e8df1156adde071197728141",
+          "privateModuleRestoredExactly": true,
+          "cases": [
+            {
+              "case": "unsigned-abort",
+              "exit": 1,
+              "durationMs": 673,
+              "result": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed/unsigned-abort/result.json",
+              "resultSha256": "0f7aec4fcbfbd1c0a62f324a3e53eef6cbe37f22bd86d865e6e533d492b8d4a3",
+              "success": false,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/active.mjs",
+              "postFailureDiagnosticExit": 0,
+              "actualPostFailure": {
+                "rows": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed/unsigned-abort/post-failure-rows.json",
+                "sha256": "d99ccf34362743c7cac1755a043bb554f34b8667c67625a5f3716d6c1fb17d39",
+                "mainUnsignedRows": 2,
+                "assuranceSessions": [
+                  {
+                    "id": "4c8cc2a0-fed1-4f7d-9845-1ab24e646b88",
+                    "endedTs": 1792010442284,
+                    "seal": "unsigned"
+                  }
+                ],
+                "auditTypes": [
+                  null,
+                  "ASSURANCE_RUN_STARTED",
+                  "ASSURANCE_RUN_ABORTED"
+                ],
+                "assuranceRuns": 0
+              },
+              "failure": {
+                "name": "AssertionError",
+                "code": "ERR_ASSERTION",
+                "reason": null,
+                "cause": null,
+                "messageSha256": "32e78b406d0ed93a889d0f8d881006295a7cafb324e10fe64d2098a353f65922"
+              }
+            }
+          ]
+        },
+        {
+          "phase": "restored",
+          "counts": {
+            "total": 2,
+            "passed": 2,
+            "failed": 0
+          },
+          "durationMs": 1385,
+          "moduleSha256": "b0c3539d50c79a59a5f22342ac1702802e78cc2d1c42cd4a5b8cfe0e8f4e8d5d",
+          "privateModuleRestoredExactly": true,
+          "cases": [
+            {
+              "case": "signed-abort",
+              "exit": 0,
+              "durationMs": 683,
+              "result": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/signed-abort/result.json",
+              "resultSha256": "b92deec4e7bebbfdab1b6302ecd70ddf58e309afdb5ac09019028798b312616b",
+              "success": true,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/active.mjs"
+            },
+            {
+              "case": "unsigned-abort",
+              "exit": 0,
+              "durationMs": 682,
+              "result": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/unsigned-abort/result.json",
+              "resultSha256": "7441ab41a5270ac9dae20379e37ce586cadc674cb62ec135ea822bf73b547f5c",
+              "success": true,
+              "actualOriginalError": {
+                "name": "AgentResponderUnavailableError",
+                "message": "No real agent target available: AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "code": "AGENT_RESPONDER_UNAVAILABLE",
+                "reason": "AMC_AGENT_BASE_URL is set to http://127.0.0.1:1 but OPENAI_API_KEY is not set",
+                "cause": null
+              },
+              "selectedRunner": "file:///private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/active.mjs"
+            }
+          ]
+        }
+      ],
+      "normalization": "Only static relative imports are routed to exact original built file URLs; private baseline/mutants share byte-equal routing. Bare dependencies resolve through owned node_modules symlink.",
+      "privateModuleRestoredExactly": true,
+      "liveInputsUnchanged": true,
+      "retainedFiles": [
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed.observed.mjs",
+          "bytes": 36786,
+          "sha256": "a7f8bb31e8676178809406ca68c0e44a9c1f9097ee442232681c42955ebb08fc"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed.patch",
+          "bytes": 291,
+          "sha256": "9708c2b3d6f7572a7a4a6cc410e8e5335d572b1b01692b08492bf64034ba3a15"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed/signed-abort/diagnostic.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed/signed-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "4bcb1ac8251c929a78d224232488656c59deb60c086ca430b8c0ed77cbceec4b"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed/signed-abort/post-failure-rows.json",
+          "bytes": 1784,
+          "sha256": "5ec5af5855bf20e3dc0424f36b048924a8c40ad5f7131e8eea06634296d06e28"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed/signed-abort/request.json",
+          "bytes": 341,
+          "sha256": "0864a58db0fbf0cbf6ee819930633e86090522c670ab15d86893e84553f06529"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed/signed-abort/result.json",
+          "bytes": 952,
+          "sha256": "12fcfbe6bf27be6a3517eac104674c51737089d079bc532fa7b671dba94174a6"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed/signed-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/abort-seal-removed/signed-abort/stdout.log",
+          "bytes": 191,
+          "sha256": "1a3340c228c53002d5cd97992bb97f880cd25bad7ce2d026c1323fdf6e0bcc06"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/active.mjs",
+          "bytes": 36854,
+          "sha256": "b0c3539d50c79a59a5f22342ac1702802e78cc2d1c42cd4a5b8cfe0e8f4e8d5d"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/actual-session-helper.mjs",
+          "bytes": 11921,
+          "sha256": "1c05b424385bc2fea494533e6c66d436b5704f3be0b4bf38099d51c96f4f81e3"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline.mjs",
+          "bytes": 36854,
+          "sha256": "b0c3539d50c79a59a5f22342ac1702802e78cc2d1c42cd4a5b8cfe0e8f4e8d5d"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/signed-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "2eb9c41d6c7e3eb6ec85fab169599e4f9d7227cbbf21355587720a24065360d2"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/signed-abort/request.json",
+          "bytes": 331,
+          "sha256": "bd26638d202d2de838f856b40c5e069e48f95747c3438bff5270cbede92cccd7"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/signed-abort/result.json",
+          "bytes": 12720,
+          "sha256": "117a6082b8c3899092ccb29502a8c2318f3a9aeed27cb9a66a84518565ef18eb"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/signed-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/signed-abort/stdout.log",
+          "bytes": 56,
+          "sha256": "b8d278a8d5bc44aeef58489136c43b901e0526adfa2f2aff561c669598f845c2"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/unsigned-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "3840d5eabaad1f05f750aa3daa2b6e2687550acc4ecf0b326655c3844eec30d0"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/unsigned-abort/request.json",
+          "bytes": 334,
+          "sha256": "c64647856d803e53ea8ff644fa36058cb371035c64df4387e87f14af1e9ef214"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/unsigned-abort/result.json",
+          "bytes": 18216,
+          "sha256": "02f3029b9e2866ad20730faca4176e7c825164a338a40d13042775ab4d634acf"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/unsigned-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/baseline/unsigned-abort/stdout.log",
+          "bytes": 58,
+          "sha256": "32fa3f3df558deb617a4663910e4ac5e5f3299cef964c3c4638124a583b4c4a8"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/deny-transport.mjs",
+          "bytes": 428,
+          "sha256": "4aa113629cf1cb068a83257ec103037e670f393c1ba519d92bdda424afaacff1"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/guards-summary.json",
+          "bytes": 18789,
+          "sha256": "579ae57022b66d52951e7fa696af084e94165fedf1648c6a636b9e2fb97aaad7"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/read-owned-failure-rows.mjs",
+          "bytes": 592,
+          "sha256": "cd8100c218d49c632e95ff9b18d53fda47b00295dbe9c0a50ea7164a3719be65"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/signed-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "999f2e3e3b02b76b390e9605a6dbb3aebe43374e89c5f3fa6f8330370a146967"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/signed-abort/request.json",
+          "bytes": 331,
+          "sha256": "d0836535bb378271e2effbf3622e7c8977356ccb8b70d9b93c981848dd8299b6"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/signed-abort/result.json",
+          "bytes": 12720,
+          "sha256": "b92deec4e7bebbfdab1b6302ecd70ddf58e309afdb5ac09019028798b312616b"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/signed-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/signed-abort/stdout.log",
+          "bytes": 56,
+          "sha256": "b8d278a8d5bc44aeef58489136c43b901e0526adfa2f2aff561c669598f845c2"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/unsigned-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "461ea382488683e04ed9303bbfee08a80d6e56a2e482279be5ca2fe893fb2463"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/unsigned-abort/request.json",
+          "bytes": 334,
+          "sha256": "197ad0a12eee1175278382c98c9d38b93ed519b10f5fec712cb16889d13d3ac9"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/unsigned-abort/result.json",
+          "bytes": 18216,
+          "sha256": "7441ab41a5270ac9dae20379e37ce586cadc674cb62ec135ea822bf73b547f5c"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/unsigned-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/restored/unsigned-abort/stdout.log",
+          "bytes": 58,
+          "sha256": "32fa3f3df558deb617a4663910e4ac5e5f3299cef964c3c4638124a583b4c4a8"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed.observed.mjs",
+          "bytes": 36814,
+          "sha256": "32339a2c9d6937eaaddced316940ea71a6a03238e8df1156adde071197728141"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed.patch",
+          "bytes": 594,
+          "sha256": "d993c40987f4500300938625e4c938a9758b09a89cba16c555d5bd51b3958605"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed/unsigned-abort/diagnostic.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed/unsigned-abort/monitor-before-artifacts.json",
+          "bytes": 694,
+          "sha256": "ffe1fcce9b265531c7deb7fe3a14eb8d3536a8917755a6c83a2da4012b3bc057"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed/unsigned-abort/post-failure-rows.json",
+          "bytes": 4794,
+          "sha256": "d99ccf34362743c7cac1755a043bb554f34b8667c67625a5f3716d6c1fb17d39"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed/unsigned-abort/request.json",
+          "bytes": 348,
+          "sha256": "0d671f50639d9f50f2aaa4f814bc1438998ccb7e73b067e0ecdfc33d7968dc0f"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed/unsigned-abort/result.json",
+          "bytes": 3622,
+          "sha256": "0f7aec4fcbfbd1c0a62f324a3e53eef6cbe37f22bd86d865e6e533d492b8d4a3"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed/unsigned-abort/stderr.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/tmp/p0-27-private-runner-exact-inputs-u34lmejj/unsigned-store-removed/unsigned-abort/stdout.log",
+          "bytes": 1177,
+          "sha256": "0198b6fb69c43b651d30358f3b04a6133b0ee2f08741c9ff764ff55a0c5f019d"
+        }
+      ]
+    }
+  ],
+  "privateMutations": [
+    {
+      "replacement": "throw sealAbortedAssuranceSession({ ledger, sessionId, runId, agentId, error }); -> throw error;",
+      "scope": "One exact line in the owned private compiled runner only",
+      "observation": "Selected signed-abort assertion genuinely fails; later readonly row inspection shows only ASSURANCE_RUN_STARTED, null endedTs/seal, zero assurance_runs."
+    },
+    {
+      "replacement": "openLedger(workspace, unsignedStore ? { store: \"unsigned\" } : {}) -> openLedger(workspace, {})",
+      "scope": "One exact line in the owned private compiled runner only",
+      "observation": "Selected unsigned isolation assertion genuinely fails on signed WAL/SHM byte changes; later readonly row inspection shows two literal unsigned rows and an unsigned seal in the main store."
+    }
+  ],
+  "observerCorrection": "The first standalone matrix also gave the signed-abort case noSign:true, an additional abort-only corner. Its actual evidence is retained separately. The final matrix uses signed noSign:false and unsigned noSign:true, matching the registered cases. Neither matrix is added to the 8 registered-test count; standalone cases have no Vitest pending/todo counters.",
+  "inputBoundary": {
+    "before": {
+      "path": "/private/tmp/p0-27-session-inputs-before-20261015.json",
+      "bytes": 2886,
+      "sha256": "4034fcf685e65973fefb4364cafd9a964b4969f2bb79d4f579cce709d0ae4ab9"
+    },
+    "final": {
+      "path": "/private/tmp/p0-27-session-final-input-check-20261015.json",
+      "bytes": 4292,
+      "sha256": "91cd05383ddd4535921a6fc91627dab8d8caf68447e524b53cba99100de43c95"
+    },
+    "all16SourceBuildTestInputsUnchanged": true,
+    "privateStaticDependencyEntries": 18,
+    "privateDependencyPinsUnchanged": true,
+    "privateActiveRestored": true,
+    "runtimeIdleBeforeRootFinalBuild": true,
+    "liveReadsFinished": true
+  },
+  "independentReview": {
+    "json": {
+      "path": "/private/tmp/p0-27-session-independent-review-20261015.json",
+      "bytes": 30280,
+      "sha256": "c4bd87f2f97fc0077538f703588fe4e840a7804d362e9a6858796982d5081fe9"
+    },
+    "markdown": {
+      "path": "/private/tmp/p0-27-session-independent-review-20261015.md",
+      "bytes": 1983,
+      "sha256": "8c5fe9b173e00c205d48f815a09a64c835c66721861c30901deb502d845cad6f"
+    },
+    "findings": []
+  },
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-27-session-first-20261015.json",
+      "bytes": 4147,
+      "sha256": "774f6afd4bec208e8b4ca19aed37517c274f8adafcbbc745901df1988e6bc8ce"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-first-20261015.log",
+      "bytes": 70,
+      "sha256": "6ddf3f5ea6377d74af7aca921af01ae6b8789e30d0b8f4367d419b4da67e29de"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-evidence-location-20261015.json",
+      "bytes": 5114,
+      "sha256": "59cefdb73ccdf0ddf68f426236681e4670b2edeeb88145a2d6ed5b5572961440"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-inputs-before-20261015.json",
+      "bytes": 2886,
+      "sha256": "4034fcf685e65973fefb4364cafd9a964b4969f2bb79d4f579cce709d0ae4ab9"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-final-input-check-20261015.json",
+      "bytes": 4292,
+      "sha256": "91cd05383ddd4535921a6fc91627dab8d8caf68447e524b53cba99100de43c95"
+    },
+    {
+      "path": "/private/tmp/p0-27-private-runner-guards-fixture-20261015.json",
+      "bytes": 4582,
+      "sha256": "d9fc2579ffda6f20001a882ed2bbdf4f8d831d10024e09546759f3293bd61d9e"
+    },
+    {
+      "path": "/private/tmp/p0-27-private-runner-exact-inputs-fixture-20261015.json",
+      "bytes": 4935,
+      "sha256": "570daed3570796da0c0e05411b62ae3a0cbfb36e1433a1ecd7ad8ef62a5c385d"
+    },
+    {
+      "path": "/private/tmp/p0-27-private-runner-guards-20261015.py",
+      "bytes": 6254,
+      "sha256": "26594216ba23471feaeb07fa027d70812a0f593751019498cc505c6f2e116596"
+    },
+    {
+      "path": "/private/tmp/p0-27-private-runner-exact-inputs-20261015.py",
+      "bytes": 6278,
+      "sha256": "84da576433154cef14629004940d352d0b4c78a33c8b3f76a21f6b73cc38d5fd"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-private-guards-20261015.log",
+      "bytes": 557,
+      "sha256": "7bdd54fdd81d6a49a7a5185b807b3d2fd154dd4172fd7ff990c2490044e4d40b"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-private-guards-exact-inputs-20261015.log",
+      "bytes": 563,
+      "sha256": "b3696229b756f5a779f9ae1468080e5f76241e9cb241724fca96c24cb4dff915"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-independent-review-20261015.json",
+      "bytes": 30280,
+      "sha256": "c4bd87f2f97fc0077538f703588fe4e840a7804d362e9a6858796982d5081fe9"
+    },
+    {
+      "path": "/private/tmp/p0-27-session-independent-review-20261015.md",
+      "bytes": 1983,
+      "sha256": "8c5fe9b173e00c205d48f815a09a64c835c66721861c30901deb502d845cad6f"
+    }
+  ],
+  "disclosureCheck": {
+    "privatePemMarkersFound": false,
+    "scope": "Referenced retained public evidence, private module copies, drivers and this compact receipt; this is a PEM-material check, not a replacement for the normal project secret scanner."
+  },
+  "limits": [
+    "This is 8-case session qualification, not whole P0-27 acceptance, full suite, coverage, Node24, hosted CI, release or Done approval.",
+    "Offline credential absence causes a genuine resolver refusal before any model call. No successful measured assurance/model capability follows from signed operational controls.",
+    "The direct first-row helper transaction control does not prove runAssurance pre-try pool cleanup; runAssurance starts that session before its later try/finally.",
+    "SQL seal faults are expected negative checks; ledger verdict false and missing seal remain explicit.",
+    "No P0-55 withSealedSession helper is added, no shared paths are transferred, and no inherited unresolved requirement is cleared.",
+    "Only own runtime state directories were cleaned after public row/byte snapshots and streams were saved. Existing logs/artifacts were retained.",
+    "Post-failure readonly row inspection may coordinate SQLite sidecars. It is separate from the original in-loop signed-byte isolation boundary.",
+    "Root budget, compiled CLI, checkpoint, export and final combined checks are separate evidence and are not absorbed into these counts.",
+    "Root may rebuild after the recorded idle notice. The final input receipt pins the completed earlier source/build boundary; this report performs no subsequent live dist read."
+  ]
+}

@@ -3,7 +3,8 @@ import { z } from "zod";
 export const experimentSchema = z.object({
   experiment: z.object({
     version: z.literal(1),
-    experimentId: z.string().min(1),
+    // Also an HTML attribute and a path segment in the Studio console: never markup or a separator.
+    experimentId: z.string().regex(/^[A-Za-z0-9_-]+$/),
     agentId: z.string().min(1),
     name: z.string().min(1),
     casebookId: z.string().min(1),
@@ -11,23 +12,33 @@ export const experimentSchema = z.object({
     baselineConfig: z.object({
       id: z.string().min(1),
       kind: z.enum(["current", "file"]),
-      path: z.string().nullable().optional()
+      path: z.string().nullable().optional(),
+      /** Full sha256 of the baseline file at set-baseline time; records without it cannot run executed trials. */
+      digestSha256: z.string().length(64).nullable().optional()
     }),
     candidateConfig: z.object({
       id: z.string().min(1),
-      kind: z.enum(["overlay-file", "current"]),
+      /** "improvement-candidate": loop output (GAP-WP08), never auditor-signed; admitted only with its loop's journal binding. */
+      kind: z.enum(["overlay-file", "current", "improvement-candidate"]),
       path: z.string().nullable().optional(),
       digestSha256: z.string().length(64).nullable().optional(),
-      signatureValid: z.boolean().default(false)
+      signatureValid: z.boolean().default(false),
+      loopId: z.string().optional()
     }).nullable().default(null)
   })
 });
 
 export const experimentGateSchema = z.object({
   minUpliftSuccessRate: z.number(),
+  /** Absolute points on the 0..100 case-value scale, not a fraction. */
   minUpliftValuePoints: z.number(),
+  valueUnit: z.literal("points").optional(),
   maxCostIncreaseRatio: z.number().positive().optional(),
-  denyIfRegression: z.boolean().optional()
+  denyIfRegression: z.boolean().optional(),
+  /** Fewer cases determinate on both sides makes the gate inconclusive (default DEFAULT_MIN_PAIRED_CASES). */
+  minPairedCases: z.number().int().min(1).optional(),
+  /** Require the paired 95% interval of the value-point difference to lie above zero. */
+  requireIntervalAboveZero: z.boolean().optional()
 });
 
 export type ExperimentFile = z.infer<typeof experimentSchema>;

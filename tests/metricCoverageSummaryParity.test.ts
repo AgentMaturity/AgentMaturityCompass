@@ -1,3 +1,4 @@
+import * as experimentStats from "../src/experiments/stats.js";
 import * as predictiveValidity from "../src/score/predictiveValidity.js";
 import * as hashUtils from "../src/utils/hash.js";
 import * as jsonUtils from "../src/utils/json.js";
@@ -116,7 +117,7 @@ const projectionMap = JSON.parse(readFileSync(resolve(process.cwd(), projectionA
 };
 
 function loadProjectionSummaries(source: string): Record<string, ProjectionSummary> {
-  // Execute the full actual module, with its three unchanged runtime dependencies.
+  // Execute the full actual module with its explicitly admitted runtime dependencies.
   const compiled = ts.transpileModule(source + projectionMap.summaries.map(row =>
     "\nexports." + row.name + " = " + row.name + ";").join(""), {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS }, reportDiagnostics: true
@@ -124,7 +125,8 @@ function loadProjectionSummaries(source: string): Record<string, ProjectionSumma
   expect(compiled.diagnostics?.filter(item => item.category === ts.DiagnosticCategory.Error)).toEqual([]);
   const exports: Record<string, ProjectionSummary> = {};
   const dependencies: Record<string, unknown> = {
-    "./predictiveValidity.js": predictiveValidity, "../utils/hash.js": hashUtils, "../utils/json.js": jsonUtils
+    "./predictiveValidity.js": predictiveValidity, "../utils/hash.js": hashUtils, "../utils/json.js": jsonUtils,
+    "../experiments/stats.js": experimentStats
   };
   runInNewContext(compiled.outputText, { exports, require: (name: string) => {
     if (!(name in dependencies)) throw new Error("Unexpected metric dependency: " + name);
@@ -209,7 +211,10 @@ function publicProjectionInput(row: typeof projectionMap.summaries[number], valu
     agentId: "owned-projection-fixture", runId: "owned-projection-run", ts: Date.UTC(2026, 9, 1),
     trustLabel: "LOW TRUST", integrityIndex: 0, evidenceCoverage: 0, correlationRatio: 0,
     unsupportedClaimCount: 0, layerScores: [{ layerName: "Strategic Agent Operations", avgFinalLevel: 0, confidenceWeightedFinalLevel: 0 }],
-    questionScores: [], sourceRefs: ["fixture:public-metric-projection"], gateMode: "ci",
+    // One scored question keeps construct validity measured, so the parity compares projection, not the
+    // "not evaluated" rule that now applies (and the archived original lacks) when no question was scored.
+    questionScores: [{ questionId: "AMC-1.1", claimedLevel: 1, supportedMaxLevel: 1, finalLevel: 1, confidence: 0.5,
+      evidenceEventIds: [], flags: [], narrative: "fixture" }], sourceRefs: ["fixture:public-metric-projection"], gateMode: "ci",
     // Deliberately uncovered, unrecognized signals exercise metadata projection;
     // these fixtures provide no signed evidence or behavioral measurement.
     [publicProjectionInputs[row.name]]: [

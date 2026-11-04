@@ -1,0 +1,254 @@
+[
+  {
+    "name": "frozen-install",
+    "cmd": "pnpm install --frozen-lockfile",
+    "exit": 0,
+    "durationMs": 1771,
+    "startedUtc": "2026-10-14T19:52:39.882271+00:00",
+    "log": "/private/tmp/p0-20-frozen-install-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "current-build",
+    "cmd": "pnpm run build",
+    "exit": 0,
+    "durationMs": 31094,
+    "startedUtc": "2026-10-14T19:54:43.203712+00:00",
+    "log": "/private/tmp/p0-20-current-build-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "original-audit-contracts",
+    "cmd": "pnpm exec vitest run tests/industryPackAudit.test.ts tests/auditBinderComplianceMaps.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts --reporter=json --outputFile=/private/tmp/p0-20-original-audit-contracts-20261015.json",
+    "exit": 0,
+    "durationMs": 7793,
+    "startedUtc": "2026-10-14T19:57:38.361683+00:00",
+    "log": "/private/tmp/p0-20-original-audit-contracts-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "signing-first",
+    "cmd": "pnpm exec vitest run tests/industryPackAuditSigningQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-signing-first-20261015.json",
+    "exit": 0,
+    "durationMs": 3244,
+    "startedUtc": "2026-10-14T19:58:24.386473+00:00",
+    "log": "/private/tmp/p0-20-signing-first-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "reader-first",
+    "cmd": "env AMC_P0_20_READER_EFFECTS_DIR=/private/tmp/p0-20-reader-first-20261015 pnpm exec vitest run tests/industryPackAuditReaderQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-reader-first-20261015.json",
+    "exit": 1,
+    "durationMs": 3783,
+    "startedUtc": "2026-10-14T19:59:31.093946+00:00",
+    "log": "/private/tmp/p0-20-reader-first-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "compiled-cli",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-compiled-cli-20261015.mjs",
+    "exit": 1,
+    "durationMs": 9973,
+    "startedUtc": "2026-10-14T20:00:16.111157+00:00",
+    "log": "/private/tmp/p0-20-compiled-cli-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "signing-private-baseline",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-private-audit-causal-20261015.mjs baseline",
+    "exit": 0,
+    "durationMs": 149,
+    "startedUtc": "2026-10-14T20:00:42.087099+00:00",
+    "log": "/private/tmp/p0-20-signing-private-baseline-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "signing-private-auto-pin",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-private-audit-causal-20261015.mjs auto-pin",
+    "exit": 1,
+    "durationMs": 152,
+    "startedUtc": "2026-10-14T20:00:52.698303+00:00",
+    "log": "/private/tmp/p0-20-signing-private-auto-pin-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "signing-private-digest-check-removed",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-private-audit-causal-20261015.mjs digest-check-removed",
+    "exit": 1,
+    "durationMs": 142,
+    "startedUtc": "2026-10-14T20:00:52.950501+00:00",
+    "log": "/private/tmp/p0-20-signing-private-digest-check-removed-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "signing-private-restored",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-private-audit-causal-20261015.mjs restored",
+    "exit": 0,
+    "durationMs": 140,
+    "startedUtc": "2026-10-14T20:00:53.189154+00:00",
+    "log": "/private/tmp/p0-20-signing-private-restored-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "reader-current-level-contract",
+    "cmd": "env AMC_P0_20_READER_EFFECTS_DIR=/private/tmp/p0-20-reader-current-level-contract-20261015 pnpm exec vitest run tests/industryPackAuditReaderQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-reader-current-level-contract-20261015.json",
+    "exit": 0,
+    "durationMs": 3910,
+    "startedUtc": "2026-10-14T20:00:55.587232+00:00",
+    "log": "/private/tmp/p0-20-reader-current-level-contract-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "repaired-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 33714,
+    "startedUtc": "2026-10-14T20:07:56.685701+00:00",
+    "log": "/private/tmp/p0-20-repaired-build-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "compiled-cli-corrected",
+    "cmd": "node /private/tmp/p0-20-compiled-cli-20261015.mjs",
+    "exit": 0,
+    "durationMs": 10387,
+    "startedUtc": "2026-10-14T20:08:51.097121+00:00",
+    "log": "/private/tmp/p0-20-compiled-cli-corrected-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "signing-wrapper-expanded",
+    "cmd": "pnpm exec vitest run tests/industryPackAuditSigningQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-signing-wrapper-expanded-20261015.json",
+    "exit": 0,
+    "durationMs": 3786,
+    "startedUtc": "2026-10-14T20:09:18.472518+00:00",
+    "log": "/private/tmp/p0-20-signing-wrapper-expanded-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "restored-build",
+    "cmd": "npm run build",
+    "exit": 0,
+    "durationMs": 33399,
+    "startedUtc": "2026-10-14T20:10:21.318374+00:00",
+    "log": "/private/tmp/p0-20-restored-build-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "generate-current-counts",
+    "cmd": "npm run gen-counts",
+    "exit": 0,
+    "durationMs": 620,
+    "startedUtc": "2026-10-14T20:11:16.826816+00:00",
+    "log": "/private/tmp/p0-20-generate-current-counts-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "compiled-cli-real-label",
+    "cmd": "node /private/tmp/p0-20-compiled-cli-20261015.mjs",
+    "exit": 1,
+    "durationMs": 11484,
+    "startedUtc": "2026-10-14T20:11:07.385951+00:00",
+    "log": "/private/tmp/p0-20-compiled-cli-real-label-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "candidate-lint",
+    "cmd": "npm run lint",
+    "exit": 0,
+    "durationMs": 5403,
+    "startedUtc": "2026-10-14T20:11:32.502953+00:00",
+    "log": "/private/tmp/p0-20-candidate-lint-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "candidate-production-types",
+    "cmd": "npm run typecheck",
+    "exit": 0,
+    "durationMs": 29302,
+    "startedUtc": "2026-10-14T20:11:08.620022+00:00",
+    "log": "/private/tmp/p0-20-candidate-production-types-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "candidate-normal-static",
+    "cmd": "python3 -c 'import subprocess,sys; commands=[\"check:freeze\",\"check:architecture-boundaries\",\"check:counts\",\"check:docs-drift\",\"check:clean-source\",\"check:api-ref\"]; statuses=[]; [(print(\"RUN \"+c,flush=True),statuses.append(subprocess.run([\"npm\",\"run\",c]).returncode)) for c in commands]; print(statuses); sys.exit(any(statuses))'",
+    "exit": 0,
+    "durationMs": 57483,
+    "startedUtc": "2026-10-14T20:11:32.502953+00:00",
+    "log": "/private/tmp/p0-20-candidate-normal-static-20261015.log",
+    "sourceHead": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe"
+  },
+  {
+    "name": "final-source-duplicates",
+    "cmd": "npm run check:duplicates",
+    "exit": 1,
+    "durationMs": 2488,
+    "startedUtc": "2026-10-14T20:13:10.700739+00:00",
+    "log": "/private/tmp/p0-20-final-source-duplicates-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "final-source-dead-code",
+    "cmd": "npm run check:dead-code",
+    "exit": 1,
+    "durationMs": 6799,
+    "startedUtc": "2026-10-14T20:13:10.700737+00:00",
+    "log": "/private/tmp/p0-20-final-source-dead-code-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "final-bounded-node22",
+    "cmd": "npx vitest run tests/industryPackAudit.test.ts tests/auditBinderComplianceMaps.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts tests/industryPackAuditSigningQualification.test.ts tests/industryPackAuditReaderQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-20-final-bounded-node22-20261015.json",
+    "exit": 0,
+    "durationMs": 10526,
+    "startedUtc": "2026-10-14T20:13:10.700775+00:00",
+    "log": "/private/tmp/p0-20-final-bounded-node22-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "final-test-types",
+    "cmd": "npm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 40686,
+    "startedUtc": "2026-10-14T20:13:10.701627+00:00",
+    "log": "/private/tmp/p0-20-final-test-types-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "proposal-private-baseline",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/two-trusted-observer.mjs baseline",
+    "exit": 1,
+    "durationMs": 2033,
+    "startedUtc": "2026-10-14T20:16:19.992367+00:00",
+    "log": "/private/tmp/p0-20-proposal-private-baseline-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "proposal-private-candidate",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-harness.mjs",
+    "exit": 1,
+    "durationMs": 114,
+    "startedUtc": "2026-10-14T20:17:11.491681+00:00",
+    "log": "/private/tmp/p0-20-proposal-private-candidate-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "proposal-private-candidate-ready",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-harness.mjs",
+    "exit": 0,
+    "durationMs": 10920,
+    "startedUtc": "2026-10-14T20:18:16.922920+00:00",
+    "log": "/private/tmp/p0-20-proposal-private-candidate-ready-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  {
+    "name": "proposal-private-restored",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/two-trusted-observer.mjs restored",
+    "exit": 1,
+    "durationMs": 1759,
+    "startedUtc": "2026-10-14T20:19:25.979319+00:00",
+    "log": "/private/tmp/p0-20-proposal-private-restored-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  }
+]

@@ -1,0 +1,176 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-08",
+  "date": "2026-10-20",
+  "commit": "f6e80b150c57d53b746fcb34238bc7e6dd95f9da",
+  "branch": "codex/p2-08-publication-final",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 31341
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 26445
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 40481
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3002
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 721
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 367
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 1632
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 455
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1659
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 197
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 166
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 562
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 285
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 1076
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 400
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 0,
+      "durationMs": 863
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 2476
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 382
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 203
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 58909
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 608
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3190
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 179
+    },
+    {
+      "cmd": "npm run -s audit:runtime",
+      "exit": 0,
+      "durationMs": 743
+    },
+    {
+      "cmd": "npm run -s check:third-party-notices",
+      "exit": 0,
+      "durationMs": 162
+    },
+    {
+      "cmd": "npm run -s check:packed-install",
+      "exit": 0,
+      "durationMs": 66285
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/keys/pkcs11Softhsm.test.ts --maxWorkers=1 --reporter=verbose --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-softhsm-v4/vitest.json",
+      "exit": 0,
+      "durationMs": 665
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "checks.json",
+      "sha256": "c062f42b3112f922a750a6e79eb15c3f612b631938cdc60da6e3407164083a8f"
+    },
+    {
+      "path": "acceptance-matrix.json",
+      "sha256": "86f037dab3bcfa82d3fe2da62ab3f1a565abfe94904d18632473e4d46b12e079"
+    },
+    {
+      "path": "mutation-results.json",
+      "sha256": "b1613c7a368dfadf4eb1dd49d80a6950107e2571ac5e05986051052065e02310"
+    },
+    {
+      "path": "input-pins.json",
+      "sha256": "330f175596661724ef06da2137b8c38a28d65ac4eef1dccdb74086c2c86f6cf0"
+    },
+    {
+      "path": "README.md",
+      "sha256": "da6588ae0a6f43ddb07674bb2dc47a66b047db7c1cbcfb36a724cc1336a26fc5"
+    },
+    {
+      "path": "BLOCKERS.md",
+      "sha256": "e65c389f51d55eb034f22895c4392d547376f71a1f23919a8d82f1807326716d"
+    }
+  ],
+  "notes": "Actual clean unchanged product-H23 required checks and3 extras exit0; separate local software-token3passed. The full suite is PENDING on a future metadata-only Q; tests is null. Both focused captures are incomplete and supply no final totals or coverage credit. Actual final-Q reporter membership/eligibility and every failure must be audited before any local landing. Technical owner dependencies, unsupported migrations, matrix currency, external resources and the home incident remain explicit in sidecars. Local macOS arm64, not CI. Exact API4/index7 are applied; other reservations remain held. Historical withdrawn mutation credit is not restored; no unique aggregate or all-AC/full-pass claim."
+}

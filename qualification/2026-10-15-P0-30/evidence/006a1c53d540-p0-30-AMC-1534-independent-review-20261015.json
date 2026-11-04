@@ -1,0 +1,971 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1534",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "capturedUtc": "2026-10-15T02:24:15.954252+00:00",
+  "scope": "Independent read-only audit of the frozen ORIGINAL native25 matrices and separate original CLI 9 context. This review executed no AMC imports, tests, parser, compiler, build, network or Git commands. Only this report pair was written.",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "findings": [],
+  "inputReceipts": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+      "bytes": 15816,
+      "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.md",
+      "bytes": 4591,
+      "sha256": "033079965c79589f11ecd435a9b06f8e380f017a4f4ac6208bea8f88e7d2b7c3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/artifact-index.json",
+      "bytes": 558115,
+      "sha256": "7c594d01e2cf509681d6c703570a831fc33ae0c8129d7cc9382cfeda2812eda0"
+    }
+  ],
+  "rawAndControllerVerification": {
+    "inputReceipts": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+        "bytes": 15816,
+        "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.md",
+        "bytes": 4591,
+        "sha256": "033079965c79589f11ecd435a9b06f8e380f017a4f4ac6208bea8f88e7d2b7c3"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/artifact-index.json",
+        "bytes": 558115,
+        "sha256": "7c594d01e2cf509681d6c703570a831fc33ae0c8129d7cc9382cfeda2812eda0"
+      }
+    ],
+    "artifactReferences": 2331,
+    "uniqueArtifactPaths": 2331,
+    "allIndexedBytesExact": true,
+    "frozenJournal": {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 15928,
+      "sha256": "d7ef95d508d69e6a8ed81700cacea42885d8978dc7cef9096ff49a4e11c53512"
+    },
+    "frozenCommandCount": 11,
+    "corpusProcesses": 8,
+    "repeatedCaseExecutions": 184,
+    "nativeDistinctRegisteredCaseNames": 25,
+    "separateCLIRegistered": 9,
+    "phases": [
+      {
+        "phase": "unchanged-original-native-budget-baseline",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/unchanged-original-native-budget-baseline/raw-tests.json",
+          "bytes": 11408,
+          "sha256": "1ae69a769b5371cc1e27144eda3fa9e2933a6f2fcfe39c3b782fb614ee75398b"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/unchanged-original-native-budget-baseline/command.json",
+          "bytes": 1739,
+          "sha256": "340a85d3e4bdf4a7618a3a5201124df9decbd7f9d96a8b034210d66e9a12faee"
+        },
+        "registered": 25,
+        "passed": 25,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 8198,
+        "failures": [],
+        "sameOrderedOriginalCases": true,
+        "originalCommandAndEnvironmentExact": true
+      },
+      {
+        "phase": "separate-original-cli-agent-loop-context",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/separate-original-cli-agent-loop-context/raw-tests.json",
+          "bytes": 4218,
+          "sha256": "eca812acd63245a789bac6df7db6c07bdb6f5a833804bb5efdc396ac2aa71782"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/separate-original-cli-agent-loop-context/command.json",
+          "bytes": 1740,
+          "sha256": "3b9a6da27451bae70198fe1e746ebcee0dc62ee90e255a953fbe7ec9387c79eb"
+        },
+        "registered": 9,
+        "passed": 9,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 9169,
+        "failures": [],
+        "sameOrderedOriginalCases": true,
+        "originalCommandAndEnvironmentExact": true
+      },
+      {
+        "phase": "P30-1534-budget-compare-baseline",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-baseline/raw-tests.json",
+          "bytes": 11395,
+          "sha256": "9b1eab11b113ed22f94d7249b703207f38cad62f3f0a8d0ec7f2d4c1fa136af6"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-baseline/command.json",
+          "bytes": 1676,
+          "sha256": "e17df2bf648e46bed1aa324de37773b6b4c6a04e83bc1de903c09a99d2a2f80e"
+        },
+        "registered": 25,
+        "passed": 25,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 8239,
+        "failures": [],
+        "sameOrderedOriginalCases": true,
+        "originalCommandAndEnvironmentExact": true
+      },
+      {
+        "phase": "P30-1534-budget-compare-mutant",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/raw-tests.json",
+          "bytes": 12190,
+          "sha256": "f934fc4b6452e3078445b1f152881011576f7be70deeca3a1e2f93a41be44236"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/command.json",
+          "bytes": 1666,
+          "sha256": "1c469e83734fedbcda81dd2626dbd1198a29bba3f4e6d1d2a1144d9269617bc4"
+        },
+        "registered": 25,
+        "passed": 23,
+        "failed": 2,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 8246,
+        "failures": [
+          {
+            "name": "AMC-1534 native budget admissions and signed accounting counts one executed audit per call, separates denials and failures, and blocks at the exact class cap",
+            "firstLine": "AssertionError: expected undefined to be 'budgets' // Object.is equality",
+            "typePrefix": "AssertionError",
+            "locations": [
+              "tests/nativeBudgets.test.ts:217:70"
+            ],
+            "fullFailureMessageSha256": "3ed8562c15755183c5fe3f0b21b7b494e59200d7d3d291fa6bdd91fceb9e62fc",
+            "retainedTrace": {
+              "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/raw-tests.json",
+              "bytes": 12190,
+              "sha256": "f934fc4b6452e3078445b1f152881011576f7be70deeca3a1e2f93a41be44236"
+            }
+          },
+          {
+            "name": "AMC-1534 native budget admissions and signed accounting missing final recording retains a pending reservation instead of freeing the final tool slot",
+            "firstLine": "AssertionError: expected undefined to be 'budgets' // Object.is equality",
+            "typePrefix": "AssertionError",
+            "locations": [
+              "tests/nativeBudgets.test.ts:232:70"
+            ],
+            "fullFailureMessageSha256": "03e0f2094168287126251018190ef557d8e5d4cab80ce2ed8f06f77a0999ff4e",
+            "retainedTrace": {
+              "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-mutant/raw-tests.json",
+              "bytes": 12190,
+              "sha256": "f934fc4b6452e3078445b1f152881011576f7be70deeca3a1e2f93a41be44236"
+            }
+          }
+        ],
+        "sameOrderedOriginalCases": true,
+        "originalCommandAndEnvironmentExact": true
+      },
+      {
+        "phase": "P30-1534-budget-compare-restored",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-restored/raw-tests.json",
+          "bytes": 11403,
+          "sha256": "e0f2e7cc771e39eb47274000527a379420c3b5e6b65135072e161996178a93a8"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-budget-compare-restored/command.json",
+          "bytes": 1676,
+          "sha256": "cad3eb18d6b45cf108e263d9524765158fd3a8f0a46e1049425bb483bda8d80d"
+        },
+        "registered": 25,
+        "passed": 25,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 8217,
+        "failures": [],
+        "sameOrderedOriginalCases": true,
+        "originalCommandAndEnvironmentExact": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-baseline",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-baseline/raw-tests.json",
+          "bytes": 11412,
+          "sha256": "7134fda4b1b7208430c46012255ca88479932c96a9170dd24e6a2f400acad6e5"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-baseline/command.json",
+          "bytes": 1676,
+          "sha256": "5b17fe4645ba87dc4810233090f82a3609026a91daabec18e2f0f88736a8c44c"
+        },
+        "registered": 25,
+        "passed": 25,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 8149,
+        "failures": [],
+        "sameOrderedOriginalCases": true,
+        "originalCommandAndEnvironmentExact": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-mutant",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-mutant/raw-tests.json",
+          "bytes": 11404,
+          "sha256": "3e1a0744b3ece7e99e5cc6cc55583d98145e5ba79b3239d477ed61ed6f20fe11"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-mutant/command.json",
+          "bytes": 1662,
+          "sha256": "9cf0c788c32d7afbacb508e5f99d6739b91a1eb71f6f122c442555f4e02355e9"
+        },
+        "registered": 25,
+        "passed": 25,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 8143,
+        "failures": [],
+        "sameOrderedOriginalCases": true,
+        "originalCommandAndEnvironmentExact": true
+      },
+      {
+        "phase": "P30-1534-no-transaction-restored",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-restored/raw-tests.json",
+          "bytes": 11395,
+          "sha256": "95f2220ec3ff9986fe335fe81ea6dffeff42c1693237f00f0f79252f50303516"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/phases/P30-1534-no-transaction-restored/command.json",
+          "bytes": 1676,
+          "sha256": "209f18cb586fcfdfbd78fa49200dc9db2de8a08ba9544ffdca6ecae2400ce9fd"
+        },
+        "registered": 25,
+        "passed": 25,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "durationMs": 8205,
+        "failures": [],
+        "sameOrderedOriginalCases": true,
+        "originalCommandAndEnvironmentExact": true
+      }
+    ],
+    "mutations": [
+      {
+        "id": "P30-1534-budget-compare",
+        "sourceTarget": "src/budgets/nativeBudgetAdmission.ts",
+        "sourceBeforeSha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db",
+        "sourceMutantSha256": "552e02347c42665d7662266f2b1ac5e6311ff8e4c1a9ab6b792c833448249f8b",
+        "sourceFindOccurrences": 1,
+        "compiledAnchorOccurrences": 1,
+        "patch": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare.patch",
+          "bytes": 685,
+          "sha256": "78d9889b4ed8971c2059ecfac0b5394e3268e564e9977a771c1a832c3fcb87a6"
+        },
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-budget-compare-mutant-source.ts",
+          "bytes": 5577,
+          "sha256": "552e02347c42665d7662266f2b1ac5e6311ff8e4c1a9ab6b792c833448249f8b"
+        },
+        "exactOnlyTargetManifestDelta": true,
+        "fullRestorationExact": true,
+        "compiledBytesNeverChanged": true,
+        "counts": [
+          25,
+          23,
+          25
+        ]
+      },
+      {
+        "id": "P30-1534-no-transaction",
+        "sourceTarget": "src/budgets/nativeBudgetAdmission.ts",
+        "sourceBeforeSha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db",
+        "sourceMutantSha256": "2bbfda574cf689e5aacb62de9387a3a34dcfb6a924761cf99d5ff535de23fce1",
+        "sourceFindOccurrences": 1,
+        "compiledAnchorOccurrences": 1,
+        "patch": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction.patch",
+          "bytes": 576,
+          "sha256": "799d378af1ba70c4bb9c51ea5d9171f057200c36bf9d993c0d716a035770de18"
+        },
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/P30-1534-no-transaction-mutant-source.ts",
+          "bytes": 5617,
+          "sha256": "2bbfda574cf689e5aacb62de9387a3a34dcfb6a924761cf99d5ff535de23fce1"
+        },
+        "exactOnlyTargetManifestDelta": true,
+        "fullRestorationExact": true,
+        "compiledBytesNeverChanged": true,
+        "counts": [
+          25,
+          25,
+          25
+        ]
+      }
+    ],
+    "launcherFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "rootHeadRetained": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "retainedRootStatusClean": true,
+    "allRawErrorsClassified": true,
+    "normalSourceModeWithoutAdaptersOrCompile": true,
+    "setupReleaseBeforeExecution": true
+  },
+  "independentMeaning": [
+    {
+      "id": "P30-1534-budget-compare",
+      "observedPassed": [
+        25,
+        23,
+        25
+      ],
+      "classification": "Two direct original expected-budget-refusal assertion failures under the exact comparison delta.",
+      "actualFailureLines": [
+        217,
+        232
+      ],
+      "expected": "budgets",
+      "actual": "undefined",
+      "previousHealthyAssertionsPassed": [
+        216,
+        231
+      ],
+      "sourceEvidence": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/budgets/nativeBudgetAdmission.ts",
+          "lines": [
+            39,
+            42
+          ],
+          "meaning": "The comparison includes executed and pending READ_ONLY slots; the private mutant compares that sum with Infinity."
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/tools/guards/policyGuards.ts",
+          "lines": [
+            77,
+            80
+          ],
+          "meaning": "The actual budgets guard calls reserveNativeToolBudget with the current signed native session."
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/tools/toolPipeline.ts",
+          "lines": [
+            412,
+            424
+          ],
+          "meaning": "The original nonjournaled pipeline returns the registered guard label before the body."
+        }
+      ],
+      "maskedAfter217": "Later failed-body and fixture-denial calls at 218\u2013219, accounting snapshot220 and totals/body assertions221\u2013224 are not reached in the mutant.",
+      "maskedAfter232": "Accounting snapshot233, usage totals234, body count235 and reservation seal239 are not reached in the mutant.",
+      "effectLimit": "The raw failures observe undefined denied.guardLabel. No second tool-body execution, later mutant accounting/seal value or generic refusal cause is invented. Intact baseline/restoration exercise the remaining criteria."
+    },
+    {
+      "id": "P30-1534-no-transaction",
+      "observedPassed": [
+        25,
+        25,
+        25
+      ],
+      "classification": "Original-corpus survivor caused by missing independent cross-process admission coverage; not equivalence.",
+      "sourceEvidence": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/tests/nativeBudgets.test.ts",
+          "lines": [
+            199,
+            209
+          ],
+          "meaning": "Both sessions run in one JavaScript process; transport overlap starts after synchronous reservation."
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/llm/adapter/llmRuntime.ts",
+          "lines": [
+            333,
+            350
+          ],
+          "meaning": "reserveNativeModelBudget runs synchronously at 337 before the awaited transport at 350."
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/tests/nativeBudgets.test.ts",
+          "lines": [
+            307,
+            319
+          ],
+          "meaning": "The rollback case constructs its own unmutated ledger transaction and does not call native reserve."
+        }
+      ],
+      "missingWitness": "No independent process contender or barrier forces overlapping read/check/reserve in this original 25-case corpus. The removed outer wrapper is therefore not causally isolated by the passing overlap/rollback titles."
+    }
+  ],
+  "counting": {
+    "nativeOriginal": {
+      "singleRegistrations": 18,
+      "protocolTableRows": 3,
+      "postAdmissionDispositionRows": 4,
+      "actualRegistered": 25,
+      "distinctRenderedCaseNames": 25
+    },
+    "separateCLIOriginal": 9,
+    "corpusProcesses": 8,
+    "repeatedCaseExecutions": 184,
+    "nativeMatricesUseOnlyOriginal25": true,
+    "sameOrderedOriginalNamesAcrossAllSevenNativeRuns": true,
+    "historical26AndHeld27RemainDistinct": true,
+    "freshFixtureBoundary": "Original generators and criteria are identical per phase, but workspaces, local key pairs, row IDs and timestamps are freshly generated; no same-physical-row assertion."
+  },
+  "preservation": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "privateCompleteRegularFiles": 12268,
+    "newCasesStaged": 0,
+    "initialRootManifest": {
+      "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+      "bytes": 1449771,
+      "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+    },
+    "allRootExpectedSourceCompiledBytesAndRootCompiledPathSetDirectlyVerifiedExact": true,
+    "privateFullPathSetAndAllBytesDirectlyVerifiedExact": true,
+    "allCopiedRegularFileInodesDistinctFromRoot": true,
+    "preparedAndFinalManifestsExact": true,
+    "sourceModeMutantsOnlyOneTSPathEach": true,
+    "allMutantManifestsDifferOnlyByExactReproducedNativeBudgetAdmissionTS": true,
+    "allRestoredManifestsExact": true,
+    "allCompiledBytesNeverChanged": true,
+    "pinGroups": [
+      {
+        "group": "protected-pins",
+        "count": 203,
+        "before": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/protected-pins-before.json",
+          "bytes": 44513,
+          "sha256": "929b63a73e91659a200313892f8639582350b3f96e87c080ea0b4e61252e2157"
+        },
+        "after": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/protected-pins-after.json",
+          "bytes": 44513,
+          "sha256": "929b63a73e91659a200313892f8639582350b3f96e87c080ea0b4e61252e2157"
+        },
+        "allCurrentBytesAndBeforeAfterDirectlyVerifiedExact": true
+      },
+      {
+        "group": "runtime-input-pins",
+        "count": 3,
+        "before": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/runtime-input-pins-before.json",
+          "bytes": 582,
+          "sha256": "35d6190aff7e98b9342b3b11292effb0b0b01e19255465a07f2ecd63dad421f8"
+        },
+        "after": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/runtime-input-pins-after.json",
+          "bytes": 582,
+          "sha256": "35d6190aff7e98b9342b3b11292effb0b0b01e19255465a07f2ecd63dad421f8"
+        },
+        "allCurrentBytesAndBeforeAfterDirectlyVerifiedExact": true
+      },
+      {
+        "group": "prior-reference-pins",
+        "count": 2182,
+        "before": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prior-reference-pins-before.json",
+          "bytes": 502174,
+          "sha256": "838cf97390b29679e8a70abd96dfcac52ee9e75b5c178538e007b059c3be66fe"
+        },
+        "after": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prior-reference-pins-after.json",
+          "bytes": 502174,
+          "sha256": "838cf97390b29679e8a70abd96dfcac52ee9e75b5c178538e007b059c3be66fe"
+        },
+        "allCurrentBytesAndBeforeAfterDirectlyVerifiedExact": true
+      }
+    ],
+    "priorClosureCount": 12,
+    "priorClosures": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/full-closure-final.json",
+          "bytes": 1399887,
+          "sha256": "299b0969cccf57ccf3b1b7f1c3a7763366d190e889786f42b8b0881f55de0228"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/full-closure-final.json",
+          "bytes": 1399899,
+          "sha256": "dda63cf4e8b307c8297550cb97a0ff4fd6510321c4cd160e0a35317bc723d4d9"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      }
+    ],
+    "allTwelvePriorActualClosurePathSetsAndListedBytesDirectlyVerifiedExact": true,
+    "dependencyResolverLinks": 307,
+    "allResolverTargetsDirectlyVerifiedExact": true,
+    "privateViteAndViteTempAreOrdinaryDirectories": true,
+    "nativePhysicalIdentityDirectlyVerifiedExact": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "missingHeldWorkerRemainsAbsentInRootAndPrivateCopy": true,
+    "retainedRootGitHead": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "retainedRootGitStatusClean": true,
+    "reviewRanGit": false
+  },
+  "guardsAndExecution": {
+    "sourceModeOriginalRelativeImportsUnadapted": true,
+    "normalVitestConfigAndGlobalPerFileGuardsUnchanged": true,
+    "originalTestTimeoutMs": 30000,
+    "testProcessesRunAloneOneWorkerNoFileParallelism": true,
+    "dualDefaultAndJSONReporters": true,
+    "noCompilerBuildOrDistMutation": true,
+    "allRawCommandCopiesAndFrozenJournalRowsExact": true,
+    "allEightCommandsHaveNoExecutionErrorSignalOrPendingTodo": true,
+    "launcherFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "launchEnvironment": "Exactly the recorded allowlist PATH/HOME/AMC_HOME/TMPDIR/NO_COLOR/TZ/LANG/NODE_ENV. Each phase has private 0700 HOME and TMPDIR; no inherited provider credential environment. Tests retain their original local fixture credential behavior.",
+    "workerFingerprintLimit": "The fingerprint is from the current launcher process. Commands name the same Node executable, but original test workers do not directly print Node version or ABI."
+  },
+  "lifecycleAndAuthorityLimits": [
+    "Original afterEach catches and suppresses SessionService.close errors at tests/nativeBudgets.test.ts36 and removes the fixture37. A successful test does not prove every pooled connection physically closed.",
+    "Separate CLI 9 uses in-process Commander plus keyless stub provider/custom tool seams; its cwd restore and original cancellation timer remain unchanged. It is not a packaged installed binary, cold child or either guard mutation corpus.",
+    "Actual local signed budget configuration, monitor/auditor histories, native session ownership, reservation journals, evidence hashes/signatures/envelopes and seals are exercised; provider bytes and custom tool bodies are fixtures. Local producer authority does not establish external identity or provider truth.",
+    "Known model cost remains a subtotal of reported cost, not a hard price oracle. readBudgetEvents reads local monitor history without an independently pre-recorded external trust anchor; deleting evidence and its lifecycle together is outside the asserted detection guarantee.",
+    "This original 25-case lane neither stages nor executes the held worker, race draft or separate v2 proposal. Later independent static review/staging is not an input or result of this packet.",
+    "No cross-process atomicity, whole-cold interval, prior mixed-parent corruption cause/repair, notary runtime, current full batch, Node24, full suite, coverage, hosted/G0/release, tracker Done or dependency closure is qualified. Generic held-scope absence is not transfer clearance."
+  ],
+  "precisionNotes": [
+    {
+      "field": "controls[].provenance",
+      "retainedWording": "Exact recovered historical recipe; current source-mode runtime not yet executed.",
+      "interpretation": "This is copied readiness recipe-origin wording. Actual adjacent retained counts, raw files and eleven-command frozen journal establish that eight corpus processes did execute in this packet; it must not be used as a current runtime-status claim. Producer bytes are preserved."
+    },
+    {
+      "field": "measurementLimits / original scope exclusions",
+      "interpretation": "The unreviewed race draft wording describes the original packet scope. Subsequent independent static review or separate v2 staging does not retroactively change original 25-case inputs."
+    }
+  ],
+  "graphNavigation": {
+    "existingFrozenReadiness": {
+      "path": "/private/tmp/p0-30-AMC-1534-1529-readiness-20261015.json",
+      "bytes": 56763,
+      "sha256": "3cc6413c0cbf95ace45833b67e01c67b980bf17a946f54f5633466c36a9a5bd4"
+    },
+    "scope": "Existing stale graph navigation evidence was reused before direct source checks. No graph refresh/query/server was run; direct current source and pinned closure bytes provide proof."
+  },
+  "sourcePins": [
+    {
+      "relativePath": "tests/nativeBudgets.test.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/tests/nativeBudgets.test.ts",
+        "bytes": 22957,
+        "sha256": "62f8aa98b6dd62d0b699107a7794ff906245e964d8d954963dae49bafdbb64c0"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/nativeBudgets.test.ts",
+        "bytes": 22957,
+        "sha256": "62f8aa98b6dd62d0b699107a7794ff906245e964d8d954963dae49bafdbb64c0"
+      }
+    },
+    {
+      "relativePath": "tests/cliAgentLoopCommands.test.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/tests/cliAgentLoopCommands.test.ts",
+        "bytes": 16872,
+        "sha256": "e80e6f8bfee373a97a02330f63d8c9f5cfc30d86e3603ac32ee7a0a4cf02d1ef"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/cliAgentLoopCommands.test.ts",
+        "bytes": 16872,
+        "sha256": "e80e6f8bfee373a97a02330f63d8c9f5cfc30d86e3603ac32ee7a0a4cf02d1ef"
+      }
+    },
+    {
+      "relativePath": "tests/helpers/llmStubUpstream.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/tests/helpers/llmStubUpstream.ts",
+        "bytes": 4815,
+        "sha256": "6d50b22b356de4447ead7826c55af66e0d68d2f581eeafd121a1a84f7fa6bc00"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/helpers/llmStubUpstream.ts",
+        "bytes": 4815,
+        "sha256": "6d50b22b356de4447ead7826c55af66e0d68d2f581eeafd121a1a84f7fa6bc00"
+      }
+    },
+    {
+      "relativePath": "tests/helpers/trustContext.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/tests/helpers/trustContext.ts",
+        "bytes": 4280,
+        "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/helpers/trustContext.ts",
+        "bytes": 4280,
+        "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+      }
+    },
+    {
+      "relativePath": "src/budgets/nativeBudgetAdmission.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/budgets/nativeBudgetAdmission.ts",
+        "bytes": 5574,
+        "sha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/budgets/nativeBudgetAdmission.ts",
+        "bytes": 5574,
+        "sha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db"
+      }
+    },
+    {
+      "relativePath": "src/budgets/nativeBudgetUsage.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/budgets/nativeBudgetUsage.ts",
+        "bytes": 17516,
+        "sha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/budgets/nativeBudgetUsage.ts",
+        "bytes": 17516,
+        "sha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980"
+      }
+    },
+    {
+      "relativePath": "src/budgets/budgets.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/budgets/budgets.ts",
+        "bytes": 10695,
+        "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/budgets/budgets.ts",
+        "bytes": 10695,
+        "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+      }
+    },
+    {
+      "relativePath": "src/tools/guards/policyGuards.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/tools/guards/policyGuards.ts",
+        "bytes": 10949,
+        "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/tools/guards/policyGuards.ts",
+        "bytes": 10949,
+        "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658"
+      }
+    },
+    {
+      "relativePath": "src/tools/toolPipeline.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/tools/toolPipeline.ts",
+        "bytes": 29435,
+        "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+        "bytes": 29435,
+        "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794"
+      }
+    },
+    {
+      "relativePath": "src/llm/adapter/llmRuntime.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/src/llm/adapter/llmRuntime.ts",
+        "bytes": 22504,
+        "sha256": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/llm/adapter/llmRuntime.ts",
+        "bytes": 22504,
+        "sha256": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c"
+      }
+    },
+    {
+      "relativePath": "vitest.config.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      }
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      }
+    },
+    {
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      }
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "private": {
+        "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/closure/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      "root": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      }
+    }
+  ],
+  "metadataPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/controller.py",
+      "bytes": 10163,
+      "sha256": "ab75a72593fbb3550191811d9b61d98ebbb660c9b3b402ba72e2d046898aa479"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prepare.py",
+      "bytes": 8752,
+      "sha256": "a73ce9fbcd37ce24cdfecbdb9ba83a840d06b00b10691e02c698c31b9af61648"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/finalize.py",
+      "bytes": 17415,
+      "sha256": "5244711f8dd8729bdf128972a9813c54d4d788c98ac1bca224e9625a13dc1e71"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/recipes.json",
+      "bytes": 7508,
+      "sha256": "441b05f44034f3272f7e229d81183a7405686e53711e52c10c5741667994b1bb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/root-runtime-release.json",
+      "bytes": 1621,
+      "sha256": "cec6200060398ea2e3889e90174fe9c28a05a37f016b11aec9757e43a9016ca1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/case-status-inventory.json",
+      "bytes": 45009,
+      "sha256": "7cdda8c26a475cafc4b0f178288ef3e7ad9cc6b77e7ba3fb2fbc08a327ac16e6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/semantic-classification.json",
+      "bytes": 8670,
+      "sha256": "77d17735024c91ea602e5e8be970da4af5803a6f121aa750dd6a2c11a83f09cb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/analyst-notes.json",
+      "bytes": 2134,
+      "sha256": "ddb40b699d29c40c07a36646366c4fe725f43ba0ae9335bba728c3a3725c4cb4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/full-closure-prepared.json",
+      "bytes": 1399777,
+      "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/root-tracked-before.json",
+      "bytes": 914595,
+      "sha256": "93b780b8024ed47e494b7b8aad80bdb72664965f45b64c83755bcacebf6f74ef"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/compiled-original.json",
+      "bytes": 462540,
+      "sha256": "82ff86751e49686db52385c53bac4a2c7ef010a2034745289731d4e6d4ac7598"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prior-closures-prepared.json",
+      "bytes": 3342,
+      "sha256": "6e8bd7e3e561cb3a17230377fef9169013326d7dd86bb87969e85f652e51d17f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/prior-closures-final.json",
+      "bytes": 3640,
+      "sha256": "1e38d494f75612dc2d5fb5ccb6e3f0ded05c437844a9c15c6a4fb8bae6f2096e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/native-before.json",
+      "bytes": 457,
+      "sha256": "2ecb3371892b7c627be792d3aadf31d3e138c657b834d73777be7d527406fb26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/dependency-links.json",
+      "bytes": 102832,
+      "sha256": "acaa51e552d00686949ef6a3b20be7b8a1d6b6afab5b1893da15a1d4d87d6d17"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/bounded-static-subreview.json",
+      "bytes": 1113,
+      "sha256": "aebba4a3b590be5a1b75abdc482422e6c98096dd95cf945636a88089a9f3c939"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/preparation-navigation-note.json",
+      "bytes": 464,
+      "sha256": "c4f9aef91843151da2e4bdd216b7bb8b6ad123924c515275339614015406b5c9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/setup-prepared.json",
+      "bytes": 6840,
+      "sha256": "870eb2eb11d73aadebda2e7bb169aa561deb7c26b820523bb842f9e3f76bbc37"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/setup-prepared.md",
+      "bytes": 2386,
+      "sha256": "2bf39d9bbcb0352c5f793f0327dc4398c6cafa4f7396943b1a39d8652e320bc5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 537965,
+      "sha256": "944282561f3bc53619512c4b5d572f4c32c41fc78f201a59548cead0ba238c3f"
+    }
+  ],
+  "reviewObserverCorrection": "A read-only schema-inspection command initially treated prior-closures-final.json as a list and stopped with a Python slicing error. The object.closures schema was then inspected and every actual prior closure was verified successfully; no product/runtime input or result was changed.",
+  "allReadsFinished": true,
+  "producerOrSourceOrPriorPacketWrites": 0,
+  "productImports": 0,
+  "testReruns": 0,
+  "parserCompilerBuildRuns": 0,
+  "networkRuns": 0,
+  "gitRuns": 0
+}

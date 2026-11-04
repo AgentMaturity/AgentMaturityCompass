@@ -1,0 +1,140 @@
+{
+  "scope": "Separate historical and compatibility probes; never aggregate them as unique guards or ordinary test totals.",
+  "historicalFrozenMetadata": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/qualification/2026-10-20-P2-27-landing/mutation-results.json",
+    "sha256": "0b588c5d31b83d7c878a892516e17ea3a8edb418f87458f7f7efa082bca9ec9b",
+    "bytes": 2617
+  },
+  "historicalSets": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/calibration-and-capture-guard-mutations-measured-index-v1.json",
+      "sha256": "10db65145c6f122d6bcfcf2381c910872332296b1d396e87b2ab3c1fa8eab18a",
+      "bytes": 19415
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/judge-response-security-mutations-v1/index.json",
+      "sha256": "35657b76311c50db1343a668394583432461e0bd34ebb148cd2dae1c816615e2",
+      "bytes": 7231
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-core-native-guard-mutations-measured-v1/index.json",
+      "sha256": "528baa46c70a63fff4ff2c22ac305809fd31326afc36a49abc7bc386b46f7c10",
+      "bytes": 73903
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-final-corrections-guard-mutations-measured-v2/index.json",
+      "sha256": "8c2a4aabb288ca6349560dd2aa98eb4e24b2ad99ee30bdb73046b70bac70ce9d",
+      "bytes": 38436
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/cli-truth-mutations-native-expectation-adjudication-v1.json",
+      "sha256": "70c2663f2ba855261d1d020ba541cc443c04b933fdf59908ee28e162a8cdf026",
+      "bytes": 9682
+    }
+  ],
+  "historicalCaveats": [
+    "M16 survived one removed guard because another guard retained refusal.",
+    "CLI mutation adjudication distinguishes branded AssertionError rows from native rejects expectation failures."
+  ],
+  "newCompatibilityProbes": [
+    {
+      "id": "V25-C01",
+      "target": "src/claims/evidenceProvenance.ts",
+      "originalSha256": "9227e5d034665d2d4acb508875dd2fa1dc820f6271c5efb476657812557b7e87",
+      "mutantSha256": "0d74825c45cc00b2fe5ce3c191b58210ea0326a60e7a7c6274a494b647512012",
+      "nativeExitCode": 1,
+      "nativeTotals": {
+        "numTotalTests": 93,
+        "numPassedTests": 86,
+        "numFailedTests": 7,
+        "numPendingTests": 0
+      },
+      "killedByNativeAssertion": true,
+      "restoredSha256": "9227e5d034665d2d4acb508875dd2fa1dc820f6271c5efb476657812557b7e87",
+      "byteRestored": true,
+      "summary": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/mutation-v25-c01-v1/summary.json",
+        "sha256": "fdc290fadf540ed8965340bbc1e71e21e82a842383eb8588d9f0b23c232f728d",
+        "bytes": 120755
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/mutation-v25-c01-v1/report.json",
+        "sha256": "1c802044ddaf45a5dcd59bc842c513c27812201e75ff71133390152dfd50ba1a",
+        "bytes": 39164
+      }
+    },
+    {
+      "id": "V25-C02",
+      "target": "src/catalog/compiler/compile.ts",
+      "originalSha256": "54a14c33eafcb987f01066cc80429ecfd5bbade26fb08eaa4c0253dd49d77709",
+      "mutantSha256": "01ec632ee114c166706b281365cb09e16f40c607246633371d32eb00801f21b5",
+      "nativeExitCode": 1,
+      "nativeTotals": {
+        "numTotalTests": 17,
+        "numPassedTests": 14,
+        "numFailedTests": 3,
+        "numPendingTests": 0
+      },
+      "killedByNativeAssertion": true,
+      "restoredSha256": "54a14c33eafcb987f01066cc80429ecfd5bbade26fb08eaa4c0253dd49d77709",
+      "byteRestored": true,
+      "summary": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/mutation-v25-c02-v1/summary.json",
+        "sha256": "45afe4ebf420e88736cb528570a3238c7b1263566d264bb17894e7766dae686a",
+        "bytes": 121288
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/mutation-v25-c02-v1/report.json",
+        "sha256": "0f019c2b14ec76247242a84977af9eaa053ac3f953a0a01e326a7cd854bd450f",
+        "bytes": 11852
+      }
+    },
+    {
+      "id": "C03-EXAMPLE-TARGET",
+      "target": "examples/regulated-industries/lib/runStation.mjs",
+      "originalSha256": "35b92f0c59bb32daa50943187d2a8df7f7ab47ac2bb420d71209d61174de043e",
+      "mutantSha256": "239547a5d06f4d0bf39f51e733a4554cf26d1cbade469a2f71f6e8b865ac13f5",
+      "nativeExitCode": 1,
+      "nativeTotals": {
+        "numTotalTests": 6,
+        "numPassedTests": 3,
+        "numFailedTests": 3,
+        "numPendingTests": 0
+      },
+      "killedByNativeAssertion": true,
+      "restoredSha256": "35b92f0c59bb32daa50943187d2a8df7f7ab47ac2bb420d71209d61174de043e",
+      "byteRestored": true,
+      "summary": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/mutation-c03-example-target-v1/summary.json",
+        "sha256": "7f36ccc0edf2ef62a5afa6b8dda86119153a8deaa5a2695375a34bc54cc1cfc9",
+        "bytes": 120729
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/mutation-c03-example-target-v1/report.json",
+        "sha256": "35e45e6b73acf80d3fda0b95f1f49f44a68ccfc0eae2672f2f93f7c7f3af14c1",
+        "bytes": 8007
+      }
+    }
+  ],
+  "newNativeIndex": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/native-compatibility-guard-mutations-v1/index.json",
+    "sha256": "04f65c43a28d8cb51c32a600f0f9818a4e2fc038bffec71cbcefdf0a26953ec9",
+    "bytes": 29890
+  },
+  "independentReview": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/native-compatibility-guard-mutations-independent-review-v1.json",
+    "sha256": "c64c51518f0c749ad1a32c7db87652b00b8a727583128dcc7cd23ecbf2672365",
+    "bytes": 61735
+  },
+  "restoredNativeRun": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/post-mutation-native-six-file-green-v1/summary.json",
+    "sha256": "04d82f430bc0ccccfc27ad476f6485306636c426062c21998062de0a2b12f5ac",
+    "bytes": 121001
+  },
+  "precision": [
+    "C01 parameter rows fail their first producer-classification assertion; the distinct diagnostic gate assertion demonstrates downstream exclusion.",
+    "C02 fails actual evidencePlan.tests inclusion after declaration and applicability assertions pass.",
+    "C03 reports each station assurance-gate expected exit 2, got 0; workflow exit 1 is the assertion wrapper.",
+    "Development RED/GREEN and mutations ran on Q2 with working compatibility edits. Their byte-equivalence to committed H3 is recorded; their runtime HEAD is not relabelled."
+  ]
+}

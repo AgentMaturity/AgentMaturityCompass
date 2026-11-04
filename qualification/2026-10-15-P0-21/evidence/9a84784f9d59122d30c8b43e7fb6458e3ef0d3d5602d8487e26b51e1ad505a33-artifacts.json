@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/classification.json",
+    "bytes": 3630,
+    "sha256": "a576f8035cf15973897cd82a204e762872bc0185e5b4da1c014c26545c4ee5f4"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/command.json",
+    "bytes": 1929,
+    "sha256": "8e8ecd4b9a6e7cf5ae6628d295da3052a702cb629587118c4f8430d751ebbcd8"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/inputs-after.json",
+    "bytes": 858,
+    "sha256": "9b5765b79f88f8f8c8c706e26d8faa675906d3f23fe7ce5f9ad81f5b7dddc111"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/inputs-before.json",
+    "bytes": 858,
+    "sha256": "d9bf7407323409ab0ba6eea30b95f0d5362fd5a6dd78f0ecb233c2e1a919e13e"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/observer.json",
+    "bytes": 22391,
+    "sha256": "ab34fc2f841cf8c00795d86693dca093691df226677f026720dceb53d879d892"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "08b75e5d70eba1c7a3781658403283ba135b33dc5b813009a629b4a7bb8dcae6"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/owned-process.json",
+    "bytes": 1554,
+    "sha256": "3674bc1723d26c2022754d66c4e076507e21a967e9de8f8d1585ad6c9a1ad977"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/raw.json",
+    "bytes": 14719,
+    "sha256": "6f8526baa3d30e3626e944bcdfbe14950c37766df78120d2ff759af047e3dba2"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/stdout-stderr.log",
+    "bytes": 1714,
+    "sha256": "0bf44734138613f567d917132ad61e46fb338475289748a8bb870d3286234035"
+  }
+]

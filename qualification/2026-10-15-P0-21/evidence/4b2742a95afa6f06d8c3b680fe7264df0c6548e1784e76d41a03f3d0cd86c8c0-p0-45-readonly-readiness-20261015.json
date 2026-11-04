@@ -1,0 +1,955 @@
+{
+  "schemaVersion": "amc.readonly-readiness/v1",
+  "capturedUtc": "2026-10-15T05:05:43.627211+00:00",
+  "key": "P0-45",
+  "state": "Conditional next-lane preparation only; not started or qualified",
+  "allReadsFinished": true,
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+    "head": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "branch": "refs/heads/codex/p0-21-current-qualification",
+    "headBasis": "Read existing .git pointer, worktree HEAD and shared branch ref as text; no Git command or Git mutation.",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "productionSourceComparison": {
+      "manifest": {
+        "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+        "bytes": 1449771,
+        "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+      },
+      "expectedFiles": 2371,
+      "actualFiles": 2371,
+      "changedOrExtra": [],
+      "missing": [],
+      "all2371CurrentSrcFilesByteIdentical": true
+    },
+    "scope": "The f58 anchor contains earlier qualification packets. Production src remains source58; no new product runtime follows from this static comparison. No full active P0-21 tree or mutable causal package was audited."
+  },
+  "planOrdering": {
+    "authority": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "bytes": 25110,
+        "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+        "matchesFrozenRouting": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "bytes": 38227,
+        "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+        "matchesFrozenRouting": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "bytes": 78486,
+        "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+        "matchesFrozenRouting": true
+      },
+      {
+        "path": "/Users/sid/Downloads/A4 · Forge.md",
+        "bytes": 47286,
+        "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+        "matchesFrozenRouting": true
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+        "matchesFrozenRouting": true
+      }
+    ],
+    "routing": {
+      "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.json",
+      "bytes": 23914,
+      "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+    },
+    "priorReadiness": {
+      "path": "/private/tmp/p0-21-readonly-readiness-v2-20261015.json",
+      "bytes": 63104,
+      "sha256": "0d6d0d47b68c29cc60c2c5d430f6c4f3ed8e7157514b4462bc7686530b35d348"
+    },
+    "P025PostcommitHandoff": {
+      "path": "/private/tmp/p0-25-canonical-postcommit-handoff-20261015.json",
+      "bytes": 3756,
+      "sha256": "fc1d63929ab12b7cced3a9d8d85cec562b44e775193fd3b64de9b3561dcc40cb"
+    },
+    "selectionRule": {
+      "source": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "lines": [
+        170,
+        176
+      ],
+      "order": [
+        "earliest open gate",
+        "Urgent before High before Medium/Low",
+        "earlier due date",
+        "longest dependent chain among ties"
+      ]
+    },
+    "candidate": {
+      "key": "P0-45",
+      "gate": "G0",
+      "epic": "E03",
+      "priority": "High",
+      "due": "2026-10-22",
+      "route": "Agent-Doable",
+      "listedBlockers": [],
+      "blocks": [
+        "GATE-G0"
+      ]
+    },
+    "directEvidence": [
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "lines": [
+          55,
+          69
+        ]
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "lines": [
+          197,
+          211
+        ]
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "lines": [
+          209,
+          262
+        ]
+      }
+    ],
+    "conditionalRecommendation": "After root completes or hands off bounded P0-21, recheck current decisions, source and ownership and select P0-45 existing-source qualification before later High P0-11 (25 Oct), P0-26 and P0-28 (28 Oct). This is not activation or authorization to edit shared production paths.",
+    "retainedRouting": "The earlier handled/skipped/bounded keys and unresolved Urgent, release, credential, A4 and quality lanes remain as recorded in the frozen post-P025 routing. Do not reopen them merely because whole-program proof remains absent. Preserve the explicit user skip of P0-29.",
+    "statusLimit": "Issues.md historical Done is dated implementation status, not current qualification, dependency closure, acceptance or authority."
+  },
+  "graphNavigation": {
+    "graph": {
+      "path": "/private/tmp/p0-52-graph-navigation-w8xr443v/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    },
+    "sourceAnchor": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "freshness": "Stale relative to f58/source58. Existing graph is navigation only.",
+    "query": "graphify query 'verifyRepair planVerifyRepair applyVerifyRepair quarantine' --budget 1600",
+    "cwd": "/private/tmp/p0-52-graph-navigation-w8xr443v",
+    "exitCode": 0,
+    "result": "72 nodes found; 56 shown; 16 truncated. Generic claims/shield quarantine nodes did not locate the current repair seam. Direct source imports and hashes supply the proof below.",
+    "versions": "Existing navigation records pin graphifyy 0.9.56 for refresh compatibility; installed read-only query tool is 0.9.74. No refresh, install, extraction, watch or server occurred."
+  },
+  "ownershipAndFreeze": {
+    "reservation": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "evidence": [
+      {
+        "lines": [
+          379,
+          395
+        ],
+        "meaning": "P2-01 scope explicitly keeps src/ledger/verifyRepair.ts untouched; the repair wrapper alone was the legal-hold registry integration seam. This is historical coordination, not a new release."
+      },
+      {
+        "lines": [
+          1239,
+          1239
+        ],
+        "meaning": "trustConfig.ts (P0-45) and signer.ts deferred in that historical scope."
+      },
+      {
+        "lines": [
+          1494,
+          1507
+        ],
+        "meaning": "Generic Agent-Doable reservations and retained Codex/A4 lanes remain; absence of a named current P0-45 worker gives no production transfer clearance."
+      },
+      {
+        "lines": [
+          1580,
+          1616
+        ],
+        "meaning": "Shared CLI coordination, held pending-main/A4 ownership and residency/P2-02 boundaries remain."
+      }
+    ],
+    "D15": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "bytes": 3052,
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0"
+    },
+    "existingP045Snapshot": {
+      "livePath": "src/trust/trustConfig.ts",
+      "archivePath": "unused-code/plan-edits/P0-45/src/trust/trustConfig.ts.landed",
+      "baseCommit": "2a5d632588f5c198785aedf229a801ad0178938d",
+      "archiveSha256": "d7ea83f8f45ab725b8dc2fb026da48d058b62670941fb9f622b79e3c7e7c39d9",
+      "manifestLines": [
+        363,
+        368
+      ],
+      "archiveHashVerified": true
+    },
+    "permittedNextScope": "Only a later explicitly released, isolated qualification of existing source. No held source, missing tests, exceptions, snapshots, release baseline or D15 archive is transferred or changed by this report. Any concrete production repair needs exact ownership and ordinary freeze checks first.",
+    "inheritedQuality": "Required duplicate1269/dead-code2751 debt remains unwaived as pinned in P0-21 readiness and the post-P025 route. No new quality observation was run here; no release-green claim."
+  },
+  "recoveredSpec": {
+    "pin": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-45.md",
+      "bytes": 16932,
+      "sha256": "0eac6a814d32339c3b8db9f506db7db1c79644158bb2197d33f4919bd028a7dd"
+    },
+    "historicalBasis": "Spec describes deleting behavior at old main8f57, not the current candidate. Use its acceptance as a requirement, not a current failure.",
+    "requiredBehavior": "Diagnose and plan by default; explicit apply plus confirmation; fail closed on unknown/active holds and trust-root/signing/plan-change checks; rename the complete failing store into timestamped quarantine; leave reports and every original byte reachable; sign a REPAIR_RECEIPT and show archive/interruption notes.",
+    "scopeLimit": "P2-01 global holds, P0-37 rotation, P1-08 purpose/lifecycle, P0-135 migration and doctor-fix are adjacent or excluded. P0-31 installed release acceptance remains separate.",
+    "commandsAreNotExecuted": true
+  },
+  "actualFlow": [
+    {
+      "step": "CLI dispatch",
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/cli.ts",
+        "firstLine": 6222,
+        "lastLine": 6239
+      },
+      "meaning": "--repair dispatches runVerifyRepair with apply/yes/optional expected-monitor. --apply or --yes alone is refused. The adjacent explicit --sign-config and relabel modes are separate effects; do not call the entire verify command universally read-only. Current verify action has no evidence rmSync/unlinkSync."
+    },
+    {
+      "step": "Read-only plan",
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+        "firstLine": 46,
+        "lastLine": 104
+      },
+      "meaning": "verifyLedgerIntegrity errors are classified. Only failed evidence-chain verification without ledger_missing chooses archive. Planned files are existing SQLite ledger/WAL/SHM, all blob files and JSONL logs selected by the JSONL marker; reports are excluded."
+    },
+    {
+      "step": "Verifier and backend",
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+        "firstLine": 657,
+        "lastLine": 740
+      },
+      "meaning": "Expected monitor pin is compared first; SQLite opens readonly only when its file exists, otherwise missing non-JSONL ledger fails. Alternate-backend verification handles JSONL; verification does not initialize a missing SQLite store. A stale comment says sessions/*.jsonl, while actual repair and JSONL implementation use .amc/jsonl."
+    },
+    {
+      "step": "Confirmation and holds",
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/cli-verify-repair.ts",
+        "firstLine": 16,
+        "lastLine": 88
+      },
+      "meaning": "Non-TTY apply without yes returns2 before apply. workspaceLegalHolds maps current registry held/clear/unknown to active/none/unknown, with errors unknown. REPAIR_RECEIPT uses signDigestWithPolicy, not a local stub in the real CLI."
+    },
+    {
+      "step": "Current empty-registry compatibility",
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/residency/legalHoldRegistry.ts",
+          "firstLine": 125,
+          "lastLine": 143
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/residency/legalHoldRegistry.ts",
+          "firstLine": 182,
+          "lastLine": 238
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/residency/legalHoldRegistry.ts",
+          "firstLine": 278,
+          "lastLine": 294
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/lifecycle/signedControlJournal.ts",
+          "firstLine": 319,
+          "lastLine": 340
+        }
+      ],
+      "meaning": "For an unregulated fixture with no rows, HEAD, journal checkpoint or pin, missing HEAD is allowed and clear can carry warning head_missing_unregulated. Regulated missing HEAD, invalid records or uncertain registry remain unknown. This is current source behavior, not a new policy waiver or a runtime result."
+    },
+    {
+      "step": "Admission before moves",
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+        "firstLine": 163,
+        "lastLine": 197
+      },
+      "meaning": "Action, trust-root, legal holds, every planned file digest and an initial signing preflight are checked before quarantine creation. The plan intent is written before any rename."
+    },
+    {
+      "step": "Moves and final receipt",
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+        "firstLine": 111,
+        "lastLine": 155
+      },
+      "meaning": "Each planned file is renamed; a failed rename rolls moved entries back in reverse order. Successful rollback removes only its repair intent and empty directories. A rollback failure reports the stuck paths; no evidence delete path is used."
+    },
+    {
+      "step": "Post-move phase",
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+        "firstLine": 198,
+        "lastLine": 232
+      },
+      "meaning": "Moved bytes are checked, then the receipt is signed in a second signer call and its signature/receipt written atomically per file. Failure after moves can leave an interrupted quarantine; archivedStores lists receipt/intent existence, not verified receipt authenticity."
+    },
+    {
+      "step": "Signing kind and local verifier",
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/crypto/signing/signerTypes.ts",
+          "firstLine": 1,
+          "lastLine": 19
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/trust/trustConfig.ts",
+          "firstLine": 41,
+          "lastLine": 60
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/crypto/signing/signer.ts",
+          "firstLine": 157,
+          "lastLine": 215
+        }
+      ],
+      "meaning": "Both 17-element signing-kind lists match exactly and include REPAIR_RECEIPT. Policy chooses local vault or notary. verifySignedDigest consults local auditor key history; CLI fixture coverage is not an independently pinned external issuer or trusted-time proof."
+    }
+  ],
+  "corpus": {
+    "registrationBasis": "Direct source declarations and literal parameter arrays only; no TypeScript parser, test collector or product import executed. Future raw registration/outcome records supersede these static expectations.",
+    "minimalPrimaryFiles": [
+      "tests/verifyRepair.test.ts",
+      "tests/verifyRepairCli.test.ts"
+    ],
+    "primaryStaticRegistrations": 17,
+    "coreStaticRegistrations": 12,
+    "builtCliStaticRegistrations": 5,
+    "verifierCompanionStaticRegistrations": 14,
+    "specFocusedFourFileStaticRegistrations": 31,
+    "files": [
+      {
+        "file": "tests/verifyRepair.test.ts",
+        "staticRegistrations": 12,
+        "mode": "Source imports, real temporary writer and verifier, injected hold callback and stub signer; namespace fs mock permits only the rename-failure spy.",
+        "expansion": "12 direct it declarations.",
+        "declarations": [
+          {
+            "line": 106,
+            "declaration": "it(\"plans nothing for a healthy store and apply moves nothing\", () => {"
+          },
+          {
+            "line": 118,
+            "declaration": "it(\"leaves evidence alone when only a signed config failed\", () => {"
+          },
+          {
+            "line": 131,
+            "declaration": "it(\"counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature\", () => {"
+          },
+          {
+            "line": 151,
+            "declaration": "it(\"counts a missing blob and keeps the ledger in plan mode\", () => {"
+          },
+          {
+            "line": 172,
+            "declaration": "it(\"moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone\", () => {"
+          },
+          {
+            "line": 201,
+            "declaration": "it(\"refuses when the legal hold state is unknown, and moves nothing\", () => {"
+          },
+          {
+            "line": 211,
+            "declaration": "it(\"refuses when the hold check itself throws\", () => {"
+          },
+          {
+            "line": 219,
+            "declaration": "it(\"refuses under an active hold and names it\", () => {"
+          },
+          {
+            "line": 228,
+            "declaration": "it(\"refuses when the monitor key does not match the expected fingerprint\", () => {"
+          },
+          {
+            "line": 239,
+            "declaration": "it(\"refuses before any move when signing fails\", () => {"
+          },
+          {
+            "line": 248,
+            "declaration": "it(\"refuses when a planned file changed after the plan\", () => {"
+          },
+          {
+            "line": 257,
+            "declaration": "it(\"puts moved files back when a rename fails part way\", () => {"
+          }
+        ],
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "bytes": 13875,
+          "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+        }
+      },
+      {
+        "file": "tests/verifyRepairCli.test.ts",
+        "staticRegistrations": 5,
+        "mode": "Source fixture parent plus real subprocess process.execPath dist/cli.js. This is a mixed source-parent/built-CLI corpus, not pure source execution.",
+        "expansion": "5 direct it declarations.",
+        "declarations": [
+          {
+            "line": 73,
+            "declaration": "it(\"changes nothing on a healthy workspace and exits 0\", () => {"
+          },
+          {
+            "line": 82,
+            "declaration": "it(\"prints a plan for a tampered workspace, exits 1 and changes nothing\", () => {"
+          },
+          {
+            "line": 94,
+            "declaration": "it(\"refuses --apply without a TTY or --yes, exits 2 and moves nothing\", () => {"
+          },
+          {
+            "line": 104,
+            "declaration": "it(\"archives a tampered store with --apply --yes under a receipt signed as REPAIR_RECEIPT\", () => {"
+          },
+          {
+            "line": 142,
+            "declaration": "it(\"no longer recommends cleaning and rebuilding when every signature fails\", () => {"
+          }
+        ],
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+          "bytes": 8093,
+          "sha256": "4491c817f7910b54a53eeede711577c04d5de86423966f076161865c590642fd"
+        }
+      },
+      {
+        "file": "tests/ledgerVerifySeparation.test.ts",
+        "staticRegistrations": 4,
+        "mode": "Source imports, same-process writer/verification separation.",
+        "expansion": "4 direct it declarations.",
+        "declarations": [
+          {
+            "line": 26,
+            "declaration": "it(\"a clean workspace passes both halves\", async () => {"
+          },
+          {
+            "line": 35,
+            "declaration": "it(\"a broken gateway config does not report the evidence chain as failed\", async () => {"
+          },
+          {
+            "line": 62,
+            "declaration": "it(\"a rewritten evidence event does fail the chain half\", async () => {"
+          },
+          {
+            "line": 94,
+            "declaration": "it(\"still reports the whole set of errors in one list\", async () => {"
+          }
+        ],
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerifySeparation.test.ts",
+          "bytes": 4311,
+          "sha256": "9f4bd6c1e007f9cc0539b4dd9725d69a704d589e19bc7d0eb0b023052db0114f"
+        }
+      },
+      {
+        "file": "tests/ledgerVerificationReadOnly.test.ts",
+        "staticRegistrations": 10,
+        "mode": "Source imports plus original cold Node --import tsx source-ledger children for six parameterized vault cases.",
+        "expansion": "2 current/legacy rows + 4 failure rows + 4 direct tests = 10 registrations.",
+        "declarations": [
+          {
+            "line": 74,
+            "declaration": "test.each([\"current\", \"legacy\"] as const)(\"cold-process %s vault verification reads encrypted evidence without trust mutations\", (format) => {"
+          },
+          {
+            "line": 90,
+            "declaration": "test.each([\"missing-passphrase\", \"wrong-passphrase\", \"missing-vault\", \"corrupt-vault\"] as const)("
+          },
+          {
+            "line": 106,
+            "declaration": "test(\"public-only ledger verification preserves the supplied trust anchors without creating a vault\", async () => {"
+          },
+          {
+            "line": 140,
+            "declaration": "test(\"JSONL-only verification checks signed rows without creating a SQLite ledger\", () => {"
+          },
+          {
+            "line": 165,
+            "declaration": "test(\"a JSONL backend marker without its event log is not verified evidence\", () => {"
+          },
+          {
+            "line": 177,
+            "declaration": "test(\"verification cannot initialize a missing ledger into an apparently valid empty workspace\", () => {"
+          }
+        ],
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+          "bytes": 9057,
+          "sha256": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96"
+        }
+      }
+    ],
+    "notAdditionalCases": "Loops over file maps, moves and receipt entries are assertions inside registered cases, not additional tests."
+  },
+  "meaningAndLifecycle": [
+    {
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "firstLine": 16,
+          "lastLine": 49
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "firstLine": 87,
+          "lastLine": 100
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "firstLine": 257,
+          "lastLine": 273
+        }
+      ],
+      "meaning": "The core uses real initialized encrypted evidence and closed writers/pools, a fake signer, injected hold verdicts, and a narrowly scoped rename spy. This preserves the original test seam; it does not qualify real registry or cryptographic receipt admission by itself."
+    },
+    {
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+        "firstLine": 18,
+        "lastLine": 69
+      },
+      "meaning": "The companion really runs built dist/cli.js in each temporary fixture. It inherits process.env, supplies isolated AMC_HOME and passphrase fallback, deletes expected-monitor/passphrase-file variables, uses non-TTY empty input and60s spawnSync timeout. It drops child.error/signal/PID from its returned shape; normal outer observations are still required. No allowlisted or secret-free environment claim follows."
+    },
+    {
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+        "firstLine": 104,
+        "lastLine": 137
+      },
+      "meaning": "Apply case first checks status0, then byte reachability/report retention, product signature verification and altered-byte refusal, then later archive note. A failure at status109 masks every later property. Signature checks use the local product verifier and workspace history, not retained offline replay proof or independent pre-artifact external pins."
+    },
+    {
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+        "firstLine": 30,
+        "lastLine": 103
+      },
+      "meaning": "Six cold Node/tsx vault cases assert output/status and disk hashes/mtime/mode excluding WAL/SHM. The parent closes ledger handles but not all pools; these are cold verifier readers against finished event production, not universal detached-pool or WAL immutability proof."
+    },
+    {
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerifySeparation.test.ts",
+          "firstLine": 16,
+          "lastLine": 23
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+          "firstLine": 16,
+          "lastLine": 27
+        }
+      ],
+      "meaning": "Original separation/read-only cleanup removes temporary roots without an explicit global pool close. Do not silently add cleanup, change helpers or recast them as fully ended native processes."
+    },
+    {
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "firstLine": 55,
+          "lastLine": 65
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+          "firstLine": 49,
+          "lastLine": 56
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+          "firstLine": 30,
+          "lastLine": 38
+        }
+      ],
+      "meaning": "Core planning comparisons omit SQLite sidecars in some checks; CLI and read-only disk snapshots omit WAL/SHM. Byte maps do not cover ACLs, extended attributes, permissions everywhere, live-writer behavior or crash recovery."
+    },
+    {
+      "evidence": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/vitest.config.ts",
+        "firstLine": 3,
+        "lastLine": 10
+      },
+      "meaning": "Normal Vitest timeout is30s; unchanged CLI spawn timeout is60s and readonly child timeout30s. Preserve all original deadlines; a later timeout/hook/teardown/transport/setup failure is incomplete infrastructure evidence, never a causal kill."
+    }
+  ],
+  "coverageGapsAndCausalPreparation": [
+    {
+      "key": "late-signing",
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+          "firstLine": 188,
+          "lastLine": 190
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+          "firstLine": 198,
+          "lastLine": 216
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "firstLine": 239,
+          "lastLine": 245
+        }
+      ],
+      "status": "Untested source path, not a measured failure",
+      "meaning": "Existing sign-failure test throws on the first preflight. A second signing failure can occur after successful moves and leave only the intent. CLI/README shorthand that signing unavailable means nothing moved must not be generalized to this later path."
+    },
+    {
+      "key": "active-writer-and-crash",
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "firstLine": 43,
+          "lastLine": 47
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+          "firstLine": 32,
+          "lastLine": 35
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+          "firstLine": 163,
+          "lastLine": 216
+        }
+      ],
+      "status": "Unqualified",
+      "meaning": "Repair fixtures deliberately finish writers and close pools. No explicit open-writer detection, crash-atomic multi-file publish, live WAL boundary, lock race, rollback-failure or post-move signer/write failure experiment exists in the selected corpus."
+    },
+    {
+      "key": "jsonl-repair",
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+          "firstLine": 77,
+          "lastLine": 83
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+          "firstLine": 140,
+          "lastLine": 174
+        }
+      ],
+      "status": "Unqualified by selected repair cases",
+      "meaning": "Readonly JSONL verification is covered statically by companion cases, but no existing primary case applies repair to a damaged JSONL workspace or establishes complete JSONL quarantine byte reachability."
+    },
+    {
+      "key": "registry-and-tty",
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "firstLine": 201,
+          "lastLine": 225
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+          "firstLine": 94,
+          "lastLine": 109
+        }
+      ],
+      "status": "Coverage boundary",
+      "meaning": "Core unknown/active/throw hold cases are injected callbacks. CLI tests cover absent-empty unregulated registry and non-TTY refusal, not genuine active/unknown signed registry scenarios or interactive typed confirmation. No hold-registry source adoption is needed to run the originals."
+    },
+    {
+      "key": "rename-invariant",
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "firstLine": 78,
+          "lastLine": 84
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+          "firstLine": 257,
+          "lastLine": 273
+        }
+      ],
+      "status": "Historical mutation instruction requires concrete future design",
+      "meaning": "Every-byte reachability alone cannot distinguish faithful copy-plus-delete from rename. The EXDEV spy separately depends on the rename path. No mutation was authored/executed, no current kill claimed, and the old spec recipe is not treated as a recovered exact executable recipe."
+    },
+    {
+      "key": "path-and-listing",
+      "evidence": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+          "firstLine": 68,
+          "lastLine": 83
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+          "firstLine": 182,
+          "lastLine": 185
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+          "firstLine": 221,
+          "lastLine": 232
+        }
+      ],
+      "status": "Outside these fixtures",
+      "meaning": "Selected cases do not establish hostile symlink/forged-plan containment, arbitrary path safety or authenticated archived-store listing. Core expects its own plan producer; file stat traversal and existence-only listing are not broader security proof."
+    }
+  ],
+  "staticGuardCandidates": [
+    {
+      "candidate": "unknown-hold",
+      "sourceExpression": "if (hold.state === \"unknown\")",
+      "sourceOccurrences": 1,
+      "compiledOccurrences": 1,
+      "sourceLine": 180,
+      "authority": "Static matching proposal only. No recipe file, mutation, compile or execution was authored or performed. Private exact-delta design still needs root release and review."
+    },
+    {
+      "candidate": "active-hold",
+      "sourceExpression": "if (hold.state === \"active\")",
+      "sourceOccurrences": 1,
+      "compiledOccurrences": 1,
+      "sourceLine": 181,
+      "authority": "Static matching proposal only. No recipe file, mutation, compile or execution was authored or performed. Private exact-delta design still needs root release and review."
+    },
+    {
+      "candidate": "changed-plan",
+      "sourceExpression": "if (current !== file.sha256)",
+      "sourceOccurrences": 1,
+      "compiledOccurrences": 1,
+      "sourceLine": 184,
+      "authority": "Static matching proposal only. No recipe file, mutation, compile or execution was authored or performed. Private exact-delta design still needs root release and review."
+    }
+  ],
+  "minimalRuntimePlanAfterSeparateRootRelease": [
+    "Do not start while P0-21 is active. After its bounded handoff, recheck exact source/plan/reservations, prepare an independently owned isolated P0-45 worktree/copy and review controller/setup. Preserve all source, original tests, helpers, config, guards, frozen snapshots, signing and held source. No such copy or setup was created here.",
+    "Use existing qualified Node/pnpm/native provenance only after measuring the actual process in the new lane. Run normal install/build and freeze prerequisites under root-approved scope; package build has prebuild clean and the normal test script has pretest build. Do not skip lifecycle scripts or rebuild shared readers in place.",
+    "Collect original core12 unchanged as source-mode baseline. Run original CLI5 separately from repository cwd so resolve(dist/cli.js) uses the actual built candidate; preserve its source-parent/built-child distinction. Optionally run the spec companions4 and10 unchanged in separate explicitly named phases. Expect17 primary and31 across four files; retain actual raw registered names/counts, not assumed totals.",
+    "Use the normal Vitest configuration, all workspace guards and original deadlines. Retain file/suite/hook/unhandled/reporter/global-teardown and late outer diagnostics, expected normal exits and owned process-group completion. Missing child observations or timeouts are incomplete; do not use nonzero alone as a kill or infer individual child signals from outer completion.",
+    "Only after fresh passing baselines, root can commission a minimal exact private source-mode hold/plan guard BMR with one reviewed delta and unchanged criteria. Source and built CLI routes require explicit separate target/build provenance; a TS-only guard change cannot qualify a restored built CLI. No recipe, mutator, new test or additional runtime is authorized by this readiness.",
+    "Preserve all original and prior packet bytes, full source/dist/native/guard closures, every exact restoration and ordinary freeze checks. New source defects or uncovered acceptance require a separate bounded decision, not weakening assertions, changing baselines, copying held fixes or declaring the original tests comprehensive.",
+    "Keep full suite, typecheck/types/lint, source-quality debt, hosted CI, Node24, installed release P0-31 and formal P0-45/GATE-G0 acceptance separate. Current historical Done and source existence do not close them."
+  ],
+  "docsAndCompatibility": {
+    "README": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/README.md",
+      "firstLine": 207,
+      "lastLine": 216
+    },
+    "changeset": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/.changeset/verify-repair-no-delete.md",
+      "bytes": 1024,
+      "sha256": "8e5a10f57356cddbfa61ea9dc7564c650edd1b9b40cefdf48b0b721cc6ad320a"
+    },
+    "meaning": "Current docs describe plan/apply/refusal/quarantine/receipt/recovery and warn against old deleting releases. They are source documentation; no old release was executed or new operator deployment approved. Preserve narrower source comments for post-move interruptions."
+  },
+  "directPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+      "bytes": 11157,
+      "sha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/cli-verify-repair.ts",
+      "bytes": 5880,
+      "sha256": "20e5b6082fe37009c29faf2b6d87eeb7564d0e18aced9d3b8e5989f468c25af4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/retentionVerification.ts",
+      "bytes": 6187,
+      "sha256": "bf7273bffd721cd6cc1441112c966ee56c79f01d7ca8d9cc28cb489f5551ce54"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/persistence/openSessionEventStore.ts",
+      "bytes": 4197,
+      "sha256": "6acc86f7b20c0fd13ec20600bb8aba44c3ffaf0b5fdee22abf41327d061a8970"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/residency/legalHoldRegistry.ts",
+      "bytes": 31030,
+      "sha256": "51bd8e494515a6a3f7825d9e72a621702acd3fd12b1a212e55bd2c6e437cd315"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/lifecycle/signedControlJournal.ts",
+      "bytes": 28916,
+      "sha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/crypto/signing/signer.ts",
+      "bytes": 7862,
+      "sha256": "88579bba0833ce86dd3fcfac8ea6ccf068772b4a5273ef7bc7b87b1c77a2ef09"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/crypto/signing/signerTypes.ts",
+      "bytes": 864,
+      "sha256": "577fab774422f8644262f94bd725e81acf90f5eb2daccfe4f53dabfe3bb37068"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/trust/trustConfig.ts",
+      "bytes": 14297,
+      "sha256": "db12a1f2f64c7feb2e23d0a2a2cdc6793ba4f93287df5d41dce41ca89ab730f6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/workspace.ts",
+      "bytes": 27587,
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+      "bytes": 13875,
+      "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+      "bytes": 8093,
+      "sha256": "4491c817f7910b54a53eeede711577c04d5de86423966f076161865c590642fd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerifySeparation.test.ts",
+      "bytes": 4311,
+      "sha256": "9f4bd6c1e007f9cc0539b4dd9725d69a704d589e19bc7d0eb0b023052db0114f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+      "bytes": 9057,
+      "sha256": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "7392b86cc5e6cf87af92844ccdb26f8f3c2624f15395c103943b5d4c1883d571"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/.changeset/verify-repair-no-delete.md",
+      "bytes": 1024,
+      "sha256": "8e5a10f57356cddbfa61ea9dc7564c650edd1b9b40cefdf48b0b721cc6ad320a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18181,
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/unused-code/plan-edits/P0-45/src/trust/trustConfig.ts.landed",
+      "bytes": 14201,
+      "sha256": "d7ea83f8f45ab725b8dc2fb026da48d058b62670941fb9f622b79e3c7e7c39d9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/cli.js",
+      "bytes": 1054087,
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/cli-verify-repair.js",
+      "bytes": 5969,
+      "sha256": "e54fc251be8750ea4e48770b3c589f8ab25f9c4fc641a55342aeab54af1f44a1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/ledger/verifyRepair.js",
+      "bytes": 9833,
+      "sha256": "1f1b870fe18fbb61800c4a0334a375b5c860f1e5beabc3ba1b31a3cdfd040e80"
+    }
+  ],
+  "referencePins": [
+    {
+      "path": "/private/tmp/p0-21-readonly-readiness-v2-20261015.json",
+      "bytes": 63104,
+      "sha256": "0d6d0d47b68c29cc60c2c5d430f6c4f3ed8e7157514b4462bc7686530b35d348"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.json",
+      "bytes": 23914,
+      "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+    },
+    {
+      "path": "/private/tmp/p0-25-canonical-postcommit-handoff-20261015.json",
+      "bytes": 3756,
+      "sha256": "fc1d63929ab12b7cced3a9d8d85cec562b44e775193fd3b64de9b3561dcc40cb"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-45.md",
+      "bytes": 16932,
+      "sha256": "0eac6a814d32339c3b8db9f506db7db1c79644158bb2197d33f4919bd028a7dd"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "bytes": 3052,
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+      "bytes": 1449771,
+      "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+    },
+    {
+      "path": "/private/tmp/p0-52-graph-navigation-w8xr443v/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    }
+  ],
+  "limits": [
+    "Only this new private JSON/Markdown pair was written. No repository/source/old artifact/Git mutation, product copy, runtime/import/parser/compiler/test/build/install/listener/network/product CLI or tracker/Claude message occurred. One read-only existing-graph query was used for navigation.",
+    "Root reports current P0-21 baselines core37/CLI14/consumers48 and normal checks0, with bounded causal preparation pending. This report neither re-verifies those active inputs nor treats P0-21 as Done.",
+    "No current P0-45 test outcomes, mutation kills, formal acceptance, legal/expert truth, external identity, trusted time, Node24, hosted CI, release-green, whole-store crash atomicity or production source clearance is claimed."
+  ],
+  "nextLane": "P0-45 is the conditional next existing-source qualification lane after bounded P0-21, subject to root recheck and release. It has not started."
+}

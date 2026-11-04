@@ -1,0 +1,37 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts (135 tests | 1 failed | 134 skipped) 31ms
+     × L1-TECH-07/negative/oracle-nis2-late.json: executes its synthetic byte, clock or device oracle 14ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > L1-TECH-07/negative/oracle-nis2-late.json: executes its synthetic byte, clock or device oracle
+AssertionError: expected { result: 'pass', …(1) } to deeply equal { result: 'fail', …(1) }
+
+- Expected
++ Received
+
+  {
+-   "reasonCode": "warning_late",
+-   "result": "fail",
++   "reasonCode": "warning_on_time",
++   "result": "pass",
+  }
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:83:72
+     81|       const spec = fixture.envelope.setup.technologyOracle as Technolo…
+     82|       const result = runTechnologyOracle(spec);
+     83|       expect({ result: result.result, reasonCode: result.reasonCode })…
+       |                                                                        ^
+     84|       expect(result.claimKind).toBe("synthetic_example");
+     85|       if (spec.kind === "iot") {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 134 skipped (135)
+   Start at  15:25:43
+   Duration  7.79s (transform 4.97s, setup 126ms, import 7.25s, tests 31ms, environment 0ms)
+

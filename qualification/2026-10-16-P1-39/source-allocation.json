@@ -1,0 +1,50 @@
+{
+  "schema": "p139-root-typed-outcome-source-allocation/1",
+  "at": "2026-10-16T15:23:50.607476+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceHead": "81758acea6c861a00a27f48475a93a79307a29d5",
+  "exactWritePaths": [
+    "src/mcp/nativeMcpClient.ts",
+    "src/tools/toolTypes.ts",
+    "src/tools/toolPipeline.ts",
+    "src/agent/pipelineToolSeam.ts"
+  ],
+  "reason": "Actual strict session-result assertion342 failed ERROR vsTOOL_OUTCOME_UNKNOWN; repair existing typed effect carrier only.",
+  "authority": "User authorized fixing remaining plan failures while preserving Claude work. Apply only exact hunks outside retained Claude P1-78 deltas, under current no-overlap evidence; no blanket ownership release or Claude checkout mutation.",
+  "rootRead": "Full patch, README, corrected review-v2, both authored Claude diffs, exact current source seams and actual red output.",
+  "concretePinsVerified": 581,
+  "noMandatoryExactPathNotifyFound": true,
+  "d15": "none",
+  "freeze": {
+    "cli": 1236,
+    "inventory": 1236,
+    "packs": 41,
+    "questions": 632
+  },
+  "hostedWip": 0,
+  "dependabotExcludedOnlyFromWip": 13,
+  "changedPathOverlapIncludingBots": [],
+  "preconditions": [
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/typed-unknown-repair-proposal/seal-v2.json",
+      "bytes": 3272,
+      "sha256": "a8564017067c85bc240d3a13fc9711dc7cf05d68872dd2edbc56d8b3743f1b52"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/stateless-three-case-outcome.json",
+      "bytes": 25177,
+      "sha256": "7fb48d38d373cdaf69b981b8b2c7256dd24db1e1b71aa6445437f5c9498b44e5"
+    },
+    {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/hosted-typed-outcome-admission.json",
+      "bytes": 11015,
+      "sha256": "9857fc17a28b57ef648c689d811911b15c1e1e11ce2c15aee78137097b529b0b"
+    }
+  ],
+  "scopeLimits": "No transport/guard/baseline/deadline/manifest/archive/held-decision/test assertion change. Cancellation and journal precedence retained; no full acceptance claim.",
+  "patch": {
+    "path": "/private/tmp/p1-39-mcp-qualification-20261016/typed-unknown-repair-proposal/typed-unknown-repair.patch",
+    "bytes": 3141,
+    "sha256": "81e5d4008fb49ec1143b86a35989647e88d203f32d9c9b0bdc6b9a5132ee98a2"
+  }
+}

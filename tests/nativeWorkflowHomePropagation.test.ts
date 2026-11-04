@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -9,6 +9,11 @@ import { prepareSkillTurn } from "../src/skills/skillTurn.js";
 // This is a composition regression, not a real PTY, provider or signed-session
 // acceptance. The child is simulated; its actual emitted argv selects the real
 // filesystem skill resolver so dropping --credentials-home is observable.
+// Operational command audit has its own signed-publication regression suite.
+vi.mock("../src/setup/nativeInteractiveCommandAudit.js", () => ({
+  runNativeInteractiveCommand: async (_input: unknown, run: () => Promise<unknown>) => run()
+}));
+
 const seam = vi.hoisted(() => ({
   answers: [] as string[],
   commands: [] as { executable: string; argv: string[]; cwd: string; shell: boolean }[],
@@ -83,7 +88,7 @@ describe("AMC-1512 native home propagation through the chat composition seam", (
       credentialsFile: file, env: {}, userEnvPath: join(root, "absent-user.env"), ...extra };
   }
   beforeEach(() => {
-    root = mkdtempSync(join(tmpdir(), "amc-native-home-propagation-"));
+    root = realpathSync(mkdtempSync(join(tmpdir(), "amc-native-home-propagation-")));
     workspace = join(root, "workspace");
     home = join(root, "shared home with 'quote'");
     const secrets = join(root, "independent credential store");

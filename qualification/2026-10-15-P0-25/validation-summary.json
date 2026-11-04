@@ -1,0 +1,97 @@
+{
+  "capturedUtc": "2026-10-15T04:51:03.210807+00:00",
+  "canonicalReceiptValidation": {
+    "phase": "canonical-qualification-first",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+    "cmd": "pnpm run check:qualification",
+    "exit": 0,
+    "durationMs": 496,
+    "startedUtc": "2026-10-15T04:49:57.742738+00:00",
+    "log": "/private/tmp/p0-25-canonical-qualification-first-20261015.log",
+    "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+  },
+  "stagedWhitespaceCheck": {
+    "phase": "staged-diff-check-first",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+    "cmd": "git diff --cached --check",
+    "exit": 2,
+    "durationMs": 18,
+    "startedUtc": "2026-10-15T04:50:19.992890+00:00",
+    "log": "/private/tmp/p0-25-staged-diff-check-first-20261015.log",
+    "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+  },
+  "retainedRawEOF": "The only diagnostic is a blank EOF line in the byte-exact copied original successful build log. The immutable log remains unchanged; exit2 is recorded, not relabelled as a pass. No product or guard change.",
+  "earlierComparison": {
+    "command": {
+      "phase": "canonical-diff-check",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+      "cmd": "git diff --no-index --check /dev/null qualification/2026-10-15-P0-25/README.md",
+      "exit": 1,
+      "durationMs": 22,
+      "startedUtc": "2026-10-15T04:49:57.742737+00:00",
+      "log": "/private/tmp/p0-25-canonical-diff-check-20261015.log",
+      "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+    },
+    "meaning": "git diff --no-index implies an exit status for differing files; this comparison returned1 with an empty diagnostic stream. The later full staged --check independently reported the exact retained raw-log EOF diagnostic."
+  },
+  "staticBuilderReview": {
+    "path": "/private/tmp/p0-25-canonical-builder-static-review-20261015.json",
+    "bytes": 14332,
+    "sha256": "52ee8a6f107cdea6abf06d07d9afc1e8eeab616f11a7cdd1267d72370879ce45"
+  },
+  "canonicalBuilderExecutedSeparately": true,
+  "newCopies": [
+    {
+      "original": {
+        "path": "/private/tmp/p0-25-canonical-builder-static-review-20261015.json",
+        "bytes": 14332,
+        "sha256": "52ee8a6f107cdea6abf06d07d9afc1e8eeab616f11a7cdd1267d72370879ce45"
+      },
+      "copy": "evidence/52ee8a6f107c-p0-25-canonical-builder-static-review-20261015.json"
+    },
+    {
+      "original": {
+        "path": "/private/tmp/p0-25-canonical-builder-static-review-20261015.md",
+        "bytes": 2471,
+        "sha256": "19f705b47fb0853886e7044a583f0e9a3190bbad45c3980529b6d124e7e769cc"
+      },
+      "copy": "evidence/19f705b47fb0-p0-25-canonical-builder-static-review-20261015.md"
+    },
+    {
+      "original": {
+        "path": "/private/tmp/p0-25-run-final-command-20261015.py",
+        "bytes": 1148,
+        "sha256": "780ce55169981260c1b696bf6f660ced97cb1665ffc5da434f27e79bdee22160"
+      },
+      "copy": "evidence/780ce5516998-p0-25-run-final-command-20261015.py"
+    },
+    {
+      "original": {
+        "path": "/private/tmp/p0-25-canonical-qualification-first-20261015.log",
+        "bytes": 234,
+        "sha256": "f71be48e374973c5062db961c9f5fe7812189868a5f005a8aeffae99de9cbb38"
+      },
+      "copy": "evidence/f71be48e3749-p0-25-canonical-qualification-first-20261015.log"
+    },
+    {
+      "original": {
+        "path": "/private/tmp/p0-25-staged-diff-check-first-20261015.log",
+        "bytes": 105,
+        "sha256": "d643e78818ab6d825a477d0729d842c279c584108839bd422b36295966580b35"
+      },
+      "copy": "evidence/d643e78818ab-p0-25-staged-diff-check-first-20261015.log"
+    },
+    {
+      "original": {
+        "path": "/private/tmp/p0-25-canonical-diff-check-20261015.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "copy": "evidence/e3b0c44298fc-p0-25-canonical-diff-check-20261015.log"
+    }
+  ],
+  "remainingChecks": "Final normal freeze, final receipt validation, exact-path staged commit, postcommit freeze/receipt validation and source/native/inbox handoff follow. No claim those later steps ran yet."
+}

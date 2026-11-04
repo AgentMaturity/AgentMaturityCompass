@@ -90,7 +90,20 @@ export interface TurnEndMeta {
  * order.
  */
 export function canonicalTurnCancelCause(cause: TurnCancelCause): TurnCancelCause {
-  return cause.kind === "hook" ? { kind: "hook", reason: cause.reason } : { kind: cause.kind };
+  return cause.kind === "hook" ? { kind: "hook", reason: boundedCancellationText(cause.reason) } : { kind: cause.kind };
+}
+
+/** Bound new cancellation metadata without invalidating historical signed rows. */
+export function boundedCancellationText(text: string): string {
+  let bytes = 0;
+  let bounded = "";
+  for (const character of text) {
+    const length = Buffer.byteLength(character, "utf8");
+    if (bytes + length > 512) break;
+    bytes += length;
+    bounded += character;
+  }
+  return bounded;
 }
 
 const TURN_END_REASONS: ReadonlySet<string> = new Set<TurnEndReason>([
@@ -246,6 +259,7 @@ export function buildStepEndMeta(params: StepEndMetaParams): Record<string, unkn
     turn: params.turn,
     step: params.step,
     stopReason: params.stopReason,
+    ...(params.usage?.reasoningTokens === undefined ? {} : { usageVersion: 2 }),
     usage:
       params.usage === null
         ? null
@@ -253,7 +267,8 @@ export function buildStepEndMeta(params: StepEndMetaParams): Record<string, unkn
             inputTokens: params.usage.inputTokens,
             outputTokens: params.usage.outputTokens,
             cacheRead: params.usage.cacheRead,
-            cacheWrite: params.usage.cacheWrite
+            cacheWrite: params.usage.cacheWrite,
+            ...(params.usage.reasoningTokens === undefined ? {} : { reasoningTokens: params.usage.reasoningTokens })
           },
     ...(params.recoveredBy === null ? {} : { recoveredBy: params.recoveredBy })
   };

@@ -1,7 +1,7 @@
 import { closeSync, constants, existsSync, fstatSync, lstatSync, mkdtempSync, openSync, opendirSync, readFileSync, readlinkSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
-import { bwrapBackend, bwrapCommandExit, linuxSocketDenyFilter } from "../sandbox/bwrapBackend.js";
+import { NAMESPACE_FLAGS, bwrapBackend, bwrapCommandExit, linuxSocketDenyFilter, unconsumedFds } from "../sandbox/bwrapBackend.js";
 import type { SandboxPolicy } from "../sandbox/sandboxTypes.js";
 import { assertTerminalDimensions } from "./terminalTypes.js";
 import { NATIVE_PTY_HELPER } from "./nativePtyHelper.js";
@@ -25,7 +25,7 @@ export interface NativePtySupport {
   readonly reason: string;
 }
 
-/** No subprocess probes. Even a positive result is NOT namespace/PTY evidence. */
+/** Only Bubblewrap's cached namespace launch probe runs. Even a positive result is NOT PTY evidence. */
 export function nativePtySupport(): NativePtySupport {
   const base = { platform: process.platform, arch: process.arch, implementation: "linux-bwrap-python-pty" as const, executionVerified: false as const };
   const bwrap = bwrapBackend().available();
@@ -39,7 +39,7 @@ export function nativePtySupport(): NativePtySupport {
       if (!parent.isDirectory() || parent.uid !== 0 || (parent.mode & 0o022) !== 0) throw new Error("untrusted installation");
       if (path === "/") break;
     }
-    return { ...base, prerequisitesAvailable: true, reason: "System Bubblewrap and Python exist; Python 3.11+, devpts and namespace execution remain unverified until launch." };
+    return { ...base, prerequisitesAvailable: true, reason: "System Bubblewrap and Python exist; Python 3.11+ and devpts remain unverified until launch." };
   } catch {
     return { ...base, prerequisitesAvailable: false, reason: "A root-owned, non-setuid system Python 3.11+ at /usr/bin/python3 is required. No host-shell fallback is available." };
   }
@@ -118,9 +118,7 @@ export function prepareNativePtyLaunch(cwd: string, policy: SandboxPolicy, cols:
     writeFileSync(filterPath, linuxSocketDenyFilter(process.arch as "x64" | "arm64"), { mode: 0o600 });
     descriptors.push(openSync(statusPath, constants.O_CREAT | constants.O_EXCL | constants.O_RDWR, 0o600));
     descriptors.push(openSync(filterPath, constants.O_RDONLY));
-    const argv = ["/usr/bin/bwrap", "--unshare-user", "--unshare-pid", "--unshare-net", "--unshare-ipc", "--unshare-uts",
-      "--die-with-parent", "--new-session", "--cap-drop", "ALL", "--disable-userns", "--assert-userns-disabled",
-      "--json-status-fd", "3", "--seccomp", "4", "--dev", "/dev", "--tmpfs", "/tmp", "--chmod", "1777", "/tmp"];
+    const argv = ["/usr/bin/bwrap", ...NAMESPACE_FLAGS, "--json-status-fd", "3", "--seccomp", "4", "--dev", "/dev", "--tmpfs", "/tmp", "--chmod", "1777", "/tmp"];
     const bind = (path: string, writable: boolean): void => {
       const canonical = realpathSync(path);
       const fd = openSync(canonical, constants.O_RDONLY | constants.O_NOFOLLOW);
@@ -129,7 +127,7 @@ export function prepareNativePtyLaunch(cwd: string, policy: SandboxPolicy, cols:
       const info = fstatSync(fd);
       if (!info.isFile() && !info.isDirectory()) throw new Error("Invalid terminal mount source.");
       if (writable) admitWritableDirectory(`/proc/self/fd/${fd}/.`);
-      argv.push(writable ? "--bind" : "--ro-bind", `/proc/self/fd/${descriptors.length + 2}`, path);
+      argv.push(writable ? "--bind-fd" : "--ro-bind-fd", String(descriptors.length + 2), path);
     };
     for (const root of RUNTIME_ROOTS) if (existsSync(root)) bind(root, false);
     for (const file of RUNTIME_FILES) if (existsSync(file)) bind(file, false);
@@ -138,6 +136,7 @@ export function prepareNativePtyLaunch(cwd: string, policy: SandboxPolicy, cols:
     argv.push("--tmpfs", join(workspace, ".amc"), "--chmod", "000", join(workspace, ".amc"), "--remount-ro", join(workspace, ".amc"),
       "--tmpfs", "/proc", "--remount-ro", "/proc", "--remount-ro", "/", "--chdir", workspace, "--",
       PYTHON, "-I", "-S", "-u", "-c", NATIVE_PTY_HELPER, String(cols), String(rows));
+    if (unconsumedFds(argv, descriptors.length).length) throw new Error("A terminal launcher fd would reach the command.");
     return {
       argv: Object.freeze(argv), cwd: workspace,
       env: Object.freeze({ PATH: "/usr/bin:/bin", HOME: "/tmp", TMPDIR: "/tmp", LANG: "C.UTF-8" }),

@@ -1,0 +1,36 @@
+# Workspace members.
+#
+# vendor/* holds the Cordis family vendored per ADR-0001, rescoped to @amc/*.
+# Those packages declare each other with pnpm's `workspace:` protocol, which npm
+# cannot parse — that is what forces pnpm here rather than npm workspaces.
+#
+# packages/* is declared ahead of the P1.2 restructure so members can be carved
+# out of src/ one at a time without another workspace change.
+packages:
+  - "vendor/*"
+  - "packages/*"
+
+# Vendored names must resolve to the workspace copies, never to a registry
+# package of the same name. The verify-vendored-links gate asserts this.
+linkWorkspacePackages: true
+
+# Native modules whose install scripts must run.
+#
+# pnpm 10 blocks lifecycle scripts by default. better-sqlite3 is AMC's evidence
+# ledger binding — without its build step every SQLite path fails at runtime,
+# and esbuild ships a platform binary the vendored hmr package builds against.
+# Everything else stays blocked.
+onlyBuiltDependencies:
+  - better-sqlite3
+  - esbuild
+
+# Flat node_modules, as npm produces.
+#
+# AMC's own release tooling — releaseSbom.ts and releaseLicenses.ts — walks
+# node_modules/<name> for every dependency to read its package.json and LICENSE.
+# pnpm's default isolated store only exposes direct dependencies there, so the
+# SBOM and licence report would silently lose every transitive package.
+#
+# Revisit when that tooling reads the dependency graph from a lockfile rather
+# than the directory layout; until then the layout is load-bearing.
+nodeLinker: hoisted

@@ -1,0 +1,387 @@
+{
+  "schema": "p139-root-mcp-pipeline-journal-regression-outcome/1",
+  "actualFiles": 27,
+  "tests": 428,
+  "passed": 425,
+  "failed": 3,
+  "hooksPassed": 344,
+  "unhandledErrors": 0,
+  "pendingOrTodo": 0,
+  "exit": 1,
+  "processDurationMs": 23095,
+  "ownedPgid": 78415,
+  "ownedGroupAbsentByESRCH": true,
+  "wrapperSignalsOtherThanZeroSent": false,
+  "fixtureScope": "Existing action fault tests intentionally terminate their owned synthetic crashing children; no claim that no fixture signal occurred. Existing fixtures use disclosed forced-close/removal cleanup; broad passes are regression assertions, not strict universal fixture/descendant lifecycle.",
+  "rootFullPostExitLogRead": true,
+  "rawObserverIdentitiesVerified": true,
+  "failureClassification": "Exactly the same three identities as retained original P1-02 RED; authorizationRecheck test and authorize.ts bytes unchanged. Keep full broad run RED/unwaived, with original held cancellation/diagnostic scopes untouched.",
+  "failures": [
+    {
+      "fullName": "P1-02 authorization recheck: fourteen specification groups 06b: cancelling an already granted approval through the public API must revoke its authority",
+      "failure": "AssertionError: expected { \u2026(3) } to deeply equal { cancellationError: null, \u2026(2) }\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts:324:82\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "fullName": "P1-02 authorization recheck: fourteen specification groups 09: copying actual approval files to another workspace does not transfer authority",
+      "failure": "AssertionError: expected 'authority_store_unavailable: approval\u2026' to match /approval_intent_mismatch|approval_not\u2026/\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts:374:36\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "fullName": "P1-02 authorization recheck: fourteen specification groups 12b: a malformed retained freeze is diagnosed as authority_store_unavailable",
+      "failure": "AssertionError: expected 'action_class_frozen' to contain 'authority_store_unavailable'\n    at refused (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts:234:34)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts:428:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    }
+  ],
+  "historicalHeldReasons": [
+    "Post-grant cancellation API rejects QUORUM_MET; authority therefore remains granted and executes one owned effect. No execution after successful cancellation is established; Claude-owned cancellation source remains held.",
+    "Copied foreign approval files already deny with zero effects but emit authority_store_unavailable instead of strict table approval_intent_mismatch/approval_not_granted.",
+    "Malformed freeze already denies with zero effects but lacks the additional authority_store_unavailable diagnostic."
+  ],
+  "currentFiles": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/agentToolsetSession.test.ts",
+      "tests": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/agentToolsetWiring.test.ts",
+      "tests": 20,
+      "passed": 20,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/approvalSeam.test.ts",
+      "tests": 13,
+      "passed": 13,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcpAgentProvider.test.ts",
+      "tests": 24,
+      "passed": 24,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcpAnalyzerScoreGaming.test.ts",
+      "tests": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcpAnalyzerUrlInjection.test.ts",
+      "tests": 1,
+      "passed": 1,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcpClaimLabels.test.ts",
+      "tests": 23,
+      "passed": 23,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcpComplianceSafety.test.ts",
+      "tests": 15,
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcpServer.test.ts",
+      "tests": 11,
+      "passed": 11,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcpServerTools.test.ts",
+      "tests": 3,
+      "passed": 3,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcpTools.test.ts",
+      "tests": 7,
+      "passed": 7,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcpTrustLedger.test.ts",
+      "tests": 4,
+      "passed": 4,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/nativeMcpClient.test.ts",
+      "tests": 15,
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/nativeMcpHttp.test.ts",
+      "tests": 15,
+      "passed": 15,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/reconciliationDefectsMcp.test.ts",
+      "tests": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/reconciliationDefectsMcpHttp.test.ts",
+      "tests": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPipeline.test.ts",
+      "tests": 18,
+      "passed": 18,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts",
+      "tests": 25,
+      "passed": 22,
+      "failed": 3
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/failureBehaviour.test.ts",
+      "tests": 31,
+      "passed": 31,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/faultMatrix.test.ts",
+      "tests": 16,
+      "passed": 16,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/idempotency.test.ts",
+      "tests": 7,
+      "passed": 7,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/normalizeArguments.test.ts",
+      "tests": 25,
+      "passed": 25,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/receiptStates.test.ts",
+      "tests": 71,
+      "passed": 71,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/reconcile.test.ts",
+      "tests": 51,
+      "passed": 51,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcp20260728.test.ts",
+      "tests": 12,
+      "passed": 12,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcpLegacyFallback.test.ts",
+      "tests": 5,
+      "passed": 5,
+      "failed": 0
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcpOauth.test.ts",
+      "tests": 7,
+      "passed": 7,
+      "failed": 0
+    }
+  ],
+  "p139RetainedPublicRecords": 25,
+  "p139PublicBodyCleanupEndpointErrors": 0,
+  "pins": [
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p139-mcp-pipeline-journal-regression/command.json",
+      "bytes": 3369,
+      "sha256": "5800c67f961352d641fd1aa38d3b2fc1bccd251b9e206fc4f831a1740f2f2620"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p139-mcp-pipeline-journal-regression/owned-process.json",
+      "bytes": 1118,
+      "sha256": "e1c32cd9a040b94ce6d0d6189940c64e17205192bb9151a365bcb3c2afd0526e"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p139-mcp-pipeline-journal-regression/owned-group-after-exit.json",
+      "bytes": 262,
+      "sha256": "2ac59fb3923c637266854c7f832fbe20541351f1c00334c74e0faa72f263f965"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p139-mcp-pipeline-journal-regression/stdout-stderr.log",
+      "bytes": 28408,
+      "sha256": "5c90e3b4c4b81c408654c24264e7bba3372b1043b57c7488a5e8d93bd1ad03b5"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p139-mcp-pipeline-journal-regression/raw.json",
+      "bytes": 153806,
+      "sha256": "f2c8bcf0eb57f803b5277c7686db48a144937d1e01007910295af05f29ad573c"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p139-mcp-pipeline-journal-regression/observer.json",
+      "bytes": 228752,
+      "sha256": "1d3359570794af022f13b9ad060a512b7242e28c774092b91ec062de1cb801f1"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-zJFjq9/public-evidence.json",
+      "bytes": 12402,
+      "sha256": "9217fb93e05922d414c7f17cab818a0ca120348e84effc84e49694391018f1b7"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-WPCVQp/public-evidence.json",
+      "bytes": 15633,
+      "sha256": "fe53bbd8278d719ebaa8169aebf1a0755a9453ea61f11288d558db036da808ea"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-w4RFwy/public-evidence.json",
+      "bytes": 12654,
+      "sha256": "93f8682f4e6d62b67231e488bfd2c870bbc707e7ff27859c32b2a1c97d920d37"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-yc2Abq/public-evidence.json",
+      "bytes": 9157,
+      "sha256": "d621a7708f8a1dda7abd5ec960f860a531c832985c9175d75e55dc9dbb324ee2"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-usqROE/public-evidence.json",
+      "bytes": 5942,
+      "sha256": "ff2260a0544b500f7c84246f5f509956ab0e461bd46ad3f79e61c6fbd20f4a99"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-rpZyIl/public-evidence.json",
+      "bytes": 24355,
+      "sha256": "a0bf0a2966f303c9d712e5152099fb9c88e6b4b57da17e2ffd7f9a493f191614"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-LkjpPT/public-evidence.json",
+      "bytes": 12414,
+      "sha256": "78d0ab8f70bd47e51236af3d2ddd7c59d71a90da9345983706bf7371092bf753"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-cVbJDY/public-evidence.json",
+      "bytes": 4960,
+      "sha256": "68fe96351419d11f0fd21a5d9df3b5fe34338338082b25e5b1e1158c032ad7b3"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-OFpvCD/public-evidence.json",
+      "bytes": 5026,
+      "sha256": "aa9fc7f4337cb3ca3f3f8606de5ccbdecb7d03c8eb114d1e81605b935b666a6d"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-4T3tII/public-evidence.json",
+      "bytes": 12927,
+      "sha256": "2c285121430eef197252e61e4c1df752bf66bb4cb0089032ba09c28c7dac896c"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-HSa5Xh/public-evidence.json",
+      "bytes": 5415,
+      "sha256": "1384f24a92f4c7b9652693bf2c527e1613265080195207871196f53b9778d936"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-d98LOw/public-evidence.json",
+      "bytes": 2522,
+      "sha256": "b0b9f60d3d860fbfc900ea0ec571d042c9b5e3cb84893b47758e10cc91356395"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-v0xtWy/public-evidence.json",
+      "bytes": 4768,
+      "sha256": "848a661ff4f815692edf165d0fc60879321a3e4991ffa8ab3c0d5396ee8819c6"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-CeQ3nQ/public-evidence.json",
+      "bytes": 3199,
+      "sha256": "9576c6639b283cb5a956531eb0773b16e9974ea2c2aa88b11aadf8cc30123f56"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-dT6qHC/public-evidence.json",
+      "bytes": 13008,
+      "sha256": "4ae658678d1459592fffe56e492445adf03bb205d70f3a5da84436a486e33544"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-1Ly6JP/public-evidence.json",
+      "bytes": 4753,
+      "sha256": "2dea51b69a8be1f8728a2b20b4c323a820e13497788b676cbd25b8cd1b8d42df"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-zEkP9k/public-evidence.json",
+      "bytes": 3674,
+      "sha256": "ff54e7d499add0137aee3001bcde8f52329ba02c6b8f609a930338f8564b028c"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-ApnpF5/public-evidence.json",
+      "bytes": 1585,
+      "sha256": "d3a49b029a1e91a0f4168f7401b7de864e88b700fcf159926dd1550790573850"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-WLvzfN/public-evidence.json",
+      "bytes": 2504,
+      "sha256": "917da8030e292358562c739dbc42c8b31d358150c7900e9a43c8425b05ea13cc"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-JmKbdK/public-evidence.json",
+      "bytes": 2116,
+      "sha256": "60fa4628ce031e10054c3f5b411939c41656c35d7f4655d0bf4bb35a51f4e887"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-2yYcBs/public-evidence.json",
+      "bytes": 28995,
+      "sha256": "6bb8f919864b7bc29da44d04addf6e8a1e24c97c3c94dae3235707e5dab212d1"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-5MXw8P/public-evidence.json",
+      "bytes": 3182,
+      "sha256": "de72713f2122132cbf0985b185837d3de3bfaada2cbfc4dc73305d1f53abc731"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-RMnMCM/public-evidence.json",
+      "bytes": 12665,
+      "sha256": "582f3ad4ff1865bc96fc205dc6ce4fbeecd1e9b084e26c944a954638c748f418"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-3CCNWk/public-evidence.json",
+      "bytes": 725,
+      "sha256": "c96351ed766cd918290e5b0dc627584b9a74cb8ac44cc608ef23f491e5a8b845"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-rnXbxO/public-evidence.json",
+      "bytes": 1582,
+      "sha256": "bba81b6fab52aaca6f8b5fff6705326912444e8d26f56b56734a311c00a632a9"
+    },
+    {
+      "path": "/private/tmp/p1-02-authorization-implementation-20261015/final-p1-02-checkpoint.json",
+      "bytes": 18510,
+      "sha256": "1d9c898f6586aa44c4de6004c84dad820232c9e446a2421a202abf52fb648721"
+    },
+    {
+      "path": "/private/tmp/p1-09-post-pack-20261015/command-p102-authorization-guard-controls/raw.json",
+      "bytes": 36508,
+      "sha256": "fe473ab0d9dbf8bbfb956c851e10866176eccde67f8b1a1ace63aaee0e8eb7c9"
+    },
+    {
+      "path": "/private/tmp/p1-02-authorization-implementation-20261015/diagnostic-proposal/README.md",
+      "bytes": 1386,
+      "sha256": "595c41db9d8090110877c8a6ac442ef76de5b4c2bd4e1e33f0f10d485291bbda"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts",
+      "bytes": 28977,
+      "sha256": "297e55b5dd88e7adea27c9f9c6189b78115821de5a5f56ff944f9c7dcb4bf375"
+    }
+  ],
+  "boundary": "No full-P1-39/global-green/quality-waiver/held-decision resolution claim."
+}

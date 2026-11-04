@@ -1,0 +1,65 @@
+{
+  "schema": "p112-compiled-guard-unit-matrix/1",
+  "target": "tests/policy/compiledPolicyGuard.test.ts",
+  "fixedTestCount": 11,
+  "cases": [
+    {
+      "case": 1,
+      "title": "shows listed names and names a hidden-tool refusal",
+      "line": 73
+    },
+    {
+      "case": 2,
+      "title": "keeps run_code visible without exempting its call from compiled guards",
+      "line": 83
+    },
+    {
+      "case": 3,
+      "title": "fails closed on unsupported guard names and identifies each supplied control version",
+      "line": 93
+    },
+    {
+      "case": 4,
+      "title": "requires a lease only for the identity-binding rule's explicit lease requirement",
+      "line": 106
+    },
+    {
+      "case": 5,
+      "title": "requires the already-derived authorization to carry its lease identity",
+      "line": 114
+    },
+    {
+      "case": 6,
+      "title": "rejects absent and OS-user principals while consuming the authenticated principal methods",
+      "line": 122
+    },
+    {
+      "case": 7,
+      "title": "preserves lease-before-principal refusal when both identity requirements apply",
+      "line": 131
+    },
+    {
+      "case": 8,
+      "title": "leaves identity requirements disabled when neither flag is required",
+      "line": 140
+    },
+    {
+      "case": 9,
+      "title": "projects the digest and revision with approval-class control before the guard fallback",
+      "line": 145
+    },
+    {
+      "case": 10,
+      "title": "leaves absent admitting controls null and unknown control versions explicitly null",
+      "line": 156
+    },
+    {
+      "case": 11,
+      "title": "projects only the supplied approval-required action classes without granting authority",
+      "line": 164
+    }
+  ],
+  "tableRowsAreObservationsNotTests": true,
+  "runtimeOutcomes": null,
+  "sourceControlOutcomes": null
+}

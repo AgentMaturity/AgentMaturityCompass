@@ -1,0 +1,59 @@
+{
+  "setupSha256": "782e8f05272eccad954f372f2ce686b9f408b962cce70aae17811fb7506853ec",
+  "controllerSha256": "5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878",
+  "proposalSha256": "74b34ab3fd8943b6d573ef8277cb6f187a43efe05edd04e7909129fac86db9e9",
+  "sourceManifestSha256": "757fc432259404ed8b4db216b0627e07ac60159aea801dd9dc3b6c129048871e",
+  "compiledManifestSha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48",
+  "preservationSha256": "0264617d15daa39ea7c52dfa01d4a391f1ceb33bfc608a877170722b8bc68d35",
+  "observerSha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447",
+  "setupIndexSha256": "83422e1b1f1922731b3ef145274d64548925669ed9a5523249b54992f5c26760",
+  "caseIdentitiesSha256": "94c9ff968471bc6cc3be324e7241df7d23a8677673e34627b021563c20e9c8dc",
+  "authorization": "START_P011_CAUSAL_C1-map-missing-path-fail-open",
+  "control": "C1-map-missing-path-fail-open",
+  "releasedUtc": "2026-10-15T06:42:47.992120+00:00",
+  "setupPath": "/private/tmp/p0-11-causal-qualification-20261015/setup.json",
+  "setupIndexPath": "/private/tmp/p0-11-causal-qualification-20261015/setup-index.json",
+  "controllerPath": "/private/tmp/p0-11-causal-qualification-20261015/driver/controller.py",
+  "closureRoot": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+  "parentRoot": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+  "rootAuthor": "Root; user-authorized bounded P0-11 qualification only",
+  "noHumanApprovalClaim": true,
+  "releaseAuthor": {
+    "path": "/private/tmp/p0-11-author-causal-release-v2-20261015.py",
+    "bytes": 5153,
+    "sha256": "fbd1c829fd98444d69f913d45ecddd65e31581395c344ef7e661398ca13b817c"
+  },
+  "preCausalNormalFreeze": {
+    "path": "/private/tmp/p0-11-qualification-20261015/command-pre-causal-normal-freeze/command.json",
+    "bytes": 1164,
+    "sha256": "1d7411985045b4e004f27aca123354993b96fb4b03cd84612659d1b23775acf8"
+  },
+  "priorControlsCompleted": [],
+  "scope": "Only the selected unchanged original map7 or recording7 source-mode baseline/mutant/restored control. No source ownership transfer, product guard waiver, dist edit or test/config/deadline change.",
+  "boundaries": "Borrowed dependencies and seven-key child environment. No independent install, OS/network or universal descendant proof. Failures and masks need actual review; C2 is the exact genuine recorder Error, and L1 diagnostic change is not invalid-fixture admission.",
+  "sealedSetupReview": {
+    "path": "/private/tmp/p0-11-controller-sealed-setup-review-20261015.json",
+    "bytes": 15390,
+    "sha256": "17782c03541ccfe9be068809b2b25a1a4ffbba2d4bc0dde0b76354848b5ab76c"
+  },
+  "staticCodeReview": {
+    "path": "/private/tmp/p0-11-controller-code-static-review-20261015.json",
+    "bytes": 5353,
+    "sha256": "94899d5f0c2c54ba5625432c1a24942102f447a946f34e0a30b7e940d2323aba"
+  },
+  "rootInputVerification": {
+    "path": "/private/tmp/p0-11-causal-root-sealed-input-verification-20261015.json",
+    "bytes": 2515,
+    "sha256": "f0e93980ecf307cc50ac8fa74b85d8d8b87839fcfaa3fe7b0d31ff50e2d2fce0"
+  },
+  "recipeReview": {
+    "path": "/private/tmp/p0-11-recipes-static-review-20261015.json",
+    "bytes": 21585,
+    "sha256": "b7619c6e45d47c4782a6cd7be7607f4debc8a8180c649aa16e99a8b7a9b7b278"
+  },
+  "originalCorporaReview": {
+    "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.json",
+    "bytes": 23426,
+    "sha256": "ad9128b687def99c672387e0c33ab1926a53082bb0b5087fa8a28905cb1d537a"
+  }
+}

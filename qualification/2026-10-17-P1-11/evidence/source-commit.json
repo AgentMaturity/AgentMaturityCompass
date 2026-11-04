@@ -1,0 +1,15 @@
+{
+  "at": "2026-10-16T19:30:44.453560+00:00",
+  "argv": [
+    "git",
+    "commit",
+    "-m",
+    "test(P1-11): qualify typed evidence admission decisions"
+  ],
+  "exit": 0,
+  "stdout": "[codex/p1-11-evidence-qualification a6909ac52] test(P1-11): qualify typed evidence admission decisions\n 11 files changed, 354 insertions(+), 15 deletions(-)\n create mode 100644 tests/catalog/evidence/decisive.test.ts\n",
+  "stderr": "",
+  "head": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+  "status": "",
+  "noForceOrNoVerify": true
+}

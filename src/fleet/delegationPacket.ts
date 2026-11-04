@@ -1,9 +1,11 @@
 import {
   createHandoffPacket,
   removeHandoffPacket,
+  removeHandoffPacketIfCurrent,
   verifyHandoffPacket,
   type HandoffPacket
 } from "./handoffPacket.js";
+import { createHandoffPacketAsync } from "./handoffPacketSigning.js";
 import type { DelegationIdentity } from "../agent/delegationIdentity.js";
 
 /**
@@ -54,10 +56,10 @@ export interface DelegationPacketRequest {
   readonly stopConditions?: readonly string[];
 }
 
-/** Thrown when a delegation cannot be authorised. Never leaves a file behind. */
+/** A refused delegation. A partial publication cause records any uncertain on-disk member. */
 export class UnsignablePacketError extends Error {
-  constructor(reason: string) {
-    super(`refusing to authorise a delegation without a signed packet: ${reason}`);
+  constructor(reason: string, cause?: unknown) {
+    super(`refusing to authorise a delegation without a signed packet: ${reason}`, { cause });
     this.name = "UnsignablePacketError";
   }
 }
@@ -107,5 +109,32 @@ export function mintDelegationPacket(
     );
   }
 
+  return packet;
+}
+
+/** Actual native mint; no announcement/session/runner effect occurs while signing is awaited. */
+export async function mintDelegationPacketAsync(workspace: string, request: DelegationPacketRequest,
+  options: { signal?: AbortSignal } = {}): Promise<HandoffPacket> {
+  const captured = structuredClone(request), signal = options.signal;
+  if (captured.child.governedAs !== captured.parent.governedAs) {
+    throw new UnsignablePacketError(`child is governed as ${captured.child.governedAs} but parent as ${captured.parent.governedAs}`);
+  }
+  let packet: HandoffPacket;
+  try {
+    packet = await createHandoffPacketAsync(workspace, {
+      fromAgentId: captured.parent.runAs, toAgentId: captured.child.runAs, goal: captured.goal,
+      delegationScope: [...(captured.delegationScope ?? [])], stopConditions: [...(captured.stopConditions ?? [])],
+      constraints: [`governedAs=${captured.child.governedAs}`, `depth=${captured.child.depth}`]
+    }, { signal, requireUnexpired: true });
+  } catch (cause) {
+    const code = (cause as { code?: unknown } | null)?.code;
+    throw new UnsignablePacketError(code === "HANDOFF_PUBLICATION_PARTIAL" ? "HANDOFF_PUBLICATION_PARTIAL; an attempted packet member may exist"
+      : typeof code === "string" && /^[A-Z][A-Z0-9_]{0,63}$/.test(code) ? code : "handoff signing or publication refused", cause);
+  }
+  const verification = verifyHandoffPacket(workspace, packet.packetId);
+  if (signal?.aborted || !verification.valid || !verification.signatureValid || packet.signature === "unsigned") {
+    removeHandoffPacketIfCurrent(workspace, packet);
+    throw new UnsignablePacketError(signal?.aborted ? "parent gave up before the delegation was authorised" : "signature did not verify");
+  }
   return packet;
 }

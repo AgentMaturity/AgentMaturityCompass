@@ -1,0 +1,249 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-25",
+  "date": "2026-10-15",
+  "mode": "Read-only static review of unexecuted canonical builder and final command wrapper. Only this review pair is written.",
+  "builder": {
+    "path": "/private/tmp/p0-25-build-canonical-packet-20261015.py",
+    "bytes": 9622,
+    "sha256": "c38a0eea4dbd0d66f81f728bc0d251d1b143c575a4f3971f2b07914fbc1c8b47"
+  },
+  "wrapper": {
+    "path": "/private/tmp/p0-25-run-final-command-20261015.py",
+    "bytes": 1148,
+    "sha256": "780ce55169981260c1b696bf6f660ced97cb1665ffc5da434f27e79bdee22160"
+  },
+  "findings": [],
+  "allReadsFinished": true,
+  "canonicalPacketEnactedByThisReview": false,
+  "runtimeExecutedByThisReview": false,
+  "decision": "No actionable static blocker in the current builder. Root outcome remains an explicit pre-execution prerequisite. Actual canonical receipt and normal checks must be assessed only after root executes the reviewed builder.",
+  "scope": {
+    "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "canonicalTarget": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-25",
+    "canonicalTargetObservedAbsent": true,
+    "writesByBuilder": "Only the new qualification folder and copied evidence; existing originals are read. No baseline, production, guard, test, reference, counter, workflow or tracker edit.",
+    "reviewWrites": [
+      "/private/tmp/p0-25-canonical-builder-static-review-20261015.json",
+      "/private/tmp/p0-25-canonical-builder-static-review-20261015.md"
+    ]
+  },
+  "graphFirst": {
+    "input": "/private/tmp/p0-25-qualification-20261015/graph-navigation.json",
+    "basis": "Recorded lintCitations query returned no matching nodes in historical source4247 graph. Direct current source establishes this review; no fresh query/refresh/server ran."
+  },
+  "checks": [
+    {
+      "topic": "Pinned packet and row equality",
+      "builderLines": "26-31",
+      "result": "Current packet7575816b and indexc652dff pins match. All137 index rows have exactly path/bytes/sha256, and all137 rehash equal. Full-dictionary pin(row.path)==row is compatible with the actual rows."
+    },
+    {
+      "topic": "Source attribution",
+      "builderLines": "8,24-25,38-40,86,100,106,108",
+      "result": "All7888 tracked source hashes were checked exact. All2371 current src files, including path-set equality, match the source58 initial manifest. Current qualification source2d552 and production source58 are distinct and correctly labeled. Prior causal receipt remains at75cb."
+    },
+    {
+      "topic": "Receipt schema and totals",
+      "builderLines": "115-125",
+      "schema": "qualification/receipt.schema.json:7-60",
+      "checker": "scripts/check-qualification-receipts.mjs:66-117",
+      "result": "Proposed top-level/command/test/artifact keys fit additionalProperties:false. Primary tests32=passed32+failed0+skipped0; separate22 and operational3 remain outside tests. Commands preserve actual cmd/exit/durationMs fields, and nonzero notes explain the three intended parser refusals. This is static compatibility, not an executed Ajv/checker result."
+    },
+    {
+      "topic": "Copy containment and hashes",
+      "builderLines": "41-84,122-123",
+      "result": "44 unique proposed source paths. After final actual-review pair arrived,43 known existing sources are regular, scanner-clean and below1048576bytes; only rootoutcome is pending. Largest known copy170772bytes. Copies use hash-prefix plus source.name inside evidence/, preserve original bytes and map original path/bytes/SHA to relative copy paths. Receipt artifacts enumerate regular outputs before receipt itself, avoiding a self-hash cycle."
+    },
+    {
+      "topic": "Review/outcome prerequisites",
+      "builderLines": "32-40",
+      "result": "Corrected actual-review filename is p0-25-bounded-independent-review-20261015.json. Frozen JSON31742bytes/edcb1b6f and MD2550bytes/f0a8be16 match root pins and pass copy limits. Root outcome is read and its formalAcceptanceClosed:false plus actual-review SHA are asserted before Q.mkdir. Outcome absence at capture is an expected prerequisite, not a builder failure."
+    },
+    {
+      "topic": "Measured result boundaries",
+      "builderLines": "85-112,120-124",
+      "result": "Primary original32=21linter+9in-process injected CLI contracts+2actual mapping-pack tests. Separate22 inject an executor. Actual collector and npm command are genuine processes with errors0, ratcheted623, baseline623; CIT0023+CIT004620=623. Three actual exit1 refusals are command observations, not test registrations or reasoned baseline updates."
+    },
+    {
+      "topic": "Historical causal reuse",
+      "builderLines": "91,106,124",
+      "result": "Prior resolver30/26/30 and ratchet30/29/30 remain attributed to source75cb and the old private compiled import-prefix adaptation. README explicitly says reused, not rerun, current32 mutant coverage or new current kill. The137-index and frozen preservation receipt retain2471 protected/4529 compiled attribution; this review does not redo the native actual auditor entire preservation analysis."
+    },
+    {
+      "topic": "Open gaps and freeze holds",
+      "builderLines": "94-112,124",
+      "result": "Prior strictP024 ISO gap, empty ISO entries,31 empty expert cells, literal one-host-list requirement, duplicate1269/dead2751 and all prior skips/holds remain open. Direct source shows catalogue/linter share the host array while regulatory checker still uses register.policy.officialHosts; subset/identity tests do not collapse those two stored lists. No expert/legal/hosted/fullgate/Done claim is made."
+    },
+    {
+      "topic": "Final command wrapper",
+      "file": "p0-25-run-final-command-20261015.py:3-22",
+      "result": "Uses argv-list subprocess without shell, inherits parent environment, prefixes Node22 PATH, sets private HOME and GIT_NO_LAZY_FETCH, writes a fresh combined log, appends exit/duration/head row and propagates actual exit. It supplies no timeout, process-family containment, environment allowlist or universal teardown/isolation proof. README keeps those limits explicit. major22 is an input label, not an independent child fingerprint."
+    }
+  ],
+  "preExecutionPrerequisites": [
+    {
+      "path": "/private/tmp/p0-25-root-bounded-outcome-20261015.json",
+      "stateAtCapture": "absent; expected to be authored by root after this review",
+      "requirements": "Must exist before builder line35 and Q.mkdir, bind the actual frozen bounded-review SHA, retain formalAcceptanceClosed:false, and satisfy the same copy size/secret constraints. Root already plans exact canonical checking afterward."
+    }
+  ],
+  "preparationCorrectionsRetained": [
+    {
+      "kind": "Root pre-execution correction",
+      "detail": "The builder secret-scanner sentinel is split in its own byte expression atline75, so copying the builder does not trigger the scanner on its guard. This is preparation history, not a product runtime failure."
+    },
+    {
+      "kind": "Root metadata filename correction",
+      "detail": "review_path now names bounded-independent-review. Initial read saw the prior name; the final reviewed builder is9622bytes/c38a0eea and uses the final actual-review path."
+    }
+  ],
+  "limits": [
+    "No builder/wrapper import or execution, target syntax/type check, test, build, Git command, process runtime, network, canonical write or repository mutation was performed. Standard-library file reads, JSON, text searches, metadata and hashing only.",
+    "No actual canonical schema/checker pass or generated-file size result is asserted before execution. Root outcome remains pending; known copied files were checked.",
+    "Fresh actual qualification and broader runtime preservation are supplied by the frozen private packet and separate actual review, not newly rerun here.",
+    "No legal/expert/current-law truth, whole release/hosted behavior, Node24/full-suite/coverage/G0/dependency closure/Done or new production ownership approval follows."
+  ],
+  "observerNotes": [
+    "A proposed narrow peer assist could not start because the collaboration agent thread limit was reached; no peer work is claimed. This review directly inspected schema/checker/wrapper.",
+    "One rg search named absent schemas/ directory; actual schema path was found through checker source. A broad host-pattern output was truncated; relevant exact source lines were then read. No target execution occurred."
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-25-build-canonical-packet-20261015.py",
+      "bytes": 9622,
+      "sha256": "c38a0eea4dbd0d66f81f728bc0d251d1b143c575a4f3971f2b07914fbc1c8b47"
+    },
+    {
+      "path": "/private/tmp/p0-25-run-final-command-20261015.py",
+      "bytes": 1148,
+      "sha256": "780ce55169981260c1b696bf6f660ced97cb1665ffc5da434f27e79bdee22160"
+    },
+    {
+      "path": "/private/tmp/p0-25-bounded-qualification-20261015.json",
+      "bytes": 18330,
+      "sha256": "7575816b0d993a8327039bbe9d904271d1e2c5937d91d27f03e83ab2d2c36ae6"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/artifact-index.json",
+      "bytes": 29617,
+      "sha256": "c652dff2952703b79bde504c8367be90cc67201dd5535d6ea910ba58ff134127"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/graph-navigation.json",
+      "bytes": 862,
+      "sha256": "cb23acf16dd700b9596ec7048739bd9a4302174fadbcf1ba65876cd891b22810"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/tracked-source-before.json",
+      "bytes": 939037,
+      "sha256": "6beffe1d202907603061308c7dd151221c58df45a5003272c3619b62ccb79259"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/initial-preflight.json",
+      "bytes": 11548,
+      "sha256": "602146f605b4b03751d2e9536eeb4234ada5e6eb7bc580d5053398eb82b63d38"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/original32-summary.json",
+      "bytes": 1772,
+      "sha256": "e732144c68637db36a70343fa21a1cd33df0b947f2fcd57d6245452fc0b0a6fd"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/release22-summary.json",
+      "bytes": 954,
+      "sha256": "7882458dd5efed969421fb19f0fbd37440ebc45b53d234fef579a9d84b935acf"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/actual-collector-summary.json",
+      "bytes": 1861,
+      "sha256": "53e1f41c709d27d568f2bc7d73ea2b795cf2ecd613b979cf88dc99bb94ea402a"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/actual-cli-refusals-summary.json",
+      "bytes": 2882,
+      "sha256": "09b8981735eaa29715ac195cd53e192f63ce7c8f604d6c89cda2ccd2afef6080"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/final-source-and-reuse-preservation.json",
+      "bytes": 2180,
+      "sha256": "3330f956401eeb479edc69c4f3ab004cf98e2c82467642b79d8ee99e2f5e0bc1"
+    },
+    {
+      "path": "/private/tmp/p0-25-bounded-independent-review-20261015.json",
+      "bytes": 31742,
+      "sha256": "edcb1b6f29516e66a22f0ceb115ca421ddf3aae4e3734360d06123b645891e11"
+    },
+    {
+      "path": "/private/tmp/p0-25-bounded-independent-review-20261015.md",
+      "bytes": 2550,
+      "sha256": "f0a8be16d7a5afbaf7177fb00f7e4752698a15553ea9feca1f35b2888fe8b197"
+    },
+    {
+      "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+      "bytes": 1449771,
+      "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+    },
+    {
+      "path": "/private/tmp/p0-30-exact-source-validation-context-20261015.json",
+      "bytes": 6662,
+      "sha256": "0be7f62a6b8d162283927e929abbbdd168126eb3585a0330161734a1117e9a03"
+    },
+    {
+      "path": "/private/tmp/p0-24-citation-causal-qualification-20261015.json",
+      "bytes": 61638,
+      "sha256": "a05fb74b1c7e19e93f862187ed09cf2cb4be49a8179522343d0b3aa06999ef54"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-25-readonly-routing-20261015.json",
+      "bytes": 23914,
+      "sha256": "e70186df02502326e435b921cf4cef09ec186d9cbe9556dc812fba4e71c0dc95"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/qualificationReceipts.test.ts",
+      "bytes": 6259,
+      "sha256": "4096d7301c7f52547052374395b719e915385079dc06f135e3e54c70fadc1171"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/lintCitations.test.ts",
+      "bytes": 5086,
+      "sha256": "d8ac693789c976e7cc84fe1ad020c4513f517d51c2188499315e8bc054c426ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/packs/regulatorySchema.ts",
+      "bytes": 12723,
+      "sha256": "61aaa47c94a3ba537390e1409de7d117211915d020bf1ca98bd2cf8b43762d61"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/compliance/citations/officialHosts.ts",
+      "bytes": 1932,
+      "sha256": "da2d28e320495df599cc87fcbf356faa6796a8f5d18fef8bda8893115761ba36"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/compliance/citations/lint.ts",
+      "bytes": 7865,
+      "sha256": "35cc58ee94b64c32ad7aa9719dc61134384cd4a3677070c4ae02ab3b88cacf7f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/check-regulatory-currency.mjs",
+      "bytes": 10338,
+      "sha256": "2e86a6035a4c389e498bbcaa92a21bfa671d4611fb66ffd7edfcd9de2fc1aff3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/compliance/citations/reference/iso42001AnnexA.json",
+      "bytes": 278,
+      "sha256": "415c9c5aa7c51f2e9b519a6c90dccfe9664e0ec57089281612125ba63a5fa545"
+    }
+  ]
+}

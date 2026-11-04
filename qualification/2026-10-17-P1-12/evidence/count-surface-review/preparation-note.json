@@ -1,0 +1,9 @@
+{
+  "schema": "p112-count-metadata-path-resolution/1",
+  "initialRead": "The anticipated B31 count-surface-admission.json name was absent and raised FileNotFoundError before this private folder was written.",
+  "correctExistingInputs": [
+    "count-surface-allocation.json",
+    "count-surface-actual.json"
+  ],
+  "response": "Located exact existing B31 count packet by finite filename search. No generator/product command, source change or qualification credit came from that failed metadata lookup."
+}

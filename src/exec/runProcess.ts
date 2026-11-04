@@ -46,6 +46,13 @@ export function runProcess(spec: ProcessSpec): RunningProcess {
   }
 
   const startedAt = Date.now();
+  const sink = (stream: "stdout" | "stderr", tee: boolean) => (text: string): void => {
+    if (tee) (stream === "stdout" ? process.stdout : process.stderr).write(text);
+    spec.onOutput?.(stream, text);
+  };
+  const stdout = new OutputCollector(spec.maxCaptureBytes, spec.scrubValues, sink("stdout", spec.stdout === "tee"));
+  const stderr = new OutputCollector(spec.maxCaptureBytes, spec.scrubValues, sink("stderr", spec.stderr === "tee"));
+  // Validate capture limits before the child can perform any effect.
   const child = spawn(program, [...spec.argv.slice(1)], {
     cwd: spec.cwd,
     env: { ...spec.env },
@@ -55,13 +62,6 @@ export function runProcess(spec: ProcessSpec): RunningProcess {
     detached: usesProcessGroups,
     stdio: [spec.stdin, spec.stdout === "ignore" ? "ignore" : "pipe", spec.stderr === "ignore" ? "ignore" : "pipe", ...(spec.extraFds ?? [])]
   });
-
-  const sink = (stream: "stdout" | "stderr", tee: boolean) => (text: string): void => {
-    if (tee) (stream === "stdout" ? process.stdout : process.stderr).write(text);
-    spec.onOutput?.(stream, text);
-  };
-  const stdout = new OutputCollector(spec.maxCaptureBytes, spec.scrubValues, sink("stdout", spec.stdout === "tee"));
-  const stderr = new OutputCollector(spec.maxCaptureBytes, spec.scrubValues, sink("stderr", spec.stderr === "tee"));
   child.stdout?.on("data", (chunk: Buffer) => stdout.push(chunk));
   child.stderr?.on("data", (chunk: Buffer) => stderr.push(chunk));
 

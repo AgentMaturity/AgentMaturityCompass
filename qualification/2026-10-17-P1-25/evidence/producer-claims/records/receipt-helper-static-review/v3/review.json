@@ -1,0 +1,30 @@
+{
+  "schema": "p125pc-independent-receipt-v3-actual-action-contract-review/1",
+  "at": "2026-10-17T02:09:53.903673+00:00",
+  "blockers": [],
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+    "bytes": 41612,
+    "sha256": "00144c15ee50956f0ef82ddabe1a9e70f6ffdc161390c72ac48120cd24d1cc23"
+  },
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/seal.json",
+    "bytes": 4660,
+    "sha256": "89c5a4dbf2aa47348aff69ae97f219a24c0311b982f9b1aded75bab30d602de4"
+  },
+  "checks": {
+    "fullNarrow2422ByteDeltaReadAndReproducedExactly": true,
+    "allSealedInputOutputPhysicalPinsExact": true,
+    "reversingOnlyDeclaredInsertionAndLoopReplacementRecoversExactV2Bytes": true,
+    "allOtherV2GuardsPrivacyCapsCompactPreservationAndChronologyUnchanged": true,
+    "fourUniqueExactPhysicalActionPinsRequired": true,
+    "actualSixFieldActionsLackFlagAndRemainUnchanged": true,
+    "allFourActualRootClosureRowsMatchModeNumberArgvTimesExitAndDependentPhase": true,
+    "naturalClosureAndDependentStartedAfterReturnAttestationsTrue": true,
+    "existingStdoutOperationIdentityAndActualChronologyStillRequired": true,
+    "unreadyOriginalTemplatePreserved": true
+  },
+  "scope": "Narrow static V3 action-schema compatibility only, building on sealed V2 full review and completed runtime review.",
+  "manifestFit": "Each future control operation must carry the complete actual action pin, including physical fields, because the V3 closure lookup requires exact pin-object equality. A three-field projection would correctly fail this contract.",
+  "boundary": "No helper import, syntax parse, compilation, execution, assembly, source/index/QA/evidence mutation or native/key/private-stream/reservation operation. No readiness, publication or future result credit."
+}

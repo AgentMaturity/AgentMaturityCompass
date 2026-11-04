@@ -1,0 +1,6 @@
+
+> agent-maturity-compass@1.2.0 lint /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass
+> oxlint --type-aware --deny-warnings -c .oxlintrc.json src && node scripts/lint-contract.mjs && node scripts/check-no-fabrication.mjs
+
+Lint contract passed: three unsafe patterns rejected; safe counterparts accepted.
+check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 303, R4 10; 16 random marker(s); 0 pending entries.

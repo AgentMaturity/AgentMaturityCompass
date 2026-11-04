@@ -1,0 +1,303 @@
+{
+  "schema": "p125f-source-run-independent-join/1",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "phase": "p125f-source-combined",
+  "orderedRows": [
+    [
+      "tests/time/tsaFallback.test.ts",
+      "P1-25 offline and configured TSA refusal continuation returns the exact default config and offline result without configured TSAs",
+      "passed"
+    ],
+    [
+      "tests/time/tsaFallback.test.ts",
+      "P1-25 offline and configured TSA refusal continuation skips an unmatched anchor before the wire beside a matching-anchor refusal",
+      "passed"
+    ],
+    [
+      "tests/time/tsaFallback.test.ts",
+      "P1-25 offline and configured TSA refusal continuation preserves literal attempt and failure order through finite HTTP, malformed and imprint refusals",
+      "passed"
+    ],
+    [
+      "tests/time/tsaFallback.test.ts",
+      "P1-25 offline and configured TSA refusal continuation continues after the unchanged 10000 ms default abort to a real next-route refusal",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "verifies the granted response and returns its exact signed CMS token bytes",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a different expected digest for the unchanged genuine signed token",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a different expected nonce for the unchanged genuine signed token",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses the independently located signed-attribute corruption",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses the genuine token under a different real root with the same permitted policy",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a policy excluded by the correctly pinned real root",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate without an EKU extension",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses explicit rejection status before requiring a timestamp token",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses a truncated copy of the genuine token",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "refuses 65537 bytes at the token size boundary before DER parsing",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "keeps claimed time separate from the genuine attested upper bound",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "keeps an artifact without a timestamp at claimed time",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "reports an untrusted TSA as a warning while the artifact time stays claimed",
+      "passed"
+    ],
+    [
+      "tests/time/verifyTimestamp.test.ts",
+      "reports a broken supplied token as an artifact integrity error",
+      "passed"
+    ]
+  ],
+  "rawObserverOrderedJoin": true,
+  "uniqueIds": 21,
+  "hookTaskEntries": 2,
+  "individualHookValues": 3,
+  "hooks": [
+    {
+      "afterAll": "pass"
+    },
+    {
+      "beforeAll": "pass",
+      "afterAll": "pass"
+    }
+  ],
+  "lifecycleRecords": [
+    {
+      "caseId": "OFFLINE",
+      "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "listenerStarted": false,
+      "listenerClosed": false,
+      "requests": [],
+      "socketCount": 0,
+      "socketsClosed": true,
+      "ownedErrors": [],
+      "bodyFailed": false,
+      "cleanupErrorCount": 0
+    },
+    {
+      "caseId": "NO-ANCHOR",
+      "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "listenerStarted": true,
+      "listenerClosed": true,
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/anchor-positive",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        },
+        {
+          "method": "POST",
+          "path": "/after-skip",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        }
+      ],
+      "socketCount": 2,
+      "socketsClosed": true,
+      "ownedErrors": [],
+      "bodyFailed": false,
+      "cleanupErrorCount": 0
+    },
+    {
+      "caseId": "ORDER",
+      "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "listenerStarted": true,
+      "listenerClosed": true,
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/single-positive",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        },
+        {
+          "method": "POST",
+          "path": "/http-first",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        },
+        {
+          "method": "POST",
+          "path": "/malformed-second",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        },
+        {
+          "method": "POST",
+          "path": "/genuine-third",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        }
+      ],
+      "socketCount": 4,
+      "socketsClosed": true,
+      "ownedErrors": [],
+      "bodyFailed": false,
+      "cleanupErrorCount": 0
+    },
+    {
+      "caseId": "TIMEOUT-CONTINUE",
+      "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "listenerStarted": true,
+      "listenerClosed": true,
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/stall-first",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": false,
+          "responseClosed": true,
+          "replyEndCalled": false,
+          "allowPeerAbort": true,
+          "stall": true
+        },
+        {
+          "method": "POST",
+          "path": "/after-timeout",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        }
+      ],
+      "socketCount": 2,
+      "socketsClosed": true,
+      "ownedErrors": [],
+      "bodyFailed": false,
+      "cleanupErrorCount": 0
+    }
+  ],
+  "actualDefaultTimeout": {
+    "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "configuredMs": 10000,
+    "elapsedMs": 10013.574583000001,
+    "failures": [
+      "stall-first: The operation was aborted",
+      "after-timeout: HTTP 500"
+    ],
+    "routes": [
+      "/stall-first",
+      "/after-timeout"
+    ]
+  },
+  "noErrorsOrLateDiagnostics": true,
+  "naturalClosure": {
+    "exit": 0,
+    "durationMs": 11769,
+    "ownedPgid": 49481,
+    "ESRCH": true,
+    "nonzeroSignalsSent": false
+  }
+}

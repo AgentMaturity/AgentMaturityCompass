@@ -1,0 +1,1 @@
+{ "mode": "observe", "rules": [{ "tool": "Bash", "decision": "deny" }, { "tool": "Read", "decision": "allow" }], "default": "ask" }

@@ -1,0 +1,6 @@
+
+> agent-maturity-compass@1.2.0 typecheck:tests /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+> tsc -p tsconfig.tests.json --noEmit
+
+tests/mcp/mcpOauth.test.ts(629,13): error TS2322: Type 'string' is not assignable to type '"oauth2"'.
+ ELIFECYCLE  Command failed with exit code 2.

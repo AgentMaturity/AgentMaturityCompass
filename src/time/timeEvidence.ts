@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isoTimeSchema } from "../contracts/v1/common.js";
 
 /**
  * Claimed time and attested time, kept apart (P1-25). A claimed time is whatever the writer said and is never
@@ -12,7 +13,7 @@ export const attestedTimeSchema = z.strictObject({
   /** anchorId names the configured TSA anchor the signer chained to. */
   tsa: z.strictObject({ subject: z.string(), certSha256: sha256Hex, anchorId: z.string() }),
   /** TSTInfo.genTime as RFC 3339. */
-  genTime: z.iso.datetime(),
+  genTime: isoTimeSchema,
   accuracyMs: z.number().nonnegative().nullable(),
   policyOid: z.string(),
   serialNumber: z.string().regex(/^[0-9a-f]+$/),
@@ -28,7 +29,7 @@ export const timeEvidenceSchema = z.strictObject({
   claimedAt: z.string(),
   attested: attestedTimeSchema.nullable(),
   basis: z.enum(["claimed", "attested-upper-bound", "attested-window"]),
-  window: z.strictObject({ notBefore: z.iso.datetime().nullable(), notAfter: z.iso.datetime() }).optional()
+  window: z.strictObject({ notBefore: isoTimeSchema.nullable(), notAfter: isoTimeSchema }).optional()
 });
 export type TimeEvidence = z.infer<typeof timeEvidenceSchema>;
 

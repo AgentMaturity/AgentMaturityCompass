@@ -1,0 +1,115 @@
+{
+  "item": "P2-08",
+  "productH": "f6e80b150c57d53b746fcb34238bc7e6dd95f9da",
+  "formalQualification": false,
+  "allAcceptanceComplete": false,
+  "rows": [
+    {
+      "id": "AC1",
+      "criterion": "Every-purpose/provider support and no private export",
+      "state": "PARTIAL",
+      "passClaim": false,
+      "assessment": "Five provider interfaces, nonexportability/refusal and migrated owner/runtime paths have scoped evidence. General binding/every-purpose production remains limited by held integrations and explicit refusals; no fallback or private-export claim is widened.",
+      "dependencies": [
+        "owner-held integrations",
+        "unreserved compound paths dependent on held consumers",
+        "unsupported provider compromise/delegate and imported-prefix migrations"
+      ]
+    },
+    {
+      "id": "AC2",
+      "criterion": "Current provider policy/matrix and canonical Ed25519/P256 verification",
+      "state": "PARTIAL",
+      "passClaim": false,
+      "assessment": "Canonical identity/signature and refusal-policy work is implemented on the migrated boundaries. Matrix facts remain dated under the research/network policy; pinned SDK shapes do not refresh service capability rows. Held A4/portable consumers remain separate integration work.",
+      "dependencies": [
+        "policy-blocked matrix currency",
+        "owner-held A4/portable edges"
+      ]
+    },
+    {
+      "id": "AC3",
+      "criterion": "Local scoped ledger delegation with no per-row remote signing",
+      "state": "SCOPED_IMPLEMENTATION_FINAL_FULL_COVERAGE_PENDING",
+      "passClaim": false,
+      "assessment": "Scoped v2 cutovers, shared quota and operational readers/writers have local evidence. Legacy unbound owner-imported rows/seals use the same authenticated history read while external trust remains separate; exact checkpoint authority is unchanged. Role-only imported prefixes cannot first-bind a provider without an unsupported separate migration protocol: typed refusal occurs before provider work and at final publication.",
+      "dependencies": [
+        "actual final-Q coverage and owned-assertion audit",
+        "remaining owner-held/portable integration"
+      ]
+    },
+    {
+      "id": "AC4",
+      "criterion": "SoftHSM CI, fake KMS tests and no real KMS network",
+      "state": "LOCAL_SOFTWARE_TOKEN_MEASURED_HOSTED_CI_UNMEASURED",
+      "passClaim": false,
+      "assessment": "Current clean-H local software-token capture has3passed,0failed,0pending in665ms. Fake transports and local software-token tests do not establish hosted Ubuntu CI execution, real cloud service or hardware HSM behavior.",
+      "dependencies": [
+        "authorized hosted CI run/resources",
+        "authorized live cloud/hardware resources if required"
+      ]
+    },
+    {
+      "id": "AC5",
+      "criterion": "Hardware/protection labels do not imply verified attestation",
+      "state": "SCOPED_LABEL_TRUTH_IMPLEMENTED_FINAL_QUALIFICATION_PENDING",
+      "passClaim": false,
+      "assessment": "Configured/provider-metadata bases remain distinct from independently verified hardware attestation. Final unfiltered report coverage/classification remains pending; no hardware qualification is inferred.",
+      "dependencies": [
+        "actual final-Q coverage and failure audit",
+        "actual attestation work remains out of current implementation scope"
+      ]
+    },
+    {
+      "id": "AC6",
+      "criterion": "Ordinary install omits optional provider SDK/addon and packed runtime works",
+      "state": "CURRENT_LOCAL_PACKAGING_MEASURED",
+      "passClaim": false,
+      "assessment": "Current clean-H actual packed-install check exits0 in66285ms and checks the isolated installed runtime and absence of default optional cloud SDKs/PKCS11 addon. Live-provider smoke and prepack release gate were not exercised. Final full coverage remains pending.",
+      "dependencies": [
+        "final qualification binding; no remaining implicit-prefix technical defect claimed"
+      ]
+    },
+    {
+      "id": "AC7",
+      "criterion": "Documentation/migration/guard evidence and complete qualification checks",
+      "state": "CURRENT_CHECKS_CLOSED_FINAL_UNFILTERED_MEASUREMENT_PENDING",
+      "passClaim": false,
+      "assessment": "All23 required checks and3 extras are closed zero on productHf6. A separate software-token run has3passed. Prior focused captures remain incomplete with no final totals. One actual unfiltered run on metadata-only Q must establish all948 required whole-file and87 owned-file coverage and classify every failure. Receipt binding/validation remain agent-doable; no unique aggregate mutation coverage or full pass is claimed.",
+      "dependencies": [
+        "audit actual final-Q whole-file collection, owned outcomes and every failure",
+        "metadata Q then actual unfiltered full",
+        "final receipt/artifact validation"
+      ]
+    }
+  ],
+  "currentPrerequisites": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-current-clean-h-prerequisite-audit-v4.json",
+    "sha256": "b181dfbd7499584323aa959f0f6d8c56437f8e2fe88e4afce987eb8f1d035aa0",
+    "bytes": 17567
+  },
+  "sourceScope": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/final-hono-product-h-source-scope-manifest-v5.json",
+    "sha256": "dbda06088b1112aab6b8286c8015c535f983c11eada447dd71978ce4c3f55c5a",
+    "bytes": 89528
+  },
+  "ownership": {
+    "api4": "APPLIED_EXACT",
+    "generatedIndex7": "APPLIED_EXACT",
+    "proof": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/approved-api4-index7-applied-v1.json",
+      "sha256": "5168bf765eee67d0888fed6977650e697d556d186ebde735c2cebb47436edb46",
+      "bytes": 1051
+    },
+    "otherReservationsRemainHeld": true
+  },
+  "full": {
+    "state": "PENDING_ON_METADATA_ONLY_CHILD_Q",
+    "Q": null,
+    "tests": null,
+    "exitCode": null,
+    "coverageAudit": "PENDING actual complete native report against all948 required whole files and87 owned whole test files",
+    "passClaim": false
+  },
+  "classification": "Technical held/dependent integration, policy-limited currency, external resources and a separate home-state decision are different categories; pending measurement is agent-doable."
+}

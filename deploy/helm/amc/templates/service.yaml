@@ -19,3 +19,8 @@ spec:
     - name: proxy
       port: {{ .Values.service.proxyPort }}
       targetPort: proxy
+    {{- if .Values.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.metrics.port }}
+      targetPort: metrics
+    {{- end }}

@@ -121,10 +121,15 @@ export class CredentialsSeamService extends AmcSeam implements CredentialsServic
  * A single-service plugin rather than a group: unlike the evidence spine, whose
  * four halves are useless apart, this seam is complete on its own and later
  * phases attach to it individually.
+ *
+ * The inner fiber is awaited so its boot error (a group-readable credentials
+ * home, unparsable YAML) fails THIS fiber with that error. Without the await
+ * the error stays on the inner fiber, and the caller only learns that no
+ * service was registered (P0-56). Still fail closed: nothing registers.
  */
 export const credentialsServices = {
   name: "amc-credentials-services",
-  apply(ctx: Context, config: CredentialsServiceConfig = {}): void {
-    ctx.plugin(CredentialsSeamService, config);
+  async apply(ctx: Context, config: CredentialsServiceConfig = {}): Promise<void> {
+    await ctx.plugin(CredentialsSeamService, config).await();
   }
 };

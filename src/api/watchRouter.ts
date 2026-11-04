@@ -1,3 +1,4 @@
+import { runHashHttpOptions } from "./runHashPublication.js";
 /**
  * watchRouter.ts — Watch/observability/guardrails API routes.
  * Full parity with: amc watch *, amc governor *, amc guardrails *
@@ -23,6 +24,7 @@ export async function handleWatchRoute(
   req: IncomingMessage,
   res: ServerResponse,
   workspace = process.cwd(),
+  revalidateAuthority?: () => boolean,
 ): Promise<boolean> {
   if (!pathname.startsWith('/api/v1/watch')) return false;
 
@@ -118,7 +120,8 @@ export async function handleWatchRoute(
       if (!body.output) { apiError(res, 400, 'output required'); return true; }
       const agentId = body.agentId ?? 'default';
       const { openLedger } = await import('../ledger/ledger.js');
-      const ledger = openLedger(workspace);
+      const { writerStore } = await import('../ledger/ledgerConnection.js');
+      const ledger = openLedger(workspace, writerStore());
       try {
         const sessionId = body.sessionId ?? `attest_${Date.now()}`;
         const eventId = ledger.appendEvidence({
@@ -150,9 +153,10 @@ export async function handleWatchRoute(
         packId: body.packId ?? 'all',
         mode: 'supervise',
         window: body.window ?? '30d',
-      });
+      }, runHashHttpOptions(res, revalidateAuthority));
       apiSuccess(res, result);
     } catch (err) {
+      if (res.headersSent) return true;
       apiError(res, 500, err instanceof Error ? err.message : 'Safety test failed');
     }
     return true;
@@ -431,7 +435,8 @@ export async function handleWatchRoute(
       const body = await bodyJson<{ agentId?: string; event: string; metadata?: unknown }>(req);
       if (!body.event) { apiError(res, 400, 'event required'); return true; }
       const { openLedger } = await import('../ledger/ledger.js');
-      const ledger = openLedger(workspace);
+      const { writerStore } = await import('../ledger/ledgerConnection.js');
+      const ledger = openLedger(workspace, writerStore());
       try {
         const eventId = ledger.appendEvidence({
           sessionId: `oversight_${Date.now()}`,

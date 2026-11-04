@@ -19,7 +19,7 @@ A strict JSON object (`deploymentProfileSchema` in `src/catalog/compiler/types.t
 | `deployment` | `tenantId`, `workspaceId`, `deploymentId` and at least one `agentIds` entry. |
 | `primaryStation`, `stations`, `domains`, `jurisdictions`, `roles`, `entityTypes`, `riskClass`, `useCases`, `dataClasses` | Facts. Stations are the seven station ids; `stations` must include `primaryStation` when both are known. |
 | `euRoleRecord`, `art63Record` | `{ ref, sha256 }` or null: artifacts, not flags. The compiler carries them; it does not check them. |
-| `operatingProfile` | `{ path, sha256, schemaVersion }` of an F1 operating profile (path relative to the working directory), or null. The CLI refuses a file whose bytes do not hash to `sha256`. |
+| `operatingProfile` | `{ path, sha256, schemaVersion }` of an F1 operating profile (path relative to the working directory, inside it), or null. `compileInputs` refuses a file it cannot read there, whose bytes do not hash to `sha256`, whose `schemaVersion` differs or that fails F1's consistency check; the plan's signed-config fragments then start from that profile's (`fromOperatingProfile`, see Outputs). |
 | `exceptions` | Reviewer exceptions, below. |
 
 A fact is `{ value, provenance, source, reviewedBy }`. `value: null` means unknown: the compiler never guesses.
@@ -114,6 +114,7 @@ for every control in the catalog, applicable or not.
 | `toolPipeline.visibleTools` | `tool_pipeline` | `intersection` | tool names |
 | `toolPipeline.approvalRequiredFor` | `tool_pipeline` | `union` | action classes |
 | `toolPipeline.requireAgentLease`, `toolPipeline.requirePrincipal` | `tool_pipeline` (guard `identity-binding`) | `true_wins` | boolean |
+| `toolPipeline.maxLeaseTtlMinutes` | `tool_pipeline` (guard `identity-binding`) | `min` | integer >= 1 |
 | `approvals.<ActionClass>.requiredApprovals` | `approvals` | `max` | integer >= 0 |
 | `approvals.<ActionClass>.requireDistinctUsers` | `approvals` | `true_wins` | boolean |
 | `approvals.<ActionClass>.rolesAllowed` | `approvals` | `intersection` | user roles |
@@ -128,9 +129,25 @@ enforces (P1-12). A control whose parameters need a guard that is not registered
 
 ## Outputs
 
-`compilePlan({ profile, catalog, asOf })` returns a `CompiledPlan` (types in `src/catalog/compiler/types.ts`):
+`compilePlan({ profile, catalog, asOf, signedTools? })` returns a `CompiledPlan` (types in `src/catalog/compiler/types.ts`).
+`signedTools` is the workspace's signed `.amc/tools.yaml` as `{ config, sha256 }`, which the caller has verified (bytes,
+signature and schema from one read); the compiler reads no file. Without it the plan is exactly what it was before
+P1-10F. Both callers that compile against a workspace, `amc catalog compile` and A4 Adapt's Understand, get it from
+`compileInputs` (`src/catalog/compileInputs.ts`): `{}` when there is no tools.yaml, and `TOOLS_CONFIG_UNVERIFIED`
+when one is present but does not verify, never the wider default list.
 
-- `profile`: id, the SHA-256 of the canonical normalized profile, and fact provenance.
+`fromOperatingProfile` is the referenced F1 profile's `proposedSignedConfigs`, which `compileInputs` reads when the
+deployment profile names one. The plan's approval policy, budgets (per agent id the profile carries), tools, action
+policy and ops policy start from those fragments instead of F1's defaults, and the plan's controls narrow them as they
+narrow the defaults; with a signed tools.yaml the visible tools are also limited to the profile's tool names. The
+firewall fragment stays `block`, the strictest mode. A profile fragment that would leave the plan weaker than the same
+compile without it is refused (`OPERATING_PROFILE_WEAKENS`), except retention days, which have two legitimate strict
+directions (record-keeping and minimization), so the profile's stand. A4 builds its deployment profile with
+`operatingProfile: null`, so it never seeds.
+
+- `profile`: id, the SHA-256 of the canonical normalized profile, fact provenance, and the profile's
+  `{ tenantId, deploymentId }`, which authorization records under the active plan bind (P1-78; absent from plans
+  compiled before it).
 - `lock`: the P1-09 catalog lockfile.
 - `requirements`, sorted by control id, with `reasons`, `missingFacts`, `exclusion`, `citationsInScope` and
   `pulledInBy`; `conflicts`; `unsupported` (`enforcement_point_absent`, `producer_planned`, `retired`;
@@ -141,6 +158,10 @@ enforces (P1-12). A control whose parameters need a guard that is not registered
   allowed hosts), deletion (an unknown legal hold denies; retention days), `proposedSignedConfigs` and `policyDigest`.
   `proposedSignedConfigs` start from the defaults and zod schemas F1's operating-profile builders use. The compiler
   writes nothing under `.amc/`; activation is described below.
+  The visible tools (P1-10F) are the tools of `signedTools`, or of the built-in default list (`defaultToolsConfig()`,
+  which has no `delegate` or `workflow`) without it, narrowed by any `toolPipeline.visibleTools` parameter the plan's
+  controls set. The tools fragment of `proposedSignedConfigs` starts from the same list. With `signedTools` the plan
+  also records `toolPipeline.toolsConfigSha256`, the SHA-256 of the tools.yaml bytes it was compiled from.
 - `evidencePlan`: one test entry per control test (run at `activation` and on each `invalidatedBy` trigger; drills
   and document reviews on the manual duty's cadence), one request per evidence contract, the manual duties, and
   release gates for runtime-enforced, configuration-check and adversarial tests, blocking when the control is
@@ -161,7 +182,11 @@ every weakening against it and refuses to sign unless `allowWeakening` is set:
 
 - a requirement that applied or was unresolved and is now absent or not applicable, or whose control version changed;
 - runtime-policy changes by rule: tools, hosts or roles added, approval classes or guards removed, fewer approvals,
-  longer approval TTLs, a true requirement turned false; any change no rule classifies, retention included, counts;
+  longer approval TTLs, a true requirement turned false; any change no rule classifies, retention included, counts.
+  A new `toolPipeline.toolsConfigSha256` is judged by what it changes: a tool a new tools.yaml adds counts through
+  `visibleTools`, and any other change to a visible tool's entry through the tools fragment below, so a digest that
+  only narrows is not a weakening. A plan that drops the digest (one compiled without tools.yaml replacing one that
+  binds it) is a weakening;
 - proposed signed configs by the same rules activation applies to live configs (`fragmentWeakenings`);
 - evidence-plan rows removed, fewer attempts, longer maximum age, a blocking gate made non-blocking, fixtures,
   triggers or binding fields removed, and any other change;
@@ -199,10 +224,19 @@ An active plan is what makes a workspace a regulated profile. Every native sessi
 tool service load it when they start. The load verifies the journal whole, then the plan inside the entry it read
 (digest and signature in the same read), then the shipped catalog against the plan's lockfile. Anything that does not
 verify refuses the session. With no plan ever activated, the session runs and its receipt records the downgrade
-`no_compiled_policy`.
+`no_compiled_policy`. A workspace that contains the control checkpoint root (for example the home directory, with
+`AMC_CONTROL_CHECKPOINT_DIR` unset) cannot hold a verifiable plan, and a missing plan there cannot be told apart from a
+deleted one, so every load refuses as `ControlCheckpointRootInWorkspaceError` (fail closed). It names
+`AMC_CONTROL_CHECKPOINT_DIR` and is never reported as a plan to restore (P0-57).
 
 The `compiled-policy` guard runs first in the native pipeline and fails closed:
 
+- when the plan records `toolPipeline.toolsConfigSha256`, every call is denied while the bytes of `.amc/tools.yaml`
+  hash to anything else (edited, re-signed or removed after compiling), until the plan is recompiled and reactivated,
+  as a catalog that no longer matches the lockfile refuses the session (P1-10F). A plan compiled from the default
+  list records no digest and does not read tools.yaml here; the `tool-allowlist` guard still checks its signature.
+  A native session reads and verifies tools.yaml once per call: this check, `network-egress`, `tool-allowlist` and
+  `native-tool-identity` all decide from those bytes;
 - a call whose tool is not in `toolPipeline.visibleTools` is denied (`run_code` is exempt; each sub-call is checked).
   Native sessions also leave those tools out of the tool list offered to the model, using the plan pinned at
   start; the guard stays the enforcement point;
@@ -212,21 +246,40 @@ The `compiled-policy` guard runs first in the native pipeline and fails closed:
   `identity-binding` requires a lease (`L0-IDN-01`) runs under a lease Studio mints for that runtime alone (P1-67): the
   task's agent, the task id as the work order, `toolhub:execute` narrowed to the action classes of its pinned signed
   tools, the task's step and token caps as its rate fields (the tool pipeline does not read them), and at most the
-  runtime's one-hour lifetime. The token reaches the `amc acp` child through `AMC_NATIVE_TASK_LEASE`, which the child
-  unsets before anything runs and scrubs from tool output; only the lease id is recorded on the signed task
-  descriptor, once the runtime holds the session's writer claim. Every call binds the lease to its authorization
-  record through the pipeline's own lease verifier (signature, expiry, agent, scope, class, signed revocations), so
-  `identity-binding` admits the call: the record's `delegation.leaseId` names the verified lease, and its principal is
-  the approvers for an approved call (every Studio workspace-tool call is approval-gated) or `lease:<id>` when no
-  approval is named. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, which
+  runtime's one-hour lifetime. The token reaches the `amc acp` child over an inherited pipe on fd 3 (named by `AMC_NATIVE_TASK_LEASE_FD`), never its
+  environment; the child reads and closes it before anything runs and scrubs it from tool output; only the lease id is recorded on the signed task
+  descriptor, once the runtime holds the session's writer claim. The lease also names the task's own `users.yaml` user
+  (P1-78). Every call binds the lease to its authorization record through the pipeline's own lease verifier (signature,
+  expiry, agent, workspace, scope, class, signed revocations): the record's `delegation.leaseId` names the verified
+  lease, and its principal is the approvers for an approved call (every Studio workspace-tool call is approval-gated),
+  otherwise the active `users.yaml` user the lease names, read and verified at bind. The lease token's own identity is
+  never a principal. Studio mints through `issueLeaseForPrincipal`: under a plan whose `identity-binding` requires a
+  principal (`planRequiresPrincipal`), a task started from a workspace-router session or with the bootstrap admin token,
+  or by a user who is not active in `users.yaml`, is not started (`NATIVE_PRINCIPAL_UNRESOLVED`) instead of minting a
+  lease every call would refuse; the recheck refuses a principal deactivated or demoted after bind. Studio revokes the lease when the runtime stops (release, the idle and lifetime sweeper, which
   stops a runtime before its lease expires, shutdown, a failed start or resume, cold verification, a runtime process
   that exited on its own) and at archive; a resumed runtime revokes the previous runtime's lease only after it holds
   the writer claim, so a refused resume leaves another process's live runtime alone. When the active plan does not
   verify or no lease can be minted (the lease signing key is unavailable), the runtime is not started; when the
-  previous lease cannot be revoked, the resumed runtime is stopped. A native session without a verified lease (a task
-  started before this change or under a plan that did not require one, a CLI agent session, an `amc acp` process
-  nobody handed a lease) is still denied every call under a plan with `L0-IDN-01`. Under a plan that does not require
-  a lease, no lease is minted or bound;
+  previous lease cannot be revoked, the resumed runtime is stopped. Under a plan whose `identity-binding` requires a
+  principal, a CLI agent run (`amc agent-loop run`, which `amc agent-loop chat` drives, and each `amc native-schedule`
+  pass), each `amc acp` session (at `session/new`, `session/load` and `session/fork`, where an operator's fork factory
+  receives the child's lease as `leaseToken`; the SDK's `AMCNativeClient` runs `amc acp`) and an in-process
+  `openAgentSession` or `resumeAgentSession` caller that passes no lease, with workspace tools, mint their own
+  lease through `issueLeaseForPrincipal` (P1-79, `src/leases/runLease.ts`): `toolhub:execute`, at most one hour, naming
+  the ACTIVE `users.yaml` user whose username is the OS account running the process, read from the verified file and
+  never from a flag, an environment variable or a request body. That is a local binding: whoever runs as that OS
+  account and can unlock the vault's lease key acts as that user. No such user, or a `users.yaml` that does not
+  verify, refuses `PRINCIPAL_UNRESOLVED` before any session row or lease exists: the CLI exits non-zero, ACP
+  answers -32602 with `data.reason` `PRINCIPAL_UNRESOLVED`, and `openAgentSession` throws `LeasePrincipalRefused`
+  (`code` `PRINCIPAL_UNRESOLVED`). A lease Studio handed an `amc acp` child, or a caller handed `openAgentSession`, is
+  kept, and a run without workspace tools mints none. In-process delegated children (`delegate`, `workflow` and a
+  schedule pass's) compose their toolsets with the parent run's lease, so each call binds the parent's principal under
+  the narrower of the child's scope and the lease's classes, until that lease expires or is revoked; a run that could
+  spawn them and holds no lease is refused `PRINCIPAL_UNRESOLVED` before its session opens. A native session without a
+  verified lease (a task started before P1-67 or under a plan that did not require one) is still denied every call
+  under a plan with `L0-IDN-01`, and so is every call after a run's one-hour lease expires (a new run, or a new or
+  loaded ACP session, mints another). Under a plan that requires neither, no lease is minted or bound;
 - any other compiled guard id denies, because this pipeline does not implement it;
 - for an action class with a compiled approval rule, the live signed approval policy must be at least as strict
   (approvals, distinct users, roles, TTL), read and verified in one read, or the call is denied;
@@ -258,11 +311,23 @@ amc catalog compile --profile <file> [--previous <plan.json>] [--lock <catalog.l
                     [--request-review] [--allow-weakening] [--activate <approvalRequestId>] [--json]
 ```
 
+It reads `.amc/tools.yaml` and passes it as `signedTools` when it verifies against the workspace's auditor keys and
+parses. Without a tools.yaml it compiles with the built-in default list. An unsigned, edited, foreign-signed or invalid
+tools.yaml refuses the compile (`TOOLS_CONFIG_UNVERIFIED`, exit 1) and names the reason (an unreadable file by its error
+class, such as `tools config unreadable (EACCES)`, never its path): re-sign it with
+`amc tools sign`, or remove it to compile with the default list. The output names which list was used
+(`visibleToolsSource` in `--json`). So `delegate` is visible under an
+activated plan only when the signed tools.yaml lists it and no control's `toolPipeline.visibleTools` leaves it out.
+After changing tools.yaml, recompile and reactivate: a plan that shows more tools than the active one is a weakening
+and needs `--allow-weakening`.
+
 `--activate <approvalRequestId>` activates the plan just compiled once that review approved it. Compiling is
 deterministic, so the usual flow is `--request-review`, an approver's `amc approvals approve`, then the same compile
 with `--activate <approvalRequestId>`. It cannot be combined with `--request-review`.
 
-It compiles against the shipped catalog and writes `plan.json` (the `CompiledPlan`), `plan.sig.json` (`compiledAt`,
+It compiles against the shipped catalog, loaded through the P1-33 admission gate (`loadAdmittedCatalog`: a pack declaring
+`reviewed` or `qualified` whose recomputed admission does not admit it compiles as `experimental`; [ADMISSION.md](ADMISSION.md)),
+and writes `plan.json` (the `CompiledPlan`), `plan.sig.json` (`compiledAt`,
 `diff`, `signature`, `review`), `plan.diff.md` and `catalog.lock.json` to `--out`, by default
 `amc-control-plans/<profileId>/<first 12 hex of the digest>/`. An `--out` under `.amc/` is refused. `--previous` reads
 `plan.json` and the `plan.sig.json` beside it. `--lock` refuses to compile when the loaded catalog differs from the
@@ -279,7 +344,9 @@ amc catalog compile --profile tests/fixtures/catalog/compiler/finance-ops-us.pro
 ## Error codes
 
 `PROFILE_INVALID`, `CATALOG_INVALID`, `UNKNOWN_PARAMETER`, `PARAMETER_TYPE`, `PARAMETER_POINT`, `STRICTNESS_MISMATCH`,
-`EXCEPTION_ON_LAYER0`, `EXCEPTION_UNKNOWN_CONTROL`, `EXCEPTION_UNKNOWN_PARAMETER`.
+`EXCEPTION_ON_LAYER0`, `EXCEPTION_UNKNOWN_CONTROL`, `EXCEPTION_UNKNOWN_PARAMETER`, `OPERATING_PROFILE_WEAKENS`, and
+`TOOLS_CONFIG_UNVERIFIED`, `OPERATING_PROFILE_UNREADABLE` and `OPERATING_PROFILE_INVALID` from `compileInputs` before
+compilePlan runs.
 
 ## Not in this step
 

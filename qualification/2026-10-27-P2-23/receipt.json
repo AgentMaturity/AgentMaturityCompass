@@ -1,0 +1,304 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-23",
+  "date": "2026-10-27",
+  "commit": "6efebd13e6d45b551fbb9683b3ce1bc4ae4b57d5",
+  "branch": "rtd/p2-23-lifecycle",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS 26.6.2",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node scripts/gen-counts.mjs --write && node scripts/check-freeze.mjs --write-baseline",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 <146 related test files: every test importing a changed module, plus tests/lifecycle and tests/api/lifecycleRouter.test.ts>",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/lifecycle tests/api/lifecycleRouter.test.ts --maxWorkers=2 (new P2-23 tests)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 <159 related test files>",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 <181 related test files>",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/lifecycle tests/api/lifecycleRouter.test.ts --maxWorkers=2 (rerun after the import-order fix)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 <181 related test files>",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "mutations-advisory-hold.json",
+      "sha256": "fd0d8540f05170a08ab0f3fad2362eed1a9055fa911ce1737d3fc0fc103195ad"
+    },
+    {
+      "path": "mutations-held-agents.json",
+      "sha256": "b19324dbf1fd6829ad0bfe766dc66e016cee3cfb97ce9090120c5dacd1e24614"
+    },
+    {
+      "path": "mutations-security-review.json",
+      "sha256": "c5ec06f3e5d36f55dff9035ad673fafff9520297c0d8b2a86c458cc6ceb70483"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "eaacd97b591e2049eebd50d06f38c62e5b463acaec23c094367ab493d4561438"
+    },
+    {
+      "path": "red-before-advisory-hold.txt",
+      "sha256": "c360f6fd72114350d3d1a7086535c6b8ae775aa97ac99df016bc76e84a75de28"
+    },
+    {
+      "path": "red-before-held-agents.txt",
+      "sha256": "6ea50e71fc0f32969505d74466ba335ab51d8c25546086194452e23e3310520f"
+    },
+    {
+      "path": "red-before-security-fixes.txt",
+      "sha256": "69e354fcf8b42171b0879783abe18eff261ca0f0e48fad665fd85c0d38d833f4"
+    },
+    {
+      "path": "sample-event-trail.json",
+      "sha256": "8fe828cee80e191f83ab8b3c1c45ed2aea560130496182ce8de6723c5a0bc1db"
+    }
+  ],
+  "notes": "P2-23 on rtd/p2-23-lifecycle, base 18b7ead85. Rows 1-14 ran at the recorded commit 6efebd13e. date: the receipt recorded 2026-10-28 (git: 6efebd13e and the receipt commit 6cdb1eda1 are 2026-10-28 02:04 +0530); the folder carries the wave-3 date 2026-10-27, which the checker requires the date field to equal, as the other wave-3 receipts dated 2026-10-27 do. Row 13: 146 test files, 2277 tests, 0 failed. Row 14 runs the new P2-23 tests: tests/lifecycle/governanceLifecycle.test.ts 6, tests/lifecycle/reassessmentTriggers.test.ts 8, tests/lifecycle/admission.test.ts 5, tests/lifecycle/retirement.test.ts 2, tests/lifecycle/legacyMigration.test.ts 3, tests/api/lifecycleRouter.test.ts 2. Rows 15-26 are the security review fixes at 51ab20745: the 11 checks, then the related tests (row 26: 159 files, 2419 tests, 0 failed); mutations in mutations-security-review.json, red run in red-before-security-fixes.txt. Rows 27-39 are the held-agent change at db74b9cef: the 11 checks; row 38, 181 files and 2575 tests with 3 failed before the import-order fix (the 3 entryPoints failures were the test's mock import order (fixed); tests/lifecycle + lifecycleRouter rerun 15 files / 56 tests passed), which is why it exits 1; row 39 is that rerun. Mutations in mutations-held-agents.json, red run in red-before-held-agents.txt. Rows 40-51 are the advisory-hold change at 0981eff04: the 11 checks, then the related tests (row 51: 181 files, 2576 tests, 0 failed); mutations in mutations-advisory-hold.json, red run in red-before-advisory-hold.txt. Rows 26, 38, 39 and 51 write each round's recorded related-test totals as vitest commands; their command lines were not recorded, and their exits follow from the recorded failure counts. mutations.json and sample-event-trail.json keep the hashes the receipt recorded; the round files are now hashed too. Pending: full suite run (integrator); freeze allowedExceptionKeys entry for P2-23 (integrator); Sid decision: hold never-migrated agents under an enforcing plan, or keep the migration opt-in. tests is null: the runs at four commits overlap and are not summed. The command durations were not recorded (durationMs 0 means not recorded)."
+}

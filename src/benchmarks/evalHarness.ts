@@ -11,6 +11,8 @@
  * - EvalReport: structured output for paper-ready tables/figures
  */
 
+import { cohensD as pooledCohensD, mean as statsMean, standardDeviation } from "../experiments/stats.js";
+
 // ── Types ──────────────────────────────────────────────────────────────────
 
 export interface EvalConfig {
@@ -171,26 +173,27 @@ export function generateConditions(
 // ── Statistical helpers ────────────────────────────────────────────────────
 
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((a, b) => a + b, 0) / values.length;
+  return statsMean(values);
 }
 
 function stdDev(values: number[]): number {
-  if (values.length <= 1) return 0;
-  const m = mean(values);
-  const variance =
-    values.reduce((sum, v) => sum + (v - m) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
+  return standardDeviation(values);
 }
 
 /**
- * Cohen's d effect size between two groups.
+ * Cohen's d effect size between two groups, rounded to three decimal places.
+ * @deprecated Import cohensD from experiments/stats.js for the unrounded statistic.
  */
 export function cohensD(
   groupA: number[],
   groupB: number[],
 ): number {
   if (groupA.length === 0 || groupB.length === 0) return 0;
+  if (groupA.length >= 2 && groupB.length >= 2) {
+    return Math.round(pooledCohensD(groupA, groupB) * 1000) / 1000;
+  }
+  // Legacy singleton policy differs from stats.ts: reuse the other group's sample SD;
+  // two singleton groups have undefined pooled SD (NaN). Preserve the exported result.
   const meanA = mean(groupA);
   const meanB = mean(groupB);
   const sdA = stdDev(groupA);

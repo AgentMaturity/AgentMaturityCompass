@@ -1,0 +1,92 @@
+{
+  "source": "2024f25c79973987b44a4a1298488d55ee0d6227",
+  "runtime": {
+    "node": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "modulesABI": "127",
+    "napi": "10",
+    "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+    "sqliteSelected": 1,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538734665,
+      "nlink": 1
+    },
+    "boundary": "Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference."
+  },
+  "runtimeLog": {
+    "path": "/private/tmp/p0-45-qualification-20261015/command-runtime-fingerprint/stdout-stderr.log",
+    "bytes": 737,
+    "sha256": "3ae66ce5aaad4b10408d753fff1f21029e64e76d540f0a8f2f12fbb7f4fea0bc"
+  },
+  "normalBuildExit": 0,
+  "compiled4529ExactToP021": true,
+  "compiledManifest": {
+    "path": "/private/tmp/p0-45-qualification-20261015/compiled-after-build.json",
+    "bytes": 485185,
+    "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+  },
+  "readinessCompiledPinsVerified": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/dist/cli.js",
+      "bytes": 1054087,
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+      "priorReadinessPin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/cli.js",
+        "bytes": 1054087,
+        "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+      }
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/dist/cli-verify-repair.js",
+      "bytes": 5969,
+      "sha256": "e54fc251be8750ea4e48770b3c589f8ab25f9c4fc641a55342aeab54af1f44a1",
+      "priorReadinessPin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/cli-verify-repair.js",
+        "bytes": 5969,
+        "sha256": "e54fc251be8750ea4e48770b3c589f8ab25f9c4fc641a55342aeab54af1f44a1"
+      }
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/dist/ledger/verifyRepair.js",
+      "bytes": 9833,
+      "sha256": "1f1b870fe18fbb61800c4a0334a375b5c860f1e5beabc3ba1b31a3cdfd040e80",
+      "priorReadinessPin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/ledger/verifyRepair.js",
+        "bytes": 9833,
+        "sha256": "1f1b870fe18fbb61800c4a0334a375b5c860f1e5beabc3ba1b31a3cdfd040e80"
+      }
+    }
+  ],
+  "tracked8205Unchanged": true,
+  "priorNativesPhysicallyDistinct": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538645305,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538593142,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    }
+  ],
+  "meaning": "Fresh owned native fingerprint is one actual process/in-memory query. No shared rebuild or per-test-child ABI inference. Prior native bodies are hash/stat checked only."
+}

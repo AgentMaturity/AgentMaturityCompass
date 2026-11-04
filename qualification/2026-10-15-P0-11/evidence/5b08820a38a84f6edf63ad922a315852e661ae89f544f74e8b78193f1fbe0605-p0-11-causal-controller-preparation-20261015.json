@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "preparedUtc": "2026-10-15T06:33:44.777551+00:00",
+  "state": "Unexecuted controller preparation only",
+  "allPreparationReadsFinished": true,
+  "controller": {
+    "path": "/private/tmp/p0-11-causal-controller-prepared-20261015.py",
+    "bytes": 28317,
+    "sha256": "5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878"
+  },
+  "reusedController": {
+    "path": "/private/tmp/p0-45-causal-controller-prepared-20261015.py",
+    "bytes": 22514,
+    "sha256": "9479a7a7186ce97e740dad14fda9c0244f3f3173d8d41a30b659de8e5e40e192"
+  },
+  "exactCausalPlan": {
+    "path": "/private/tmp/p0-11-causal-readonly-plan-20261015.json",
+    "bytes": 47054,
+    "sha256": "154463c7ef958626a2fc7c2426343abd5184fddf8b754c9088ff07abbbd2e1b3"
+  },
+  "source": {
+    "parentSource": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "parentRoot": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+    "expectedTrackedCopied": 8362,
+    "expectedCompiledCopied": 4529,
+    "expectedTotalCopied": 12891,
+    "basis": "Root activation notice and previously verified source-equivalent anchors. No current parent source/dist/native/active-original-run body was read in this preparation. Future measured/sealed inputs must prove these counts and bytes."
+  },
+  "controls": [
+    {
+      "id": "C1-map-missing-path-fail-open",
+      "corpusKey": "map",
+      "files": [
+        "tests/threatModelMap.test.ts"
+      ],
+      "staticExpectedCases": 7,
+      "meaning": "New current semantic fail-open error removal with continue; no predicted outcome is promoted to fact."
+    },
+    {
+      "id": "C2-tool-recorder-error-propagates",
+      "corpusKey": "recording",
+      "files": [
+        "tests/toolEvidenceRecording.test.ts"
+      ],
+      "staticExpectedCases": 7,
+      "meaning": "Outer barrier rethrows same genuine callback Error. Exact named case/message and source frames required; ordinary body rejection is distinct from AssertionError and infrastructure."
+    },
+    {
+      "id": "L1-optional-historical-literal-whole-branch-removal",
+      "corpusKey": "map",
+      "files": [
+        "tests/threatModelMap.test.ts"
+      ],
+      "staticExpectedCases": 7,
+      "meaning": "Root explicitly requested historical literal control. ENOENT/changed diagnostics can retain invalid-fixture refusal; never call that invalid-map admission or silently satisfy original pass-after-removal criterion."
+    }
+  ],
+  "changesFromReviewedP045": [
+    "New P011 base/root/source/fa3 and root START_P011_CAUSAL_<control-id> binding. Existing P045 prepared controller remains byte-identical.",
+    "Three exact plan recipes and two closed per-control corpora, each seven original cases. No primary9/preview5/recording7 aggregate is invented.",
+    "Future normalized proposal and case-identities map must derive two distinct actual memberships from root-sealed complete green original raw reports. No future identity or run report was authored now.",
+    "C2 allows only exact Error name/message from the named direct recorder case, requiring original callback202/body-await206/record invocation306 in both serialized observer stacks and raw text. No inserted throwline requirement. Other non-AssertionErrors halt conservatively.",
+    "Release binds actual future setup, proposal, controller, reporter, source/compiled manifests, preservation, setup index and case-identities hashes and paths. Expected measured physical count8362+4529 is explicit.",
+    "Per-control wx phases/results, owned-session wait420seconds, no terminating signals, bounded5s/50ms signal0 polling and positive ESRCH, known late-close/hook/unhandled rejection gates, no automatic restoration on exception, original tests/setup/30s deadlines and compiler/dist/import absence remain inherited."
+  ],
+  "futureSetupContract": {
+    "files": [
+      "setup.json",
+      "setup-index.json",
+      "proposal.json",
+      "inputs/source-manifest.json",
+      "inputs/compiled-manifest.json",
+      "inputs/preservation.json",
+      "inputs/case-identities.json",
+      "driver/observer-reporter.mjs"
+    ],
+    "setupFields": [
+      "parentSource",
+      "productionSource",
+      "parentRoot",
+      "closureRoot",
+      "trackedCopied",
+      "compiledCopied",
+      "totalPhysicalCopied",
+      "originalCasesByCorpus",
+      "frozenOwnInputs",
+      "noMutantWritten",
+      "testExecutionPerformed"
+    ],
+    "caseIdentityShape": {
+      "map": "Seven actual {file,fullName} records derived from sealed original map raw.",
+      "recording": "Seven actual {file,fullName} records derived from sealed original recording raw."
+    },
+    "proposalShape": {
+      "causalPlan": "Exact immutable plan pin.",
+      "corpora": {
+        "map": [
+          "tests/threatModelMap.test.ts"
+        ],
+        "recording": [
+          "tests/toolEvidenceRecording.test.ts"
+        ]
+      },
+      "staticExpectedCasesByCorpus": {
+        "map": 7,
+        "recording": 7
+      },
+      "originalReportPins": {
+        "map": "Exact immutable {path,bytes,sha256} original source-root map report pin.",
+        "recording": "Exact immutable original source-root recording report pin."
+      },
+      "recipes": "Ordered C1,C2,L1; map target\u2192file, sourcePin.sha256\u2192baselineSha256, one find/replace\u2192anchors, prospectiveTargetSha256\u2192proposedMutantSha256; add corpusKey. No field comes from hypothetical run results."
+    },
+    "dependencyBoundary": "Later copy has no .git and borrows ONLY current owned P011 node_modules by explicit symlink. Full source/compiled memberships and bytes, link target and native path/hash/device/inode/nlink/mode must remain measured and sealed. No independent dependency install or complete cache-isolation claim.",
+    "release": "Must bind the actual executing controller copy/hash and sealed setup/index path/hash plus every listed release hash; exact token per control. No release, copy, directories, manifests or source mutation exists from this task."
+  },
+  "classificationLimits": [
+    "All baseline/restored actual7 must pass normally; mutant survivor0 retained, or normal mutant1 with actual body AssertionErrors/specific C2 error only. No generic nonzero or setup/hook/native/timeout/late-close diagnostic is a guard kill.",
+    "C2 may reject at original await206 before recorderCalled/ok/output/denied assertions210\u2013213. It does not claim those later values were observed. Direct callback is independent of the ledger.",
+    "Correction to the immutable plan broad transaction phrasing: appendEvidenceBatch queue follows runImmediateTransaction completion in ordinary fixtures; nested caller uses a savepoint and does not establish universal outer durable commit. No plan bytes were overwritten.",
+    "Source-only MJS checker children and in-process TS recorder corpus are not a built amc CLI, actual collector outage, authenticated actor, sixteen-channel enforcement or formal acceptance proof.",
+    "Seven-key environment uses the unchanged legacy reporter key; no inherited os.environ and no OS/universal transport isolation claim. Current root original wrappers retain their separately documented boundary.",
+    "No import/parser/syntax validation, product/controller execution, preparation copy/setup, native/dependency access or mutation was performed. Static reviewer must independently inspect code before physical preparation and sealed release.",
+    "Formal/fullsuite/coverage/Node24/hosted/PR+merge/G0/Done acceptance, source-quality debt and all prior human/Claude/shared/paused holds remain open."
+  ],
+  "writes": "Only this new prepared controller and this new JSON preparation note. No existing artifact/source/qualification/role file was changed."
+}

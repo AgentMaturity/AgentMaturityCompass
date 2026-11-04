@@ -7,7 +7,7 @@
  * Hypotheses live only in the revision spec, never in the decision-receipt files a full score run marks observed.
  */
 import { readFileSync } from "node:fs";
-import { dirname, join, relative, sep } from "node:path";
+import { dirname, join } from "node:path";
 import YAML from "yaml";
 import { listArchetypes, previewArchetypeApply } from "../../archetypes/index.js";
 import { validateContextGraph, type ContextGraph } from "../../context/contextGraph.js";
@@ -32,7 +32,7 @@ import { valueContractSchema, valueContractTemplate } from "../../value/valueCon
 import { valueAgentContractPath, verifyValueContractSignature } from "../../value/valueStore.js";
 import { a4ProjectsRoot } from "../a4Blobs.js";
 import type { A4EffectContext, A4EffectDef, A4EffectOutcome } from "../a4Effects.js";
-import { explain, type A4ExplainFact, type A4ExplainLevel } from "../a4Explain.js";
+import type { A4ExplainFact, A4ExplainLevel } from "../a4Explain.js";
 import { RESOURCE_SLOTS } from "../a4Gates.js";
 import type { A4ProducerContext, A4ProducerResult } from "../a4RouterStages.js";
 import { a4HypothesisSchema, mapRiskTier, type A4Answer, type A4Hypothesis, type A4StageRegistry } from "../a4Schema.js";
@@ -40,9 +40,10 @@ import { TIER_RANK, type A4ReadinessState } from "../a4Readiness.js";
 import { A4StoreError } from "../a4Store.js";
 import { errorCodeOf, understandAspire } from "../aspireUnderstand.js";
 import {
-  ASPIRE_CLAIM_BOUNDARY, ASPIRE_SPEC_SCHEMA, HYPOTHESIS_ID, QUESTIONS, answerGaps, answerValues, answersDigestOf, aspireItems, aspireSpecOf, dependencyDigest,
+  ASPIRE_CLAIM_BOUNDARY, ASPIRE_SPEC_SCHEMA, HYPOTHESIS_ID, QUESTIONS, answerGaps, answerValues, answersDigestOf, askGapCodes, aspireItems, aspireSpecOf, dependencyDigest,
   hypothesisDigestOf, learningPlanSchema, listValue, misuseSchema, previousHypotheses, textValue, unmeasuredTargets
 } from "../spec/aspire.js";
+import { explanationResult, fail, relPath } from "./common.js";
 
 const DAY_MS = 86_400_000;
 const HYPOTHESIS_WINDOW_DAYS = 90;
@@ -54,8 +55,6 @@ const tooLargeForBuild = (spec: Record<string, unknown>): boolean => canonicaliz
 const EDITABLE = ["hypotheses", "learningPlan", "quality", "misuse"] as const;
 type Editable = (typeof EDITABLE)[number];
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
-const relPath = (workspace: string, path: string): string => relative(workspace, path).split(sep).join("/");
 /** A file's bytes; null only when it is absent. Any other read error is 409 RESOURCE_UNREADABLE naming `what` (the RESOURCE_SLOTS contract). */
 function readOrAbsent(path: string, what: string): Buffer | null {
   try {
@@ -100,8 +99,8 @@ function typedGraphDigest(workspace: string, agentId: string): string | null {
 
 /**
  * What Enforce binds for the agent: the sha256 of its live resource set (its config and the config's `.sig`, its context
- * graph, the fleet's typed-graphs/latest.json, …) once it has a latest manifest, null before. A later write Enforce would
- * read as DRIFTED (another agent's Build replacing latest.json, a removed or replaced `.sig`) is then RESOURCE_DRIFTED at
+ * graph, its typed-graphs/<agentId>/latest.json, …) once it has a latest manifest, null before. A later write Enforce would
+ * read as DRIFTED (a graph naming this agent replacing that file, a removed or replaced `.sig`) is then RESOURCE_DRIFTED at
  * decide, complete and the effect preamble. Assemble (P1-60) binds this same slot and reuses this recomputer.
  * ponytail: hashes every Enforce candidate on each read; cache by mtime if large imported runs make readiness slow.
  */
@@ -208,7 +207,7 @@ function mergeOutcomeMetrics(workspace: string, agentId: string, metrics: readon
  * Returns whether the agent has a (verified) value contract.
  */
 function assertContractsWritable(workspace: string, agentId: string, metrics: readonly OutcomeMetric[]): boolean {
-  getPrivateKeyPem(workspace, "auditor");
+  for (const purpose of ["artifact-seal", "config-signature"] as const) getPrivateKeyPem(workspace, purpose); // P1-08: value contract and receipt; outcome contract, agent config and target profile
   if (metrics.length > 0) trustedOutcomeContract(workspace, agentId);
   return trustedValueContract(workspace, agentId);
 }
@@ -316,11 +315,7 @@ function priorAgent(workspace: string, agentId: string): PriorAgent {
 
 /** The router's entry (src/a4/spec/aspire.ts PRODUCERS). */
 export async function produceAspire(step: "understand" | "explain" | "propose" | "build" | "review", ctx: A4ProducerContext): Promise<A4ProducerResult> {
-  if (step === "understand") return understand(ctx);
-  if (step === "explain") return explainStep(ctx);
-  if (step === "propose") return propose(ctx);
-  if (step === "build") return build(ctx);
-  return review(ctx);
+  return { understand, explain: explainStep, propose, build, review }[step](ctx);
 }
 
 const createdProfile = (state: A4ReadinessState): Record<string, unknown> => state.chain.find((link) => link.kind === "CREATED")?.body ?? {};
@@ -399,9 +394,7 @@ function explainStep(ctx: A4ProducerContext): A4ProducerResult {
   const level: A4ExplainLevel = ctx.level ?? "practitioner";
   const { spec, answers } = aspireSpecOf(ctx.state);
   const facts = aspireFacts(spec, answers);
-  const items = explain(facts, level);
-  return { outputs: [{ output: "explanation", label: `aspire explain at the ${level} level`, lane: "recommendation", method: null, body: { level, items } }],
-    spec: { ...spec, explanation: { level, facts } }, response: { explanation: { level, items } } };
+  return explanationResult("aspire", spec, facts, level);
 }
 
 const slug = (text: string): string => text.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 64) || "metric";
@@ -557,8 +550,7 @@ function priorRiskTierOf(workspace: string, agentId: string): string | null {
 /** Propose: the brief and everything around it, from the answers; members may edit hypotheses, learning plan, quality and misuse. */
 function propose(ctx: A4ProducerContext): A4ProducerResult {
   const { spec, answers } = aspireSpecOf(ctx.state);
-  const gaps = answerGaps(answers);
-  const codes = [...gaps.missing.map((id) => `ANSWER_MISSING:${id}`), ...gaps.stale.map((id) => `ANSWER_STALE:${id}`), ...gaps.invalid.map((id) => `ANSWER_INVALID:${id}`)];
+  const codes = askGapCodes(answerGaps(answers));
   if (codes.length > 0) throw fail(409, "A4_NOT_READY", "Answer or confirm the listed questions before proposing.", { reasonCodes: codes });
   for (const key of Object.keys(ctx.spec ?? {})) {
     if (!(EDITABLE as readonly string[]).includes(key) && canonicalize(ctx.spec![key] ?? null) !== canonicalize(spec[key] ?? null)) {
@@ -624,7 +616,7 @@ function propose(ctx: A4ProducerContext): A4ProducerResult {
  * Build (after the direction gate is consumed): the context graph through validateContextGraph and initWorkspace's writer,
  * scaffoldAgent for an agent with none of its files, else the signed config re-saved (a placeholder one when it has none)
  * and its own target profile re-signed with the new contextGraphHash and its verified mapping; the outcome contract when
- * there is none; the typed multi-agent graph (writeTypedMultiAgentGraph, which also replaces the fleet's latest.json);
+ * there is none; the typed multi-agent graph (writeTypedMultiAgentGraph, which also replaces this agent's and the fleet's latest.json);
  * then the Enforce manifest so the agent is ACTIVE. It signs what `agent add`, `target set` and `snapshot`
  * sign, so it takes their owner-mode gates, and the router admits only owners (src/api/accessPolicy.ts A4_OWNER). Every
  * check that can refuse runs before the first write. Each write is an implementation ref with its file's sha256; the

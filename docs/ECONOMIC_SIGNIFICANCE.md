@@ -38,4 +38,4 @@ This emits `VALUE_REGRESSION_DETECTED` and feeds advisories/forecasts for recurr
 
 ## Important Constraint
 
-If evidence gates fail, AMC does not output strong ROI-style numerics. The output is marked `INSUFFICIENT_EVIDENCE` with explicit reasons.
+If evidence gates fail, AMC does not output strong ROI-style numerics. The output is marked `INSUFFICIENT_EVIDENCE` with explicit reasons. When the gates pass but no contract KPI measured a benefit, the score is `null` with the reason `VALUE_NOT_MEASURED`, never a score built on a 0 benefit.

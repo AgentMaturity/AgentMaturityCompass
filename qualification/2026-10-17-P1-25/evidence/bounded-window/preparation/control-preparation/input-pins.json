@@ -1,0 +1,123 @@
+{
+  "schema": "p125w-control-preparation-inputs/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "bytes": 73883,
+      "sha256": "d5e42ca4121f2cb2b098303d1e79e8645ba02045bd012c466a0b55ec5a0e62ca",
+      "dev": 16777231,
+      "inode": 543741190,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/root-candidate-read.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/root-candidate-read.json",
+      "bytes": 766,
+      "sha256": "7252d7c8f156263aa761f363e037372c2e1652773d615e918e5480ac8ea8fbe9",
+      "dev": 16777231,
+      "inode": 543741351,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/README.md",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/README.md",
+      "bytes": 4294,
+      "sha256": "df44429f93ab0071cd7edeabf1ec34164e9133b5b0682eca868e59188fc69f18",
+      "dev": 16777231,
+      "inode": 543729291,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/matrix.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/matrix.json",
+      "bytes": 4138,
+      "sha256": "b06211705c317ad84cbe07707b9f5141f20c737dcf5f61bbbdd11232c5314286",
+      "dev": 16777231,
+      "inode": 543729290,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/seal.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/seal.json",
+      "bytes": 3262,
+      "sha256": "e0ee965ad1ac607320c2c37ba9bd274422e53300cdbe2572ec0b829b2acb9301",
+      "dev": 16777231,
+      "inode": 543729294,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543727816,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.py",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.py",
+      "bytes": 19281,
+      "sha256": "585b761a615a4fed59c1961ccd15b353728b73ab8c583dc5d83cbc4df89f6f27",
+      "dev": 16777231,
+      "inode": 543730118,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7651,
+      "sha256": "87d2a39c245dd707529d645416f2e9beb93c6338c34fa868d1f19783e2e131fb",
+      "dev": 16777231,
+      "inode": 543658547,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-m1-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-m1-outcome.json",
+      "bytes": 9571,
+      "sha256": "72b4b7323fa3f16ea203057bda4a9d7038e42436c7a1d97b842b5276e87bd9fe",
+      "dev": 16777231,
+      "inode": 543731267,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/m1-classification.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/m1-classification.json",
+      "bytes": 1935,
+      "sha256": "38a94b1f8fc857e0e1adad6886daeccf10d8993e154102dd4e11721acf4472a8",
+      "dev": 16777231,
+      "inode": 543731299,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-fresh-canonical-corrected-path-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-fresh-canonical-corrected-path-outcome.json",
+      "bytes": 5930,
+      "sha256": "7769033d3aa5eae403e69239a501de9db75ee251c3c26176aa3a15bea48ee91d",
+      "dev": 16777231,
+      "inode": 543730145,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "dev": 16777231,
+      "inode": 542461050,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "dev": 16777231,
+      "inode": 542461052,
+      "nlink": 1
+    }
+  ],
+  "boundary": "Only these named public source/evidence inputs were read for this preparation; no signing roots, keys, unknown streams or missing reservation path were probed."
+}

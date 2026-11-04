@@ -1,0 +1,280 @@
+{
+  "schema": "p107-final-check-preparation/1",
+  "at": "2026-10-16T18:01:03.451604+00:00",
+  "status": "read-only preparation; no checks or generators executed",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceHeadFromExistingAdmission": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "branchFromRoot": "codex/p1-07-gate-qualification",
+  "packageScripts": {
+    "build": "tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build",
+    "prebuild": "npm run clean",
+    "clean": "node scripts/clean-dist.mjs",
+    "lint": "oxlint --type-aware --deny-warnings -c .oxlintrc.json src && node scripts/lint-contract.mjs && node scripts/check-no-fabrication.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
+    "pretest": "npm run build",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "gen-counts": "node scripts/gen-counts.mjs --write",
+    "check:counts": "node scripts/gen-counts.mjs --check",
+    "check:gates": "node scripts/check-gate-reachability.mjs",
+    "check:freeze": "node scripts/check-freeze.mjs",
+    "check:qualification": "node scripts/check-qualification-receipts.mjs",
+    "check:docs-drift": "node scripts/docs-drift-check.mjs",
+    "check:architecture-boundaries": "node scripts/architecture-boundaries-check.mjs",
+    "check:threat-model": "node scripts/check-threat-model.mjs",
+    "check:no-fabrication": "node scripts/check-no-fabrication.mjs",
+    "check:duplicates": "node scripts/source-quality.mjs duplicates",
+    "check:dead-code": "node scripts/source-quality.mjs dead-code",
+    "check:clean-source": "node scripts/clean-source-check.mjs",
+    "check:packed-install": "node scripts/packed-install-check.mjs",
+    "release:gate": "node scripts/release-gate.mjs"
+  },
+  "observedInventory": {
+    "method": "Read-only filesystem name inventory, independent of gen-counts execution",
+    "currentTestFiles": 1686,
+    "inventoryPathsSha256": "0c22d310382328741cab61fdea03f6c14b0cc95274cacab56380c68108047797",
+    "threeTargets": {
+      "tests/diagnostic/levelCumulative.test.ts": true,
+      "tests/diagnostic/evidenceEmitterRegistry.test.ts": true,
+      "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts": true
+    },
+    "publishedTestFiles": 1683,
+    "expectedAfterOnlyThreeAdditions": 1686,
+    "expectationConditionalOn": "exact three target additions and no unrelated new test paths; actual final count measured1686 at seal preparation",
+    "affectedCurrentCountSurfaces": [
+      "README.md",
+      "CONTRIBUTING.md",
+      "website/index.html",
+      "website/lite.html",
+      "website/i18n.js",
+      "docs/content/show-hn-draft.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "allTenCurrentSurfacesObservedAt": "1,683",
+    "testBlocks": "Lexical inventory only; not a test result or acceptance total.",
+    "earlierRead": {
+      "testFiles": 1685,
+      "runtimeTargetPresent": false,
+      "boundary": "Before root concurrently materialized third file; preserved initial private preparation was superseded for this read race."
+    }
+  },
+  "rootExecutionOrder": [
+    "Finish reviewed runtime V2, retain actual first attempt/corrections, then root materializes only admitted third path and runs bounded source cohort with existing observer and 30s deadline. Do not sum cohorts.",
+    "Root checks current scope/ownership/D15 for the ten count surfaces before an ordinary count writer mutation. Preserve held R, Claude inputs, guards, registry/map/provenance and existing tests.",
+    "Run source and tests compilers, lint, current build and scoped checks using the frozen root wrapper. Build executes prebuild clean-dist in the owned S only; it rebuilds dist consumed by counts/gates/freeze.",
+    "Use only gen-counts --write to update actual current source inventory, review exactly the admitted generated surface diff, then check:counts. Do not type numbers or call inventory counts passing tests.",
+    "Root source checkpoint ordinary Git operations only after exact diff/preservation review. check:clean-source --keep must run against that committed source; an earlier committed HEAD omits new tests/counts.",
+    "Bind actual fresh checkout source/dist/native/runner and execute admitted canonical/control/exact-restoration cohorts. Keep TS source controls distinct from compiled sensitivity, inspect first failures and masking, preserve cleanup failures and frozen compiler halt evidence.",
+    "Build private dated receipt with actual source SHA, commands/exits/durations, canonical totals, reachability table, methodology hash, real runtime evidence and bounded limits; validate private parent, then root materializes admitted qualification folder and validates ordinary qualification root."
+  ],
+  "futureRootCommands": {
+    "sourceChecks": [
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "typecheck"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "typecheck:tests"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "lint"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "build"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:gates"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:threat-model"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:architecture-boundaries"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:docs-drift"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:duplicates"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:dead-code"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:counts"
+      ],
+      [
+        "/opt/homebrew/bin/pnpm",
+        "--dir",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "run",
+        "check:freeze"
+      ]
+    ],
+    "countWriter": [
+      "/opt/homebrew/bin/pnpm",
+      "--dir",
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "exec",
+      "/opt/homebrew/opt/node@22/bin/node",
+      "scripts/gen-counts.mjs",
+      "--write"
+    ],
+    "cleanSourceKeep": [
+      "/opt/homebrew/bin/pnpm",
+      "--dir",
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "exec",
+      "/opt/homebrew/opt/node@22/bin/node",
+      "scripts/clean-source-check.mjs",
+      "--keep"
+    ],
+    "privateReceiptValidation": [
+      "/opt/homebrew/bin/pnpm",
+      "--dir",
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "exec",
+      "/opt/homebrew/opt/node@22/bin/node",
+      "scripts/check-qualification-receipts.mjs",
+      "--root",
+      "<actual-private-parent-containing-YYYY-MM-DD-P1-07>"
+    ],
+    "ordinaryReceiptValidation": [
+      "/opt/homebrew/bin/pnpm",
+      "--dir",
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "run",
+      "check:qualification"
+    ]
+  },
+  "executionDependencies": [
+    "Root serial frozen wrapper and current natural-closure/certificate prerequisites; no active command/control, no marker clearing or retry after unexpected compiler exit2.",
+    "Root-qualified Node22 and pnpm10.33.0 with unchanged environment/deadline/reporters. npm test/pretest performs build and full suite, so it is not shorthand for the bounded observed cohort.",
+    "gen-counts, check:gates and check:freeze use process.cwd and built modules; pnpm --dir S supplies S cwd. Existing Q135 dist binding is historical baseline authority, not a fresh P107 build.",
+    "tsconfig.tests.json includes all tests/**/*.ts; ordinary tests compiler covers all three new paths. lint scans src and also executes contract/no-fabrication checks.",
+    "check:clean-source clones committed HEAD without hardlinks, installs frozen lock, builds, runs isolated keyless signed smoke and cross-process resume. --keep retains its new owned root; it does not run Vitest.",
+    "source-quality scanners keep current zero-duplicate threshold and Knip workspaces. CI continue-on-error is existing reporting policy, not a waiver or permission to label them green."
+  ],
+  "receiptPattern": {
+    "previous": "qualification/2026-10-16-P1-35",
+    "previousSourceCommit": "88e0dbdef8871f119325d289757ad1de38b88a1a",
+    "previousCommands": 51,
+    "previousArtifacts": 159,
+    "previousPhysicalFilesRootReported": 160,
+    "schemaVersion": 1,
+    "requiredKeys": [
+      "schemaVersion",
+      "key",
+      "date",
+      "commit",
+      "branch",
+      "node",
+      "pnpm",
+      "os",
+      "arch",
+      "commands",
+      "tests",
+      "artifacts",
+      "notes"
+    ],
+    "newKey": "P1-07",
+    "folder": "qualification/<actual-calendar-date>-P1-07",
+    "commit": "actual full40hex source commit checked; metadata commit separate",
+    "commands": "actual cmd, integer exit, nonnegative durationMs; every nonzero explained",
+    "tests": "one canonical run total=passed+failed+skipped, or null; no summing control/restoration/history",
+    "artifacts": "relative regular files, exact sha256; no symlinks, secrets or private keys; every file <=1,048,576 bytes",
+    "privateValidation": "--root must be real parent containing dated folder; empty/missing roots pass and supply no receipt evidence",
+    "notes": "Keep all actual red/setup/cleanup/masking histories and held/global/full-acceptance limits. Preserve prior packets byte-exact; do not inherit P135 test totals."
+  },
+  "fullAcceptanceStillRequiredNotPerformedHere": {
+    "programmeContract": "docs/program/READY_TO_DEPLOY.md Commands before every PR and Definition of Done; all applicable checks pass or same origin/main failure shown. No PR/merge/full issue completion from bounded checks.",
+    "specSelectedRegression": [
+      "tests/diagnostic",
+      "tests/questionBank.test.ts",
+      "tests/evidenceGatingCorrection.test.ts",
+      "tests/spineEvidenceProjection.test.ts",
+      "tests/liveEvidenceProjection.test.ts",
+      "tests/antiGaming.test.ts",
+      "tests/publicMethodology.test.ts"
+    ],
+    "fullSuiteAndCoverage": "npm test in programme/spec; CI Node22+24 full suite/coverage, performance serial, per-file floors and checkout cleanliness remain separate obligations.",
+    "additionalCurrentCiScripts": [
+      "check:schemas",
+      "check:regulatory-currency",
+      "check:citations",
+      "check:package",
+      "check:policy-fixtures (Node24)",
+      "check:question-bank-export",
+      "check:coverage",
+      "check:incident-readiness",
+      "check:compliance-freshness",
+      "check:evidence-paths",
+      "check:api-ref",
+      "check:changelog-page",
+      "check:vendor-links",
+      "check:vendor-rescope",
+      "check:third-party-notices"
+    ],
+    "conditionalOnly": [
+      "check:packed-install when packaging/bin/exports/bundled runtime changes",
+      "release:gate when release path/CI/gate/packaging changes"
+    ],
+    "noAuthorizationAdded": "This preparation does not dispatch CI, release, a global run, a source change, or a hold resolution."
+  },
+  "unresolvedLimits": [
+    "This reviewer examined no actual closed runtime V2 outcome; root owns qualification and lifecycle evidence.",
+    "Final read sees all three new test paths and1,686 source files; public count surfaces remain1,683. A source inventory is not an executed test result.",
+    "P135 quality remains historical RED/unwaived:1,268 duplicates,2,727 dead-code incl manual generator finding; proper Knip change held at ignored D15 archive. No quality config, ignore, baseline, force-add or bypass authorized.",
+    "Real same-day two-session/four-audit fixture is honestly capped at L1; synthetic two-day unit evidence is not real continuity or crypto. Higher L3-L5 not_evaluated and existing gate minima stay intact.",
+    "P107 spec broader strict-binding, doc parity/version/migration, runner length, all acceptance and PR/merge criteria must be reconciled separately. Three tests do not close dependencies P1-01/P0-18/P1-35 or held decisions.",
+    "Fresh P107 source/native/control/restore evidence and final preservation remain future. Borrowed R cwd is not S source authority.",
+    "No source quality, runtime, generated outputs, receipt validation or Git state command executed by this reviewer. Metadata/admission head strings are explicitly historical where recorded."
+  ]
+}

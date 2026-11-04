@@ -1,0 +1,207 @@
+{
+  "schema": "amc-p117-fresh68-independent-runtime-audit/1",
+  "capturedUtc": "2026-10-16T09:47:43.023684+00:00",
+  "scope": "Closed fresh runtime, frozen source/native bindings and retained public artifacts. Filesystem, committed Gitblob reads and offline Node builtin crypto only; no AMC imports, SQL, signer, tests, live process probe, R write or producer edit.",
+  "sourceCommit": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+  "physicalQ": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+  "result": {
+    "total": 68,
+    "passed": 68,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "files": [
+      [
+        "tests/incidentClockEvents.test.ts",
+        25
+      ],
+      [
+        "tests/incidentClockSurfaces.test.ts",
+        3
+      ],
+      [
+        "tests/incidentEvidencePacket.test.ts",
+        13
+      ],
+      [
+        "tests/mcpServer.test.ts",
+        11
+      ],
+      [
+        "tests/regulatoryClocks.test.ts",
+        16
+      ]
+    ],
+    "same68IdentityMultisetAsR": true,
+    "rawObserverIdentityStatusAgreement": true,
+    "meaning": "One repeated68-registration corpus in the fresh checkout, not a sum of runs."
+  },
+  "infrastructure": {
+    "hookStates": {
+      "afterAll:pass": 5,
+      "afterEach:pass": 24,
+      "beforeAll:pass": 1
+    },
+    "taskOrUnhandledErrors": 0,
+    "pendingTodoNonterminal": 0,
+    "outerOrChildLateDiagnostics": 0,
+    "normalExit": 0,
+    "durationMs": 6317,
+    "ownedOuterPgid": 28340,
+    "positiveESRCH": true,
+    "noNonzeroSignals": true,
+    "commandOutcomeArtifactPinsMatch": true
+  },
+  "runner": "Qualified R Vitest entry from Rcwd with --root physical Q, whose five actual raw/observer test paths and all surface producer/CLI/SDK paths are Q. ObservercwdR is expected. No independently installed Q-runner claim.",
+  "actualSurfaceRoots": [
+    {
+      "root": "/private/tmp/p117-surface-tTABKp",
+      "kind": "cli",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+      "anchorSha256": "b607e3d195ea2371345382759cb4e2614beca067cdaa7d94c16bcf804e099d18",
+      "children": [
+        {
+          "label": "init",
+          "pid": 28348,
+          "exit": 0,
+          "signal": null,
+          "positivePIDESRCH": true
+        },
+        {
+          "label": "seed",
+          "pid": 28355,
+          "exit": 0,
+          "signal": null,
+          "positivePIDESRCH": true
+        },
+        {
+          "label": "cli",
+          "pid": 28356,
+          "exit": 0,
+          "signal": null,
+          "positivePIDESRCH": true
+        }
+      ]
+    },
+    {
+      "root": "/private/tmp/p117-surface-FZXwmG",
+      "kind": "http",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+      "anchorSha256": "2f6f542f4e1c1990940b6932810550b44cd2864079b3d9540f793bd46542c301",
+      "children": [
+        {
+          "label": "init",
+          "pid": 28357,
+          "exit": 0,
+          "signal": null,
+          "positivePIDESRCH": true
+        },
+        {
+          "label": "seed",
+          "pid": 28358,
+          "exit": 0,
+          "signal": null,
+          "positivePIDESRCH": true
+        },
+        {
+          "label": "http",
+          "pid": 28359,
+          "exit": 0,
+          "signal": null,
+          "positivePIDESRCH": true
+        }
+      ]
+    },
+    {
+      "root": "/private/tmp/p117-surface-lCe0oO",
+      "kind": "mcp",
+      "sourceRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+      "anchorSha256": "85bd49ad9ec7d001ac31d08f3bf64eec5f4f69f2a7b2ee45a7e0c8581a577452",
+      "children": [
+        {
+          "label": "init",
+          "pid": 28360,
+          "exit": 0,
+          "signal": null,
+          "positivePIDESRCH": true
+        },
+        {
+          "label": "seed",
+          "pid": 28378,
+          "exit": 0,
+          "signal": null,
+          "positivePIDESRCH": true
+        },
+        {
+          "label": "mcp",
+          "pid": 28379,
+          "exit": 0,
+          "signal": null,
+          "positivePIDESRCH": true
+        }
+      ]
+    }
+  ],
+  "publicVerification": {
+    "markerFilesMatching": 3,
+    "childrenNaturallyClosed": 9,
+    "capturesFullUTF8ByteHashMatches": 18,
+    "directBuildSDKFiles": 15,
+    "directChecksAcrossRoots": 45,
+    "independentSignatures": {
+      "incidents": 3,
+      "seedClockEvents": 6,
+      "HTTPCreatedEvent": 1,
+      "total": 10
+    },
+    "anchorOrder": "Initresult\u2192external Ed25519 anchor\u2192seedconfig; anchor equals init/seed/currentpublickey and expectedseedhash.",
+    "wire": "Independent incident canonicalization and flat snake_case event preimage; Ed25519 signature over32byteSHA256,64byte signatures. No product verifier used.",
+    "surfaceResults": "Q compiledCLI JSON matches retained listing. HTTP200/400/404/400/201/200 creates and reads back third signed event. Actual SDKMCP lists11tools and invokes clocktool with conservative self_reported/not_evaluated claim and specific invalid/missing errors.",
+    "limits": "Local keys and stated timestamps only; no externalissuer, authenticatedhuman, incidenttruth, legal/expertapproval, filing, outerHTTPauth, Studio, stdio or deployedproof."
+  },
+  "baselineBinding": {
+    "rows": 8,
+    "distinctPaths": 7,
+    "duplicate": "incidentClockEvents.ts occurs twice; eight rows mean seven distinct paths.",
+    "committedBlobMatches": true,
+    "method": "All frozen SHA256/size rows independently match3ebf Gitblobs. Current Q TypeScript was not read as baseline while controls were active; no current-pristine claim. Historical inode/nlink rows remain historical.",
+    "nativeSource": {
+      "role": "nativeSource",
+      "actual": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1
+      },
+      "matchesBinding": true
+    },
+    "nativeFresh": {
+      "role": "nativeFresh",
+      "actual": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 541993341,
+        "nlink": 1
+      },
+      "matchesBinding": true
+    },
+    "nativeInodesDistinct": true,
+    "scopeLimit": "Selected direct files/native rows, not full transitive provenance or full-checkout preservation. Separate install/build statement is pinned context, not independently re-audited here."
+  },
+  "privacy": "Owned roots0700/configs0600. Actual private passphrase values were checked in memory and absent from public captures/markers. No credential/config body copied into output. Successful25event fixtures are deleted; only reached assertions, not retained independent DBpackets, are credited there.",
+  "limits": [
+    "Current Q mutation phases/restores are excluded until separately audited.",
+    "Normal quality/freeze, full suite/globalcoverage, PR/merge/gate, expert review and fullP117acceptance remain separate.",
+    "F37skip and all human/Claude/paused scope boundaries remain."
+  ],
+  "blockingRuntimeFindings": [],
+  "calculationFactsFile": "/private/tmp/p1-17-qualification-20261016/fresh-runtime-audit/calculation-facts.json",
+  "publicVerificationFile": "/private/tmp/p1-17-qualification-20261016/fresh-runtime-audit/public-verification.json",
+  "inputPinsFile": "/private/tmp/p1-17-qualification-20261016/fresh-runtime-audit/input-pins.json",
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false
+}

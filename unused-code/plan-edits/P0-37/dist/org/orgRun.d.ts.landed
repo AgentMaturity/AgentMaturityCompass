@@ -1,0 +1,166 @@
+import { type EpisodeRecord } from "../lifecycle/episodeRecord.js";
+import { type AMCSurface, type LifecycleSurfaceSummary } from "../lifecycle/lifecycleRunArtifact.js";
+export type OrgRoleCategory = "revenue-delivery" | "innovation";
+export type OrgRunStatus = "completed" | "needs-approval" | "blocked";
+export type OrgRoleRunStatus = "completed" | "needs-approval" | "blocked";
+export type OrgHeartbeatStatus = "ready" | "needs-approval" | "blocked" | "plateau";
+export type OrgGateStatus = "passed" | "needs-approval" | "blocked";
+export interface OrgRoleDefinition {
+    roleId: string;
+    category: OrgRoleCategory;
+    defaultScope: string;
+    primarySurface: AMCSurface;
+}
+export interface OrgHeartbeatPolicy {
+    intervalMinutes: number;
+    maxStaleMinutes: number;
+    plateauAfterHeartbeats: number;
+    triggers: Array<"scheduled-review" | "stalled-work" | "plateau-detected" | "failing-gates" | "lifecycle-continuation">;
+}
+export interface OrgRoleScope {
+    summary: string;
+    allowedWriteRoots: string[];
+    deniedActionClasses: string[];
+    surfaceMap: AMCSurface[];
+    resourceVersion: string;
+}
+export interface OrgStateRef {
+    path: string;
+    sha256: string | null;
+    visibility: "public" | "private";
+}
+export interface OrgHandoffRef {
+    kind: "role-workspace" | "amc-os";
+    path: string;
+    sha256: string | null;
+}
+export interface OrgApprovalGate {
+    gateId: string;
+    surface: AMCSurface;
+    status: OrgGateStatus;
+    reason: string;
+    refs: string[];
+}
+export interface OrgHeartbeat {
+    heartbeatId: string;
+    roleId: string;
+    status: OrgHeartbeatStatus;
+    createdAt: string;
+    nextReviewAt: string;
+    triggers: OrgHeartbeatPolicy["triggers"];
+    blockedGateIds: string[];
+    note: string;
+}
+export interface OrgRoleRun {
+    roleRunId: string;
+    parentRunId: string;
+    roleId: string;
+    category: OrgRoleCategory;
+    status: OrgRoleRunStatus;
+    roleWorkspace: string;
+    scope: OrgRoleScope;
+    publicStateRef: OrgStateRef;
+    privateGraderStateRef: OrgStateRef;
+    handoffNoteRefs: OrgHandoffRef[];
+    heartbeatPolicy: OrgHeartbeatPolicy;
+    heartbeats: OrgHeartbeat[];
+    approvalGates: OrgApprovalGate[];
+    episodeRecordRef: {
+        episodeId: string;
+        path: string;
+    };
+    lifecycleArtifactRef: {
+        lifecycleRunId: string;
+        path: string;
+        signaturePath: string | null;
+    };
+    evidenceRefs: string[];
+    createdAt: string;
+    updatedAt: string;
+}
+export interface OrgRunArtifact {
+    schemaVersion: "2026-05-22";
+    orgRunId: string;
+    parentRunId: string;
+    workspace: string;
+    source: "cli" | "studio" | "api" | "ci";
+    command: string;
+    goal: string;
+    status: OrgRunStatus;
+    createdAt: string;
+    updatedAt: string;
+    heartbeatPolicy: OrgHeartbeatPolicy;
+    surfaces: Record<AMCSurface, LifecycleSurfaceSummary>;
+    roles: OrgRoleRun[];
+    parentEpisodeRecordRef: {
+        episodeId: string;
+        path: string;
+    };
+    parentLifecycleArtifactRef: {
+        lifecycleRunId: string;
+        path: string;
+        signaturePath: string | null;
+    };
+    summary: {
+        roleCount: number;
+        completedRoles: number;
+        needsApprovalRoles: number;
+        blockedRoles: number;
+        heartbeatCount: number;
+        blockedGateCount: number;
+        privateStateCount: number;
+    };
+}
+export interface OrgRunResult {
+    artifact: OrgRunArtifact;
+    artifactPath: string;
+    signaturePath: string | null;
+}
+export interface RunOrgInput {
+    workspace: string;
+    roles?: string[];
+    goal?: string;
+    source?: OrgRunArtifact["source"];
+    command?: string;
+    heartbeatPolicy?: Partial<OrgHeartbeatPolicy>;
+    orgRunId?: string;
+}
+export declare const REVENUE_DELIVERY_ROLE_IDS: readonly ["REV_COO_ORCH", "REV_CHIEF_OF_STAFF", "REV_PROGRAM_MANAGER", "REV_OPS_AUTOMATION_ENGINEER", "REV_KB_MANAGER", "REV_QA_LEAD", "REV_SECURITY_OFFICER", "REV_COMPLIANCE_OFFICER", "REV_CFO_FINANCE", "REV_LEGAL_CONTRACTS", "REV_PRODUCT_MANAGER", "REV_TECH_LEAD", "REV_FULLSTACK_ENGINEER", "REV_DEVOPS_ENGINEER", "REV_DATA_ENGINEER", "REV_ANALYTICS_ENGINEER", "REV_UX_UI_DESIGNER", "REV_DOCS_TECH_WRITER", "REV_QA_TESTER", "REV_IMPLEMENTATION_SPECIALIST", "REV_CUSTOMER_SUCCESS_MANAGER", "REV_SUPPORT_LEAD", "REV_HEAD_OF_SALES", "REV_REVOPS_CRM", "REV_SDR_SMB", "REV_SDR_MIDMARKET", "REV_SDR_AGENCY", "REV_ACCOUNT_EXEC_CLOSER", "REV_SALES_ENGINEER_DEMOS", "REV_PROPOSAL_SOW_SPECIALIST", "REV_OBJECTION_COACH", "REV_ACCOUNT_MANAGER_EXPANSION", "REV_HEAD_OF_GROWTH", "REV_BRAND_MESSAGING", "REV_COPYWRITER_DIRECT_RESPONSE", "REV_COPYWRITER_TECHNICAL", "REV_CONTENT_STRATEGIST", "REV_SEO_SPECIALIST", "REV_LANDING_PAGE_BUILDER", "REV_SOCIAL_LINKEDIN", "REV_SOCIAL_X", "REV_EMAIL_NEWSLETTER", "REV_WEBINAR_PRODUCER", "REV_PR_PODCAST_BOOKER", "REV_COMMUNITY_MANAGER", "REV_HEAD_OF_PARTNERSHIPS", "REV_AGENCY_PARTNER_MANAGER", "REV_AFFILIATE_REFERRAL_MANAGER", "REV_INTEGRATION_PARTNER_SCOUT", "REV_CREATOR_PARTNERSHIPS"];
+export declare const INNOVATION_ROLE_IDS: readonly ["INNO_HEAD_OF_INSIGHTS", "INNO_FORUM_LISTENER_REDDIT", "INNO_FORUM_LISTENER_HN", "INNO_FORUM_LISTENER_GITHUB", "INNO_FORUM_LISTENER_LINKEDIN", "INNO_FORUM_LISTENER_X", "INNO_VOICE_OF_CUSTOMER_ANALYST", "INNO_USER_RESEARCH_PLANNER", "INNO_PAINPOINT_SYNTHESIZER", "INNO_COMPETITOR_INTEL", "INNO_PRICING_EXPERIMENTER", "INNO_ONBOARDING_FRICTION_ANALYST", "INNO_ACTIVATION_ANALYST", "INNO_RETENTION_ANALYST", "INNO_GROWTH_EXPERIMENT_SCIENTIST", "INNO_AI_AGENT_RND", "INNO_EVAL_BENCHMARKER", "INNO_SECURITY_RESEARCHER", "INNO_AI_POLICY_WATCH", "INNO_PROTOTYPE_BUILDER"];
+export declare const ORG_ROLE_DEFINITIONS: OrgRoleDefinition[];
+export declare function parseOrgRoleList(input?: string | string[]): string[];
+export declare function orgRunsDir(workspace: string): string;
+export declare function orgRunDir(workspace: string, orgRunId: string): string;
+export declare function orgRunArtifactPath(workspace: string, orgRunId: string): string;
+export declare function runOrg(input: RunOrgInput): OrgRunResult;
+export declare function listOrgRuns(input: {
+    workspace: string;
+    limit?: number;
+    redacted?: boolean;
+}): OrgRunArtifact[];
+export declare function loadOrgRun(input: {
+    workspace: string;
+    selector: string;
+    redacted?: boolean;
+}): OrgRunArtifact;
+export declare function redactOrgRunArtifact(run: OrgRunArtifact): OrgRunArtifact;
+export declare function orgRunRoleDefinitions(): OrgRoleDefinition[];
+export declare function orgRunSummaryForUi(run: OrgRunArtifact): {
+    orgRunId: string;
+    status: OrgRunStatus;
+    goal: string;
+    createdAt: string;
+    roleCount: number;
+    heartbeatCount: number;
+    blockedGateCount: number;
+    roles: Array<{
+        roleId: string;
+        status: OrgRoleRunStatus;
+        heartbeatStatus: OrgHeartbeatStatus;
+        nextReviewAt: string;
+        blockedGateIds: string[];
+        lifecycleRunId: string;
+        rollbackRef: string;
+    }>;
+};
+export type OrgRunEpisodeStage = EpisodeRecord["lifecycleStage"];

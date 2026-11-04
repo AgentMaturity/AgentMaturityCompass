@@ -1,0 +1,132 @@
+{
+  "schema": "p112-bounded-whole-issue-gaps-preparation/1",
+  "at": "2026-10-16T20:11:57.384500+00:00",
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "branch": "codex/p1-12-compiled-guard-qualification",
+  "wholeIssueDone": false,
+  "boundedScope": "11 typed helper tests plus 24 unchanged neighboring tests; numeric inventory maintenance only.",
+  "actualCanonical": {
+    "tests": {
+      "total": 35,
+      "passed": 35,
+      "failed": 0,
+      "skipped": 0
+    },
+    "files": 3,
+    "hookTaskEntries": 3,
+    "individualHookValues": 3,
+    "durationMs": 4457,
+    "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout"
+  },
+  "gaps": [
+    {
+      "id": "destination-threshold",
+      "kind": "source-and-acceptance-gap",
+      "facts": "The current PARAMETERS table supports visibility, identity, approval, egress-host and deletion-retention settings, with no payment amount threshold. compiledPolicyDenial implements identity-binding parameters and refuses any other guard generically.",
+      "needed": "A supported policy must actually block the prohibited 900.00 effect versus a valid allowed control and keep a real owned destination log empty. Generic unsupported-guard refusal and helper inputs do not satisfy the specification.",
+      "source": [
+        "src/catalog/compiler/runtimePolicy.ts:35",
+        "src/tools/guards/compiledPolicyGuard.ts:76"
+      ]
+    },
+    {
+      "id": "signed-authority",
+      "kind": "unqualified-existing-implementation",
+      "facts": "Active plan loading, signed activation/journal checks, per-call head checks, lease/approval binding and recheck exist. The new tests consume already-derived ActiveCompiledPolicy and AuthorizationRecordV1 fields with placeholder hashes; they do not load or verify these authorities.",
+      "needed": "Real signed-plan/lock/journal activation and tamper/session-start/head-change evidence, plus actual signed authority and last-moment recheck observations. Existing held P1-02 combinations remain excluded and unchanged.",
+      "source": [
+        "src/catalog/compiler/activate.ts:94",
+        "src/tools/guards/compiledPolicyGuard.ts:95",
+        "src/actions/authorize.ts:192",
+        "src/actions/authorize.ts:295"
+      ]
+    },
+    {
+      "id": "live-approval-policy",
+      "kind": "unqualified-existing-implementation",
+      "facts": "The live approval-policy branch reads exact bytes, checks the workspace auditor signature and compares quorum/distinct-users/roles/TTL against the compiled rule. Denial fixtures deliberately have no approval rule; FINANCIAL appears only in facts projection.",
+      "needed": "Genuine live signed approval-policy strictness and refusal tests. Projection of approval classes or controlFor does not grant or verify approval; key-precedence decisions remain held.",
+      "source": [
+        "src/tools/guards/compiledPolicyGuard.ts:45",
+        "src/tools/guards/compiledPolicyGuard.ts:109",
+        "src/tools/guards/compiledPolicyGuard.ts:123"
+      ]
+    },
+    {
+      "id": "effective-receipt-binding",
+      "kind": "unqualified-existing-implementation-and-contract-precision",
+      "facts": "Native ensureReceipt is lazy before a governed call and keyed by session/guard labels. writeEffectivePolicyReceipt signs an artifact and records EFFECTIVE_POLICY, returning the reported event ID or an explicit receipt fallback. Kernel tool service has no session writer. Current receipt contains planDigest/leaseId and infers regulated state from active-plan presence; it has no explicit regulated boolean.",
+      "needed": "Observe real native receipt signatures, exact digest/revision/session, guard-set changes and actual evidence-event references in consequential authorization records. Receipt X for session/policy Y must not earn enforcement credit, and pending catalog review must not become a regulated pass. No universal every-session or schema-equivalence claim follows from helper tests.",
+      "source": [
+        "src/agent/agentToolset.ts:292",
+        "src/policy/effectivePolicyReceipt.ts:83",
+        "src/policy/effectivePolicyReceipt.ts:119",
+        "src/kernel/services/toolServices.ts:49"
+      ]
+    },
+    {
+      "id": "domain-proposals",
+      "kind": "unqualified-existing-implementation",
+      "facts": "Domain apply removes the legacy boolean map while preserving its true IDs as proposals, writes proposed/none rows and returns guardrailsEnabled:[]. The rendered guidance says Proposed control. Receipt code also reads legacy/proposed IDs as none with unenforced_domain_rules.",
+      "needed": "An actual domain-apply-only destination contrast and receipt observation using the same effect, plus the full no-boolean/proposal/deprecated-field acceptance. Source reading and new helper tests do not qualify those behaviors.",
+      "source": [
+        "src/domains/domainApply.ts:66",
+        "src/domains/domainApply.ts:217",
+        "src/domains/domainApply.ts:258",
+        "src/policy/effectivePolicyReceipt.ts:63"
+      ]
+    },
+    {
+      "id": "fourteen-labels-and-journal",
+      "kind": "unqualified-existing-implementation-and-source-question",
+      "facts": "The current runtime table separates three firewall bindings, tool allowlist/budgets, session-specific approval and catalog-only rows. audit-trail-enforcer remains catalog-only/none with wording awaiting P1-03, while existing ToolPipeline contains journaling behavior.",
+      "needed": "Reconcile and qualify the conditional journal label against actual present composition without assuming whole P1-03 closure. All 14 row snapshots, runtime boundaries, profile refusal and the runbook table need their own finite real-source/regression proof. No label source is changed here.",
+      "source": [
+        "src/enforce/guardrailRuntimeBindings.ts:32",
+        "src/enforce/guardrailRuntimeBindings.ts:60",
+        "src/enforce/guardrailRuntimeBindings.ts:141",
+        "src/enforce/guardrailProfiles.ts:23",
+        "docs/runbooks/GUARDRAIL_CONTROL_STATE.md:43"
+      ]
+    },
+    {
+      "id": "strict-binding-closed-component",
+      "kind": "preserved-closed-predecessor-component",
+      "facts": "P1-07 removed the switch. runner warns when the environment variable exists but continues selecting tagged evidence; effective receipts report enabled:true/source:default. P1-12 step7 expressly shrinks when P1-07 deleted the switch.",
+      "needed": "Preserve that closure and do not restore an opt-out or impose the obsolete refusal/downgrade design. No fresh P1-07 qualification credit is claimed by this lane.",
+      "source": [
+        "src/diagnostic/runner.ts:238",
+        "src/policy/effectivePolicyReceipt.ts:108"
+      ]
+    },
+    {
+      "id": "full-acceptance-and-publication",
+      "kind": "unqualified-acceptance",
+      "facts": "Only one new helper test and numeric count maintenance are added by this source checkpoint. Source/local and fresh canonical cohorts pass 35/35; an unchanged baseline and repetitions are separate cohorts.",
+      "needed": "The full specification destination/label mutation set, full suite and coverage, all required current checks, semantic docs/runbook changes and changeset, sample genuine signed effective receipt and merged PR/SHA remain acceptance work. Three helper controls being performed by root are not outcomes or substitutes in this preparation. No PR, push, merge, release or tracker Done occurred.",
+      "source": [
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-12.md",
+        "tests/policy/compiledPolicyGuard.test.ts"
+      ]
+    },
+    {
+      "id": "quality-remains-red",
+      "kind": "actual-quality-gap",
+      "facts": "Duplicates remain 1268 before and after. Dead-code findings change 2724 to 2723 solely because the legitimate new test imports compiledPolicyDenial, removing that unused-export identity and adding none. Both quality gates still exit1. The comparison diagnostic exit0 means data collection completed.",
+      "needed": "Keep all remaining findings unwaived. This is test reachability, not new production reachability or enforcement, and no baseline/scanner/Knip configuration was changed.",
+      "source": [
+        "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta.json",
+        "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/review.json"
+      ]
+    }
+  ],
+  "controls": {
+    "outcomesConsumed": false,
+    "predictedOutcomes": false,
+    "boundary": "Root is executing source-only controls and will separately classify actual RED, restore and reruns. This preparation makes no control-result claim."
+  },
+  "ownership": "All existing Claude source, variants and authored prose remain protected. Missing shared reservation retains its last-known binding and pending private entry; absence is not release. No current reservation delta or new human approval requirement is inferred.",
+  "holds": "P1-01 gaps; P0-29 successors; P0-22 empty results; D-03 health skip until P2-06; P0-09/P0-51 key precedence; P0-24 expert wording; P2-02 pause/P2-27 echo; P1-06 ownership; P1-02 held combinations and P1-02/P1-03 diagnostics/cancellation; private SAML/Okta/Entra inputs; ignored D15 provider archive; broader P1-25/P1-11 gaps; F37 skip. All remain unchanged.",
+  "sourceRepairsOrAllocation": "None proposed; this is private prose preparation only. Root owns next plan routing and every subsequent admission/check/write.",
+  "execution": "Read-only source/retained evidence and private prose/hash metadata. No product/runtime/compiler/test/helper/native/SQL/network/checkout/index action."
+}

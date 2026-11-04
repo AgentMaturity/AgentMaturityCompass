@@ -1,0 +1,381 @@
+{
+  "issue": "P0-51",
+  "kind": "Actual ten-family CLI witness and retained RED receipt; qualification remains incomplete",
+  "createdAt": "2026-10-14T18:07:21.646043+00:00",
+  "workspace": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass",
+  "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "ownedFile": {
+    "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts",
+    "sha256": "86f45ab5601d53ae0dc274a52a113d7bb2cbdc9451c74c0e68668f46ce8e286f",
+    "lines": 463,
+    "declaredCases": 84
+  },
+  "sourceEditedByThisAgent": false,
+  "committedByThisAgent": false,
+  "phases": [
+    {
+      "name": "portable-cli-first",
+      "rawJson": "/private/tmp/p0-51-portable-cli-first-20261014.raw.json",
+      "sha256": "eb62958df514a949510c8fe4578d4e995a3d22fb38a9a659e5c024fc58a08ba4",
+      "numTotalTests": 76,
+      "numPassedTests": 0,
+      "numFailedTests": 0,
+      "numPendingTests": 76,
+      "numTodoTests": 0,
+      "success": false,
+      "suiteMessages": [
+        "Agent config not found: /private/tmp/amc-p0-51-portable-cli-zJSeUZ/workspace/.amc/agent.config.yaml"
+      ]
+    },
+    {
+      "name": "portable-cli-fixtures-corrected",
+      "rawJson": "/private/tmp/p0-51-portable-cli-fixtures-corrected-20261014.raw.json",
+      "sha256": "76de4e2065cee9a43532b01390092de026776217025988de4e129042554e0a55",
+      "numTotalTests": 76,
+      "numPassedTests": 0,
+      "numFailedTests": 0,
+      "numPendingTests": 76,
+      "numTodoTests": 0,
+      "success": false,
+      "suiteMessages": [
+        "Agent config not found: /private/tmp/amc-p0-51-portable-cli-AIuX92/workspace/.amc/agent.config.yaml"
+      ]
+    },
+    {
+      "name": "portable-cli-default-fleet-fixture",
+      "rawJson": "/private/tmp/p0-51-portable-cli-default-fleet-fixture-20261014.raw.json",
+      "sha256": "0156d1702c8ad2ac55fb19fee8425633f747687bcbae64f57901049097919ed2",
+      "numTotalTests": 76,
+      "numPassedTests": 45,
+      "numFailedTests": 31,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": false,
+      "suiteMessages": []
+    },
+    {
+      "name": "portable-cli-valid-operator-lists",
+      "rawJson": "/private/tmp/p0-51-portable-cli-valid-operator-lists-20261014.raw.json",
+      "sha256": "b929b1ab0b5a3346f4cc6b206cce2a1318f8cbdb6bf9e855bf22e6a574aea0db",
+      "numTotalTests": 76,
+      "numPassedTests": 67,
+      "numFailedTests": 9,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": false,
+      "suiteMessages": []
+    },
+    {
+      "name": "portable-cli-license-legacy-controls",
+      "rawJson": "/private/tmp/p0-51-portable-cli-license-legacy-controls-20261014.raw.json",
+      "sha256": "56385371ff2449d5193877fee2defe00cbe96502b34495daed09aec2258d42d4",
+      "numTotalTests": 84,
+      "numPassedTests": 8,
+      "numFailedTests": 0,
+      "numPendingTests": 76,
+      "numTodoTests": 0,
+      "success": true,
+      "suiteMessages": []
+    }
+  ],
+  "commands": [
+    {
+      "path": "/private/tmp/amc-p0-51-portable-cli-zTFVjX/logs/commands.json",
+      "sha256": "15817201b8ba24d3e282d205667ae6293baf0dfb8eb2c78f084c626833f15e14",
+      "commands": 76,
+      "independentlyVerifiedStreams": 152,
+      "fixtureManifest": "/private/tmp/amc-p0-51-portable-cli-zTFVjX/logs/fixture.json",
+      "fixtureManifestSha256": "77a2f4d5a1d31ae75b53cb952634f9d1cb6ab2bb5c29de44e4ab08ea6f23ab40"
+    },
+    {
+      "path": "/private/tmp/amc-p0-51-portable-cli-dh1kUi/logs/commands.json",
+      "sha256": "aa633893235ca0a98b2ddd7dc2b8bff70936f4e5d4402117d4826b3bdac012c4",
+      "commands": 8,
+      "independentlyVerifiedStreams": 16,
+      "fixtureManifest": "/private/tmp/amc-p0-51-portable-cli-dh1kUi/logs/fixture.json",
+      "fixtureManifestSha256": "079b96571e26dd6f5d84bfe8e1e2080e5f845539f7a7f58713296041789c13f8"
+    }
+  ],
+  "commandJournal": [
+    {
+      "name": "portable-cli-first",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-first-20261014.raw.json",
+      "exit": 1,
+      "durationMs": 3173,
+      "startedUtc": "2026-10-14T17:58:06.911083+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-first-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "portable-cli-fixtures-corrected",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-fixtures-corrected-20261014.raw.json",
+      "exit": 1,
+      "durationMs": 3123,
+      "startedUtc": "2026-10-14T17:59:01.114490+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-fixtures-corrected-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "portable-cli-test-types",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 38141,
+      "startedUtc": "2026-10-14T18:00:11.501950+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-test-types-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "portable-cli-default-fleet-fixture",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-default-fleet-fixture-20261014.raw.json",
+      "exit": 1,
+      "durationMs": 60971,
+      "startedUtc": "2026-10-14T17:59:53.594762+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-default-fleet-fixture-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "portable-cli-valid-operator-lists",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-valid-operator-lists-20261014.raw.json",
+      "exit": 1,
+      "durationMs": 58707,
+      "startedUtc": "2026-10-14T18:01:30.011990+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-valid-operator-lists-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "portable-cli-final-test-types",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 35585,
+      "startedUtc": "2026-10-14T18:03:48.390691+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-final-test-types-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "portable-cli-license-legacy-controls",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts -t 'locally valid HMAC|locally allowlisted legacy' --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-license-legacy-controls-20261014.raw.json",
+      "exit": 0,
+      "durationMs": 10018,
+      "startedUtc": "2026-10-14T18:04:30.320132+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-license-legacy-controls-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "portable-cli-expanded-test-types",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 36458,
+      "startedUtc": "2026-10-14T18:04:57.541481+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-expanded-test-types-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    }
+  ],
+  "compiledInputsObservedAfterRuns": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/cli.js",
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/cli-trust-flags.js",
+      "sha256": "5c5b00d912c2dd73b52776b8fabd528265e253dd43482532d601e1ff1a677a71"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/trust/admission.js",
+      "sha256": "b81927daf71b18dfba3978d64ae02d752f3d4a8f61204bd36e4134e971d38078"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/trust/verifierReport.js",
+      "sha256": "ab5306a3b3bde8cbf4776dc72638d8a213ace2c717d7c2194bcbb24ee73b37ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/bench/benchRegistryServer.js",
+      "sha256": "170d971bce594673624e4ff7acb1a5d4029f774942dcc66a670d1c0086b572aa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/bom/bomVerifier.js",
+      "sha256": "f0d1f0e6f4b6abb557327fab13021e0c280a6118d564aa73bb02c221315e9169"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/notary/notaryCli.js",
+      "sha256": "8f8d363fa3f78b98a201b9bc0b6c0bf81e25fed54a406ea432ec9573665e90c0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/notary/notaryAttestation.js",
+      "sha256": "5d8b0516436b71c3534197231019d6cfc6761dc114edacc6f9840dbb2412d101"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/transparency/logChain.js",
+      "sha256": "850d57cf4f790ee44bda5ece13804e51775a4ae88a7facd27e79f8f881d45d5d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/transparency/merkleIndexStore.js",
+      "sha256": "435876eb3a21e0b1a835fa4b918bd80bcb7daff7171cfb87da30908fe748ad2e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/transparency/sessionAnchorVerify.js",
+      "sha256": "3976f359d54b588cefa9d125d8c1779c5e11a7b8cda64e52c011e7a2761fd6bf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/domains/industryPackEntitlement.js",
+      "sha256": "eaac1f3d3e383dd8ac32b10613f7510dee38d9d15cd69aeb925cd7fa4dfbc03b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/standard/externalEvidenceFiles.js",
+      "sha256": "f3c2d023b0c8f63f9367eda5d44d13f14edd0380dc9dedb84253002b4b0e103f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/standard/externalEvidenceProfile.js",
+      "sha256": "a78855df54d8090b0fcb6f93d0c9d634c8dbf43bbad34853d18a5ee1ef28b9e2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/enforce/formalVerification.js",
+      "sha256": "660650b73cdf688898ba3a422b91037574dfa5d3ef9322da8ffa167fa69619b8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/dist/passport/trustInterchange.js",
+      "sha256": "ed424ea26484c37cc96ea547bbdc1c0338fa6ced2adb2a2004e5df76bd9dd0a1"
+    }
+  ],
+  "familyMapping": [
+    {
+      "family": "registry",
+      "observedCasesAcrossSeparatePhases": 9,
+      "passed": 9,
+      "failed": 0,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    },
+    {
+      "family": "bom",
+      "observedCasesAcrossSeparatePhases": 9,
+      "passed": 9,
+      "failed": 0,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    },
+    {
+      "family": "notary",
+      "observedCasesAcrossSeparatePhases": 9,
+      "passed": 6,
+      "failed": 3,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    },
+    {
+      "family": "merkle",
+      "observedCasesAcrossSeparatePhases": 9,
+      "passed": 9,
+      "failed": 0,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    },
+    {
+      "family": "transparency",
+      "observedCasesAcrossSeparatePhases": 9,
+      "passed": 6,
+      "failed": 3,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    },
+    {
+      "family": "formal",
+      "observedCasesAcrossSeparatePhases": 5,
+      "passed": 5,
+      "failed": 0,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    },
+    {
+      "family": "passport",
+      "observedCasesAcrossSeparatePhases": 5,
+      "passed": 5,
+      "failed": 0,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    },
+    {
+      "family": "license",
+      "observedCasesAcrossSeparatePhases": 14,
+      "passed": 13,
+      "failed": 1,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    },
+    {
+      "family": "imports",
+      "observedCasesAcrossSeparatePhases": 9,
+      "passed": 8,
+      "failed": 1,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    },
+    {
+      "family": "session",
+      "observedCasesAcrossSeparatePhases": 6,
+      "passed": 5,
+      "failed": 1,
+      "limit": "These rows combine the 76-case original-dist run with eight separately selected license controls; they are not a final whole-file run."
+    }
+  ],
+  "retainedFailures": [
+    {
+      "name": "Portable CLI notary accepts the independently captured operator PEM",
+      "message": "AssertionError: Strict claim exit 70 is not verifier qualification: expected 70 not to be 70 // Object.is equality\n    at invoke (/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:264:136)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:280:20\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "Portable CLI notary unused allow flags leave a pinned verdict trusted without an override",
+      "message": "AssertionError: Strict claim exit 70 is not verifier qualification: expected 70 not to be 70 // Object.is equality\n    at invoke (/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:264:136)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:299:20\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "Portable CLI notary accepts a genuinely signed operator trust list for the required purpose",
+      "message": "AssertionError: Strict claim exit 70 is not verifier qualification: expected 70 not to be 70 // Object.is equality\n    at invoke (/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:264:136)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:305:20\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "Portable CLI transparency accepts the independently captured operator PEM",
+      "message": "AssertionError: Strict claim exit 70 is not verifier qualification: expected 70 not to be 70 // Object.is equality\n    at invoke (/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:264:136)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:280:20\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "Portable CLI transparency unused allow flags leave a pinned verdict trusted without an override",
+      "message": "AssertionError: Strict claim exit 70 is not verifier qualification: expected 70 not to be 70 // Object.is equality\n    at invoke (/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:264:136)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:299:20\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "Portable CLI transparency accepts a genuinely signed operator trust list for the required purpose",
+      "message": "AssertionError: Strict claim exit 70 is not verifier qualification: expected 70 not to be 70 // Object.is equality\n    at invoke (/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:264:136)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:305:20\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "Portable CLI Industry Packs license key-compromise revocation beats a matching explicit license pin and both allow flags",
+      "message": "AssertionError: expected +0 to be 1 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:371:42\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "Portable CLI external-evidence profile signed revoked authority refuses even with the independent authority file",
+      "message": "AssertionError: expected +0 to be 1 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:409:42\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    },
+    {
+      "name": "Portable CLI detached session proof matching fingerprint cannot bypass operator revoked decision",
+      "message": "AssertionError: expected +0 to be 1 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:439:42\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    }
+  ],
+  "rules": {
+    "fixtures": "Actual existing constructors generate signed index, BOM, local software notary attestation, transparency inclusion/log bundle, detached session proof, governed external profile, formal hash certificate, HMAC demo token and Ed25519/HMAC/legacy-license controls. No producer or handler is mocked.",
+    "pins": "Auditor/notary PEMs are captured from operator key creation before export. Trust-list roots are independently generated and pinned before CLI use. Authority keys and original/digest references are supplied in separate operator files.",
+    "isolation": "Fresh private HOME and AMC_HOME, isolated child cwd, explicit qualified process.execPath and PATH prefix, strict claim mode, transport-denying preload and no live license activation or model requests.",
+    "exits": "The five carried-key signed families exercise 0/1/2. Formal hash and Passport HMAC stay exit1 despite intact integrity. HMAC/legacy Industry Pack activation fixtures remain portable exit1 with all four allow combinations. A session requires its separately captured expected-auditor fingerprint; wrong fingerprints fail integrity.",
+    "reports": "Actual JSON is parsed by the production strict verifierReportSchema. Scope, freshness, completeness and satisfaction stay not-evaluated. No allow flag becomes trusted, and unused allow flags add no override.",
+    "privateEvidence": "Raw child streams remain private and 168 stream hashes were independently checked. License and JSON-token argv are replaced by SHA256 in command manifests; environment secret values and private signing keys are not put in canonical receipts."
+  },
+  "sourceFindings": [
+    {
+      "finding": "The JSON success paths for notary verify-attest and transparency verify-bundle emit a trusted report but exit70 because printClaimResult(...,{json:true}) returns without recording claim output.",
+      "evidence": "Each family has three retained real failures: captured PEM, unused allow flags, and a valid signed operator trust list. Failure diagnosis agent owns any authorized local-helper repair; this agent changed no source.",
+      "source": "src/cli.ts:11743-11745 and12480-12483;src/cli/claimOutput.ts:38"
+    },
+    {
+      "finding": "License PEM, external authority file and mandatory session fingerprint are explicit pins that return admitted before key-compromise revocation is checked. All three genuine revoked contexts exit0/trusted rather than the retained expected1.",
+      "source": "src/trust/admission.ts:120-130",
+      "contractConflict": "P0-09:44 states a key must be neither revoked nor distrusted, while P0-09:159-163 orders explicit-key admission before trust-list revocation. Parent leaves precedence unresolved; no behavior or test expectation was silently reinterpreted."
+    }
+  ],
+  "fixtureCorrections": [
+    "Two initial setup phases had76 pending and no child evidence: initWorkspace({agentId:default}) skipped ensureDefaultFleetAgent. Existing BOM fixture pattern without explicit agentId and a scoped empty AMC_AGENT_ID stub fixes setup.",
+    "First full runtime had45 pass31fail0pending. Twenty-six signed-list cases were a malformed flattened envelope; corrected to {list,signatures} with an actual verifySignedTrustList control. One Merkle assumption incorrectly expected one issuer record; the actual proof.sig and root.sig pair is now required and both key/purpose admissions asserted. Genuine strict failures were retained."
+  ],
+  "limits": [
+    "The 84-case final test file has not had a final whole-file rebuilt-dist run. The extra eight-case selected phase reports76 intentionally filtered pending cases, never an84-case pass.",
+    "Signed-trust-list-only license lookup and F4 export containment are sibling-owned witnesses; this observer does not replace them.",
+    "The registry witness verifies a genuine signed empty initialized index; it does not qualify published bench payload serving or external registry transport.",
+    "No shared CLI/API/Studio/archive edit, build/install, freeze/floor/budget mutation, live service, hosted CI, coverage acceptance or release claim occurred.",
+    "P0-22 inherited empty-contract failures and explicit held/paused scopes remain."
+  ],
+  "nextAction": "Parent reviews repairs and freeze checks, builds candidate normally, then reruns this unchanged refusal corpus. Preserve the three pin-precedence REDs until the contradictory authored requirements are reconciled."
+}

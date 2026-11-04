@@ -1,0 +1,259 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 19305,
+  "cwd": "/private/tmp/p0-45-causal-qualification-20261015/closure",
+  "reason": "failed",
+  "files": [
+    "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts"
+  ],
+  "testCount": 12,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "948291585",
+      "name": "tests/verifyRepair.test.ts",
+      "fullName": null,
+      "filepath": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "948291585_0",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_0_0",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair plans nothing for a healthy store and apply moves nothing",
+      "fullName": "planVerifyRepair plans nothing for a healthy store and apply moves nothing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_0_1",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair leaves evidence alone when only a signed config failed",
+      "fullName": "planVerifyRepair leaves evidence alone when only a signed config failed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_0_2",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature",
+      "fullName": "planVerifyRepair counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_0_3",
+      "name": "tests/verifyRepair.test.ts planVerifyRepair counts a missing blob and keeps the ledger in plan mode",
+      "fullName": "planVerifyRepair counts a missing blob and keeps the ledger in plan mode",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "948291585_1",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_0",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone",
+      "fullName": "applyVerifyRepair moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_1",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses when the legal hold state is unknown, and moves nothing",
+      "fullName": "applyVerifyRepair refuses when the legal hold state is unknown, and moves nothing",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": [
+        {
+          "message": "expected undefined to be an instance of RepairRefused",
+          "showDiff": false,
+          "operator": "strictEqual",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:203:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "expectRefused",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 99,
+              "column": 18
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 203,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_2",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses when the hold check itself throws",
+      "fullName": "applyVerifyRepair refuses when the hold check itself throws",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": [
+        {
+          "message": "expected undefined to be an instance of RepairRefused",
+          "showDiff": false,
+          "operator": "strictEqual",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:213:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "expectRefused",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 99,
+              "column": 18
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 213,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_3",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses under an active hold and names it",
+      "fullName": "applyVerifyRepair refuses under an active hold and names it",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": [
+        {
+          "message": "expected undefined to be an instance of RepairRefused",
+          "showDiff": false,
+          "operator": "strictEqual",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be an instance of RepairRefused\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1386:15)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at expectRefused (/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:99:18)\n    at /private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts:221:5\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "expectRefused",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 99,
+              "column": 18
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-45-causal-qualification-20261015/closure/tests/verifyRepair.test.ts",
+              "line": 221,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_4",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses when the monitor key does not match the expected fingerprint",
+      "fullName": "applyVerifyRepair refuses when the monitor key does not match the expected fingerprint",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_5",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses before any move when signing fails",
+      "fullName": "applyVerifyRepair refuses before any move when signing fails",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_6",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair refuses when a planned file changed after the plan",
+      "fullName": "applyVerifyRepair refuses when a planned file changed after the plan",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "948291585_1_7",
+      "name": "tests/verifyRepair.test.ts applyVerifyRepair puts moved files back when a rename fails part way",
+      "fullName": "applyVerifyRepair puts moved files back when a rename fails part way",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

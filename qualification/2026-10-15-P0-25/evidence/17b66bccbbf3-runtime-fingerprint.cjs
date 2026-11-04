@@ -1,0 +1,13 @@
+const fs = require('node:fs');
+const crypto = require('node:crypto');
+const { createRequire } = require('node:module');
+const path = require('node:path');
+const root = '/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass';
+const localRequire = createRequire(path.join(root, 'package.json'));
+const Database = localRequire('better-sqlite3');
+const db = new Database(':memory:');
+const selected = db.prepare('SELECT 1 AS selected').get();
+db.close();
+const file = fs.realpathSync(localRequire.resolve('better-sqlite3/build/Release/better_sqlite3.node'));
+const stat = fs.statSync(file);
+console.log(JSON.stringify({node:process.version,executable:fs.realpathSync(process.execPath),modulesABI:process.versions.modules,napi:process.versions.napi,cwd:process.cwd(),sqliteSelected:selected.selected,native:{path:file,bytes:stat.size,sha256:crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'),device:stat.dev,inode:stat.ino,nlink:stat.nlink},boundary:'Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference.'},null,2));

@@ -1,0 +1,387 @@
+{
+  "key": "P0-30",
+  "candidate": "AMC-1525 supplemental direct readonly guard",
+  "date": "2026-10-15",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "root": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015",
+  "corpus": {
+    "file": "tests/ledgerVerificationReadOnly.test.ts",
+    "totalRegisteredCases": 10,
+    "actualNames": [
+      "cold-process current vault verification reads encrypted evidence without trust mutations",
+      "cold-process legacy vault verification reads encrypted evidence without trust mutations",
+      "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+      "cold-process encrypted evidence fails closed for wrong-passphrase without modifying disk",
+      "cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+      "cold-process encrypted evidence fails closed for corrupt-vault without modifying disk",
+      "public-only ledger verification preserves the supplied trust anchors without creating a vault",
+      "JSONL-only verification checks signed rows without creating a SQLite ledger",
+      "a JSONL backend marker without its event log is not verified evidence",
+      "verification cannot initialize a missing ledger into an apparently valid empty workspace"
+    ],
+    "originalAssertionsInputsSetupCleanupDeadlinesPreserved": true,
+    "adaptations": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/adaptations.json",
+      "bytes": 891,
+      "sha256": "e5b6cf07164f1e31c7d3fa0e336cc1969c0fbfeb76cf4dade2df312ca981895c"
+    },
+    "scope": "A distinct bounded corpus consisting of the unchanged original ten readonly cases. It does not rename, trim or rewrite the old held 76-case runner or the original full62 observation. Original fixtures generate fresh random keys and times per run."
+  },
+  "classification": "assertion-specific behavioral failure in completed ten-case corpus",
+  "matrix": {
+    "recipe": {
+      "id": "P30-1525-cold-vault-initializes",
+      "oldIssue": "AMC-1525",
+      "file": "src/ledger/ledgerVerification.ts",
+      "find": "ledger = openLedger(workspacePath, { readonly: true });",
+      "replace": "ledger = openLedger(workspacePath);",
+      "tests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts",
+        "tests/ledgerVerificationReadOnly.test.ts"
+      ],
+      "expect": "killed",
+      "candidateOccurrences": 1,
+      "heldOccurrences": 1,
+      "candidateFindLine": 702,
+      "missingCandidateTests": [
+        "tests/crypto/keyHistoryMutationGuards.test.ts"
+      ],
+      "staticMatchAndTestsExist": false
+    },
+    "baseline": {
+      "numTotalTests": 10,
+      "numPassedTests": 10,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true,
+      "exit": 0,
+      "names": [
+        "cold-process current vault verification reads encrypted evidence without trust mutations",
+        "cold-process legacy vault verification reads encrypted evidence without trust mutations",
+        "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+        "cold-process encrypted evidence fails closed for wrong-passphrase without modifying disk",
+        "cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+        "cold-process encrypted evidence fails closed for corrupt-vault without modifying disk",
+        "public-only ledger verification preserves the supplied trust anchors without creating a vault",
+        "JSONL-only verification checks signed rows without creating a SQLite ledger",
+        "a JSONL backend marker without its event log is not verified evidence",
+        "verification cannot initialize a missing ledger into an apparently valid empty workspace"
+      ],
+      "failed": [],
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-baseline/raw-tests.json",
+        "bytes": 3760,
+        "sha256": "8d8bb3400692b7b31d95158d9bf964e7971ad0a3b82b45ef5efd820310ea35b2"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-baseline/command.json",
+        "bytes": 2001,
+        "sha256": "bf0c03ab9ec479f312900a84d5e2655656743c95629d89583e42daa5a5ff718f"
+      },
+      "infrastructureFailure": false
+    },
+    "mutant": {
+      "numTotalTests": 10,
+      "numPassedTests": 7,
+      "numFailedTests": 3,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": false,
+      "exit": 1,
+      "names": [
+        "cold-process current vault verification reads encrypted evidence without trust mutations",
+        "cold-process legacy vault verification reads encrypted evidence without trust mutations",
+        "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+        "cold-process encrypted evidence fails closed for wrong-passphrase without modifying disk",
+        "cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+        "cold-process encrypted evidence fails closed for corrupt-vault without modifying disk",
+        "public-only ledger verification preserves the supplied trust anchors without creating a vault",
+        "JSONL-only verification checks signed rows without creating a SQLite ledger",
+        "a JSONL backend marker without its event log is not verified evidence",
+        "verification cannot initialize a missing ledger into an apparently valid empty workspace"
+      ],
+      "failed": [
+        {
+          "name": "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+          "messages": [
+            "AssertionError: expected +0 to be 1 // Object.is equality\n    at /private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/closure/tests/ledgerVerificationReadOnly.test.ts:99:27\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+          "messages": [
+            "AssertionError: expected { \u2026(84) } to deeply equal { \u2026(79) }\n    at /private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/closure/tests/ledgerVerificationReadOnly.test.ts:102:42\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "public-only ledger verification preserves the supplied trust anchors without creating a vault",
+          "messages": [
+            "AssertionError: expected [ \u2026(2) ] to deeply equal []\n    at /private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/closure/tests/ledgerVerificationReadOnly.test.ts:125:25\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-mutant/raw-tests.json",
+        "bytes": 6664,
+        "sha256": "22be5926eb2f8d29ea483c5a83605669f06cab9feb0861452a4011a9e865f4d5"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-mutant/command.json",
+        "bytes": 1987,
+        "sha256": "ce053737973b70712accdacc34faa788a8dff50d1f7a8b95d5c1c4949c473590"
+      },
+      "infrastructureFailure": false
+    },
+    "restored": {
+      "numTotalTests": 10,
+      "numPassedTests": 10,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true,
+      "exit": 0,
+      "names": [
+        "cold-process current vault verification reads encrypted evidence without trust mutations",
+        "cold-process legacy vault verification reads encrypted evidence without trust mutations",
+        "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+        "cold-process encrypted evidence fails closed for wrong-passphrase without modifying disk",
+        "cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+        "cold-process encrypted evidence fails closed for corrupt-vault without modifying disk",
+        "public-only ledger verification preserves the supplied trust anchors without creating a vault",
+        "JSONL-only verification checks signed rows without creating a SQLite ledger",
+        "a JSONL backend marker without its event log is not verified evidence",
+        "verification cannot initialize a missing ledger into an apparently valid empty workspace"
+      ],
+      "failed": [],
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-restored/raw-tests.json",
+        "bytes": 3755,
+        "sha256": "b919cf2d50e7c2d5dc8e3ad2da9452d15ccc20ca51942a293d29ae2feec2a323"
+      },
+      "command": {
+        "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-restored/command.json",
+        "bytes": 2001,
+        "sha256": "25e8fd9ca4d9f79ecbadd8e100844c0f78e74c86594271b99c37ecbc030abc6b"
+      },
+      "infrastructureFailure": false
+    },
+    "classification": "behavior-failure-needs-classification",
+    "sourceRestoreExact": true,
+    "fullCompiledRestoreExact": true,
+    "originalCriteriaAndCases": true,
+    "distinctBoundedCorpus": "Unchanged original ledgerVerificationReadOnly.test.ts ten cases; supplemental direct check, not old held76 batch."
+  },
+  "matrixFile": {
+    "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/direct-P30-1525-cold-vault-initializes-matrix.json",
+    "bytes": 9616,
+    "sha256": "8b486645aab77fbb02266174cb805f6aa0e926900a888ce052e6a77cb95a39e8"
+  },
+  "compilerIsolation": {
+    "actualInstalledTscUsed": true,
+    "mutantTargetRestoredBeforeTest": false,
+    "meaning": "Only the exact readonly TS guard and expected target JS differ during the mutant. Unrelated emitted bundled kernel output is restored from the pinned baseline before tests.",
+    "mutant": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-mutant/emit-isolation.json",
+      "bytes": 487,
+      "sha256": "8a0eea20d65c26308a73e0883a6f42e6b37cffea8ec2a36d3c0a63a34a4fdd66"
+    },
+    "restored": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/direct-P30-1525-cold-vault-initializes-compile-restored/emit-isolation.json",
+      "bytes": 413,
+      "sha256": "88b9098a990dddcf793714bdef26b76e84a5a1331e7187d02f14eebffaf2ef4f"
+    }
+  },
+  "originalPacketPreservation": {
+    "receipt": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+      "bytes": 95234,
+      "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+    },
+    "markdown": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.md",
+      "bytes": 2742,
+      "sha256": "77d12b860e6747093ececf69f79f43e26988de7c2d0b55c69905235218391b6a"
+    },
+    "index": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/artifact-index.json",
+      "bytes": 80407,
+      "sha256": "88c47cfa764cab70825d6bf67ac3e23615bf6b95fbb7aee6ac6959b8d1f30339"
+    },
+    "after": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/original-packet-after.json",
+      "bytes": 456,
+      "sha256": "f4999e55e0f76fde30e152fb94a2eaffddd9d3a837d86a5e97e5198209acae17"
+    },
+    "originalFull62FifthCounts": {
+      "numTotalTests": 62,
+      "numPassedTests": 44,
+      "numFailedTests": 3,
+      "numPendingTests": 15,
+      "numTodoTests": 0
+    },
+    "originalFull62FifthClassification": "partial assertion failures with pending portable cases after product fixture refusal; not a completed 62-case kill",
+    "scope": "The original 44pass/3fail/15pending run remains an incomplete full62 mutation observation. This supplemental run supplies separate direct-ten evidence and does not retroactively complete or relabel that run."
+  },
+  "compatibleFixedEffectEvidenceReused": {
+    "sameSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "all4529CompiledBaselineHashesMatchOriginal": true,
+    "effects": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-baseline-effects.json",
+        "bytes": 6306,
+        "sha256": "48205bbee4c0cb07d641bf44e791899b501c04fad05a3817c75569644539f7ae"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-mutant-effects.json",
+        "bytes": 9233,
+        "sha256": "3e10f2bd7150c902c7bf5477e19042cc4885c143d056a8725446151cda1ff0a6"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/P30-1525-cold-vault-initializes-restored-effects.json",
+        "bytes": 6306,
+        "sha256": "f000187d9d916b23c4b3c5bd28991d2196f9346256772582207bc48683111cf6"
+      }
+    ],
+    "publicPinsBeforeEvidence": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/public-pins-before-evidence.json",
+      "bytes": 1028,
+      "sha256": "a8bad16b2e904e39ccae65062032d45b738997be62e9ac78d4c5d5f6d8b2f927"
+    },
+    "frozenInputs": {
+      "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/cold-effects/frozen-inputs.json",
+      "bytes": 57064,
+      "sha256": "be6f5742e6135ca91c53cae8b6b30038b86c295246b9b502873583543054a924"
+    },
+    "rerun": false,
+    "scope": "Previously observed frozen physical data remains byte-exact; the original missing-vault mutant changed14 noncoordination files plus WAL/SHM with all table rows unchanged. No additional fixed-effect product probe or new lifecycle claim."
+  },
+  "runtime": {
+    "currentLauncherActual": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "launcherRaw": {
+      "path": "/private/tmp/p0-30-actual-runtime-fingerprint-20261015.log",
+      "bytes": 114,
+      "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+    },
+    "scope": "ABI127 is observed for the current same-launcher probe. Prior children record version/executable only, not invented per-child ABI fields.",
+    "nativeBefore": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/native-before.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "nativeAfter": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/native-after.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "noNativeRebuildOrInstall": true
+  },
+  "preservation": {
+    "protected31Pins": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/source-after.json",
+      "bytes": 12730,
+      "sha256": "d343a6dffe4cd6aeb778d88fdd9a0bb2bb3672ca994945e1545a47a537fefdbb"
+    },
+    "initial7739SourceManifest": {
+      "path": "/private/tmp/p0-30-initial-tracked-manifest-20261015.json",
+      "bytes": 1449771,
+      "sha256": "a17289fed9769adb7e4985847b6698b013d2eb253928174f80a42839992ddfa0"
+    },
+    "preflight": {
+      "path": "/private/tmp/p0-30-root-scope-preflight-20261015.json",
+      "bytes": 9648,
+      "sha256": "5a35eb722c60578da5f983e42d8dca457cbacc13bfab9d02cab2fe3cccbef88f"
+    },
+    "live7739SourceExact": true,
+    "private7739SourceRestoredExact": true,
+    "live4529CompiledExact": true,
+    "private4529CompiledRestoredExact": true,
+    "full12268Closure": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+    },
+    "nativeBytesDeviceInodeLinkCountExact": true,
+    "status": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/phases/supplemental-final-live-status/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "journal": {
+    "frozen": {
+      "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 13224,
+      "sha256": "79353a21045db532910ba408526d1caceb3495920654dc9588e2cd044ac9820e"
+    },
+    "phaseCount": 8,
+    "phases": [
+      {
+        "phase": "supplemental-private-copy-setup",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 3700
+      },
+      {
+        "phase": "direct-P30-1525-cold-vault-initializes-baseline",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 6956
+      },
+      {
+        "phase": "direct-P30-1525-cold-vault-initializes-compile-mutant",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28358
+      },
+      {
+        "phase": "direct-P30-1525-cold-vault-initializes-mutant",
+        "exit": 1,
+        "executionError": null,
+        "durationMs": 7562
+      },
+      {
+        "phase": "direct-P30-1525-cold-vault-initializes-compile-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 28835
+      },
+      {
+        "phase": "direct-P30-1525-cold-vault-initializes-restored",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 7363
+      },
+      {
+        "phase": "supplemental-final-preservation",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 2397
+      },
+      {
+        "phase": "supplemental-final-live-status",
+        "exit": 0,
+        "executionError": null,
+        "durationMs": 46
+      }
+    ]
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/artifact-index.json",
+    "bytes": 15704,
+    "sha256": "861366240c5cf98002552bf3ce6820155af84125c12d10ef48aa08e9d74152c7"
+  },
+  "artifactCount": 62,
+  "limits": [
+    "No live source, original test, helper, archive, counter, dependency, native module, Git or canonical qualification edit was made.",
+    "The completed original receipt, 322 references, original copied closure and original fixed fixtures remain byte-immutable.",
+    "Actual assertion-specific failures and pending/setup outcomes determine scope; nonzero alone is not a kill.",
+    "This is direct helper/backend evidence, not an authenticated routed CLI/API claim, broader P0-30/native/race batch, Node24, full suite, coverage, hosted CI, release, source failure repair or Done approval."
+  ]
+}

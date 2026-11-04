@@ -1,0 +1,50 @@
+{
+  "source": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "atUtc": "2026-10-14T17:37:36.836154+00:00",
+  "checkouts": {
+    "primary": {
+      "path": "/Users/sid/AgentMaturityCompass",
+      "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "trackedStatus": ""
+    },
+    "Claude": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+      "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+      "trackedStatus": ""
+    }
+  },
+  "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+  "protectedEqualAcceptedMain": {
+    "src/api/index.ts": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+    "src/api/accessPolicy.ts": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+    "src/api/resultRouteRegistry.ts": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+    "src/studio/studioServer.ts": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+    "src/studio/openapi.ts": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+    "website/openapi.yaml": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+    "src/console/assets/app.js": "6bdee3f49798480be259852993fdead87c6dc6faa2333751318ec25da1ed058a",
+    "src/console/assets/components/claimBadge.js": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+    "src/mcp/amcMcpServer.ts": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+    "src/mcp/a4Tools.ts": "4614662d0246743ea1949aa9fcb93f88b6f9268fb5bdafe2f4747148d953ebca",
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/repl/replParser.ts": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "scripts/line-budgets.json": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+    "scripts/quality/coverage-baseline.json": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+    "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/release-gate.mjs": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc"
+  },
+  "policy": "No held source edits, paused A4/P2-02 resume, source overlay, freeze exception, floor/baseline/dependency change, tracker closure, external message, push or publication.",
+  "historicalHeldClaudeRoot": {
+    "commit": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "objectType": "commit",
+    "verifiedInPrimaryRepository": "/Users/sid/AgentMaturityCompass",
+    "status": "Held historical source reference; s7fccbbfa wrapper directory is not a Git checkout. This object is not present in the separate durable clone; no ancestry claim is made.",
+    "currentPrimaryRef": "refs/heads/pending-main-442cd919",
+    "observedTip": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "unchangedFromInitialHandoff": true
+  }
+}

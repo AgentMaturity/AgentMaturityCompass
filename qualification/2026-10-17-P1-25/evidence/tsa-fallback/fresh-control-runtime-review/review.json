@@ -1,0 +1,1049 @@
+{
+  "schema": "p125f-independent-fresh-control-runtime-review/1",
+  "at": "2026-10-16T22:29:09.590929+00:00",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+  "blockers": [],
+  "allReadsFinished": true,
+  "actualSevenPhaseChain": [
+    {
+      "phase": "p125f-fresh-canonical",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 12329,
+      "pid": 51695,
+      "ownedPgid": 51695,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "firstFailures": [],
+      "lifecycle": {
+        "records": 4,
+        "socketCount": 8,
+        "allOwnedTerminalsClosed": true,
+        "cleanupErrorCount": 0,
+        "ownedErrors": [],
+        "bodyFailureCount": 0,
+        "defaultTimeout": {
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "configuredMs": 10000,
+          "elapsedMs": 10011.649333,
+          "failures": [
+            "stall-first: The operation was aborted",
+            "after-timeout: HTTP 500"
+          ],
+          "routes": [
+            "/stall-first",
+            "/after-timeout"
+          ]
+        }
+      },
+      "raw": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-fresh-canonical/raw.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-fresh-canonical/raw.json",
+        "bytes": 7234,
+        "sha256": "8f878a5a18b17800de95278dc1e61d0493c18a2e0aa226f9df9e83db80fe203d",
+        "dev": 16777231,
+        "inode": 543576124,
+        "nlink": 1
+      },
+      "observer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-fresh-canonical/observer.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-fresh-canonical/observer.json",
+        "bytes": 9825,
+        "sha256": "30e616adb66f0e66779be989d0750e5057d4a56c967868711ef830d073eb9227",
+        "dev": 16777231,
+        "inode": 543576122,
+        "nlink": 1
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-fresh-canonical/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-fresh-canonical/command.json",
+        "bytes": 2828,
+        "sha256": "847cbcfddc3010b8c8747cb4d2698e6248ab897d847a1e42a930d2d79987ea31",
+        "dev": 16777231,
+        "inode": 543576125,
+        "nlink": 1
+      },
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-fresh-canonical/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-fresh-canonical/stdout-stderr.log",
+        "bytes": 4671,
+        "sha256": "30c158981f9eceaf1ae3287874f41c2aaea34e69a7fbb1782dd45fcfd231910e",
+        "dev": 16777231,
+        "inode": 543575828,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p125f-m1",
+      "tests": {
+        "total": 21,
+        "passed": 18,
+        "failed": 3,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 11534,
+      "pid": 51819,
+      "ownedPgid": 51819,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "firstFailures": [
+        {
+          "identity": "P1-25 offline and configured TSA refusal continuation skips an unmatched anchor before the wire beside a matching-anchor refusal",
+          "name": "AssertionError",
+          "firstProjectFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/tests/time/tsaFallback.test.ts",
+            "line": 239,
+            "column": 22
+          },
+          "message": "expected { grant: null, failures: [ …(2) ] } to deeply equal { grant: null, failures: [ …(2) ] }"
+        },
+        {
+          "identity": "P1-25 offline and configured TSA refusal continuation preserves literal attempt and failure order through finite HTTP, malformed and imprint refusals",
+          "name": "AssertionError",
+          "firstProjectFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/tests/time/tsaFallback.test.ts",
+            "line": 261,
+            "column": 61
+          },
+          "message": "expected [ '/single-positive', …(3) ] to deeply equal [ '/single-positive', …(3) ]"
+        },
+        {
+          "identity": "P1-25 offline and configured TSA refusal continuation continues after the unchanged 10000 ms default abort to a real next-route refusal",
+          "name": "AssertionError",
+          "firstProjectFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/tests/time/tsaFallback.test.ts",
+            "line": 287,
+            "column": 61
+          },
+          "message": "expected [ '/after-timeout', '/stall-first' ] to deeply equal [ '/stall-first', '/after-timeout' ]"
+        }
+      ],
+      "lifecycle": {
+        "records": 4,
+        "socketCount": 8,
+        "allOwnedTerminalsClosed": true,
+        "cleanupErrorCount": 0,
+        "ownedErrors": [],
+        "bodyFailureCount": 3,
+        "defaultTimeout": {
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "configuredMs": 10000,
+          "elapsedMs": 10003.394124999999,
+          "failures": [
+            "after-timeout: HTTP 500",
+            "stall-first: The operation was aborted"
+          ],
+          "routes": [
+            "/after-timeout",
+            "/stall-first"
+          ]
+        }
+      },
+      "raw": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m1/raw.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m1/raw.json",
+        "bytes": 9489,
+        "sha256": "6af2404946f86c1d5260702a5e5f63ce967dcd7f2cedd00a36093a5b7baa3898",
+        "dev": 16777231,
+        "inode": 543576478,
+        "nlink": 1
+      },
+      "observer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m1/observer.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m1/observer.json",
+        "bytes": 16836,
+        "sha256": "5f849eb8537dfa3be69822b1443f1c431341a9a0e6994e88bf15fc3598b0edbe",
+        "dev": 16777231,
+        "inode": 543576476,
+        "nlink": 1
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m1/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m1/command.json",
+        "bytes": 2738,
+        "sha256": "26a2ef6be310dfb5ff86129f9fee8205322c6a41c7f16417483653de50df3ee0",
+        "dev": 16777231,
+        "inode": 543576479,
+        "nlink": 1
+      },
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m1/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m1/stdout-stderr.log",
+        "bytes": 8276,
+        "sha256": "90b41083465e8c37f0ed1ee221d8ab3a00eac427d661ee880272acaa7682583d",
+        "dev": 16777231,
+        "inode": 543576178,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p125f-restore1",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 11525,
+      "pid": 51945,
+      "ownedPgid": 51945,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "firstFailures": [],
+      "lifecycle": {
+        "records": 4,
+        "socketCount": 8,
+        "allOwnedTerminalsClosed": true,
+        "cleanupErrorCount": 0,
+        "ownedErrors": [],
+        "bodyFailureCount": 0,
+        "defaultTimeout": {
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "configuredMs": 10000,
+          "elapsedMs": 10012.591957999999,
+          "failures": [
+            "stall-first: The operation was aborted",
+            "after-timeout: HTTP 500"
+          ],
+          "routes": [
+            "/stall-first",
+            "/after-timeout"
+          ]
+        }
+      },
+      "raw": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore1/raw.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore1/raw.json",
+        "bytes": 7236,
+        "sha256": "75cc9d5149bcb5039fe534758992d6d5cbddd5bdb703725df586bf11e128a539",
+        "dev": 16777231,
+        "inode": 543576823,
+        "nlink": 1
+      },
+      "observer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore1/observer.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore1/observer.json",
+        "bytes": 9825,
+        "sha256": "db4b7a060fcc988b1c149cf23f315ff1d962fa1c6102d76b2a240a5aad4cf94f",
+        "dev": 16777231,
+        "inode": 543576821,
+        "nlink": 1
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore1/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore1/command.json",
+        "bytes": 2779,
+        "sha256": "073f8e3adbd2fed28add4b1a592af6e43d6d07ef05e3882cb2bb30645c4b71e6",
+        "dev": 16777231,
+        "inode": 543576824,
+        "nlink": 1
+      },
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore1/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore1/stdout-stderr.log",
+        "bytes": 4670,
+        "sha256": "ff6fc10aaeeb93930ee392c0f371ba7a9bf668c6342fc75212a2e2408d57cd5a",
+        "dev": 16777231,
+        "inode": 543576526,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p125f-m2",
+      "tests": {
+        "total": 21,
+        "passed": 19,
+        "failed": 2,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 11512,
+      "pid": 52054,
+      "ownedPgid": 52054,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "firstFailures": [
+        {
+          "identity": "P1-25 offline and configured TSA refusal continuation preserves literal attempt and failure order through finite HTTP, malformed and imprint refusals",
+          "name": "AssertionError",
+          "firstProjectFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/tests/time/tsaFallback.test.ts",
+            "line": 261,
+            "column": 61
+          },
+          "message": "expected [ '/single-positive', '/http-first' ] to deeply equal [ '/single-positive', …(3) ]"
+        },
+        {
+          "identity": "P1-25 offline and configured TSA refusal continuation continues after the unchanged 10000 ms default abort to a real next-route refusal",
+          "name": "AssertionError",
+          "firstProjectFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/tests/time/tsaFallback.test.ts",
+            "line": 287,
+            "column": 61
+          },
+          "message": "expected [ '/stall-first' ] to deeply equal [ '/stall-first', '/after-timeout' ]"
+        }
+      ],
+      "lifecycle": {
+        "records": 4,
+        "socketCount": 5,
+        "allOwnedTerminalsClosed": true,
+        "cleanupErrorCount": 0,
+        "ownedErrors": [],
+        "bodyFailureCount": 2,
+        "defaultTimeout": {
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "configuredMs": 10000,
+          "elapsedMs": 10003.507834,
+          "failures": [
+            "stall-first: The operation was aborted"
+          ],
+          "routes": [
+            "/stall-first"
+          ]
+        }
+      },
+      "raw": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m2/raw.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m2/raw.json",
+        "bytes": 8718,
+        "sha256": "3ce154f10b5e8c29c9290717e4ad7d3c6d94757117b84404a706233912c4eaa9",
+        "dev": 16777231,
+        "inode": 543577148,
+        "nlink": 1
+      },
+      "observer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m2/observer.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m2/observer.json",
+        "bytes": 14097,
+        "sha256": "200166b8a6539d45226fa5839b46f53a7daaf86c701fe018ee2eb6fe3007fb09",
+        "dev": 16777231,
+        "inode": 543577146,
+        "nlink": 1
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m2/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m2/command.json",
+        "bytes": 2738,
+        "sha256": "eaf4be7ad8f7c9a386d2f6f73f97ca73e226988db075f46532396e8702c26314",
+        "dev": 16777231,
+        "inode": 543577149,
+        "nlink": 1
+      },
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m2/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m2/stdout-stderr.log",
+        "bytes": 6382,
+        "sha256": "c824aad1cc5cc213455b85e7e8d11adc6a0072aadf429094313ea1a1b635b433",
+        "dev": 16777231,
+        "inode": 543576844,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p125f-restore2",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 11606,
+      "pid": 52133,
+      "ownedPgid": 52133,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "firstFailures": [],
+      "lifecycle": {
+        "records": 4,
+        "socketCount": 8,
+        "allOwnedTerminalsClosed": true,
+        "cleanupErrorCount": 0,
+        "ownedErrors": [],
+        "bodyFailureCount": 0,
+        "defaultTimeout": {
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "configuredMs": 10000,
+          "elapsedMs": 10010.687125,
+          "failures": [
+            "stall-first: The operation was aborted",
+            "after-timeout: HTTP 500"
+          ],
+          "routes": [
+            "/stall-first",
+            "/after-timeout"
+          ]
+        }
+      },
+      "raw": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore2/raw.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore2/raw.json",
+        "bytes": 7236,
+        "sha256": "4e7d2408d0ec9c5c0f3c4fcb0bfb82d7adc3503500c6b9bfcfaa8cf7b24857b6",
+        "dev": 16777231,
+        "inode": 543577483,
+        "nlink": 1
+      },
+      "observer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore2/observer.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore2/observer.json",
+        "bytes": 9825,
+        "sha256": "c98ca55055a48d0fd6eaa166425624a82286173fbf8acb02b68de8ac51155b48",
+        "dev": 16777231,
+        "inode": 543577481,
+        "nlink": 1
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore2/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore2/command.json",
+        "bytes": 2779,
+        "sha256": "87c40409eacc17fc6192f44f4dd84d2a5d5ca519577530a0b95df5c0908f539b",
+        "dev": 16777231,
+        "inode": 543577484,
+        "nlink": 1
+      },
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore2/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore2/stdout-stderr.log",
+        "bytes": 4664,
+        "sha256": "394a7fbead946cc491fc72fb9b7381821f746ed6e0b1d3cf2999aadc66b2883a",
+        "dev": 16777231,
+        "inode": 543577179,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p125f-m3",
+      "tests": {
+        "total": 21,
+        "passed": 20,
+        "failed": 1,
+        "skipped": 0
+      },
+      "exit": 1,
+      "durationMs": 11607,
+      "pid": 52256,
+      "ownedPgid": 52256,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "firstFailures": [
+        {
+          "identity": "P1-25 offline and configured TSA refusal continuation skips an unmatched anchor before the wire beside a matching-anchor refusal",
+          "name": "AssertionError",
+          "firstProjectFrame": {
+            "method": "",
+            "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/tests/time/tsaFallback.test.ts",
+            "line": 237,
+            "column": 86
+          },
+          "message": "expected [ { method: 'POST', …(10) } ] to have a length of +0 but got 1"
+        }
+      ],
+      "lifecycle": {
+        "records": 4,
+        "socketCount": 9,
+        "allOwnedTerminalsClosed": true,
+        "cleanupErrorCount": 0,
+        "ownedErrors": [],
+        "bodyFailureCount": 1,
+        "defaultTimeout": {
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "configuredMs": 10000,
+          "elapsedMs": 10008.821667,
+          "failures": [
+            "stall-first: The operation was aborted",
+            "after-timeout: HTTP 500"
+          ],
+          "routes": [
+            "/stall-first",
+            "/after-timeout"
+          ]
+        }
+      },
+      "raw": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m3/raw.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m3/raw.json",
+        "bytes": 8414,
+        "sha256": "e7e6c1530a3996f426f79fca4b19008aa17ea4292b1179f9d561d97629bfc145",
+        "dev": 16777231,
+        "inode": 543577815,
+        "nlink": 1
+      },
+      "observer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m3/observer.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m3/observer.json",
+        "bytes": 12162,
+        "sha256": "0d2a58c3b9c437f3ceb6dc73890dd1aa7709a91b46e612782e8aca80c9bf610c",
+        "dev": 16777231,
+        "inode": 543577813,
+        "nlink": 1
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m3/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m3/command.json",
+        "bytes": 2738,
+        "sha256": "af04213d28952b5e4dc8e78ccb16a4638e7e215eff2a983b71f5b6f7113ab35d",
+        "dev": 16777231,
+        "inode": 543577816,
+        "nlink": 1
+      },
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m3/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-m3/stdout-stderr.log",
+        "bytes": 6211,
+        "sha256": "ad5d064fe989ab8f4b08338e6a5e8af476a6ce5a9d7b05c40fff73983166226a",
+        "dev": 16777231,
+        "inode": 543577527,
+        "nlink": 1
+      }
+    },
+    {
+      "phase": "p125f-restore3",
+      "tests": {
+        "total": 21,
+        "passed": 21,
+        "failed": 0,
+        "skipped": 0
+      },
+      "exit": 0,
+      "durationMs": 11564,
+      "pid": 52977,
+      "ownedPgid": 52977,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "rawObserverOrderedJoin": true,
+      "noUnhandledLateOrHookErrors": true,
+      "naturalESRCH": true,
+      "nonzeroSignalsSent": false,
+      "firstFailures": [],
+      "lifecycle": {
+        "records": 4,
+        "socketCount": 8,
+        "allOwnedTerminalsClosed": true,
+        "cleanupErrorCount": 0,
+        "ownedErrors": [],
+        "bodyFailureCount": 0,
+        "defaultTimeout": {
+          "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "configuredMs": 10000,
+          "elapsedMs": 10009.9475,
+          "failures": [
+            "stall-first: The operation was aborted",
+            "after-timeout: HTTP 500"
+          ],
+          "routes": [
+            "/stall-first",
+            "/after-timeout"
+          ]
+        }
+      },
+      "raw": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore3/raw.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore3/raw.json",
+        "bytes": 7234,
+        "sha256": "d40b75732e2cba660a419b9d1ad7cb83fc9c04a4385b43ec47e5425a5c11efbd",
+        "dev": 16777231,
+        "inode": 543578903,
+        "nlink": 1
+      },
+      "observer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore3/observer.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore3/observer.json",
+        "bytes": 9825,
+        "sha256": "20a278879a3d54f07e3e265587baf40b3841eb2f9e61ca74a8ea63bd54f22005",
+        "dev": 16777231,
+        "inode": 543578901,
+        "nlink": 1
+      },
+      "command": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore3/command.json",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore3/command.json",
+        "bytes": 2779,
+        "sha256": "0e6130ec2a714bbb5b9768df66c42503cc14e79d77663629faa4d933bd7346b5",
+        "dev": 16777231,
+        "inode": 543578904,
+        "nlink": 1
+      },
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore3/stdout-stderr.log",
+        "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-restore3/stdout-stderr.log",
+        "bytes": 4662,
+        "sha256": "2a3d2fb43bc32bf0e9c643dfd355713c90ce5b6ea779917009ef5099b9298fb5",
+        "dev": 16777231,
+        "inode": 543578606,
+        "nlink": 1
+      }
+    }
+  ],
+  "sourceRun": {
+    "phase": "p125f-source-combined",
+    "tests": {
+      "total": 21,
+      "passed": 21,
+      "failed": 0,
+      "skipped": 0
+    },
+    "exit": 0,
+    "durationMs": 11769,
+    "pid": 49481,
+    "ownedPgid": 49481,
+    "hookTaskEntries": 2,
+    "individualHookValues": 3,
+    "rawObserverOrderedJoin": true,
+    "noUnhandledLateOrHookErrors": true,
+    "naturalESRCH": true,
+    "nonzeroSignalsSent": false,
+    "firstFailures": [],
+    "lifecycle": {
+      "records": 4,
+      "socketCount": 8,
+      "allOwnedTerminalsClosed": true,
+      "cleanupErrorCount": 0,
+      "ownedErrors": [],
+      "bodyFailureCount": 0,
+      "defaultTimeout": {
+        "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "configuredMs": 10000,
+        "elapsedMs": 10013.574583000001,
+        "failures": [
+          "stall-first: The operation was aborted",
+          "after-timeout: HTTP 500"
+        ],
+        "routes": [
+          "/stall-first",
+          "/after-timeout"
+        ]
+      }
+    },
+    "raw": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/raw.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/raw.json",
+      "bytes": 7189,
+      "sha256": "4bb86592657d20cd4c95d20198411ffdeee127e748c1a46308349245f5ab8617",
+      "dev": 16777231,
+      "inode": 543511352,
+      "nlink": 1
+    },
+    "observer": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/observer.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/observer.json",
+      "bytes": 9761,
+      "sha256": "c8a77aa54eca56efaee29984af2c9de6fc2d610b8a5efc2e1d6473509a3d429a",
+      "dev": 16777231,
+      "inode": 543511350,
+      "nlink": 1
+    },
+    "command": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/command.json",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/command.json",
+      "bytes": 2796,
+      "sha256": "1d2b4d18151b7bf943ddf916016538c44f523dad4c26bf5868011ce11d153bc6",
+      "dev": 16777231,
+      "inode": 543511353,
+      "nlink": 1
+    },
+    "log": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/stdout-stderr.log",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-source-combined/stdout-stderr.log",
+      "bytes": 4581,
+      "sha256": "cc4fee427d9d010a54f3f789ce0f3249177b8197aba1264c2636072a16816a47",
+      "dev": 16777231,
+      "inode": 543511047,
+      "nlink": 1
+    }
+  },
+  "identity": {
+    "sameOrderedUnique21AcrossSourceAndSevenFreshRuns": true,
+    "orderedUniqueIdentities": [
+      [
+        "tests/time/tsaFallback.test.ts",
+        "P1-25 offline and configured TSA refusal continuation returns the exact default config and offline result without configured TSAs"
+      ],
+      [
+        "tests/time/tsaFallback.test.ts",
+        "P1-25 offline and configured TSA refusal continuation skips an unmatched anchor before the wire beside a matching-anchor refusal"
+      ],
+      [
+        "tests/time/tsaFallback.test.ts",
+        "P1-25 offline and configured TSA refusal continuation preserves literal attempt and failure order through finite HTTP, malformed and imprint refusals"
+      ],
+      [
+        "tests/time/tsaFallback.test.ts",
+        "P1-25 offline and configured TSA refusal continuation continues after the unchanged 10000 ms default abort to a real next-route refusal"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "verifies the granted response and returns its exact signed CMS token bytes"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses a different expected digest for the unchanged genuine signed token"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses a different expected nonce for the unchanged genuine signed token"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses the independently located signed-attribute corruption"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses the genuine token under a different real root with the same permitted policy"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses a policy excluded by the correctly pinned real root"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses a genuinely signed TSA certificate without an EKU extension"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses a genuinely signed TSA certificate with noncritical timestamping EKU"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses a genuinely signed TSA certificate expired at the fixed signed genTime"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses explicit rejection status before requiring a timestamp token"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses a truncated copy of the genuine token"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "refuses 65537 bytes at the token size boundary before DER parsing"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "keeps claimed time separate from the genuine attested upper bound"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "keeps an artifact without a timestamp at claimed time"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "reports an untrusted TSA as a warning while the artifact time stays claimed"
+      ],
+      [
+        "tests/time/verifyTimestamp.test.ts",
+        "reports a broken supplied token as an artifact integrity error"
+      ]
+    ],
+    "files": {
+      "tests/time/tsaFallback.test.ts": 4,
+      "tests/time/verifyTimestamp.test.ts": 17
+    },
+    "cohortsNotSummed": true,
+    "hookTaskEntriesEachRun": 2,
+    "individualHookValuesEachRun": 3
+  },
+  "manualAndPhysicalProtocol": {
+    "rootAllActualFailuresReadBeforeEachRestore": true,
+    "sourceOperatorOutcomeHashBoundClassificationsExact": true,
+    "firstSensitiveAssertionReadAndMaskingExplicit": true,
+    "exclusiveOriginalsPreparedRecordsLivePatchesExact": true,
+    "targetRegularSingleLinkBeforeEachWrite": true,
+    "actualTargetPhysicallyDistinctFromS": true,
+    "restoresByteExact": true,
+    "noAutomaticRestoreRetryCompiledOrNativeMutation": true
+  },
+  "operators": [
+    {
+      "operator": "F1-order",
+      "actualFailureLines": [
+        239,
+        261,
+        287
+      ],
+      "classification": {
+        "path": "/private/tmp/p1-25-fallback-qualification-20261017/m1-classification.json",
+        "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/m1-classification.json",
+        "bytes": 1750,
+        "sha256": "b203557cf5c7d6866801c3a1d0803198a61b923b3d6e6a8fa9aadd359decfbd1",
+        "dev": 16777231,
+        "inode": 543576518,
+        "nlink": 1
+      },
+      "firstSensitiveAssertion": "Actual NO-ANCHOR result failure order at tsaFallback.test.ts:239:22; the configured next HTTP500 precedes the missing-anchor diagnostic. Primary literal HTTP order witness at261:61 observed single-positive,genuine-third,malformed-second,http-first after actual single-positive500. TIMEOUT-CONTINUE at287:61 observed after-timeout,stall-first.",
+      "masking": [
+        "NO-ANCHOR237 zero unmatched-wire and238 matching route assertions pass;239 fails on failure order.",
+        "ORDER261 fails before264 grant null,265-267 detailed failures and268 method/body assertions; no independent credit for masked assertions.",
+        "TIMEOUT287 fails before288 exact result; default10000 abort still naturally occurred after actual reverse dispatch."
+      ],
+      "originalSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "mutantSha256": "ff81c88306ad744cdb6efa0011aef214c686733a6ef98e77993fabf0b17d7fc9",
+      "livePatchSha256": "c62b9a4a7d71807af886c065889b1448cc9b6167711bcb0f21806a7c96fbdd22",
+      "restoreByteExact": true,
+      "manualClassificationPrecedesExplicitRestore": true,
+      "sameSingleLinkTargetInode": 543530786,
+      "sourceTargetDistinctInode": 542461053
+    },
+    {
+      "operator": "F2-no-continue",
+      "actualFailureLines": [
+        261,
+        287
+      ],
+      "classification": {
+        "path": "/private/tmp/p1-25-fallback-qualification-20261017/m2-classification.json",
+        "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/m2-classification.json",
+        "bytes": 1752,
+        "sha256": "20da10d3e5e34071bcaca5c46d96e15cf9ea57a26b67ffc2949f9d8b726f0bf3",
+        "dev": 16777231,
+        "inode": 543577163,
+        "nlink": 1
+      },
+      "firstSensitiveAssertion": "Actual ORDER dispatch witness at tsaFallback.test.ts:261:61 observed only single-positive,http-first after genuine positive verification and single-positive500. Actual TIMEOUT-CONTINUE287:61 observed only stall-first after the unchanged10000ms default abort, proving inserted catch break prevents next dispatch.",
+      "masking": [
+        "ORDER261 fails before264 grant null,265-267 exact HTTP/malformed/imprint failures and268 method/body assertion; no credit for masked later assertions.",
+        "TIMEOUT287 fails before288 exact abort-plus-next500 result. Actual abort message logged; no typed AbortError/code inference.",
+        "NO-ANCHOR passes because unmatched branch continue is unchanged and actual last matching500 completes its configured loop."
+      ],
+      "originalSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "mutantSha256": "c8b94cc2b7ba905d380e64989bce9e4f3734e6dfc4aeb4a588f4612a86e1dc31",
+      "livePatchSha256": "78c67228af26e6e4832291aef960142e8655bc09312b079fc3be217830ef4508",
+      "restoreByteExact": true,
+      "manualClassificationPrecedesExplicitRestore": true,
+      "sameSingleLinkTargetInode": 543530786,
+      "sourceTargetDistinctInode": 542461053
+    },
+    {
+      "operator": "F3-unpinned-dispatch",
+      "actualFailureLines": [
+        237
+      ],
+      "classification": {
+        "path": "/private/tmp/p1-25-fallback-qualification-20261017/m3-classification.json",
+        "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/m3-classification.json",
+        "bytes": 1678,
+        "sha256": "85126a31b0e9ed3cd2beb5740c098337f58586352621e8483fd842fae4b7abb5",
+        "dev": 16777231,
+        "inode": 543578570,
+        "nlink": 1
+      },
+      "firstSensitiveAssertion": "Actual NO-ANCHOR zero-wire assertion tsaFallback.test.ts:237:86 expected0 but saw1 request to /missing-anchor. Actual matching-anchor positive231 already passed on /anchor-positive500; log records /anchor-positive,/missing-anchor,/after-skip.",
+      "masking": [
+        "NO-ANCHOR237 fails before238 route list and239-241 exact failure/result assertion; those later assertions receive no independent sensitivity credit.",
+        "Actual missing-anchor dispatch is configured-anchor selection evidence only, not F37 bypass, signed trust-list admission or successful grant.",
+        "Other three fallback bodies and all17 verifier bodies pass."
+      ],
+      "originalSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+      "mutantSha256": "ecae1ba1428281a8ba8fe7e1e065d4cffa0e62504a113dfd70d43c745de16938",
+      "livePatchSha256": "ce4a036cde6be44ad26b1adbabd61a343041347d8d000ac0bfc4f56c0475eca6",
+      "restoreByteExact": true,
+      "manualClassificationPrecedesExplicitRestore": true,
+      "sameSingleLinkTargetInode": 543530786,
+      "sourceTargetDistinctInode": 542461053
+    }
+  ],
+  "finalIndependentPreservation": {
+    "selectedPathsEachRoot": 72,
+    "selectedPhysicalIdentities": 144,
+    "compiledPairs": 8,
+    "protectedInputs": 128,
+    "nativePhysicalPins": 8,
+    "allCurrentPinsRehashedExact": true,
+    "allSelectedAndNativePhysicalPinsExact": true,
+    "bothTreesClean": true,
+    "bothIndexesEmpty": true,
+    "heldRHead18RowsIndexExact": true,
+    "freshNativeInode": 543570530,
+    "targetOriginalSha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "readOnlyGitObservations": [
+      {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit": 0,
+        "stdout": "d8b5c3250138a10078c21886642595f669c4a73c\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=all"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+          "diff",
+          "--cached",
+          "--name-only"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit": 0,
+        "stdout": "d8b5c3250138a10078c21886642595f669c4a73c\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=all"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+          "diff",
+          "--cached",
+          "--name-only"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "rev-parse",
+          "HEAD"
+        ],
+        "exit": 0,
+        "stdout": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "status",
+          "--porcelain=v1",
+          "--untracked-files=all"
+        ],
+        "exit": 0,
+        "stdout": " M CONTRIBUTING.md\n M README.md\n M docs/SSO_OIDC.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M src/identity/identityConfig.ts\n M src/identity/oidc/jwtVerify.ts\n M src/identity/oidc/oidcRoutes.ts\n M tests/identity/jwtVerify.test.ts\n M unused-code/plan-edits/manifest.json\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? .changeset/p2-07-oidc-validation-policy.md\n?? tests/identity/oidcValidationConfig.test.ts\n",
+        "stderr": ""
+      },
+      {
+        "argv": [
+          "git",
+          "--no-optional-locks",
+          "-C",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "diff",
+          "--cached",
+          "--name-only"
+        ],
+        "exit": 0,
+        "stdout": "",
+        "stderr": ""
+      }
+    ]
+  },
+  "lifecycleBoundary": "Each actual run has four finite safe lifecycle records. OFFLINE never listens. The other three listeners close naturally after owned request, response and socket terminal promises. Only the stalled request permits the real client abort; response end/finish remain false and close is observed. All owned error arrays and cleanup counts are empty. The six actual mutant assertion failures survive finally without AggregateError masking. These records do not establish universal descendant, filesystem, environment or loader isolation.",
+  "helperBoundary": {
+    "phase": "p125f-clean-source",
+    "exit": 0,
+    "durationMs": 47211,
+    "ownPgid": 50963,
+    "naturalESRCH": true,
+    "noNonzeroSignals": true,
+    "vitestCredit": false,
+    "sourceAuthority": "S/Q d8b5c3250138a10078c21886642595f669c4a73c",
+    "wrapperCwdAndHead": "held R bf3b7766e7b2e70d8e72135773a5c0e612ae013d"
+  },
+  "claimLimits": [
+    "This is the actual fallback refusal-continuation component qualification; the canonical inventory is 21, not a sum of repeated runs or earlier lanes.",
+    "The genuine fixed signed token is positively verified before wrong-imprint refusal; this cohort does not produce a fresh-query matching-nonce successful grant.",
+    "Configured anchor selection is tested through typed caller input; no authenticated trust-list loader admission, public TSA, library approval or F37 TCP/Unix guard proof is claimed.",
+    "The 10000 ms production timeout and 30000 ms Vitest deadline are unchanged. The caught message is actual Node22 text, not typed AbortError/code proof.",
+    "Source-only mutants do not qualify modified compiled output; eight compiled pairs and all native files remain original.",
+    "Global source quality remains RED1268 duplicates/2719 dead-code findings, unwaived. All held decisions, protected Claude work and the F37 skip remain open. No whole-issue, full npm test, release, tracker, plan or goal completion is inferred."
+  ],
+  "executionBoundary": "Independent stdlib file reads, hashing, physical stat checks and Git --no-optional-locks observations only. No AMC/helper/test/compiler/parser/native/SQL/network/process-probe execution, source/index/QA edits, RES probe or messages to Claude."
+}

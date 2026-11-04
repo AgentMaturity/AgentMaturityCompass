@@ -1,0 +1,120 @@
+{
+  "at": "2026-10-17T00:57:17.725668+00:00",
+  "adapters": [
+    {
+      "original": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/audit-observed.py",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/audit-observed.py",
+        "bytes": 2195,
+        "sha256": "ecfc3fe96e8b0d895645c229e4c67bd92e54e0d395544d82f1711e08b4fbfe88",
+        "dev": 16777231,
+        "inode": 543750154,
+        "nlink": 1
+      },
+      "active": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+        "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+        "bytes": 2197,
+        "sha256": "1d72bdb7d77cbff0251219cf33884e51c24bff5862cffeb052c1bf24124a58be",
+        "dev": 16777231,
+        "inode": 543829389,
+        "nlink": 1
+      },
+      "delta": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py.adaptation.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py.adaptation.patch.txt",
+        "bytes": 986,
+        "sha256": "a790a372fb128e288d575275211f0e83032f35a8a2e3e8aa3c67b23cb83d29e8",
+        "dev": 16777231,
+        "inode": 543829390,
+        "nlink": 1
+      }
+    },
+    {
+      "original": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-auditor-proposal/v2/audit-public.py.source.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-auditor-proposal/v2/audit-public.py.source.txt",
+        "bytes": 27505,
+        "sha256": "1345879bc4d723bb3544494f64423bb09a173b0ae67a8a548ad5a0f98abadcf5",
+        "dev": 16777231,
+        "inode": 543829170,
+        "nlink": 1
+      },
+      "active": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-public.py",
+        "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/audit-public.py",
+        "bytes": 27508,
+        "sha256": "dc346333754ba26c06233ba94719b271645513ecb12856c3a14dd5c1bb27f0eb",
+        "dev": 16777231,
+        "inode": 543829391,
+        "nlink": 1
+      },
+      "delta": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-public.py.adaptation.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/audit-public.py.adaptation.patch.txt",
+        "bytes": 4249,
+        "sha256": "fbb69b5037e3bb0cebd8405a123a9c3affc253f702e55b2b34de9828528c9eaa",
+        "dev": 16777231,
+        "inode": 543829392,
+        "nlink": 1
+      }
+    }
+  ],
+  "onlyChanges": "Actual B39 output namespace, unique p125ec phase/schema prefix; actual preserved old-window source assertion line metadata474481486487. No semantic/guard/resource/corpus change. V2 signer consistency retained.",
+  "sourceCandidate": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+    "bytes": 48568,
+    "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+    "dev": 16777231,
+    "inode": 543658576,
+    "nlink": 1
+  },
+  "sourceScope": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/review-v2.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-source-scope/review-v2.json",
+    "bytes": 13290,
+    "sha256": "cd938738e1a50c8129e3bd677dfe0a53f7eacb84bd2bbaa76439b42a0f870f3a",
+    "dev": 16777231,
+    "inode": 543829006,
+    "nlink": 1
+  },
+  "sourceHelperUnchanged": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+    "bytes": 25255,
+    "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+    "dev": 16777231,
+    "inode": 543658575,
+    "nlink": 1
+  },
+  "grantFileUnchanged": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+    "bytes": 2964,
+    "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+    "dev": 16777231,
+    "inode": 543583997,
+    "nlink": 1
+  },
+  "qualityHelper": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/capture-quality.mjs",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/capture-quality.mjs",
+    "bytes": 915,
+    "sha256": "31c5a641f799a6231da30161c30889a70b414f5c367fd78b25428156a2f43de6",
+    "dev": 16777231,
+    "inode": 543829393,
+    "nlink": 1
+  },
+  "beforeQualityActual": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/after-metadata-full.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/after-metadata-full.json",
+    "bytes": 247260,
+    "sha256": "3f7df6574a5bfc8ad4d7cd3d73081074a411a41463e66c8c2325727be8ccab00",
+    "dev": 16777231,
+    "inode": 543824558,
+    "nlink": 1
+  },
+  "independentRebindReviewPending": true,
+  "noProductExecutionYet": true
+}

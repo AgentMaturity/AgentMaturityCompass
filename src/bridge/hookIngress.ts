@@ -2,7 +2,8 @@ import { randomUUID } from "node:crypto";
 import { canonicalize } from "../utils/json.js";
 import YAML from "yaml";
 import { z } from "zod";
-import { getPublicKeyHistory } from "../crypto/keys.js";
+import { isoTimeOffsetSchema } from "../contracts/v1/common.js";
+import { getPurposeKeyHistory } from "../keys/signingKeys.js";
 import { openLedger, hashBinaryOrPath, verifyEvidenceEventIntegrity } from "../ledger/ledger.js";
 import { verifyReceipt, type ReceiptKind } from "../receipts/receipt.js";
 import type { EvidenceEvent, EvidenceEventType } from "../types.js";
@@ -17,8 +18,7 @@ export const OBSERVED_HOOK_CORRELATION_ROUTE = "/hooks/aep/0.1/correlation";
 export const MAX_OBSERVED_HOOK_BODY_BYTES = 262_144;
 export const MAX_HOOK_CORRELATION_BODY_BYTES = 4_096;
 
-const MAX_EVENT_AGE_MS = 24 * 60 * 60_000;
-const MAX_EVENT_FUTURE_SKEW_MS = 5 * 60_000;
+const MAX_EVENT_AGE_MS = 24 * 60 * 60_000, MAX_EVENT_FUTURE_SKEW_MS = 5 * 60_000;
 const SAFE_ID = /^[A-Za-z0-9][A-Za-z0-9._:-]*$/;
 
 export type HookIngressErrorCode =
@@ -176,7 +176,7 @@ const decisionSchema = z.object({
   reason: z.string().max(16_384).optional(),
   feedback: z.string().max(16_384).optional(),
   policy_id: idSchema.optional(),
-  time: z.string().datetime({ offset: true }).optional(),
+  time: isoTimeOffsetSchema.optional(),
   response_time_ms: z.number().nonnegative().optional()
 }).strict();
 
@@ -210,7 +210,7 @@ export const observedAepActionEventSchema = z.object({
   aep_version: z.literal("0.1"),
   id: idSchema,
   type: z.enum(["action.requested", "action.completed", "action.failed", "action.denied"]),
-  time: z.string().datetime({ offset: true }),
+  time: isoTimeOffsetSchema,
   hook: optionalShortStringSchema,
   agent: agentSchema,
   session: sessionSchema.optional(),
@@ -587,7 +587,7 @@ function recoverObservedHookReceipt(input: {
     requireReceipt: true,
     requireSealedSession: true
   });
-  const verifiedReceipt = verifyReceipt(result.data.receipt, getPublicKeyHistory(input.ledger.workspace, "monitor"));
+  const verifiedReceipt = verifyReceipt(result.data.receipt, getPurposeKeyHistory(input.ledger.workspace, "receipt"));
   if (
     !integrity.ok
     || !verifiedReceipt.ok

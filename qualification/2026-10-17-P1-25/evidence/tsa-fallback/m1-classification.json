@@ -1,0 +1,42 @@
+{
+  "schema": "p125f-root-control-classification/1",
+  "at": "2026-10-16T22:23:53.915983+00:00",
+  "phase": "p125f-m1",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "operator": "F1-order",
+  "outcomeSha256": "790008e79a2a551fbc1aae7354a6be78d5d3d5a7bbae46546eb04331e92efe74",
+  "rootAllFailuresRead": true,
+  "allFailuresClassified": true,
+  "firstSensitiveAssertionRead": true,
+  "noHookOrEnvironmentFailure": true,
+  "firstSensitiveAssertion": "Actual NO-ANCHOR result failure order at tsaFallback.test.ts:239:22; the configured next HTTP500 precedes the missing-anchor diagnostic. Primary literal HTTP order witness at261:61 observed single-positive,genuine-third,malformed-second,http-first after actual single-positive500. TIMEOUT-CONTINUE at287:61 observed after-timeout,stall-first.",
+  "masking": [
+    "NO-ANCHOR237 zero unmatched-wire and238 matching route assertions pass;239 fails on failure order.",
+    "ORDER261 fails before264 grant null,265-267 detailed failures and268 method/body assertions; no independent credit for masked assertions.",
+    "TIMEOUT287 fails before288 exact result; default10000 abort still naturally occurred after actual reverse dispatch."
+  ],
+  "actualFirstFailureLines": [
+    239,
+    261,
+    287
+  ],
+  "actualTests": {
+    "total": 21,
+    "passed": 18,
+    "failed": 3,
+    "skipped": 0
+  },
+  "lifecycle": {
+    "allFourRecordsRead": true,
+    "cleanupErrorCounts": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "ownedErrors": [],
+    "allEightSocketsClosed": true,
+    "bodyFailuresOnlyThreeIntendedAssertions": true
+  },
+  "restoreAdmission": "Restore exact captured original only; no production/source checkout, compiled, native, deadline, fixture or configuration changes."
+}

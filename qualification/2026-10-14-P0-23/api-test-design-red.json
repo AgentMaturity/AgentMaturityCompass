@@ -1,0 +1,602 @@
+{
+  "issue": "P0-23",
+  "status": "test-only bounded RED; not acceptance or source repair",
+  "generatedUtc": "2026-10-14T17:11:59.591805+00:00",
+  "worktree": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass",
+  "head": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "branch": "codex/p0-23-current-qualification",
+  "ownedNewTest": {
+    "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/apiClaimLabels.test.ts",
+    "sha256": "0b3ce0a7a268fc6564d53bcc11f6acbe946cc22e49b97250b798396e7e9ccdd1",
+    "bytes": 15391
+  },
+  "runtime": {
+    "node": "v22.23.3",
+    "executable": {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+      "bytes": 67024
+    },
+    "SDKVersion": "1.32.1"
+  },
+  "sourceInputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/index.ts",
+      "sha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+      "bytes": 19070,
+      "gitHeadBlob": "4ab8c976b28dc1941188c4d0f80a0592f029db2e",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/accessPolicy.ts",
+      "sha256": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+      "bytes": 8057,
+      "gitHeadBlob": "4bde7602a982982e270b71f903e7ad38cc2d18b2",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/resultRouteRegistry.ts",
+      "sha256": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+      "bytes": 13528,
+      "gitHeadBlob": "50316b894c5124249ff60d762c70ccaff28a7f16",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/apiHelpers.ts",
+      "sha256": "d645ef39b25422ae3dd2a771c3555daedafe134c07afb6ed9b7508fd30ffc46a",
+      "bytes": 6027,
+      "gitHeadBlob": "4a02acf06469d9d79dae223e3a0e36895e738d9b",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/scoreRouter.ts",
+      "sha256": "e081c2a91f3750bf0ddc2cb1196ae107b1639a7d7619a2a2e12c19d8ad534691",
+      "bytes": 39273,
+      "gitHeadBlob": "783ff355e36dbd88a7af682adacd3e24744aa12e",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/shieldRouter.ts",
+      "sha256": "8c880494557b9868de2f0323420e7c748e670a58dc5f9ea95e61d070ba23c554",
+      "bytes": 19067,
+      "gitHeadBlob": "8c3b562100e41d560a20e5476cba499209cdc954",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/studio/openapi.ts",
+      "sha256": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+      "bytes": 93763,
+      "gitHeadBlob": "7bfac97d2e0a4e3a2acf36f5f5a3a066900121ba",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/website/openapi.yaml",
+      "sha256": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+      "bytes": 514686,
+      "gitHeadBlob": "3f3304ad041bacc8f228e9fb9d321df8eefa7b03",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+      "sha256": "c7b666c37c3b7348164002ccb2ad21a85c16d60e92d50ec6a417436ef279c497",
+      "bytes": 8482,
+      "gitHeadBlob": "6093414342c245b1128ce13b659f7c1fd0de6e93",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/adapters/results.ts",
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "bytes": 9797,
+      "gitHeadBlob": "f9993b2dd4980debcc721da495fb4a3b502c8b50",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/render.ts",
+      "sha256": "274b20ebbef6a2a3746ef88ceea552a2717a94e61b264698e6a4afd48791b1da",
+      "bytes": 7029,
+      "gitHeadBlob": "359560c9aa5d63bddc8e9d03a66ca4aec6ff7edb",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/diagnostic/reportSeal.ts",
+      "sha256": "890711c710ce278edef9081355417474cdfe7ae281c562d1d277a64e48d80c4f",
+      "bytes": 1471,
+      "gitHeadBlob": "96eebf423f7de2a4ca715b4be0d847087df30dfd",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/diagnostic/evidenceReadiness.ts",
+      "sha256": "b213abd2246373799e87cb12631f75502ebbff430869898020ad16c3b8182624",
+      "bytes": 6072,
+      "gitHeadBlob": "024acb8abd0b118223438a4bb5f37316fa60d69d",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/diagnostic/runReportResolution.ts",
+      "sha256": "892b489a786d45e238c71615db3000cb48f922013d9cefbe26d9e41208f3d39f",
+      "bytes": 4495,
+      "gitHeadBlob": "a1212248cad5dbc002c5ab6d420aee854411626a",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/workspace.ts",
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "bytes": 27587,
+      "gitHeadBlob": "32e5e9c85c077fe84f2f4fb8d65b742208740d76",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/methodology/publicMethodology.ts",
+      "sha256": "a86de215883618469ed69872823a8ad194b52290145427b3f66592c05b1df97a",
+      "bytes": 930822,
+      "gitHeadBlob": "59b9a2f42869e06deeeeeae6ccc31dce95062be0",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "bytes": 1324,
+      "gitHeadBlob": "e72e9654a9d602319c28febb5893da12eb5438b8",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "bytes": 8631,
+      "gitHeadBlob": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "bytes": 155432,
+      "gitHeadBlob": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+      "equalsHeadBytes": true
+    }
+  ],
+  "phases": [
+    {
+      "phase": "red",
+      "report": {
+        "path": "/private/tmp/p0-23-api-claim-labels-red-20261014.json",
+        "sha256": "ae212c08ce6cc0e661bd6c8a6c4024d2bfef0d7c12bf04c9c2692dcdb2bdcb94",
+        "bytes": 6760
+      },
+      "log": {
+        "path": "/private/tmp/p0-23-api-claim-labels-red-20261014.log",
+        "sha256": "36da2c9e8238ca5bfcc684509d54c8ca3d6fce7561b7a5a9e09b25f0087f1efa",
+        "bytes": 35425
+      },
+      "counts": {
+        "success": false,
+        "numTotalTests": 7,
+        "numPassedTests": 4,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "cases": [
+        {
+          "title": "saved OpenAPI has every registered result operation and its ClaimResult JSON schema",
+          "status": "failed",
+          "durationMs": 161.26604099999986
+        },
+        {
+          "title": "generated OpenAPI has every registered result operation and its ClaimResult JSON schema",
+          "status": "failed",
+          "durationMs": 9.010333000000173
+        },
+        {
+          "title": "the stored-run route retains protected human-read access metadata",
+          "status": "passed",
+          "durationMs": 0.3293340000000171
+        },
+        {
+          "title": "a real sealed 1.1.1 stored run stays legacy self-reported in the actual dispatcher response",
+          "status": "failed",
+          "durationMs": 236.41170799999963
+        },
+        {
+          "title": "a current sealed stored run preserves its observed claim and current result",
+          "status": "passed",
+          "durationMs": 184.14549999999963
+        },
+        {
+          "title": "a tampered current stored run never inherits observed or positive claim fields",
+          "status": "passed",
+          "durationMs": 176.52566700000034
+        },
+        {
+          "title": "a missing stored run keeps the actual 404 error contract without fabricated claims",
+          "status": "passed",
+          "durationMs": 156.06333300000006
+        }
+      ],
+      "command": {
+        "name": "api-claim-labels-red",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/apiClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-api-claim-labels-red-20261014.json",
+        "exit": 1,
+        "durationMs": 4652,
+        "startedUtc": "2026-10-14T17:06:17.605559+00:00",
+        "log": "/private/tmp/p0-23-api-claim-labels-red-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    },
+    {
+      "phase": "refined-red",
+      "report": {
+        "path": "/private/tmp/p0-23-api-claim-labels-refined-red-20261014.json",
+        "sha256": "3ad0f4f89857235df191a63455ce05d246c5342b19edc396e426cf18717c8ca9",
+        "bytes": 7092
+      },
+      "log": {
+        "path": "/private/tmp/p0-23-api-claim-labels-refined-red-20261014.log",
+        "sha256": "90b352a9c45cea02545d2fc30609e19ce5a2133699c50a6298cb98e2cb710297",
+        "bytes": 17628
+      },
+      "counts": {
+        "success": false,
+        "numTotalTests": 8,
+        "numPassedTests": 5,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "cases": [
+        {
+          "title": "saved OpenAPI has every registered result operation and its ClaimResult JSON schema",
+          "status": "failed",
+          "durationMs": 158.254958
+        },
+        {
+          "title": "generated OpenAPI has every registered result operation and its ClaimResult JSON schema",
+          "status": "failed",
+          "durationMs": 9.188874999999825
+        },
+        {
+          "title": "the stored-run route retains protected human-read access metadata",
+          "status": "passed",
+          "durationMs": 0.30625000000009095
+        },
+        {
+          "title": "a real sealed 1.1.1 stored run stays legacy self-reported in the actual dispatcher response",
+          "status": "failed",
+          "durationMs": 230.599291
+        },
+        {
+          "title": "a current sealed stored run preserves its observed claim and current result",
+          "status": "passed",
+          "durationMs": 182.41304100000025
+        },
+        {
+          "title": "a tampered current stored run never inherits observed or positive claim fields",
+          "status": "passed",
+          "durationMs": 177.19337499999983
+        },
+        {
+          "title": "an unsealed current stored run cannot promote its own observed metadata",
+          "status": "passed",
+          "durationMs": 167.33779200000026
+        },
+        {
+          "title": "a missing stored run keeps the actual 404 error contract without fabricated claims",
+          "status": "passed",
+          "durationMs": 156.95287499999995
+        }
+      ],
+      "command": {
+        "name": "api-claim-labels-refined-red",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/apiClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-api-claim-labels-refined-red-20261014.json",
+        "exit": 1,
+        "durationMs": 4688,
+        "startedUtc": "2026-10-14T17:09:23.669473+00:00",
+        "log": "/private/tmp/p0-23-api-claim-labels-refined-red-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    }
+  ],
+  "openApiAccounting": [
+    {
+      "contract": "saved",
+      "artifact": {
+        "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/saved-openapi-accounting.json",
+        "sha256": "ad0c631275d1e22f0c00742ec89da1641def586eb22e65746a6058f64ffd9695",
+        "bytes": 34436
+      },
+      "registryCount": 113,
+      "documented": 57,
+      "missing": 56,
+      "ambiguous": 0,
+      "violationCount": 57,
+      "missingOperations": [
+        "GET /api/v1/score/evidence-drilldown/:runId/:questionId",
+        "POST /api/v1/score/industry/adjust",
+        "GET /api/v1/score/industry/models",
+        "GET /api/v1/score/industry/model/:industryId",
+        "POST /api/v1/score/lane/safety-research",
+        "POST /api/v1/score/judge-calibration",
+        "POST /api/v1/score/live-drift",
+        "POST /api/v1/score/provider-drift",
+        "POST /api/v1/score/promptfoo-provider-drift",
+        "POST /api/v1/score/inspect-provider-drift",
+        "POST /api/v1/score/tensorzero-provider-drift",
+        "POST /api/v1/score/helm-provider-drift",
+        "POST /api/v1/score/patronus-provider-drift",
+        "POST /api/v1/score/trust/verify-claim",
+        "POST /api/v1/score/trust/transitive",
+        "POST /api/v1/score/trust/decay",
+        "POST /api/v1/score/trust/inherited",
+        "POST /api/v1/passport/trust-token/verify",
+        "POST /api/v1/passport/trust-token/translate",
+        "POST /api/v1/badge/export",
+        "POST /api/v1/bundle/verify",
+        "POST /api/v1/bundle/inspect",
+        "POST /api/v1/bundle/diff",
+        "POST /api/v1/bundle/export",
+        "POST /api/v1/bom/verify",
+        "POST /api/v1/enforce/formal/certificate",
+        "POST /api/v1/enforce/formal/verify",
+        "POST /api/v1/assurance",
+        "GET /api/v1/assurance",
+        "GET /api/v1/assurance/:runId",
+        "GET /api/v1/assurance/history",
+        "POST /api/v1/assurance/verify",
+        "GET /api/v1/assurance/workspace/verify",
+        "POST /api/v1/assurance/lab/:packName",
+        "POST /api/v1/assurance/cert",
+        "GET /api/v1/assurance/cert/latest",
+        "POST /api/v1/assurance/cert/verify",
+        "POST /api/v1/benchmarks/verify",
+        "POST /api/v1/benchmarks/provider-drift",
+        "POST /api/v1/benchmarks/promptfoo-provider-drift",
+        "POST /api/v1/benchmarks/inspect-provider-drift",
+        "POST /api/v1/benchmarks/tensorzero-provider-drift",
+        "POST /api/v1/benchmarks/helm-provider-drift",
+        "POST /api/v1/shield/red-team/run",
+        "POST /api/v1/shield/trust-pipeline/run",
+        "POST /api/v1/shield/replay-corpus/verify",
+        "POST /api/v1/shield/live-drift/verify",
+        "POST /api/v1/shield/judge-calibration/verify",
+        "POST /api/v1/shield/provider-drift/verify",
+        "POST /api/v1/shield/promptfoo-provider-drift/verify",
+        "POST /api/v1/shield/inspect-provider-drift/verify",
+        "POST /api/v1/shield/tensorzero-provider-drift/verify",
+        "POST /api/v1/shield/helm-provider-drift/verify",
+        "POST /api/v1/shield/patronus-provider-drift/verify",
+        "POST /api/v1/compliance/regulatory/check",
+        "GET /api/v1/incidents/:id/clocks"
+      ],
+      "existingSchemaGaps": [
+        {
+          "method": "POST",
+          "path": "/api/v1/shield/exploit-confirmation/run",
+          "matchingPaths": [
+            "/v1/shield/exploit-confirmation/run"
+          ],
+          "operationCount": 1,
+          "successes": [
+            {
+              "status": "200",
+              "mediaTypes": [
+                "application/json"
+              ],
+              "claimReference": true
+            },
+            {
+              "status": "201",
+              "mediaTypes": [],
+              "claimReference": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "contract": "generated",
+      "artifact": {
+        "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/generated-openapi-accounting.json",
+        "sha256": "c9a251fe8f44bbcba80b9aea8303273921e4b9d67370a58a1786e2e640dbf3a7",
+        "bytes": 28304
+      },
+      "registryCount": 113,
+      "documented": 7,
+      "missing": 106,
+      "ambiguous": 0,
+      "violationCount": 106,
+      "missingOperations": [
+        "GET /api/v1/score/latest",
+        "GET /api/v1/score/history",
+        "GET /api/v1/score/runs",
+        "POST /api/v1/score/run",
+        "GET /api/v1/score/run/:runId",
+        "GET /api/v1/score/report",
+        "GET /api/v1/score/report/:runId",
+        "GET /api/v1/score/result/:sessionId",
+        "POST /api/v1/score/quick",
+        "POST /api/v1/score/quickscore",
+        "GET /api/v1/score/compare",
+        "POST /api/v1/score/compare",
+        "POST /api/v1/score/formal-spec",
+        "POST /api/v1/score/adversarial",
+        "POST /api/v1/score/industry/adjust",
+        "GET /api/v1/score/industry/models",
+        "GET /api/v1/score/industry/model/:industryId",
+        "POST /api/v1/score/lane/safety-research",
+        "POST /api/v1/score/judge-calibration",
+        "POST /api/v1/score/live-drift",
+        "POST /api/v1/score/provider-drift",
+        "POST /api/v1/score/promptfoo-provider-drift",
+        "POST /api/v1/score/inspect-provider-drift",
+        "POST /api/v1/score/tensorzero-provider-drift",
+        "POST /api/v1/score/helm-provider-drift",
+        "POST /api/v1/score/patronus-provider-drift",
+        "POST /api/v1/score/trust/verify-claim",
+        "POST /api/v1/score/trust/transitive",
+        "POST /api/v1/score/trust/decay",
+        "POST /api/v1/score/trust/inherited",
+        "GET /api/v1/passport/:id",
+        "GET /api/v1/passport/:id/verify",
+        "GET /api/v1/passports",
+        "POST /api/v1/passport/trust-token/verify",
+        "POST /api/v1/passport/trust-token/translate",
+        "POST /api/v1/badge/export",
+        "POST /api/v1/bundle/verify",
+        "POST /api/v1/bundle/inspect",
+        "POST /api/v1/bundle/diff",
+        "POST /api/v1/bundle/export",
+        "POST /api/v1/bom/verify",
+        "POST /api/v1/attest/notary",
+        "POST /api/v1/attest/notary/verify",
+        "POST /api/v1/attest/outcome",
+        "POST /api/v1/export/badge",
+        "GET /api/v1/export/badge/generate",
+        "GET /api/v1/export/badge/url",
+        "GET /api/v1/security/sleeper-detection",
+        "GET /api/v1/security/gaming-resistance",
+        "POST /api/v1/security/adversarial",
+        "GET /api/v1/security/insider/scores",
+        "GET /api/v1/security/insider/report",
+        "POST /api/v1/crypto/cert/issue",
+        "POST /api/v1/crypto/cert/verify",
+        "POST /api/v1/crypto/cert/inspect",
+        "POST /api/v1/crypto/cert/verify-revocation",
+        "POST /api/v1/crypto/notary/verify-attest",
+        "GET /api/v1/crypto/notary/log-verify",
+        "POST /api/v1/crypto/merkle/verify-proof",
+        "POST /api/v1/enforce/formal/certificate",
+        "POST /api/v1/enforce/formal/verify",
+        "GET /api/v1/fleet/report",
+        "GET /api/v1/fleet/agents/:agentId",
+        "POST /api/v1/ci/gate",
+        "POST /api/v1/ci/predict",
+        "POST /api/v1/proof/check",
+        "GET /api/v1/proof/status",
+        "GET /api/v1/compliance/verify",
+        "POST /api/v1/assurance",
+        "GET /api/v1/assurance",
+        "GET /api/v1/assurance/:runId",
+        "GET /api/v1/assurance/history",
+        "GET /api/v1/assurance/readiness",
+        "POST /api/v1/assurance/verify",
+        "GET /api/v1/assurance/workspace/verify",
+        "POST /api/v1/assurance/lab/:packName",
+        "POST /api/v1/assurance/cert",
+        "GET /api/v1/assurance/cert/latest",
+        "POST /api/v1/assurance/cert/verify",
+        "GET /api/v1/benchmarks/stats",
+        "POST /api/v1/benchmarks/verify",
+        "POST /api/v1/benchmarks/provider-drift",
+        "POST /api/v1/benchmarks/promptfoo-provider-drift",
+        "POST /api/v1/benchmarks/inspect-provider-drift",
+        "POST /api/v1/benchmarks/tensorzero-provider-drift",
+        "POST /api/v1/benchmarks/helm-provider-drift",
+        "POST /api/v1/shield/red-team/run",
+        "POST /api/v1/shield/trust-pipeline/run",
+        "POST /api/v1/shield/exploit-confirmation/run",
+        "POST /api/v1/shield/replay-corpus/verify",
+        "POST /api/v1/shield/live-drift/verify",
+        "POST /api/v1/shield/judge-calibration/verify",
+        "POST /api/v1/shield/provider-drift/verify",
+        "POST /api/v1/shield/promptfoo-provider-drift/verify",
+        "POST /api/v1/shield/inspect-provider-drift/verify",
+        "POST /api/v1/shield/tensorzero-provider-drift/verify",
+        "POST /api/v1/shield/helm-provider-drift/verify",
+        "POST /api/v1/shield/patronus-provider-drift/verify",
+        "POST /api/v1/compliance/report",
+        "POST /api/v1/compliance/fleet",
+        "POST /api/v1/compliance/diff",
+        "POST /api/v1/compliance/regulatory/check",
+        "GET /api/v1/regulatory/eu-ai-act",
+        "GET /api/v1/regulatory/owasp-llm",
+        "GET /api/v1/regulatory/readiness",
+        "GET /api/v1/incidents/:id/clocks"
+      ],
+      "existingSchemaGaps": []
+    }
+  ],
+  "responseAssets": [
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/current-sealed-api.json",
+      "sha256": "1b1f55c71aa7b2bfae5d13ec3909ef7adc82039d012276cd63bcda497c90e50b",
+      "bytes": 1764115
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/current-tampered-api.json",
+      "sha256": "3b060c73668c43499a9a2fa089b40c71ab394b3eef74716d132ed303d9e81d5e",
+      "bytes": 1764291
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/current-unsealed-api.json",
+      "sha256": "24a96b893e403f7b2685c844d19edd2a68257d8cf49aa8616bf6e21d6c0b4f29",
+      "bytes": 1763987
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/legacy-1-1-1-api.json",
+      "sha256": "182ca52cef6a1cf3d188317cf6120bc89a46b9dbfeeb61c57145c258d05dc589",
+      "bytes": 1764111
+    },
+    {
+      "path": "/private/tmp/p0-23-api-claim-responses-refined-red-20261014/missing-api-run.json",
+      "sha256": "d172a747d214966a71ebf723a6bc694aa1fc3d89d6c43952e87d32c23f5a6ecc",
+      "bytes": 217
+    }
+  ],
+  "legacyReproduction": {
+    "actualStatus": 200,
+    "sealVerifiedByRealTest": true,
+    "version": "1.1.1",
+    "actualClaimKind": "observed",
+    "actualDimensions": {
+      "applicability": {
+        "state": "applicable"
+      },
+      "evidence": "sufficient",
+      "result": "pass",
+      "enforcement": {
+        "state": "none"
+      },
+      "review": "pending"
+    },
+    "actualLabel": "Claim: Observed \u00b7 Result: pass \u00b7 Evidence: sufficient \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+    "requiredKind": "self_reported",
+    "requiredResult": "not_evaluated",
+    "requiredLabelPrefix": "Claim: Legacy (1.x), self-reported",
+    "dataByteObjectPreserved": true
+  },
+  "observerCorrections": [
+    "The initial helper required200 application/json exclusively, incorrectly flagging legitimate 201 schemas; that raw phase remains retained. The refined helper checks each declared 2xx response content schema, preserves declared media types and resolves local response/schema JSON Pointer reference chains.",
+    "Saved 113 = 57 documented + 56 missing agrees with static preflight. The extra refined violation is an actually emitted 201 exploit-confirmation success whose saved response has no schema, even though its 200 blocked-result response is claim-bearing."
+  ],
+  "smallestReadOnlyRepairRecommendations": [
+    {
+      "path": "src/api/resultRouteRegistry.ts",
+      "reason": "Verified diagnostic stored files reach envelopeForDiagnosticReport directly, bypassing the version-sensitive stored-run policy.",
+      "recommendation": "After existing actual seal verification, reuse canonical envelopeForStoredRun(report,{sealVerified:true,now}) with a truthful DiagnosticReport type/narrowing. Keep failed-seal fallback, current signed observed control, returned report bytes, errors and access policy unchanged. Studio shares the same resultEnvelope path, but this test does not qualify Studio transport."
+    },
+    {
+      "paths": [
+        "src/studio/openapi.ts",
+        "src/api/resultRouteRegistry.ts",
+        "website/openapi.yaml"
+      ],
+      "reason": "Saved and generated documentation omit actual registered API method/path operations, and the augmenting helper skips missing operations and non-200 successes.",
+      "recommendation": "Under reconciled shared ownership, reuse accurate current route operation definitions and retained response/request/security details for all 113 registered method/path entries in the generator and saved contract; apply the canonical claim schema to every emitted successful result response, including 201. Preserve all held A4 operations and published formats/auth/refusal contracts. Do not add generic fabricated operations, hide routes, waive missing operations, or rewrite archive/freeze inputs to make these checks pass."
+    }
+  ],
+  "scopeLimits": [
+    "Only tests/apiClaimLabels.test.ts was edited by this agent; other displayed source/test changes belong to the parent or MCP agent.",
+    "Actual handleApiRoute used with captured IncomingMessage/ServerResponse I/O, not a mocked router/producer/claim helper. No listener, socket, external transport, live provider, dependency install or build was used.",
+    "Protected/read access metadata was asserted; Studio authentication is upstream and was not exercised. This is not authenticated HTTP/Studio or all 113-handler qualification.",
+    "No A4 handler was invoked; six A4 operations remain included in exact schema accounting.",
+    "P0-22 two successful empty-array label failures remain unresolved and unchanged.",
+    "No source repair, source acceptance, mutation proof, full suite, coverage, hosted CI or deployment claim follows from these 8 cases."
+  ],
+  "gitStatusAtReceipt": [
+    " M src/mcp/mcpClaimOutput.ts",
+    "?? tests/apiClaimLabels.test.ts",
+    "?? tests/claimBadge.test.ts",
+    "?? tests/mcpClaimLabels.test.ts"
+  ]
+}

@@ -68,13 +68,27 @@ export function registerSessionCommands(program: Command): void {
     .description("Show a session's projected conversation and its event spine")
     .argument("<id>", "session id")
     .option("--json", "Output as JSON")
-    .action(async (id: string, opts: { json?: boolean }) => {
+    .option("--limit <rows>", "Read one verified committed page of 1-256 rows (requires --json)")
+    .option("--cursor <cursor>", "Continue a verified committed page or reconnect position (requires --json)")
+    .action(async (id: string, opts: { json?: boolean; limit?: string; cursor?: string }) => {
       const { readNativeSessionEvents } = await import("./session/readNativeSessionEvents.js");
       const { projectNativeRunUsage, renderNativeRunUsage } = await import("./agent/nativeRunUsage.js");
       const { projectNativeRunDiagnostics, renderNativeRunDiagnostics } = await import("./agent/nativeFailureGuidance.js");
       const { projectSurface } = await import("./session/surfaceProjection.js");
       const { extractEnvelope } = await import("./session/sessionTypes.js");
       try {
+        if (opts.limit !== undefined || opts.cursor !== undefined) {
+          if (!opts.json) throw new Error("Paged session inspection requires --json.");
+          if (opts.limit !== undefined && (!/^[1-9][0-9]{0,2}$/.test(opts.limit) || Number(opts.limit) > 256)) {
+            throw new Error("Choose a page limit from 1 to 256.");
+          }
+          const { readAcpSessionUpdatePage } = await import("./acp/acpSessionUpdatePage.js");
+          const page = readAcpSessionUpdatePage({ workspace: process.cwd(), sessionId: id,
+            ...(opts.limit === undefined ? {} : { limit: Number(opts.limit) }),
+            ...(opts.cursor === undefined ? {} : { cursor: opts.cursor }) });
+          console.log(JSON.stringify(page, null, 2));
+          return;
+        }
         const events = readNativeSessionEvents(process.cwd(), id);
         if (events.length === 0) {
           console.error(chalk.red(`No events found for session ${id}.`));
@@ -96,7 +110,8 @@ export function registerSessionCommands(program: Command): void {
           };
         });
         if (opts.json) {
-          console.log(JSON.stringify({ sessionId: id, spine, history, usage, diagnostics }, null, 2));
+          const { sessionTokenCounts } = await import("./session/sessionTokenCounts.js");
+          console.log(JSON.stringify({ sessionId: id, spine, history, usage, tokenCounts: sessionTokenCounts(events), diagnostics }, null, 2));
           return;
         }
         console.log(chalk.bold(`Session ${id}`));
@@ -272,7 +287,9 @@ export function registerSessionCommands(program: Command): void {
         );
       }
 
-      const derivations = deriveSessionRequests({ workspace, sessionId: id });
+      // P1-38: pi-ai requests re-derive only through the pinned library, loaded only when this session used it.
+      const piEncoders = await (await import("./llm/providers/piAi/piAiAdapter.js")).piAiDerivationEncoders(workspace, id);
+      const derivations = deriveSessionRequests({ workspace, sessionId: id, ...(piEncoders === null ? {} : { encoders: piEncoders }) });
       if (derivations.length === 0) {
         console.error(chalk.red(`Session ${id} recorded no request/header events.`));
         process.exit(1);

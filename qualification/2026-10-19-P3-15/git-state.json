@@ -1,0 +1,9 @@
+{
+  "sourceHead": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+  "int": "ccaabe07fdddfad442bfd1a738026862c67f7985",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-15",
+  "branch": "codex/p3-15-education-overlay",
+  "statusPorcelain": "?? qualification/2026-10-19-P3-15/README.md",
+  "gitLogIntToHead": "a625ee5ca Merge branch 'int' into codex/p3-15-education-overlay\n7cb1050b3 test(catalog): align Education admission and station expectations (P3-15)\nf34245de2 feat(catalog): draft Education overlay and synthetic oracles (P3-15)\n874aa26bb test(catalog): specify Education draft contract (P3-15)",
+  "qualificationOnlyCommit": "Pending; recorded after commit in off-tree final proof."
+}

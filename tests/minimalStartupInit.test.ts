@@ -69,6 +69,6 @@ describe("minimal startup setup", () => {
     expect(read("docs/QUICKSTART.md")).toContain("amc init --minimal");
     expect(read("docs/CLI_COMMAND_INVENTORY.md")).toContain("`--minimal`");
     expect(read("docs/API_REFERENCE.md")).toContain("#### `amc init`");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("Minimal startup path — ✅ Resolved 2026-06-16");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("Minimal startup path — ✅ Resolved 2026-06-16");
   });
 });

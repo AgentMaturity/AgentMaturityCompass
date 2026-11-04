@@ -1,6 +1,5 @@
 /**
  * OpenAPI 3.0 Spec Generator for the full AMC Studio + Bridge + Gateway API.
- *
  * Extends the Bridge-only spec from integrationScaffold with Studio API
  * endpoints, Gateway routes, and authentication documentation.
  *
@@ -9,6 +8,7 @@
  *   HTTP:  GET /openapi.yaml from Studio server
  */
 import { a4Endpoints, a4Schemas } from "./a4Openapi.js";
+import { operatorEndpoints, operatorSchemas } from "./operatorOpenapi.js";
 import { generateBridgeOpenApiSpec, type OpenApiSpec } from "../setup/integrationScaffold.js";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
@@ -665,7 +665,7 @@ function studioSchemas(): Record<string, unknown> {
       type: "object",
       properties: {
         error: { type: "string" },
-        message: { type: "string" },
+        message: { type: "string" }, requestId: { type: "string" },
       },
       required: ["error"],
     },
@@ -1069,7 +1069,7 @@ function studioSchemas(): Record<string, unknown> {
         effectiveLogic: { oneOf: [{ $ref: "#/components/schemas/PolicyEvidenceLogic" }, { type: "null" }] },
         effectiveLogicSha256: { type: "string", pattern: "^[a-f0-9]{64}$" },
         hasAlternatives: { type: "boolean" },
-        mandatoryGates: { type: "array", minItems: 9, maxItems: 9, items: { type: "string" } },
+        mandatoryGates: { type: "array", minItems: 10, maxItems: 10, items: { type: "string" } },
         baseline: { $ref: "#/components/schemas/ActionEvidencePolicyHash" },
       },
       required: ["schemaVersion", "actionClass", "configured", "gateCount", "gates", "effectiveLogic", "effectiveLogicSha256", "hasAlternatives", "mandatoryGates", "baseline"],
@@ -1087,7 +1087,7 @@ function studioSchemas(): Record<string, unknown> {
         requiresAlternativeAcknowledgement: { type: "boolean" },
         gateCount: { type: "integer", minimum: 1, maximum: 60 },
         gates: { type: "array", minItems: 1, maxItems: 60, items: { $ref: "#/components/schemas/ActionEvidenceGate" } },
-        mandatoryGates: { type: "array", minItems: 9, maxItems: 9, items: { type: "string" } },
+        mandatoryGates: { type: "array", minItems: 10, maxItems: 10, items: { type: "string" } },
         baseline: { $ref: "#/components/schemas/ActionEvidencePolicyHash" },
         candidate: { $ref: "#/components/schemas/ActionEvidencePolicyHash" },
         logic: {
@@ -1655,8 +1655,8 @@ function studioSchemas(): Record<string, unknown> {
               },
               required: ["requested", "decision", "terminal"],
             },
-            evidenceEventIds: { type: "array", items: { type: "string" } },
-            receiptIds: { type: "array", items: { type: "string" } },
+            evidenceEventIds: { type: "array", items: { type: "string" } }, receiptIds: { type: "array", items: { type: "string" } },
+            authorizationMismatch: { type: ["boolean", "null"] }, observationConflict: { type: "boolean" }, observationNotRecorded: { enum: ["rate-limited", null] },
             rawProviderPayloadStored: { type: "boolean", const: false },
             claimBoundary: { type: "string" },
           },
@@ -2128,13 +2128,13 @@ export function generateFullOpenApiSpec(): OpenApiSpec {
     ...studioEndpoints(),
     ...gatewayEndpoints(),
     ...nativeTaskEndpoints(),
-    ...a4Endpoints(),
+    ...a4Endpoints(), ...operatorEndpoints(),
   };
   const allSchemas = {
     ...bridgeSpec.components.schemas,
     ...studioSchemas(),
     ...nativeTaskSchemas(),
-    ...a4Schemas(),
+    ...a4Schemas(), ...operatorSchemas(),
     ...claimOpenApiSchemas(),
   };
   return {
@@ -2147,7 +2147,7 @@ export function generateFullOpenApiSpec(): OpenApiSpec {
         "Includes endpoints for diagnostics, assurance, CGX, leases, approvals, " +
         "plugins, forecasting, and provider proxying.",
     },
-    paths: withClaimResponses(withClaimResponses(allPaths, API_RESULT_ROUTES, true), STUDIO_RESULT_ROUTES, false),
+    paths: withClaimResponses(withClaimResponses(allPaths, API_RESULT_ROUTES, true, true), STUDIO_RESULT_ROUTES, false),
     components: {
       schemas: allSchemas,
       securitySchemes: {

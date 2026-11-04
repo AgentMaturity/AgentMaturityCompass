@@ -1,0 +1,1114 @@
+{
+  "scope": "This is bounded P0-27 F3 checkpoint-helper and F4 seeded signed collector qualification. It does not close P0-27, installed O20 acceptance, P0-31, G0, release, or live behavior.",
+  "workspace": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-27-current-qualification",
+  "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "observedGitStatus": [
+    "?? tests/assuranceSessionQualification.test.ts",
+    "?? tests/budgetIntegrityQualification.test.ts",
+    "?? tests/controlCheckpointQualification.test.ts",
+    "?? tests/evidenceAgentFilterQualification.test.ts"
+  ],
+  "ownedChanges": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/tests/controlCheckpointQualification.test.ts",
+      "sha256": "7569ac285ff36b9e8cb1e4f8878d2b71be614ab4f752c444d6ebb0d98686dbcd",
+      "lines": 114,
+      "new": true,
+      "committed": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/tests/evidenceAgentFilterQualification.test.ts",
+      "sha256": "33ee082ab1d053fd7821c2936ea8cd9fcc0324273c2fe1e1778214786d889c79",
+      "lines": 180,
+      "new": true,
+      "committed": false
+    }
+  ],
+  "productionChangesByThisAgent": [],
+  "sourceInputs": [
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/assurance/agentResponder.ts",
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "sha256": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/ledger/ledger.ts",
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/ledger/ledgerConnection.ts",
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/ledger/ledgerSessionTransactions.ts",
+      "sha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/ledger/ledgerVerification.ts",
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/diagnostic/runner.ts",
+      "sha256": "7e07cb0b29a19e9629838303b601663feaea6854703c5edc49fa77e60abb3ecd",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/ledger/monitor.ts",
+      "sha256": "2fa631a7fca5c2e7e8279f985a84d456a991e5bc775750f1568f53a35a95c589",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/budgets/nativeBudgetUsage.ts",
+      "sha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/llm/adapter/llmRuntime.ts",
+      "sha256": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/agent/nativeFailureGuidance.ts",
+      "sha256": "e797ef59196351467b5fd8e41e0ce2fc81936e19ffda50f6afef4a0c05f0b01b",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "sha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/utils/pathSafety.ts",
+      "sha256": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/evidence/exporter.ts",
+      "sha256": "30837bbe636fcae29331041f6cb4f7aa314687034d7f0416f0dde55bed31041a",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/trust/trustContext.ts",
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/crypto/keys.ts",
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "matchesPreflight": true
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "matchesPreflight": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "matchesPreflight": true
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "matchesPreflight": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "matchesPreflight": true
+    }
+  ],
+  "compiledSnapshot": {
+    "root": "/private/tmp/p0-27-private-causal-v8mdbxtn",
+    "repo": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+    "inputs": [
+      {
+        "path": "dist/utils/pathSafety.js",
+        "sourceSha256": "f81acfa5f8dd237c20b94ab6f7c464a6ffe1c645816e1a523368b654676fb837",
+        "copySha256": "f81acfa5f8dd237c20b94ab6f7c464a6ffe1c645816e1a523368b654676fb837",
+        "bytes": 1525
+      },
+      {
+        "path": "dist/lifecycle/signedControlJournal.js",
+        "sourceSha256": "368c5b4994358af01b17da9c4165687298c1be4ecd4a74c51c4dccd1c2785cac",
+        "copySha256": "368c5b4994358af01b17da9c4165687298c1be4ecd4a74c51c4dccd1c2785cac",
+        "bytes": 27342
+      },
+      {
+        "path": "dist/evidence/exporter.js",
+        "sourceSha256": "b6c5d4ed0d122daa936feaa8e83a5c74efdb0c4354dea0fed4fd9646e2fa8072",
+        "copySha256": "b6c5d4ed0d122daa936feaa8e83a5c74efdb0c4354dea0fed4fd9646e2fa8072",
+        "bytes": 14536
+      },
+      {
+        "path": "dist/ledger/ledger.js",
+        "sourceSha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2",
+        "copySha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2",
+        "bytes": 40649
+      },
+      {
+        "path": "dist/ledger/ledgerConnection.js",
+        "sourceSha256": "0dbf42f44099d70defdf362bd58a8489053ba3257b5af6b908d611a0144ca121",
+        "copySha256": "0dbf42f44099d70defdf362bd58a8489053ba3257b5af6b908d611a0144ca121",
+        "bytes": 3070
+      },
+      {
+        "path": "dist/workspace.js",
+        "sourceSha256": "5b50d81f0ba2619bc7a6b5651f0e6179d542d7febbbfa513a30e218ea2215c06",
+        "copySha256": "5b50d81f0ba2619bc7a6b5651f0e6179d542d7febbbfa513a30e218ea2215c06",
+        "bytes": 28184
+      },
+      {
+        "path": "dist/trust/trustContext.js",
+        "sourceSha256": "846b794fdcde123feda47f36b371891bcbdb5f8a5086fb2aaaaf8df73c618390",
+        "copySha256": "846b794fdcde123feda47f36b371891bcbdb5f8a5086fb2aaaaf8df73c618390",
+        "bytes": 5605
+      },
+      {
+        "path": "dist/contracts/index.js",
+        "sourceSha256": "bbbcc219df5d3cea5b0c405596067b44dd8fce203127d1f0239019bb3593511a",
+        "copySha256": "bbbcc219df5d3cea5b0c405596067b44dd8fce203127d1f0239019bb3593511a",
+        "bytes": 7965
+      }
+    ],
+    "nodeModulesLink": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/node_modules",
+    "privateCopyOnly": true
+  },
+  "runtime": "The actual runs used Node v22.23.3 through the explicit Node22 executable and the matching wrapper PATH. Node24 was accepted by the fixture guard but not exercised.",
+  "actualSourceRuns": [
+    {
+      "family": "checkpoint",
+      "raw": "/private/tmp/p0-27-checkpoint-first-20261015.json",
+      "exit": 0,
+      "total": 13,
+      "passed": 13,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "durationMs": 13.6396484375,
+      "cases": [
+        {
+          "name": "P0-27 actual checkpoint root layouts accepts a sibling HOME default without creating checkpoint directories",
+          "status": "passed",
+          "durationMs": 2.2406250000000227
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts refuses HOME equal to the workspace",
+          "status": "passed",
+          "durationMs": 1.014125000000007
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts refuses HOME nested under the workspace",
+          "status": "passed",
+          "durationMs": 1.1152919999999824
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts refuses a configured checkpoint root equal to the workspace",
+          "status": "passed",
+          "durationMs": 0.7828329999999823
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts refuses the ..cache child by path segments",
+          "status": "passed",
+          "durationMs": 0.7427909999999827
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts accepts the external physical root for runtime-firewall-policy",
+          "status": "passed",
+          "durationMs": 0.776332999999994
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts accepts the external physical root for guardrail-control",
+          "status": "passed",
+          "durationMs": 0.7320829999999887
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts accepts the external physical root for compiled-control-plan",
+          "status": "passed",
+          "durationMs": 0.7456659999999999
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts accepts the external physical root for legal-hold-head",
+          "status": "passed",
+          "durationMs": 0.9901250000000061
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts accepts missing external leaf segments without creating them",
+          "status": "passed",
+          "durationMs": 0.7519159999999943
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts refuses an outside alias whose target is physically inside",
+          "status": "passed",
+          "durationMs": 0.9844170000000076
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts accepts an inside alias whose target is physically outside",
+          "status": "passed",
+          "durationMs": 0.7617909999999881
+        },
+        {
+          "name": "P0-27 actual checkpoint root layouts uses one workspace identity across owned aliases and actual macOS var aliases",
+          "status": "passed",
+          "durationMs": 1.6396670000000029
+        }
+      ]
+    },
+    {
+      "family": "export",
+      "raw": "/private/tmp/p0-27-export-first-20261015.json",
+      "exit": 1,
+      "total": 11,
+      "passed": 10,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "durationMs": 132.0380859375,
+      "cases": [
+        {
+          "name": "P0-27 genuine seeded evidence collector exports every owned session row beyond twenty plus direct legacy agent rows",
+          "status": "passed",
+          "durationMs": 17.41675000000032
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector excludes foreign, untagged system and non-string malformed agent tags",
+          "status": "passed",
+          "durationMs": 14.273415999999997
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector returns exactly the other agent's own session",
+          "status": "passed",
+          "durationMs": 12.667167000000063
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector returns an empty measured selection for a missing agent",
+          "status": "passed",
+          "durationMs": 11.18991700000015
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector unfiltered selection undefined retains all genuine ledger rows",
+          "status": "passed",
+          "durationMs": 12.353083999999853
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector unfiltered selection \"\" retains all genuine ledger rows",
+          "status": "passed",
+          "durationMs": 11.963333000000148
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector unfiltered selection \"   \" retains all genuine ledger rows",
+          "status": "passed",
+          "durationMs": 11.623459000000366
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector normalizes the requested agent and records disabled-chain semantics",
+          "status": "passed",
+          "durationMs": 13.77279099999987
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector writes genuine selected IDs, dataset-two counts and exact output hash through the real exporter",
+          "status": "passed",
+          "durationMs": 2.5966669999997976
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector records accepted explicit system-row metadata behavior without making system session-owned",
+          "status": "passed",
+          "durationMs": 10.502790999999888
+        },
+        {
+          "name": "P0-27 genuine seeded evidence collector [strict spec conflict] never includes a system row even when its direct metadata names the agent",
+          "status": "failed",
+          "durationMs": 13.038083999999799
+        }
+      ]
+    }
+  ],
+  "checkpointEvidence": {
+    "cases": 13,
+    "measuredCalls": 15,
+    "everyRecordedSnapshotEqual": true,
+    "coverage": "Sibling/default, equal/nested HOME, equal/configured ..cache, all four valid kinds, missing external leaves, physical parent aliases, workspace alias and the actual macOS /var alias were exercised.",
+    "limit": "These are actual helper calls. Firewall enable, checkpoint storage admission, races, old checkpoint relocation and the held P0-57 work are not qualified here."
+  },
+  "exportEvidence": {
+    "actualFixtures": [
+      {
+        "name": "matrix",
+        "monitorId": "916ba5f74225e8b6f6924a5361fed1bcc3d74af7690f39ff5efae94f55bb7b45",
+        "pinCapturedBeforeRows": true,
+        "rows": 40,
+        "seals": 5,
+        "expectedIds": [
+          "owned-open",
+          "owned-0",
+          "owned-1",
+          "owned-2",
+          "owned-3",
+          "owned-4",
+          "owned-5",
+          "owned-6",
+          "owned-7",
+          "owned-8",
+          "owned-9",
+          "owned-10",
+          "owned-11",
+          "owned-12",
+          "owned-13",
+          "owned-14",
+          "owned-15",
+          "owned-16",
+          "owned-17",
+          "owned-18",
+          "owned-19",
+          "owned-20",
+          "owned-21",
+          "owned-22",
+          "owned-23",
+          "owned-close",
+          "legacy-camel",
+          "legacy-snake"
+        ],
+        "allIds": [
+          "owned-open",
+          "owned-0",
+          "owned-1",
+          "owned-2",
+          "owned-3",
+          "owned-4",
+          "owned-5",
+          "owned-6",
+          "owned-7",
+          "owned-8",
+          "owned-9",
+          "owned-10",
+          "owned-11",
+          "owned-12",
+          "owned-13",
+          "owned-14",
+          "owned-15",
+          "owned-16",
+          "owned-17",
+          "owned-18",
+          "owned-19",
+          "owned-20",
+          "owned-21",
+          "owned-22",
+          "owned-23",
+          "owned-close",
+          "foreign-open",
+          "foreign-0",
+          "foreign-1",
+          "foreign-2",
+          "foreign-close",
+          "legacy-camel",
+          "legacy-snake",
+          "legacy-untagged",
+          "malformed-tag-0",
+          "malformed-tag-1",
+          "malformed-tag-2",
+          "malformed-tag-3",
+          "malformed-tag-4",
+          "untagged-system"
+        ],
+        "independentEd25519RowsAndSeals": true
+      },
+      {
+        "name": "tagged",
+        "monitorId": "a9ced3d3d07718729eab55b40288fa15631cc5ffc4b55dc6daf5a17a3768a0ba",
+        "pinCapturedBeforeRows": true,
+        "rows": 2,
+        "seals": 1,
+        "expectedIds": [
+          "tagged-system-open"
+        ],
+        "allIds": [
+          "tagged-system-open",
+          "untagged-system-tail"
+        ],
+        "independentEd25519RowsAndSeals": true
+      }
+    ],
+    "recordedCollectorIntervals": 10,
+    "allRecordedFullSnapshotsEqual": true,
+    "allRecordedSemanticRowsEqual": true,
+    "publicPins": [
+      {
+        "path": "/private/tmp/p0-27-export-first-20261015/matrix-operator-monitor.pub",
+        "sha256": "916ba5f74225e8b6f6924a5361fed1bcc3d74af7690f39ff5efae94f55bb7b45",
+        "publicOnly": true,
+        "capturedBeforeRows": true
+      },
+      {
+        "path": "/private/tmp/p0-27-export-first-20261015/tagged-operator-monitor.pub",
+        "sha256": "a9ced3d3d07718729eab55b40288fa15631cc5ffc4b55dc6daf5a17a3768a0ba",
+        "publicOnly": true,
+        "capturedBeforeRows": true
+      },
+      {
+        "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/operator-monitor.pub",
+        "sha256": "f2c505731b965e201bee22f884acaab1bbd5c19590c3dca35222112ddcad67ef",
+        "publicOnly": true,
+        "capturedBeforeRows": true
+      }
+    ],
+    "coverage": "The genuine 40-row matrix selects exactly 28 default rows, five foreign rows, zero missing-agent rows and all 40 unfiltered rows. Twenty-four stdout rows lack row-level agent metadata, direct camel/snake legacy controls are preserved, and malformed non-string metadata tags are excluded. Dataset2 counts and a real JSON export hash are checked.",
+    "claimLimits": "Cryptographic signatures are verified independently under captured operator pins; the explicitly SELF_REPORTED producer provenance remains self_reported. Seeded ledger rows do not prove actual native-turn execution.",
+    "outputLimit": "The real JSON output hash and ledger semantic rows are asserted. Its file is an intentional output outside the workspace; no blanket zero-filesystem-effect claim is made."
+  },
+  "observedEffects": [
+    {
+      "family": "checkpoint",
+      "name": "sibling-home",
+      "beforePathCount": 5,
+      "afterPathCount": 5,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "equal-home",
+      "beforePathCount": 5,
+      "afterPathCount": 5,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "nested-home",
+      "beforePathCount": 6,
+      "afterPathCount": 6,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "equal-configured",
+      "beforePathCount": 5,
+      "afterPathCount": 5,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "dotdot-cache",
+      "beforePathCount": 5,
+      "afterPathCount": 5,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "external-runtime-firewall-policy",
+      "beforePathCount": 5,
+      "afterPathCount": 5,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "external-guardrail-control",
+      "beforePathCount": 5,
+      "afterPathCount": 5,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "external-compiled-control-plan",
+      "beforePathCount": 5,
+      "afterPathCount": 5,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "external-legal-hold-head",
+      "beforePathCount": 5,
+      "afterPathCount": 5,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "external-missing",
+      "beforePathCount": 5,
+      "afterPathCount": 5,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "alias-inside",
+      "beforePathCount": 7,
+      "afterPathCount": 7,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "alias-outside",
+      "beforePathCount": 6,
+      "afterPathCount": 6,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "canonical-workspace",
+      "beforePathCount": 6,
+      "afterPathCount": 6,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "owned-workspace-alias",
+      "beforePathCount": 6,
+      "afterPathCount": 6,
+      "changedPaths": []
+    },
+    {
+      "family": "checkpoint",
+      "name": "macos-var-alias",
+      "beforePathCount": 6,
+      "afterPathCount": 6,
+      "changedPaths": []
+    },
+    {
+      "family": "export",
+      "name": "owned-and-legacy",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    },
+    {
+      "family": "export",
+      "name": "negative-tags",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    },
+    {
+      "family": "export",
+      "name": "foreign-agent",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    },
+    {
+      "family": "export",
+      "name": "missing-agent",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    },
+    {
+      "family": "export",
+      "name": "unfiltered-undefined",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    },
+    {
+      "family": "export",
+      "name": "unfiltered-",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    },
+    {
+      "family": "export",
+      "name": "unfiltered-   ",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    },
+    {
+      "family": "export",
+      "name": "trimmed-no-chain",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    },
+    {
+      "family": "export",
+      "name": "accepted-tagged-system",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    },
+    {
+      "family": "export",
+      "name": "strict-system-spec",
+      "beforePathCount": 116,
+      "afterPathCount": 116,
+      "changedPaths": [],
+      "semanticRowsEqual": true
+    }
+  ],
+  "unresolvedStrictContract": {
+    "status": "RED and unresolved",
+    "specPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-27.md",
+    "specLine": 49,
+    "specText": "Never include system rows for a named agent.",
+    "actualFailedCase": "P0-27 genuine seeded evidence collector [strict spec conflict] never includes a system row even when its direct metadata names the agent",
+    "testLine": 178,
+    "actual": "One explicitly agent-tagged system/open row is selected; system is not included in sessionsIncluded, and its untagged tail is excluded.",
+    "acceptedHistory": "Original F4 commit 151d471d8f7c82e30ce5a1e5833b176f1de0aaf9 already carries direct metadata selection and the same scoped system-session exclusion. GETTING_STARTED.md:527 describes rows whose metadata names the agent plus every row of its native sessions.",
+    "sourceLines": [
+      291,
+      293,
+      301
+    ],
+    "interpretation": "Accepted compatibility code and docs establish existing behavior but do not reconcile the literal specification. Both the compatibility control and strict failing control remain; no repair or green reinterpretation is made."
+  },
+  "causalMutations": {
+    "checkpoint": {
+      "family": "checkpoint",
+      "target": "dist/utils/pathSafety.js",
+      "baselineSha256": "f81acfa5f8dd237c20b94ab6f7c464a6ffe1c645816e1a523368b654676fb837",
+      "mutantSha256": "fc0416d0aea636163343dc56852cbb159286cafcc7734219fcba0ca06a014646",
+      "patchSha256": "25345e3b18ba26c27c8f25f901c9c7e436fdefd87fb7e908a6b18acb196ce260",
+      "phases": [
+        {
+          "phase": "baseline",
+          "command": [
+            "python3",
+            "/private/tmp/p0-27-run-command-20261015.py",
+            "checkpoint-causal-baseline",
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs",
+            "checkpoint",
+            "baseline"
+          ],
+          "exit": 0,
+          "durationMs": 310,
+          "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-baseline.json",
+          "rawSha256": "90939503d75b26f69a650eadba646f16c495ed657e9d08e12dd586bbf60a5655",
+          "passed": 4,
+          "failed": 0,
+          "changedPrivateCompiledFiles": []
+        },
+        {
+          "phase": "mutant",
+          "command": [
+            "python3",
+            "/private/tmp/p0-27-run-command-20261015.py",
+            "checkpoint-causal-mutant",
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs",
+            "checkpoint",
+            "mutant"
+          ],
+          "exit": 1,
+          "durationMs": 320,
+          "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-mutant.json",
+          "rawSha256": "2316e1f18fdb62bab2d98a9ba2f597a8854d34cca2b28618f1e1f36c87e25a0a",
+          "passed": 3,
+          "failed": 1,
+          "changedPrivateCompiledFiles": [
+            "dist/utils/pathSafety.js"
+          ]
+        },
+        {
+          "phase": "restored",
+          "command": [
+            "python3",
+            "/private/tmp/p0-27-run-command-20261015.py",
+            "checkpoint-causal-restored",
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs",
+            "checkpoint",
+            "restored"
+          ],
+          "exit": 0,
+          "durationMs": 309,
+          "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-restored.json",
+          "rawSha256": "94f5e0c09b00953974e75816f75e3860d11a45c55ffc1a997f4b0230a2a3c559",
+          "passed": 4,
+          "failed": 0,
+          "changedPrivateCompiledFiles": []
+        }
+      ],
+      "restoredSha256": "f81acfa5f8dd237c20b94ab6f7c464a6ffe1c645816e1a523368b654676fb837",
+      "exactRestoration": true,
+      "observerSource": {
+        "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/first-observer.mjs",
+        "sha256": "82b9e2840639481c19c6001b8404a3ce86abb3afec853b81bc7ae91e1c59d32a"
+      }
+    },
+    "export": {
+      "family": "export",
+      "target": "dist/evidence/exporter.js",
+      "baselineSha256": "b6c5d4ed0d122daa936feaa8e83a5c74efdb0c4354dea0fed4fd9646e2fa8072",
+      "mutantSha256": "01d816d15bfc662af0cacb4a9ca1c2e805b7c979bd450ac29dfca40bcd06dd79",
+      "patchSha256": "9f923750f8efe207227370963ce5b9ebac814339a30370afa8ba287f0c201ab8",
+      "phases": [
+        {
+          "phase": "selection-baseline",
+          "command": [
+            "python3",
+            "/private/tmp/p0-27-run-command-20261015.py",
+            "export-causal-selection-baseline",
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs",
+            "export",
+            "selection-baseline"
+          ],
+          "exit": 0,
+          "durationMs": 341,
+          "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-baseline.json",
+          "rawSha256": "b888163c4ce47b051bc7290c6b7debf05b16eb7125c46ebe2153664fa24338eb",
+          "passed": 10,
+          "failed": 0,
+          "changedPrivateCompiledFiles": []
+        },
+        {
+          "phase": "selection-mutant",
+          "command": [
+            "python3",
+            "/private/tmp/p0-27-run-command-20261015.py",
+            "export-causal-selection-mutant",
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs",
+            "export",
+            "selection-mutant"
+          ],
+          "exit": 1,
+          "durationMs": 335,
+          "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-mutant.json",
+          "rawSha256": "7182a8f571f7be81306e67f068ffad62a1eacabb48e946cc8176d4fa673dfd55",
+          "passed": 7,
+          "failed": 3,
+          "changedPrivateCompiledFiles": [
+            "dist/evidence/exporter.js"
+          ]
+        },
+        {
+          "phase": "selection-restored",
+          "command": [
+            "python3",
+            "/private/tmp/p0-27-run-command-20261015.py",
+            "export-causal-selection-restored",
+            "/opt/homebrew/opt/node@22/bin/node",
+            "/private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs",
+            "export",
+            "selection-restored"
+          ],
+          "exit": 0,
+          "durationMs": 336,
+          "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-restored.json",
+          "rawSha256": "6a25f661e3c9debf7291e8dc941991f9ff121b13c1defd7c3ac109321409f103",
+          "passed": 10,
+          "failed": 0,
+          "changedPrivateCompiledFiles": []
+        }
+      ],
+      "restoredSha256": "b6c5d4ed0d122daa936feaa8e83a5c74efdb0c4354dea0fed4fd9646e2fa8072",
+      "exactRestoration": true,
+      "observerSource": {
+        "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs",
+        "sha256": "6b2f58673949a4007039ef428d63f672220454b330dc419db0628f938c840269"
+      }
+    },
+    "privateDistFileCount": 4529,
+    "allPrivateDistFilesRestoredExactly": true,
+    "protocol": "Only separate copied compiled modules were changed. The same observer assertions ran baseline, mutant and restored under fresh explicit Node22 processes, with bounded 60-second child waits. Original source, live dist and original tests were not mutated.",
+    "F3Outcome": "Restoring the legacy startsWith(\"..\") predicate loses only the ..cache refusal. Baseline/restored pass4; mutant passes3 and fails1.",
+    "F4Outcome": "A valid false owned-session OR predicate consumes the original third SQL parameter. Default selection falls from28 to3 and foreign selection from5 to1; schema2 count assertions fail, while direct legacy controls, exclusions, missing/unfiltered selection, signed self_reported status and ledger integrity controls remain green. Baseline/restored pass10; mutant passes7 and fails3.",
+    "sourceCompilationLimit": "These mutations exercise retained compiled copies. No independently changed TypeScript source was compiled, and no original-test or origin/main run was performed."
+  },
+  "retainedInitialPrivateFailure": {
+    "raw": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-baseline.json",
+    "exit": 1,
+    "passed": 9,
+    "failed": 1,
+    "failedCase": "persistent-names-and-bytes-unchanged",
+    "actualEffects": "The fresh-process reader initialized .amc/evidence.sqlite-wal and .amc/evidence.sqlite-shm, changing the .amc parent link count. All selection and semantic row assertions passed; the phase was not counted as a killed behavioral mutation.",
+    "observerCorrection": "The corrected private observer records entrySnapshot, opens the same owned ledger, and then records the before-collector snapshot. Initial coordination effects remain visible in every corrected phase. Collector and persistent-byte assertions are unchanged; no production/test criteria were relaxed.",
+    "observerSource": {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/first-observer.mjs",
+      "sha256": "82b9e2840639481c19c6001b8404a3ce86abb3afec853b81bc7ae91e1c59d32a"
+    }
+  },
+  "pending": [
+    "The literal tagged-system export decision remains unresolved.",
+    "Root owns production/static/type checks, original tests, F1/F2 and actual compiled O20/native/CLI coverage.",
+    "This agent did not commit, change trackers, modify Claude work, shared CLI/registry/REPL/ledger/API/Studio/A4/archives, or widen freeze/budgets/floors."
+  ],
+  "preservedDebt": "P0-29 and P0-22 skips, P0-51 pin precedence, P0-52 narrow decision, P0-20 shared CLI label decision, held P1-78 and paused P2-02 scopes remain unchanged.",
+  "artifactHashes": [
+    {
+      "path": "/private/tmp/p0-27-scope-freeze-preflight-20261015.json",
+      "sha256": "302e70d00fedba9d178d6f612545d5a33eba226ea8a81ebcb14701f107adfb13",
+      "bytes": 22384
+    },
+    {
+      "path": "/private/tmp/p0-27-scope-freeze-preflight-20261015.md",
+      "sha256": "5f3f220cc4df6d2657624d2127a52302a1339e09b713277535b8322fcbe61e14",
+      "bytes": 4504
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-copy-20261015.json",
+      "sha256": "3802cc9a3998343e6430972b70a1720eadd01ac5a2944a6c0a7aa3794f6be6af",
+      "bytes": 2393
+    },
+    {
+      "path": "/private/tmp/p0-27-checkpoint-export-command-snapshot-20261015.jsonl",
+      "sha256": "31447ce2fe3ae9fa802485c344c5e68fa25ea05734ec7bd1eedeb32121fe4208",
+      "bytes": 7342
+    },
+    {
+      "path": "/private/tmp/p0-27-checkpoint-first-20261015.json",
+      "sha256": "82a56fc40d17ca45ee48e19dcc6fb691a7415fcc0bf4478d7ad2b21aba3f10d0",
+      "bytes": 4916
+    },
+    {
+      "path": "/private/tmp/p0-27-checkpoint-first-20261015.log",
+      "sha256": "4391bd551caf820c833ad6a48908ec41305952b316491876f9df9632bc4b933b",
+      "bytes": 73
+    },
+    {
+      "path": "/private/tmp/p0-27-checkpoint-first-20261015/checkpoint-effects.json",
+      "sha256": "4dcc9761f0b94bc7eaedc3266a2549f0893269213ae0c0353988782a6d10849a",
+      "bytes": 44919
+    },
+    {
+      "path": "/private/tmp/p0-27-export-first-20261015.json",
+      "sha256": "8d7c02503b0ea72c6feee1da9bcb5b2a9ab540a0138debf93fa58c0ed0b1c94a",
+      "bytes": 5936
+    },
+    {
+      "path": "/private/tmp/p0-27-export-first-20261015.log",
+      "sha256": "8b6b808a99d7c643b8d5bbde8a98c85df97f22b1fbfa5e2e8cd7df2917bd0d01",
+      "bytes": 69
+    },
+    {
+      "path": "/private/tmp/p0-27-export-first-20261015/export-effects.json",
+      "sha256": "cde347613e0cccd9d8beace834966d7870dac6f8c53dddc11e148fbdb6499525",
+      "bytes": 1588944
+    },
+    {
+      "path": "/private/tmp/p0-27-export-first-20261015/matrix-operator-monitor.pub",
+      "sha256": "916ba5f74225e8b6f6924a5361fed1bcc3d74af7690f39ff5efae94f55bb7b45",
+      "bytes": 113
+    },
+    {
+      "path": "/private/tmp/p0-27-export-first-20261015/selected-evidence.json",
+      "sha256": "01a3350c4082b2baa2138e4dd639e8da94185e11b5161638e9934ab597ce3557",
+      "bytes": 31181
+    },
+    {
+      "path": "/private/tmp/p0-27-export-first-20261015/tagged-operator-monitor.pub",
+      "sha256": "a9ced3d3d07718729eab55b40288fa15631cc5ffc4b55dc6daf5a17a3768a0ba",
+      "bytes": 113
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/causal-summary.json",
+      "sha256": "f5102559a85a87e51e03423e71cb182279e44b08a61cd7046f95053f1e3a4112",
+      "bytes": 3644
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-baseline-command.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-baseline-command.stdout",
+      "sha256": "e4dc7b463f1dc1cfb1de72cdd80f1ba30c5d54e97e366f9904b8dad8de2a773c",
+      "bytes": 367
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-baseline.json",
+      "sha256": "90939503d75b26f69a650eadba646f16c495ed657e9d08e12dd586bbf60a5655",
+      "bytes": 6163
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-mutant-command.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-mutant-command.stdout",
+      "sha256": "14f5575c6217088daf9eda8431a6e322d72c4be5a506c3bb779546b36517ebfd",
+      "bytes": 361
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-mutant.json",
+      "sha256": "2316e1f18fdb62bab2d98a9ba2f597a8854d34cca2b28618f1e1f36c87e25a0a",
+      "bytes": 6069
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-private-mutation.patch",
+      "sha256": "25345e3b18ba26c27c8f25f901c9c7e436fdefd87fb7e908a6b18acb196ce260",
+      "bytes": 351
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-restored-command.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-restored-command.stdout",
+      "sha256": "69791018c8bc6abf12b9aafcc74c9d95d86a3afa7ab09f9f07dbe41fea7dde13",
+      "bytes": 367
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/checkpoint-restored.json",
+      "sha256": "94f5e0c09b00953974e75816f75e3860d11a45c55ffc1a997f4b0230a2a3c559",
+      "bytes": 6163
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/copy-inputs.json",
+      "sha256": "3802cc9a3998343e6430972b70a1720eadd01ac5a2944a6c0a7aa3794f6be6af",
+      "bytes": 2393
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-baseline-command.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-baseline-command.stdout",
+      "sha256": "bd2fca50a278741ee7c5f1db3d97a0e47be19e1219cfa230dc0df26b9bc93235",
+      "bytes": 355
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-baseline.json",
+      "sha256": "9b7f40fe33aca61b9753365ab35590328d168f2312818b8e1c600e07f65bab4b",
+      "bytes": 312019
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-private-mutation.patch",
+      "sha256": "9f923750f8efe207227370963ce5b9ebac814339a30370afa8ba287f0c201ab8",
+      "bytes": 512
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-baseline-command.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-baseline-command.stdout",
+      "sha256": "5a0f8de9518aec5b535342bffeb22d8924fff5414241bbabc5213c38816e7eea",
+      "bytes": 385
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-baseline.json",
+      "sha256": "b888163c4ce47b051bc7290c6b7debf05b16eb7125c46ebe2153664fa24338eb",
+      "bytes": 337118
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-mutant-command.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-mutant-command.stdout",
+      "sha256": "c236dc98f56567d87e4bd1e0336b3e156ddec1ab0f42b87cf65baab03c5e858e",
+      "bytes": 379
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-mutant.json",
+      "sha256": "7182a8f571f7be81306e67f068ffad62a1eacabb48e946cc8176d4fa673dfd55",
+      "bytes": 297043
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-restored-command.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-restored-command.stdout",
+      "sha256": "5c4eb33d32a3d77f4db531f815105d5bf9a441b12f3d7e1650227f5dc59d50b6",
+      "bytes": 385
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/export-selection-restored.json",
+      "sha256": "6a25f661e3c9debf7291e8dc941991f9ff121b13c1defd7c3ac109321409f103",
+      "bytes": 337118
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/first-causal-summary.json",
+      "sha256": "f5102559a85a87e51e03423e71cb182279e44b08a61cd7046f95053f1e3a4112",
+      "bytes": 3644
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/first-observer.mjs",
+      "sha256": "82b9e2840639481c19c6001b8404a3ce86abb3afec853b81bc7ae91e1c59d32a",
+      "bytes": 6716
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/first-run-causal.py",
+      "sha256": "0b2579bcdde2ecc8b131a2184c0b871fc742583e3f6dc40dcea08712c4f99bbb",
+      "bytes": 3516
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/fixture.json",
+      "sha256": "be1f598353f0fa55496c49bc3f9bddacbddc0115369b214ff10646c2ef137fcb",
+      "bytes": 47597
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/fixture.mjs",
+      "sha256": "b26d87f8e7a14cdeaa6e82eca18f3e0b138ab91c4997cefc3175c4aa02075841",
+      "bytes": 4619
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/observer.mjs",
+      "sha256": "6b2f58673949a4007039ef428d63f672220454b330dc419db0628f938c840269",
+      "bytes": 6879
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/operator-monitor.pub",
+      "sha256": "f2c505731b965e201bee22f884acaab1bbd5c19590c3dca35222112ddcad67ef",
+      "bytes": 113
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/private-dist-before-after.json",
+      "sha256": "a013581f0e7b70d0902a2cc871dfc76bf61daf2aa41cc322584451940cfcd35f",
+      "bytes": 988567
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/private-dist-initial-hashes.json",
+      "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48",
+      "bytes": 485185
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/run-causal.py",
+      "sha256": "2f114712bea66de2e6713ea88b073b50b9403a9ec36f34ddc49ac7822d1bbb92",
+      "bytes": 3473
+    },
+    {
+      "path": "/private/tmp/p0-27-private-causal-v8mdbxtn/selection-causal-summary.json",
+      "sha256": "f42fa584f15e82e37249ba5772358248e8b2676756922f58cb194df9d38a5e86",
+      "bytes": 2596
+    }
+  ]
+}

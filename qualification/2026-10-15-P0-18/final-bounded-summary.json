@@ -1,0 +1,29 @@
+{
+  "capturedUtc": "2026-10-14T23:06:10.638745+00:00",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "raw": {
+    "path": "/private/tmp/p0-18-final-bounded-node22-20261015.json",
+    "bytes": 51527,
+    "sha256": "6750dd76fd13dbc3cb25524c4ae63e97b1e9c5ae08213f03ba6b6253f00ad80f"
+  },
+  "counts": {
+    "numTotalTests": 158,
+    "numPassedTests": 158,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "files": 9,
+  "allCasesExecuted": true,
+  "separateCorporaNotAdded": [
+    "Importer/seeder original59 cases overlap the final corpus.",
+    "Operational16 checks contain15passes and1unresolved historical1.2.0-versus-2.0.0 message failure.",
+    "Private14-case crypto and59-case mutation runs are controls, not additional final cases."
+  ],
+  "remainingAcceptance": [
+    "Historical removed-message release text and attestation-purpose mismatches require a scoped decision.",
+    "Both required source-quality gates remain failed:1269duplicate and2751dead-code findings.",
+    "P0-18 full suite, coverage, Node24, hosted CI, dependency and G0 acceptance remain unqualified.",
+    "All earlier strict failures, pending ownership decisions, written skips and paused work remain."
+  ]
+}

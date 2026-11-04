@@ -1,0 +1,446 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "reviewer": "/root/native_race_static_review",
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "scope": "Independent read-only audit of four completed original corpora and stable source/preservation inputs. Root authored/executed the run wrapper; this reviewer did not execute or rerun product tests. No causal qualification is established by this original-corpora review.",
+  "decision": "FOUR_SEPARATE_ORIGINAL_CORPORA_VERIFIED_WITH_BOUNDED_MEANING",
+  "blockingFindings": [],
+  "blockingPacketFindings": [],
+  "formalAcceptanceClosed": false,
+  "originalSummary": {
+    "path": "/private/tmp/p0-11-qualification-20261015/original-corpora-summary.json",
+    "bytes": 14279,
+    "sha256": "820707b3b52608f9659db54f06da636dd5a8b52123d489ff6a166a10a13d20e9"
+  },
+  "preflight": {
+    "path": "/private/tmp/p0-11-qualification-20261015/initial-preflight.json",
+    "bytes": 26306,
+    "sha256": "23f1964928e523777c6f61b1a733011318427abfcf2ad9b25c3703e20590cbba"
+  },
+  "postBuildProvenance": {
+    "path": "/private/tmp/p0-11-qualification-20261015/post-build-provenance.json",
+    "bytes": 1251,
+    "sha256": "e984f1f5c1d819e86ad21d13d7d8378a9dc03a15389874fc30a29323781f73fb"
+  },
+  "fingerprint": {
+    "path": "/private/tmp/p0-11-qualification-20261015/command-runtime-fingerprint/stdout-stderr.log",
+    "bytes": 737,
+    "sha256": "dcf620b6a846d8c2b3cc181d8685332012c3d7219b26a566f773885438aa9cc5"
+  },
+  "separateOriginalRuns": [
+    {
+      "corpus": "map",
+      "file": "tests/threatModelMap.test.ts",
+      "registered": 7,
+      "passed": 7,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "pid": 21896,
+      "ownedPgid": 21896,
+      "exit": 0,
+      "durationMs": 1697,
+      "allChecksPassed": true,
+      "sourceTestPin": {
+        "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/threatModelMap.test.ts",
+        "bytes": 3263,
+        "sha256": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/raw.json",
+        "bytes": 2588,
+        "sha256": "c8cdbcb952f46d7012a4dfaf6a5cf937c364a39056f3bfb1f3fb16083747640e"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/observer.json",
+        "bytes": 3613,
+        "sha256": "a4a5d185446cbb3194e7ad41d25cd5b435a88162e4b965c3db13d0c39c340e2d"
+      },
+      "command": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/command.json",
+        "bytes": 2479,
+        "sha256": "c8cc3e0ffd9c31be3eb2554ae36177f730ef078582f35810754b6b5f7d1f45e8"
+      },
+      "ownedGroupAfterExit": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "a0dcb3c454626415570a53d3be10edfba33d5650e62b51ab263ea7c9f41095f4"
+      },
+      "combinedStream": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-map/stdout-stderr.log",
+        "bytes": 104,
+        "sha256": "b3e53395437e2728e9dbf8f777708d22109bc2007bd63e2e65037511ec6c50c2"
+      }
+    },
+    {
+      "corpus": "telemetry",
+      "file": "tests/telemetryExporterFailure.test.ts",
+      "registered": 2,
+      "passed": 2,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "pid": 21954,
+      "ownedPgid": 21954,
+      "exit": 0,
+      "durationMs": 3701,
+      "allChecksPassed": true,
+      "sourceTestPin": {
+        "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/telemetryExporterFailure.test.ts",
+        "bytes": 4746,
+        "sha256": "fcf694842227d513eaf52e2c62c57910ccbb332e420cf82f38a57bc29d836e16"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/raw.json",
+        "bytes": 1605,
+        "sha256": "8cfaf43a295ddbbdb2918cd51a1633b3d2dbbd07495d371ac242f525cf2cf4da"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/observer.json",
+        "bytes": 2441,
+        "sha256": "4af18c3feb880bd07bdb3bc264c365732799177175ed5696b16cd251e37ca696"
+      },
+      "command": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/command.json",
+        "bytes": 2541,
+        "sha256": "35b1dd1afcf43f750ab8df6f4aa8150966dca3a410e2f30f7a62bd32e85f95b0"
+      },
+      "ownedGroupAfterExit": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "a5542226806908342290cc83a3f41da88eec16143cad24e39b40fd887c4f6fe0"
+      },
+      "combinedStream": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-telemetry/stdout-stderr.log",
+        "bytes": 110,
+        "sha256": "8524cdd48ddfd44de4971ca4b8916fe6ab4fea3f67471bed7a2a04a9ea7f3135"
+      }
+    },
+    {
+      "corpus": "preview",
+      "file": "tests/observabilityOtelExporter.test.ts",
+      "registered": 5,
+      "passed": 5,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "pid": 22068,
+      "ownedPgid": 22068,
+      "exit": 0,
+      "durationMs": 1541,
+      "allChecksPassed": true,
+      "sourceTestPin": {
+        "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/observabilityOtelExporter.test.ts",
+        "bytes": 5975,
+        "sha256": "4bab25e8a2d72c4c9c2d703a45434a15b5f5005c89aa8d7f1e5f6287568986d4"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/raw.json",
+        "bytes": 2131,
+        "sha256": "5ff58729ce2475abe249733a1f1a78a4afabc0af9a2bf4cc6fa9a2607d1a3293"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/observer.json",
+        "bytes": 3072,
+        "sha256": "f9a98c1982c64a0ae9882e08f19af7f89636c98e02d7178e46228de41dc5d591"
+      },
+      "command": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/command.json",
+        "bytes": 2529,
+        "sha256": "f8440944db61b6a78cee7b9de5866280a2d1451eb633c6a555d19e86fc933d00"
+      },
+      "ownedGroupAfterExit": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "c24c3335f9df85e2219d523198b856b22329d836e29b911fd8b0d183dfa2845d"
+      },
+      "combinedStream": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-preview/stdout-stderr.log",
+        "bytes": 108,
+        "sha256": "51e57a55f0933f47e2cd0f965776b950898d8e4ae88473c15200001d5053049b"
+      }
+    },
+    {
+      "corpus": "recording",
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "registered": 7,
+      "passed": 7,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "pid": 22144,
+      "ownedPgid": 22144,
+      "exit": 0,
+      "durationMs": 4257,
+      "allChecksPassed": true,
+      "sourceTestPin": {
+        "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/toolEvidenceRecording.test.ts",
+        "bytes": 11449,
+        "sha256": "8dcbb281f950c7f0f60cf50e9b2e3c1c620db985b684b7c2005885818bc73168"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/raw.json",
+        "bytes": 2720,
+        "sha256": "5fa08197911d76ad188fd610118cadf4e4c89c7cbf25dd1bc95c319a99e904cb"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/observer.json",
+        "bytes": 4571,
+        "sha256": "b1c5b110d44c753c98b499f29d6b18e76fb471d762ccd6c3fd5155779073bdff"
+      },
+      "command": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/command.json",
+        "bytes": 2535,
+        "sha256": "7c460aecc801449c22a6f7091350c4df0f5e079256fa1d9fc86f30a56e11c966"
+      },
+      "ownedGroupAfterExit": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "5596c1272c4dbe3b280efba43c49d7758f8fddba34ec69701cbe92bef709f929"
+      },
+      "combinedStream": {
+        "path": "/private/tmp/p0-11-qualification-20261015/command-original-recording/stdout-stderr.log",
+        "bytes": 110,
+        "sha256": "121b5970746ca295cd5475302c44863c64244f5a903f3a458d812a2d15d48d01"
+      }
+    }
+  ],
+  "counting": {
+    "distinctOriginalFileTitleRegistrations": 21,
+    "files": 4,
+    "invocations": 4,
+    "primaryMap7AndTelemetry2": 9,
+    "adjacentPreview5AndRecording7": 12,
+    "single21CaseRun": false,
+    "single9CaseRun": false,
+    "rawSuiteCountersMeaning": "Raw suite totals2/2/2/4 include nested describe ancestors; each invocation has one test file. These are not2/2/2/4 separate file processes."
+  },
+  "checks": {
+    "summaryProducerPinsAndIdentityListsExact": true,
+    "rawSnapshotEqualsProducerBytesAllFour": true,
+    "expectedRawCountsAndStatuses": true,
+    "observerCaseIdentitiesAndStatusesMatch": true,
+    "sourceTitleStringsMatchRaw": true,
+    "fileSuiteTaskErrors": 0,
+    "unhandledErrors": 0,
+    "hookErrorsOrPending": 0,
+    "pendingOrTodo": 0,
+    "observerPidCwdBoundToActualOuter": true,
+    "actualOuterPidEqualsRecordedOwnedPgid": true,
+    "normalExits0AllFour": true,
+    "onlySignalZeroRecorded": true,
+    "positiveOwnedGroupESRCHAfterExitAllFour": true,
+    "completePostExitStreamsOnlyProducerMessage": true,
+    "knownLatePatternHits": [],
+    "knownLatePatterns": [
+      "Unhandled Errors?",
+      "Unhandled Rejection",
+      "uncaught exception",
+      "Error during teardown",
+      "Error during global teardown",
+      "Tests modified the repository workspace",
+      "Hook timed out",
+      "ELIFECYCLE",
+      "error during close",
+      "close timed out",
+      "Tests closed successfully but something prevents",
+      "teardown timed out"
+    ],
+    "observerPrecedesGlobalTeardown": true,
+    "globalTeardownAssessedBy": "Completed exit0 plus entire retained post-exit streams and known-late/global-guard diagnostics; observer alone is not teardown proof.",
+    "liveJournalReadOrPinned": false
+  },
+  "findings": [
+    {
+      "id": "O1",
+      "severity": "informational",
+      "title": "Separate original runs pass with bounded counts",
+      "finding": "Map7,telemetry2,preview5,recording7 all pass separately at sourcefa3.21 unique file/title registrations across4files are not one21-case invocation; primary9 likewise spans2 invocations."
+    },
+    {
+      "id": "O2",
+      "severity": "acceptance-limit",
+      "title": "Map is a schema and source-reference check",
+      "finding": "Six real source-checker child invocations run through process.execPath: validfixture,fournegativefixtures andcurrentmap. Children inherit helper behavior and no explicit child timeout; tests assert returned status and selected diagnostic strings. No separate child PID/full-transcript files are retained. Seventh case checks doc strings/channel headings/failure IDs and ASI01–10 only. Checker uses schema, path existence, whole-identifier text, owner syntax regex and test-or-owner presence. It does not prove compiled exports/wiring, genuine plan-key registration or16-channel enforcement."
+    },
+    {
+      "id": "O3",
+      "severity": "causal-attribution-limit",
+      "title": "Telemetry original tests cover composed survival with real local audit reads",
+      "finding": "Actual workspace/vault/budgets/firewall+governed fs.read and readonlySQLite queries run. recordEvidenceEvent is spied to throw in one case; globalfetch rejects with canned ECONNREFUSED in another, with threshold spied128 and retries0. The tests assert spycall, outcomeOK and exactly1 matching TOOL_CALL_ALLOWED audit row. This proves the composed tested path, not independent inner-catch causality, real collector outage or complete signature chain."
+    },
+    {
+      "id": "O4",
+      "severity": "causal-attribution-limit",
+      "title": "Inner/outer recorder barriers and transaction scope remain distinct",
+      "finding": "queueEvidenceEventSpan catches recordEvidenceEvent exceptions; ToolPipeline separately catches record callback errors and returns the finalized outcome. agentToolset's ordinary ledger batch transaction finishes before queue dispatch, but a nested caller transaction owns the outer commit and the ledger owns only a savepoint. Do not claim universal durable commit before telemetry queue. The direct throwing READ_ONLY echo callback in recording7 independently reaches the pipeline barrier; telemetry2 alone does not isolate that outer catch or the inner catch."
+    },
+    {
+      "id": "O5",
+      "severity": "trust-and-lifecycle-limit",
+      "title": "Preview, persisted tool rows and recorder-outage model have different meanings",
+      "finding": "Preview5 instantiates disabled exporters and asserts in-memory OTLP/Zipkin/Jaeger request shapes with hand-shaped EvidenceEvent hash/signature fields; it dispatches no collector request. Recording7 includes5 actual workspace/SQLite cases,1direct callback failure case and1pure projection case. It asserts OBSERVED allowed/denied/correlated rows, exact audit+metric types/counts and no duplicated argument marker, plus echo's original outcome despite actual callback throw. Simulateddarwin+unconfinedShell cli-flag makes denial independent of Linux backend; shell denial is not confinement proof. No durable-store outage, journal reconciliation, cold seal/history, external issuer or full footprint proof."
+    },
+    {
+      "id": "O6",
+      "severity": "open-formal-gap",
+      "title": "Original passes do not close human/document/quality acceptance",
+      "finding": "Sid residual-risk/status review is pending; ASI titles retain re-verify/experimental labels. Map stamped2026-10-07/e25cce1a is not refreshed by current passing source references. Historical follow-up namesP1-56/57/58 collide with currentA4 keys and are not filed/approved successors. No mutation sensitivity, fullsuite/hosted/PR/merge/G0/Done proof is supplied here.1269duplicate/2751dead-code quality debt and all prior held/unresolved boundaries remain unwaived."
+    }
+  ],
+  "sourceSemantics": {
+    "map": {
+      "test": "tests/threatModelMap.test.ts:15–17,21–74",
+      "checker": "scripts/check-threat-model.mjs:38–68,73–84",
+      "actualCheckerChildren": 6,
+      "negativeCases": [
+        {
+          "fixture": "missing-path.json",
+          "firstAssertion": "status===1 at29",
+          "diagnostics": "channel network-egress; src/tools/noSuchFile.ts does not exist at30–31"
+        },
+        {
+          "fixture": "missing-symbol.json",
+          "firstAssertion": "status===1 at36",
+          "diagnostics": "channel network-egress; hostAllowedX does not occur in src/gateway/server.ts at37–38"
+        },
+        {
+          "fixture": "bad-owner.json",
+          "firstAssertion": "status===1 at43",
+          "diagnostics": "channel network-egress andP9-99 at44–45; regex rejects owner namespace, not actual current plan lookup"
+        },
+        {
+          "fixture": "orphan-failure-row.json",
+          "firstAssertion": "status===1 at50",
+          "diagnostics": "failure recorder-fails-after-effect; names no test and no owner at51–52"
+        }
+      ],
+      "positiveMapCounts": [
+        16,
+        8
+      ],
+      "masking": "All current assertions pass. In any later causal failure, the status assertion can mask the later diagnostic assertion; nonzero alone is not a kill. Removing the entire missing-path branch can still fall through into readFileSyncENOENT; use exact reviewed recipe semantics rather than generic labels."
+    },
+    "telemetry": {
+      "source": "tests/telemetryExporterFailure.test.ts:27–46,48–79,82–107",
+      "firstAssertions": [
+        "record spy called at90, thenoutcomeOK91,localallowedAudits1 at92",
+        "fetch spy called at104, thenoutcomeOK105,localallowedAudits1 at106"
+      ],
+      "cleanup": "afterEach restores mocks and four saved env keys, resets shared exporter, closes toolsets and removes owned fixtures. All recorded hooks pass. readonlySQL connection closes in finally; primary toolset/ledger can still be open at assertions.",
+      "retention": "The ephemeral databases/keys/effects are cleaned; retained outer raw/observer/streams are assertion evidence, not separately frozen signed rows or cold-reader transcripts.",
+      "barriers": "src/observability/otelExporter.ts:848–856; src/tools/toolPipeline.ts:305–329; src/agent/agentToolset.ts:430–467; src/ledger/ledger.ts:603–652; src/ledger/ledgerSessionTransactions.ts:6–16"
+    },
+    "preview": {
+      "source": "tests/observabilityOtelExporter.test.ts:25–160",
+      "disabled": true,
+      "collectorCall": false,
+      "meaning": "Payload/endpoint projection assertions only; fixture writer_sig='sig' and repeated event hashes are hand-shaped, not cryptographic verification."
+    },
+    "recording": {
+      "source": "tests/toolEvidenceRecording.test.ts:82–181,184–239",
+      "actualWorkspaceCases": 5,
+      "directInjectedRecorderCase": 1,
+      "pureProjectionCase": 1,
+      "guards": "Denial examples route through allowlist and do not execute their shell bodies. The source temporarily overrides process.platform and explicitly uses unconfinedShell:'cli-flag'; afterEach restores platform/owned roots. No OS containment evidence.",
+      "directFailure": "Callback really runs and throws at200–203; assertions210–213 require recorderCalledtrue, outcome.oktrue, outputreal output and deniednull. This model does not cause a real durable store failure or prove later dependent journal blocking/reconciliation.",
+      "rows": "Ordinary successful read has EFFECTIVE_POLICY,NATIVE_BUDGET_RESERVATION,TOOL_CALL_ALLOWED plus one tool_call_outcome metric. Correlation is asserted; no independent signature/seal replay is performed."
+    }
+  },
+  "preservation": {
+    "source8362Exact": true,
+    "compiled4529Exact": true,
+    "distMembershipExact": true,
+    "mappedSourcePinsChecked": 92,
+    "mappedSourcePinsFailed": [],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538824643,
+      "nlink": 1
+    },
+    "priorNativePins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "inode": 538734665,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "inode": 538645305,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "inode": 538593142,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "inode": 537685380,
+        "nlink": 1,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      }
+    ]
+  },
+  "runtime": {
+    "observedFingerprint": {
+      "node": "v22.23.3",
+      "modulesABI": "127",
+      "sqliteSelected": 1,
+      "nativeInode": 538824643,
+      "nlink": 1
+    },
+    "boundary": "Fresh owned native load/query was measured by root's closed fingerprint process. No native was loaded by this reviewer; per-other-child ABI is not inferred.",
+    "originalEnvironment": "Inherited environment with privateHOME,Node22PATH,GIT_NO_LAZY_FETCH and reporter path override; endpoint overrides absent in preflight is not zero-network, credential or OS isolation.",
+    "originalDeadlines": "Vitest30s and original helpers/config unchanged. Root command wrapper waits normally without an outer timeout or terminating signal; its five-second50ms signal0 absence polling proves only ownedgroup absence.",
+    "universalDescendantAbsence": false
+  },
+  "reusedPreparation": {
+    "wrapperReview": {
+      "path": "/private/tmp/p0-11-wrapper-static-review-20261015.json",
+      "bytes": 3720,
+      "sha256": "43390cccbc1f122267cd822f5f72b107759dc51fd66363636471605459006fcf"
+    },
+    "readiness": {
+      "path": "/private/tmp/p0-11-readonly-readiness-20261015.json",
+      "bytes": 59639,
+      "sha256": "9e94b03051722cbc7593f7c0c827079060d10cabdffead3d062f56b18bc8565a"
+    },
+    "meaning": "Preparation statements that runtime was pending remain historical; current four closed runs supersede only that runtime-pending point. Other human/owner/trust/formal gaps remain."
+  },
+  "inheritedLimits": [
+    "No Sid residual-risk approval, OWASP/ASI factual re-verification, reassigned free successor keys or current mapstamp acceptance.",
+    "No fullsuite/types/lint/docs/architecture/coverage/Node24/hosted/PR/mergedSHA/release/G0/Done is established by these four test runs; ordinary required gates are not waived.",
+    "P029user skip,P022arrays,P023heldAPI/Studio,P051issuer/formal,P024ISO/expert,P021literal20/10outsideR4,P045byteinvariant/receipt/doctor,P019/P020proposals,P030heldrunner/fullbatch/installedpack remain open.",
+    "Claude/sharedCLI/API/Studio/A4, pausedP202, pendingtransfers and historicalsource ownership remain preserved.",
+    "A causal controller/setup and its release require separate root review/authorization. No original run was rerun or weakened to claim sensitivity."
+  ],
+  "method": "Read closed raw/observer/command/process/group/complete-stream artifacts, compare exact identities/statuses/pins with frozen root summary, read original test/checker and targeted implementation source, hash8362 recorded source files+4529dist+92mapped source pins and stat/hash current/four prior native files. Python standard-library JSON/text/SHA/stat only; no product imports, source parser/compiler, test collection or execution.",
+  "performed": {
+    "productRuntimeOrRerun": false,
+    "importsParsersCompilers": false,
+    "testsBuildInstall": false,
+    "gitCommands": false,
+    "network": false,
+    "processProbesOrSignals": false,
+    "activeArtifactReads": false,
+    "liveJournalReadOrPinned": false,
+    "sourceOrProducerEdits": false,
+    "writes": "Only NEW original-corpora independent review JSON/MD pair."
+  },
+  "allReadsFinished": true,
+  "capturedUtc": "2026-10-15T06:35:43.446772+00:00",
+  "markdown": {
+    "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.md",
+    "bytes": 3460,
+    "sha256": "1b42150ef1a54466cd24f81c739e506d103219e056c8bd00b4e09c0766cc95df"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "p107-precommit-source-review-seal/1",
+  "at": "2026-10-16T18:09:14.383790+00:00",
+  "blockers": [],
+  "inputCount": 96,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/precommit-source-review/review.json",
+      "bytes": 13135,
+      "sha256": "819c741be5d0b2efa4eccd56113ec76e9c5246b3da437655b16b257e29a842d3",
+      "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/precommit-source-review/review.json",
+      "regular": true
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/precommit-source-review/README.md",
+      "bytes": 2399,
+      "sha256": "bf10314905b1874bee871f228a2a18744ab273efe3cc68b2fff7eabc69506e94",
+      "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/precommit-source-review/README.md",
+      "regular": true
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/precommit-source-review/pins.json",
+      "bytes": 37341,
+      "sha256": "04cec5b303a5fa951da98cd951f89b815332cdc94efbfb1fb7026afd8e61a70e",
+      "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/precommit-source-review/pins.json",
+      "regular": true
+    }
+  ]
+}

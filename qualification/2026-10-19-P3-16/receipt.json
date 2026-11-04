@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "key": "P3-16",
+  "date": "2026-10-19",
+  "commit": "49cd72a2440fae02c45af17aee7ec109c84900c7",
+  "branch": "codex/p3-16-environment-overlay",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit; local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 90286
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/formal-checks/49cd72a2440fae02c45af17aee7ec109c84900c7/raw/checks/focused-report.json tests/catalog/stations/environment tests/catalog/catalogLoader.test.ts tests/catalog/controlRecordSchema.test.ts tests/catalog/citations.test.ts tests/catalog/lockfile.test.ts tests/catalog/predicate.test.ts tests/usRegister.test.ts tests/catalog/compiler/unknown.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts tests/catalog/evidence/decisive.test.ts tests/catalog/admission/checker.test.ts tests/catalog/admission/gatedLoads.test.ts tests/catalog/governance/promotion.test.ts tests/catalog/governance/currency.test.ts tests/catalog/governance/reverify.test.ts tests/catalog/governance/changelogGuard.test.ts tests/industryPacks-environment.test.ts tests/environmentalInfraPack.test.ts tests/regulatoryClocks.test.ts tests/industryPackSchema.test.ts tests/industryPacksSplitEquality.test.ts tests/deepIndustryPacksStations.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/wealthOverlay.test.ts",
+      "exit": 1,
+      "durationMs": 197484
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 55790
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 83562
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 3789
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 925
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 785
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 781
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 628
+    },
+    {
+      "cmd": "pnpm check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 2548
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2365
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 654
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 1021
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 530
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 558
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 711
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 1949
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 536
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 2026
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 797
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 1,
+      "durationMs": 1348
+    },
+    {
+      "cmd": "node scripts/check-catalog-changelog.mjs",
+      "exit": 1,
+      "durationMs": 845
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1178
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 4410
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 72726
+    },
+    {
+      "cmd": "npx tsx /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/probe-environment.mts 49cd72a2440fae02c45af17aee7ec109c84900c7 dc8c34d0403c7e4d7513ad546f202574e3e78af8 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/native-case-probe-final-49cd72a2440fae02c45af17aee7ec109c84900c7/cases.json",
+      "exit": 0,
+      "durationMs": 3243
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "a74b239702deae0678911f079c0f5f3c808fbf0f36b790854886bd2fbfaadd8e"
+    },
+    {
+      "path": "case-command.json",
+      "sha256": "b99f0c4b960e9237de9d557f9e046c8865f404cfd7e295109a6dad156ad5cdbc"
+    },
+    {
+      "path": "case-results.json",
+      "sha256": "5fd47b868542d90c0b5df3cfe87fdff6cf754e713651673d548cf9be62ef68d0"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "0b88e63dae04b6d2bdbc72e5a3254b66357d5d7c03b4594a2d2d5a2e7b8e1230"
+    },
+    {
+      "path": "decision.json",
+      "sha256": "946390780a3a4255c2a9c6cb9c5a14b28b61ba06c09d022bc61a33c34607d1e9"
+    },
+    {
+      "path": "git-state.json",
+      "sha256": "d780b23f66fad7d6ecaa4409e7f2a5b0c28ff977d359c7196505396651ffcd51"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "531e4c8e3f2f911026607d81d7f41dfeaa72352a0cd8dd2b32e981333f78bccc"
+    },
+    {
+      "path": "source-audit.json",
+      "sha256": "f7d58600e13bc07e5472101940ec33b67c4fb786fb20f22fbd7b6c68cf632141"
+    },
+    {
+      "path": "tdd.json",
+      "sha256": "7dcdc9d15c17a65a43280dc94efbf8db87b8fe90c0dfcb55df3ecefc9de34c60"
+    }
+  ],
+  "notes": "Authorized experimental unreviewed draft only; promotion none. Full NOT_RUN/tests null; final merged-HEAD two-worker suite still required. Exact nonzero focused/catalog guards remain FAIL/pending, not baseline/pass. Current own 179 tests pass; isolated49 intended assertion kills, exact restoration, 179 restored. Canonical, synthetic-local and empty-production outcomes remain distinct. No primary/legal/human/partner approval or production pass. At assembly, native receipt validation has not run; root records its subsequent command and measured result off-tree and in the handoff."
+}

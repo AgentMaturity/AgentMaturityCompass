@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-50",
+  "date": "2026-10-17",
+  "commit": "84f3ada9d97a71b9e9b9610168fe4213afff0812",
+  "branch": "codex/p1-28-qualification",
+  "node": "22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run audit:runtime",
+      "exit": 0,
+      "durationMs": 772
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,sys\nr=subprocess.run(['\"'\"'/Users/sid/.local/share/uv/tools/graphifyy/bin/python3'\"'\"','\"'\"'-B'\"'\"','\"'\"'-m'\"'\"','\"'\"'graphify'\"'\"','\"'\"'query'\"'\"','\"'\"'native MCP SDK OAuth HTTP stdio'\"'\"','\"'\"'--budget'\"'\"','\"'\"'1000'\"'\"'],cwd='\"'\"'/Users/sid/AgentMaturityCompass'\"'\"')\nsys.exit(r.returncode)'",
+      "exit": 0,
+      "durationMs": 1288
+    },
+    {
+      "cmd": "rg -n -g '*.ts' -e @modelcontextprotocol/sdk/client/auth -e authProvider -e 'withOAuth\\(' -e 'fetchToken\\(' -e ClientCredentialsProvider -e PrivateKeyJwtProvider -e StaticPrivateKeyJwtProvider -e CrossAppAccessProvider /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/src",
+      "exit": 0,
+      "durationMs": 68
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,sys\nr=subprocess.run([\"/opt/homebrew/opt/node@22/bin/node\",\"--input-type=module\",\"--eval\",\"console.log(JSON.stringify({node:process.version,cwd:process.cwd(),importer:import.meta.url,entries:[\\\"@modelcontextprotocol/sdk/client/index.js\\\",\\\"@modelcontextprotocol/sdk/client/streamableHttp.js\\\",\\\"@modelcontextprotocol/sdk/client/stdio.js\\\"].map(specifier=>({specifier,url:import.meta.resolve(specifier)}))}));\"],cwd=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/src/mcp\")\nsys.exit(r.returncode)'",
+      "exit": 0,
+      "durationMs": 146
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/nativeMcpClient.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/nativeMcpHttp.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/reconciliationDefectsMcp.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/reconciliationDefectsMcpHttp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p050-current-mcp.raw.json",
+      "exit": 0,
+      "durationMs": 11428
+    },
+    {
+      "cmd": "git --no-optional-locks -c core.fsmonitor=false -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass status --porcelain=v1 -z --untracked-files=all",
+      "exit": 0,
+      "durationMs": 104
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-50-qualification-20261017/audit-ownership.py /private/tmp/p0-50-qualification-20261017/ownership-observations.actual.json",
+      "exit": 0,
+      "durationMs": 14591
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1752
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:qualification",
+      "exit": 0,
+      "durationMs": 1008
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1504
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 377
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 323
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 3265
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 661
+    }
+  ],
+  "tests": {
+    "total": 34,
+    "passed": 34,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "b270ed56e677e16a11179c490d75a24b538cd325bdd5a4694cbbbd16d7cc4bd7"
+    },
+    {
+      "path": "ordered-case-audit.json",
+      "sha256": "a8d3d1d3b9fa226c3f002145b42b802033f751d7e753c4b617db98ab6679bba4"
+    }
+  ],
+  "notes": "Bounded unchanged four-file MCP cohort:34/34 canonical cases,10 raw suites=4files+6nested,44observer tasks,34afterEach+4afterAll pass, normal0/11428ms/owned-groupESRCH. Complete raw/observer/order/50inputpins retained. Same34 historical selected identities are not summed to68; old parent1/wrapper70/19failures remain. Additional actual ownership/pre-packet freeze observations are recorded separately; no ownership release is inferred. First command reuses prior P049 production/moderate audit0/772ms with exact unchanged U package+lock fullpins; next five are actual newly closed P050 phases. Actual public SDK3-entry resolution imports no module and supplies no Vitest trace/full SDK integrity proof. AMC-owned OAuth flow exists separately; no issuer/legacy-credential/provider migration or deployment proof. PR50 fullCI/release checkbox remains unchecked. RED2710/1268 and all D15/Claude/human/publication/F37 holds remain unwaived. Actual post-packet qualification/freeze/counts/docs checks pass; dead-code1/2710 and duplicates1/1268 remain RED. No future result or metadata commit, Node24/installedpack/fullCI/release/wholeP050/plan completion credited."
+}

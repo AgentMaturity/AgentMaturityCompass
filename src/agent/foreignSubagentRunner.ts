@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import { join } from "node:path";
 import { UNSIGNED_EVIDENCE_STORE } from "../ledger/ledgerConnection.js";
 import { spawnGovernedChild } from "../ledger/monitor.js";
+import { BRIDGE_REDACTED_MARKER } from "../bridge/bridgeRedaction.js";
 import type { SubagentRunContext, SubagentRunResult, SubagentRunner } from "./subagentSpawn.js";
 
 /**
@@ -18,8 +19,8 @@ import type { SubagentRunContext, SubagentRunResult, SubagentRunner } from "./su
  * Studio to be running; it mints its own `randomUUID()` session id, so the
  * announced `childSessionId` would name a session that does not exist; it
  * returns only an `exitCode` with no child text, so there is nothing to put in
- * `SubagentRunResult.text`; and its SANDBOX branch returns a hardcoded
- * `exitCode: 0`, so a crashed foreign agent reports success. This composes the
+ * `SubagentRunResult.text` (its SANDBOX branch also hardcoded `exitCode: 0`
+ * until WP36). This composes the
  * same primitives one level down instead.
  *
  * WHAT AMC CAN AND CANNOT BIND ON A FOREIGN CHILD. It cannot intercept the
@@ -85,7 +86,9 @@ function foldChildOutput(
     let truncated = false;
     for (const row of rows) {
       if (row.event_type === "stdout") {
-        text += row.payload_inline ?? "";
+        // Where the workspace opted in (P2-02) a redacted value is stored as the anonymous marker; the answer drops it
+        // rather than quoting AMC's placeholder to the parent's model as the child's words.
+        text += (row.payload_inline ?? "").split(BRIDGE_REDACTED_MARKER).join("");
         continue;
       }
       if (row.event_type !== "metric") continue;

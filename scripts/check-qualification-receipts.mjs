@@ -19,6 +19,13 @@ const MAX_BYTES = 1_048_576;
 const SCHEMA_PATH = resolve(dirname(fileURLToPath(import.meta.url)), "../qualification/receipt.schema.json");
 const FORBIDDEN_NAME = /(\.pem|\.key|\.p12|\.amcvault)$|^\.env/;
 const FOLDER = /^(\d{4}-\d{2}-\d{2})-(.+)$/;
+/** A second receipt for the same key and day keeps the key and adds a lowercase variant: 2026-10-15-P0-27-node-runtime. */
+const VARIANT = /^-[a-z0-9]+(?:-[a-z0-9]+)*$/;
+/**
+ * Tracked harness definitions that live beside the receipts and are not receipts themselves: the reference deployment
+ * harness (P2-06) and the matched comparison campaign plans that checkComparisonCampaign reads (WP29).
+ */
+const DEFINITION_FOLDERS = new Set(["reference-deployment", "wp29-campaign"]);
 
 let validateSchema;
 function schemaValidator() {
@@ -87,7 +94,10 @@ function checkReceipt(dir, folder, errors) {
   }
   if (!isRealDate(receipt.date)) prefix(`receipt date ${receipt.date} is not a real date.`);
   if (receipt.date !== match[1]) prefix(`folder date ${match[1]} differs from receipt date ${receipt.date}.`);
-  if (receipt.key !== match[2]) prefix(`folder key ${match[2]} differs from receipt key ${receipt.key}.`);
+  const folderKey = match[2];
+  if (folderKey !== receipt.key && !(folderKey.startsWith(receipt.key) && VARIANT.test(folderKey.slice(receipt.key.length)))) {
+    prefix(`folder key ${folderKey} differs from receipt key ${receipt.key}.`);
+  }
   const { tests } = receipt;
   if (tests && tests.passed + tests.failed + tests.skipped !== tests.total) {
     prefix(`tests: passed + failed + skipped (${tests.passed + tests.failed + tests.skipped}) differs from total ${tests.total}.`);
@@ -125,7 +135,7 @@ export function validateQualificationDir(dir) {
   if (!existsSync(dir)) return { ok: true, receipts, errors };
   checkFiles(dir, errors);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
+    if (!entry.isDirectory() || DEFINITION_FOLDERS.has(entry.name)) continue;
     const receipt = checkReceipt(dir, entry.name, errors);
     if (receipt) receipts.push(receipt);
   }

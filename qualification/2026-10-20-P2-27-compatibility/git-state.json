@@ -1,0 +1,17 @@
+{
+  "sourceCommit": "a66542d969e68115f61eea0a1028b59061110b55",
+  "baseInt": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+  "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020",
+  "branch": "codex/p2-27-compatibility-final",
+  "statusAtPreparation": "",
+  "sourceManifest": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/product-h3-exact-source-scope-manifest-v1.json",
+    "sha256": "3459a9fc6df1af0754e6acc9ee8c669fca29718f1d1f990620670bc9daa918bf",
+    "bytes": 57273
+  },
+  "futureQ3Rule": "The sole child of H3 adds only these 12 new qualification files. Actual Q3 identity is established after commit, externally; it is not guessed here.",
+  "q3": null,
+  "noDeletions": true,
+  "noReservedPathEdits": true,
+  "noMainMergeOrPush": true
+}

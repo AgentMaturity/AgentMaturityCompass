@@ -1,0 +1,13 @@
+{
+  "graph": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+  "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+  "installedVersion": "0.9.74",
+  "refreshPin": "0.9.56",
+  "selectedExactVocabularyTokens": [
+    "archive",
+    "manifest",
+    "parity",
+    "snapshot"
+  ],
+  "use": "Scoped navigation only; graph is September-stale and does not establish October helper wiring. Current source is verified directly. No refresh, watcher or server."
+}

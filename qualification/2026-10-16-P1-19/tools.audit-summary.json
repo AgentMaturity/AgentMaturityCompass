@@ -1,0 +1,101 @@
+{
+  "schema": "p119-tools-public-audit-summary/1",
+  "sourceCommit": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+  "freshTests": {
+    "total": 32,
+    "passed": 32,
+    "failed": 0,
+    "filtered": 0,
+    "todo": 0,
+    "rawObserverIdentityAndStatusMultiplicityMatched": true,
+    "fileSuiteHookBodyUnhandledOrKnownLateErrors": 0
+  },
+  "actualSummary": {
+    "providerChildren": 33,
+    "providerRows": 254,
+    "paymentPosts": 14,
+    "commits": 14,
+    "operation.call": 67,
+    "call.finops_propose_payment": 32,
+    "operation.approval": 5,
+    "operation.approve": 30,
+    "call.finops_execute_payment": 31,
+    "action.completed": 15,
+    "operation.context": 11,
+    "contextPositive": 1,
+    "call.finops_lookup_payment": 1,
+    "observedConsumptionRecords": 4,
+    "operation.inspect": 2,
+    "coldVerifierChildren": 1,
+    "action.denied": 13,
+    "denial.guard": 2,
+    "action.outcome_unknown": 2,
+    "operation.reconcile": 2,
+    "appliedSettlements": 2,
+    "denial.approval": 8,
+    "expiryFallbacks": 1,
+    "contextRefusals": 10,
+    "denial.authorization": 3,
+    "operation.tamper": 3,
+    "denial.visibility": 2,
+    "call.finops_list_transactions": 2,
+    "call.finops_reconcile": 1,
+    "exactTxnIdReports": 1,
+    "operation.block-preimages": 1,
+    "pathObstructionControls": 1
+  },
+  "closure": {
+    "outerPgid": 11249,
+    "outerExit": 0,
+    "outerESRCH": true,
+    "launcherChildren": 155,
+    "providerChildren": 33,
+    "nestedColdVerifierChildren": 1,
+    "allReportedNatural0ClosedStreamsAndPidESRCH": true
+  },
+  "specificChecks": {
+    "publicProjections": "Cross-linked/rehashed; not retained independent signatures for every fixture.",
+    "oracle": "One actual positive oracle passed16checks; scoped17signed inputs, not full F01-F38.",
+    "queryBytes": "Unobserved in provider log; normalized route/order/result evidence only.",
+    "persistence": "Actual directory obstruction and signed terminal state, not power-loss/fsync injection."
+  },
+  "limits": [
+    "Root ran the tests. This peer only read public files/metadata and recomputed hashes; no product runtime,import,parser,SQL,network,R write or successful-fixture reopening occurred.",
+    "Public decision/receipt/record projections were cross-linked and rehashed,not independently retained signatures. One actual separately pinned oracle/coldCLI provides its scoped cryptographic proof with17 signed inputs; that is not independent signature verification of every fixture by this peer.",
+    "Provider log bytes/checkpoints were reconstructed from published records after successful cleanup publication. DB/WAL/key evidence is the actual oracle result,not peer SQL inspection.",
+    "Causal refinements are exact: real path obstruction is not direct fsync/power-loss evidence; query bytes remain unobserved despite real expiry/key/twoGET/applied identity.",
+    "The real SIMULATE projection reaches its preview output and completed/not_applied,while the pre-aborted fresh execution is denied at approval. No token getter instrumentation or unmeasured abort-after-start behavior is claimed.",
+    "The finite exact txnId seed-report regression is not normative F37 setup/runner completion. control-result in the actual oracle says dimensions were not requested.",
+    "Prior31/30/1 failure is preserved separately. Full F01-F38,compliance,global/full-suite coverage,Linux,Node24,hosted release and formal P119 completion are not claimed.",
+    "Root latest quality metadata records1268 duplicate findings and2734 dead-code findings,including2 new owned files; both remain open/unwaived. This narrow runtime review did not rerun quality tools."
+  ],
+  "formalAcceptanceClosed": false,
+  "freshPeerReview": {
+    "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/fresh-tools-audit/review.json",
+    "bytes": 218147,
+    "sha256": "6cdc0d4fc94d3bbf0e4184785ce2d9c12e7375e02c8c020bb52c6c813789a9db"
+  },
+  "freshPeerGate": {
+    "schema": "p119-fresh-tools-peer/1",
+    "result": "The closed physical-clone run establishes its canonical finite32/32 result with matching independent metadata checks.",
+    "tests": {
+      "total": 32,
+      "passed": 32,
+      "failed": 0,
+      "filtered": 0,
+      "todo": 0,
+      "rawObserverIdentityAndStatusMultiplicityMatched": true,
+      "fileSuiteHookBodyUnhandledOrKnownLateErrors": 0
+    },
+    "preservedLimits": [
+      "Root ran the tests. This peer only read public files/metadata and recomputed hashes; no product runtime,import,parser,SQL,network,R write or successful-fixture reopening occurred.",
+      "Public decision/receipt/record projections were cross-linked and rehashed,not independently retained signatures. One actual separately pinned oracle/coldCLI provides its scoped cryptographic proof with17 signed inputs; that is not independent signature verification of every fixture by this peer.",
+      "Provider log bytes/checkpoints were reconstructed from published records after successful cleanup publication. DB/WAL/key evidence is the actual oracle result,not peer SQL inspection.",
+      "Causal refinements are exact: real path obstruction is not direct fsync/power-loss evidence; query bytes remain unobserved despite real expiry/key/twoGET/applied identity.",
+      "The real SIMULATE projection reaches its preview output and completed/not_applied,while the pre-aborted fresh execution is denied at approval. No token getter instrumentation or unmeasured abort-after-start behavior is claimed.",
+      "The finite exact txnId seed-report regression is not normative F37 setup/runner completion. control-result in the actual oracle says dimensions were not requested.",
+      "Prior31/30/1 failure is preserved separately. Full F01-F38,compliance,global/full-suite coverage,Linux,Node24,hosted release and formal P119 completion are not claimed.",
+      "Root latest quality metadata records1268 duplicate findings and2734 dead-code findings,including2 new owned files; both remain open/unwaived. This narrow runtime review did not rerun quality tools."
+    ]
+  }
+}

@@ -5,6 +5,7 @@ import { openLedger, hashBinaryOrPath } from "./ledger.js";
 import { runProcess } from "../exec/runProcess.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { dummyProviderKeyEnv, stripProviderKeys } from "../utils/providerKeys.js";
+import { processOutputRedactor, recordedArgv } from "../bridge/bridgeRedaction.js";
 
 /** How long any single `--version` attempt may take before it is abandoned. */
 const VERSION_PROBE_TIMEOUT_MS = 3_000;
@@ -84,6 +85,8 @@ async function spawnMonitoredProcess(params: {
   cwd?: string;
   /** Kill the child after this long. Absent means no deadline. */
   timeoutMs?: number;
+  /** Trusted negative launch seam; absent on ordinary monitor callers. */
+  beforeLaunch?: () => void;
   /**
    * What the child's stdin is connected to.
    *
@@ -95,6 +98,7 @@ async function spawnMonitoredProcess(params: {
    */
   stdinMode?: "forward" | "close";
 }): Promise<{ sessionId: string; exitCode: number; terminatedBy: string | null }> {
+  params.beforeLaunch?.();
   // P0-55: rows written under AMC_NO_SIGN=1 (evidence collect --first-run, amc wrap) go to the unsigned store.
   const ledger = openLedger(params.workspace, process.env.AMC_NO_SIGN === "1" ? { store: "unsigned" } : {});
   const sessionId = params.sessionId ?? randomUUID();
@@ -110,22 +114,26 @@ async function spawnMonitoredProcess(params: {
       binarySha256: binaryHash
     });
 
+    const argv = recordedArgv(params.workspace, params.command, params.args, params.scrubValues);
     ledger.appendEvidence({
       sessionId,
       runtime: params.runtime,
       eventType: "gateway",
-      payload: JSON.stringify({ stage: "process_start", command: params.command, args: params.args, meta: params.meta ?? {} }),
+      payload: JSON.stringify({ stage: "process_start", command: argv.command, args: argv.args, meta: params.meta ?? {} }),
       payloadExt: "json",
       meta: {
         stage: "process_start",
-        command: params.command,
-        args: params.args,
+        command: argv.command,
+        args: argv.args,
         ...(params.meta ?? {})
       }
     });
 
     const recorded = { stdout: 0, stderr: 0 };
     const truncationAnnounced = { stdout: false, stderr: false };
+    // What the process wrote and was sent: where the workspace opted in to protected-data redaction (P2-02), stored as
+    // `amc wrap`'s bridge telemetry is; elsewhere as it was (`processOutputRedactor`). The terminal sees the scrubbed text.
+    const evidence = processOutputRedactor(params.workspace);
     const record = (stream: "stdout" | "stderr", text: string): void => {
       const bytes = Buffer.byteLength(text, "utf8");
       if (recorded[stream] >= MAX_RECORDED_OUTPUT_BYTES) {
@@ -153,7 +161,7 @@ async function spawnMonitoredProcess(params: {
         sessionId,
         runtime: params.runtime,
         eventType: stream,
-        payload: text,
+        payload: evidence(text),
         payloadExt: "txt",
         inline: true,
         meta: {
@@ -164,6 +172,7 @@ async function spawnMonitoredProcess(params: {
       });
     };
 
+    params.beforeLaunch?.();
     const running = runProcess({
       argv: [params.command, ...params.args],
       cwd: params.cwd ?? process.cwd(),
@@ -173,8 +182,8 @@ async function spawnMonitoredProcess(params: {
         AMC_EVALUATED_AGENT: "1"
       },
       stdin: "pipe",
-      // Tee AND record: the operator and the log see the same scrubbed text,
-      // so there is no arrangement in which they disagree.
+      // Tee AND record: the operator and the log both see the scrubbed text; in an
+      // opted-in workspace the log stores it after the redaction above, which only removes more.
       stdout: "tee",
       stderr: "tee",
       maxCaptureBytes: MAX_RECORDED_OUTPUT_BYTES,
@@ -195,7 +204,7 @@ async function spawnMonitoredProcess(params: {
           sessionId,
           runtime: params.runtime,
           eventType: "stdin",
-          payload: chunk,
+          payload: evidence(chunk),
           payloadExt: "txt",
           inline: true,
           meta: {
@@ -267,8 +276,8 @@ async function spawnMonitoredProcess(params: {
     ledger.sealSession(sessionId);
     // The exit code goes BACK to the caller, not only into the ledger. It was
     // always recorded as `runtime_exit_code`; discarding it here is why
-    // `runAdapterCommand`'s SANDBOX branch could return a hardcoded `exitCode: 0`
-    // and report a crashed foreign agent as a success.
+    // `runAdapterCommand`'s SANDBOX branch once returned a hardcoded `exitCode: 0`
+    // and reported a crashed foreign agent as a success (fixed in WP36, AXR-05).
     return { sessionId, exitCode: outcome.exitCode ?? 1, terminatedBy: outcome.terminatedBy ?? null };
   } finally {
     ledger.close();
@@ -301,24 +310,41 @@ export async function wrapRuntime(
   })).sessionId;
 }
 
-export async function wrapAny(
+export async function wrapAny(...params: Parameters<typeof wrapAnyOutcome>): Promise<string> {
+  return (await wrapAnyOutcome(...params)).sessionId;
+}
+
+/** `wrapAny` that also returns the process's exit code, for callers that report it (a sandboxed run, AXR-05). */
+export async function wrapAnyOutcome(
   command: string,
   args: string[],
-  opts: { workspace: string; agentId?: string; signal?: AbortSignal }
-): Promise<string> {
+  opts: {
+    workspace: string;
+    agentId?: string;
+    signal?: AbortSignal;
+    beforeLaunch?: () => void;
+    /** Environment the process gets beside AMC's (a sandbox's `docker run -e NAME` values). */
+    envExtras?: Record<string, string>;
+    /** Values to scrub from the recorded argv and output: a lease handed to the process, above all. */
+    scrubValues?: readonly string[];
+  }
+): Promise<{ sessionId: string; exitCode: number; terminatedBy: string | null }> {
   const agentId = resolveAgentId(opts.workspace, opts.agentId);
-  return (await spawnMonitoredProcess({
+  return spawnMonitoredProcess({
     workspace: opts.workspace,
     runtime: "any",
     command,
     args,
+    ...(opts.envExtras ? { envExtras: opts.envExtras } : {}),
+    ...(opts.scrubValues ? { scrubValues: opts.scrubValues } : {}),
     ...(opts.signal ? { signal: opts.signal } : {}),
+    ...(opts.beforeLaunch ? { beforeLaunch: opts.beforeLaunch } : {}),
     meta: {
       mode: "wrap-any",
       agentId,
       trustTier: "OBSERVED"
     }
-  })).sessionId;
+  });
 }
 
 /**
@@ -326,8 +352,8 @@ export async function wrapAny(
  *
  * The narrow entry point P6.1b needs, and deliberately not `runAdapterCommand`:
  * that requires AMC Studio to be running, mints its own session id, returns only
- * an exit code with no child text, and hardcodes `exitCode: 0` on its SANDBOX
- * branch. This composes the same primitives at the level a subagent runner
+ * an exit code with no child text (its SANDBOX branch hardcoded `exitCode: 0`
+ * until WP36). This composes the same primitives at the level a subagent runner
  * actually needs.
  *
  * Differences from `superviseProcess`, each load-bearing:
@@ -459,13 +485,15 @@ export async function startMonitor(opts: {
     });
 
     if (opts.stdin) {
+      // Where the workspace opted in (P2-02), stored as `amc wrap`'s stdout telemetry is; elsewhere as it was.
+      const evidence = processOutputRedactor(opts.workspace);
       await new Promise<void>((resolve) => {
         process.stdin.on("data", (chunk: Buffer) => {
           ledger.appendEvidence({
             sessionId,
             runtime: opts.runtime,
             eventType: "stdout",
-            payload: chunk,
+            payload: evidence(chunk),
             payloadExt: "txt",
             inline: true,
             meta: { source: "stdin_pipe", trustTier: "OBSERVED", agentId }

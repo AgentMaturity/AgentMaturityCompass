@@ -10,10 +10,26 @@
     "statements": 64
   },
   "platformFloorsSource": {
-    "linux": "GitHub Actions ubuntu-latest Node 22, CI run 37483109284 on main 8d78504d (the first build-test to complete since 2026-09-16)"
+    "linux": "GitHub Actions ubuntu-latest Node 22, CI run 37483109284 on main 8d78504d (the first build-test to complete since 2026-09-16); extended from CI run 41736923846 (PR #76 at e61ee9c13, Node 22 and 24, the lower of the two) for tracked files that measure lower on Linux"
   },
   "platformFloors": {
     "linux": {
+      "src/acp/acpAgentServer.ts": {
+        "functions": {
+          "total": 44,
+          "covered": 36
+        }
+      },
+      "src/acp/acpConnection.ts": {
+        "branches": {
+          "total": 63,
+          "covered": 54
+        },
+        "statements": {
+          "total": 155,
+          "covered": 141
+        }
+      },
       "src/acp/acpProjection.ts": {
         "lines": {
           "total": 48,
@@ -28,10 +44,2090 @@
           "covered": 41
         }
       },
+      "src/adapters/adapterCli.ts": {
+        "lines": {
+          "total": 143,
+          "covered": 25
+        },
+        "functions": {
+          "total": 43,
+          "covered": 11
+        },
+        "branches": {
+          "total": 133,
+          "covered": 20
+        },
+        "statements": {
+          "total": 204,
+          "covered": 28
+        }
+      },
+      "src/adapters/adapterConfigStore.ts": {
+        "lines": {
+          "total": 100,
+          "covered": 48
+        },
+        "functions": {
+          "total": 42,
+          "covered": 21
+        },
+        "branches": {
+          "total": 58,
+          "covered": 23
+        },
+        "statements": {
+          "total": 157,
+          "covered": 65
+        }
+      },
       "src/adapters/adapterDetection.ts": {
         "branches": {
           "total": 42,
           "covered": 29
+        }
+      },
+      "src/adapters/hookIntegrationCli.ts": {
+        "lines": {
+          "total": 115,
+          "covered": 23
+        },
+        "functions": {
+          "total": 11,
+          "covered": 3
+        },
+        "statements": {
+          "total": 137,
+          "covered": 23
+        }
+      },
+      "src/agent/agentSession.ts": {
+        "functions": {
+          "total": 52,
+          "covered": 48
+        }
+      },
+      "src/agent/agentToolset.ts": {
+        "functions": {
+          "total": 58,
+          "covered": 51
+        }
+      },
+      "src/agent/approvalGate.ts": {
+        "lines": {
+          "total": 22,
+          "covered": 18
+        },
+        "functions": {
+          "total": 11,
+          "covered": 8
+        },
+        "branches": {
+          "total": 39,
+          "covered": 33
+        },
+        "statements": {
+          "total": 24,
+          "covered": 20
+        }
+      },
+      "src/agent/delegateTool.ts": {
+        "lines": {
+          "total": 23,
+          "covered": 21
+        },
+        "branches": {
+          "total": 32,
+          "covered": 28
+        },
+        "statements": {
+          "total": 24,
+          "covered": 22
+        }
+      },
+      "src/agent/loopTypes.ts": {
+        "branches": {
+          "total": 4,
+          "covered": 3
+        }
+      },
+      "src/agent/nativeRunUsage.ts": {
+        "branches": {
+          "total": 290,
+          "covered": 271
+        }
+      },
+      "src/agent/providers/claudeCliProvider.ts": {
+        "lines": {
+          "total": 40,
+          "covered": 36
+        },
+        "branches": {
+          "total": 62,
+          "covered": 45
+        },
+        "statements": {
+          "total": 45,
+          "covered": 41
+        }
+      },
+      "src/agent/providers/delegationProviders.ts": {
+        "branches": {
+          "total": 24,
+          "covered": 15
+        }
+      },
+      "src/agent/requestRetry.ts": {
+        "lines": {
+          "total": 57,
+          "covered": 52
+        },
+        "branches": {
+          "total": 37,
+          "covered": 31
+        }
+      },
+      "src/agent/subagentRunner.ts": {
+        "lines": {
+          "total": 169,
+          "covered": 158
+        },
+        "functions": {
+          "total": 32,
+          "covered": 26
+        },
+        "branches": {
+          "total": 225,
+          "covered": 198
+        },
+        "statements": {
+          "total": 223,
+          "covered": 190
+        }
+      },
+      "src/agent/subagentSpawn.ts": {
+        "lines": {
+          "total": 225,
+          "covered": 219
+        }
+      },
+      "src/agents/monitor.ts": {
+        "statements": {
+          "total": 112,
+          "covered": 97
+        }
+      },
+      "src/agents/traceIngestion.ts": {
+        "lines": {
+          "total": 74,
+          "covered": 59
+        },
+        "branches": {
+          "total": 60,
+          "covered": 42
+        },
+        "statements": {
+          "total": 81,
+          "covered": 63
+        }
+      },
+      "src/api/adaptersRouter.ts": {
+        "lines": {
+          "total": 117,
+          "covered": 90
+        },
+        "branches": {
+          "total": 128,
+          "covered": 82
+        },
+        "statements": {
+          "total": 136,
+          "covered": 98
+        }
+      },
+      "src/api/complianceRouter.ts": {
+        "branches": {
+          "total": 408,
+          "covered": 257
+        }
+      },
+      "src/api/driftRouter.ts": {
+        "functions": {
+          "total": 4,
+          "covered": 2
+        },
+        "branches": {
+          "total": 120,
+          "covered": 58
+        },
+        "statements": {
+          "total": 95,
+          "covered": 71
+        }
+      },
+      "src/api/evidenceRouter.ts": {
+        "lines": {
+          "total": 241,
+          "covered": 216
+        },
+        "branches": {
+          "total": 333,
+          "covered": 226
+        },
+        "statements": {
+          "total": 263,
+          "covered": 223
+        }
+      },
+      "src/api/exportRouter.ts": {
+        "lines": {
+          "total": 99,
+          "covered": 77
+        },
+        "branches": {
+          "total": 109,
+          "covered": 67
+        },
+        "statements": {
+          "total": 113,
+          "covered": 79
+        }
+      },
+      "src/api/firewallRouter.ts": {
+        "lines": {
+          "total": 97,
+          "covered": 73
+        },
+        "branches": {
+          "total": 143,
+          "covered": 80
+        },
+        "statements": {
+          "total": 119,
+          "covered": 77
+        }
+      },
+      "src/api/gatewayRouter.ts": {
+        "lines": {
+          "total": 160,
+          "covered": 76
+        },
+        "functions": {
+          "total": 13,
+          "covered": 2
+        },
+        "branches": {
+          "total": 109,
+          "covered": 42
+        },
+        "statements": {
+          "total": 194,
+          "covered": 82
+        }
+      },
+      "src/api/importerRouter.ts": {
+        "lines": {
+          "total": 45,
+          "covered": 14
+        },
+        "statements": {
+          "total": 46,
+          "covered": 14
+        }
+      },
+      "src/api/incidentRouter.ts": {
+        "lines": {
+          "total": 165,
+          "covered": 132
+        },
+        "functions": {
+          "total": 15,
+          "covered": 10
+        },
+        "branches": {
+          "total": 146,
+          "covered": 85
+        },
+        "statements": {
+          "total": 194,
+          "covered": 141
+        }
+      },
+      "src/api/index.ts": {
+        "lines": {
+          "total": 54,
+          "covered": 47
+        },
+        "functions": {
+          "total": 29,
+          "covered": 24
+        }
+      },
+      "src/api/runtimeRouter.ts": {
+        "lines": {
+          "total": 96,
+          "covered": 55
+        },
+        "functions": {
+          "total": 8,
+          "covered": 6
+        },
+        "branches": {
+          "total": 150,
+          "covered": 65
+        },
+        "statements": {
+          "total": 99,
+          "covered": 55
+        }
+      },
+      "src/api/toolsRouter.ts": {
+        "lines": {
+          "total": 299,
+          "covered": 255
+        },
+        "branches": {
+          "total": 287,
+          "covered": 184
+        },
+        "statements": {
+          "total": 368,
+          "covered": 274
+        }
+      },
+      "src/api/watchRouter.ts": {
+        "branches": {
+          "total": 276,
+          "covered": 181
+        },
+        "statements": {
+          "total": 272,
+          "covered": 211
+        }
+      },
+      "src/api/workflowRouter.ts": {
+        "statements": {
+          "total": 163,
+          "covered": 133
+        }
+      },
+      "src/approvals/approvalCliCommands.ts": {
+        "lines": {
+          "total": 49,
+          "covered": 13
+        },
+        "branches": {
+          "total": 47,
+          "covered": 3
+        },
+        "statements": {
+          "total": 55,
+          "covered": 13
+        }
+      },
+      "src/approvals/approvalDelivery.ts": {
+        "lines": {
+          "total": 87,
+          "covered": 81
+        },
+        "branches": {
+          "total": 65,
+          "covered": 56
+        },
+        "statements": {
+          "total": 105,
+          "covered": 94
+        }
+      },
+      "src/approvals/approvalPolicyEngine.ts": {
+        "lines": {
+          "total": 93,
+          "covered": 75
+        },
+        "branches": {
+          "total": 81,
+          "covered": 54
+        },
+        "statements": {
+          "total": 116,
+          "covered": 86
+        }
+      },
+      "src/approvals/approvalStudioService.ts": {
+        "lines": {
+          "total": 76,
+          "covered": 55
+        },
+        "statements": {
+          "total": 81,
+          "covered": 57
+        }
+      },
+      "src/approvals/nativeApprovalLoginCli.ts": {
+        "branches": {
+          "total": 27,
+          "covered": 14
+        }
+      },
+      "src/assurance/assuranceCli.ts": {
+        "branches": {
+          "total": 12,
+          "covered": 1
+        }
+      },
+      "src/assurance/assurancePolicyStore.ts": {
+        "lines": {
+          "total": 156,
+          "covered": 96
+        },
+        "statements": {
+          "total": 209,
+          "covered": 119
+        }
+      },
+      "src/assurance/assuranceScoring.ts": {
+        "lines": {
+          "total": 36,
+          "covered": 9
+        }
+      },
+      "src/assurance/evidenceWriters.ts": {
+        "lines": {
+          "total": 29,
+          "covered": 28
+        },
+        "statements": {
+          "total": 32,
+          "covered": 31
+        }
+      },
+      "src/assurance/falsePositiveTracker.ts": {
+        "lines": {
+          "total": 166,
+          "covered": 165
+        }
+      },
+      "src/assurance/packs/context-leakage.ts": {
+        "lines": {
+          "total": 29,
+          "covered": 27
+        },
+        "branches": {
+          "total": 10,
+          "covered": 8
+        },
+        "statements": {
+          "total": 31,
+          "covered": 29
+        }
+      },
+      "src/assurance/report.ts": {
+        "lines": {
+          "total": 15,
+          "covered": 14
+        },
+        "functions": {
+          "total": 7,
+          "covered": 6
+        },
+        "branches": {
+          "total": 17,
+          "covered": 14
+        },
+        "statements": {
+          "total": 18,
+          "covered": 17
+        }
+      },
+      "src/assurance/validators.ts": {
+        "branches": {
+          "total": 129,
+          "covered": 100
+        }
+      },
+      "src/audit/auditApi.ts": {
+        "statements": {
+          "total": 272,
+          "covered": 65
+        }
+      },
+      "src/audit/auditMapStore.ts": {
+        "lines": {
+          "total": 58,
+          "covered": 24
+        },
+        "functions": {
+          "total": 17,
+          "covered": 10
+        },
+        "branches": {
+          "total": 60,
+          "covered": 4
+        },
+        "statements": {
+          "total": 76,
+          "covered": 24
+        }
+      },
+      "src/audit/auditPolicyStore.ts": {
+        "lines": {
+          "total": 56,
+          "covered": 38
+        },
+        "functions": {
+          "total": 24,
+          "covered": 18
+        },
+        "branches": {
+          "total": 16,
+          "covered": 4
+        },
+        "statements": {
+          "total": 68,
+          "covered": 38
+        }
+      },
+      "src/audit/binderSigner.ts": {
+        "lines": {
+          "total": 11,
+          "covered": 10
+        },
+        "functions": {
+          "total": 4,
+          "covered": 3
+        },
+        "branches": {
+          "total": 2,
+          "covered": 1
+        },
+        "statements": {
+          "total": 12,
+          "covered": 10
+        }
+      },
+      "src/audit/binderStore.ts": {
+        "statements": {
+          "total": 73,
+          "covered": 56
+        }
+      },
+      "src/audit/evidenceRequestStore.ts": {
+        "lines": {
+          "total": 50,
+          "covered": 12
+        },
+        "functions": {
+          "total": 8,
+          "covered": 4
+        },
+        "branches": {
+          "total": 28,
+          "covered": 1
+        },
+        "statements": {
+          "total": 51,
+          "covered": 12
+        }
+      },
+      "src/audit/evidenceRequests.ts": {
+        "lines": {
+          "total": 94,
+          "covered": 29
+        },
+        "functions": {
+          "total": 21,
+          "covered": 6
+        },
+        "branches": {
+          "total": 53,
+          "covered": 11
+        },
+        "statements": {
+          "total": 123,
+          "covered": 29
+        }
+      },
+      "src/auth/sessionTokens.ts": {
+        "branches": {
+          "total": 19,
+          "covered": 18
+        },
+        "statements": {
+          "total": 36,
+          "covered": 35
+        }
+      },
+      "src/autonomy/scheduleStore.ts": {
+        "lines": {
+          "total": 267,
+          "covered": 254
+        },
+        "functions": {
+          "total": 66,
+          "covered": 64
+        },
+        "branches": {
+          "total": 253,
+          "covered": 209
+        },
+        "statements": {
+          "total": 360,
+          "covered": 323
+        }
+      },
+      "src/bench/benchApi.ts": {
+        "lines": {
+          "total": 131,
+          "covered": 50
+        },
+        "functions": {
+          "total": 35,
+          "covered": 12
+        },
+        "branches": {
+          "total": 91,
+          "covered": 18
+        },
+        "statements": {
+          "total": 181,
+          "covered": 51
+        }
+      },
+      "src/bench/benchPolicyStore.ts": {
+        "lines": {
+          "total": 69,
+          "covered": 43
+        },
+        "functions": {
+          "total": 29,
+          "covered": 20
+        },
+        "branches": {
+          "total": 20,
+          "covered": 7
+        },
+        "statements": {
+          "total": 78,
+          "covered": 45
+        }
+      },
+      "src/benchmarks/academicPaper.ts": {
+        "branches": {
+          "total": 22,
+          "covered": 17
+        }
+      },
+      "src/benchmarks/benchExport.ts": {
+        "lines": {
+          "total": 135,
+          "covered": 122
+        },
+        "functions": {
+          "total": 33,
+          "covered": 29
+        },
+        "statements": {
+          "total": 205,
+          "covered": 172
+        }
+      },
+      "src/benchmarks/consortium.ts": {
+        "lines": {
+          "total": 80,
+          "covered": 78
+        },
+        "functions": {
+          "total": 33,
+          "covered": 31
+        }
+      },
+      "src/benchmarks/publicLeaderboard.ts": {
+        "lines": {
+          "total": 57,
+          "covered": 42
+        },
+        "functions": {
+          "total": 13,
+          "covered": 12
+        },
+        "statements": {
+          "total": 59,
+          "covered": 43
+        }
+      },
+      "src/benchmarks/replayBenchmarkCorpus.ts": {
+        "lines": {
+          "total": 6365,
+          "covered": 5472
+        },
+        "functions": {
+          "total": 1838,
+          "covered": 1834
+        },
+        "statements": {
+          "total": 6699,
+          "covered": 5695
+        }
+      },
+      "src/bom/bomVerifier.ts": {
+        "functions": {
+          "total": 18,
+          "covered": 16
+        },
+        "statements": {
+          "total": 135,
+          "covered": 118
+        }
+      },
+      "src/bridge/bridgeAuth.ts": {
+        "statements": {
+          "total": 58,
+          "covered": 56
+        }
+      },
+      "src/bridge/hookControl.ts": {
+        "functions": {
+          "total": 21,
+          "covered": 20
+        }
+      },
+      "src/budgets/budgets.ts": {
+        "functions": {
+          "total": 37,
+          "covered": 34
+        },
+        "branches": {
+          "total": 117,
+          "covered": 95
+        }
+      },
+      "src/business/fairScenario.ts": {
+        "lines": {
+          "total": 85,
+          "covered": 63
+        },
+        "statements": {
+          "total": 91,
+          "covered": 67
+        }
+      },
+      "src/canon/canonApi.ts": {
+        "branches": {
+          "total": 2,
+          "covered": 0
+        }
+      },
+      "src/canon/canonLoader.ts": {
+        "functions": {
+          "total": 22,
+          "covered": 14
+        }
+      },
+      "src/casebooks/casebookStore.ts": {
+        "lines": {
+          "total": 134,
+          "covered": 83
+        },
+        "functions": {
+          "total": 28,
+          "covered": 19
+        },
+        "branches": {
+          "total": 51,
+          "covered": 17
+        },
+        "statements": {
+          "total": 147,
+          "covered": 83
+        }
+      },
+      "src/cgx/cgxApi.ts": {
+        "lines": {
+          "total": 42,
+          "covered": 17
+        },
+        "functions": {
+          "total": 13,
+          "covered": 3
+        },
+        "branches": {
+          "total": 30,
+          "covered": 8
+        },
+        "statements": {
+          "total": 55,
+          "covered": 17
+        }
+      },
+      "src/cgx/cgxBuilder.ts": {
+        "lines": {
+          "total": 170,
+          "covered": 110
+        },
+        "functions": {
+          "total": 33,
+          "covered": 17
+        },
+        "branches": {
+          "total": 78,
+          "covered": 33
+        },
+        "statements": {
+          "total": 199,
+          "covered": 116
+        }
+      },
+      "src/cgx/cgxCli.ts": {
+        "lines": {
+          "total": 9,
+          "covered": 1
+        },
+        "functions": {
+          "total": 9,
+          "covered": 1
+        },
+        "statements": {
+          "total": 12,
+          "covered": 1
+        }
+      },
+      "src/cgx/cgxStore.ts": {
+        "lines": {
+          "total": 60,
+          "covered": 40
+        },
+        "functions": {
+          "total": 29,
+          "covered": 22
+        },
+        "branches": {
+          "total": 28,
+          "covered": 15
+        },
+        "statements": {
+          "total": 74,
+          "covered": 46
+        }
+      },
+      "src/ci/gate.ts": {
+        "lines": {
+          "total": 300,
+          "covered": 201
+        },
+        "functions": {
+          "total": 56,
+          "covered": 31
+        },
+        "branches": {
+          "total": 273,
+          "covered": 163
+        },
+        "statements": {
+          "total": 383,
+          "covered": 211
+        }
+      },
+      "src/claims/claimConfidence.ts": {
+        "lines": {
+          "total": 154,
+          "covered": 151
+        },
+        "statements": {
+          "total": 167,
+          "covered": 164
+        }
+      },
+      "src/cli-agent-guide-commands.ts": {
+        "lines": {
+          "total": 30,
+          "covered": 6
+        },
+        "functions": {
+          "total": 8,
+          "covered": 3
+        },
+        "branches": {
+          "total": 23,
+          "covered": 4
+        },
+        "statements": {
+          "total": 33,
+          "covered": 6
+        }
+      },
+      "src/cli-agent-options.ts": {
+        "lines": {
+          "total": 170,
+          "covered": 144
+        },
+        "functions": {
+          "total": 38,
+          "covered": 31
+        },
+        "branches": {
+          "total": 166,
+          "covered": 129
+        },
+        "statements": {
+          "total": 199,
+          "covered": 170
+        }
+      },
+      "src/cli-native-schedule-commands.ts": {
+        "lines": {
+          "total": 108,
+          "covered": 96
+        },
+        "functions": {
+          "total": 24,
+          "covered": 14
+        }
+      },
+      "src/codemode/codeModeRunner.ts": {
+        "statements": {
+          "total": 179,
+          "covered": 171
+        }
+      },
+      "src/codemode/runCodeTool.ts": {
+        "statements": {
+          "total": 33,
+          "covered": 29
+        }
+      },
+      "src/compliance/dataResidency.ts": {
+        "lines": {
+          "total": 196,
+          "covered": 175
+        },
+        "functions": {
+          "total": 48,
+          "covered": 43
+        },
+        "branches": {
+          "total": 175,
+          "covered": 143
+        },
+        "statements": {
+          "total": 230,
+          "covered": 206
+        }
+      },
+      "src/compliance/privacyRedaction.ts": {
+        "lines": {
+          "total": 49,
+          "covered": 47
+        }
+      },
+      "src/config/amcConfigCli.ts": {
+        "lines": {
+          "total": 33,
+          "covered": 16
+        },
+        "branches": {
+          "total": 24,
+          "covered": 9
+        },
+        "statements": {
+          "total": 36,
+          "covered": 16
+        }
+      },
+      "src/config/amcConfigLoader.ts": {
+        "functions": {
+          "total": 11,
+          "covered": 9
+        }
+      },
+      "src/correlation/correlationAudits.ts": {
+        "branches": {
+          "total": 4,
+          "covered": 3
+        }
+      },
+      "src/credentials/localCredentialsService.ts": {
+        "branches": {
+          "total": 28,
+          "covered": 25
+        }
+      },
+      "src/crypto/keyHistoryEnvelope.ts": {
+        "lines": {
+          "total": 45,
+          "covered": 43
+        }
+      },
+      "src/crypto/keyRotationReceipt.ts": {
+        "lines": {
+          "total": 15,
+          "covered": 13
+        },
+        "branches": {
+          "total": 11,
+          "covered": 8
+        },
+        "statements": {
+          "total": 18,
+          "covered": 14
+        }
+      },
+      "src/crypto/signing/signer.ts": {
+        "functions": {
+          "total": 36,
+          "covered": 31
+        }
+      },
+      "src/diagnostic/audits.ts": {
+        "lines": {
+          "total": 124,
+          "covered": 93
+        },
+        "branches": {
+          "total": 117,
+          "covered": 79
+        },
+        "statements": {
+          "total": 126,
+          "covered": 95
+        }
+      },
+      "src/diagnostic/autoAnswer/autoAnswerEngine.ts": {
+        "lines": {
+          "total": 16,
+          "covered": 15
+        },
+        "branches": {
+          "total": 15,
+          "covered": 11
+        },
+        "statements": {
+          "total": 28,
+          "covered": 27
+        }
+      },
+      "src/diagnostic/autoAnswer/traceEvidenceMapper.ts": {
+        "lines": {
+          "total": 52,
+          "covered": 51
+        }
+      },
+      "src/diagnostic/bank/bankApi.ts": {
+        "branches": {
+          "total": 5,
+          "covered": 0
+        }
+      },
+      "src/diagnostic/bank/bankLoader.ts": {
+        "lines": {
+          "total": 56,
+          "covered": 25
+        },
+        "functions": {
+          "total": 17,
+          "covered": 8
+        },
+        "branches": {
+          "total": 27,
+          "covered": 4
+        },
+        "statements": {
+          "total": 91,
+          "covered": 38
+        }
+      },
+      "src/diagnostic/confidenceControls.ts": {
+        "statements": {
+          "total": 37,
+          "covered": 36
+        }
+      },
+      "src/diagnostic/gates.ts": {
+        "lines": {
+          "total": 88,
+          "covered": 83
+        },
+        "functions": {
+          "total": 24,
+          "covered": 22
+        },
+        "branches": {
+          "total": 98,
+          "covered": 87
+        },
+        "statements": {
+          "total": 102,
+          "covered": 96
+        }
+      },
+      "src/diagnostic/metaConfidence.ts": {
+        "statements": {
+          "total": 55,
+          "covered": 52
+        }
+      },
+      "src/diagnostic/questionExplain.ts": {
+        "lines": {
+          "total": 32,
+          "covered": 25
+        },
+        "functions": {
+          "total": 16,
+          "covered": 14
+        },
+        "branches": {
+          "total": 18,
+          "covered": 7
+        },
+        "statements": {
+          "total": 39,
+          "covered": 30
+        }
+      },
+      "src/diagnostic/rapidQuickscore.ts": {
+        "lines": {
+          "total": 44,
+          "covered": 32
+        },
+        "functions": {
+          "total": 14,
+          "covered": 12
+        },
+        "branches": {
+          "total": 32,
+          "covered": 19
+        },
+        "statements": {
+          "total": 49,
+          "covered": 36
+        }
+      },
+      "src/diagnostic/runReportResolution.ts": {
+        "functions": {
+          "total": 31,
+          "covered": 28
+        }
+      },
+      "src/diagnostic/runner.ts": {
+        "lines": {
+          "total": 747,
+          "covered": 549
+        },
+        "functions": {
+          "total": 134,
+          "covered": 104
+        },
+        "branches": {
+          "total": 832,
+          "covered": 526
+        },
+        "statements": {
+          "total": 799,
+          "covered": 592
+        }
+      },
+      "src/doctor/doctorLiveProbe.ts": {
+        "branches": {
+          "total": 39,
+          "covered": 35
+        },
+        "statements": {
+          "total": 48,
+          "covered": 47
+        }
+      },
+      "src/domains/deepIndustryPacks.ts": {
+        "branches": {
+          "total": 8,
+          "covered": 7
+        }
+      },
+      "src/domains/domainApply.ts": {
+        "functions": {
+          "total": 21,
+          "covered": 19
+        }
+      },
+      "src/domains/domainRegistry.ts": {
+        "branches": {
+          "total": 10,
+          "covered": 9
+        }
+      },
+      "src/domains/industryPackAudit.ts": {
+        "lines": {
+          "total": 198,
+          "covered": 197
+        },
+        "statements": {
+          "total": 228,
+          "covered": 224
+        }
+      },
+      "src/domains/industryPacks.ts": {
+        "lines": {
+          "total": 31,
+          "covered": 25
+        },
+        "statements": {
+          "total": 34,
+          "covered": 28
+        }
+      },
+      "src/drift/alerts.ts": {
+        "lines": {
+          "total": 109,
+          "covered": 70
+        },
+        "functions": {
+          "total": 24,
+          "covered": 17
+        },
+        "branches": {
+          "total": 46,
+          "covered": 26
+        },
+        "statements": {
+          "total": 143,
+          "covered": 80
+        }
+      },
+      "src/eval/costLatencyAssertions.ts": {
+        "lines": {
+          "total": 129,
+          "covered": 121
+        }
+      },
+      "src/eval/effectAutoAgentReplayCorpus.ts": {
+        "functions": {
+          "total": 26,
+          "covered": 25
+        },
+        "statements": {
+          "total": 129,
+          "covered": 114
+        }
+      },
+      "src/eval/evalImporters.ts": {
+        "functions": {
+          "total": 141,
+          "covered": 116
+        }
+      },
+      "src/eval/evalRunCli.ts": {
+        "lines": {
+          "total": 86,
+          "covered": 8
+        },
+        "statements": {
+          "total": 88,
+          "covered": 10
+        }
+      },
+      "src/eval/judgeCalibration.ts": {
+        "lines": {
+          "total": 309,
+          "covered": 299
+        },
+        "statements": {
+          "total": 341,
+          "covered": 328
+        }
+      },
+      "src/evidence/auditPacket.ts": {
+        "lines": {
+          "total": 137,
+          "covered": 125
+        },
+        "functions": {
+          "total": 23,
+          "covered": 21
+        },
+        "branches": {
+          "total": 84,
+          "covered": 48
+        },
+        "statements": {
+          "total": 229,
+          "covered": 190
+        }
+      },
+      "src/experiments/architectureExperiment.ts": {
+        "functions": {
+          "total": 33,
+          "covered": 32
+        }
+      },
+      "src/experiments/experimentCli.ts": {
+        "branches": {
+          "total": 27,
+          "covered": 16
+        }
+      },
+      "src/extensions/nativeExtensionRuntime.ts": {
+        "branches": {
+          "total": 49,
+          "covered": 41
+        }
+      },
+      "src/extensions/nativeExtensionStore.ts": {
+        "lines": {
+          "total": 261,
+          "covered": 110
+        },
+        "functions": {
+          "total": 26,
+          "covered": 11
+        },
+        "branches": {
+          "total": 213,
+          "covered": 63
+        },
+        "statements": {
+          "total": 385,
+          "covered": 124
+        }
+      },
+      "src/federation/federationCli.ts": {
+        "lines": {
+          "total": 40,
+          "covered": 8
+        },
+        "branches": {
+          "total": 11,
+          "covered": 0
+        },
+        "statements": {
+          "total": 54,
+          "covered": 11
+        }
+      },
+      "src/fleet/delegationPacket.ts": {
+        "lines": {
+          "total": 22,
+          "covered": 19
+        },
+        "branches": {
+          "total": 34,
+          "covered": 27
+        },
+        "statements": {
+          "total": 23,
+          "covered": 20
+        }
+      },
+      "src/fleet/fleetScoring.ts": {
+        "functions": {
+          "total": 38,
+          "covered": 32
+        }
+      },
+      "src/fleet/registry.ts": {
+        "lines": {
+          "total": 171,
+          "covered": 96
+        },
+        "functions": {
+          "total": 48,
+          "covered": 21
+        },
+        "branches": {
+          "total": 114,
+          "covered": 39
+        },
+        "statements": {
+          "total": 199,
+          "covered": 104
+        }
+      },
+      "src/forecast/advisoryGenerator.ts": {
+        "branches": {
+          "total": 41,
+          "covered": 32
+        },
+        "statements": {
+          "total": 39,
+          "covered": 34
+        }
+      },
+      "src/forecast/forecastCli.ts": {
+        "lines": {
+          "total": 54,
+          "covered": 9
+        },
+        "branches": {
+          "total": 37,
+          "covered": 1
+        },
+        "statements": {
+          "total": 72,
+          "covered": 9
+        }
+      },
+      "src/forecast/forecastStore.ts": {
+        "lines": {
+          "total": 78,
+          "covered": 55
+        },
+        "statements": {
+          "total": 122,
+          "covered": 81
+        }
+      },
+      "src/forecast/leadingIndicators.ts": {
+        "statements": {
+          "total": 57,
+          "covered": 50
+        }
+      },
+      "src/gateway/config.ts": {
+        "lines": {
+          "total": 132,
+          "covered": 64
+        },
+        "functions": {
+          "total": 29,
+          "covered": 18
+        },
+        "branches": {
+          "total": 97,
+          "covered": 33
+        },
+        "statements": {
+          "total": 146,
+          "covered": 71
+        }
+      },
+      "src/gateway/redaction.ts": {
+        "functions": {
+          "total": 21,
+          "covered": 19
+        }
+      },
+      "src/governor/canaryRegisters.ts": {
+        "branches": {
+          "total": 46,
+          "covered": 41
+        },
+        "statements": {
+          "total": 100,
+          "covered": 97
+        }
+      },
+      "src/governor/policyCanary.ts": {
+        "lines": {
+          "total": 181,
+          "covered": 154
+        },
+        "functions": {
+          "total": 42,
+          "covered": 37
+        },
+        "branches": {
+          "total": 103,
+          "covered": 85
+        },
+        "statements": {
+          "total": 206,
+          "covered": 170
+        }
+      },
+      "src/governor/policyDebt.ts": {
+        "statements": {
+          "total": 137,
+          "covered": 36
+        }
+      },
+      "src/guide/fixCli.ts": {
+        "lines": {
+          "total": 78,
+          "covered": 2
+        },
+        "statements": {
+          "total": 80,
+          "covered": 2
+        }
+      },
+      "src/guide/guideGenerator.ts": {
+        "lines": {
+          "total": 524,
+          "covered": 480
+        },
+        "functions": {
+          "total": 53,
+          "covered": 51
+        },
+        "branches": {
+          "total": 347,
+          "covered": 225
+        },
+        "statements": {
+          "total": 600,
+          "covered": 533
+        }
+      },
+      "src/guide/oneClickFix.ts": {
+        "lines": {
+          "total": 63,
+          "covered": 57
+        },
+        "functions": {
+          "total": 17,
+          "covered": 16
+        },
+        "branches": {
+          "total": 55,
+          "covered": 41
+        },
+        "statements": {
+          "total": 71,
+          "covered": 65
+        }
+      },
+      "src/identity/oidc/jwtVerify.ts": {
+        "functions": {
+          "total": 29,
+          "covered": 27
+        }
+      },
+      "src/identity/oidc/oidcClient.ts": {
+        "lines": {
+          "total": 48,
+          "covered": 38
+        },
+        "statements": {
+          "total": 50,
+          "covered": 39
+        }
+      },
+      "src/identity/oidc/oidcRoutes.ts": {
+        "functions": {
+          "total": 7,
+          "covered": 5
+        },
+        "branches": {
+          "total": 31,
+          "covered": 19
+        }
+      },
+      "src/importers/piSessionImport.ts": {
+        "statements": {
+          "total": 224,
+          "covered": 212
+        }
+      },
+      "src/incidents/autoAssembly.ts": {
+        "functions": {
+          "total": 26,
+          "covered": 22
+        }
+      },
+      "src/ingest/ingest.ts": {
+        "lines": {
+          "total": 109,
+          "covered": 68
+        },
+        "functions": {
+          "total": 33,
+          "covered": 23
+        },
+        "statements": {
+          "total": 135,
+          "covered": 80
+        }
+      },
+      "src/integrations/integrationDeliveryQueue.ts": {
+        "functions": {
+          "total": 67,
+          "covered": 41
+        }
+      },
+      "src/integrations/integrationDeliveryStore.ts": {
+        "lines": {
+          "total": 97,
+          "covered": 68
+        },
+        "functions": {
+          "total": 32,
+          "covered": 18
+        },
+        "branches": {
+          "total": 50,
+          "covered": 27
+        },
+        "statements": {
+          "total": 113,
+          "covered": 74
+        }
+      },
+      "src/integrations/integrationDispatcher.ts": {
+        "lines": {
+          "total": 216,
+          "covered": 185
+        },
+        "functions": {
+          "total": 58,
+          "covered": 42
+        },
+        "statements": {
+          "total": 265,
+          "covered": 222
+        }
+      },
+      "src/integrations/integrationStore.ts": {
+        "lines": {
+          "total": 82,
+          "covered": 36
+        },
+        "functions": {
+          "total": 13,
+          "covered": 9
+        },
+        "branches": {
+          "total": 28,
+          "covered": 9
+        },
+        "statements": {
+          "total": 92,
+          "covered": 36
+        }
+      },
+      "src/integrations/integrationsCli.ts": {
+        "lines": {
+          "total": 18,
+          "covered": 3
+        },
+        "functions": {
+          "total": 14,
+          "covered": 1
+        },
+        "statements": {
+          "total": 19,
+          "covered": 3
+        }
+      },
+      "src/integrations/noCodeGovernanceCli.ts": {
+        "lines": {
+          "total": 2,
+          "covered": 1
+        },
+        "functions": {
+          "total": 2,
+          "covered": 1
+        },
+        "branches": {
+          "total": 1,
+          "covered": 0
+        },
+        "statements": {
+          "total": 2,
+          "covered": 1
+        }
+      },
+      "src/integrations/noCodeGovernanceStore.ts": {
+        "lines": {
+          "total": 77,
+          "covered": 37
+        },
+        "functions": {
+          "total": 28,
+          "covered": 13
+        },
+        "branches": {
+          "total": 35,
+          "covered": 13
+        },
+        "statements": {
+          "total": 112,
+          "covered": 49
+        }
+      },
+      "src/jobs/jobRegistry.ts": {
+        "statements": {
+          "total": 246,
+          "covered": 219
+        }
+      },
+      "src/kernel/agentLoopRunner.ts": {
+        "functions": {
+          "total": 25,
+          "covered": 23
+        }
+      },
+      "src/kernel/services/agentLoopServices.ts": {
+        "branches": {
+          "total": 20,
+          "covered": 16
+        }
+      },
+      "src/kernel/services/llmServices.ts": {
+        "lines": {
+          "total": 18,
+          "covered": 17
+        },
+        "functions": {
+          "total": 11,
+          "covered": 10
+        },
+        "statements": {
+          "total": 18,
+          "covered": 17
+        }
+      },
+      "src/kernel/services/toolServices.ts": {
+        "branches": {
+          "total": 10,
+          "covered": 0
+        }
+      },
+      "src/lab/cognitionLab.ts": {
+        "lines": {
+          "total": 246,
+          "covered": 170
+        },
+        "functions": {
+          "total": 72,
+          "covered": 51
+        },
+        "branches": {
+          "total": 173,
+          "covered": 94
+        },
+        "statements": {
+          "total": 313,
+          "covered": 195
+        }
+      },
+      "src/leases/leaseCli.ts": {
+        "lines": {
+          "total": 52,
+          "covered": 41
+        },
+        "functions": {
+          "total": 15,
+          "covered": 13
+        },
+        "statements": {
+          "total": 55,
+          "covered": 42
+        }
+      },
+      "src/leases/leaseSigner.ts": {
+        "lines": {
+          "total": 68,
+          "covered": 58
+        },
+        "functions": {
+          "total": 14,
+          "covered": 13
+        },
+        "branches": {
+          "total": 68,
+          "covered": 47
+        },
+        "statements": {
+          "total": 109,
+          "covered": 80
+        }
+      },
+      "src/leases/leaseStore.ts": {
+        "lines": {
+          "total": 258,
+          "covered": 205
+        },
+        "functions": {
+          "total": 67,
+          "covered": 62
+        },
+        "branches": {
+          "total": 237,
+          "covered": 163
+        },
+        "statements": {
+          "total": 334,
+          "covered": 258
+        }
+      },
+      "src/ledger/ledgerConnection.ts": {
+        "lines": {
+          "total": 27,
+          "covered": 26
+        },
+        "statements": {
+          "total": 29,
+          "covered": 28
+        }
+      },
+      "src/ledger/ledgerSessionTransactions.ts": {
+        "branches": {
+          "total": 22,
+          "covered": 21
+        },
+        "statements": {
+          "total": 27,
+          "covered": 26
+        }
+      },
+      "src/lifecycle/artifactSignature.ts": {
+        "statements": {
+          "total": 70,
+          "covered": 66
+        }
+      },
+      "src/lifecycle/signedControlJournal.ts": {
+        "functions": {
+          "total": 8,
+          "covered": 7
+        }
+      },
+      "src/llm/adapter/adapterRegistry.ts": {
+        "branches": {
+          "total": 86,
+          "covered": 79
+        },
+        "statements": {
+          "total": 89,
+          "covered": 87
+        }
+      },
+      "src/llm/adapter/llmRuntime.ts": {
+        "lines": {
+          "total": 124,
+          "covered": 118
+        },
+        "statements": {
+          "total": 131,
+          "covered": 124
+        }
+      },
+      "src/llm/providers/ollamaAdapter.ts": {
+        "statements": {
+          "total": 176,
+          "covered": 147
+        }
+      },
+      "src/mcp/nativeMcpClient.ts": {
+        "lines": {
+          "total": 339,
+          "covered": 331
+        }
+      },
+      "src/mcp/nativeMcpHttpTransport.ts": {
+        "lines": {
+          "total": 399,
+          "covered": 373
+        },
+        "functions": {
+          "total": 70,
+          "covered": 65
+        },
+        "branches": {
+          "total": 470,
+          "covered": 390
+        },
+        "statements": {
+          "total": 554,
+          "covered": 481
+        }
+      },
+      "src/mechanic/executionEngine.ts": {
+        "lines": {
+          "total": 91,
+          "covered": 57
+        },
+        "functions": {
+          "total": 25,
+          "covered": 18
+        },
+        "branches": {
+          "total": 30,
+          "covered": 14
+        },
+        "statements": {
+          "total": 166,
+          "covered": 105
+        }
+      },
+      "src/mechanic/gapAnalysis.ts": {
+        "branches": {
+          "total": 88,
+          "covered": 64
+        }
+      },
+      "src/mechanic/planStore.ts": {
+        "branches": {
+          "total": 29,
+          "covered": 12
+        }
+      },
+      "src/mechanic/profiles.ts": {
+        "lines": {
+          "total": 65,
+          "covered": 47
+        },
+        "functions": {
+          "total": 25,
+          "covered": 15
+        },
+        "branches": {
+          "total": 60,
+          "covered": 42
+        },
+        "statements": {
+          "total": 102,
+          "covered": 69
+        }
+      },
+      "src/mechanic/simulator.ts": {
+        "lines": {
+          "total": 27,
+          "covered": 20
+        },
+        "functions": {
+          "total": 13,
+          "covered": 10
+        },
+        "branches": {
+          "total": 7,
+          "covered": 3
+        },
+        "statements": {
+          "total": 32,
+          "covered": 22
+        }
+      },
+      "src/mechanic/targetsStore.ts": {
+        "lines": {
+          "total": 82,
+          "covered": 52
+        },
+        "functions": {
+          "total": 24,
+          "covered": 17
+        },
+        "statements": {
+          "total": 94,
+          "covered": 59
+        }
+      },
+      "src/mechanic/tuningStore.ts": {
+        "lines": {
+          "total": 24,
+          "covered": 14
+        },
+        "functions": {
+          "total": 14,
+          "covered": 7
+        },
+        "branches": {
+          "total": 8,
+          "covered": 4
+        },
+        "statements": {
+          "total": 29,
+          "covered": 15
+        }
+      },
+      "src/mechanic/upgradePlanner.ts": {
+        "lines": {
+          "total": 112,
+          "covered": 94
+        },
+        "functions": {
+          "total": 37,
+          "covered": 35
+        },
+        "branches": {
+          "total": 112,
+          "covered": 74
+        },
+        "statements": {
+          "total": 149,
+          "covered": 115
+        }
+      },
+      "src/mirofish/engine.ts": {
+        "lines": {
+          "total": 128,
+          "covered": 127
+        }
+      },
+      "src/notary/notaryAttestation.ts": {
+        "lines": {
+          "total": 81,
+          "covered": 74
+        },
+        "statements": {
+          "total": 85,
+          "covered": 78
+        }
+      },
+      "src/notary/notaryLog.ts": {
+        "statements": {
+          "total": 138,
+          "covered": 123
+        }
+      },
+      "src/observability/anomalyDetector.ts": {
+        "lines": {
+          "total": 98,
+          "covered": 91
+        }
+      },
+      "src/observability/evalTracing.ts": {
+        "lines": {
+          "total": 34,
+          "covered": 28
+        },
+        "functions": {
+          "total": 5,
+          "covered": 4
+        },
+        "branches": {
+          "total": 18,
+          "covered": 12
+        },
+        "statements": {
+          "total": 35,
+          "covered": 28
+        }
+      },
+      "src/observability/riskCostLatencySlo.ts": {
+        "lines": {
+          "total": 119,
+          "covered": 113
+        },
+        "statements": {
+          "total": 143,
+          "covered": 125
+        }
+      },
+      "src/observability/sessionCorrelator.ts": {
+        "functions": {
+          "total": 51,
+          "covered": 45
+        }
+      },
+      "src/observability/timeline.ts": {
+        "lines": {
+          "total": 102,
+          "covered": 96
+        },
+        "functions": {
+          "total": 31,
+          "covered": 30
+        }
+      },
+      "src/ops/audit.ts": {
+        "lines": {
+          "total": 13,
+          "covered": 12
+        },
+        "branches": {
+          "total": 8,
+          "covered": 5
+        },
+        "statements": {
+          "total": 18,
+          "covered": 15
         }
       },
       "src/ops/backup/backupEngine.ts": {
@@ -48,14 +2144,370 @@
           "covered": 172
         }
       },
-      "src/prompt/promptPackApi.ts": {
+      "src/ops/latencyAccounting.ts": {
         "lines": {
-          "total": 281,
-          "covered": 160
+          "total": 64,
+          "covered": 48
+        }
+      },
+      "src/ops/maintenance/logRotation.ts": {
+        "lines": {
+          "total": 35,
+          "covered": 28
         },
         "statements": {
-          "total": 289,
-          "covered": 165
+          "total": 36,
+          "covered": 28
+        }
+      },
+      "src/ops/operatorUx.ts": {
+        "lines": {
+          "total": 253,
+          "covered": 235
+        },
+        "branches": {
+          "total": 153,
+          "covered": 111
+        },
+        "statements": {
+          "total": 283,
+          "covered": 261
+        }
+      },
+      "src/ops/overheadAccounting.ts": {
+        "lines": {
+          "total": 133,
+          "covered": 124
+        }
+      },
+      "src/ops/policy.ts": {
+        "lines": {
+          "total": 162,
+          "covered": 71
+        },
+        "functions": {
+          "total": 48,
+          "covered": 21
+        },
+        "branches": {
+          "total": 107,
+          "covered": 53
+        },
+        "statements": {
+          "total": 236,
+          "covered": 96
+        }
+      },
+      "src/ops/retention/retentionCli.ts": {
+        "lines": {
+          "total": 5,
+          "covered": 4
+        },
+        "functions": {
+          "total": 5,
+          "covered": 4
+        },
+        "statements": {
+          "total": 5,
+          "covered": 4
+        }
+      },
+      "src/ops/retention/retentionEngine.ts": {
+        "lines": {
+          "total": 34,
+          "covered": 32
+        },
+        "branches": {
+          "total": 22,
+          "covered": 13
+        },
+        "statements": {
+          "total": 34,
+          "covered": 32
+        }
+      },
+      "src/org/orgApi.ts": {
+        "lines": {
+          "total": 42,
+          "covered": 20
+        },
+        "functions": {
+          "total": 10,
+          "covered": 4
+        },
+        "branches": {
+          "total": 28,
+          "covered": 8
+        },
+        "statements": {
+          "total": 47,
+          "covered": 20
+        }
+      },
+      "src/org/orgCli.ts": {
+        "lines": {
+          "total": 67,
+          "covered": 13
+        },
+        "functions": {
+          "total": 22,
+          "covered": 4
+        },
+        "branches": {
+          "total": 20,
+          "covered": 3
+        },
+        "statements": {
+          "total": 74,
+          "covered": 13
+        }
+      },
+      "src/org/orgCommitments.ts": {
+        "lines": {
+          "total": 77,
+          "covered": 31
+        },
+        "functions": {
+          "total": 25,
+          "covered": 8
+        },
+        "branches": {
+          "total": 17,
+          "covered": 2
+        },
+        "statements": {
+          "total": 95,
+          "covered": 35
+        }
+      },
+      "src/org/orgStore.ts": {
+        "lines": {
+          "total": 115,
+          "covered": 67
+        },
+        "functions": {
+          "total": 49,
+          "covered": 31
+        },
+        "branches": {
+          "total": 77,
+          "covered": 41
+        },
+        "statements": {
+          "total": 158,
+          "covered": 91
+        }
+      },
+      "src/outcomes/outcomeContractEngine.ts": {
+        "functions": {
+          "total": 29,
+          "covered": 26
+        }
+      },
+      "src/pairing/lanMode.ts": {
+        "lines": {
+          "total": 124,
+          "covered": 32
+        },
+        "functions": {
+          "total": 24,
+          "covered": 8
+        },
+        "branches": {
+          "total": 100,
+          "covered": 16
+        },
+        "statements": {
+          "total": 154,
+          "covered": 32
+        }
+      },
+      "src/pairing/pairingApi.ts": {
+        "lines": {
+          "total": 14,
+          "covered": 11
+        },
+        "functions": {
+          "total": 6,
+          "covered": 4
+        },
+        "branches": {
+          "total": 13,
+          "covered": 10
+        },
+        "statements": {
+          "total": 14,
+          "covered": 11
+        }
+      },
+      "src/passport/adapterCapabilityReceipt.ts": {
+        "functions": {
+          "total": 40,
+          "covered": 38
+        }
+      },
+      "src/passport/passportApi.ts": {
+        "lines": {
+          "total": 202,
+          "covered": 116
+        },
+        "functions": {
+          "total": 61,
+          "covered": 37
+        },
+        "branches": {
+          "total": 114,
+          "covered": 58
+        },
+        "statements": {
+          "total": 257,
+          "covered": 134
+        }
+      },
+      "src/passport/passportCli.ts": {
+        "lines": {
+          "total": 115,
+          "covered": 54
+        },
+        "branches": {
+          "total": 114,
+          "covered": 36
+        },
+        "statements": {
+          "total": 166,
+          "covered": 55
+        }
+      },
+      "src/passport/passportSigner.ts": {
+        "functions": {
+          "total": 5,
+          "covered": 4
+        }
+      },
+      "src/persistence/openSessionEventStore.ts": {
+        "lines": {
+          "total": 35,
+          "covered": 34
+        },
+        "statements": {
+          "total": 38,
+          "covered": 37
+        }
+      },
+      "src/plugins/nativeExecutablePolicy.ts": {
+        "lines": {
+          "total": 231,
+          "covered": 58
+        },
+        "functions": {
+          "total": 43,
+          "covered": 16
+        },
+        "branches": {
+          "total": 220,
+          "covered": 47
+        },
+        "statements": {
+          "total": 352,
+          "covered": 67
+        }
+      },
+      "src/plugins/pluginStore.ts": {
+        "lines": {
+          "total": 48,
+          "covered": 46
+        },
+        "statements": {
+          "total": 48,
+          "covered": 46
+        }
+      },
+      "src/plugins/pluginVerifier.ts": {
+        "branches": {
+          "total": 19,
+          "covered": 13
+        }
+      },
+      "src/policyPacks/packApply.ts": {
+        "lines": {
+          "total": 67,
+          "covered": 61
+        },
+        "statements": {
+          "total": 89,
+          "covered": 80
+        }
+      },
+      "src/policyPacks/packCli.ts": {
+        "functions": {
+          "total": 6,
+          "covered": 3
+        }
+      },
+      "src/presets/agentPresets.ts": {
+        "lines": {
+          "total": 54,
+          "covered": 51
+        },
+        "statements": {
+          "total": 74,
+          "covered": 70
+        }
+      },
+      "src/product/asyncCallback.ts": {
+        "statements": {
+          "total": 52,
+          "covered": 21
+        }
+      },
+      "src/product/toolCostEstimator.ts": {
+        "statements": {
+          "total": 31,
+          "covered": 30
+        }
+      },
+      "src/prompt/context/contextPreStep.ts": {
+        "branches": {
+          "total": 32,
+          "covered": 31
+        }
+      },
+      "src/prompt/context/instructionFiles.ts": {
+        "lines": {
+          "total": 96,
+          "covered": 90
+        },
+        "branches": {
+          "total": 85,
+          "covered": 69
+        },
+        "statements": {
+          "total": 110,
+          "covered": 96
+        }
+      },
+      "src/prompt/promptPackApi.ts": {
+        "lines": {
+          "total": 190,
+          "covered": 84
+        },
+        "statements": {
+          "total": 195,
+          "covered": 86
+        },
+        "functions": {
+          "total": 44,
+          "covered": 20
+        },
+        "branches": {
+          "total": 177,
+          "covered": 76
+        }
+      },
+      "src/prompt/promptPackStore.ts": {
+        "lines": {
+          "total": 44,
+          "covered": 29
         }
       },
       "src/prompt/promptPackVerifier.ts": {
@@ -72,10 +2524,72 @@
           "covered": 27
         }
       },
+      "src/prompt/promptPolicyStore.ts": {
+        "lines": {
+          "total": 57,
+          "covered": 33
+        },
+        "functions": {
+          "total": 25,
+          "covered": 18
+        },
+        "branches": {
+          "total": 19,
+          "covered": 4
+        },
+        "statements": {
+          "total": 69,
+          "covered": 35
+        }
+      },
+      "src/redteam/mcpAgentProvider.ts": {
+        "branches": {
+          "total": 74,
+          "covered": 33
+        }
+      },
       "src/release/releaseProvenance.ts": {
         "branches": {
           "total": 15,
           "covered": 11
+        }
+      },
+      "src/release/releaseSigner.ts": {
+        "lines": {
+          "total": 45,
+          "covered": 10
+        },
+        "statements": {
+          "total": 45,
+          "covered": 10
+        }
+      },
+      "src/sandbox/nativeSandboxBinding.ts": {
+        "lines": {
+          "total": 43,
+          "covered": 41
+        },
+        "functions": {
+          "total": 8,
+          "covered": 7
+        },
+        "branches": {
+          "total": 64,
+          "covered": 56
+        },
+        "statements": {
+          "total": 47,
+          "covered": 42
+        }
+      },
+      "src/sandbox/nativeSandboxPolicy.ts": {
+        "branches": {
+          "total": 46,
+          "covered": 41
+        },
+        "statements": {
+          "total": 46,
+          "covered": 41
         }
       },
       "src/sandbox/seatbeltBackend.ts": {
@@ -96,10 +2610,406 @@
           "covered": 14
         }
       },
+      "src/score/crossAgentTrust.ts": {
+        "lines": {
+          "total": 182,
+          "covered": 178
+        },
+        "statements": {
+          "total": 223,
+          "covered": 210
+        }
+      },
+      "src/score/densityMap.ts": {
+        "lines": {
+          "total": 47,
+          "covered": 46
+        },
+        "statements": {
+          "total": 58,
+          "covered": 57
+        }
+      },
+      "src/score/domainPacks.ts": {
+        "functions": {
+          "total": 6,
+          "covered": 5
+        },
+        "branches": {
+          "total": 18,
+          "covered": 12
+        },
+        "statements": {
+          "total": 35,
+          "covered": 33
+        }
+      },
+      "src/score/factuality.ts": {
+        "lines": {
+          "total": 73,
+          "covered": 71
+        },
+        "statements": {
+          "total": 88,
+          "covered": 85
+        }
+      },
+      "src/score/failSecureGovernance.ts": {
+        "branches": {
+          "total": 54,
+          "covered": 51
+        }
+      },
+      "src/score/humanOversightQuality.ts": {
+        "lines": {
+          "total": 226,
+          "covered": 214
+        },
+        "statements": {
+          "total": 248,
+          "covered": 235
+        }
+      },
+      "src/score/interpretability.ts": {
+        "branches": {
+          "total": 59,
+          "covered": 53
+        }
+      },
+      "src/score/pauseQuality.ts": {
+        "branches": {
+          "total": 55,
+          "covered": 49
+        }
+      },
+      "src/score/statisticalAnalysis.ts": {
+        "lines": {
+          "total": 131,
+          "covered": 130
+        }
+      },
+      "src/sdk/nativeAgentClient.ts": {
+        "lines": {
+          "total": 395,
+          "covered": 372
+        }
+      },
       "src/session/approvalEventMeta.ts": {
         "branches": {
           "total": 74,
           "covered": 56
+        }
+      },
+      "src/session/sessionOwnership.ts": {
+        "branches": {
+          "total": 157,
+          "covered": 140
+        }
+      },
+      "src/session/sessionRecovery.ts": {
+        "lines": {
+          "total": 227,
+          "covered": 213
+        },
+        "branches": {
+          "total": 158,
+          "covered": 126
+        },
+        "statements": {
+          "total": 246,
+          "covered": 226
+        }
+      },
+      "src/session/sessionSpine.ts": {
+        "lines": {
+          "total": 130,
+          "covered": 117
+        },
+        "functions": {
+          "total": 24,
+          "covered": 21
+        },
+        "branches": {
+          "total": 114,
+          "covered": 81
+        },
+        "statements": {
+          "total": 144,
+          "covered": 122
+        }
+      },
+      "src/session/spill/spillEncryption.ts": {
+        "lines": {
+          "total": 96,
+          "covered": 87
+        },
+        "branches": {
+          "total": 87,
+          "covered": 73
+        },
+        "statements": {
+          "total": 110,
+          "covered": 94
+        }
+      },
+      "src/session/spill/spillLifecycle.ts": {
+        "branches": {
+          "total": 172,
+          "covered": 145
+        }
+      },
+      "src/session/spill/spillStore.ts": {
+        "lines": {
+          "total": 168,
+          "covered": 155
+        },
+        "functions": {
+          "total": 30,
+          "covered": 26
+        }
+      },
+      "src/session/surfaceCompaction.ts": {
+        "lines": {
+          "total": 89,
+          "covered": 84
+        }
+      },
+      "src/session/surfaceCompactionValidation.ts": {
+        "lines": {
+          "total": 79,
+          "covered": 73
+        }
+      },
+      "src/setup/nativeInteractiveSession.ts": {
+        "functions": {
+          "total": 35,
+          "covered": 25
+        }
+      },
+      "src/setup/nativeMcpConfig.ts": {
+        "lines": {
+          "total": 170,
+          "covered": 143
+        },
+        "functions": {
+          "total": 31,
+          "covered": 29
+        },
+        "branches": {
+          "total": 254,
+          "covered": 169
+        },
+        "statements": {
+          "total": 221,
+          "covered": 176
+        }
+      },
+      "src/setup/nativeValidationConfig.ts": {
+        "branches": {
+          "total": 101,
+          "covered": 97
+        },
+        "statements": {
+          "total": 98,
+          "covered": 94
+        }
+      },
+      "src/setup/setupWizard.ts": {
+        "lines": {
+          "total": 176,
+          "covered": 117
+        },
+        "functions": {
+          "total": 37,
+          "covered": 24
+        },
+        "branches": {
+          "total": 106,
+          "covered": 65
+        },
+        "statements": {
+          "total": 190,
+          "covered": 123
+        }
+      },
+      "src/simulator/targetWhatIf.ts": {
+        "lines": {
+          "total": 52,
+          "covered": 32
+        },
+        "functions": {
+          "total": 15,
+          "covered": 4
+        },
+        "branches": {
+          "total": 42,
+          "covered": 21
+        },
+        "statements": {
+          "total": 60,
+          "covered": 33
+        }
+      },
+      "src/skills/skillCatalog.ts": {
+        "lines": {
+          "total": 112,
+          "covered": 94
+        },
+        "branches": {
+          "total": 101,
+          "covered": 62
+        },
+        "statements": {
+          "total": 149,
+          "covered": 111
+        }
+      },
+      "src/skills/skillTurn.ts": {
+        "lines": {
+          "total": 32,
+          "covered": 29
+        },
+        "functions": {
+          "total": 5,
+          "covered": 4
+        },
+        "branches": {
+          "total": 28,
+          "covered": 21
+        },
+        "statements": {
+          "total": 51,
+          "covered": 45
+        }
+      },
+      "src/standard/standardApi.ts": {
+        "lines": {
+          "total": 29,
+          "covered": 2
+        },
+        "functions": {
+          "total": 12,
+          "covered": 1
+        },
+        "branches": {
+          "total": 2,
+          "covered": 0
+        },
+        "statements": {
+          "total": 45,
+          "covered": 2
+        }
+      },
+      "src/standard/standardGenerator.ts": {
+        "lines": {
+          "total": 51,
+          "covered": 29
+        },
+        "functions": {
+          "total": 17,
+          "covered": 12
+        },
+        "branches": {
+          "total": 36,
+          "covered": 16
+        },
+        "statements": {
+          "total": 56,
+          "covered": 30
+        }
+      },
+      "src/steer/parameterMatrix.ts": {
+        "lines": {
+          "total": 53,
+          "covered": 52
+        },
+        "statements": {
+          "total": 61,
+          "covered": 60
+        }
+      },
+      "src/steer/research/eval_feedback_convergence.ts": {
+        "lines": {
+          "total": 57,
+          "covered": 49
+        },
+        "functions": {
+          "total": 11,
+          "covered": 9
+        },
+        "statements": {
+          "total": 62,
+          "covered": 54
+        }
+      },
+      "src/steer/research/eval_scoring_calibration.ts": {
+        "lines": {
+          "total": 42,
+          "covered": 41
+        }
+      },
+      "src/storage/blobs/blobKeys.ts": {
+        "lines": {
+          "total": 182,
+          "covered": 82
+        },
+        "functions": {
+          "total": 38,
+          "covered": 19
+        },
+        "branches": {
+          "total": 97,
+          "covered": 34
+        },
+        "statements": {
+          "total": 234,
+          "covered": 85
+        }
+      },
+      "src/storage/consolidation/guardEventConsolidation.ts": {
+        "branches": {
+          "total": 35,
+          "covered": 30
+        }
+      },
+      "src/storage/nativeGuard.ts": {
+        "lines": {
+          "total": 76,
+          "covered": 53
+        },
+        "branches": {
+          "total": 96,
+          "covered": 57
+        },
+        "statements": {
+          "total": 102,
+          "covered": 64
+        }
+      },
+      "src/storage/workspaceRecordStore.ts": {
+        "lines": {
+          "total": 219,
+          "covered": 215
+        }
+      },
+      "src/studio/apiDelegation.ts": {
+        "lines": {
+          "total": 52,
+          "covered": 44
+        },
+        "branches": {
+          "total": 72,
+          "covered": 60
+        },
+        "statements": {
+          "total": 53,
+          "covered": 44
+        }
+      },
+      "src/studio/connectWizard.ts": {
+        "branches": {
+          "total": 35,
+          "covered": 31
         }
       },
       "src/studio/nativeTaskProjection.ts": {
@@ -120,6 +3030,64 @@
           "covered": 52
         }
       },
+      "src/studio/nativeTaskService.ts": {
+        "lines": {
+          "total": 427,
+          "covered": 294
+        },
+        "functions": {
+          "total": 76,
+          "covered": 54
+        },
+        "branches": {
+          "total": 678,
+          "covered": 395
+        },
+        "statements": {
+          "total": 650,
+          "covered": 407
+        }
+      },
+      "src/studio/signatures.ts": {
+        "lines": {
+          "total": 106,
+          "covered": 33
+        },
+        "functions": {
+          "total": 21,
+          "covered": 2
+        },
+        "branches": {
+          "total": 45,
+          "covered": 10
+        },
+        "statements": {
+          "total": 144,
+          "covered": 33
+        }
+      },
+      "src/studio/studioServer.ts": {
+        "functions": {
+          "total": 319,
+          "covered": 124
+        }
+      },
+      "src/studio/studioState.ts": {
+        "functions": {
+          "total": 32,
+          "covered": 27
+        }
+      },
+      "src/targets/targetProfile.ts": {
+        "lines": {
+          "total": 49,
+          "covered": 29
+        },
+        "statements": {
+          "total": 50,
+          "covered": 29
+        }
+      },
       "src/terminal/nativePtySandbox.ts": {
         "lines": {
           "total": 85,
@@ -138,6 +3106,452 @@
           "covered": 3
         }
       },
+      "src/terminal/nativeTerminal.ts": {
+        "branches": {
+          "total": 61,
+          "covered": 52
+        },
+        "statements": {
+          "total": 95,
+          "covered": 86
+        }
+      },
+      "src/toolhub/protectedPaths.ts": {
+        "lines": {
+          "total": 36,
+          "covered": 35
+        },
+        "statements": {
+          "total": 52,
+          "covered": 51
+        }
+      },
+      "src/toolhub/toolhubCli.ts": {
+        "lines": {
+          "total": 18,
+          "covered": 15
+        },
+        "functions": {
+          "total": 6,
+          "covered": 4
+        },
+        "branches": {
+          "total": 11,
+          "covered": 7
+        },
+        "statements": {
+          "total": 18,
+          "covered": 15
+        }
+      },
+      "src/toolhub/toolhubExecutors/http.ts": {
+        "lines": {
+          "total": 47,
+          "covered": 38
+        },
+        "functions": {
+          "total": 11,
+          "covered": 8
+        },
+        "statements": {
+          "total": 60,
+          "covered": 43
+        }
+      },
+      "src/toolhub/toolhubReceipts.ts": {
+        "lines": {
+          "total": 25,
+          "covered": 16
+        },
+        "functions": {
+          "total": 4,
+          "covered": 3
+        },
+        "branches": {
+          "total": 46,
+          "covered": 22
+        },
+        "statements": {
+          "total": 27,
+          "covered": 17
+        }
+      },
+      "src/toolhub/toolhubServer.ts": {
+        "branches": {
+          "total": 283,
+          "covered": 189
+        }
+      },
+      "src/toolhub/toolhubValidators.ts": {
+        "lines": {
+          "total": 217,
+          "covered": 201
+        },
+        "statements": {
+          "total": 269,
+          "covered": 249
+        }
+      },
+      "src/toolhub/toolsSchema.ts": {
+        "lines": {
+          "total": 17,
+          "covered": 14
+        },
+        "functions": {
+          "total": 6,
+          "covered": 3
+        },
+        "branches": {
+          "total": 15,
+          "covered": 13
+        },
+        "statements": {
+          "total": 18,
+          "covered": 14
+        }
+      },
+      "src/tools/builtin/readBeforeEdit.ts": {
+        "branches": {
+          "total": 14,
+          "covered": 12
+        }
+      },
+      "src/tools/builtin/searchTools.ts": {
+        "lines": {
+          "total": 27,
+          "covered": 3
+        },
+        "functions": {
+          "total": 14,
+          "covered": 1
+        },
+        "branches": {
+          "total": 10,
+          "covered": 0
+        },
+        "statements": {
+          "total": 40,
+          "covered": 3
+        }
+      },
+      "src/tools/builtin/workspaceWalk.ts": {
+        "lines": {
+          "total": 127,
+          "covered": 72
+        },
+        "functions": {
+          "total": 10,
+          "covered": 6
+        },
+        "branches": {
+          "total": 158,
+          "covered": 59
+        },
+        "statements": {
+          "total": 171,
+          "covered": 78
+        }
+      },
+      "src/tools/executors/toolhubTools.ts": {
+        "lines": {
+          "total": 24,
+          "covered": 20
+        },
+        "functions": {
+          "total": 8,
+          "covered": 7
+        },
+        "branches": {
+          "total": 34,
+          "covered": 20
+        },
+        "statements": {
+          "total": 27,
+          "covered": 21
+        }
+      },
+      "src/tools/guards/policyGuards.ts": {
+        "lines": {
+          "total": 44,
+          "covered": 43
+        },
+        "branches": {
+          "total": 63,
+          "covered": 53
+        },
+        "statements": {
+          "total": 51,
+          "covered": 49
+        }
+      },
+      "src/tools/toolArguments.ts": {
+        "lines": {
+          "total": 29,
+          "covered": 28
+        },
+        "branches": {
+          "total": 25,
+          "covered": 21
+        },
+        "statements": {
+          "total": 34,
+          "covered": 32
+        }
+      },
+      "src/tools/toolEvidence.ts": {
+        "statements": {
+          "total": 39,
+          "covered": 38
+        }
+      },
+      "src/tools/toolPipeline.ts": {
+        "lines": {
+          "total": 262,
+          "covered": 253
+        },
+        "branches": {
+          "total": 262,
+          "covered": 246
+        },
+        "statements": {
+          "total": 310,
+          "covered": 294
+        }
+      },
+      "src/transformation/transformApi.ts": {
+        "lines": {
+          "total": 24,
+          "covered": 1
+        },
+        "functions": {
+          "total": 17,
+          "covered": 1
+        },
+        "statements": {
+          "total": 24,
+          "covered": 1
+        }
+      },
+      "src/transformation/transformCli.ts": {
+        "lines": {
+          "total": 36,
+          "covered": 15
+        },
+        "functions": {
+          "total": 17,
+          "covered": 3
+        },
+        "statements": {
+          "total": 41,
+          "covered": 15
+        }
+      },
+      "src/transformation/transformPlanner.ts": {
+        "lines": {
+          "total": 208,
+          "covered": 144
+        },
+        "functions": {
+          "total": 45,
+          "covered": 28
+        },
+        "statements": {
+          "total": 226,
+          "covered": 154
+        }
+      },
+      "src/transformation/transformTasks.ts": {
+        "branches": {
+          "total": 31,
+          "covered": 23
+        }
+      },
+      "src/transparency/merkle.ts": {
+        "branches": {
+          "total": 35,
+          "covered": 31
+        }
+      },
+      "src/transparency/merkleIndexState.ts": {
+        "functions": {
+          "total": 12,
+          "covered": 11
+        },
+        "statements": {
+          "total": 67,
+          "covered": 57
+        }
+      },
+      "src/transparency/merkleIndexStore.ts": {
+        "lines": {
+          "total": 235,
+          "covered": 190
+        },
+        "functions": {
+          "total": 39,
+          "covered": 32
+        },
+        "statements": {
+          "total": 251,
+          "covered": 199
+        }
+      },
+      "src/transparency/sessionAnchorVerify.ts": {
+        "lines": {
+          "total": 64,
+          "covered": 57
+        },
+        "branches": {
+          "total": 38,
+          "covered": 32
+        },
+        "statements": {
+          "total": 64,
+          "covered": 57
+        }
+      },
+      "src/transparency/sessionRootDescriptor.ts": {
+        "branches": {
+          "total": 72,
+          "covered": 61
+        }
+      },
+      "src/transparency/transparencyMerkleCli.ts": {
+        "branches": {
+          "total": 10,
+          "covered": 6
+        }
+      },
+      "src/transparency/transparencyReportCli.ts": {
+        "lines": {
+          "total": 42,
+          "covered": 4
+        },
+        "statements": {
+          "total": 44,
+          "covered": 5
+        }
+      },
+      "src/trust/trustConfig.ts": {
+        "lines": {
+          "total": 141,
+          "covered": 87
+        },
+        "functions": {
+          "total": 22,
+          "covered": 18
+        },
+        "branches": {
+          "total": 94,
+          "covered": 47
+        },
+        "statements": {
+          "total": 147,
+          "covered": 89
+        }
+      },
+      "src/tuning/upgradeEngine.ts": {
+        "lines": {
+          "total": 56,
+          "covered": 52
+        },
+        "functions": {
+          "total": 29,
+          "covered": 25
+        },
+        "statements": {
+          "total": 59,
+          "covered": 55
+        }
+      },
+      "src/unified/unifiedRenderer.ts": {
+        "branches": {
+          "total": 44,
+          "covered": 24
+        },
+        "statements": {
+          "total": 94,
+          "covered": 73
+        }
+      },
+      "src/utils/json.ts": {
+        "branches": {
+          "total": 36,
+          "covered": 35
+        },
+        "statements": {
+          "total": 47,
+          "covered": 46
+        }
+      },
+      "src/value/valueApi.ts": {
+        "lines": {
+          "total": 203,
+          "covered": 48
+        },
+        "functions": {
+          "total": 48,
+          "covered": 11
+        },
+        "branches": {
+          "total": 158,
+          "covered": 25
+        },
+        "statements": {
+          "total": 272,
+          "covered": 48
+        }
+      },
+      "src/value/valueEvidenceGates.ts": {
+        "lines": {
+          "total": 18,
+          "covered": 15
+        },
+        "statements": {
+          "total": 21,
+          "covered": 18
+        }
+      },
+      "src/value/valueScoring.ts": {
+        "lines": {
+          "total": 74,
+          "covered": 68
+        },
+        "statements": {
+          "total": 90,
+          "covered": 84
+        }
+      },
+      "src/value/valueStore.ts": {
+        "lines": {
+          "total": 167,
+          "covered": 119
+        },
+        "functions": {
+          "total": 63,
+          "covered": 48
+        },
+        "branches": {
+          "total": 85,
+          "covered": 57
+        },
+        "statements": {
+          "total": 194,
+          "covered": 137
+        }
+      },
+      "src/values/valueCoherence.ts": {
+        "lines": {
+          "total": 122,
+          "covered": 120
+        }
+      },
+      "src/vault/dlp.ts": {
+        "branches": {
+          "total": 54,
+          "covered": 45
+        }
+      },
       "src/vault/passphraseStore.ts": {
         "branches": {
           "total": 39,
@@ -154,8 +3568,74 @@
           "covered": 159
         },
         "statements": {
-          "total": 290,
-          "covered": 261
+          "total": 447,
+          "covered": 402
+        }
+      },
+      "src/watch/overrideNearMissAnalytics.ts": {
+        "lines": {
+          "total": 122,
+          "covered": 117
+        },
+        "functions": {
+          "total": 55,
+          "covered": 54
+        },
+        "statements": {
+          "total": 142,
+          "covered": 124
+        }
+      },
+      "src/watch/ragTextGenerationLiveDrift.ts": {
+        "statements": {
+          "total": 45,
+          "covered": 41
+        }
+      },
+      "src/wire/wireListener.ts": {
+        "branches": {
+          "total": 24,
+          "covered": 18
+        }
+      },
+      "src/wire/wireMethods.ts": {
+        "branches": {
+          "total": 12,
+          "covered": 9
+        }
+      },
+      "src/workflow/workflowPlan.ts": {
+        "lines": {
+          "total": 72,
+          "covered": 69
+        },
+        "statements": {
+          "total": 96,
+          "covered": 87
+        }
+      },
+      "src/workflow/workflowRunner.ts": {
+        "lines": {
+          "total": 108,
+          "covered": 107
+        },
+        "statements": {
+          "total": 144,
+          "covered": 141
+        }
+      },
+      "src/workspaces/workspaceManager.ts": {
+        "lines": {
+          "total": 118,
+          "covered": 76
+        },
+        "branches": {
+          "total": 104,
+          "covered": 39
+        },
+        "statements": {
+          "total": 121,
+          "covered": 76
         }
       }
     }
@@ -34377,6 +37857,3228 @@
       "statements": {
         "total": 39,
         "covered": 25
+      }
+    },
+    "packages/verifier/src/records/evidence.ts": {
+      "lines": {
+        "total": 23,
+        "covered": 23
+      },
+      "functions": {
+        "total": 2,
+        "covered": 2
+      },
+      "branches": {
+        "total": 6,
+        "covered": 3
+      },
+      "statements": {
+        "total": 25,
+        "covered": 24
+      }
+    },
+    "packages/verifier/src/records/trustList.ts": {
+      "lines": {
+        "total": 28,
+        "covered": 13
+      },
+      "functions": {
+        "total": 12,
+        "covered": 6
+      },
+      "branches": {
+        "total": 20,
+        "covered": 8
+      },
+      "statements": {
+        "total": 34,
+        "covered": 16
+      }
+    },
+    "src/cli-a4-commands.ts": {
+      "lines": {
+        "total": 314,
+        "covered": 153
+      },
+      "functions": {
+        "total": 95,
+        "covered": 40
+      },
+      "branches": {
+        "total": 256,
+        "covered": 68
+      },
+      "statements": {
+        "total": 385,
+        "covered": 174
+      }
+    },
+    "src/cli-incident-clocks.ts": {
+      "lines": {
+        "total": 6,
+        "covered": 0
+      },
+      "functions": {
+        "total": 2,
+        "covered": 0
+      },
+      "branches": {
+        "total": 2,
+        "covered": 0
+      },
+      "statements": {
+        "total": 9,
+        "covered": 0
+      }
+    },
+    "src/cli-legal-hold.ts": {
+      "lines": {
+        "total": 39,
+        "covered": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0
+      },
+      "branches": {
+        "total": 36,
+        "covered": 0
+      },
+      "statements": {
+        "total": 42,
+        "covered": 0
+      }
+    },
+    "src/cli-lifecycle-governance-commands.ts": {
+      "lines": {
+        "total": 28,
+        "covered": 0
+      },
+      "functions": {
+        "total": 5,
+        "covered": 0
+      },
+      "branches": {
+        "total": 30,
+        "covered": 0
+      },
+      "statements": {
+        "total": 30,
+        "covered": 0
+      }
+    },
+    "src/cli-trust-resign-command.ts": {
+      "lines": {
+        "total": 18,
+        "covered": 0
+      },
+      "functions": {
+        "total": 3,
+        "covered": 0
+      },
+      "branches": {
+        "total": 8,
+        "covered": 0
+      },
+      "statements": {
+        "total": 20,
+        "covered": 0
+      }
+    },
+    "src/cli-verify-repair.ts": {
+      "lines": {
+        "total": 60,
+        "covered": 0
+      },
+      "functions": {
+        "total": 11,
+        "covered": 0
+      },
+      "branches": {
+        "total": 42,
+        "covered": 0
+      },
+      "statements": {
+        "total": 70,
+        "covered": 0
+      }
+    },
+    "src/cli-workload-trust-commands.ts": {
+      "lines": {
+        "total": 21,
+        "covered": 19
+      },
+      "functions": {
+        "total": 9,
+        "covered": 7
+      },
+      "branches": {
+        "total": 12,
+        "covered": 5
+      },
+      "statements": {
+        "total": 21,
+        "covered": 19
+      }
+    },
+    "src/workspaceColdOrgPrerequisites.ts": {
+      "lines": {
+        "total": 42,
+        "covered": 20
+      },
+      "functions": {
+        "total": 17,
+        "covered": 7
+      },
+      "branches": {
+        "total": 53,
+        "covered": 16
+      },
+      "statements": {
+        "total": 96,
+        "covered": 36
+      }
+    },
+    "src/workspaceInitializationAsync.ts": {
+      "lines": {
+        "total": 6,
+        "covered": 6
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 7,
+        "covered": 4
+      },
+      "statements": {
+        "total": 8,
+        "covered": 7
+      }
+    },
+    "src/workspaceMatureInitialization.ts": {
+      "lines": {
+        "total": 154,
+        "covered": 32
+      },
+      "functions": {
+        "total": 32,
+        "covered": 1
+      },
+      "branches": {
+        "total": 149,
+        "covered": 11
+      },
+      "statements": {
+        "total": 284,
+        "covered": 44
+      }
+    },
+    "src/a4/a4AuditReader.ts": {
+      "lines": {
+        "total": 28,
+        "covered": 24
+      },
+      "functions": {
+        "total": 6,
+        "covered": 4
+      },
+      "branches": {
+        "total": 33,
+        "covered": 26
+      },
+      "statements": {
+        "total": 34,
+        "covered": 25
+      }
+    },
+    "src/a4/a4Binder.ts": {
+      "lines": {
+        "total": 71,
+        "covered": 63
+      },
+      "functions": {
+        "total": 33,
+        "covered": 19
+      },
+      "branches": {
+        "total": 60,
+        "covered": 33
+      },
+      "statements": {
+        "total": 97,
+        "covered": 74
+      }
+    },
+    "src/a4/a4Blobs.ts": {
+      "lines": {
+        "total": 80,
+        "covered": 71
+      },
+      "functions": {
+        "total": 18,
+        "covered": 17
+      },
+      "branches": {
+        "total": 54,
+        "covered": 31
+      },
+      "statements": {
+        "total": 96,
+        "covered": 79
+      }
+    },
+    "src/a4/a4Conformance.ts": {
+      "lines": {
+        "total": 130,
+        "covered": 96
+      },
+      "functions": {
+        "total": 31,
+        "covered": 23
+      },
+      "branches": {
+        "total": 172,
+        "covered": 84
+      },
+      "statements": {
+        "total": 161,
+        "covered": 107
+      }
+    },
+    "src/a4/a4Deploy.ts": {
+      "lines": {
+        "total": 152,
+        "covered": 119
+      },
+      "functions": {
+        "total": 45,
+        "covered": 31
+      },
+      "branches": {
+        "total": 185,
+        "covered": 114
+      },
+      "statements": {
+        "total": 190,
+        "covered": 139
+      }
+    },
+    "src/a4/a4DeployVerify.ts": {
+      "lines": {
+        "total": 105,
+        "covered": 71
+      },
+      "functions": {
+        "total": 23,
+        "covered": 13
+      },
+      "branches": {
+        "total": 114,
+        "covered": 68
+      },
+      "statements": {
+        "total": 118,
+        "covered": 77
+      }
+    },
+    "src/a4/a4Effects.ts": {
+      "lines": {
+        "total": 297,
+        "covered": 218
+      },
+      "functions": {
+        "total": 87,
+        "covered": 62
+      },
+      "branches": {
+        "total": 284,
+        "covered": 151
+      },
+      "statements": {
+        "total": 379,
+        "covered": 257
+      }
+    },
+    "src/a4/a4Erasure.ts": {
+      "lines": {
+        "total": 16,
+        "covered": 14
+      },
+      "functions": {
+        "total": 4,
+        "covered": 4
+      },
+      "branches": {
+        "total": 12,
+        "covered": 5
+      },
+      "statements": {
+        "total": 21,
+        "covered": 17
+      }
+    },
+    "src/a4/a4Events.ts": {
+      "lines": {
+        "total": 19,
+        "covered": 3
+      },
+      "functions": {
+        "total": 2,
+        "covered": 0
+      },
+      "branches": {
+        "total": 14,
+        "covered": 0
+      },
+      "statements": {
+        "total": 24,
+        "covered": 3
+      }
+    },
+    "src/a4/a4Evidence.ts": {
+      "lines": {
+        "total": 98,
+        "covered": 81
+      },
+      "functions": {
+        "total": 18,
+        "covered": 13
+      },
+      "branches": {
+        "total": 144,
+        "covered": 103
+      },
+      "statements": {
+        "total": 121,
+        "covered": 96
+      }
+    },
+    "src/a4/a4Mechanic.ts": {
+      "lines": {
+        "total": 49,
+        "covered": 27
+      },
+      "functions": {
+        "total": 17,
+        "covered": 11
+      },
+      "branches": {
+        "total": 34,
+        "covered": 17
+      },
+      "statements": {
+        "total": 66,
+        "covered": 37
+      }
+    },
+    "src/a4/a4Monitor.ts": {
+      "lines": {
+        "total": 79,
+        "covered": 69
+      },
+      "functions": {
+        "total": 25,
+        "covered": 23
+      },
+      "branches": {
+        "total": 66,
+        "covered": 36
+      },
+      "statements": {
+        "total": 94,
+        "covered": 82
+      }
+    },
+    "src/a4/a4Package.ts": {
+      "lines": {
+        "total": 343,
+        "covered": 298
+      },
+      "functions": {
+        "total": 102,
+        "covered": 89
+      },
+      "branches": {
+        "total": 281,
+        "covered": 159
+      },
+      "statements": {
+        "total": 438,
+        "covered": 347
+      }
+    },
+    "src/a4/a4Preflight.ts": {
+      "lines": {
+        "total": 12,
+        "covered": 8
+      },
+      "functions": {
+        "total": 5,
+        "covered": 4
+      },
+      "branches": {
+        "total": 10,
+        "covered": 1
+      },
+      "statements": {
+        "total": 17,
+        "covered": 10
+      }
+    },
+    "src/a4/a4Presence.ts": {
+      "lines": {
+        "total": 11,
+        "covered": 3
+      },
+      "functions": {
+        "total": 5,
+        "covered": 0
+      },
+      "branches": {
+        "total": 14,
+        "covered": 0
+      },
+      "statements": {
+        "total": 18,
+        "covered": 3
+      }
+    },
+    "src/a4/a4Rollback.ts": {
+      "lines": {
+        "total": 167,
+        "covered": 127
+      },
+      "functions": {
+        "total": 46,
+        "covered": 33
+      },
+      "branches": {
+        "total": 160,
+        "covered": 55
+      },
+      "statements": {
+        "total": 204,
+        "covered": 144
+      }
+    },
+    "src/a4/a4Router.ts": {
+      "lines": {
+        "total": 365,
+        "covered": 260
+      },
+      "functions": {
+        "total": 83,
+        "covered": 63
+      },
+      "branches": {
+        "total": 354,
+        "covered": 203
+      },
+      "statements": {
+        "total": 445,
+        "covered": 295
+      }
+    },
+    "src/a4/a4RouterError.ts": {
+      "lines": {
+        "total": 23,
+        "covered": 17
+      },
+      "functions": {
+        "total": 2,
+        "covered": 2
+      },
+      "branches": {
+        "total": 41,
+        "covered": 23
+      },
+      "statements": {
+        "total": 31,
+        "covered": 20
+      }
+    },
+    "src/a4/a4RouterReleases.ts": {
+      "lines": {
+        "total": 123,
+        "covered": 40
+      },
+      "functions": {
+        "total": 32,
+        "covered": 3
+      },
+      "branches": {
+        "total": 120,
+        "covered": 23
+      },
+      "statements": {
+        "total": 155,
+        "covered": 41
+      }
+    },
+    "src/a4/a4TransitionSigning.ts": {
+      "lines": {
+        "total": 108,
+        "covered": 87
+      },
+      "functions": {
+        "total": 19,
+        "covered": 17
+      },
+      "branches": {
+        "total": 133,
+        "covered": 70
+      },
+      "statements": {
+        "total": 161,
+        "covered": 111
+      }
+    },
+    "src/a4/a4UpdatePolicy.ts": {
+      "lines": {
+        "total": 18,
+        "covered": 8
+      },
+      "functions": {
+        "total": 5,
+        "covered": 3
+      },
+      "branches": {
+        "total": 15,
+        "covered": 1
+      },
+      "statements": {
+        "total": 21,
+        "covered": 10
+      }
+    },
+    "src/a4/a4Value.ts": {
+      "lines": {
+        "total": 126,
+        "covered": 76
+      },
+      "functions": {
+        "total": 45,
+        "covered": 25
+      },
+      "branches": {
+        "total": 139,
+        "covered": 34
+      },
+      "statements": {
+        "total": 162,
+        "covered": 93
+      }
+    },
+    "src/a4/a4Verify.ts": {
+      "lines": {
+        "total": 332,
+        "covered": 263
+      },
+      "functions": {
+        "total": 96,
+        "covered": 71
+      },
+      "branches": {
+        "total": 402,
+        "covered": 253
+      },
+      "statements": {
+        "total": 427,
+        "covered": 314
+      }
+    },
+    "src/a4/adaptMemoryPolicy.ts": {
+      "lines": {
+        "total": 62,
+        "covered": 53
+      },
+      "functions": {
+        "total": 14,
+        "covered": 9
+      },
+      "branches": {
+        "total": 47,
+        "covered": 17
+      },
+      "statements": {
+        "total": 73,
+        "covered": 56
+      }
+    },
+    "src/a4/adaptPermissions.ts": {
+      "lines": {
+        "total": 61,
+        "covered": 44
+      },
+      "functions": {
+        "total": 21,
+        "covered": 14
+      },
+      "branches": {
+        "total": 62,
+        "covered": 26
+      },
+      "statements": {
+        "total": 81,
+        "covered": 53
+      }
+    },
+    "src/a4/assembleBuild.ts": {
+      "lines": {
+        "total": 199,
+        "covered": 58
+      },
+      "functions": {
+        "total": 52,
+        "covered": 12
+      },
+      "branches": {
+        "total": 234,
+        "covered": 31
+      },
+      "statements": {
+        "total": 239,
+        "covered": 64
+      }
+    },
+    "src/a4/assembleConnect.ts": {
+      "lines": {
+        "total": 146,
+        "covered": 24
+      },
+      "functions": {
+        "total": 21,
+        "covered": 3
+      },
+      "branches": {
+        "total": 80,
+        "covered": 11
+      },
+      "statements": {
+        "total": 169,
+        "covered": 25
+      }
+    },
+    "src/a4/spec/assemble.ts": {
+      "lines": {
+        "total": 132,
+        "covered": 102
+      },
+      "functions": {
+        "total": 34,
+        "covered": 26
+      },
+      "branches": {
+        "total": 260,
+        "covered": 137
+      },
+      "statements": {
+        "total": 167,
+        "covered": 116
+      }
+    },
+    "src/a4/stages/activate.ts": {
+      "lines": {
+        "total": 83,
+        "covered": 79
+      },
+      "functions": {
+        "total": 34,
+        "covered": 32
+      },
+      "branches": {
+        "total": 63,
+        "covered": 28
+      },
+      "statements": {
+        "total": 105,
+        "covered": 95
+      }
+    },
+    "src/a4/stages/adapt.ts": {
+      "lines": {
+        "total": 219,
+        "covered": 198
+      },
+      "functions": {
+        "total": 64,
+        "covered": 57
+      },
+      "branches": {
+        "total": 193,
+        "covered": 107
+      },
+      "statements": {
+        "total": 254,
+        "covered": 220
+      }
+    },
+    "src/a4/stages/aspire.ts": {
+      "lines": {
+        "total": 338,
+        "covered": 251
+      },
+      "functions": {
+        "total": 95,
+        "covered": 73
+      },
+      "branches": {
+        "total": 310,
+        "covered": 124
+      },
+      "statements": {
+        "total": 414,
+        "covered": 289
+      }
+    },
+    "src/a4/stages/assemble.ts": {
+      "lines": {
+        "total": 134,
+        "covered": 113
+      },
+      "functions": {
+        "total": 52,
+        "covered": 34
+      },
+      "branches": {
+        "total": 214,
+        "covered": 107
+      },
+      "statements": {
+        "total": 158,
+        "covered": 124
+      }
+    },
+    "src/a4/stages/common.ts": {
+      "lines": {
+        "total": 9,
+        "covered": 8
+      },
+      "functions": {
+        "total": 5,
+        "covered": 5
+      },
+      "branches": {
+        "total": 2,
+        "covered": 1
+      },
+      "statements": {
+        "total": 11,
+        "covered": 10
+      }
+    },
+    "src/actions/actionCliCommands.ts": {
+      "lines": {
+        "total": 16,
+        "covered": 0
+      },
+      "functions": {
+        "total": 2,
+        "covered": 0
+      },
+      "branches": {
+        "total": 16,
+        "covered": 0
+      },
+      "statements": {
+        "total": 19,
+        "covered": 0
+      }
+    },
+    "src/adapters/hookCapabilityInspection.ts": {
+      "lines": {
+        "total": 74,
+        "covered": 58
+      },
+      "functions": {
+        "total": 11,
+        "covered": 8
+      },
+      "branches": {
+        "total": 84,
+        "covered": 45
+      },
+      "statements": {
+        "total": 112,
+        "covered": 75
+      }
+    },
+    "src/adapters/hookForwarder.ts": {
+      "lines": {
+        "total": 262,
+        "covered": 192
+      },
+      "functions": {
+        "total": 33,
+        "covered": 25
+      },
+      "branches": {
+        "total": 250,
+        "covered": 144
+      },
+      "statements": {
+        "total": 299,
+        "covered": 208
+      }
+    },
+    "src/adapters/codex/codexObserveForwarder.ts": {
+      "lines": {
+        "total": 18,
+        "covered": 7
+      },
+      "functions": {
+        "total": 5,
+        "covered": 1
+      },
+      "branches": {
+        "total": 12,
+        "covered": 2
+      },
+      "statements": {
+        "total": 21,
+        "covered": 7
+      }
+    },
+    "src/adapters/dsh/dshControlClient.ts": {
+      "lines": {
+        "total": 38,
+        "covered": 14
+      },
+      "functions": {
+        "total": 7,
+        "covered": 1
+      },
+      "branches": {
+        "total": 53,
+        "covered": 28
+      },
+      "statements": {
+        "total": 39,
+        "covered": 14
+      }
+    },
+    "src/adapters/dsh/dshVersions.ts": {
+      "lines": {
+        "total": 2,
+        "covered": 2
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 2,
+        "covered": 1
+      },
+      "statements": {
+        "total": 2,
+        "covered": 2
+      }
+    },
+    "src/adapters/pi/piInstall.ts": {
+      "lines": {
+        "total": 46,
+        "covered": 38
+      },
+      "functions": {
+        "total": 12,
+        "covered": 10
+      },
+      "branches": {
+        "total": 39,
+        "covered": 22
+      },
+      "statements": {
+        "total": 60,
+        "covered": 45
+      }
+    },
+    "src/api/operatorRouter.ts": {
+      "lines": {
+        "total": 73,
+        "covered": 41
+      },
+      "functions": {
+        "total": 7,
+        "covered": 6
+      },
+      "branches": {
+        "total": 75,
+        "covered": 37
+      },
+      "statements": {
+        "total": 83,
+        "covered": 44
+      }
+    },
+    "src/api/runHashPublication.ts": {
+      "lines": {
+        "total": 5,
+        "covered": 1
+      },
+      "functions": {
+        "total": 2,
+        "covered": 1
+      },
+      "branches": {
+        "total": 6,
+        "covered": 1
+      },
+      "statements": {
+        "total": 8,
+        "covered": 2
+      }
+    },
+    "src/archetypes/archetypePublication.ts": {
+      "lines": {
+        "total": 125,
+        "covered": 0
+      },
+      "functions": {
+        "total": 18,
+        "covered": 0
+      },
+      "branches": {
+        "total": 57,
+        "covered": 0
+      },
+      "statements": {
+        "total": 185,
+        "covered": 0
+      }
+    },
+    "src/artifact/artifactProvenanceSupport.ts": {
+      "lines": {
+        "total": 119,
+        "covered": 1
+      },
+      "functions": {
+        "total": 22,
+        "covered": 0
+      },
+      "branches": {
+        "total": 104,
+        "covered": 0
+      },
+      "statements": {
+        "total": 136,
+        "covered": 1
+      }
+    },
+    "src/assurance/assuranceWaiverPublication.ts": {
+      "lines": {
+        "total": 149,
+        "covered": 19
+      },
+      "functions": {
+        "total": 45,
+        "covered": 5
+      },
+      "branches": {
+        "total": 93,
+        "covered": 3
+      },
+      "statements": {
+        "total": 257,
+        "covered": 27
+      }
+    },
+    "src/assurance/executed/scope.ts": {
+      "lines": {
+        "total": 25,
+        "covered": 18
+      },
+      "functions": {
+        "total": 3,
+        "covered": 2
+      },
+      "branches": {
+        "total": 31,
+        "covered": 24
+      },
+      "statements": {
+        "total": 31,
+        "covered": 20
+      }
+    },
+    "src/assurance/judges/regulatedJudgeEvaluation.ts": {
+      "lines": {
+        "total": 8,
+        "covered": 8
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 2,
+        "covered": 1
+      },
+      "statements": {
+        "total": 9,
+        "covered": 8
+      }
+    },
+    "src/assurance/packs/industryPackManifest.ts": {
+      "lines": {
+        "total": 22,
+        "covered": 12
+      },
+      "functions": {
+        "total": 4,
+        "covered": 0
+      },
+      "branches": {
+        "total": 6,
+        "covered": 0
+      },
+      "statements": {
+        "total": 25,
+        "covered": 12
+      }
+    },
+    "src/audit/auditPolicyMapPublication.ts": {
+      "lines": {
+        "total": 93,
+        "covered": 15
+      },
+      "functions": {
+        "total": 42,
+        "covered": 5
+      },
+      "branches": {
+        "total": 131,
+        "covered": 8
+      },
+      "statements": {
+        "total": 205,
+        "covered": 32
+      }
+    },
+    "src/audit/binderArtifactAsync.ts": {
+      "lines": {
+        "total": 65,
+        "covered": 56
+      },
+      "functions": {
+        "total": 20,
+        "covered": 17
+      },
+      "branches": {
+        "total": 47,
+        "covered": 18
+      },
+      "statements": {
+        "total": 155,
+        "covered": 128
+      }
+    },
+    "src/audit/binderArtifactMembers.ts": {
+      "lines": {
+        "total": 50,
+        "covered": 50
+      },
+      "functions": {
+        "total": 7,
+        "covered": 7
+      },
+      "branches": {
+        "total": 34,
+        "covered": 19
+      },
+      "statements": {
+        "total": 66,
+        "covered": 63
+      }
+    },
+    "src/audit/binderConformanceRun.ts": {
+      "lines": {
+        "total": 36,
+        "covered": 7
+      },
+      "functions": {
+        "total": 13,
+        "covered": 2
+      },
+      "branches": {
+        "total": 22,
+        "covered": 3
+      },
+      "statements": {
+        "total": 47,
+        "covered": 10
+      }
+    },
+    "src/audit/binderDimensions.ts": {
+      "lines": {
+        "total": 26,
+        "covered": 13
+      },
+      "functions": {
+        "total": 2,
+        "covered": 1
+      },
+      "branches": {
+        "total": 20,
+        "covered": 9
+      },
+      "statements": {
+        "total": 26,
+        "covered": 13
+      }
+    },
+    "src/audit/binderFileVerification.ts": {
+      "lines": {
+        "total": 7,
+        "covered": 6
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 4,
+        "covered": 2
+      },
+      "statements": {
+        "total": 11,
+        "covered": 8
+      }
+    },
+    "src/audit/binderReadOnlyInputs.ts": {
+      "lines": {
+        "total": 8,
+        "covered": 3
+      },
+      "functions": {
+        "total": 4,
+        "covered": 3
+      },
+      "branches": {
+        "total": 2,
+        "covered": 0
+      },
+      "statements": {
+        "total": 8,
+        "covered": 3
+      }
+    },
+    "src/audit/binderRequestBoundary.ts": {
+      "lines": {
+        "total": 28,
+        "covered": 24
+      },
+      "functions": {
+        "total": 13,
+        "covered": 11
+      },
+      "branches": {
+        "total": 18,
+        "covered": 10
+      },
+      "statements": {
+        "total": 57,
+        "covered": 44
+      }
+    },
+    "src/audit/binderSchedulerPublication.ts": {
+      "lines": {
+        "total": 44,
+        "covered": 20
+      },
+      "functions": {
+        "total": 14,
+        "covered": 4
+      },
+      "branches": {
+        "total": 28,
+        "covered": 11
+      },
+      "statements": {
+        "total": 101,
+        "covered": 35
+      }
+    },
+    "src/audit/binderStatePublication.ts": {
+      "lines": {
+        "total": 16,
+        "covered": 0
+      },
+      "functions": {
+        "total": 8,
+        "covered": 0
+      },
+      "branches": {
+        "total": 4,
+        "covered": 0
+      },
+      "statements": {
+        "total": 34,
+        "covered": 0
+      }
+    },
+    "src/audit/evidenceRequestFulfillment.ts": {
+      "lines": {
+        "total": 58,
+        "covered": 52
+      },
+      "functions": {
+        "total": 16,
+        "covered": 14
+      },
+      "branches": {
+        "total": 42,
+        "covered": 16
+      },
+      "statements": {
+        "total": 134,
+        "covered": 121
+      }
+    },
+    "src/audit/evidenceRequestPublication.ts": {
+      "lines": {
+        "total": 128,
+        "covered": 95
+      },
+      "functions": {
+        "total": 35,
+        "covered": 30
+      },
+      "branches": {
+        "total": 123,
+        "covered": 63
+      },
+      "statements": {
+        "total": 256,
+        "covered": 183
+      }
+    },
+    "src/bench/benchArtifactAsync.ts": {
+      "lines": {
+        "total": 22,
+        "covered": 21
+      },
+      "functions": {
+        "total": 9,
+        "covered": 9
+      },
+      "branches": {
+        "total": 21,
+        "covered": 8
+      },
+      "statements": {
+        "total": 75,
+        "covered": 60
+      }
+    },
+    "src/bench/benchComparisonAsync.ts": {
+      "lines": {
+        "total": 12,
+        "covered": 11
+      },
+      "functions": {
+        "total": 4,
+        "covered": 3
+      },
+      "branches": {
+        "total": 17,
+        "covered": 6
+      },
+      "statements": {
+        "total": 40,
+        "covered": 35
+      }
+    },
+    "src/bench/benchImportLogAuthority.ts": {
+      "lines": {
+        "total": 16,
+        "covered": 0
+      },
+      "functions": {
+        "total": 4,
+        "covered": 0
+      },
+      "branches": {
+        "total": 25,
+        "covered": 0
+      },
+      "statements": {
+        "total": 32,
+        "covered": 0
+      }
+    },
+    "src/bench/benchPolicyAsync.ts": {
+      "lines": {
+        "total": 18,
+        "covered": 0
+      },
+      "functions": {
+        "total": 7,
+        "covered": 0
+      },
+      "branches": {
+        "total": 9,
+        "covered": 0
+      },
+      "statements": {
+        "total": 28,
+        "covered": 0
+      }
+    },
+    "src/bench/benchReadOnlyInputs.ts": {
+      "lines": {
+        "total": 18,
+        "covered": 10
+      },
+      "functions": {
+        "total": 9,
+        "covered": 4
+      },
+      "branches": {
+        "total": 21,
+        "covered": 7
+      },
+      "statements": {
+        "total": 35,
+        "covered": 15
+      }
+    },
+    "src/bootstrap/bootstrapProviderSuffix.ts": {
+      "lines": {
+        "total": 120,
+        "covered": 105
+      },
+      "functions": {
+        "total": 41,
+        "covered": 37
+      },
+      "branches": {
+        "total": 46,
+        "covered": 27
+      },
+      "statements": {
+        "total": 199,
+        "covered": 169
+      }
+    },
+    "src/bridge/codexObserveHttp.ts": {
+      "lines": {
+        "total": 25,
+        "covered": 22
+      },
+      "functions": {
+        "total": 4,
+        "covered": 3
+      },
+      "branches": {
+        "total": 22,
+        "covered": 12
+      },
+      "statements": {
+        "total": 31,
+        "covered": 24
+      }
+    },
+    "src/bundles/bundleA4.ts": {
+      "lines": {
+        "total": 115,
+        "covered": 111
+      },
+      "functions": {
+        "total": 44,
+        "covered": 42
+      },
+      "branches": {
+        "total": 70,
+        "covered": 41
+      },
+      "statements": {
+        "total": 154,
+        "covered": 140
+      }
+    },
+    "src/business/cliOptions.ts": {
+      "lines": {
+        "total": 22,
+        "covered": 0
+      },
+      "functions": {
+        "total": 4,
+        "covered": 0
+      },
+      "branches": {
+        "total": 20,
+        "covered": 0
+      },
+      "statements": {
+        "total": 22,
+        "covered": 0
+      }
+    },
+    "src/casebooks/casebookPublication.ts": {
+      "lines": {
+        "total": 75,
+        "covered": 0
+      },
+      "functions": {
+        "total": 26,
+        "covered": 0
+      },
+      "branches": {
+        "total": 49,
+        "covered": 0
+      },
+      "statements": {
+        "total": 125,
+        "covered": 0
+      }
+    },
+    "src/catalog/catalogCli.ts": {
+      "lines": {
+        "total": 60,
+        "covered": 38
+      },
+      "functions": {
+        "total": 15,
+        "covered": 8
+      },
+      "branches": {
+        "total": 48,
+        "covered": 23
+      },
+      "statements": {
+        "total": 80,
+        "covered": 45
+      }
+    },
+    "src/catalog/compiler/mergeStations.ts": {
+      "lines": {
+        "total": 70,
+        "covered": 19
+      },
+      "functions": {
+        "total": 28,
+        "covered": 3
+      },
+      "branches": {
+        "total": 90,
+        "covered": 10
+      },
+      "statements": {
+        "total": 108,
+        "covered": 22
+      }
+    },
+    "src/catalog/compiler/stationException.ts": {
+      "lines": {
+        "total": 27,
+        "covered": 3
+      },
+      "functions": {
+        "total": 7,
+        "covered": 0
+      },
+      "branches": {
+        "total": 29,
+        "covered": 0
+      },
+      "statements": {
+        "total": 35,
+        "covered": 3
+      }
+    },
+    "src/catalog/evidence/signedResults.ts": {
+      "lines": {
+        "total": 34,
+        "covered": 32
+      },
+      "functions": {
+        "total": 4,
+        "covered": 4
+      },
+      "branches": {
+        "total": 19,
+        "covered": 11
+      },
+      "statements": {
+        "total": 38,
+        "covered": 34
+      }
+    },
+    "src/ci/ciWorkflow.ts": {
+      "lines": {
+        "total": 17,
+        "covered": 17
+      },
+      "functions": {
+        "total": 3,
+        "covered": 3
+      },
+      "branches": {
+        "total": 6,
+        "covered": 3
+      },
+      "statements": {
+        "total": 17,
+        "covered": 17
+      }
+    },
+    "src/cli/claimLabelHooks.ts": {
+      "lines": {
+        "total": 22,
+        "covered": 0
+      },
+      "functions": {
+        "total": 5,
+        "covered": 0
+      },
+      "branches": {
+        "total": 22,
+        "covered": 0
+      },
+      "statements": {
+        "total": 26,
+        "covered": 0
+      }
+    },
+    "src/cli/claimOutput.ts": {
+      "lines": {
+        "total": 66,
+        "covered": 26
+      },
+      "functions": {
+        "total": 29,
+        "covered": 8
+      },
+      "branches": {
+        "total": 56,
+        "covered": 24
+      },
+      "statements": {
+        "total": 77,
+        "covered": 27
+      }
+    },
+    "src/cli/instantWorkspaceDiagnostic.ts": {
+      "lines": {
+        "total": 60,
+        "covered": 0
+      },
+      "functions": {
+        "total": 9,
+        "covered": 0
+      },
+      "branches": {
+        "total": 59,
+        "covered": 0
+      },
+      "statements": {
+        "total": 96,
+        "covered": 0
+      }
+    },
+    "src/cli/reportRenderers.ts": {
+      "lines": {
+        "total": 17,
+        "covered": 0
+      },
+      "functions": {
+        "total": 5,
+        "covered": 0
+      },
+      "branches": {
+        "total": 46,
+        "covered": 0
+      },
+      "statements": {
+        "total": 17,
+        "covered": 0
+      }
+    },
+    "src/cli/resultCommandRegistry.ts": {
+      "lines": {
+        "total": 11,
+        "covered": 8
+      },
+      "functions": {
+        "total": 7,
+        "covered": 4
+      },
+      "branches": {
+        "total": 7,
+        "covered": 2
+      },
+      "statements": {
+        "total": 14,
+        "covered": 11
+      }
+    },
+    "src/cli/scoreEvidenceOutput.ts": {
+      "lines": {
+        "total": 5,
+        "covered": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0
+      },
+      "branches": {
+        "total": 6,
+        "covered": 0
+      },
+      "statements": {
+        "total": 8,
+        "covered": 0
+      }
+    },
+    "src/cli/skillCatalogOptions.ts": {
+      "lines": {
+        "total": 19,
+        "covered": 4
+      },
+      "functions": {
+        "total": 3,
+        "covered": 1
+      },
+      "branches": {
+        "total": 30,
+        "covered": 3
+      },
+      "statements": {
+        "total": 30,
+        "covered": 5
+      }
+    },
+    "src/compliance/stationTags.ts": {
+      "lines": {
+        "total": 28,
+        "covered": 4
+      },
+      "functions": {
+        "total": 5,
+        "covered": 1
+      },
+      "branches": {
+        "total": 16,
+        "covered": 0
+      },
+      "statements": {
+        "total": 38,
+        "covered": 5
+      }
+    },
+    "src/config/amcConfigInitialization.ts": {
+      "lines": {
+        "total": 111,
+        "covered": 0
+      },
+      "functions": {
+        "total": 30,
+        "covered": 0
+      },
+      "branches": {
+        "total": 89,
+        "covered": 0
+      },
+      "statements": {
+        "total": 196,
+        "covered": 0
+      }
+    },
+    "src/contracts/index.ts": {
+      "lines": {
+        "total": 17,
+        "covered": 15
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8
+      },
+      "branches": {
+        "total": 7,
+        "covered": 2
+      },
+      "statements": {
+        "total": 18,
+        "covered": 16
+      }
+    },
+    "src/crypto/signing/verifiedArtifacts.ts": {
+      "lines": {
+        "total": 33,
+        "covered": 26
+      },
+      "functions": {
+        "total": 25,
+        "covered": 18
+      },
+      "branches": {
+        "total": 30,
+        "covered": 19
+      },
+      "statements": {
+        "total": 41,
+        "covered": 33
+      }
+    },
+    "src/dataflow/redactingSession.ts": {
+      "lines": {
+        "total": 134,
+        "covered": 101
+      },
+      "functions": {
+        "total": 40,
+        "covered": 30
+      },
+      "branches": {
+        "total": 157,
+        "covered": 83
+      },
+      "statements": {
+        "total": 190,
+        "covered": 122
+      }
+    },
+    "src/diagnostic/instantDiagnosticSnapshot.ts": {
+      "lines": {
+        "total": 29,
+        "covered": 0
+      },
+      "functions": {
+        "total": 4,
+        "covered": 0
+      },
+      "branches": {
+        "total": 20,
+        "covered": 0
+      },
+      "statements": {
+        "total": 44,
+        "covered": 0
+      }
+    },
+    "src/domains/stations.ts": {
+      "lines": {
+        "total": 24,
+        "covered": 20
+      },
+      "functions": {
+        "total": 8,
+        "covered": 6
+      },
+      "branches": {
+        "total": 15,
+        "covered": 8
+      },
+      "statements": {
+        "total": 32,
+        "covered": 21
+      }
+    },
+    "src/domains/conformance/conformanceEvidence.ts": {
+      "lines": {
+        "total": 92,
+        "covered": 3
+      },
+      "functions": {
+        "total": 29,
+        "covered": 0
+      },
+      "branches": {
+        "total": 98,
+        "covered": 0
+      },
+      "statements": {
+        "total": 119,
+        "covered": 3
+      }
+    },
+    "src/domains/conformance/conformanceExport.ts": {
+      "lines": {
+        "total": 45,
+        "covered": 0
+      },
+      "functions": {
+        "total": 19,
+        "covered": 0
+      },
+      "branches": {
+        "total": 47,
+        "covered": 0
+      },
+      "statements": {
+        "total": 58,
+        "covered": 0
+      }
+    },
+    "src/domains/conformance/conformanceRequirements.ts": {
+      "lines": {
+        "total": 28,
+        "covered": 2
+      },
+      "functions": {
+        "total": 14,
+        "covered": 0
+      },
+      "branches": {
+        "total": 24,
+        "covered": 0
+      },
+      "statements": {
+        "total": 32,
+        "covered": 2
+      }
+    },
+    "src/domains/conformance/conformanceRun.ts": {
+      "lines": {
+        "total": 90,
+        "covered": 0
+      },
+      "functions": {
+        "total": 22,
+        "covered": 0
+      },
+      "branches": {
+        "total": 45,
+        "covered": 0
+      },
+      "statements": {
+        "total": 101,
+        "covered": 0
+      }
+    },
+    "src/domains/conformance/environment.ts": {
+      "lines": {
+        "total": 15,
+        "covered": 1
+      },
+      "functions": {
+        "total": 2,
+        "covered": 0
+      },
+      "branches": {
+        "total": 14,
+        "covered": 0
+      },
+      "statements": {
+        "total": 15,
+        "covered": 1
+      }
+    },
+    "src/domains/deep/health.ts": {
+      "lines": {
+        "total": 6,
+        "covered": 6
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 2,
+        "covered": 1
+      },
+      "statements": {
+        "total": 7,
+        "covered": 6
+      }
+    },
+    "src/domains/operatingProfiles/operatingProfileActivation.ts": {
+      "lines": {
+        "total": 136,
+        "covered": 92
+      },
+      "functions": {
+        "total": 55,
+        "covered": 40
+      },
+      "branches": {
+        "total": 121,
+        "covered": 76
+      },
+      "statements": {
+        "total": 177,
+        "covered": 123
+      }
+    },
+    "src/domains/operatingProfiles/operatingProfileSignature.ts": {
+      "lines": {
+        "total": 41,
+        "covered": 5
+      },
+      "functions": {
+        "total": 9,
+        "covered": 1
+      },
+      "branches": {
+        "total": 31,
+        "covered": 2
+      },
+      "statements": {
+        "total": 49,
+        "covered": 6
+      }
+    },
+    "src/enforce/guardrailControlAsync.ts": {
+      "lines": {
+        "total": 48,
+        "covered": 0
+      },
+      "functions": {
+        "total": 22,
+        "covered": 0
+      },
+      "branches": {
+        "total": 23,
+        "covered": 0
+      },
+      "statements": {
+        "total": 71,
+        "covered": 0
+      }
+    },
+    "src/experiments/architectureCli.ts": {
+      "lines": {
+        "total": 41,
+        "covered": 0
+      },
+      "functions": {
+        "total": 5,
+        "covered": 0
+      },
+      "branches": {
+        "total": 20,
+        "covered": 0
+      },
+      "statements": {
+        "total": 54,
+        "covered": 0
+      }
+    },
+    "src/experiments/nativeTrialRunner.ts": {
+      "lines": {
+        "total": 32,
+        "covered": 30
+      },
+      "functions": {
+        "total": 11,
+        "covered": 10
+      },
+      "branches": {
+        "total": 46,
+        "covered": 27
+      },
+      "statements": {
+        "total": 38,
+        "covered": 34
+      }
+    },
+    "src/exports/oscal/oscalCli.ts": {
+      "lines": {
+        "total": 39,
+        "covered": 24
+      },
+      "functions": {
+        "total": 11,
+        "covered": 2
+      },
+      "branches": {
+        "total": 60,
+        "covered": 31
+      },
+      "statements": {
+        "total": 56,
+        "covered": 31
+      }
+    },
+    "src/fleet/agentScaffoldPublication.ts": {
+      "lines": {
+        "total": 111,
+        "covered": 2
+      },
+      "functions": {
+        "total": 25,
+        "covered": 2
+      },
+      "branches": {
+        "total": 46,
+        "covered": 0
+      },
+      "statements": {
+        "total": 166,
+        "covered": 2
+      }
+    },
+    "src/forecast/forecastPublication.ts": {
+      "lines": {
+        "total": 112,
+        "covered": 48
+      },
+      "functions": {
+        "total": 54,
+        "covered": 25
+      },
+      "branches": {
+        "total": 61,
+        "covered": 9
+      },
+      "statements": {
+        "total": 198,
+        "covered": 94
+      }
+    },
+    "src/governor/breakGlassCommand.ts": {
+      "lines": {
+        "total": 13,
+        "covered": 0
+      },
+      "functions": {
+        "total": 3,
+        "covered": 0
+      },
+      "branches": {
+        "total": 14,
+        "covered": 0
+      },
+      "statements": {
+        "total": 19,
+        "covered": 0
+      }
+    },
+    "src/integrations/integrationBatchRunner.ts": {
+      "lines": {
+        "total": 32,
+        "covered": 0
+      },
+      "functions": {
+        "total": 22,
+        "covered": 0
+      },
+      "branches": {
+        "total": 24,
+        "covered": 0
+      },
+      "statements": {
+        "total": 56,
+        "covered": 0
+      }
+    },
+    "src/integrations/integrationJournalProtocol.ts": {
+      "lines": {
+        "total": 70,
+        "covered": 55
+      },
+      "functions": {
+        "total": 33,
+        "covered": 23
+      },
+      "branches": {
+        "total": 89,
+        "covered": 64
+      },
+      "statements": {
+        "total": 134,
+        "covered": 99
+      }
+    },
+    "src/kernel/composedSessionSeal.ts": {
+      "lines": {
+        "total": 8,
+        "covered": 6
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 14,
+        "covered": 10
+      },
+      "statements": {
+        "total": 12,
+        "covered": 6
+      }
+    },
+    "src/keys/providerBridge.ts": {
+      "lines": {
+        "total": 27,
+        "covered": 10
+      },
+      "functions": {
+        "total": 3,
+        "covered": 1
+      },
+      "branches": {
+        "total": 35,
+        "covered": 22
+      },
+      "statements": {
+        "total": 31,
+        "covered": 12
+      }
+    },
+    "src/lab/labComparisonCli.ts": {
+      "lines": {
+        "total": 9,
+        "covered": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0
+      },
+      "branches": {
+        "total": 8,
+        "covered": 0
+      },
+      "statements": {
+        "total": 10,
+        "covered": 0
+      }
+    },
+    "src/learning/correctionMemoryCli.ts": {
+      "lines": {
+        "total": 7,
+        "covered": 0
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0
+      },
+      "branches": {
+        "total": 4,
+        "covered": 0
+      },
+      "statements": {
+        "total": 8,
+        "covered": 0
+      }
+    },
+    "src/ledger/encryption/syncUnwrap.ts": {
+      "lines": {
+        "total": 8,
+        "covered": 7
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 19,
+        "covered": 11
+      },
+      "statements": {
+        "total": 10,
+        "covered": 8
+      }
+    },
+    "src/lifecycle/controlJournalMirror.ts": {
+      "lines": {
+        "total": 19,
+        "covered": 0
+      },
+      "functions": {
+        "total": 7,
+        "covered": 0
+      },
+      "branches": {
+        "total": 17,
+        "covered": 0
+      },
+      "statements": {
+        "total": 26,
+        "covered": 0
+      }
+    },
+    "src/lifecycle/signedControlJournalAsync.ts": {
+      "lines": {
+        "total": 65,
+        "covered": 0
+      },
+      "functions": {
+        "total": 17,
+        "covered": 0
+      },
+      "branches": {
+        "total": 39,
+        "covered": 0
+      },
+      "statements": {
+        "total": 80,
+        "covered": 0
+      }
+    },
+    "src/lighthouse/finance/financeOpsTools.ts": {
+      "lines": {
+        "total": 125,
+        "covered": 0
+      },
+      "functions": {
+        "total": 18,
+        "covered": 0
+      },
+      "branches": {
+        "total": 113,
+        "covered": 0
+      },
+      "statements": {
+        "total": 153,
+        "covered": 0
+      }
+    },
+    "src/lighthouse/finance/financePaymentContext.ts": {
+      "lines": {
+        "total": 101,
+        "covered": 0
+      },
+      "functions": {
+        "total": 13,
+        "covered": 0
+      },
+      "branches": {
+        "total": 72,
+        "covered": 0
+      },
+      "statements": {
+        "total": 108,
+        "covered": 0
+      }
+    },
+    "src/mcp/a4Tools.ts": {
+      "lines": {
+        "total": 125,
+        "covered": 89
+      },
+      "functions": {
+        "total": 41,
+        "covered": 20
+      },
+      "branches": {
+        "total": 126,
+        "covered": 63
+      },
+      "statements": {
+        "total": 151,
+        "covered": 99
+      }
+    },
+    "src/mcp/oauth/discovery.ts": {
+      "lines": {
+        "total": 90,
+        "covered": 76
+      },
+      "functions": {
+        "total": 19,
+        "covered": 13
+      },
+      "branches": {
+        "total": 130,
+        "covered": 107
+      },
+      "statements": {
+        "total": 111,
+        "covered": 90
+      }
+    },
+    "src/mechanic/mechanicAnalysisBank.ts": {
+      "lines": {
+        "total": 18,
+        "covered": 16
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8
+      },
+      "branches": {
+        "total": 10,
+        "covered": 5
+      },
+      "statements": {
+        "total": 31,
+        "covered": 25
+      }
+    },
+    "src/mechanic/mechanicAnalysisCanon.ts": {
+      "lines": {
+        "total": 4,
+        "covered": 3
+      },
+      "functions": {
+        "total": 2,
+        "covered": 2
+      },
+      "branches": {
+        "total": 2,
+        "covered": 1
+      },
+      "statements": {
+        "total": 5,
+        "covered": 4
+      }
+    },
+    "src/mechanic/mechanicAnalysisInputs.ts": {
+      "lines": {
+        "total": 23,
+        "covered": 21
+      },
+      "functions": {
+        "total": 8,
+        "covered": 8
+      },
+      "branches": {
+        "total": 10,
+        "covered": 5
+      },
+      "statements": {
+        "total": 32,
+        "covered": 25
+      }
+    },
+    "src/mechanic/mechanicAnalysisPublication.ts": {
+      "lines": {
+        "total": 74,
+        "covered": 32
+      },
+      "functions": {
+        "total": 27,
+        "covered": 11
+      },
+      "branches": {
+        "total": 34,
+        "covered": 13
+      },
+      "statements": {
+        "total": 157,
+        "covered": 66
+      }
+    },
+    "src/mechanic/mechanicBudgetAction.ts": {
+      "lines": {
+        "total": 31,
+        "covered": 19
+      },
+      "functions": {
+        "total": 9,
+        "covered": 6
+      },
+      "branches": {
+        "total": 20,
+        "covered": 4
+      },
+      "statements": {
+        "total": 54,
+        "covered": 33
+      }
+    },
+    "src/mechanic/mechanicExecutionPublication.ts": {
+      "lines": {
+        "total": 11,
+        "covered": 4
+      },
+      "functions": {
+        "total": 4,
+        "covered": 1
+      },
+      "branches": {
+        "total": 0,
+        "covered": 0
+      },
+      "statements": {
+        "total": 13,
+        "covered": 5
+      }
+    },
+    "src/mechanic/mechanicPublication.ts": {
+      "lines": {
+        "total": 15,
+        "covered": 8
+      },
+      "functions": {
+        "total": 9,
+        "covered": 7
+      },
+      "branches": {
+        "total": 13,
+        "covered": 1
+      },
+      "statements": {
+        "total": 35,
+        "covered": 23
+      }
+    },
+    "src/mechanic/mechanicSettingsPublication.ts": {
+      "lines": {
+        "total": 66,
+        "covered": 6
+      },
+      "functions": {
+        "total": 18,
+        "covered": 2
+      },
+      "branches": {
+        "total": 43,
+        "covered": 0
+      },
+      "statements": {
+        "total": 133,
+        "covered": 11
+      }
+    },
+    "src/operator/blockerInbox.ts": {
+      "lines": {
+        "total": 52,
+        "covered": 44
+      },
+      "functions": {
+        "total": 23,
+        "covered": 15
+      },
+      "branches": {
+        "total": 51,
+        "covered": 28
+      },
+      "statements": {
+        "total": 66,
+        "covered": 52
+      }
+    },
+    "src/operator/operatorSources.ts": {
+      "lines": {
+        "total": 24,
+        "covered": 19
+      },
+      "functions": {
+        "total": 5,
+        "covered": 3
+      },
+      "branches": {
+        "total": 12,
+        "covered": 10
+      },
+      "statements": {
+        "total": 27,
+        "covered": 21
+      }
+    },
+    "src/operator/planDiffView.ts": {
+      "lines": {
+        "total": 66,
+        "covered": 54
+      },
+      "functions": {
+        "total": 20,
+        "covered": 14
+      },
+      "branches": {
+        "total": 58,
+        "covered": 32
+      },
+      "statements": {
+        "total": 81,
+        "covered": 62
+      }
+    },
+    "src/operator/reviewPacket.ts": {
+      "lines": {
+        "total": 85,
+        "covered": 60
+      },
+      "functions": {
+        "total": 33,
+        "covered": 25
+      },
+      "branches": {
+        "total": 86,
+        "covered": 34
+      },
+      "statements": {
+        "total": 112,
+        "covered": 74
+      }
+    },
+    "src/ops/backup/restoreCommit.ts": {
+      "lines": {
+        "total": 19,
+        "covered": 15
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 6,
+        "covered": 3
+      },
+      "statements": {
+        "total": 20,
+        "covered": 15
+      }
+    },
+    "src/ops/retention/wormTargets.ts": {
+      "lines": {
+        "total": 40,
+        "covered": 32
+      },
+      "functions": {
+        "total": 14,
+        "covered": 12
+      },
+      "branches": {
+        "total": 42,
+        "covered": 24
+      },
+      "statements": {
+        "total": 48,
+        "covered": 37
+      }
+    },
+    "src/org/orgPublication.ts": {
+      "lines": {
+        "total": 59,
+        "covered": 20
+      },
+      "functions": {
+        "total": 19,
+        "covered": 7
+      },
+      "branches": {
+        "total": 56,
+        "covered": 15
+      },
+      "statements": {
+        "total": 88,
+        "covered": 30
+      }
+    },
+    "src/passport/passportInputs.ts": {
+      "lines": {
+        "total": 94,
+        "covered": 58
+      },
+      "functions": {
+        "total": 32,
+        "covered": 21
+      },
+      "branches": {
+        "total": 114,
+        "covered": 47
+      },
+      "statements": {
+        "total": 173,
+        "covered": 95
+      }
+    },
+    "src/passport/passportLazyReads.ts": {
+      "lines": {
+        "total": 86,
+        "covered": 29
+      },
+      "functions": {
+        "total": 22,
+        "covered": 8
+      },
+      "branches": {
+        "total": 78,
+        "covered": 13
+      },
+      "statements": {
+        "total": 182,
+        "covered": 54
+      }
+    },
+    "src/passport/passportPairPublication.ts": {
+      "lines": {
+        "total": 28,
+        "covered": 18
+      },
+      "functions": {
+        "total": 14,
+        "covered": 8
+      },
+      "branches": {
+        "total": 14,
+        "covered": 6
+      },
+      "statements": {
+        "total": 62,
+        "covered": 38
+      }
+    },
+    "src/passport/passportProducer.ts": {
+      "lines": {
+        "total": 98,
+        "covered": 85
+      },
+      "functions": {
+        "total": 19,
+        "covered": 15
+      },
+      "branches": {
+        "total": 65,
+        "covered": 25
+      },
+      "statements": {
+        "total": 183,
+        "covered": 150
+      }
+    },
+    "src/passport/passportPublication.ts": {
+      "lines": {
+        "total": 49,
+        "covered": 35
+      },
+      "functions": {
+        "total": 14,
+        "covered": 11
+      },
+      "branches": {
+        "total": 56,
+        "covered": 21
+      },
+      "statements": {
+        "total": 96,
+        "covered": 68
+      }
+    },
+    "src/policy/effectivePolicyReceipt.ts": {
+      "lines": {
+        "total": 26,
+        "covered": 24
+      },
+      "functions": {
+        "total": 10,
+        "covered": 6
+      },
+      "branches": {
+        "total": 36,
+        "covered": 29
+      },
+      "statements": {
+        "total": 31,
+        "covered": 27
+      }
+    },
+    "src/prompt/promptArchive.ts": {
+      "lines": {
+        "total": 20,
+        "covered": 19
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 11,
+        "covered": 3
+      },
+      "statements": {
+        "total": 28,
+        "covered": 24
+      }
+    },
+    "src/prompt/promptCompilerAsync.ts": {
+      "lines": {
+        "total": 55,
+        "covered": 46
+      },
+      "functions": {
+        "total": 11,
+        "covered": 8
+      },
+      "branches": {
+        "total": 45,
+        "covered": 30
+      },
+      "statements": {
+        "total": 107,
+        "covered": 85
+      }
+    },
+    "src/prompt/promptPackSnapshot.ts": {
+      "lines": {
+        "total": 23,
+        "covered": 21
+      },
+      "functions": {
+        "total": 1,
+        "covered": 1
+      },
+      "branches": {
+        "total": 8,
+        "covered": 4
+      },
+      "statements": {
+        "total": 26,
+        "covered": 23
+      }
+    },
+    "src/prompt/promptPolicyAsync.ts": {
+      "lines": {
+        "total": 44,
+        "covered": 11
+      },
+      "functions": {
+        "total": 8,
+        "covered": 1
+      },
+      "branches": {
+        "total": 28,
+        "covered": 9
+      },
+      "statements": {
+        "total": 71,
+        "covered": 17
+      }
+    },
+    "src/prompt/promptSchedulerAsync.ts": {
+      "lines": {
+        "total": 42,
+        "covered": 0
+      },
+      "functions": {
+        "total": 11,
+        "covered": 0
+      },
+      "branches": {
+        "total": 46,
+        "covered": 0
+      },
+      "statements": {
+        "total": 81,
+        "covered": 0
+      }
+    },
+    "src/residency/deletionGate.ts": {
+      "lines": {
+        "total": 60,
+        "covered": 38
+      },
+      "functions": {
+        "total": 12,
+        "covered": 11
+      },
+      "branches": {
+        "total": 70,
+        "covered": 34
+      },
+      "statements": {
+        "total": 74,
+        "covered": 47
+      }
+    },
+    "src/residency/legalHoldRegistry.ts": {
+      "lines": {
+        "total": 251,
+        "covered": 200
+      },
+      "functions": {
+        "total": 62,
+        "covered": 56
+      },
+      "branches": {
+        "total": 334,
+        "covered": 185
+      },
+      "statements": {
+        "total": 421,
+        "covered": 297
+      }
+    },
+    "src/runtime/fatalDiagnostic.ts": {
+      "lines": {
+        "total": 46,
+        "covered": 34
+      },
+      "functions": {
+        "total": 13,
+        "covered": 7
+      },
+      "branches": {
+        "total": 46,
+        "covered": 30
+      },
+      "statements": {
+        "total": 56,
+        "covered": 39
+      }
+    },
+    "src/runtime/firewallPolicyAsync.ts": {
+      "lines": {
+        "total": 68,
+        "covered": 0
+      },
+      "functions": {
+        "total": 19,
+        "covered": 0
+      },
+      "branches": {
+        "total": 49,
+        "covered": 0
+      },
+      "statements": {
+        "total": 97,
+        "covered": 0
+      }
+    },
+    "src/sandbox/seatbeltNativeShell.ts": {
+      "lines": {
+        "total": 60,
+        "covered": 34
+      },
+      "functions": {
+        "total": 12,
+        "covered": 10
+      },
+      "branches": {
+        "total": 96,
+        "covered": 32
+      },
+      "statements": {
+        "total": 76,
+        "covered": 43
+      }
+    },
+    "src/sdk/a4Client.ts": {
+      "lines": {
+        "total": 37,
+        "covered": 25
+      },
+      "functions": {
+        "total": 19,
+        "covered": 7
+      },
+      "branches": {
+        "total": 21,
+        "covered": 13
+      },
+      "statements": {
+        "total": 43,
+        "covered": 29
+      }
+    },
+    "src/sdk/nativeCli.ts": {
+      "lines": {
+        "total": 37,
+        "covered": 35
+      },
+      "functions": {
+        "total": 17,
+        "covered": 11
+      },
+      "branches": {
+        "total": 75,
+        "covered": 62
+      },
+      "statements": {
+        "total": 69,
+        "covered": 49
+      }
+    },
+    "src/setup/nativeInteractiveAskUser.ts": {
+      "lines": {
+        "total": 85,
+        "covered": 59
+      },
+      "functions": {
+        "total": 23,
+        "covered": 14
+      },
+      "branches": {
+        "total": 80,
+        "covered": 51
+      },
+      "statements": {
+        "total": 119,
+        "covered": 71
+      }
+    },
+    "src/standard/standardPublication.ts": {
+      "lines": {
+        "total": 43,
+        "covered": 26
+      },
+      "functions": {
+        "total": 17,
+        "covered": 11
+      },
+      "branches": {
+        "total": 13,
+        "covered": 7
+      },
+      "statements": {
+        "total": 78,
+        "covered": 43
+      }
+    },
+    "src/standard/standardVerification.ts": {
+      "lines": {
+        "total": 23,
+        "covered": 22
+      },
+      "functions": {
+        "total": 4,
+        "covered": 2
+      },
+      "branches": {
+        "total": 18,
+        "covered": 9
+      },
+      "statements": {
+        "total": 35,
+        "covered": 27
+      }
+    },
+    "src/studio/passportBadgeRead.ts": {
+      "lines": {
+        "total": 29,
+        "covered": 20
+      },
+      "functions": {
+        "total": 4,
+        "covered": 3
+      },
+      "branches": {
+        "total": 43,
+        "covered": 20
+      },
+      "statements": {
+        "total": 42,
+        "covered": 27
+      }
+    },
+    "src/studio/reportSigningAuthority.ts": {
+      "lines": {
+        "total": 6,
+        "covered": 6
+      },
+      "functions": {
+        "total": 4,
+        "covered": 4
+      },
+      "branches": {
+        "total": 2,
+        "covered": 1
+      },
+      "statements": {
+        "total": 13,
+        "covered": 12
+      }
+    },
+    "src/studio/reportSigningError.ts": {
+      "lines": {
+        "total": 8,
+        "covered": 1
+      },
+      "functions": {
+        "total": 1,
+        "covered": 0
+      },
+      "branches": {
+        "total": 10,
+        "covered": 0
+      },
+      "statements": {
+        "total": 11,
+        "covered": 1
+      }
+    },
+    "src/studio/studioSelfRunTransparency.ts": {
+      "lines": {
+        "total": 100,
+        "covered": 73
+      },
+      "functions": {
+        "total": 21,
+        "covered": 17
+      },
+      "branches": {
+        "total": 37,
+        "covered": 20
+      },
+      "statements": {
+        "total": 165,
+        "covered": 116
+      }
+    },
+    "src/targets/targetProfilePublication.ts": {
+      "lines": {
+        "total": 121,
+        "covered": 95
+      },
+      "functions": {
+        "total": 29,
+        "covered": 24
+      },
+      "branches": {
+        "total": 89,
+        "covered": 36
+      },
+      "statements": {
+        "total": 195,
+        "covered": 147
+      }
+    },
+    "src/tools/builtin/grepWorker.ts": {
+      "lines": {
+        "total": 64,
+        "covered": 0
+      },
+      "functions": {
+        "total": 3,
+        "covered": 0
+      },
+      "branches": {
+        "total": 58,
+        "covered": 0
+      },
+      "statements": {
+        "total": 80,
+        "covered": 0
+      }
+    },
+    "src/tools/builtin/webFetchTool.ts": {
+      "lines": {
+        "total": 16,
+        "covered": 12
+      },
+      "functions": {
+        "total": 3,
+        "covered": 2
+      },
+      "branches": {
+        "total": 20,
+        "covered": 11
+      },
+      "statements": {
+        "total": 16,
+        "covered": 12
+      }
+    },
+    "src/tools/guards/governedCallDecision.ts": {
+      "lines": {
+        "total": 22,
+        "covered": 18
+      },
+      "functions": {
+        "total": 8,
+        "covered": 7
+      },
+      "branches": {
+        "total": 17,
+        "covered": 10
+      },
+      "statements": {
+        "total": 25,
+        "covered": 21
+      }
+    },
+    "src/transformation/transformInputs.ts": {
+      "lines": {
+        "total": 74,
+        "covered": 39
+      },
+      "functions": {
+        "total": 39,
+        "covered": 23
+      },
+      "branches": {
+        "total": 95,
+        "covered": 28
+      },
+      "statements": {
+        "total": 136,
+        "covered": 67
+      }
+    },
+    "src/transparency/merkleProducerPublication.ts": {
+      "lines": {
+        "total": 148,
+        "covered": 64
+      },
+      "functions": {
+        "total": 37,
+        "covered": 18
+      },
+      "branches": {
+        "total": 150,
+        "covered": 41
+      },
+      "statements": {
+        "total": 271,
+        "covered": 126
+      }
+    },
+    "src/transparency/merkleProofPublication.ts": {
+      "lines": {
+        "total": 169,
+        "covered": 0
+      },
+      "functions": {
+        "total": 35,
+        "covered": 0
+      },
+      "branches": {
+        "total": 206,
+        "covered": 0
+      },
+      "statements": {
+        "total": 367,
+        "covered": 0
+      }
+    },
+    "src/transparency/anchors/anchor.ts": {
+      "lines": {
+        "total": 67,
+        "covered": 45
+      },
+      "functions": {
+        "total": 19,
+        "covered": 16
+      },
+      "branches": {
+        "total": 52,
+        "covered": 23
+      },
+      "statements": {
+        "total": 82,
+        "covered": 56
+      }
+    },
+    "src/transparency/anchors/rekorV2.ts": {
+      "lines": {
+        "total": 39,
+        "covered": 34
+      },
+      "functions": {
+        "total": 8,
+        "covered": 7
+      },
+      "branches": {
+        "total": 23,
+        "covered": 11
+      },
+      "statements": {
+        "total": 46,
+        "covered": 36
+      }
+    },
+    "src/trust/notaryEnablementPublication.ts": {
+      "lines": {
+        "total": 115,
+        "covered": 51
+      },
+      "functions": {
+        "total": 25,
+        "covered": 11
+      },
+      "branches": {
+        "total": 96,
+        "covered": 27
+      },
+      "statements": {
+        "total": 176,
+        "covered": 69
       }
     }
   }

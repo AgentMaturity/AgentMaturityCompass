@@ -5,8 +5,8 @@ import { runDiagnostic } from "../diagnostic/runner.js";
 import { runAssurance } from "../assurance/assuranceRunner.js";
 import { buildDashboard } from "../dashboard/build.js";
 import { createUnifiedClaritySnapshot } from "../snapshot/snapshot.js";
-import { createTransformPlan } from "../transformation/transformPlanner.js";
-import { runTransformTracker } from "../transformation/transformTracker.js";
+import { createTransformPlanAsync } from "../transformation/transformPlanner.js";
+import { runTransformTrackerAsync } from "../transformation/transformTracker.js";
 import { loadLatestTransformPlan } from "../transformation/transformTasks.js";
 
 interface LoopConfig {
@@ -156,14 +156,14 @@ export async function loopRun(params: {
     agentId
   };
   if (!loadLatestTransformPlan(params.workspace, transformScope)) {
-    createTransformPlan({
+    await createTransformPlanAsync({
       workspace: params.workspace,
       scope: transformScope,
       to: "targets",
       window
     });
   }
-  const tracker = runTransformTracker({
+  const tracker = await runTransformTrackerAsync({
     workspace: params.workspace,
     scope: transformScope,
     window

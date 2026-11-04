@@ -1,0 +1,87 @@
+{
+  "schema": "p139-oauth-real-flow-independent-static-review/1",
+  "at": "2026-10-16T16:04:24.649883+00:00",
+  "scope": "Exact materialized governed OAuth replacement; reuse prior sealed review for unchanged prefix.",
+  "candidate": {
+    "path": "/private/tmp/p1-39-mcp-qualification-20261016/oauth-governed-real-authorization-proposal/mcpOauth.test.ts",
+    "bytes": 63347,
+    "sha256": "fbd1550e7a5f0d90089ec81868477245f4ed534dfce7a9763b3d3a106b32b508"
+  },
+  "materialized": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcpOauth.test.ts",
+    "bytes": 63347,
+    "sha256": "fbd1550e7a5f0d90089ec81868477245f4ed534dfce7a9763b3d3a106b32b508"
+  },
+  "blockers": [],
+  "versionBinding": {
+    "authorManifestRows": 99,
+    "unchangedExactRows": 98,
+    "admittedTransition": {
+      "from": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcpOauth.test.ts",
+        "bytes": 60936,
+        "sha256": "98ab5573a1eac3ac37d89172773372abc783c6c342d697905c7e8e0a3688c47d"
+      },
+      "to": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcpOauth.test.ts",
+        "bytes": 63347,
+        "sha256": "fbd1550e7a5f0d90089ec81868477245f4ed534dfce7a9763b3d3a106b32b508"
+      }
+    },
+    "historicalTypedInputReconstructedInMemory": {
+      "bytes": 60936,
+      "sha256": "98ab5573a1eac3ac37d89172773372abc783c6c342d697905c7e8e0a3688c47d"
+    },
+    "proposalSealFileRowsVerified": 4,
+    "distinctCurrentInputPins": 109
+  },
+  "preservation": {
+    "earlierElevenCasesHelpersImportsByteExact": true,
+    "explicitConfigTypingRepairRetainedAtLines": [
+      628,
+      629
+    ],
+    "existingGovernedSensitiveAssertionBlockByteExact": true,
+    "entireBodyCatchAndCleanupTailByteExact": true,
+    "nominalCaseDeclarationsNotObservedPasses": 12,
+    "sourceRepairAndGuardInputsUnchanged": true
+  },
+  "findings": [
+    {
+      "topic": "Authorization and persistence",
+      "conclusion": "The case replaces a direct grant save with interactiveAttempt against the same real owned endpoint and file-backed store. It requires initial absence and reload matching issuer, resource, client ID, read scope, issued access/refresh tokens and parseable expiry. Existing authorizeNativeMcpOAuth performs S256/state/iss validation and awaits store.save. The final facts require successful authorization, valid forms and exactly one authorization/token exchange."
+    },
+    {
+      "topic": "Public flow and transcript",
+      "conclusion": "installCatalog overrides only the MCP endpoint, preserving its unauthenticated PRM/read challenge; the other interactive routes remain. Authorization request facts are copied before later resolve discovery. The expected five-request authorization transcript and six authenticated methods match resolve, reviewed catalog, mount catalog recheck and call-time tools/list followed by one tools/call. No new helper or transport behavior is introduced."
+    },
+    {
+      "topic": "Receipt",
+      "conclusion": "The real helper returns expires_in=3600; product tokenRequest stores an ISO expiresAt. The exact receipt expiry must therefore equal that reloaded grant rather than the old seed null. Non-null auth, exact keys/issuer/read scope, reviewed catalog digest/protocol and explicit stateless 2026-07-28 checks remain. The actual sample is still emitted only when the receipt secrecy boolean permits it."
+    },
+    {
+      "topic": "Secrets",
+      "conclusion": "New public facts and assertion operands contain only booleans, method/path/status/header-presence and counts. They do not expose grants, access/refresh tokens, authorization URL/query, code or verifier. Existing secret registration, recursive AggregateError sanitization, encoded-record secret refusal, outcome/row/decrypted-payload secrecy and redaction assertions remain intact."
+    },
+    {
+      "topic": "Errors and lifecycle",
+      "conclusion": "Safe authorization facts are retained before later resolution. The full body catch and independent mount/toolset/session/vault cleanup tail are unchanged, preserving body-first AggregateError ordering. Existing governed assertions precede the new transcript assertions, so earlier failure may mask later checks; only actual execution establishes reach."
+    },
+    {
+      "topic": "Type fit",
+      "conclusion": "New local booleans and storedGrant null narrowing fit existing interfaces; explicit imported NativeMcpOAuthConfig typing is unchanged. This static conclusion is not a compiler result."
+    }
+  ],
+  "preparationCorrection": {
+    "staticPreparationStoppedBeforeAnyOutputWrite": true,
+    "reason": "An annotation locator assumed line629; actual auth annotation is628 and config assignment629.",
+    "semanticOrRuntimeFailure": false,
+    "resolvedBy": "Read exact lines and correct report locators; product bytes unchanged."
+  },
+  "boundaries": [
+    "No compiler/test/product/helper/native/SQL/network/process execution or checkout/index/QA write by reviewer.",
+    "The earlier 81-pass checkpoint and seeded/null-expiry receipt remain historical; they are not this new-flow proof. Root owns actual rerun evidence, receipt, fresh qualification and controls.",
+    "Production callback close remains its existing non-awaitable closeAllConnections/void-close boundary. Public configuration resolution still inherits process.env/user dotenv; the direct isolated credential store does not establish whole-process isolation.",
+    "No new approval gate, quality waiver, release or full P1-39 completion claim."
+  ]
+}

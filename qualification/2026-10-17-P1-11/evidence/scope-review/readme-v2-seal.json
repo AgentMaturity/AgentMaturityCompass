@@ -1,0 +1,15 @@
+{
+  "schema": "p111-current-scope-refresh-readme-seal/1",
+  "preferredREADME": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/README-v2.md",
+    "bytes": 1589,
+    "sha256": "b909fd5ad98b2be68f46523fd4f8898e2b74541a7fabdc217f78bd339d1be8c7"
+  },
+  "originalSeal": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/seal.json",
+    "bytes": 1237,
+    "sha256": "ca06c88ba3695dd3781ecf84315d02a697a4a57af766a7b4eacd5f9d24ed086a"
+  },
+  "delta": "Spacing only in persisted prose; original review, pending entry, pins and seal preserved.",
+  "blockers": []
+}

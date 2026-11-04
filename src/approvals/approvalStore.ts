@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
 import type { ActionClass, ExecutionMode } from "../types.js";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
@@ -72,7 +72,7 @@ function approvalConsumedPath(workspace: string, agentId: string, approvalId: st
 
 function signFile(workspace: string, file: string): string {
   const digest = sha256Hex(readFileSync(file));
-  const signature = signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
+  const signature = signHexDigest(digest, getSigningKey(workspace, "artifact-seal"));
   const payload: SignaturePayload = {
     digestSha256: digest,
     signature,

@@ -1,0 +1,1791 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1542",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "kind": "independent actual seven-consumer baseline receipt review",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T00:57:57.184418+00:00",
+  "status": "PASS_WITH_BOUNDED_LIMITS",
+  "findings": [],
+  "scope": "Frozen baseline supplement only. No six-guard mutant result, combined original35 suite or source repair is reviewed or inferred.",
+  "freeze": "All actual reads started after the explicit baseline freeze notice. The separate active consumer-guard namespace was neither read nor changed. Only the frozen journal was used.",
+  "verified": {
+    "receipt": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.json",
+      "bytes": 8254,
+      "sha256": "f45962ff6d63a7e05610eaecd839ec6c6fbfe6847ca73bd16c30eb38b2a72ee8"
+    },
+    "markdown": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.md",
+      "bytes": 2920,
+      "sha256": "b089457a1246fae287dd00937607c567e1523e1959de8ac18523e19ca4f75c4e"
+    },
+    "index": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/artifact-index.json",
+      "bytes": 33613,
+      "sha256": "7b9eeaf467195bfe6e8d27143c3ce75cf6a86ff5958d49552a65ed0bfc76f838"
+    },
+    "indexRefsChecked": 149,
+    "frozenPhases": [
+      {
+        "phase": "reviewed-seven-consumer-first-baseline",
+        "exit": 0,
+        "durationMs": 5771,
+        "executionError": null,
+        "executionErrorFieldPresent": true
+      },
+      {
+        "phase": "observation-reporters-rerun",
+        "exit": 0,
+        "durationMs": 5710,
+        "executionError": null,
+        "executionErrorFieldPresent": true
+      },
+      {
+        "phase": "root-head-final",
+        "exit": 0,
+        "durationMs": 13,
+        "executionError": null,
+        "executionErrorFieldPresent": false
+      },
+      {
+        "phase": "root-status-final",
+        "exit": 0,
+        "durationMs": 35,
+        "executionError": null,
+        "executionErrorFieldPresent": false
+      }
+    ],
+    "rawPhases": [
+      {
+        "kind": "first",
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/command.json",
+          "bytes": 1760,
+          "sha256": "21e1197ed32b094016b00c107bf75951a1faf9d4fdf9f13d87737accf36849fb"
+        },
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/reviewed-seven-consumer-first-baseline/raw-tests.json",
+          "bytes": 2596,
+          "sha256": "7aa7b7050359c7588c555b369d8c5665cf7bcfdd2f4b779a08225d4d54648bb6"
+        },
+        "counts": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "names": [
+          "private AMC-1542 current public revocation consumers managedHookLease",
+          "private AMC-1542 current public revocation consumers bridgeAuth",
+          "private AMC-1542 current public revocation consumers gateway",
+          "private AMC-1542 current public revocation consumers workspaceRouter",
+          "private AMC-1542 current public revocation consumers wireDispatcher",
+          "private AMC-1542 current public revocation consumers agentCredentialAuth",
+          "private AMC-1542 current public revocation consumers studioServer"
+        ],
+        "markers": 0,
+        "durationMs": 5771
+      },
+      {
+        "kind": "reporterRerun",
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/command.json",
+          "bytes": 1745,
+          "sha256": "7c1295a5ad210493812e6660b0c19ffb6cf2b998cf43307b23a8cadf27dfedf2"
+        },
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/raw-tests.json",
+          "bytes": 2603,
+          "sha256": "d8b613bf9c0f557e23de9bab49d86140b986994c10381b751cc9f50f5462fa15"
+        },
+        "counts": {
+          "numTotalTests": 7,
+          "numPassedTests": 7,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "names": [
+          "private AMC-1542 current public revocation consumers managedHookLease",
+          "private AMC-1542 current public revocation consumers bridgeAuth",
+          "private AMC-1542 current public revocation consumers gateway",
+          "private AMC-1542 current public revocation consumers workspaceRouter",
+          "private AMC-1542 current public revocation consumers wireDispatcher",
+          "private AMC-1542 current public revocation consumers agentCredentialAuth",
+          "private AMC-1542 current public revocation consumers studioServer"
+        ],
+        "markers": 7,
+        "durationMs": 5710
+      }
+    ],
+    "sameEnvironmentAndReporterOnlyChange": true,
+    "sourceAndPreservation": {
+      "sourceFiles": 7739,
+      "compiledFiles": 4529,
+      "oneNewPrivateFile": {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/closure/tests/leaseRevocationConsumerQualification.test.ts",
+        "bytes": 31014,
+        "sha256": "11c5ea168b78429fc1f2e34acc71fd350c0bed92af513cb54f234816a471329c"
+      },
+      "fullClosure": 12269,
+      "coreClosure": 12268,
+      "coreRefs": 106,
+      "coreOriginalIndexRefs": 103,
+      "protectedEntries": 128,
+      "uniqueProtectedPaths": 120,
+      "allDirectCurrentBytesExact": true,
+      "native": {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "device": 16777231,
+        "inode": 537685380,
+        "nlink": 1
+      },
+      "dependencyLinksChecked": 307,
+      "noGitMetadata": true
+    },
+    "observations": {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/phases/observation-reporters-rerun/observations.json",
+      "bytes": 429203,
+      "sha256": "8ee83998b80a8fa48b0c8674816c89bdb531fc77f9ec77db501917f7e39c8674"
+    },
+    "totals": {
+      "admissions": 14,
+      "withinCallExact": 56,
+      "refusals": 42
+    },
+    "distinctPreArtifactSPKIFingerprints": 28,
+    "derivedConsumers": [
+      {
+        "consumer": "managedHookLease",
+        "publicPinRows": 8,
+        "signatureCheckedLeaseRows": 2,
+        "runtime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "fixtureRootRemoved": true,
+        "statePairRetainedSignatureAndExactRestoration": true,
+        "admissions": 2,
+        "refusals": 6,
+        "calls": [
+          {
+            "state": "healthy",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default",
+              "expired": false
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 13,
+            "protectedCanonicalSha256": "332ab53162b95d1bf4012cf7dec64c3d4da676d8729dba608543807d4891bfc5",
+            "pairCanonicalSha256": "c219aa7e161e04a65fa7c5a2d14089b9d948097f560bfb9347397390135ab194"
+          },
+          {
+            "state": "healthy",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": null,
+            "reason": "lease revoked",
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default",
+              "expired": false
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 13,
+            "protectedCanonicalSha256": "221004542e825260e98f09b1bbe72cb56d228b917019af2e6806c43647c7632c",
+            "pairCanonicalSha256": "c219aa7e161e04a65fa7c5a2d14089b9d948097f560bfb9347397390135ab194"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": null,
+            "reason": "lease revocation store unverifiable (digest mismatch); refusing to treat it as empty",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null,
+              "expired": false
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 13,
+            "protectedCanonicalSha256": "332ab53162b95d1bf4012cf7dec64c3d4da676d8729dba608543807d4891bfc5",
+            "pairCanonicalSha256": "7aed969d180341612359eb0831b38cbf5e3c500e61a735a7275a203854a69667"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": null,
+            "reason": "lease revocation store unverifiable (digest mismatch); refusing to treat it as empty",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null,
+              "expired": false
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 13,
+            "protectedCanonicalSha256": "221004542e825260e98f09b1bbe72cb56d228b917019af2e6806c43647c7632c",
+            "pairCanonicalSha256": "7aed969d180341612359eb0831b38cbf5e3c500e61a735a7275a203854a69667"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": null,
+            "reason": "lease revocation store unverifiable (revocation list missing but signature present); refusing to treat it as empty",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null,
+              "expired": false
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 13,
+            "protectedCanonicalSha256": "332ab53162b95d1bf4012cf7dec64c3d4da676d8729dba608543807d4891bfc5",
+            "pairCanonicalSha256": "1caca11052d6c062e1275904371a558e3ad97de2c4da8705eabfaae04b96533d"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": null,
+            "reason": "lease revocation store unverifiable (revocation list missing but signature present); refusing to treat it as empty",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null,
+              "expired": false
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 13,
+            "protectedCanonicalSha256": "221004542e825260e98f09b1bbe72cb56d228b917019af2e6806c43647c7632c",
+            "pairCanonicalSha256": "1caca11052d6c062e1275904371a558e3ad97de2c4da8705eabfaae04b96533d"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default",
+              "expired": false
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 13,
+            "protectedCanonicalSha256": "332ab53162b95d1bf4012cf7dec64c3d4da676d8729dba608543807d4891bfc5",
+            "pairCanonicalSha256": "c219aa7e161e04a65fa7c5a2d14089b9d948097f560bfb9347397390135ab194"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": null,
+            "reason": "lease revoked",
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default",
+              "expired": false
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 13,
+            "protectedCanonicalSha256": "221004542e825260e98f09b1bbe72cb56d228b917019af2e6806c43647c7632c",
+            "pairCanonicalSha256": "c219aa7e161e04a65fa7c5a2d14089b9d948097f560bfb9347397390135ab194"
+          }
+        ],
+        "cleanup": [
+          "exact original pair restored",
+          "owned server/ledger closers, pool closure, vault lock and fixture removal attempted; errors retained"
+        ]
+      },
+      {
+        "consumer": "bridgeAuth",
+        "publicPinRows": 8,
+        "signatureCheckedLeaseRows": 2,
+        "runtime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "fixtureRootRemoved": true,
+        "statePairRetainedSignatureAndExactRestoration": true,
+        "admissions": 2,
+        "refusals": 6,
+        "calls": [
+          {
+            "state": "healthy",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "c9472d815d4abcc786d38875668e5bf62d662c8a8d5dc17eb6e7886b58f1d59c",
+            "pairCanonicalSha256": "127f6ee09862877c62847768b6588f834fb0620c3bc5c0dcf6e6c118d2b41215"
+          },
+          {
+            "state": "healthy",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revoked",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "c9472d815d4abcc786d38875668e5bf62d662c8a8d5dc17eb6e7886b58f1d59c",
+            "pairCanonicalSha256": "127f6ee09862877c62847768b6588f834fb0620c3bc5c0dcf6e6c118d2b41215"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: digest mismatch",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "c9472d815d4abcc786d38875668e5bf62d662c8a8d5dc17eb6e7886b58f1d59c",
+            "pairCanonicalSha256": "af52e9eccc9718bae4f3dcbfd358966a46e68385ef5934042d49e0c3f5c0e202"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: digest mismatch",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "c9472d815d4abcc786d38875668e5bf62d662c8a8d5dc17eb6e7886b58f1d59c",
+            "pairCanonicalSha256": "af52e9eccc9718bae4f3dcbfd358966a46e68385ef5934042d49e0c3f5c0e202"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: revocation list missing but signature present",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "c9472d815d4abcc786d38875668e5bf62d662c8a8d5dc17eb6e7886b58f1d59c",
+            "pairCanonicalSha256": "41cabb247a128e15095fafdd28d9898125e43c0d4eb0180f07502cb48a5f4b6b"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: revocation list missing but signature present",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "c9472d815d4abcc786d38875668e5bf62d662c8a8d5dc17eb6e7886b58f1d59c",
+            "pairCanonicalSha256": "41cabb247a128e15095fafdd28d9898125e43c0d4eb0180f07502cb48a5f4b6b"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "workspaceId": "default"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "c9472d815d4abcc786d38875668e5bf62d662c8a8d5dc17eb6e7886b58f1d59c",
+            "pairCanonicalSha256": "127f6ee09862877c62847768b6588f834fb0620c3bc5c0dcf6e6c118d2b41215"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revoked",
+            "witness": {
+              "agentId": null,
+              "workspaceId": null
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "c9472d815d4abcc786d38875668e5bf62d662c8a8d5dc17eb6e7886b58f1d59c",
+            "pairCanonicalSha256": "127f6ee09862877c62847768b6588f834fb0620c3bc5c0dcf6e6c118d2b41215"
+          }
+        ],
+        "cleanup": [
+          "exact original pair restored",
+          "owned server/ledger closers, pool closure, vault lock and fixture removal attempted; errors retained"
+        ]
+      },
+      {
+        "consumer": "gateway",
+        "publicPinRows": 8,
+        "signatureCheckedLeaseRows": 2,
+        "runtime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "fixtureRootRemoved": true,
+        "statePairRetainedSignatureAndExactRestoration": true,
+        "admissions": 2,
+        "refusals": 6,
+        "calls": [
+          {
+            "state": "healthy",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "upstreamResponseId": "owned-local-upstream"
+            },
+            "operation": "upstream",
+            "before": {
+              "count": 0,
+              "ids": []
+            },
+            "after": {
+              "count": 1,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "772d03912680ee163e04b62a90e1344e260715f7b376e0b99a05629f43488353",
+            "pairCanonicalSha256": "6837668c49ca2a623cc6aee7cd0ef082f4f3c0182fe0b72c35f546b457bf2319"
+          },
+          {
+            "state": "healthy",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revoked",
+            "witness": {},
+            "operation": "upstream",
+            "before": {
+              "count": 1,
+              "ids": []
+            },
+            "after": {
+              "count": 1,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "772d03912680ee163e04b62a90e1344e260715f7b376e0b99a05629f43488353",
+            "pairCanonicalSha256": "6837668c49ca2a623cc6aee7cd0ef082f4f3c0182fe0b72c35f546b457bf2319"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: digest mismatch",
+            "witness": {},
+            "operation": "upstream",
+            "before": {
+              "count": 1,
+              "ids": []
+            },
+            "after": {
+              "count": 1,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "772d03912680ee163e04b62a90e1344e260715f7b376e0b99a05629f43488353",
+            "pairCanonicalSha256": "54cc55ca8d06022d6fe874aa7ce16e2a25908b47873e9f7bee6a78f9211c8603"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: digest mismatch",
+            "witness": {},
+            "operation": "upstream",
+            "before": {
+              "count": 1,
+              "ids": []
+            },
+            "after": {
+              "count": 1,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "772d03912680ee163e04b62a90e1344e260715f7b376e0b99a05629f43488353",
+            "pairCanonicalSha256": "54cc55ca8d06022d6fe874aa7ce16e2a25908b47873e9f7bee6a78f9211c8603"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: revocation list missing but signature present",
+            "witness": {},
+            "operation": "upstream",
+            "before": {
+              "count": 1,
+              "ids": []
+            },
+            "after": {
+              "count": 1,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "772d03912680ee163e04b62a90e1344e260715f7b376e0b99a05629f43488353",
+            "pairCanonicalSha256": "ae15fd0a87524e1059bf5a182a53b2a9c3993a7b27fd6943742be62301e00f03"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: revocation list missing but signature present",
+            "witness": {},
+            "operation": "upstream",
+            "before": {
+              "count": 1,
+              "ids": []
+            },
+            "after": {
+              "count": 1,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "772d03912680ee163e04b62a90e1344e260715f7b376e0b99a05629f43488353",
+            "pairCanonicalSha256": "ae15fd0a87524e1059bf5a182a53b2a9c3993a7b27fd6943742be62301e00f03"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "upstreamResponseId": "owned-local-upstream"
+            },
+            "operation": "upstream",
+            "before": {
+              "count": 1,
+              "ids": []
+            },
+            "after": {
+              "count": 2,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "772d03912680ee163e04b62a90e1344e260715f7b376e0b99a05629f43488353",
+            "pairCanonicalSha256": "6837668c49ca2a623cc6aee7cd0ef082f4f3c0182fe0b72c35f546b457bf2319"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revoked",
+            "witness": {},
+            "operation": "upstream",
+            "before": {
+              "count": 2,
+              "ids": []
+            },
+            "after": {
+              "count": 2,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "772d03912680ee163e04b62a90e1344e260715f7b376e0b99a05629f43488353",
+            "pairCanonicalSha256": "6837668c49ca2a623cc6aee7cd0ef082f4f3c0182fe0b72c35f546b457bf2319"
+          }
+        ],
+        "cleanup": [
+          "exact original pair restored",
+          "owned server/ledger closers, pool closure, vault lock and fixture removal attempted; errors retained"
+        ]
+      },
+      {
+        "consumer": "workspaceRouter",
+        "publicPinRows": 8,
+        "signatureCheckedLeaseRows": 2,
+        "runtime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "fixtureRootRemoved": true,
+        "statePairRetainedSignatureAndExactRestoration": true,
+        "admissions": 2,
+        "refusals": 6,
+        "calls": [
+          {
+            "state": "healthy",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "knownToolListed": true,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "d3a33940b32e505fdbb7c1eec70df76459f02d5ad192e4f6e0fbcd430d0e0951",
+            "pairCanonicalSha256": "b6f428fa817c91c56f144954a18dd1eed64858887df5bd971e5177db010b0557"
+          },
+          {
+            "state": "healthy",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revoked",
+            "witness": {
+              "knownToolListed": false,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "d3a33940b32e505fdbb7c1eec70df76459f02d5ad192e4f6e0fbcd430d0e0951",
+            "pairCanonicalSha256": "b6f428fa817c91c56f144954a18dd1eed64858887df5bd971e5177db010b0557"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: digest mismatch",
+            "witness": {
+              "knownToolListed": false,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "d3a33940b32e505fdbb7c1eec70df76459f02d5ad192e4f6e0fbcd430d0e0951",
+            "pairCanonicalSha256": "a35e6256c2cb8296f02396ebbb6ce5e57a3d6ec5b00705b8a276702ac743e97b"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: digest mismatch",
+            "witness": {
+              "knownToolListed": false,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "d3a33940b32e505fdbb7c1eec70df76459f02d5ad192e4f6e0fbcd430d0e0951",
+            "pairCanonicalSha256": "a35e6256c2cb8296f02396ebbb6ce5e57a3d6ec5b00705b8a276702ac743e97b"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: revocation list missing but signature present",
+            "witness": {
+              "knownToolListed": false,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "d3a33940b32e505fdbb7c1eec70df76459f02d5ad192e4f6e0fbcd430d0e0951",
+            "pairCanonicalSha256": "636f9cb1f2c60d15ace79acf5f36b156db24b3feab176eeaf0971e0fc0c0daf7"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: revocation list missing but signature present",
+            "witness": {
+              "knownToolListed": false,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "d3a33940b32e505fdbb7c1eec70df76459f02d5ad192e4f6e0fbcd430d0e0951",
+            "pairCanonicalSha256": "636f9cb1f2c60d15ace79acf5f36b156db24b3feab176eeaf0971e0fc0c0daf7"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "knownToolListed": true,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "d3a33940b32e505fdbb7c1eec70df76459f02d5ad192e4f6e0fbcd430d0e0951",
+            "pairCanonicalSha256": "b6f428fa817c91c56f144954a18dd1eed64858887df5bd971e5177db010b0557"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revoked",
+            "witness": {
+              "knownToolListed": false,
+              "credentialPath": "tracked-owner-session-plus-supplied-agent-lease"
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "d3a33940b32e505fdbb7c1eec70df76459f02d5ad192e4f6e0fbcd430d0e0951",
+            "pairCanonicalSha256": "b6f428fa817c91c56f144954a18dd1eed64858887df5bd971e5177db010b0557"
+          }
+        ],
+        "cleanup": [
+          "exact original pair restored",
+          "owned server/ledger closers, pool closure, vault lock and fixture removal attempted; errors retained"
+        ]
+      },
+      {
+        "consumer": "wireDispatcher",
+        "publicPinRows": 8,
+        "signatureCheckedLeaseRows": 2,
+        "runtime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "fixtureRootRemoved": true,
+        "statePairRetainedSignatureAndExactRestoration": true,
+        "admissions": 2,
+        "refusals": 6,
+        "calls": [
+          {
+            "state": "healthy",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "receiptSha256": "8f8ead438fd079ac23e3697a0c598e6054e4748ed9ce1b60a1e2c77519f3f636",
+              "workSessionId": "c1ca1b4e-3f50-4c52-aed2-014f7977e83d",
+              "agentId": "default"
+            },
+            "operation": "wire",
+            "before": {
+              "count": 0,
+              "ids": []
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "78a9bc7899ea835093238f806f347e58fae39b741da173489c49b93060cf8aa3",
+            "pairCanonicalSha256": "72a67f07c2f132520a0673218902a25db55523a70b4fe8c931ab6d2006a228df"
+          },
+          {
+            "state": "healthy",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": -32001,
+            "reason": "lease revoked",
+            "witness": {
+              "receiptSha256": null,
+              "workSessionId": null,
+              "agentId": "default"
+            },
+            "operation": "wire",
+            "before": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "78a9bc7899ea835093238f806f347e58fae39b741da173489c49b93060cf8aa3",
+            "pairCanonicalSha256": "72a67f07c2f132520a0673218902a25db55523a70b4fe8c931ab6d2006a228df"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": -32001,
+            "reason": "the lease revocation list does not verify; refusing every lease until it does",
+            "witness": {
+              "receiptSha256": null,
+              "workSessionId": null,
+              "agentId": "default"
+            },
+            "operation": "wire",
+            "before": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "78a9bc7899ea835093238f806f347e58fae39b741da173489c49b93060cf8aa3",
+            "pairCanonicalSha256": "9e67cf2040567c2087586e078616e90659ea1361ac7c8bea5c85e0c13bb354d8"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": -32001,
+            "reason": "the lease revocation list does not verify; refusing every lease until it does",
+            "witness": {
+              "receiptSha256": null,
+              "workSessionId": null,
+              "agentId": "default"
+            },
+            "operation": "wire",
+            "before": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "78a9bc7899ea835093238f806f347e58fae39b741da173489c49b93060cf8aa3",
+            "pairCanonicalSha256": "9e67cf2040567c2087586e078616e90659ea1361ac7c8bea5c85e0c13bb354d8"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": -32001,
+            "reason": "the lease revocation list does not verify; refusing every lease until it does",
+            "witness": {
+              "receiptSha256": null,
+              "workSessionId": null,
+              "agentId": "default"
+            },
+            "operation": "wire",
+            "before": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "78a9bc7899ea835093238f806f347e58fae39b741da173489c49b93060cf8aa3",
+            "pairCanonicalSha256": "8d2e3d2a358d84cab9fd6cad4cb12a645b92275747d4bbb35837b1cc2d60f553"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": -32001,
+            "reason": "the lease revocation list does not verify; refusing every lease until it does",
+            "witness": {
+              "receiptSha256": null,
+              "workSessionId": null,
+              "agentId": "default"
+            },
+            "operation": "wire",
+            "before": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "78a9bc7899ea835093238f806f347e58fae39b741da173489c49b93060cf8aa3",
+            "pairCanonicalSha256": "8d2e3d2a358d84cab9fd6cad4cb12a645b92275747d4bbb35837b1cc2d60f553"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "receiptSha256": "0eb809b3d5f4d31c1fc6fdef5440eb660f21145882588e74d20dc24ec466521b",
+              "workSessionId": "ca84a9bc-2b36-4adb-96df-de187eafdef0",
+              "agentId": "default"
+            },
+            "operation": "wire",
+            "before": {
+              "count": 1,
+              "ids": [
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "after": {
+              "count": 2,
+              "ids": [
+                "5ed7d9f4-7db1-47c3-9c48-3ec19c55c7a0",
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "78a9bc7899ea835093238f806f347e58fae39b741da173489c49b93060cf8aa3",
+            "pairCanonicalSha256": "72a67f07c2f132520a0673218902a25db55523a70b4fe8c931ab6d2006a228df"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": -32001,
+            "reason": "lease revoked",
+            "witness": {
+              "receiptSha256": null,
+              "workSessionId": null,
+              "agentId": "default"
+            },
+            "operation": "wire",
+            "before": {
+              "count": 2,
+              "ids": [
+                "5ed7d9f4-7db1-47c3-9c48-3ec19c55c7a0",
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "after": {
+              "count": 2,
+              "ids": [
+                "5ed7d9f4-7db1-47c3-9c48-3ec19c55c7a0",
+                "ced886a3-cc22-403b-b24a-3dc7af3bc585"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "78a9bc7899ea835093238f806f347e58fae39b741da173489c49b93060cf8aa3",
+            "pairCanonicalSha256": "72a67f07c2f132520a0673218902a25db55523a70b4fe8c931ab6d2006a228df"
+          }
+        ],
+        "cleanup": [
+          "exact original pair restored",
+          "owned server/ledger closers, pool closure, vault lock and fixture removal attempted; errors retained"
+        ]
+      },
+      {
+        "consumer": "agentCredentialAuth",
+        "publicPinRows": 8,
+        "signatureCheckedLeaseRows": 2,
+        "runtime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "fixtureRootRemoved": true,
+        "statePairRetainedSignatureAndExactRestoration": true,
+        "admissions": 2,
+        "refusals": 6,
+        "calls": [
+          {
+            "state": "healthy",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "username": "agent-lease",
+              "scopes": [
+                "toolhub:intent"
+              ]
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "1a86b5d4bc82cef201b162c732c2d94213a4bc101ca50b801fd629848d269123",
+            "pairCanonicalSha256": "3f1b3dd7670b9ee5d14b13157b67bf284096d2fd9e4ae1e76ac162dfc735c6d7"
+          },
+          {
+            "state": "healthy",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": null,
+            "reason": "credential refused",
+            "witness": {},
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "1a86b5d4bc82cef201b162c732c2d94213a4bc101ca50b801fd629848d269123",
+            "pairCanonicalSha256": "3f1b3dd7670b9ee5d14b13157b67bf284096d2fd9e4ae1e76ac162dfc735c6d7"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": null,
+            "reason": "credential refused",
+            "witness": {},
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "1a86b5d4bc82cef201b162c732c2d94213a4bc101ca50b801fd629848d269123",
+            "pairCanonicalSha256": "0e0585db1608170f3057fcf4051e219a85ba491c0bc679c9acea13739e8b1e77"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": null,
+            "reason": "credential refused",
+            "witness": {},
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "1a86b5d4bc82cef201b162c732c2d94213a4bc101ca50b801fd629848d269123",
+            "pairCanonicalSha256": "0e0585db1608170f3057fcf4051e219a85ba491c0bc679c9acea13739e8b1e77"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": null,
+            "reason": "credential refused",
+            "witness": {},
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "1a86b5d4bc82cef201b162c732c2d94213a4bc101ca50b801fd629848d269123",
+            "pairCanonicalSha256": "9afebed81343083352fb3e29683c1d41ec143f5f0cc26a2ceac91d7ad55c2091"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": null,
+            "reason": "credential refused",
+            "witness": {},
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "1a86b5d4bc82cef201b162c732c2d94213a4bc101ca50b801fd629848d269123",
+            "pairCanonicalSha256": "9afebed81343083352fb3e29683c1d41ec143f5f0cc26a2ceac91d7ad55c2091"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": null,
+            "reason": null,
+            "witness": {
+              "agentId": "default",
+              "username": "agent-lease",
+              "scopes": [
+                "toolhub:intent"
+              ]
+            },
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "1a86b5d4bc82cef201b162c732c2d94213a4bc101ca50b801fd629848d269123",
+            "pairCanonicalSha256": "3f1b3dd7670b9ee5d14b13157b67bf284096d2fd9e4ae1e76ac162dfc735c6d7"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": null,
+            "reason": "credential refused",
+            "witness": {},
+            "operation": "none",
+            "before": {
+              "count": null,
+              "ids": []
+            },
+            "after": {
+              "count": null,
+              "ids": []
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "1a86b5d4bc82cef201b162c732c2d94213a4bc101ca50b801fd629848d269123",
+            "pairCanonicalSha256": "3f1b3dd7670b9ee5d14b13157b67bf284096d2fd9e4ae1e76ac162dfc735c6d7"
+          }
+        ],
+        "cleanup": [
+          "exact original pair restored",
+          "owned server/ledger closers, pool closure, vault lock and fixture removal attempted; errors retained"
+        ]
+      },
+      {
+        "consumer": "studioServer",
+        "publicPinRows": 8,
+        "signatureCheckedLeaseRows": 2,
+        "runtime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "fixtureRootRemoved": true,
+        "statePairRetainedSignatureAndExactRestoration": true,
+        "admissions": 2,
+        "refusals": 6,
+        "calls": [
+          {
+            "state": "healthy",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "intentId": "intent_89c60cdb9261479e932aa9f33e1b150a",
+              "effectiveMode": "SIMULATE"
+            },
+            "operation": "intent",
+            "before": {
+              "count": 0,
+              "ids": []
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "328fc9a0bd33d31892ffce38898cf6dab3b1eeb938bcfec60e94c22fbbb65117",
+            "pairCanonicalSha256": "a602075a8f8f7540010898dda2f6d0eb6a3d86ac960031d198e25f902481f3bd"
+          },
+          {
+            "state": "healthy",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revoked",
+            "witness": {},
+            "operation": "intent",
+            "before": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "328fc9a0bd33d31892ffce38898cf6dab3b1eeb938bcfec60e94c22fbbb65117",
+            "pairCanonicalSha256": "a602075a8f8f7540010898dda2f6d0eb6a3d86ac960031d198e25f902481f3bd"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: digest mismatch",
+            "witness": {},
+            "operation": "intent",
+            "before": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "328fc9a0bd33d31892ffce38898cf6dab3b1eeb938bcfec60e94c22fbbb65117",
+            "pairCanonicalSha256": "3205704e26e3eb34129681a2e65925835905e3dae46b6e87e603f21b1a2c7273"
+          },
+          {
+            "state": "removed-row-old-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: digest mismatch",
+            "witness": {},
+            "operation": "intent",
+            "before": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "328fc9a0bd33d31892ffce38898cf6dab3b1eeb938bcfec60e94c22fbbb65117",
+            "pairCanonicalSha256": "3205704e26e3eb34129681a2e65925835905e3dae46b6e87e603f21b1a2c7273"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "live",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: revocation list missing but signature present",
+            "witness": {},
+            "operation": "intent",
+            "before": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "328fc9a0bd33d31892ffce38898cf6dab3b1eeb938bcfec60e94c22fbbb65117",
+            "pairCanonicalSha256": "2e4d4e196117e70d64fcb5494ba6f332126ae94b2f27895cce8a369359bb7ed2"
+          },
+          {
+            "state": "missing-list-kept-signature",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revocation signature invalid: revocation list missing but signature present",
+            "witness": {},
+            "operation": "intent",
+            "before": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "after": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "328fc9a0bd33d31892ffce38898cf6dab3b1eeb938bcfec60e94c22fbbb65117",
+            "pairCanonicalSha256": "2e4d4e196117e70d64fcb5494ba6f332126ae94b2f27895cce8a369359bb7ed2"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "live",
+            "admitted": true,
+            "status": 200,
+            "reason": null,
+            "witness": {
+              "intentId": "intent_b76cc3e6110f4bf89ee27bc21520e831",
+              "effectiveMode": "SIMULATE"
+            },
+            "operation": "intent",
+            "before": {
+              "count": 1,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a"
+              ]
+            },
+            "after": {
+              "count": 2,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a",
+                "intent_b76cc3e6110f4bf89ee27bc21520e831"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "328fc9a0bd33d31892ffce38898cf6dab3b1eeb938bcfec60e94c22fbbb65117",
+            "pairCanonicalSha256": "a602075a8f8f7540010898dda2f6d0eb6a3d86ac960031d198e25f902481f3bd"
+          },
+          {
+            "state": "restored",
+            "tokenKind": "revoked",
+            "admitted": false,
+            "status": 401,
+            "reason": "lease revoked",
+            "witness": {},
+            "operation": "intent",
+            "before": {
+              "count": 2,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a",
+                "intent_b76cc3e6110f4bf89ee27bc21520e831"
+              ]
+            },
+            "after": {
+              "count": 2,
+              "ids": [
+                "intent_89c60cdb9261479e932aa9f33e1b150a",
+                "intent_b76cc3e6110f4bf89ee27bc21520e831"
+              ]
+            },
+            "withinLifetime": true,
+            "protectedEntries": 12,
+            "protectedCanonicalSha256": "328fc9a0bd33d31892ffce38898cf6dab3b1eeb938bcfec60e94c22fbbb65117",
+            "pairCanonicalSha256": "a602075a8f8f7540010898dda2f6d0eb6a3d86ac960031d198e25f902481f3bd"
+          }
+        ],
+        "cleanup": [
+          "exact original pair restored",
+          "owned server/ledger closers, pool closure, vault lock and fixture removal attempted; errors retained"
+        ]
+      }
+    ],
+    "cryptoReverificationPerformed": false,
+    "cryptoScope": "Actual stored Node booleans and pin chronology/procedure checked; no raw crypto inputs retained for independent offline replay."
+  },
+  "additionalEvidencePins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/driver-first-json-only.py",
+      "bytes": 10608,
+      "sha256": "8c3dc5929eec944c8f2c835e149d9791301ab53e984c1e0e013c5103d8986303"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/driver.py",
+      "bytes": 10985,
+      "sha256": "546de3f39a83f65e7a9fd32f0810c3de22a76459b02344f5ab2aadf9d1afb855"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/finalize.py",
+      "bytes": 18727,
+      "sha256": "efc69806c1c2c62d3aeeb0ebb847428b5f060fcd7c5bfde677465729d02e86aa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/reporter-retention-correction.json",
+      "bytes": 1440,
+      "sha256": "d530366f4f1bebe3e755e5e29deafb8498b4677b3eaa58489bb3955a9131cf64"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/semantic-observation-validation.json",
+      "bytes": 40395,
+      "sha256": "a5e6cb9036b7a9eafd35090db04f463b6fca87d1527506da0570a1c0c0073c99"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/prepared.json",
+      "bytes": 763,
+      "sha256": "556cb7d7effe21c39677bd24dcb6e6f11954cecea724b93015a8d608f1cc8d62"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 5540,
+      "sha256": "7f72e8609ee1d711bea4733b9113c783af1e25a3f4ba95760d30ac550f83d180"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-preservation-before.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/core-preservation-after.json",
+      "bytes": 293,
+      "sha256": "899eb2761566ff9a4cfface513ab6db70e3c01f2297c928cf1c0445464d6348d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/index.UpGiHP7g.js",
+      "bytes": 151531,
+      "sha256": "cdafaf8e508042dddba72f8c7bbae84e2836ddb6b06c7026520c35d91af4e798"
+    }
+  ],
+  "reporterCorrectionReview": {
+    "first": "The retained JSON-only phase has 7/7 passing cases and zero observation markers. It is genuine execution evidence with incomplete detailed-effect retention, not a product failure and not independently observable 56-call evidence.",
+    "difference": "The default reporter was added beside JSON and the output destination changed; selected source, assertions, config, setup, guards, deadlines, launch path, environment and cwd are identical. The frozen original driver and raw phase remain retained. A fresh generator run uses new physical fixture keys and paths.",
+    "installedEvidence": "The pinned installed BaseReporter onUserConsoleLog implementation at 2400-2408 emits user logs; the JsonReporter class begins 3522 and has no onUserConsoleLog handler. This static reading supports the recorded retention cause without changing reporter/dependency bytes.",
+    "second": "The reporter-only rerun also passes 7/7 with zero failed/pending/todo, and exact raw stdout yields seven observations / 56 calls. The rerun does not double distinct cases."
+  },
+  "independentEffectMeaning": [
+    "Every consumer has two admitted calls: healthy/live and restored/live. The six other calls refuse. All 56 calls retain exact protected-before/after and pair-before/after views plus valid-lifetime booleans.",
+    "Gateway has actual HTTP200 with its local upstream marker on two healthy/restored live calls. Its upstream counter increases 0\u21921\u21922 only on those admissions; every denied call has no increment.",
+    "Wire returns an actual workSessionId and receipt hash with default-agent attribution on two admissions. Each inserts exactly one new work/accepted ID; refused requests preserve count and IDs. The retained receipt hash is not independent cryptographic verification of that receipt.",
+    "Studio returns an actual new intent ID present in the public pending-intent list, with precisely one added ID and count per admission. All denied calls preserve the sorted pending ID set. This measures SIMULATE intent admission only, not fs.read execution or permission.",
+    "Router has a healthy/restored protected HTTP200 tool-context witness with a real OWNER cookie plus the supplied lease. Damaged pairs return the outer signature-specific 401. The human session avoids earlier agentCredentialAuth masking while the router still verifies the supplied lease.",
+    "Managed-hook, Bridge and agent-credential positive payload/principal fields match the expected actor/workspace or finite scope grant. Their inapplicable operation counters are null; no audit/filesystem zero is invented. Agent credential null refusal is generic, so intact controls and independently invalid pair procedure bound its meaning.",
+    "For each consumer, the same signature hash/mode remains through all four states; the removed-row list hash changes, missing-data state reports missing, and healthy/restored pair descriptors are identical. Raw signed-pair bytes are not retained for offline reconstruction."
+  ],
+  "cryptoAndChronology": {
+    "rows": "Seven consumers record 56 public-pin rows and 14 lease signature-check rows, with 28 distinct pre-artifact SPKI fingerprints. Each role fingerprint/PEM hash agrees with its persisted-before-initWorkspace entry and all named public-key file hashes in protected snapshots.",
+    "procedure": "The byte-exact independently reviewed source records Node-generated role fingerprints before createVault and signed histories, checks persisted public keys before initWorkspace and later signed artifacts, verifies actual token signatures with the captured lease public key, and checks decoded 32-byte digest signatures with the captured auditor public key. Actual logs report those booleans true for valid states and false for both damaged pair states.",
+    "limit": "This independent review checked the retained runtime booleans, ordering, hashes and exact source procedure. It did not execute cryptography or independently replay signatures. Cleanup removed all seven fixture roots and raw public keys/tokens/pairs. Hash-only logs cannot support offline independent verification or external authority, real-person, signed-list-delegation or truth claims."
+  },
+  "cleanupAndEnvironment": {
+    "actual": "Every observation records exact pair restoration followed by registered server/ledger close, pool close, vault lock and fixture-removal attempts; no errors/failure labels remain and all seven fixture root paths are absent. Within-call snapshots are captured before restoration, so cleanup is not used to hide a changed input.",
+    "limits": "These are selected isolated-worker operations and named snapshots. They do not prove no audit, sessions, SQLite/WAL/SHM, pool or arbitrary filesystem effects, nor provide a system-wide write/process/network audit. HOME/AMC_HOME/TMPDIR are unchanged private0700 paths across reporter phases."
+  },
+  "limits": [
+    "Baseline only; no consumer mutation result or production failure follows. The static six-recipe proposal and original core controls remain separate immutable evidence.",
+    "The seven distinct cases do not become 14 after the reporter rerun and are not silently combined with the separate original 35 as an executed 42-case suite.",
+    "All seven final observations directly record Node v22.23.3, the actual Cellar22 executable and ABI127. This baseline has a direct observation per retained case, unlike the earlier core launcher-only ABI observation.",
+    "New cases have explicit 90-second deadlines and 5-second HTTP timeouts; the original 35 retain normal 30-second config. Port probe/reuse remains a race, though no setup/transport/timeout error occurred in these phases.",
+    "The fresh independent filesystem copy has no .git metadata. Its 12,269 regular-file closure excludes node_modules and symlinks; 307 dependency links and the native binding identity were checked separately. This is not literal-clone or installed-route acceptance.",
+    "No active consumer-guard namespace, held source/test/runner, original test/helper/config, archive, counters, D-15/P1-67 or P1-08 ownership scope, generic 1496/1497/CLI1588 holds, freeze baseline, dependency or Git metadata was changed.",
+    "Five verify-then-reload windows, deleting both files, rollback anchors, pair publication/crash, all authentication branches, full suite, coverage, Node24, hosted CI, G0, release and Done remain unqualified."
+  ],
+  "observerHistory": [
+    {
+      "kind": "corrected read-only verifier schema assumption",
+      "detail": "A preliminary filesystem/raw verifier assumed every frozen command record included executionError and stopped with KeyError on a root Git-observation record. The subsequent inventory showed the field exists on both test records and is absent on root-head-final/root-status-final. The corrected read-only verifier checked both actual shapes and all four records; no evidence input or product runtime was altered."
+    }
+  ],
+  "operations": {
+    "productImports": 0,
+    "testReruns": 0,
+    "cryptoReplay": 0,
+    "compilerBuildInstall": 0,
+    "networkRequests": 0,
+    "GitCommands": 0,
+    "sourceInputPriorOrActiveNamespaceWrites": 0,
+    "writesOnly": [
+      "/private/tmp/p0-30-AMC-1542-consumer-independent-review-20261015.json",
+      "/private/tmp/p0-30-AMC-1542-consumer-independent-review-20261015.md"
+    ]
+  },
+  "allReadsFinished": true
+}

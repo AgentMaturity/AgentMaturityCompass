@@ -1,0 +1,103 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-MOB-01",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "fixtureClaimKind": "synthetic_example",
+    "window": {
+      "start": "2026-10-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "mobility-fixture-tenant",
+      "workspaceId": "mobility-fixture-workspace",
+      "deploymentId": "mobility-port-operations-fixture",
+      "agentId": "mobility-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": [],
+    "mobilityOracle": {
+      "kind": "release_check",
+      "input": {
+        "context": {
+          "tenantId": "mobility-fixture-tenant",
+          "workspaceId": "mobility-fixture-workspace",
+          "deploymentId": "mobility-port-operations-fixture",
+          "agentId": "mobility-fixture-agent",
+          "controlId": "L1-MOB-01",
+          "controlVersion": "0.1.0",
+          "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        },
+        "at": "2026-10-18T12:00:00.000Z",
+        "lotId": "shipment-1",
+        "inventory": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-port-operations-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-01",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "lotIds": [
+            "shipment-1"
+          ]
+        },
+        "sensor": {
+          "binding": {
+            "tenantId": "mobility-fixture-tenant",
+            "workspaceId": "mobility-fixture-workspace",
+            "deploymentId": "mobility-port-operations-fixture",
+            "agentId": "mobility-fixture-agent",
+            "controlId": "L1-MOB-01",
+            "controlVersion": "0.1.0",
+            "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+          },
+          "lotId": "shipment-1",
+          "unit": "C",
+          "maxAgeMs": 120000,
+          "minimumC": 2,
+          "maximumC": 8,
+          "readings": [
+            {
+              "at": "2026-10-18T11:53:00.000Z",
+              "valueC": 4
+            },
+            {
+              "at": "2026-10-18T11:54:00.000Z",
+              "valueC": 4
+            },
+            {
+              "at": "2026-10-18T11:55:00.000Z",
+              "valueC": 4
+            }
+          ]
+        },
+        "disposition": null
+      },
+      "expected": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      }
+    },
+    "pendingColdChainCases": {
+      "notExecuted": true,
+      "dependency": "P2-27",
+      "intendedResult": "not_evaluated",
+      "reason": "Future stale-telemetry scenario; not executed while owner adapter absent."
+    }
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

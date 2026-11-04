@@ -1,0 +1,49 @@
+{
+  "classification": "body-failures-observed",
+  "total": 7,
+  "passed": 6,
+  "failed": 1,
+  "pending": 0,
+  "todo": 0,
+  "failures": [
+    {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "fullName": "recording never breaks the call returns the tool's real outcome when the recorder throws",
+      "failureKind": "exact-genuine-recorder-error-propagation",
+      "rawFailureMessages": [
+        "Error: the evidence store is unreachable\n    at Object.record (/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:202:15)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts:306:19\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:206:21\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "observerErrors": [
+        {
+          "stack": "Error: the evidence store is unreachable\n    at Object.record (/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:202:15)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts:306:19\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts:206:21\n    at file:///Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "message": "the evidence store is unreachable",
+          "constructor": "Function<Error>",
+          "name": "Error",
+          "toString": "Function<toString>",
+          "stacks": [
+            {
+              "method": "Object.record",
+              "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+              "line": 202,
+              "column": 15
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/src/tools/toolPipeline.ts",
+              "line": 306,
+              "column": 19
+            },
+            {
+              "method": "",
+              "file": "/private/tmp/p0-11-causal-qualification-20261015/closure/tests/toolEvidenceRecording.test.ts",
+              "line": 206,
+              "column": 21
+            }
+          ]
+        }
+      ],
+      "masking": "C2 await rejects before outcome assertions210-213; map first-failure frames require root attribution."
+    }
+  ],
+  "attribution": "Exact failure bodies retained for root review; nonzero alone is not a causal kill."
+}

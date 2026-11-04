@@ -1,0 +1,12 @@
+{
+  "schema": "p125pc-clean-source-actual-natural-closure/1",
+  "at": "2026-10-17T01:56:30.376445+00:00",
+  "phase": "p125pc-clean-source",
+  "exit": 0,
+  "durationMs": 48817,
+  "actualEndedUtc": "2026-10-17T01:55:14.888774+00:00",
+  "naturalExecSession35919Closed": true,
+  "retainedRoot": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT",
+  "vitestCredit": false,
+  "freshBindingNotYetExecuted": true
+}

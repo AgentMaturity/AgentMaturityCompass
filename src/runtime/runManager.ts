@@ -546,39 +546,55 @@ export function appendRuntimeRunEvent(input: RuntimeRunAppendInput): RuntimeRunW
   };
 }
 
-export function resumeRuntimeRun(input: { workspace: string; runId: string; agentId?: string | null; source?: RuntimeRunSource; stage?: string; message?: string }): RuntimeRunWriteResult {
+/**
+ * Record-only lifecycle update: this does not resume a process or native session.
+ * Native execution ownership lives in src/sdk/nativeAgentClient.ts and
+ * src/acp/acpAgentServer.ts; their session/turn APIs own actual execution.
+ */
+export function resumeRuntimeRun(input: { workspace: string; runId: string; agentId?: string | null; source?: RuntimeRunSource; stage?: string; message?: string }): RuntimeRunWriteResult & { executionEffect: "record-only" } {
   const run = loadRuntimeRun(input);
   if (run.status === "completed" || run.status === "canceled") {
     throw new Error(`Runtime run ${run.runId} is ${run.status} and cannot be resumed`);
   }
-  return appendRuntimeRunEvent({
-    workspace: input.workspace,
-    runId: run.runId,
-    agentId: run.agentId,
-    episodeId: run.episodeId,
-    lifecycleRunId: run.lifecycleRunId,
-    source: input.source ?? "cli",
-    type: "run.resumed",
-    stage: input.stage ?? run.currentStage,
-    severity: "info",
-    message: input.message ?? "Runtime run resumed from persisted state."
-  });
+  return {
+    ...appendRuntimeRunEvent({
+      workspace: input.workspace,
+      runId: run.runId,
+      agentId: run.agentId,
+      episodeId: run.episodeId,
+      lifecycleRunId: run.lifecycleRunId,
+      source: input.source ?? "cli",
+      type: "run.resumed",
+      stage: input.stage ?? run.currentStage,
+      severity: "info",
+      message: input.message ?? "Runtime run resume recorded; no process or native session was resumed."
+    }),
+    executionEffect: "record-only"
+  };
 }
 
-export function cancelRuntimeRun(input: { workspace: string; runId: string; agentId?: string | null; source?: RuntimeRunSource; reason?: string }): RuntimeRunWriteResult {
+/**
+ * Record-only lifecycle update: this does not signal a process or native session.
+ * Use the owned turn/session cancellation APIs in src/sdk/nativeAgentClient.ts
+ * or src/acp/acpAgentServer.ts to request actual native execution cancellation.
+ */
+export function cancelRuntimeRun(input: { workspace: string; runId: string; agentId?: string | null; source?: RuntimeRunSource; reason?: string }): RuntimeRunWriteResult & { executionEffect: "record-only" } {
   const run = loadRuntimeRun(input);
-  return appendRuntimeRunEvent({
-    workspace: input.workspace,
-    runId: run.runId,
-    agentId: run.agentId,
-    episodeId: run.episodeId,
-    lifecycleRunId: run.lifecycleRunId,
-    source: input.source ?? "cli",
-    type: "run.canceled",
-    stage: run.currentStage,
-    severity: "medium",
-    message: input.reason ?? "Runtime run canceled by operator."
-  });
+  return {
+    ...appendRuntimeRunEvent({
+      workspace: input.workspace,
+      runId: run.runId,
+      agentId: run.agentId,
+      episodeId: run.episodeId,
+      lifecycleRunId: run.lifecycleRunId,
+      source: input.source ?? "cli",
+      type: "run.canceled",
+      stage: run.currentStage,
+      severity: "medium",
+      message: input.reason ?? "Runtime run cancellation recorded; no process or native session was canceled."
+    }),
+    executionEffect: "record-only"
+  };
 }
 
 export function markRuntimeRunDegraded(input: { workspace: string; runId: string; agentId?: string | null; source?: RuntimeRunSource; reason?: string }): RuntimeRunWriteResult {

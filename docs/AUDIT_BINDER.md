@@ -6,8 +6,8 @@ It is an engineering evidence package, not legal advice.
 
 ## What It Contains
 
-- Trust and evidence-gate signals (integrity, correlation, trust label, evidence mix)
-- Maturity summary (5 dimensions + unknown counts)
+- Trust and evidence-gate signals (integrity, correlation, trust label, evidence mix); a signal that no trusted run or scorecard measured is `null`, and the gates then report `GATE_FAIL_INTEGRITY_NOT_MEASURED`, `GATE_FAIL_CORRELATION_NOT_MEASURED`, `MIN_INTEGRITY_NOT_MEASURED` or `MIN_CORRELATION_NOT_MEASURED`
+- Maturity summary (5 dimensions + unknown counts); without a trusted run or org scorecard every question in the bank counts as unknown, never 0
 - Governance and model/tool control summaries
 - Assurance certificate summary and top findings metadata
 - Supply-chain integrity summaries (plugins, releases, backups)

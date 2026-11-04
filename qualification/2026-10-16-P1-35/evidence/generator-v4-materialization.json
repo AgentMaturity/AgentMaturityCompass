@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-16T16:58:23.767131+00:00",
+  "target": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/make-legacy-fixtures.mjs",
+  "bytes": 20953,
+  "sha256": "0d756ecec2b9f95520b38ac8a54a4fe22a26843aa0df338f4ef4ac426b6ba9cb",
+  "inputOutputAndPeerRowsChecked": 71,
+  "rootReadEntireDelta": true,
+  "peerCodeReviewBlockers": [],
+  "change": "Exact naturally closed inline ledger snapshot before diagnostic/assurance; no old source/validator/decryption/claim/gate change",
+  "priorV3CodeCorpusAndActualRedPreserved": true,
+  "actualRuntimeNotYetObserved": true
+}

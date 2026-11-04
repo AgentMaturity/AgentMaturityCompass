@@ -1,0 +1,2 @@
+sessionId,reviewerPseudonym,packetId,itemId,decision,startedAt,completedAt,activeSeconds
+rts_22841d83722e2c3dbf2c60e4,15497011d2047d4b6077681df724782bb555e4f02a05515964c1b4c2c3c2f1b6,rp_aaaaaaaaaaaaaaaaaaaaaaaa,results/control-results.json,disputed,2026-10-27T10:00:00.000Z,2026-10-27T10:00:09.000Z,4

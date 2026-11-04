@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:counts /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass
+> node scripts/gen-counts.mjs --check
+
+Published source counts match the repository; this check does not execute tests.

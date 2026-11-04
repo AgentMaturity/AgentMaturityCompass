@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull } from "../utils/ratio.js";
 /**
  * Industry-Specific Trust Models for AMC Score
  *
@@ -32,15 +34,18 @@ export interface IndustryTrustModel {
 }
 
 export interface IndustryAdjustedScore {
-  rawScore: number;                // Display scale (default 0–100)
-  adjustedScore: number;           // Display scale (default 0–100)
-  maturityLevel: MaturityLevel;    // L0–L5 derived from internal score
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
+  rawScore: number | null;                // Display scale (default 0–100)
+  adjustedScore: number | null;           // Display scale (default 0–100)
+  maturityLevel: MaturityLevel | null;    // L0–L5 derived from internal score
   industryId: string;
   percentileRank: null;            // no peer data has been measured
   percentileReason: "no peer data";
   observedEvidenceShare: number | null; // from the agent's run; null when not evaluated
   dimensionAdjustments: Record<string, { raw: number; weighted: number; weight: number; level: MaturityLevel }>;
-  decayApplied: number;            // Display scale
+  decayApplied: number | null;            // Display scale
   riskFactors: string[];
   complianceGaps: string[];
 }
@@ -181,6 +186,7 @@ export function computeIndustryAdjustedScore(
   let totalWeight = 0;
 
   for (const [dim, rawScore] of Object.entries(rawDimensionScores)) {
+    // One is a neutral multiplier for an observed dimension without an industry-specific weight.
     const weight = model.dimensionWeights[dim] ?? 1.0;
     const weighted = rawScore * weight;
     adjustments[dim] = { raw: toDisplayScore(rawScore), weighted: toDisplayScore(weighted), weight, level: scoreToLevel(rawScore) };
@@ -188,16 +194,18 @@ export function computeIndustryAdjustedScore(
     totalWeight += weight;
   }
 
-  let internalScore = totalWeight > 0 ? totalWeighted / totalWeight : 0;
+  let internalScore = ratioOrNull(totalWeighted, totalWeight);
 
   // Apply temporal decay
-  const decayPoints = Math.min(internalScore, (staleHours / 24) * model.trustDecayRate);
-  if (staleHours > model.maxStaleHours) {
-    internalScore = 0; // Expired → L0
-  } else {
-    internalScore -= decayPoints;
+  const decayPoints = internalScore === null ? null : Math.min(internalScore, (staleHours / 24) * model.trustDecayRate);
+  if (internalScore !== null && decayPoints !== null) {
+    if (staleHours > model.maxStaleHours) {
+      internalScore = 0; // Expired measured evidence remains an L0 score.
+    } else {
+      internalScore -= decayPoints;
+    }
+    internalScore = Math.max(0, internalScore);
   }
-  internalScore = Math.max(0, internalScore);
 
   // Risk factors
   const riskFactors: string[] = [];
@@ -216,18 +224,27 @@ export function computeIndustryAdjustedScore(
     }
   }
 
-  const rawAvg = Object.values(rawDimensionScores).reduce((s, v) => s + v, 0) / Math.max(1, Object.keys(rawDimensionScores).length);
+  const rawAvg = ratioOrNull(Object.values(rawDimensionScores).reduce((s, v) => s + v, 0), Object.keys(rawDimensionScores).length);
 
   return {
-    rawScore: toDisplayScore(rawAvg),
-    adjustedScore: toDisplayScore(internalScore),
-    maturityLevel: scoreToLevel(internalScore),
+    outcome: internalScore === null ? "not_evaluated" : "measured",
+    sampleSize: Object.keys(rawDimensionScores).length,
+    metricOutcomes: {
+      rawScore: rawAvg === null ? "not_evaluated" : "measured",
+      adjustedScore: internalScore === null ? "not_evaluated" : "measured",
+      decayApplied: decayPoints === null ? "not_evaluated" : "measured",
+      observedEvidenceShare: observedEvidenceShare === null ? "not_evaluated" : "measured",
+      percentileRank: "not_evaluated",
+    },
+    rawScore: rawAvg === null ? null : toDisplayScore(rawAvg),
+    adjustedScore: internalScore === null ? null : toDisplayScore(internalScore),
+    maturityLevel: internalScore === null ? null : scoreToLevel(internalScore),
     industryId: model.industryId,
     percentileRank: null,
     percentileReason: "no peer data",
     observedEvidenceShare,
     dimensionAdjustments: adjustments,
-    decayApplied: toDisplayScore(decayPoints),
+    decayApplied: decayPoints === null ? null : toDisplayScore(decayPoints),
     riskFactors,
     complianceGaps,
   };

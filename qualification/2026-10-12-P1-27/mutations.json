@@ -1,0 +1,121 @@
+{
+  "commit": "118a574fed7d6343ff988d09bc6a219ba6cbd5e2",
+  "environment": "local macOS arm64, not CI",
+  "mutations": [
+    {
+      "mutation": "dsse-sign-raw-payload",
+      "file": "src/attest/dsse.ts",
+      "command": "npx vitest run tests/attest/dsse.test.ts",
+      "exit": 1,
+      "killedBy": [
+        "an envelope signed over the PAE verifies with the signer's key and returns the payload"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "dsse-pae-no-lengths",
+      "file": "src/attest/dsse.ts",
+      "command": "npx vitest run tests/attest/dsse.test.ts",
+      "exit": 1,
+      "killedBy": [
+        "matches the DSSE protocol's worked example byte for byte",
+        "counts bytes, not characters, and keeps the payload bytes as they are"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "amc-skip-subject-compare",
+      "file": "src/attest/statement.ts",
+      "command": "npx vitest run tests/attest/statement.test.ts tests/attest/bundleAttestation.test.ts",
+      "exit": 1,
+      "killedBy": [
+        "subjectMismatches names a changed AIBOM and a missing subject, and nothing for the signed bytes",
+        "a tampered AIBOM breaks verification in AMC and in P1-06's verifier"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "amc-allow-synthetic",
+      "file": "src/attest/statement.ts",
+      "command": "npx vitest run tests/attest/statement.test.ts",
+      "exit": 1,
+      "killedBy": [
+        "any synthetic evidence refuses the attestation with SYNTHETIC_NOT_ATTESTABLE"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "amc-independent-without-key",
+      "file": "src/attest/statement.ts",
+      "command": "npx vitest run tests/attest/statement.test.ts",
+      "exit": 1,
+      "killedBy": [
+        "independently_reviewed needs a key admitted for independent-attestation"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "aibom-facts-from-unverified",
+      "file": "src/aibom/collect.ts",
+      "command": "npx vitest run tests/aibom/aibom.test.ts",
+      "exit": 1,
+      "killedBy": [
+        "a config whose signature no longer verifies is listed as such and is not read for facts"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "verifier-skip-subject-compare",
+      "file": "packages/verifier/src/kinds/dsseIntoto.ts",
+      "command": "conformance run.mjs",
+      "exit": 1,
+      "killedBy": [
+        "FAIL dsse-subject-mismatch"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "verifier-skip-payload-type",
+      "file": "packages/verifier/src/kinds/dsseIntoto.ts",
+      "command": "conformance run.mjs",
+      "exit": 1,
+      "killedBy": [
+        "FAIL dsse-wrong-payload-type"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "verifier-sign-check-raw",
+      "file": "packages/verifier/src/kinds/dsseIntoto.ts",
+      "command": "conformance run.mjs",
+      "exit": 1,
+      "killedBy": [
+        "FAIL dsse-expired",
+        "FAIL dsse-independent-claim-seal-key",
+        "FAIL dsse-subject-mismatch",
+        "FAIL dsse-valid"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "verifier-ignore-expiry",
+      "file": "packages/verifier/src/kinds/dsseIntoto.ts",
+      "command": "conformance run.mjs",
+      "exit": 1,
+      "killedBy": [
+        "FAIL dsse-expired"
+      ],
+      "killed": true
+    },
+    {
+      "mutation": "verifier-artifact-seal-for-independent",
+      "file": "packages/verifier/src/kinds/dsseIntoto.ts",
+      "command": "conformance run.mjs",
+      "exit": 1,
+      "killedBy": [
+        "FAIL dsse-independent-claim-seal-key"
+      ],
+      "killed": true
+    }
+  ]
+}

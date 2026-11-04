@@ -1,0 +1,1176 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-14",
+  "finishedUtc": "2026-10-14T13:06:30.809940+00:00",
+  "taskStatus": "User directed skipping P0-29; already-started read-only audit finalized only. No further review expansion.",
+  "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "checkout": "/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass",
+  "refreshedJson": {
+    "path": "/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/docs/program/gap-register-reconciliation.json",
+    "sha256AtFinalization": "2ef11713d5863fb57f18032e1e7c73b1bbc96f6ba5654e7c2def6c539b7c99b0",
+    "reviewStartSha256": "2ef11713d5863fb57f18032e1e7c73b1bbc96f6ba5654e7c2def6c539b7c99b0"
+  },
+  "scope": {
+    "reviewedRows": 35,
+    "byGroup": {
+      "G4": 2,
+      "G5": 8,
+      "G6": 12,
+      "G8": 13
+    },
+    "byDeclaredStatus": {
+      "implemented": 14,
+      "deleted": 9,
+      "relabelled": 12
+    },
+    "noG7FinalRows": true,
+    "supplementalReviewed": [
+      "G8-25b"
+    ],
+    "reviewedEvidenceFiles": 34,
+    "reviewStartEvidenceReferences": 39,
+    "fullRefreshedEvidenceSnippetsAtFinalization": 275,
+    "fullRefreshedEvidenceFiles": 202,
+    "fullNamedInventoryFiles": 480,
+    "countLimit": "34/39 refer only to this G4-G8 final-row review. Earlier63/160 referred only to the38 unresolved rows, not the full reconciliation. Full candidate snippet count grew from273 to275 during parent evidence corrections."
+  },
+  "independentInspection": {
+    "sourceMethod": "Read committed git objects at main5ea rather than dirty working-file documentation. Traced judge transport, third-party attestation guard/API, archive helper, container runtime bootstrap and six production hook callers.",
+    "sourceExcerptConclusion": "At review start, all39 cited source blobs and whole-file SHA256 values matched main. Excerpts matched their splitlines-and-join ranges without a forced final LF; no substantive byte mismatch was found. Evidence range support limitations are listed separately.",
+    "ancestryCommandsExecuted": 24,
+    "ancestryFailures": [],
+    "historicalAncestry": [
+      {
+        "commit": "1fb284effdd99f6fd6611502f92c3e5fe4f96846",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "231549f646dfe5b1c948e9afa30ccb519422dc25",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "4838351ecab2856031caa2bc4f9fdfb67dce8ac5",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "49b163ebf2d062e21d5f3dc35d9af1841913cab3",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "4bfbf48341fc85e65d8e29180ad029b6ce196cf1",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "6ea0453f653b25048a6a051a5cb6ff863ad472df",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "77aae47add3372cd37c63f18b2653bb85b249f46",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "7cfcb767ec8aa7c8e214d79912df0895d9fa0eb2",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "8e7c6351ca071202f3788c7f4cf8d52e26ee9b00",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "8fb725399b6438c8dfcb4edf2306e33de8bac4f5",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "a7e43ba8a11f4542b2725c48d39f353b23722a03",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "aa0870907e5e5c41b3e303eadd2b0397bbebac96",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "ab41907756d9f3288f61700764d7eb549bad1839",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "af77881ee86d3b3a49d20727431c579cc04113dd",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "b993093e021d6a081c63922c9ac59364cde1da18",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "bda990ac032c1858b7dee1a9ed25d967ac556aa6",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "bfb0cd66dfb241492287b1e532ca2cd5da812b56",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "cb6bba21155254b3a03e3aa696bf08737c375429",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "cb7893e1a2d6f8d1cbb4046e7bf679467aa6ebef",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "e2274875eaf1ce7315a172e10d23713074d7cba1",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "e337d72722e1f37d212e9d8fbf8e9821dacf0f71",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "e6b131073bf2ebcd9ae4de8eb868193ce5c4b15d",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "ec271345d9048d3d53a9a821dd0ca8abd5c23fc7",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      },
+      {
+        "commit": "fe24368522cb6e17c5c95123a0ace887667b4836",
+        "observedExitCode": 0,
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      }
+    ],
+    "limits": [
+      "Source-only confirmation, not new runtime or qualification proof.",
+      "Ancestry is provenance, not a causal fix assertion.",
+      "User skipped P0-29; parent reported the broad runner stopped with exit130. This report is not a passing receipt.",
+      "Dirty worktree documentation was not used as accepted-main source.",
+      "No product fix, row/status/routing change, test edit, tracker update, cleanup or freeze bypass occurred."
+    ]
+  },
+  "materialFindings": [
+    {
+      "id": "review-G8-14",
+      "priority": 1,
+      "rowIds": [
+        "G8-14"
+      ],
+      "kind": "final_status_scope_defect",
+      "conclusion": "The process-local counter disclaimer is present, but it does not dispose of the original six unwired hooks. The second header still claims production bridging, and main-wide grep finds the hook names only in definitions/comments and src/index.ts exports, not runtime callers. A final relabelled disposition is broader than the demonstrated counter clarification; retain as unresolved review debt.",
+      "evidence": [
+        "src/ops/productionWiring.ts:4-11",
+        "src/ops/productionWiring.ts:15-33",
+        "src/ops/productionWiring.ts:134,211,274,310,346,410",
+        "src/index.ts:1693-1699",
+        "main-wide git grep of the six exact hook names"
+      ],
+      "proposal": "Reclassify only after scope review to a non-final disposition with an explicit successor or unresolved routing debt. This proposal is not applied and not qualified.",
+      "currentState": "Unresolved review debt; P0-29 skipped."
+    },
+    {
+      "id": "review-G8-16",
+      "priority": 2,
+      "rowIds": [
+        "G8-16"
+      ],
+      "kind": "whole_scope_consolidation_limit",
+      "conclusion": "The three named divergent tables now import shared canonical definitions and agree on SELF_REPORTED=0.4. The fourth named evidenceCollector still uses independent literals 0.4 and 1.0. Its present values match, so no current numeric divergence is established, but a claim that all four paths have one imported table is unsupported. Keep complete consolidation acceptance explicit.",
+      "evidence": [
+        "src/score/trustWeights.ts:28-40",
+        "src/score/evidenceIngestion.ts:27-30",
+        "src/score/formalSpec.ts:5-31",
+        "src/score/modelDrift.ts:203-205",
+        "src/score/evidenceCollector.ts:30-34",
+        "src/score/evidenceCollector.ts:71-76"
+      ],
+      "proposal": "Confirm the three-table remedy narrowly and retain the fourth path as explicit scope debt; do not assert whole-product canonicalization. No current numeric divergence or new assignment is claimed.",
+      "currentState": "Unresolved scope review debt; P0-29 skipped."
+    },
+    {
+      "id": "review-G6-04",
+      "priority": 2,
+      "rowIds": [
+        "G6-04"
+      ],
+      "kind": "current_absence_witness_gap",
+      "conclusion": "All five literal original secret filenames are absent from accepted main; examples are intentionally different names. The refreshed structured witness has empty paths and retains the five only as historicalPaths. That is inadequate as a current five-member witness until its observation is stated explicitly.",
+      "evidence": [
+        "accepted main tree: five historicalPaths in absenceEvidence",
+        ".gitignore:119-124"
+      ],
+      "currentWitness": {
+        "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "paths": [],
+        "presentMembers": [],
+        "historicalPaths": [
+          "deploy/compose/secrets/amc_vault_passphrase.txt",
+          "deploy/compose/secrets/amc_owner_username.txt",
+          "deploy/compose/secrets/amc_owner_password.txt",
+          "deploy/compose/secrets/amc_notary_auth_secret.txt",
+          "deploy/compose/secrets/amc_notary_passphrase.txt"
+        ]
+      },
+      "independentNamedPaths": [
+        {
+          "path": "deploy/compose/secrets/amc_vault_passphrase.txt",
+          "presentOnMain": false
+        },
+        {
+          "path": "deploy/compose/secrets/amc_owner_username.txt",
+          "presentOnMain": false
+        },
+        {
+          "path": "deploy/compose/secrets/amc_owner_password.txt",
+          "presentOnMain": false
+        },
+        {
+          "path": "deploy/compose/secrets/amc_notary_auth_secret.txt",
+          "presentOnMain": false
+        },
+        {
+          "path": "deploy/compose/secrets/amc_notary_passphrase.txt",
+          "presentOnMain": false
+        }
+      ],
+      "proposal": "Preserve historicalPaths and add a truthful current five-member absence witness in a later authorized source-evidence refresh. No deletion, status or routing action follows.",
+      "currentState": "Citation/absence witness correction debt; P0-29 skipped."
+    },
+    {
+      "id": "review-citations",
+      "priority": 2,
+      "rowIds": [
+        "G4-36",
+        "G6-02",
+        "G6-03",
+        "G6-04",
+        "G6-06",
+        "G8-29"
+      ],
+      "kind": "evidence_range_scope_gap",
+      "conclusion": "Some original cited ranges omit the actual current statements that support a narrow remedy. G4-36 needs baseline write persistence at119-137; compose/K8s secret ignores are .gitignore119-124; pickle ignore is115-117; Studio target inheritance is Dockerfile43-59 and80-89. Whole-file blob/hash identity alone cannot make an unrelated line range evidence.",
+      "supportingRanges": [
+        "scripts/architecture-boundaries-check.mjs:119-137",
+        ".gitignore:119-124",
+        ".gitignore:115-117",
+        "Dockerfile:43-59",
+        "Dockerfile:80-89"
+      ],
+      "currentCandidateRefs": {
+        "G4-36": [
+          "scripts/architecture-boundaries-check.mjs:65-113"
+        ],
+        "G6-02": [
+          ".gitignore:98-110"
+        ],
+        "G6-03": [
+          "deploy/k8s/kustomization.yaml:1-14"
+        ],
+        "G6-04": [
+          ".gitignore:100-115"
+        ],
+        "G6-06": [
+          "deploy/compose/docker-compose.yml:11-45",
+          "Dockerfile:55-67"
+        ],
+        "G8-29": [
+          ".gitignore:98-110"
+        ]
+      },
+      "proposal": "Retain or correct citation anchors only as unqualified review debt; do not treat the interrupted run as passing qualification.",
+      "currentState": "Root reported citation corrections will be retained as unqualified review debt."
+    },
+    {
+      "id": "review-G5-31",
+      "priority": 2,
+      "rowIds": [
+        "G5-31"
+      ],
+      "kind": "over_specific_header_claim",
+      "conclusion": "No learned-ML implementation is supported in the named generator, but the header says generationMethod is template for every attack while methods return evolutionary at237 and hybrid at299. The narrow no-ML relabel is confirmed; the stronger all-template claim is not.",
+      "evidence": [
+        "src/shield/dynamicAttackGenerator.ts:5-8",
+        "src/shield/dynamicAttackGenerator.ts:237",
+        "src/shield/dynamicAttackGenerator.ts:299"
+      ],
+      "proposal": "Do not repeat the all-template claim in reconciliation evidence. Any product-header correction remains successor work, outside this skipped P0-29 review.",
+      "currentState": "Unresolved wording debt."
+    },
+    {
+      "id": "review-provenance-text",
+      "priority": 2,
+      "rowIds": [
+        "G4-40",
+        "G6-02",
+        "G6-03",
+        "G6-04",
+        "G6-06",
+        "G6-11",
+        "G6-25",
+        "G6-26",
+        "G8-09",
+        "G8-24",
+        "G8-29",
+        "G8-30"
+      ],
+      "kind": "mixed_old_new_main_labels",
+      "conclusion": "Several row evidence strings retain main tree55a5f121d while structured absenceEvidence names current main5ea5e866a. Preserve the old assertion as history and distinguish current witnesses; do not read the old label as current qualification.",
+      "proposal": "A later authorized evidence refresh should label historical and current observations separately.",
+      "currentState": "Unqualified provenance clarification debt."
+    }
+  ],
+  "rows": [
+    {
+      "id": "G4-36",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "Ratchet **blesses** the two worst monoliths instead of shrinking them: `lineBudgets` freeze `cli.ts` at 24417 and `studioServer.ts` at 8883 as permanent \"audit baselines\" — the only two files with a guard, and it enforces \"don't grow,\" never \"get smaller\"",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "The source scans all TS files, rejects new over-cap files and growth above a recorded budget, and --update persists lowered budgets. This implements the named descending-ratchet replacement; it does not compel monolith decomposition or resume G4.",
+      "independentEvidence": [
+        "scripts/architecture-boundaries-check.mjs:65-105",
+        "scripts/architecture-boundaries-check.mjs:119-137"
+      ],
+      "citedHistoricalCommits": [
+        "fe24368522cb6e17c5c95123a0ace887667b4836"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G4-40",
+      "declaredStatusAtReviewStart": "deleted",
+      "currentStatusAtFinalization": "deleted",
+      "finding": "`cli-watch-commands.ts` — imported but body is a hard `return;` at line 16, leaving ~170 unreachable lines; `cli-new-commands.ts.fragment` is a 506-line leftover duplicating shield/enforce/product commands",
+      "verdict": "confirmed_named_deletion",
+      "conclusion": "Both explicitly named dead CLI files are absent from the accepted main tree. This is repository absence only.",
+      "independentEvidence": [
+        "accepted main tree: src/cli-watch-commands.ts",
+        "accepted main tree: src/cli-new-commands.ts.fragment"
+      ],
+      "citedHistoricalCommits": [
+        "ec271345d9048d3d53a9a821dd0ca8abd5c23fc7"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "src/cli-watch-commands.ts",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "src/cli-new-commands.ts.fragment",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G5-11",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "`assurancePackIdSchema` enumerates **7** pack ids",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "The seven-value enum is replaced by a nonempty alphanumeric identifier schema. Registry resolution separately checks membership through getAssurancePack. This fixes rejection of the registry own ids by the old fixed enum; it is an alternative to generating an enum, not proof of every consumer or arbitrary id admission.",
+      "independentEvidence": [
+        "src/assurance/assuranceSchema.ts:9-25",
+        "src/assurance/packs/index.ts:296-305"
+      ],
+      "citedHistoricalCommits": [
+        "af77881ee86d3b3a49d20727431c579cc04113dd"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G5-21",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "Whitepaper filename `_v1` vs header \"Version 2.0\"",
+      "verdict": "confirmed_named_relabel",
+      "conclusion": "The main whitepaper explicitly says its v1 filename is historical for link stability and header version 2.0 is authoritative. No rename or technical version qualification is claimed.",
+      "independentEvidence": [
+        "whitepaper/AMC_WHITEPAPER_v1.md:4-10"
+      ],
+      "citedHistoricalCommits": [
+        "b993093e021d6a081c63922c9ac59364cde1da18"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G5-22",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "Stale `## [Unreleased]` block buried mid-file",
+      "verdict": "confirmed_named_relabel",
+      "conclusion": "The buried Unreleased block is explicitly labelled historical and shipped; the block is retained rather than deleted. This supports relabelled, not removed.",
+      "independentEvidence": [
+        "CHANGELOG.md:589-598"
+      ],
+      "citedHistoricalCommits": [
+        "b993093e021d6a081c63922c9ac59364cde1da18"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G5-29",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "Title \"2 Minutes\" vs body \"under 5 minutes\"",
+      "verdict": "confirmed_named_relabel",
+      "conclusion": "The quickstart headline and introductory task distinction replace the contradictory two/five minute claims. No measured time-to-value is established.",
+      "independentEvidence": [
+        "docs/QUICKSTART.md:1-9"
+      ],
+      "citedHistoricalCommits": [
+        "ab41907756d9f3288f61700764d7eb549bad1839"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G5-31",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "\"**ML-powered** attack synthesis like Promptfoo / replaces static pattern matching\"",
+      "verdict": "confirmed_narrowly_with_wording_debt",
+      "conclusion": "The generator rejects a learned-ML description and uses templates, string heuristics and randomized combinations. The historical redteam path resolves to the shield implementation. However, its header claim that every generationMethod is template is inaccurate: evolutionary and hybrid branches exist; do not reproduce that stronger claim.",
+      "independentEvidence": [
+        "src/shield/dynamicAttackGenerator.ts:1-9",
+        "src/shield/dynamicAttackGenerator.ts:194-245",
+        "src/shield/dynamicAttackGenerator.ts:277-301"
+      ],
+      "citedHistoricalCommits": [
+        "8e7c6351ca071202f3788c7f4cf8d52e26ee9b00"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G5-32",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "\"**ML-powered**\" behavioral profiling",
+      "verdict": "confirmed_named_relabel",
+      "conclusion": "The named profiler header describes robust z-score/MAD statistics and explicitly says not machine learning. No new model capability is built or qualified.",
+      "independentEvidence": [
+        "src/watch/behavioralProfiler.ts:1-16"
+      ],
+      "citedHistoricalCommits": [
+        "8e7c6351ca071202f3788c7f4cf8d52e26ee9b00"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G5-33",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "i18n \"**20 locales** / multilingual foundation\"",
+      "verdict": "confirmed_named_relabel",
+      "conclusion": "The named framework header says English-only scaffold, locale list as schema intent, and no current CLI/report t() path. This confirms that file relabel, not multilingual product support or public-copy completeness.",
+      "independentEvidence": [
+        "src/i18n/i18nFramework.ts:1-7"
+      ],
+      "citedHistoricalCommits": [
+        "6ea0453f653b25048a6a051a5cb6ff863ad472df"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G5-34",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "pyproject declares anthropic/openai/presidio/detect-secrets/cyclonedx/otel",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "The named LLM/PII/BOM/OTel packages are outside default dependencies and in explicit unused-reserved optional extras. This confirms removal from default installation declarations, not package installation execution.",
+      "independentEvidence": [
+        "platform/python/pyproject.toml:14-41",
+        "platform/python/pyproject.toml:43-55"
+      ],
+      "citedHistoricalCommits": [
+        "e2274875eaf1ce7315a172e10d23713074d7cba1"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-02",
+      "declaredStatusAtReviewStart": "deleted",
+      "currentStatusAtFinalization": "deleted",
+      "finding": "Malicious-pickle fixture at repo root — `pickle.loads(b'malicious_code')`; trips any downstream security scanner that clones",
+      "verdict": "confirmed_named_deletion",
+      "conclusion": "test_model.pkl is absent from the accepted tree. Its ignore rule is at current .gitignore:115-117, outside the candidate cited 98-110 range. Existing local copies and historical exposure are unaffected.",
+      "independentEvidence": [
+        "accepted main tree: test_model.pkl",
+        ".gitignore:115-117"
+      ],
+      "citedHistoricalCommits": [
+        "cb6bba21155254b3a03e3aa696bf08737c375429"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "test_model.pkl",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-03",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "k8s `Secret` with placeholder creds is included by kustomization, so `kubectl apply -k` ships known credentials",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "Kustomization does not include secret.yaml; the real secret path is absent and ignored while the example remains separate. This removes deployment of the committed known placeholder file, not operator deployment qualification.",
+      "independentEvidence": [
+        "deploy/k8s/kustomization.yaml:3-14",
+        ".gitignore:119-124",
+        "accepted main tree: deploy/k8s/secret.yaml"
+      ],
+      "citedHistoricalCommits": [
+        "cb6bba21155254b3a03e3aa696bf08737c375429"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "deploy/k8s/secret.yaml",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-04",
+      "declaredStatusAtReviewStart": "deleted",
+      "currentStatusAtFinalization": "deleted",
+      "finding": "Five committed compose secret files with real `change-me-*` values live in git",
+      "verdict": "confirmed_named_deletion_with_witness_debt",
+      "conclusion": "All five literal original secret filenames are absent from accepted main; examples are intentionally different names. The refreshed structured witness has empty paths and retains the five only as historicalPaths. That is inadequate as a current five-member witness until its observation is stated explicitly.",
+      "independentEvidence": [
+        "accepted main tree: five historicalPaths in absenceEvidence",
+        ".gitignore:119-124"
+      ],
+      "citedHistoricalCommits": [
+        "cb6bba21155254b3a03e3aa696bf08737c375429"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "deploy/compose/secrets/amc_vault_passphrase.txt",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "deploy/compose/secrets/amc_owner_username.txt",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "deploy/compose/secrets/amc_owner_password.txt",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "deploy/compose/secrets/amc_notary_auth_secret.txt",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "deploy/compose/secrets/amc_notary_passphrase.txt",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-05",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "Default vault passphrase baked into the shipped image",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "The full main Dockerfile has no baked AMC_VAULT_PASSPHRASE ENV. Studio bootstrap requires readable runtime secrets, and production defaultPassphrase throws without a credential. VITEST fallback and operator provisioning remain separate acceptance.",
+      "independentEvidence": [
+        "Dockerfile:1-89",
+        "docker/entrypoint.sh:34-52",
+        "src/vault/vault.ts:126-144"
+      ],
+      "citedHistoricalCommits": [
+        "aa0870907e5e5c41b3e303eadd2b0397bbebac96"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-06",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "Divergent unhardened image: node:22-slim, **root user**, no healthcheck; plain `docker-compose.yml` uses it while TLS variant uses the hardened root `Dockerfile`",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "Plain Compose builds root Dockerfile studio target with read-only/tmpfs/cap-drop/no-new-privileges controls. Runtime user is 10001 and studio inherits runtime; divergent deploy/compose/Dockerfile is absent. No container or deployment ran in this review.",
+      "independentEvidence": [
+        "deploy/compose/docker-compose.yml:11-46",
+        "Dockerfile:43-59",
+        "Dockerfile:80-89",
+        "accepted main tree: deploy/compose/Dockerfile"
+      ],
+      "citedHistoricalCommits": [
+        "77aae47add3372cd37c63f18b2653bb85b249f46"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "deploy/compose/Dockerfile",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-11",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "Fake \"signatures\" presented as crypto attestations",
+      "verdict": "confirmed_named_relabel",
+      "conclusion": "All four named original members are disposed of narrowly: watch output signed:false, AgentBus contentDigest, identity provenanceTag explicitly noncryptographic, and selfModelCalibration absent. This does not add authenticity proof.",
+      "independentEvidence": [
+        "src/watch/outputAttestation.ts:12-32",
+        "src/watch/agentBus.ts:16-35",
+        "src/diagnostic/identityStability.ts:43-50",
+        "accepted main tree: src/diagnostic/selfModelCalibration.ts"
+      ],
+      "citedHistoricalCommits": [
+        "4bfbf48341fc85e65d8e29180ad029b6ce196cf1",
+        "e337d72722e1f37d212e9d8fbf8e9821dacf0f71"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "src/diagnostic/selfModelCalibration.ts",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-12",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "\"Zero-knowledge\" privacy uses toy crypto: secp256k1 **group order** as a field modulus, DLP in a 256-bit multiplicative group (sub-exponentially breakable); code comment admits it",
+      "verdict": "confirmed_named_relabel",
+      "conclusion": "The named module explicitly says it is not a ZK proof system, describes broken toy protocols and denies a privacy guarantee. This is non-production documentation, not repaired/vetted cryptography.",
+      "independentEvidence": [
+        "src/vault/zkPrivacy.ts:1-32"
+      ],
+      "citedHistoricalCommits": [
+        "cb7893e1a2d6f8d1cbb4046e7bf679467aa6ebef"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-13",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "Root composite Action installs AMC via unpinned `curl \\| sh` — supply-chain risk it warns consumers against elsewhere",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "The composite action fixes version 1.2.0, downloads its archive and SHA256SUMS, checks sha256sum, then installs the archive; moving curl|sh execution is gone. Published assets and installation execution were not checked.",
+      "independentEvidence": [
+        "action.yml:24-31"
+      ],
+      "citedHistoricalCommits": [
+        "231549f646dfe5b1c948e9afa30ccb519422dc25"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-14",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "Consumer-template workflow ships the same unpinned `curl \\| sh` to every downstream user",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "The consumer template uses the same versioned archive and checksum path instead of moving curl|sh. This confirms template source only, not downstream execution or public archive availability.",
+      "independentEvidence": [
+        ".github/workflows/amc-score.yml:48-55"
+      ],
+      "citedHistoricalCommits": [
+        "bda990ac032c1858b7dee1a9ed25d967ac556aa6"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-19",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "Three archive-extraction sites shell out to raw `tar -xzf`, bypassing `safeTarArchive` (zip-slip/size limits) that sibling code uses",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "All three named extraction wrappers call extractValidatedTarGzipArchive with explicit archive limits. The shared helper inspects before tar and validates the extracted tree afterward. No extraction or malicious-archive test ran here.",
+      "independentEvidence": [
+        "src/audit/binderArtifact.ts:50-73",
+        "src/audit/binderVerifier.ts:30-54",
+        "src/passport/passportArtifact.ts:27-50",
+        "src/security/safeTarArchive.ts:154-199"
+      ],
+      "citedHistoricalCommits": [
+        "cb6bba21155254b3a03e3aa696bf08737c375429"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-25",
+      "declaredStatusAtReviewStart": "deleted",
+      "currentStatusAtFinalization": "deleted",
+      "finding": "Internal strategy/competitive docs are **tracked** in a public repo; `.gitignore` pattern `COMPETITIVE_ANALYSIS.md` misses the real `…_G0DM0D3.md` names",
+      "verdict": "confirmed_named_deletion",
+      "conclusion": "All three named internal/competitive root documents are absent and the actual filename family is ignored. Historical publication is not erased; other internal docs are outside this named deletion set.",
+      "independentEvidence": [
+        "accepted main tree: three absenceEvidence paths",
+        ".gitignore:91-97"
+      ],
+      "citedHistoricalCommits": [
+        "cb6bba21155254b3a03e3aa696bf08737c375429"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "AMC_COMPLETE_KNOWLEDGE.md",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "COMPETITIVE_ANALYSIS_G0DM0D3.md",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "COMPETITIVE_GAP_REPORT_G0DM0D3.md",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G6-26",
+      "declaredStatusAtReviewStart": "deleted",
+      "currentStatusAtFinalization": "deleted",
+      "finding": "Four temp event dumps tracked and not gitignored — will recur",
+      "verdict": "confirmed_named_deletion",
+      "conclusion": "All four original temp dump files are absent and .tmp-* is ignored. This does not delete or inspect current local runtime dumps.",
+      "independentEvidence": [
+        "accepted main tree: four absenceEvidence paths",
+        ".gitignore:115-117"
+      ],
+      "citedHistoricalCommits": [
+        "cb6bba21155254b3a03e3aa696bf08737c375429"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": ".tmp-a2a-events.json",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": ".tmp-distributed-events.json",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": ".tmp-memory-depth-events.json",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": ".tmp-gap-report.json",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-04",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "1.0GB npm cache bloats the worktree",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "The release bundle passes an OS-tmpdir cache path to npm. This prevents this writer from creating its cache in the worktree; it does not prove old local cache data moved or was removed.",
+      "independentEvidence": [
+        "src/release/releaseBundle.ts:120-130"
+      ],
+      "citedHistoricalCommits": [
+        "49b163ebf2d062e21d5f3dc35d9af1841913cab3"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-07",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "`enterpriseIam.ts` — 415-line SSO/RBAC/audit engine, self-flagged \"#1 blocker,\" reachable only via `src/index.ts` barrel",
+      "verdict": "confirmed_named_relabel",
+      "conclusion": "Enterprise IAM declares itself an embedder toolkit, identifies AMC real authorization paths and denies that its mere presence means AMC RBAC is enabled. Missing runtime wiring is not implemented.",
+      "independentEvidence": [
+        "src/auth/enterpriseIam.ts:20-31"
+      ],
+      "citedHistoricalCommits": [
+        "bfb0cd66dfb241492287b1e532ca2cd5da812b56"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-08",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "`eval/llmApiIntegration.ts` implements genuine OpenAI/Anthropic fetch clients but has zero importers, while the shipped judge is the hardcoded mock",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "The judge wrapper delegates to ProductionLLMJudgeEngine, which makes a real client request and throws without an API key. No hardcoded default score remains in that named transport path; no external judge call was made.",
+      "independentEvidence": [
+        "src/eval/llmJudgeEngine.ts:350-365",
+        "src/eval/llmApiIntegration.ts:312-336",
+        "src/eval/llmApiIntegration.ts:339-353"
+      ],
+      "citedHistoricalCommits": [
+        "e6b131073bf2ebcd9ae4de8eb868193ce5c4b15d"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-09",
+      "declaredStatusAtReviewStart": "deleted",
+      "currentStatusAtFinalization": "deleted",
+      "finding": "`eval/llmJudgeCli.ts` (the judge CLI) never registered in `cli.ts` — dead",
+      "verdict": "confirmed_named_deletion",
+      "conclusion": "The named unused llmJudgeCli.ts is absent from main. No claim is made that its command was wired or local copies removed.",
+      "independentEvidence": [
+        "accepted main tree: src/eval/llmJudgeCli.ts"
+      ],
+      "citedHistoricalCommits": [
+        "ec271345d9048d3d53a9a821dd0ca8abd5c23fc7"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "src/eval/llmJudgeCli.ts",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-10",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "Second SCIM implementation `integrations/scimAdapter.ts` (`InMemoryScimUserStore`) is barrel-export only, never mounted — duplicates the wired `identity/scim/scimRoutes.ts`",
+      "verdict": "confirmed_named_relabel",
+      "conclusion": "The adapter is documented as a standalone embedder handler with a prototype in-memory store, explicitly not mounted by AMC, and directs operators to identity/scim. This is a boundary relabel, not server consolidation.",
+      "independentEvidence": [
+        "src/integrations/scimAdapter.ts:1-16"
+      ],
+      "citedHistoricalCommits": [
+        "bfb0cd66dfb241492287b1e532ca2cd5da812b56"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-14",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "`ops/productionWiring.ts` — six \"production wiring\" hooks called by no code",
+      "verdict": "partial_final_status_defect",
+      "conclusion": "The process-local counter disclaimer is present, but it does not dispose of the original six unwired hooks. The second header still claims production bridging, and main-wide grep finds the hook names only in definitions/comments and src/index.ts exports, not runtime callers. A final relabelled disposition is broader than the demonstrated counter clarification; retain as unresolved review debt.",
+      "independentEvidence": [
+        "src/ops/productionWiring.ts:4-11",
+        "src/ops/productionWiring.ts:15-33",
+        "src/ops/productionWiring.ts:134,211,274,310,346,410",
+        "src/index.ts:1693-1699",
+        "main-wide git grep of the six exact hook names"
+      ],
+      "citedHistoricalCommits": [
+        "4838351ecab2856031caa2bc4f9fdfb67dce8ac5"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-15",
+      "declaredStatusAtReviewStart": "relabelled",
+      "currentStatusAtFinalization": "relabelled",
+      "finding": "Flat-0.7 \"observed\" evidence path still wired despite the f419839a \"reconcile\" commit",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "Caller supplied module outputs now use self_reported and 0.4, not observed at 0.7. The separately retained guard-ledger path is not part of that narrow relabel and its provenance was not qualified here.",
+      "independentEvidence": [
+        "src/score/evidenceCollector.ts:14-42"
+      ],
+      "citedHistoricalCommits": [
+        "8e7c6351ca071202f3788c7f4cf8d52e26ee9b00"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-16",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "Three divergent trust-weight tables for the same tiers",
+      "verdict": "confirmed_narrowly_with_scope_debt",
+      "conclusion": "The three named divergent tables now import shared canonical definitions and agree on SELF_REPORTED=0.4. The fourth named evidenceCollector still uses independent literals 0.4 and 1.0. Its present values match, so no current numeric divergence is established, but a claim that all four paths have one imported table is unsupported. Keep complete consolidation acceptance explicit.",
+      "independentEvidence": [
+        "src/score/trustWeights.ts:28-40",
+        "src/score/evidenceIngestion.ts:27-30",
+        "src/score/formalSpec.ts:5-31",
+        "src/score/modelDrift.ts:203-205",
+        "src/score/evidenceCollector.ts:30-34",
+        "src/score/evidenceCollector.ts:71-76"
+      ],
+      "citedHistoricalCommits": [
+        "8fb725399b6438c8dfcb4edf2306e33de8bac4f5"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-21",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "`attestIngestSession` upgrades SELF_REPORTED→ATTESTED by re-signing the same unverified payload",
+      "verdict": "confirmed_narrowly",
+      "conclusion": "Self-attestation remains SELF_REPORTED. Promotion requires a signature over the bound bundle digest from a key admitted for independent-attestation; own workspace keys and absent trust lists are refused. The API loads operator trust rather than accepting it from the request. This proves the source guard path, not content truth or a fresh runtime test.",
+      "independentEvidence": [
+        "src/ingest/ingest.ts:139-195",
+        "src/claims/evidenceProvenance.ts:112-128",
+        "src/api/evidenceRouter.ts:394-412"
+      ],
+      "citedHistoricalCommits": [
+        "1fb284effdd99f6fd6611502f92c3e5fe4f96846"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-24",
+      "declaredStatusAtReviewStart": "deleted",
+      "currentStatusAtFinalization": "deleted",
+      "finding": "Six tracked ad-hoc debug scratch scripts",
+      "verdict": "confirmed_named_deletion",
+      "conclusion": "All six literal scratch script paths are absent and internal/ is ignored. No local authored scratch or historical object was removed.",
+      "independentEvidence": [
+        "accepted main tree: six absenceEvidence paths",
+        ".gitignore:140-144"
+      ],
+      "citedHistoricalCommits": [
+        "7cfcb767ec8aa7c8e214d79912df0895d9fa0eb2"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "internal/debug/debug_hipaa.js",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "internal/debug/debug_hipaa2.js",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "internal/debug/debug_hipaa3.js",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "internal/debug/test-compare-models.js",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "internal/debug/test-model-scanner.cjs",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "internal/debug/test-model-scanner.mjs",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-29",
+      "declaredStatusAtReviewStart": "deleted",
+      "currentStatusAtFinalization": "deleted",
+      "finding": "Malicious-pickle fixture orphaned at repo root",
+      "verdict": "confirmed_named_deletion",
+      "conclusion": "The duplicate original pickle finding has the same current named-path absence as G6-02. Its distinct historical ID is retained.",
+      "independentEvidence": [
+        "accepted main tree: test_model.pkl",
+        ".gitignore:115-117"
+      ],
+      "citedHistoricalCommits": [
+        "cb6bba21155254b3a03e3aa696bf08737c375429"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "test_model.pkl",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-30",
+      "declaredStatusAtReviewStart": "deleted",
+      "currentStatusAtFinalization": "deleted",
+      "finding": "Internal strategy docs tracked in a public repo (ignore pattern misses them)",
+      "verdict": "confirmed_named_deletion",
+      "conclusion": "The three named internal documents are absent with corrected filename-family ignores, as for G6-25. Distinct historical ID and exposure limits remain.",
+      "independentEvidence": [
+        "accepted main tree: three absenceEvidence paths",
+        ".gitignore:91-97"
+      ],
+      "citedHistoricalCommits": [
+        "cb6bba21155254b3a03e3aa696bf08737c375429"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [
+        {
+          "path": "AMC_COMPLETE_KNOWLEDGE.md",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "COMPETITIVE_ANALYSIS_G0DM0D3.md",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        },
+        {
+          "path": "COMPETITIVE_GAP_REPORT_G0DM0D3.md",
+          "mainTree": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "present": false
+        }
+      ],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    },
+    {
+      "id": "G8-25b",
+      "declaredStatusAtReviewStart": "implemented",
+      "currentStatusAtFinalization": "implemented",
+      "finding": "secret scanner paths (supplemental)",
+      "verdict": "confirmed_supplemental_path_fix",
+      "conclusion": "Scanner resolves the root and uses nodeRelative(rootPath, fullPath), with slash normalization, instead of slicing the root string. This confirms only the supplemental filename bug; it does not dispose of original G8-25 QA-service scope.",
+      "independentEvidence": [
+        "src/release/releaseSecretScan.ts:113-141"
+      ],
+      "citedHistoricalCommits": [
+        "a7e43ba8a11f4542b2725c48d39f353b23722a03"
+      ],
+      "historicalAncestry": "All listed commits inspected during this review were ancestors of main; this is provenance, not proof of the remedy.",
+      "namedAbsenceWitnesses": [],
+      "runtimeExecuted": false,
+      "statusChangeApplied": false
+    }
+  ],
+  "appliedChanges": false,
+  "onlyWrittenFiles": [
+    "/private/tmp/p0-29-final-g4-g8-review-20261014.json",
+    "/private/tmp/p0-29-final-g4-g8-review-20261014.md"
+  ]
+}

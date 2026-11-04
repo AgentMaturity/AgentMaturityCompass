@@ -3,7 +3,7 @@ import { createServer, request as httpRequest } from "node:http";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { initWorkspace } from "../../src/workspace.js";
 import { loadAssurancePolicy, saveAssurancePolicy } from "../../src/assurance/assurancePolicyStore.js";
 import { startStudioApiServer } from "../../src/studio/studioServer.js";
@@ -14,7 +14,7 @@ import { addUser, initUsersConfig } from "../../src/auth/authApi.js";
 import { initHostDb, createHostUser, createWorkspaceRecord, grantMembership } from "../../src/workspaces/hostDb.js";
 import { hostWorkspaceDir } from "../../src/workspaces/workspacePaths.js";
 import { startWorkspaceRouter } from "../../src/workspaces/workspaceRouter.js";
-import { verifyJwtIdToken } from "../../src/identity/oidc/jwtVerify.js";
+import { validateOidcUrl, verifyJwtIdToken } from "../../src/identity/oidc/jwtVerify.js";
 
 const roots: string[] = [];
 
@@ -504,18 +504,21 @@ describe("API security hardening", () => {
     }
   }, 30_000);
 
-  test("OIDC JWT verifier rejects expired and nonce-mismatched tokens", async () => {
-    const keyPair = generateKeyPairSync("ed25519");
+  test("OIDC JWT verifier rejects expired, nonce-mismatched, EdDSA and non-loopback-opt-in HTTP tokens", async () => {
+    // P2-07 admits RS256, PS256 and ES256 only.
+    const keyPair = generateKeyPairSync("rsa", { modulusLength: 2048 });
+    const edKeyPair = generateKeyPairSync("ed25519");
     const kid = "security-test-kid";
     const issuerPort = await pickFreePort();
     const issuer = `http://127.0.0.1:${issuerPort}`;
     const audience = "amc-security-audience";
     const jwk = keyPair.publicKey.export({ format: "jwk" }) as Record<string, unknown>;
+    const edJwk = edKeyPair.publicKey.export({ format: "jwk" }) as Record<string, unknown>;
     const server = createServer((req, res) => {
       if ((req.url ?? "").startsWith("/jwks")) {
         res.statusCode = 200;
         res.setHeader("content-type", "application/json");
-        res.end(JSON.stringify({ keys: [{ ...jwk, kid, alg: "EdDSA", use: "sig" }] }));
+        res.end(JSON.stringify({ keys: [{ ...jwk, kid, alg: "RS256", use: "sig" }, { ...edJwk, kid: "ed-kid", alg: "EdDSA", use: "sig" }] }));
         return;
       }
       res.statusCode = 404;
@@ -524,13 +527,29 @@ describe("API security hardening", () => {
     await new Promise<void>((resolvePromise) => server.listen(issuerPort, "127.0.0.1", () => resolvePromise()));
     try {
       const nowSec = Math.floor(Date.now() / 1000);
-      const encodeJwt = (claims: Record<string, unknown>): string => {
-        const header = toBase64Url(Buffer.from(JSON.stringify({ alg: "EdDSA", typ: "JWT", kid }), "utf8"));
+      const encodeJwt = (claims: Record<string, unknown>, eddsa = false): string => {
+        const header = toBase64Url(Buffer.from(JSON.stringify({ alg: eddsa ? "EdDSA" : "RS256", typ: "JWT", kid: eddsa ? "ed-kid" : kid }), "utf8"));
         const payload = toBase64Url(Buffer.from(JSON.stringify(claims), "utf8"));
         const signingInput = Buffer.from(`${header}.${payload}`, "utf8");
-        const signature = signDetached(null, signingInput, keyPair.privateKey);
+        const signature = eddsa ? signDetached(null, signingInput, edKeyPair.privateKey) : signDetached("sha256", signingInput, keyPair.privateKey);
         return `${header}.${payload}.${toBase64Url(signature)}`;
       };
+      const verifyAt = (token: string) => verifyJwtIdToken({
+        token, issuer, audience, jwksUri: `${issuer}/jwks`, nonce: "expected-nonce", clockSkewSeconds: 0
+      });
+      const validClaims = { iss: issuer, aud: audience, sub: "oidc-user-1", nonce: "expected-nonce", exp: nowSec + 600, iat: nowSec };
+
+      // P2-07: an HTTP issuer is refused unless the loopback development opt-in is set.
+      expect(await verifyAt(encodeJwt(validClaims))).toEqual({ ok: false, error: "id_token verification failed" });
+      expect(() => validateOidcUrl("http://idp.example.com")).toThrow("OIDC HTTPS required");
+      expect(() => validateOidcUrl("https://10.0.0.1")).toThrow("OIDC private destination refused");
+      // The fake issuer is this test's subject and listens on literal 127.0.0.1 over HTTP.
+      vi.stubEnv("AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK", "1");
+      // The opt-in covers literal loopback only, never another private address or plain HTTP elsewhere.
+      expect(() => validateOidcUrl("https://10.0.0.1")).toThrow("OIDC private destination refused");
+      expect(() => validateOidcUrl("http://localhost:8080")).toThrow("OIDC HTTPS required");
+      expect((await verifyAt(encodeJwt(validClaims))).ok).toBe(true);
+      expect(await verifyAt(encodeJwt(validClaims, true))).toEqual({ ok: false, error: "unsupported jwt alg" });
 
       const expiredToken = encodeJwt({
         iss: issuer,
@@ -574,6 +593,7 @@ describe("API security hardening", () => {
         expect(nonceMismatch.error).toContain("nonce mismatch");
       }
     } finally {
+      vi.unstubAllEnvs();
       await new Promise<void>((resolvePromise) => server.close(() => resolvePromise()));
     }
   });

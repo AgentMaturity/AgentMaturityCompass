@@ -1,22 +1,23 @@
 import { z } from "zod";
-import { nonEmpty, sha256HexSchema } from "./common.js";
+import { isoTimeSchema, nonEmpty, sha256HexSchema } from "./common.js";
 
 /**
  * `amc.a4-deployment-receipt/v1`: the operator's statement (`recordedStatus`, self_reported) and AMC's own check
  * (`amcCheckStatus`) kept in two fields, never merged. "verified" is reserved for the independently_reviewed lane.
+ * `kind` mirrors the a4_deployments column: a `rollback` row is the operator's statement of a rollback AMC prepared.
  */
 export const a4DeploymentReceiptV1Schema = z.strictObject({
   schema: z.literal("amc.a4-deployment-receipt/v1"),
   deploymentId: nonEmpty,
   releaseId: nonEmpty,
   projectId: nonEmpty,
-  kind: z.enum(["deploy", "verify", "monitor"]),
+  kind: z.enum(["deploy", "verify", "rollback", "monitor"]),
   environment: z.enum(["staging", "production"]),
   target: z.enum(["compose", "helm"]),
   receipt: z.strictObject({
     imageDigest: z.string().nullable(),
     overlayDigest: sha256HexSchema.nullable(),
-    restartedAt: z.iso.datetime().nullable(),
+    restartedAt: isoTimeSchema.nullable(),
     helmRevision: z.number().int().min(1).nullable(),
     destinationRef: z.string().nullable(),
     note: z.string().nullable()

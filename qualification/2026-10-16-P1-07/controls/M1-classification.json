@@ -1,0 +1,59 @@
+{
+  "schema": "p107-control-classification/1",
+  "number": 1,
+  "phase": "p107-m1",
+  "actualExit": 1,
+  "actualTests": {
+    "numTotalTests": 971,
+    "numPassedTests": 968,
+    "numFailedTests": 3,
+    "numPendingTests": 0
+  },
+  "same971OrderedCaseInventory": true,
+  "firstFailures": [
+    {
+      "name": "P1-07 cumulative gate graphs (synthetic inputs) a later passing L3 cannot skip failed L2; the contiguous graph still has a positive",
+      "message": "AssertionError: expected 3 to be 1 // Object.is equality",
+      "firstFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:55:23"
+    },
+    {
+      "name": "P1-07 cumulative gate graphs (synthetic inputs) a missing lower gate stops advancement although later gates were evaluated",
+      "message": "AssertionError: expected 3 to be +0 // Object.is equality",
+      "firstFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:71:24"
+    },
+    {
+      "name": "P1-07 cumulative gate graphs (synthetic inputs) not_evaluated below a passing later gate stops the contiguous level",
+      "message": "AssertionError: expected 3 to be 1 // Object.is equality",
+      "firstFrame": "    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout/tests/diagnostic/levelCumulative.test.ts:85:26"
+    }
+  ],
+  "causalWitness": "Only final highest-pass selection changed. The fixed synthetic gap graph has L1 pass, L2 fail, L3 pass but now returns3 instead of1. Its adjacent all-pass graph still returns3 before the gap assertion. Missing lower and not_evaluated lower graph cases also fail at their own contiguous-level assertions.",
+  "maskedAssertions": [
+    "noL2.level assertion after first noL1.level failure on line71",
+    "not_evaluated reason assertion on line86 after line85 failure"
+  ],
+  "hooks": "46 observer entries all pass",
+  "nativeFixture": "Actual runtime case passes with signed rows, exact mapping and clean owned resource/input checks; same-day earned level1",
+  "unhandledErrors": [],
+  "compiledSensitivityClaim": false,
+  "fullIssueDone": false,
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "originalClassification": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/m1-classification.json",
+    "bytes": 2252,
+    "sha256": "e760d57904b938f01092f8534de454b5ef24dcbec4eb5fcd24d7d52d1aedeae5"
+  },
+  "actualSourceBinding": {
+    "apply": {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/m1-apply.json",
+      "bytes": 845,
+      "sha256": "876ac7f7fcd12bb12c8a0c36b948b3d2b518760741fbdb42a083363410144102"
+    },
+    "freshBinding": {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+      "bytes": 11026,
+      "sha256": "8b2dfb76a10435847b92e768b6eac044a012bf73c7184345d515cb0e3b3c7af7"
+    },
+    "method": "Root verified the actual fresh root/commit and exact original\u2192mutant target before the run; preferred record adds source binding to preserved original classification without changing its outcomes."
+  }
+}

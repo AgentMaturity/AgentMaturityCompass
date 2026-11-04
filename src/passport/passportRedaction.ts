@@ -55,7 +55,10 @@ function looksLikeHash(value: string): boolean {
 }
 
 function allowsLongText(path: string): boolean {
-  return /^status\.reasons\[\d+\]$/.test(path);
+  // AMC's own sentences: status reasons, and the explainability rows' repair hints and evidence-rejection reasons
+  // (every other rule, emails, URLs, paths, tokens and keys, still applies to them).
+  return /^status\.reasons\[\d+\]$/.test(path)
+    || /^maturity\.questionExplainabilitySummary\.rows\[\d+\]\.(repairHint|rejectedEvidenceReasons\[\d+\]\.reason)$/.test(path);
 }
 
 function walk(

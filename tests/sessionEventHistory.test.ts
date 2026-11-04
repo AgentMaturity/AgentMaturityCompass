@@ -22,7 +22,8 @@ beforeEach(() => {
   for (const name of ["AMC_SESSION_STORE", "AMC_EXPECTED_MONITOR_FINGERPRINT", "AMC_NO_SIGN"]) vi.stubEnv(name, undefined);
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-session-history-fixture");
   workspace = mkdtempSync(join(tmpdir(), "amc-public-history-"));
-  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite lists the sessions it writes from an empty ledger, without the creation marker.
+  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated", witnessing: false });
 });
 afterEach(() => { lockVault(workspace); vi.restoreAllMocks(); vi.unstubAllEnvs(); rmSync(workspace, { recursive: true, force: true }); });
 function record(backend: "sqlite" | "jsonl", id = "history-subject-a", close = true) {

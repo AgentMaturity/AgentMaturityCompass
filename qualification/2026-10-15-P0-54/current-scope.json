@@ -1,0 +1,173 @@
+{
+  "key": "P0-54",
+  "source": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+  "worktree": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-54-current-qualification",
+  "createdUtc": "2026-10-14T19:29:59.995577+00:00",
+  "verifiedSourceInputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/scripts/check-no-fabrication.mjs",
+      "sha256": "57bc9a8e3db3e49aad6703402555b995847dc5fd6ec811865a7b077b50d34dcc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/scripts/no-fabrication-allowlist.json",
+      "sha256": "33ed6db7299ffb7ef1cdb32ea4882e28d4601f5cb19334114820efcadddd5937"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/scripts/check-gate-reachability.mjs",
+      "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/scripts/check-threat-model.mjs",
+      "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/docs/security/channel-map.json",
+      "sha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/docs/security/THREAT_MODEL.md",
+      "sha256": "816600297a6dbc51487b993172ccd3b7ac920593582baba53c5d35f6873398fa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/mode/mode.ts",
+      "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/a4/a4Store.ts",
+      "sha256": "ab1d4b6efdf129ff25cefe37f3a3c401ee82430c0649ed1b6c5eabb8ff1525c0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/a4/a4Identity.ts",
+      "sha256": "6fa17fa2d5288738f447130cd28908fe2dce4fdc7321421fce9537ccbeaf57a2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/docs/program/metrics.json",
+      "sha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/tests/checkNoFabrication.test.ts",
+      "sha256": "344b6f2dd9103b7a6f2a887978f3db8ce6cc4d75448d6acc8afdf9b8f65b9528"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/tests/threatModelMap.test.ts",
+      "sha256": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/tests/portableVerifierServerQualification.test.ts",
+      "sha256": "22580eb50ff6786803aa529cd7c64e51404091bf8d4fe1322477c8d3b01fcc20"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/api/apiHelpers.ts",
+      "sha256": "d645ef39b25422ae3dd2a771c3555daedafe134c07afb6ed9b7508fd30ffc46a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/api/passportRouter.ts",
+      "sha256": "650016fbfe7b2eacc58f2d2b59349133374e3b50c4c0c2bf9888e8d5554b7405"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/api/enforceRouter.ts",
+      "sha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/api/index.ts",
+      "sha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/audit/auditApi.ts",
+      "sha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/claims/eligibility/adapters/results.ts",
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/compliance/complianceEngine.ts",
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805"
+    }
+  ],
+  "planInputs": [
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+      "bytes": 38227
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+      "bytes": 78486
+    },
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+      "bytes": 25110
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+      "bytes": 47286
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-54.md",
+      "sha256": "a9a7773d4336ef57424ebcb20e24eb7835766de077dec7619cd556f07de40a3e",
+      "bytes": 8728
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-55.md",
+      "sha256": "d77a082bd93e1dd71c16063854c1be74d574a0d9b73ecffdbc890bf31783398d",
+      "bytes": 9347
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-11.md",
+      "sha256": "ebf31f8e80615b05a449c62a0ef02da996fca57e12d770fe5226872a4ba5d4e8",
+      "bytes": 16346
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-16.md",
+      "sha256": "160133be570bedf991837bf0cd08db318cc5d6ea26073315344b2cd98614adbd",
+      "bytes": 12153
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0",
+      "bytes": 3052
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "bytes": 275376
+    }
+  ],
+  "authority": "Serial qualification of accepted guard wiring; no A4 implementation or source repair. User-provided AGENTS instructions remain applicable though this tracked checkout has no AGENTS.md file.",
+  "correction": "The routing preflight says R1-R3 use guarded roots. Actual check-no-fabrication.mjs R2 identifier scan does not require guarded. Only R1 random/hash and R3 path-presence are A4-root-sensitive; R2 and R4 provide global compatibility controls. Original routing receipt is preserved.",
+  "scope": "Only two new qualification tests, factual count outputs and receipts. Source/scripts/original tests/A4/API/Studio/CLI/registry/REPL/archives/freeze/floors/metrics unchanged. P0-41 owns A4 metric duty.",
+  "limits": "Owner helper and guard checks do not prove routed authorization, native sessions, browser behavior or release acceptance. Seven P0-52 failures and its unresolved narrow source decision remain active."
+}

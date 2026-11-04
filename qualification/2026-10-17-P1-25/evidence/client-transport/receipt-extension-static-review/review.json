@@ -1,0 +1,99 @@
+{
+  "schema": "p125c-receipt-extension-static-review/1",
+  "at": "2026-10-16T21:56:02.405575+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "preferredAssembler": {
+    "path": "/private/tmp/p1-25-client-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py",
+    "bytes": 11264,
+    "sha256": "4dc62ec23720263b7d40c3cd9b9a7af3e35e4c711e502f38bd2d64f81bb45579",
+    "executed": false,
+    "parsedOrImported": false
+  },
+  "v1": {
+    "preservedSealExact": true,
+    "executed": false,
+    "concreteFinding": "The source artifact exclusion covered before-originals but missed the actual private-originals count directory. Those small authored files could pass V1\u2019s otherwise valid prefix/cap rules.",
+    "additionalRootRequestedGate": "Pinning review/preservation/gap JSON alone did not require matching actual source/roots and the completed chain. Root requested exact actual-schema predicates before use."
+  },
+  "v2Correction": {
+    "exactTwoSourceReplacements": true,
+    "allOtherV1CodeBytesIdentical": true,
+    "rejectsBothCountOriginalComponents": true,
+    "sourceAndActualRootBoundChainReview": true,
+    "actualClosedFive28CasePhasesWithFailureCounts": [
+      0,
+      2,
+      0,
+      1,
+      0
+    ],
+    "actualHookEntriesValues": [
+      2,
+      3
+    ],
+    "requiresJoinedNoErrorNaturalClosureFacts": true,
+    "finalPreservationSourceRoots71Eight121SevenCleanAndRBound": true,
+    "wholeIssueSourceAndNoDoneBound": true,
+    "currentRealInputFieldsAllMatch": true,
+    "futureGenericControlPrediction": false,
+    "authorshipBoundary": "Independent V1 review followed by root-requested narrow V2 authoring and exact static delta/actual-field review. Root separately fully reads/adopts V2 before execution."
+  },
+  "preservation": {
+    "baseSourceCommit": "2792ccc6ad68f9ec3df97fbdfc63718727245695",
+    "existingFileSet": 341,
+    "existingArtifacts": 340,
+    "unchangedPayloads": 338,
+    "oldCommandsInOrder": 41,
+    "oldAssemblyInputsInOrder": 359,
+    "oldManifestValuePreserved": true,
+    "allExisting340ArtifactHashesVerified": true,
+    "onlyThreeExistingPathsChanged": [
+      "README.md",
+      "receipt.json",
+      "assembly-inputs.json"
+    ],
+    "onlyNewPrefix": "evidence/client-transport/",
+    "baseRootExpression": "base.parent.parent is exactly the actual S root for S/qualification/2026-10-17-P1-25.",
+    "currentCompositeReadmeVerbatimOldSuffix": true
+  },
+  "construction": {
+    "actualCanonical28NotSum47": true,
+    "requiredSourceFreshOrdered28AndHooks": true,
+    "explicitPinnedNewArtifactListNoRecursiveAdoption": true,
+    "newSourcesScriptsMustEndSourceTxt": true,
+    "newLogsPatchesRequireExistingLosslessBase64Envelope": true,
+    "originalShaBytesRelativeNameRetained": true,
+    "originalSecretGuardBeforeEncoding": true,
+    "assemblerSourceMustRemainHashOnly": true,
+    "oneMiBEveryOutputFileCap": true,
+    "forbiddenKeyNamesAndContentGuardRetained": true,
+    "allPayloadsAndReceiptSelfInPublicationExpectations": true,
+    "exclusiveOutputPacketAndExclusiveFiles": true,
+    "exactOutputByteRoundtrip": true,
+    "futureValidationIndexWhitespaceCommitExportCredit": false
+  },
+  "currentProseReview": {
+    "currentSource5bebAndHistorical2792Distinguished": true,
+    "sourceAndFiveActualRunsCountsAndFirstFramesFitIndependentAudit": true,
+    "masks194And282Recorded": true,
+    "finiteHttpCleanupNotUniversalIsolation": true,
+    "syntheticFiveBytesNotCmsGrant": true,
+    "noF37Qualification": true,
+    "globalQualityRed1268And2720Unwaived": true,
+    "heldAndWholeIssueGapsRemainOpen": true,
+    "noWholePlanCompletionOrFuturePublicationClaim": true
+  },
+  "rootAdoptionConditions": [
+    "Fill and fully read a separate actual ready manifest; the sealed unready template remains historical with null slots, not filesystem absence claims.",
+    "Select only reviewed compact artifacts: no raw count originals, no large ownership observations, no native/private signing data, no assembler source copy.",
+    "Include exact completed command/raw/observer/classification/apply/restore/preservation/review evidence and correct current environment; script projections are construction rather than a new independent runtime audit.",
+    "After actual private assembly, root compares old338 payloads,41 command prefix,359 input prefix, complete output file set/hashes and every envelope roundtrip, then runs unchanged private/source validators.",
+    "Root verifies exact admitted source/index paths and every staged blob plus default delta/full-range whitespace before dependent ordinary commit; validate actual HEAD-only export afterward. No force, ignore, validator, source producer or policy change."
+  ],
+  "limitations": [
+    "No helper execution, syntax/parser/import/compiler/product/native/SQL/network/process probe or checkout/index/Git/QA mutation by this review.",
+    "No assembled packet, validator success, staging, metadata commit, export, QA closure or future result is claimed.",
+    "Whole P1-25, package/public-entry decisions, full suite/coverage, global quality, all held work and the plan remain open."
+  ]
+}

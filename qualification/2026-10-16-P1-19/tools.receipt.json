@@ -1,0 +1,182 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-19",
+  "date": "2026-10-16",
+  "branch": "codex/p1-19-qualification",
+  "node": "22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS 26.6.2 (25G83), Darwin 25.6.0",
+  "arch": "arm64",
+  "notes": "Only the actual fresh 32/32 result is canonical. All 24 commands are retained, including seven exit-1 results: the missing-source RED, the historical v1 fixture-expectation failure, the pre-generation count check, the report-contract RED, and the duplicate, dead-code and detailed dead-code delta checks. The 1,268 duplicate findings and 2,734 dead-code findings, including two new unreachable finance modules, remain open and unwaived. The earlier 120 component cases, ten oracle cases and filtered controls remain separate. The normative F37 runner, full F01-F38 corpus, compliance, formal P119 acceptance, global qualification, release and Done claims remain open. The alternate tools.receipt.json requires separate validation through an unchanged canonical mirror; no validation outcome is claimed in advance.",
+  "commit": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts -t 'a genuine two-role factory execution has one effect and passes the independent cold oracle' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-missing-positive.producer.json",
+      "exit": 1,
+      "durationMs": 1874
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc --noEmit",
+      "exit": 0,
+      "durationMs": 28862
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 34248
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts -t 'a genuine two-role factory execution has one effect and passes the independent cold oracle' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-positive.producer.json",
+      "exit": 0,
+      "durationMs": 4481
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts tests/lighthouse/financePaymentContext.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-all.producer.json",
+      "exit": 1,
+      "durationMs": 44027
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3105
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 39997
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts tests/lighthouse/financePaymentContext.test.ts -t 'expired provider key indexes|a real durable-preimage persistence fault' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v2-repaired-controls.producer.json",
+      "exit": 0,
+      "durationMs": 5518
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 342
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 226
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts -t 'actual read results and the seed' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-red.producer.json",
+      "exit": 1,
+      "durationMs": 2259
+    },
+    {
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 33841
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts -t 'actual read results and the seed' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-green.producer.json",
+      "exit": 0,
+      "durationMs": 2286
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40176
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3157
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1502
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 228
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 159
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1568
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 462
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2936
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node --input-type=module -e 'import { createHash } from \"node:crypto\"; import { scanSourceQuality } from \"/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs\"; const baseline=scanSourceQuality(\"dead-code\",\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout\"); const current=scanSourceQuality(\"dead-code\",\"/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass\"); const before=new Set(baseline.findings),after=new Set(current.findings); console.log(JSON.stringify({schema:\"p119-deadcode-exact-delta/1\",baselineRoot:\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout\",currentRoot:\"/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass\",tool:current.tool,version:current.version,baselineCount:baseline.findings.length,currentCount:current.findings.length,added:current.findings.filter(x=>!before.has(x)),removed:baseline.findings.filter(x=>!after.has(x)),baselineFindings:baseline.findings,currentFindings:current.findings},null,2)); process.exitCode=current.findings.length?1:0;'",
+      "exit": 1,
+      "durationMs": 6117
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 51615
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout --config /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout/vitest.config.ts tests/lighthouse/financeOpsTools.test.ts tests/lighthouse/financePaymentContext.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-fresh.producer.json",
+      "exit": 0,
+      "durationMs": 48156
+    }
+  ],
+  "tests": {
+    "total": 32,
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "tools.README.md",
+      "sha256": "811cf60587f96fff97df930152d1f89b7af422038fd001e2f13813a0a1479896"
+    },
+    {
+      "path": "tools.audit-summary.json",
+      "sha256": "d6f648492b1b1303b89780aafeb72099e95c12e3b67f0f046733f18c20531eed"
+    },
+    {
+      "path": "tools.command-records.json",
+      "sha256": "278485288a2b9aa23e9584812ee3e62a01eff76df941af64c61be0d5c812a1f1"
+    },
+    {
+      "path": "tools.evidence.json",
+      "sha256": "3329edacb0c6ae227b8e1b9c97d19ae83ec6058a540734d35b05490d04511426"
+    },
+    {
+      "path": "tools.fresh.observer.json",
+      "sha256": "f72021905af5ab1c453758626417e2cc14ebb2c9abdb8e27e7786151fa389f75"
+    },
+    {
+      "path": "tools.fresh.raw.json",
+      "sha256": "f07a38f8d56e8bf0ddeaa7d6553ba74d253fe92afd99a9d12bed554b95024852"
+    },
+    {
+      "path": "tools.private-references.json",
+      "sha256": "03b93a8424870c4a49b90eb83f765e1b19d4be18d23e58ee7e7f3eccbb39a065"
+    },
+    {
+      "path": "tools.repair-history.json",
+      "sha256": "48f6834567dc2fdbf21a2e8ce590906492b48b7926eea17242e9038135929e4b"
+    },
+    {
+      "path": "tools.source-candidate.json",
+      "sha256": "2a2000349a4d2d3c1496ef3cfffba47d68566e28d88b25d383ff71e0a7fb021d"
+    },
+    {
+      "path": "tools.v1-failed.raw.json",
+      "sha256": "383e84379cf9c7fe9e8f59bfe4abde6a5222a17bfd99e0265f7b60600548e3d9"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 import type { ServerResponse } from "node:http";
-import { claimPairingCode, pairingTokenFromCookie, verifyPairingToken } from "./pairingCodes.js";
+import { claimPairingCode, claimPairingCodeAsync, pairingTokenFromCookie, verifyPairingToken } from "./pairingCodes.js";
 
 function setPairingCookie(res: ServerResponse, token: string, maxAgeSeconds: number): void {
   res.setHeader("set-cookie", `amc_pairing=${encodeURIComponent(token)}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${Math.max(60, maxAgeSeconds)}`);
@@ -20,6 +20,10 @@ export function claimPairingForResponse(params: {
     code: params.code,
     pairingTtlMs: Math.max(60, params.ttlSeconds ?? 10 * 60) * 1000
   });
+  return pairingClaimForResponse(params, claimed);
+}
+
+function pairingClaimForResponse(params: Parameters<typeof claimPairingForResponse>[0], claimed: ReturnType<typeof claimPairingCode>): ReturnType<typeof claimPairingForResponse> {
   if (!claimed.ok || !claimed.token || !claimed.expiresTs) {
     return {
       ok: false,
@@ -32,6 +36,12 @@ export function claimPairingForResponse(params: {
     pairingId: claimed.pairingId,
     expiresTs: claimed.expiresTs
   };
+}
+
+export async function claimPairingForResponseAsync(params: Parameters<typeof claimPairingForResponse>[0]): Promise<ReturnType<typeof claimPairingForResponse>> {
+  const claimed = await claimPairingCodeAsync({ workspace: params.workspace, code: params.code,
+    pairingTtlMs: Math.max(60, params.ttlSeconds ?? 10 * 60) * 1000 });
+  return pairingClaimForResponse(params, claimed);
 }
 
 export function pairingCookieValid(workspace: string, rawCookieHeader: string | undefined): boolean {

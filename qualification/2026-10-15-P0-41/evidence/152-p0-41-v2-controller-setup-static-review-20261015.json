@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-41",
+  "reviewer": "/root/failure_diagnosis",
+  "capturedUtc": "2026-10-15T07:33:39.993010+00:00",
+  "decision": "NO_BLOCKING_STATIC_FINDINGS",
+  "findings": [],
+  "blockingFindings": [],
+  "controller": {
+    "path": "/private/tmp/p0-41-causal-controller-v2-prepared-20261015.py",
+    "bytes": 25175,
+    "sha256": "d8a77e46b5b95f537c21f5eac47f3b16f5a9791584c53ba67fd43b63d48515ca"
+  },
+  "stagedDriver": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/driver/controller.py",
+    "bytes": 25175,
+    "sha256": "d8a77e46b5b95f537c21f5eac47f3b16f5a9791584c53ba67fd43b63d48515ca"
+  },
+  "preparedPlan": {
+    "path": "/private/tmp/p0-41-causal-plan-v2-prepared-20261015.json",
+    "bytes": 4818,
+    "sha256": "40c69dbdf6df2937236595b352e539eb0e88c7d842970421cb62123f4b30ad8a"
+  },
+  "boundPlan": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/plan-bound.json",
+    "bytes": 32806,
+    "sha256": "9888941998eb409295712feb80bc4a3c386fbbd33fbadd89db5f6ffb57da0c20"
+  },
+  "setup": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/setup-bound-inputs.json",
+    "bytes": 4150,
+    "sha256": "c21b02564791a6f0f90a9a26d0db57af14a26f141007934c3644edbe257fcb50"
+  },
+  "setupIndex": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/setup-index.json",
+    "bytes": 17489,
+    "sha256": "079b4aeb10da46f34517ddf6759a73f64ace99afc1a8abc2a8c9b4f23988c22c"
+  },
+  "derivation": {
+    "controllerExactlyThreeLiteralNamespaceTemplateHashChanges": true,
+    "allOtherControllerBytesUnchanged": true,
+    "copyHelperExactlyOneNamespaceChange": true,
+    "copyHelper": {
+      "path": "/private/tmp/p0-41-prepare-source-copy-v2-prepared-20261015.py",
+      "bytes": 2502,
+      "sha256": "6ab1627fd9ea5778e0820a744a6508e1de536b4e78e7f5bd81b59869a376f9ea"
+    },
+    "rootDerivationNote": {
+      "path": "/private/tmp/p0-41-v2-preparation-derivation-20261015.json",
+      "bytes": 969,
+      "sha256": "ef06868577f7ab6be3b2089f7eacf3952cce37fc9bee5fc1c9272cff58867b7d"
+    },
+    "fullPriorControllerReview": {
+      "path": "/private/tmp/p0-41-causal-controller-setup-static-review-20261015.json",
+      "bytes": 8823,
+      "sha256": "d173e808bd9b3f06a862f56fb4b9261c86ee09e3fafc416f2643c940de097c97"
+    }
+  },
+  "bindings": {
+    "externalUniquePinsVerified": 119,
+    "setupIndexPinsVerified": 82,
+    "setupPlanTemplateRootsInputsRecipesCorpusAndEnvironmentMatch": true,
+    "allSetupPinsInBoundExternalList": true,
+    "runtimeAuthorized": false,
+    "freshControlMarkersOrResultsPresent": false
+  },
+  "physicalVerification": {
+    "parentTracked": 8574,
+    "parentCompiled": 4529,
+    "physicalPairsReadAndHashed": 13103,
+    "fixtureOverlay": 1,
+    "privateRegularFileUniverseVerified": 13104,
+    "allBytesModesAndRecordedIdentitiesMatch": true,
+    "copyIdentitiesUniqueSingleLinkAndDisjointFromParentAndV1Copy": true,
+    "nativeBytesDeviceInodeModeNlinkUnchanged": true,
+    "borrowedDependencyLinkScopedToOwnedParent": true,
+    "privateGitAbsent": true,
+    "baseSourceHomeTmpOwned0700": true,
+    "sourceManifest": {
+      "bytes": 1073886,
+      "path": "/private/tmp/p0-41-qualification-20261015/tracked-source-before.json",
+      "sha256": "6a87be623c9a996b469a0cee493c308224c6dd338a1e6a8da5f89d9dcc9e80aa"
+    },
+    "compiledManifest": {
+      "bytes": 485185,
+      "path": "/private/tmp/p0-41-qualification-20261015/compiled-after-build.json",
+      "sha256": "7366e9fb3ab0c66386420af2a5794f55899a78854aabc7a0a92a17af0b70f879"
+    },
+    "physicalManifest": {
+      "bytes": 4232642,
+      "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/physical-source-dist-manifest.json",
+      "sha256": "7ac31242cbdcde0ded6dc8d8efa65ab02ab458151b3c5191a68c3eaf8c254342"
+    },
+    "manifestBodiesPrivateOnly": true
+  },
+  "fixture": {
+    "prepared": {
+      "bytes": 38030,
+      "path": "/private/tmp/p0-41-program-metrics-qualification-v2-prepared.test.ts",
+      "sha256": "21da24dd0de6d5d0d3acb3e7dbd0a30e7edb7ef6220e091abb75344006c4199a"
+    },
+    "copied": {
+      "bytes": 38030,
+      "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+      "sha256": "21da24dd0de6d5d0d3acb3e7dbd0a30e7edb7ef6220e091abb75344006c4199a"
+    },
+    "expectedIdentities": {
+      "bytes": 5880,
+      "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/new-fixture-expected-case-identities.json",
+      "sha256": "556f2b4cefcb37ebd4736bd07160499b601918c0cd5f47a087d4693606bb1f8b"
+    },
+    "expectedAuthoredDefinitions": 27,
+    "actualV2CollectedOrPassedCases": null,
+    "same27NamesAsV1": true,
+    "staticDeltaAndV1FailureReview": {
+      "path": "/private/tmp/p0-41-v1-baseline-failure-review-20261015.json",
+      "bytes": 17058,
+      "sha256": "b139c788093191536f5b686909b88207cc8718178670a9915fa88c9216da6f40"
+    }
+  },
+  "preservedV1": {
+    "index": {
+      "path": "/private/tmp/p0-41-v1-runtime-artifact-index-20261015.json",
+      "bytes": 465452,
+      "sha256": "ac23c7341ac53efdb8872eaa5bb36cd3d15888fa499b67303287c7172a71fc3c"
+    },
+    "allIndexedRefsRehashed": 1578,
+    "rootPreservation": {
+      "path": "/private/tmp/p0-41-v1-root-failure-preservation-20261015.json",
+      "bytes": 949,
+      "sha256": "d3d225b6ca39584da44da60ac91fe420b2630a48307013038971b9449f353e72"
+    },
+    "activeAndHaltedIntact": true,
+    "baselineCounts": {
+      "registered": 27,
+      "passed": 26,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0
+    },
+    "qualificationState": "Failed fixture precondition, not a mutation kill; Q12d product refusal was masked. Old namespace remains halted."
+  },
+  "behavioralReview": "Reviewed v1 controller behavior is unchanged. Exact releases, eight-key phase environment/fresh external artifact roots, original guards30s/Git5s, outer420s uncertainty detection, positive owned-group ESRCH, raw/observer body-only error classification/late-close gates, source-only delta and fail-closed no automatic restoration remain.",
+  "limits": [
+    "No product/controller execution, code parsing, imports, typecheck or collection by this review.",
+    "No runtime authorization follows bound:true or this review.",
+    "Future actual baseline/mutant/restored outcomes, first frames, masking, artifact completeness and restoration remain unmeasured.",
+    "Survivor or uncertainty stops with markers retained; no terminating signal, retry, cleanup or restoration claim.",
+    "Owned group and observer limits remain; no universal detached-descendant, network, cache, OS or credential isolation.",
+    "New physical copy borrows dependencies; no independent install or Git clone claim.",
+    "V1 failed evidence remains distinct from the unexecuted v2 candidate.",
+    "No whole issue, full suite, Node24, release, Done, prior holds or debt waiver."
+  ],
+  "performed": {
+    "metadataAndFullPhysicalReads": true,
+    "exactNamespaceAndFixtureDeltaComparison": true,
+    "codeParserImportTypecheckCollectionOrRuntime": false,
+    "signalsOrSourceSetupOldPacketWrites": false,
+    "writes": "Only this new private review pair."
+  },
+  "runtimeAuthorizationProvided": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-41-v2-controller-setup-static-review-20261015.md",
+    "bytes": 3274,
+    "sha256": "5af5c9b592674c0b81fe461398e6c089bac024a380da88c6ed74380759b63108"
+  }
+}

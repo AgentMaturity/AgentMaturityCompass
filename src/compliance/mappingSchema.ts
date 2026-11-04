@@ -3,7 +3,7 @@ import type { EvidenceEventType } from "../types.js";
 import type { ClaimKind, ClaimReasonCode, EvidenceState, ResultState, StatusDimensions } from "../claims/eligibility/types.js";
 import type { ControlResult } from "../catalog/evidence/types.js";
 import { questionIds } from "../diagnostic/questionBank.js";
-import { frameworkChoices } from "./frameworks.js";
+import { frameworkChoices, type FamilyReview } from "./frameworks.js";
 import { STATIONS, type Station } from "../domains/stations.js";
 
 const frameworkEnum = z.enum(frameworkChoices() as [string, ...string[]]);
@@ -47,6 +47,13 @@ export const complianceEvidenceRequirementSchema = z.discriminatedUnion("type", 
   })
 ]);
 
+// Official text a mapping's clause was read from; retrievedAt is the calendar date it was read.
+const complianceMappingSourceSchema = z.object({
+  title: z.string().min(1),
+  url: z.string().url(),
+  retrievedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/)
+});
+
 export const complianceMappingSchema = z.object({
   id: z.string().min(1),
   framework: frameworkEnum,
@@ -61,7 +68,14 @@ export const complianceMappingSchema = z.object({
     questions: z.array(questionEnum).default([]),
     packs: z.array(z.string().min(1)).default([]),
     configs: z.array(z.string().min(1)).default([])
-  })
+  }),
+  sources: z.array(complianceMappingSourceSchema).min(1).optional(),
+  /**
+   * Catalog control ids this mapping corresponds to (P1-53). Information only: it never changes how the mapping is
+   * evaluated or its result. Built-in pairings are AI-proposed and pending review (docs/catalog/CONSOLIDATION.md).
+   * The default keeps maps signed before P1-53 parseable.
+   */
+  catalogControls: z.array(z.string().regex(/^L[0-3](-[A-Z0-9]{2,8}){1,2}-[0-9]{2,3}$/, "must be a catalog control id")).default([])
 });
 
 export const complianceMapsSchema = z.object({
@@ -71,9 +85,50 @@ export const complianceMapsSchema = z.object({
   })
 });
 
+/**
+ * A crosswalk link from a clause-level control to a built-in mapping (P1-45). `partial`: the mapping's
+ * evidence addresses part of the clause; `conflicting`: it pulls against the clause; `equivalent`: it
+ * covers the whole clause, which only a named D-08 expert may decide, so it needs `signOffId`. Links are
+ * information: a result for one framework never sets a result for another.
+ */
+export const crosswalkLinkSchema = z
+  .object({
+    mappingId: z.string().min(1),
+    relation: z.enum(["equivalent", "partial", "conflicting"]),
+    rationale: z.string().trim().min(1),
+    signOffId: z.string().trim().min(1).optional()
+  })
+  .strict()
+  .refine((link) => link.relation !== "equivalent" || link.signOffId !== undefined,
+    { message: "an equivalent link needs a named expert's sign-off id (D-08)" });
+
+// One clause of an official text (src/compliance/frameworks/controls.ts). verified means the text was
+// string-checked against sourceUrl as read on retrievedAt, so a paraphrase is never verified.
+export const frameworkControlSchema = z
+  .object({
+    controlId: z.string().min(1),
+    framework: frameworkEnum,
+    category: z.string().min(1).nullable(),
+    title: z.string().min(1),
+    text: z.string().min(1),
+    textKind: z.enum(["verbatim", "verbatim-excerpt", "paraphrase"]),
+    status: z.enum(["law", "proposed", "guidance"]),
+    sourceUrl: z.string().url(),
+    retrievedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    verified: z.boolean(),
+    unverifiedReason: z.string().min(1).optional(),
+    mappings: z.array(crosswalkLinkSchema)
+  })
+  .refine((row) => row.textKind !== "paraphrase" || !row.verified, { message: "a paraphrase cannot be verified against its source" })
+  .refine((row) => row.verified || row.unverifiedReason !== undefined, { message: "an unverified control must say why" });
+
+export type FrameworkControl = z.infer<typeof frameworkControlSchema>;
 export type ComplianceEvidenceRequirement = z.infer<typeof complianceEvidenceRequirementSchema>;
 export type ComplianceMapping = z.infer<typeof complianceMappingSchema>;
+export type ComplianceMappingSource = z.infer<typeof complianceMappingSourceSchema>;
 export type ComplianceMapsFile = z.infer<typeof complianceMapsSchema>;
+/** What a caller may pass to be parsed: defaulted fields such as `catalogControls` may be left out. */
+export type ComplianceMapsFileInput = z.input<typeof complianceMapsSchema>;
 
 /**
  * PARTIAL and UNKNOWN are kept only to read reports written before P1-11 and P0-17; the engine never emits them. The
@@ -107,6 +162,8 @@ export interface ComplianceCategoryResult {
   admitted: ControlResult["admitted"];
   rejected: ControlResult["rejected"];
   neededToSatisfy: string[];
+  /** Set when the category's source text is descoped: listed, never evaluated, left out of `coverage` (P1-45). */
+  descoped?: string;
 }
 
 export interface ComplianceReportJson {
@@ -140,4 +197,6 @@ export interface ComplianceReportJson {
   };
   categories: ComplianceCategoryResult[];
   nonClaims: string[];
+  /** The framework family's review status and currency flags (P1-45). Absent in reports written before it. */
+  familyReview?: FamilyReview;
 }

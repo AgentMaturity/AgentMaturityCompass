@@ -1,0 +1,53 @@
+{
+  "graph": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+  "root_graph_modified": false,
+  "current_clone_graph": false,
+  "cli_version": "0.9.74",
+  "project_refresh_pin": "0.9.56",
+  "selected_terms": [
+    "technology",
+    "catalog",
+    "fixture",
+    "control"
+  ],
+  "nodes": [
+    {
+      "id": "docs_amc_questions_in_depth_amc_5_5_digital_technology_mastery",
+      "label": "AMC-5.5 \u2014 Digital Technology Mastery",
+      "source_file": "docs/AMC_QUESTIONS_IN_DEPTH.md",
+      "source_location": "L671"
+    },
+    {
+      "id": "docs_amc_questions_in_depth_amc_questions_and_options_in_depth",
+      "label": "AMC Questions and Options (In-Depth)",
+      "source_file": "docs/AMC_QUESTIONS_IN_DEPTH.md",
+      "source_location": "L1"
+    },
+    {
+      "id": "docs_sector_packs_technology_5_packs",
+      "label": "\ud83d\udca1 Technology (5 packs)",
+      "source_file": "docs/SECTOR_PACKS.md",
+      "source_location": "L115"
+    },
+    {
+      "id": "docs_sector_packs_the_7_stations_41_packs_390_questions",
+      "label": "The 7 Stations \u2014 41 Packs, 390 Questions",
+      "source_file": "docs/SECTOR_PACKS.md",
+      "source_location": "L32"
+    },
+    {
+      "id": "src_assurance_packs_technologygdprsocpack",
+      "label": "technologyGDPRSOCPack.ts",
+      "source_file": "src/assurance/packs/technologyGDPRSOCPack.ts",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_assurance_packs_technologygdprsocpack_validatetechnologyresponse",
+      "label": "validateTechnologyResponse()",
+      "source_file": "src/assurance/packs/technologyGDPRSOCPack.ts",
+      "source_location": "L3"
+    }
+  ],
+  "current_catalog_source_nodes": 0,
+  "use": "Historical navigation only; no current catalog source evidence; source files verified directly."
+}

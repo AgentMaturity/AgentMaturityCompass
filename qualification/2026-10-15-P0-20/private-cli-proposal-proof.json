@@ -1,0 +1,746 @@
+{
+  "issue": "P0-20",
+  "kind": "Pre-approval private copied-artifact proposal witness; not accepted-source qualification",
+  "recordedUtc": "2026-10-14T20:21:58.532929+00:00",
+  "sourceSnapshot": {
+    "liveRoot": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass",
+    "sourceHeadAtSnapshot": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+    "snapshot": {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/snapshot.json",
+      "bytes": 763415,
+      "sha256": "502792a5f261c854fe910dc3480c5a7a6ac22c00c8dceb6698a026e804ea5463"
+    },
+    "builtFileCount": 4529,
+    "allBuiltBytesCopiedExactlyBeforePatch": true,
+    "privateRoot": "/private/tmp/p0-20-proposal-proof-9b9tzktr",
+    "privateCliIsIndependentRegularFile": true,
+    "privateNodeModulesResolver": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/node_modules",
+    "packageHash": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "sourceInputsAfterProof": [
+      {
+        "path": "package.json",
+        "capturedSha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+        "actualSha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+        "unchanged": true
+      },
+      {
+        "path": "pnpm-lock.yaml",
+        "capturedSha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "actualSha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "unchanged": true
+      },
+      {
+        "path": "src/cli.ts",
+        "capturedSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+        "actualSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+        "unchanged": true
+      },
+      {
+        "path": "src/audit/auditCli.ts",
+        "capturedSha256": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee",
+        "actualSha256": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee",
+        "unchanged": true
+      },
+      {
+        "path": "src/cli/claimOutput.ts",
+        "capturedSha256": "1abdc50016d1b45d4cfc1b50217e715194133256cb4427823a89793045437686",
+        "actualSha256": "1abdc50016d1b45d4cfc1b50217e715194133256cb4427823a89793045437686",
+        "unchanged": true
+      },
+      {
+        "path": "src/domains/industryPackAudit.ts",
+        "capturedSha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+        "actualSha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+        "unchanged": true
+      },
+      {
+        "path": "src/audit/binderSigner.ts",
+        "capturedSha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+        "actualSha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+        "unchanged": true
+      },
+      {
+        "path": "tests/industryPackAuditSigningQualification.test.ts",
+        "capturedSha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7",
+        "actualSha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7",
+        "unchanged": true
+      },
+      {
+        "path": "scripts/freeze-baseline.json",
+        "capturedSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "actualSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "unchanged": true
+      }
+    ],
+    "noLiveSourceOrDistWriteByAgent": true
+  },
+  "proposal": {
+    "onlyPrivateModifiedBuiltPath": "dist/cli.js",
+    "oneExistingLineAdds": "claim: artifactClaim(\"audit:industry-pack\")",
+    "mechanism": "Existing finishVerify emits a real text claim line and adds canonical JSON claim fields, retaining verifier/trust/verdict behavior.",
+    "privateCliBeforeSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+    "privateCliCandidateSha256": "9c5c714c39a34acaf7f90a5462fea459b7dd12356d0b6c483e03ba3e5825f197",
+    "patch": {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/private-cli-proposal.patch",
+      "bytes": 794,
+      "sha256": "85bee63b494fcc4443e19b8a7928c5afd779c1e2b6ba3ed863c4407cd0156975"
+    },
+    "harness": {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-harness.mjs",
+      "bytes": 12269,
+      "sha256": "6e9a08f77ac247fa3dd4a71e0f10b192ca12653e295489908d650ec4cbd22e9c"
+    },
+    "retainedSourceHarness": {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/original-harness.mjs",
+      "bytes": 12125,
+      "sha256": "42c611e8b810fc034e380ba9119eed1ac631df6746f216bb12b7a41fddf2721a"
+    },
+    "harnessAdaptation": {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/private-harness-adaptation.patch",
+      "bytes": 9890,
+      "sha256": "eb77be0a37533e7b9321188017a697828c1d358487262e94179b6686ff57602c"
+    },
+    "sourceProposalApproval": "No shared-source transfer/approval inferred; human decision remains pending."
+  },
+  "baselineTwoProbe": {
+    "raw": {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/baseline-two-trusted.json",
+      "bytes": 9289,
+      "sha256": "771404bca6a4fee6f9b61111962427ab0d98fa9284bf6b220fbd54507c389446"
+    },
+    "counts": {
+      "total": 2,
+      "passed": 0,
+      "failed": 2
+    },
+    "exits": [
+      {
+        "name": "trusted-text-verify",
+        "exit": 70,
+        "effectsUnchanged": true,
+        "failedGates": [
+          "trusted exit0",
+          "actual canonical text claim line"
+        ]
+      },
+      {
+        "name": "trusted-json-verify",
+        "exit": 70,
+        "effectsUnchanged": true,
+        "failedGates": [
+          "trusted exit0",
+          "canonical self-reported JSON fields"
+        ]
+      }
+    ],
+    "origin": "Only public bytes and pre-sign independent public pin copied from the retained root original12 baseline; own new observer cwd/HOME, no parent fixture writes."
+  },
+  "candidateTwelve": {
+    "raw": {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-receipt.json",
+      "bytes": 19010,
+      "sha256": "72240bd422e7d6d9793de04a0dd2f538ca6d4f8c59987b07b4674e7b99597c79"
+    },
+    "counts": {
+      "total": 12,
+      "passed": 12,
+      "failed": 0
+    },
+    "phase": {
+      "name": "proposal-private-candidate-ready",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-harness.mjs",
+      "exit": 0,
+      "durationMs": 10920,
+      "startedUtc": "2026-10-14T20:18:16.922920+00:00",
+      "log": "/private/tmp/p0-20-proposal-private-candidate-ready-20261015.log",
+      "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+    },
+    "allExpectedExitsMatch": true,
+    "allMandatoryReadRefusalEffectsUnchanged": true,
+    "privateInputsUnchangedDuringTwelve": true,
+    "streamHashCount": 36,
+    "streamHashProblems": [],
+    "artifacts": [
+      {
+        "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/owned-state/outputs/signed.json",
+        "sha256": "4778d877234b1d4a5bcf6a8bee3123f22b5afdafa4852cb1da41057e7465abe5",
+        "actualSha256": "4778d877234b1d4a5bcf6a8bee3123f22b5afdafa4852cb1da41057e7465abe5",
+        "match": true
+      },
+      {
+        "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/owned-state/outputs/unsigned.json",
+        "sha256": "16de40b8645601808e4f6473b2e4fa7ba67f0725398c43c96666b9df7598edd1",
+        "actualSha256": "16de40b8645601808e4f6473b2e4fa7ba67f0725398c43c96666b9df7598edd1",
+        "match": true
+      },
+      {
+        "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/owned-state/outputs/baseline.json",
+        "sha256": "b2961523abc413fadb37da0d1f03122d75fdaefa9a9391b0b8969807d5cc7334",
+        "actualSha256": "b2961523abc413fadb37da0d1f03122d75fdaefa9a9391b0b8969807d5cc7334",
+        "match": true
+      },
+      {
+        "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/owned-state/outputs/tampered-rechecksummed.json",
+        "sha256": "b49c65cad507ef7e794a07c30c4db541d3cbe7f30c86ea1465e821795c0ddf96",
+        "actualSha256": "b49c65cad507ef7e794a07c30c4db541d3cbe7f30c86ea1465e821795c0ddf96",
+        "match": true
+      },
+      {
+        "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/owned-state/outputs/foreign-signed.json",
+        "sha256": "01d0d762da087a62846ef52f489cf910813d94dc596883bea9af5e86780534e6",
+        "actualSha256": "01d0d762da087a62846ef52f489cf910813d94dc596883bea9af5e86780534e6",
+        "match": true
+      },
+      {
+        "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/owned-state/responses.json",
+        "sha256": "1dcaadc51d4896e88a0e04c18935daad7b650673a9e3fcbf99f6491eb6b49ffc",
+        "actualSha256": "1dcaadc51d4896e88a0e04c18935daad7b650673a9e3fcbf99f6491eb6b49ffc",
+        "match": true
+      }
+    ],
+    "actualCanonicalTrustedTextLine": "Claim: Self-reported \u00b7 Result: not evaluated \u00b7 Evidence: sufficient \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+    "actualTrustedJsonFields": {
+      "ok": true,
+      "trusted": true,
+      "signatureOk": true,
+      "checksumOk": true,
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "sufficient",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported \u00b7 Result: not evaluated \u00b7 Evidence: sufficient \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+      "auditEligibleLevel": 1
+    },
+    "genuineLicenseAndPins": {
+      "genuineLocalEd25519License": true,
+      "issuerPublicKeySha256": "daa77327d696d644c8bd168fb645690bc4e41793fc2994649e4566da00a38aa3",
+      "privateKeyPassedToChild": false,
+      "activation": false,
+      "transportDenied": true
+    },
+    "operatorPinProvenance": {
+      "capturedBeforeAuditSigning": true,
+      "auditorPublicKeySha256": "7ce9d6543662f895d586dfa89c5fd64b823bf76f5803d131f0dea7618ed439b4",
+      "foreignPublicKeySha256": "76c03704360b22e13b671eb995b6c545c94c4234f6ebfeed71fc10f74c23d9e5",
+      "independentPublicPinFile": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/owned-state/independent-auditor.pub"
+    },
+    "commandOutcomes": [
+      {
+        "name": "paid-gate-refusal",
+        "exit": 1,
+        "expectedExit": 1,
+        "expectUnchanged": true,
+        "unchanged": true,
+        "checkError": null
+      },
+      {
+        "name": "signed-text-write",
+        "exit": 0,
+        "expectedExit": 0,
+        "expectUnchanged": false,
+        "unchanged": false,
+        "checkError": null
+      },
+      {
+        "name": "trusted-text-verify",
+        "exit": 0,
+        "expectedExit": 0,
+        "expectUnchanged": true,
+        "unchanged": true,
+        "checkError": null
+      },
+      {
+        "name": "trusted-json-verify",
+        "exit": 0,
+        "expectedExit": 0,
+        "expectUnchanged": true,
+        "unchanged": true,
+        "checkError": null
+      },
+      {
+        "name": "unpinned-refusal",
+        "exit": 1,
+        "expectedExit": 1,
+        "expectUnchanged": true,
+        "unchanged": true,
+        "checkError": null
+      },
+      {
+        "name": "unsigned-text-write",
+        "exit": 0,
+        "expectedExit": 0,
+        "expectUnchanged": false,
+        "unchanged": false,
+        "checkError": null
+      },
+      {
+        "name": "unsigned-verify-refusal",
+        "exit": 1,
+        "expectedExit": 1,
+        "expectUnchanged": true,
+        "unchanged": true,
+        "checkError": null
+      },
+      {
+        "name": "baseline-checksum-json",
+        "exit": 0,
+        "expectedExit": 0,
+        "expectUnchanged": false,
+        "unchanged": false,
+        "checkError": null
+      },
+      {
+        "name": "baseline-sign-refusal",
+        "exit": 1,
+        "expectedExit": 1,
+        "expectUnchanged": true,
+        "unchanged": true,
+        "checkError": null
+      },
+      {
+        "name": "locked-sign-refusal",
+        "exit": 1,
+        "expectedExit": 1,
+        "expectUnchanged": true,
+        "unchanged": true,
+        "checkError": null
+      },
+      {
+        "name": "tamper-rechecksum-refusal",
+        "exit": 1,
+        "expectedExit": 1,
+        "expectUnchanged": true,
+        "unchanged": true,
+        "checkError": null
+      },
+      {
+        "name": "foreign-signer-refusal",
+        "exit": 1,
+        "expectedExit": 1,
+        "expectUnchanged": true,
+        "unchanged": true,
+        "checkError": null
+      }
+    ]
+  },
+  "exactRestoration": {
+    "wholeDistFileCount": 4529,
+    "fileSetEqualSnapshot": true,
+    "hashMismatches": [],
+    "privateCliAfterSha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+    "allCopiedModulesRestoredExactly": true,
+    "restoredTwoProbeRaw": {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/restored-two-trusted.json",
+      "bytes": 9288,
+      "sha256": "d339a25178e9e96d08c88fe08f7672ae4c3e19c41e8386ff23ab6c83f03758a8"
+    },
+    "restoredCounts": {
+      "total": 2,
+      "passed": 0,
+      "failed": 2
+    },
+    "restoredExits": [
+      {
+        "name": "trusted-text-verify",
+        "exit": 70,
+        "effectsUnchanged": true
+      },
+      {
+        "name": "trusted-json-verify",
+        "exit": 70,
+        "effectsUnchanged": true
+      }
+    ]
+  },
+  "observerCorrection": {
+    "setupFailure": {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/first-setup-failure.json",
+      "bytes": 867,
+      "sha256": "ab1303226722d3962b6ab71e54a674ea4c96416f095815923f096c3b238ce87f"
+    },
+    "failedPhase": {
+      "name": "proposal-private-candidate",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-harness.mjs",
+      "exit": 1,
+      "durationMs": 114,
+      "startedUtc": "2026-10-14T20:17:11.491681+00:00",
+      "log": "/private/tmp/p0-20-proposal-private-candidate-20261015.log",
+      "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+    },
+    "meaning": "Immutable harness already had the root uppercase correction, so an older-lowercase exact substitution declined setup. A subsequent missing candidate-harness path exited1 before any CLI case. The log remains separate; no product verdict. The corrected unique candidate-ready phase then executed all12.",
+    "exactCanonicalMatching": "Text requires a line starting Claim: Self-reported \u00b7 Result: not evaluated; JSON requires self_reported/not_evaluated with the canonical line and no Observed. No broad casing allowance."
+  },
+  "phaseJournal": [
+    {
+      "name": "proposal-private-baseline",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/two-trusted-observer.mjs baseline",
+      "exit": 1,
+      "durationMs": 2033,
+      "startedUtc": "2026-10-14T20:16:19.992367+00:00",
+      "log": "/private/tmp/p0-20-proposal-private-baseline-20261015.log",
+      "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+    },
+    {
+      "name": "proposal-private-candidate",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-harness.mjs",
+      "exit": 1,
+      "durationMs": 114,
+      "startedUtc": "2026-10-14T20:17:11.491681+00:00",
+      "log": "/private/tmp/p0-20-proposal-private-candidate-20261015.log",
+      "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+    },
+    {
+      "name": "proposal-private-candidate-ready",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-harness.mjs",
+      "exit": 0,
+      "durationMs": 10920,
+      "startedUtc": "2026-10-14T20:18:16.922920+00:00",
+      "log": "/private/tmp/p0-20-proposal-private-candidate-ready-20261015.log",
+      "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+    },
+    {
+      "name": "proposal-private-restored",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-20-proposal-proof-9b9tzktr/two-trusted-observer.mjs restored",
+      "exit": 1,
+      "durationMs": 1759,
+      "startedUtc": "2026-10-14T20:19:25.979319+00:00",
+      "log": "/private/tmp/p0-20-proposal-private-restored-20261015.log",
+      "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+    }
+  ],
+  "retainedPrivateEvidence": [
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/original-harness.mjs",
+      "bytes": 12125,
+      "sha256": "42c611e8b810fc034e380ba9119eed1ac631df6746f216bb12b7a41fddf2721a"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-harness.mjs",
+      "bytes": 12269,
+      "sha256": "6e9a08f77ac247fa3dd4a71e0f10b192ca12653e295489908d650ec4cbd22e9c"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/two-trusted-observer.mjs",
+      "bytes": 4713,
+      "sha256": "57a771edb1951c08bc3e21f17263ff74352c5bceb8ea04b46ec9839de17ab68a"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/private-cli-proposal.patch",
+      "bytes": 794,
+      "sha256": "85bee63b494fcc4443e19b8a7928c5afd779c1e2b6ba3ed863c4407cd0156975"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/private-harness-adaptation.patch",
+      "bytes": 9890,
+      "sha256": "eb77be0a37533e7b9321188017a697828c1d358487262e94179b6686ff57602c"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-proposal.json",
+      "bytes": 1044,
+      "sha256": "b72be496ba1306a36f4742897445f4705eb04f9ff85dd9f1da34bd075ac18953"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/parent-baseline-receipt.json",
+      "bytes": 17272,
+      "sha256": "6b21f1847fa9807599b53c51a70e6da088373b1b4ae7cd04f085f620041d0075"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/observer-provenance.json",
+      "bytes": 862,
+      "sha256": "ab0395c8312e55d2f8e8d3dd5e0fc08262bcd36adf05e17618491136737bc203"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/first-setup-failure.json",
+      "bytes": 867,
+      "sha256": "ab1303226722d3962b6ab71e54a674ea4c96416f095815923f096c3b238ce87f"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/whole-dist-restoration.json",
+      "bytes": 138,
+      "sha256": "71c1b439fcdf9ff7932a63dab4fd24b4676cfb0c7b151770b327082078a0f675"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/original-private-cli.js",
+      "bytes": 1054087,
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-private-cli.js",
+      "bytes": 1054132,
+      "sha256": "9c5c714c39a34acaf7f90a5462fea459b7dd12356d0b6c483e03ba3e5825f197"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/baseline-two-trusted.json",
+      "bytes": 9289,
+      "sha256": "771404bca6a4fee6f9b61111962427ab0d98fa9284bf6b220fbd54507c389446"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/restored-two-trusted.json",
+      "bytes": 9288,
+      "sha256": "d339a25178e9e96d08c88fe08f7672ae4c3e19c41e8386ff23ab6c83f03758a8"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-receipt.json",
+      "bytes": 19010,
+      "sha256": "72240bd422e7d6d9793de04a0dd2f538ca6d4f8c59987b07b4674e7b99597c79"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/paid-gate-refusal.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/paid-gate-refusal.stderr",
+      "bytes": 244,
+      "sha256": "dd26db6c2c5acef02566f05f8973068392d8eb7be46c44c1dff1f961b953406b"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/paid-gate-refusal.effects.json",
+      "bytes": 75050,
+      "sha256": "007d7348d852feac7ede996fbd9493e384fea5057e51ddad4d97a699eaa2cbfc"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/signed-text-write.stdout",
+      "bytes": 26370,
+      "sha256": "e809317aa9bb5429fcb4c2837e4781d454b5efb131af6c34a4a4ccd22e18f444"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/signed-text-write.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/signed-text-write.effects.json",
+      "bytes": 75212,
+      "sha256": "0eb688a381a6a2207758f9e70891a61fd2c11a4a57efcd9d2ef3a9c281fd0810"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/trusted-text-verify.stdout",
+      "bytes": 374,
+      "sha256": "eeed67c1896ffa4f0fba61dd08132d1c230b48615b70d62b75bf0cf47f00f572"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/trusted-text-verify.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/trusted-text-verify.effects.json",
+      "bytes": 75374,
+      "sha256": "98997b0c248aac29b7798e86c22dabf35441cc4949026e375ae0e155e2c7d868"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/trusted-json-verify.stdout",
+      "bytes": 44424,
+      "sha256": "ebf490bb382975b27e666f6905ce8810ce2ba5891f8538fcafa269e2a029b6fb"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/trusted-json-verify.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/trusted-json-verify.effects.json",
+      "bytes": 75374,
+      "sha256": "98997b0c248aac29b7798e86c22dabf35441cc4949026e375ae0e155e2c7d868"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/unpinned-refusal.stdout",
+      "bytes": 44867,
+      "sha256": "edd6b00a618d930cce271911dfe145c9004e4b01adb83128a9177544b5203f3b"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/unpinned-refusal.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/unpinned-refusal.effects.json",
+      "bytes": 75374,
+      "sha256": "98997b0c248aac29b7798e86c22dabf35441cc4949026e375ae0e155e2c7d868"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/unsigned-text-write.stdout",
+      "bytes": 25919,
+      "sha256": "c5f2134e039c1cd6c0313f8e23325e00b1bd600414ad21f4dafa37b16c41960b"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/unsigned-text-write.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/unsigned-text-write.effects.json",
+      "bytes": 75538,
+      "sha256": "8c442adc4dd7a377097b48df4bb799d60708e4e91d71b4ed863aea3cd3b4a318"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/unsigned-verify-refusal.stdout",
+      "bytes": 43215,
+      "sha256": "030b7cca1d534f69e3c0b7f9458c6aa59f277515aeda09fd272e612c44223cef"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/unsigned-verify-refusal.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/unsigned-verify-refusal.effects.json",
+      "bytes": 75702,
+      "sha256": "777e87ceb6210395253cd6b4a11e974c0ec388b8bd0b60a52bd3457b5390147c"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/baseline-checksum-json.stdout",
+      "bytes": 40139,
+      "sha256": "71279a802d377e0172cd19cdea8d34dc192384f5997f74013390fb9dcf323548"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/baseline-checksum-json.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/baseline-checksum-json.effects.json",
+      "bytes": 75866,
+      "sha256": "17c037ee7ef741db8b1e3188b1c71dbd8db558ef936e5ca1f527ba06e7248d81"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/baseline-sign-refusal.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/baseline-sign-refusal.stderr",
+      "bytes": 162,
+      "sha256": "e453fb0f2a9a81147efb088e1792637498fc722945223ea9687c8a088252e8a5"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/baseline-sign-refusal.effects.json",
+      "bytes": 76030,
+      "sha256": "28d4228dc98f30e677fa89df94c60b7c89681483d60db27db9c751f8a8ef7736"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/locked-sign-refusal.stdout",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/locked-sign-refusal.stderr",
+      "bytes": 257,
+      "sha256": "1396c3557f68695ad1ffa597f293817d18999ab0a89ee1232fd06d32eb5b112d"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/locked-sign-refusal.effects.json",
+      "bytes": 76030,
+      "sha256": "28d4228dc98f30e677fa89df94c60b7c89681483d60db27db9c751f8a8ef7736"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/tamper-rechecksum-refusal.stdout",
+      "bytes": 44801,
+      "sha256": "74b0b5ba024ca7126bc3941fff2da531c6980c43dbcd3f5ddfa8e4e4e6948186"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/tamper-rechecksum-refusal.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/tamper-rechecksum-refusal.effects.json",
+      "bytes": 76386,
+      "sha256": "86c7ce2e2b75b5626a997ff7c6f44dc7e79184b4c029c5a82dce940397d16964"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/foreign-signer-refusal.stdout",
+      "bytes": 44875,
+      "sha256": "c4e31c578d6ed77ca83a0d878ee57c505fd3e232571c6e3a170bb1693f2415a9"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/foreign-signer-refusal.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/candidate-cli-wHedMf/foreign-signer-refusal.effects.json",
+      "bytes": 76726,
+      "sha256": "d5ccd572d4418c36bd9a37747459f8d38ccc10a30faab01492719fd6c756e909"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-private-baseline-20261015.log",
+      "bytes": 364,
+      "sha256": "6fc0d99f79ab38a91598b9694236c077352a1fef39839b4a3a0b5bc59f9732eb"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-private-candidate-20261015.log",
+      "bytes": 699,
+      "sha256": "30f70268f986c46c548b934cd01431195137bf9f712c9fdb408a11e56610e5c3"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-private-candidate-ready-20261015.log",
+      "bytes": 198,
+      "sha256": "6111d9e2e640909039314b72f930dc1119cf8aa18259d9346b8e359d32f6c0dd"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-private-restored-20261015.log",
+      "bytes": 364,
+      "sha256": "ba5013ef2aab6eec060bab06245eec0b7edf30a8b10ef01b2560bbf3e08cee2c"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/baseline-trusted-text-verify.stdout",
+      "bytes": 235,
+      "sha256": "6c005a3d23122acc8b89cbb74b40e1b2c624cedff058e0103358cbe1325f445f"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/baseline-trusted-text-verify.stderr",
+      "bytes": 64,
+      "sha256": "29ecbb28d33e7fd4cba2fc4d166f840f9afbdf48d6686e68af468ec8445beebb"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/baseline-trusted-json-verify.stdout",
+      "bytes": 43986,
+      "sha256": "987ad26cb14ee340d057bb0c88287195d2066742c419657d2af3983e53798d51"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/baseline-trusted-json-verify.stderr",
+      "bytes": 64,
+      "sha256": "29ecbb28d33e7fd4cba2fc4d166f840f9afbdf48d6686e68af468ec8445beebb"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/restored-trusted-text-verify.stdout",
+      "bytes": 235,
+      "sha256": "6c005a3d23122acc8b89cbb74b40e1b2c624cedff058e0103358cbe1325f445f"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/restored-trusted-text-verify.stderr",
+      "bytes": 64,
+      "sha256": "29ecbb28d33e7fd4cba2fc4d166f840f9afbdf48d6686e68af468ec8445beebb"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/restored-trusted-json-verify.stdout",
+      "bytes": 43986,
+      "sha256": "c65a7a5ad060318377f84d79822f24cccca0304b2c341f50e639b9610750a513"
+    },
+    {
+      "path": "/private/tmp/p0-20-proposal-proof-9b9tzktr/restored-trusted-json-verify.stderr",
+      "bytes": 64,
+      "sha256": "29ecbb28d33e7fd4cba2fc4d166f840f9afbdf48d6686e68af468ec8445beebb"
+    }
+  ],
+  "privateKeyMaterialInReportsOrStreams": [],
+  "limits": [
+    "The candidate patches only a private compiled copy. It is not accepted TypeScript source, live-main repair, shared-path clearance, freeze approval or release qualification.",
+    "Private baseline/restoration are two trusted probes each; only the candidate runs the preserved full12 argv/license/refusal/effect corpus. These standalone CLI counts are not added to registered Vitest counts.",
+    "All4,529 built files and package were copied; only node_modules resolution uses the existing owned installation. No package/dependency/install/runtime-cap changes.",
+    "Actual canonical generic artifact label reports Evidence:sufficient, Result:not_evaluated and self_reported; nested audit eligibleLevel remains1. No observed/independent promotion is claimed.",
+    "No network/provider activation/checkout/notary/HSM/authenticated HTTP, whole suite/coverage/Node24/hosted/publication claim.",
+    "Live original21 signing test/receipt and root original12(10pass/2labelfail) remain unchanged; shared transfer question and two genuine accepted-source exit70 outcomes remain open. Earlier P0-22/P0-23/P0-51/P0-52 failures and skipped/paused boundaries remain active."
+  ],
+  "runtimeIdle": true
+}

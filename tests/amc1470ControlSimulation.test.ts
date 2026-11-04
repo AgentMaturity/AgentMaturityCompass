@@ -59,7 +59,8 @@ let previousFirewallEnabled: string | undefined;
 function workspace(initialize = true): string {
   const root = mkdtempSync(join(tmpdir(), "amc-control-simulation-"));
   roots.push(root);
-  if (initialize) initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite compares the workspace bytes before and after a read, without the creation marker.
+  if (initialize) initWorkspace({ workspacePath: root, trustBoundaryMode: "isolated", witnessing: false });
   return root;
 }
 
@@ -253,15 +254,17 @@ describe("AMC-1470 evaluator-backed control simulation", () => {
       matched: true,
       matchedRuleIds: ["action:READ_ONLY"],
       matchedControlIds: ["action:READ_ONLY"],
-      failClosed: true,
+      // The evaluator and its signed policy are trusted; the fresh agent lacks a trusted run (the rule's run-integrity condition).
+      failClosed: false,
     });
     expect(simulated.reasons).toEqual(direct.reasons);
     expect(simulated.conditions).toEqual(direct.conditionResults);
     expect(simulated.conditions).toEqual(expect.arrayContaining([
       expect.objectContaining({ conditionId: "action-policy-rule", passed: true }),
-      expect.objectContaining({ conditionId: "action-policy-signature", passed: false }),
+      expect.objectContaining({ conditionId: "action-policy-signature", passed: true }),
+      expect.objectContaining({ conditionId: "run-integrity", passed: false, actual: null, expected: 0.6 }),
     ]));
-    expect(simulated.reasons.join(" ")).toMatch(/untrusted config/i);
+    expect(simulated.reasons.join(" ")).toMatch(/untrusted run/i);
   });
 
   test("uses approval request policy validation shared with real request creation", () => {

@@ -1,0 +1,1 @@
+{"total": 3, "passed": 0, "errors": {"emotion-json": ["AssertionError"], "emotion-text": ["AssertionError"], "false-emotion-chatbot-json": ["AssertionError"]}, "receipt": "/private/tmp/p0-24-cold-cli-qualification-20261015.json"}

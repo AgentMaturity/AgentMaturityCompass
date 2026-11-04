@@ -1,3 +1,4 @@
+import { signatureEnvelopeSchema } from "../crypto/signing/signatureEnvelope.js";
 import { z } from "zod";
 
 export const benchScopeTypeSchema = z.enum(["WORKSPACE", "NODE", "AGENT"]);
@@ -16,25 +17,29 @@ export const benchRiskSchema = z.object({
   digitalDualityRisk: z.number().min(0).max(100)
 });
 
-export const benchValuesSchema = z.object({
-  emotionalValue: z.number().min(0).max(100),
-  functionalValue: z.number().min(0).max(100),
-  economicValue: z.number().min(0).max(100),
-  brandValue: z.number().min(0).max(100),
-  lifetimeValue: z.number().min(0).max(100),
-  valueScore: z.number().min(0).max(100).optional()
-});
+// A metric AMC did not measure is null (not evaluated), never 0. Strategy risks stay worst-case 100 (WP37).
+// The shapes below are shared with passports and audit binders.
+const nullableScore = (max: number) => z.number().min(0).max(max).nullable();
+export const valueDimensionFields = { emotionalValue: nullableScore(100), functionalValue: nullableScore(100),
+  economicValue: nullableScore(100), brandValue: nullableScore(100), lifetimeValue: nullableScore(100) };
+export const fiveLayersSchema = z.object({ strategicOps: nullableScore(5), leadership: nullableScore(5), culture: nullableScore(5),
+  resilience: nullableScore(5), skills: nullableScore(5) });
+/** Shares of evidence by trust kind; null when nothing measured the mix. */
+export const evidenceCoverageSchema = z.object({ observedShare: z.number().min(0).max(1), attestedShare: z.number().min(0).max(1),
+  selfReportedShare: z.number().min(0).max(1) }).nullable();
+
+export const benchValuesSchema = z.object({ ...valueDimensionFields, valueScore: nullableScore(100).optional() });
 
 export const benchOperatingHealthSchema = z.object({
-  approvalsBacklogCount: z.number().int().min(0),
-  approvalsMedianAgeHours: z.number().min(0),
+  approvalsBacklogCount: z.number().int().min(0).nullable(),
+  approvalsMedianAgeHours: z.number().min(0).nullable(),
   budgetExceedEvents: z.number().int().min(0),
-  toolhubDenialRate: z.number().min(0).max(1),
+  toolhubDenialRate: z.number().min(0).max(1).nullable(),
   freezeEvents: z.number().int().min(0),
   assurance: z.object({
-    latestScore: z.number().min(0).max(100),
-    injectionFailures: z.number().int().min(0),
-    exfilAttemptsDetected: z.number().int().min(0)
+    latestScore: z.number().min(0).max(100).nullable(),
+    injectionFailures: z.number().int().min(0).nullable(),
+    exfilAttemptsDetected: z.number().int().min(0).nullable()
   }),
   plugins: z.object({
     integrity: benchPluginIntegritySchema,
@@ -48,20 +53,14 @@ export const benchOperatingHealthSchema = z.object({
 });
 
 export const benchMaturitySchema = z.object({
-  overall: z.number().min(0).max(5),
-  fiveLayers: z.object({
-    strategicOps: z.number().min(0).max(5),
-    leadership: z.number().min(0).max(5),
-    culture: z.number().min(0).max(5),
-    resilience: z.number().min(0).max(5),
-    skills: z.number().min(0).max(5)
-  }),
+  overall: z.number().min(0).max(5).nullable(),
+  fiveLayers: fiveLayersSchema,
   fiveDimensions: z.object({
-    d1: z.number().min(0).max(5),
-    d2: z.number().min(0).max(5),
-    d3: z.number().min(0).max(5),
-    d4: z.number().min(0).max(5),
-    d5: z.number().min(0).max(5)
+    d1: z.number().min(0).max(5).nullable(),
+    d2: z.number().min(0).max(5).nullable(),
+    d3: z.number().min(0).max(5).nullable(),
+    d4: z.number().min(0).max(5).nullable(),
+    d5: z.number().min(0).max(5).nullable()
   }),
   questions42: z
     .array(
@@ -79,14 +78,10 @@ export const benchEvidenceSchema = z.object({
     startTs: z.number().int(),
     endTs: z.number().int()
   }),
-  integrityIndex: z.number().min(0).max(1),
-  correlationRatio: z.number().min(0).max(1),
+  integrityIndex: z.number().min(0).max(1).nullable(),
+  correlationRatio: z.number().min(0).max(1).nullable(),
   trustLabel: benchTrustLabelSchema,
-  evidenceCoverage: z.object({
-    observedShare: z.number().min(0).max(1),
-    attestedShare: z.number().min(0).max(1),
-    selfReportedShare: z.number().min(0).max(1)
-  })
+  evidenceCoverage: evidenceCoverageSchema
 });
 
 export const benchProofBindingSchema = z.object({
@@ -145,21 +140,7 @@ export const benchSignatureSchema = z.object({
   signature: z.string().min(1),
   signedTs: z.number().int(),
   signer: z.literal("auditor"),
-  envelope: z
-    .object({
-      v: z.literal(1),
-      alg: z.literal("ed25519"),
-      pubkeyB64: z.string().min(1),
-      fingerprint: z.string().length(64),
-      sigB64: z.string().min(1),
-      signedTs: z.number().int(),
-      signer: z.object({
-        type: z.enum(["VAULT", "NOTARY"]),
-        attestationLevel: z.enum(["SOFTWARE", "HARDWARE"]),
-        notaryFingerprint: z.string().length(64).optional()
-      })
-    })
-    .optional()
+  envelope: signatureEnvelopeSchema.optional()
 });
 
 export const benchPiiScanSchema = z.object({
@@ -208,11 +189,13 @@ export const benchComparisonSchema = z.object({
       high: z.number().int().min(0)
     })
   }),
-  percentiles: z.record(z.string().min(1), z.number().min(0).max(100)),
+  /** null per metric when there is no imported population to rank against (WP37). */
+  percentiles: z.record(z.string().min(1), z.number().min(0).max(100).nullable()),
+  /** null when an input of the composite was not measured. */
   composites: z.object({
-    ecosystemAlignmentScore: z.number().min(0).max(100),
-    riskAssuranceScore: z.number().min(0).max(100),
-    digitalDualityReadiness: z.number().min(0).max(100)
+    ecosystemAlignmentScore: z.number().min(0).max(100).nullable(),
+    riskAssuranceScore: z.number().min(0).max(100).nullable(),
+    digitalDualityReadiness: z.number().min(0).max(100).nullable()
   }),
   peerGroup: z.object({
     id: z.string().min(1),

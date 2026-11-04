@@ -1,0 +1,42 @@
+{
+  "schema": "p112-compiled-guard-unit-author-review/1",
+  "at": "2026-10-16T19:53:00.751464+00:00",
+  "allCandidateLinesRead": true,
+  "fixedTestCount": 11,
+  "typedInputBuilders": [
+    "ActiveCompiledPolicy",
+    "EffectiveRuntimePolicy",
+    "ToolExecution",
+    "AuthorizationRecordV1"
+  ],
+  "realExportsUsed": [
+    "compiledPolicyShows",
+    "compiledPolicyDenial",
+    "planRequiresAgentLease",
+    "compiledPolicyFacts",
+    "compiledApprovalClasses"
+  ],
+  "castsAnyMocksAdded": false,
+  "sourceCallsitesRead": [
+    "agentToolset active-load/lease/guard/authorizationContext/schema-filter seams",
+    "kernel ToolPipelineService constructor",
+    "authorize actionFacts/bindAuthorization/checkLease/recheckAuthorization",
+    "studio runtimeLease",
+    "a4 workflowVisibility"
+  ],
+  "liveWorkspaceBranchesUsed": false,
+  "newDependencies": false,
+  "globalClockOrEnvironmentMutation": false,
+  "candidateExecuted": false,
+  "compilerOrParserExecuted": false,
+  "checkoutOrIndexWrites": false,
+  "runtimeFitClaimed": false,
+  "sourceMutationsAuthored": false,
+  "blockers": [],
+  "limits": [
+    "Already-derived unit fields do not prove signed plan, lease, principal or approval verification.",
+    "Unknown-guard denial does not prove amount-threshold destination enforcement.",
+    "Active-head/live-policy/receipt/session/domain/guardrail-label integration remains outside this lane.",
+    "No full issue or quality/hold closure; root owns admission and all actual checks."
+  ]
+}

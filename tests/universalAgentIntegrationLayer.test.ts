@@ -183,8 +183,8 @@ afterEach(() => {
 
 describe("universal agent integration layer", () => {
   test("bridge compat routes proxy major provider shapes and mint observed evidence receipts", async () => {
+    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase"; // before the vault is sealed, as Studio unlocks with it
     const workspace = newWorkspace();
-    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase";
     const fakeOpenAI = await startFakeOpenAI();
     const fakeAnthropic = await startFakeAnthropic();
     const fakeGemini = await startFakeGemini();
@@ -380,8 +380,8 @@ describe("universal agent integration layer", () => {
   });
 
   test("bridge streaming passthrough uses trailer receipts instead of buffering responses first", async () => {
+    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase"; // before the vault is sealed, as Studio unlocks with it
     const workspace = newWorkspace();
-    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase";
     const upstream = await new Promise<{ server: HttpServer; port: number }>((resolvePromise) => {
       const s = createHttpServer((req, res) => {
         if ((req.method ?? "POST").toUpperCase() !== "POST") {
@@ -556,8 +556,8 @@ describe("universal agent integration layer", () => {
   });
 
   test("wrap command captures redacted output and stores hashed blob evidence", async () => {
+    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase"; // before the vault is sealed, as Studio unlocks with it
     const workspace = newWorkspace();
-    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase";
     const token = "studio-admin-token";
     const server = await startStudioApiServer({
       workspace,
@@ -618,8 +618,8 @@ describe("universal agent integration layer", () => {
   }, 15000);
 
   test("SDK OpenAI instrumentation routes through bridge and keeps correlation metadata", async () => {
+    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase"; // before the vault is sealed, as Studio unlocks with it
     const workspace = newWorkspace();
-    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase";
     const fakeOpenAI = await startFakeOpenAI();
     initGatewayConfig(workspace, {
       listen: { host: "127.0.0.1", port: 0 },
@@ -758,8 +758,8 @@ describe("universal agent integration layer", () => {
   });
 
   test("security: lease auth cannot call owner pairing endpoint and disallowed bridge model is rejected", async () => {
+    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase"; // before the vault is sealed, as Studio unlocks with it
     const workspace = newWorkspace();
-    process.env.AMC_VAULT_PASSPHRASE = "universal-test-passphrase";
     const fakeOpenAI = await startFakeOpenAI();
     initGatewayConfig(workspace, {
       listen: { host: "127.0.0.1", port: 0 },

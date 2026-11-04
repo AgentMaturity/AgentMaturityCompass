@@ -1,0 +1,1518 @@
+{
+  "capturedUtc": "2026-10-14T22:11:52.758473+00:00",
+  "scope": "P0-24/P0-25 citation-linter and ratchet causal controls using unchanged original cases in an independently owned compiled copy. Only private closure, driver, logs, cases, and this receipt pair were written.",
+  "sourceHeadAtRuntime": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-24-citation-causal-20261015/closure",
+  "result": "Both independent same-input baseline/mutant/restored controls are causal. Each baseline and restoration passes 30/30. The resolver mutation adds four actual failed cases; the ratchet mutation adds one actual above-baseline failed case. No phase has pending or todo cases.",
+  "caseCounts": {
+    "linterSuite": 21,
+    "issueFixtures": 13,
+    "otherLinterContracts": 8,
+    "cliSuite": 9,
+    "sameCasesEachPhase": 30,
+    "phases": 6
+  },
+  "sameThirtyCaseNames": [
+    "check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+    "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+    "check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+    "check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+    "check-citations CLI refuses --update-baseline without --reason",
+    "check-citations CLI rejects an unknown flag",
+    "check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+    "check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+    "check-citations CLI prints a JSON summary with per-rule totals",
+    "lintCitations fixtures covers the thirteen issue fixtures",
+    "lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+    "lintCitations fixtures SR 11-7 reference whose record is in-force",
+    "lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+    "lintCitations fixtures malformed ATLAS id AML.T48",
+    "lintCitations fixtures prompt injection labelled AML.T0048",
+    "lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+    "lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+    "lintCitations fixtures mapping packId pii_detection_leakage",
+    "lintCitations fixtures related.packs host_hardening",
+    "lintCitations fixtures statusType binding",
+    "lintCitations fixtures superseded record without supersededBy",
+    "lintCitations fixtures url on a host outside the shared list",
+    "lintCitations fixtures record with neither retrievedAt nor contentSha256",
+    "lintCitations fixtures names the replacement when a citation is superseded",
+    "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+    "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+    "lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+    "shared official host list contains every register host and every pack-catalogue host",
+    "shared official host list is the list the pack catalogue validates against",
+    "framework reference tables records where each filled table came from"
+  ],
+  "fixtureCases": [
+    {
+      "name": "complete record on an official host with statusType supervisory-guidance",
+      "expect": []
+    },
+    {
+      "name": "SR 11-7 reference whose record is in-force",
+      "expect": [
+        {
+          "rule": "CIT001",
+          "zeroTolerance": true
+        }
+      ]
+    },
+    {
+      "name": "SR 11-7 record repealed with supersededBy us-sr-26-2",
+      "expect": []
+    },
+    {
+      "name": "malformed ATLAS id AML.T48",
+      "expect": [
+        {
+          "rule": "CIT002",
+          "zeroTolerance": true
+        }
+      ]
+    },
+    {
+      "name": "prompt injection labelled AML.T0048",
+      "expect": [
+        {
+          "rule": "CIT002",
+          "zeroTolerance": false
+        }
+      ]
+    },
+    {
+      "name": "NIST GOVERN 9.9 with a filled reference table",
+      "expect": [
+        {
+          "rule": "CIT002",
+          "zeroTolerance": false
+        }
+      ]
+    },
+    {
+      "name": "ISO/IEC 42001 A.5 labelled AI policy",
+      "expect": [
+        {
+          "rule": "CIT002",
+          "zeroTolerance": false
+        }
+      ]
+    },
+    {
+      "name": "mapping packId pii_detection_leakage",
+      "expect": [
+        {
+          "rule": "CIT003",
+          "zeroTolerance": true
+        }
+      ]
+    },
+    {
+      "name": "related.packs host_hardening",
+      "expect": [
+        {
+          "rule": "CIT003",
+          "zeroTolerance": true
+        }
+      ]
+    },
+    {
+      "name": "statusType binding",
+      "expect": [
+        {
+          "rule": "CIT005",
+          "zeroTolerance": true
+        }
+      ]
+    },
+    {
+      "name": "superseded record without supersededBy",
+      "expect": [
+        {
+          "rule": "CIT005",
+          "zeroTolerance": true
+        }
+      ]
+    },
+    {
+      "name": "url on a host outside the shared list",
+      "expect": [
+        {
+          "rule": "CIT004",
+          "zeroTolerance": false
+        }
+      ]
+    },
+    {
+      "name": "record with neither retrievedAt nor contentSha256",
+      "expect": [
+        {
+          "rule": "CIT004",
+          "zeroTolerance": false
+        }
+      ]
+    }
+  ],
+  "phases": [
+    {
+      "phase": "resolver-baseline",
+      "startedUtc": "2026-10-14T22:08:25.970293+00:00",
+      "durationMs": 934,
+      "cwd": "/private/tmp/p0-24-citation-causal-20261015/closure",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/citations/lintCitations.test.ts",
+        "tests/citations/checkCitationsCli.test.ts",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--cache=false",
+        "--reporter=json",
+        "--outputFile=/private/tmp/p0-24-citation-causal-20261015/phases/resolver-baseline/raw-tests.json"
+      ],
+      "exit": 0,
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesAbi": "127"
+      },
+      "raw": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-baseline/raw-tests.json",
+      "stdout": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-baseline/stdout.log",
+      "stderr": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-baseline/stderr.log",
+      "changedPrivateInputs": [],
+      "protectedInputsUnchangedDuringRuntime": true,
+      "protectedInputCount": 4627,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 30,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "cases": [
+        {
+          "name": "check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses --update-baseline without --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI rejects an unknown flag",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI prints a JSON summary with per-rule totals",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures covers the thirteen issue fixtures",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 reference whose record is in-force",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures malformed ATLAS id AML.T48",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures prompt injection labelled AML.T0048",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures mapping packId pii_detection_leakage",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures related.packs host_hardening",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures statusType binding",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures superseded record without supersededBy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures url on a host outside the shared list",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures record with neither retrievedAt nor contentSha256",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures names the replacement when a citation is superseded",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list contains every register host and every pack-catalogue host",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list is the list the pack catalogue validates against",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "framework reference tables records where each filled table came from",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ],
+      "phaseManifest": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-baseline/phase.json",
+      "rawSha256": "c6e875d18edcfeacb51c08611de64f743923310a7ba61a40bc6a9e3ff2facd3d"
+    },
+    {
+      "phase": "resolver-mutant",
+      "startedUtc": "2026-10-14T22:08:27.114447+00:00",
+      "durationMs": 868,
+      "cwd": "/private/tmp/p0-24-citation-causal-20261015/closure",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/citations/lintCitations.test.ts",
+        "tests/citations/checkCitationsCli.test.ts",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--cache=false",
+        "--reporter=json",
+        "--outputFile=/private/tmp/p0-24-citation-causal-20261015/phases/resolver-mutant/raw-tests.json"
+      ],
+      "exit": 1,
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesAbi": "127"
+      },
+      "raw": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-mutant/raw-tests.json",
+      "stdout": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-mutant/stdout.log",
+      "stderr": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-mutant/stderr.log",
+      "changedPrivateInputs": [
+        "dist/compliance/citations/lint.js"
+      ],
+      "protectedInputsUnchangedDuringRuntime": true,
+      "protectedInputCount": 4627,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 26,
+        "numFailedTests": 4,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false
+      },
+      "cases": [
+        {
+          "name": "check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses --update-baseline without --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI rejects an unknown flag",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI prints a JSON summary with per-rule totals",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures covers the thirteen issue fixtures",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 reference whose record is in-force",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures malformed ATLAS id AML.T48",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures prompt injection labelled AML.T0048",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures mapping packId pii_detection_leakage",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected [] to deeply equal [ { rule: 'CIT003', \u2026(1) } ]"
+        },
+        {
+          "name": "lintCitations fixtures related.packs host_hardening",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected [] to deeply equal [ { rule: 'CIT003', \u2026(1) } ]"
+        },
+        {
+          "name": "lintCitations fixtures statusType binding",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures superseded record without supersededBy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures url on a host outside the shared list",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures record with neither retrievedAt nor contentSha256",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures names the replacement when a citation is superseded",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+          "status": "failed",
+          "failureFirstLine": "TypeError: Cannot read properties of undefined (reading 'message')"
+        },
+        {
+          "name": "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected [] to deeply equal [ StringContaining{\u2026} ]"
+        },
+        {
+          "name": "lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list contains every register host and every pack-catalogue host",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list is the list the pack catalogue validates against",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "framework reference tables records where each filled table came from",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ],
+      "phaseManifest": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-mutant/phase.json",
+      "rawSha256": "929ea75d755f18889e34a6ca72568250efa81e007ae0cf412bf983e3151509b4"
+    },
+    {
+      "phase": "resolver-restored",
+      "startedUtc": "2026-10-14T22:08:28.202485+00:00",
+      "durationMs": 909,
+      "cwd": "/private/tmp/p0-24-citation-causal-20261015/closure",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/citations/lintCitations.test.ts",
+        "tests/citations/checkCitationsCli.test.ts",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--cache=false",
+        "--reporter=json",
+        "--outputFile=/private/tmp/p0-24-citation-causal-20261015/phases/resolver-restored/raw-tests.json"
+      ],
+      "exit": 0,
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesAbi": "127"
+      },
+      "raw": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-restored/raw-tests.json",
+      "stdout": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-restored/stdout.log",
+      "stderr": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-restored/stderr.log",
+      "changedPrivateInputs": [],
+      "protectedInputsUnchangedDuringRuntime": true,
+      "protectedInputCount": 4627,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 30,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "cases": [
+        {
+          "name": "check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses --update-baseline without --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI rejects an unknown flag",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI prints a JSON summary with per-rule totals",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures covers the thirteen issue fixtures",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 reference whose record is in-force",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures malformed ATLAS id AML.T48",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures prompt injection labelled AML.T0048",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures mapping packId pii_detection_leakage",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures related.packs host_hardening",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures statusType binding",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures superseded record without supersededBy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures url on a host outside the shared list",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures record with neither retrievedAt nor contentSha256",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures names the replacement when a citation is superseded",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list contains every register host and every pack-catalogue host",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list is the list the pack catalogue validates against",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "framework reference tables records where each filled table came from",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ],
+      "phaseManifest": "/private/tmp/p0-24-citation-causal-20261015/phases/resolver-restored/phase.json",
+      "rawSha256": "aae750795fcbaefaf79b04e2038ba43848a008d4d62a52ee0cf8f37ab2e53987"
+    },
+    {
+      "phase": "ratchet-baseline",
+      "startedUtc": "2026-10-14T22:08:29.330530+00:00",
+      "durationMs": 869,
+      "cwd": "/private/tmp/p0-24-citation-causal-20261015/closure",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/citations/lintCitations.test.ts",
+        "tests/citations/checkCitationsCli.test.ts",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--cache=false",
+        "--reporter=json",
+        "--outputFile=/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-baseline/raw-tests.json"
+      ],
+      "exit": 0,
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesAbi": "127"
+      },
+      "raw": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-baseline/raw-tests.json",
+      "stdout": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-baseline/stdout.log",
+      "stderr": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-baseline/stderr.log",
+      "changedPrivateInputs": [],
+      "protectedInputsUnchangedDuringRuntime": true,
+      "protectedInputCount": 4627,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 30,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "cases": [
+        {
+          "name": "check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses --update-baseline without --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI rejects an unknown flag",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI prints a JSON summary with per-rule totals",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures covers the thirteen issue fixtures",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 reference whose record is in-force",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures malformed ATLAS id AML.T48",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures prompt injection labelled AML.T0048",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures mapping packId pii_detection_leakage",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures related.packs host_hardening",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures statusType binding",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures superseded record without supersededBy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures url on a host outside the shared list",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures record with neither retrievedAt nor contentSha256",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures names the replacement when a citation is superseded",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list contains every register host and every pack-catalogue host",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list is the list the pack catalogue validates against",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "framework reference tables records where each filled table came from",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ],
+      "phaseManifest": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-baseline/phase.json",
+      "rawSha256": "9f4846840a7b123f2b472e51447a7fc3d933cedf9380a36fe7937a0f60d28491"
+    },
+    {
+      "phase": "ratchet-mutant",
+      "startedUtc": "2026-10-14T22:08:30.418906+00:00",
+      "durationMs": 864,
+      "cwd": "/private/tmp/p0-24-citation-causal-20261015/closure",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/citations/lintCitations.test.ts",
+        "tests/citations/checkCitationsCli.test.ts",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--cache=false",
+        "--reporter=json",
+        "--outputFile=/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-mutant/raw-tests.json"
+      ],
+      "exit": 1,
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesAbi": "127"
+      },
+      "raw": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-mutant/raw-tests.json",
+      "stdout": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-mutant/stdout.log",
+      "stderr": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-mutant/stderr.log",
+      "changedPrivateInputs": [
+        "scripts/check-citations.mjs"
+      ],
+      "protectedInputsUnchangedDuringRuntime": true,
+      "protectedInputCount": 4627,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 29,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false
+      },
+      "cases": [
+        {
+          "name": "check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+          "status": "failed",
+          "failureFirstLine": "AssertionError: expected +0 to be 1 // Object.is equality"
+        },
+        {
+          "name": "check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses --update-baseline without --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI rejects an unknown flag",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI prints a JSON summary with per-rule totals",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures covers the thirteen issue fixtures",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 reference whose record is in-force",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures malformed ATLAS id AML.T48",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures prompt injection labelled AML.T0048",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures mapping packId pii_detection_leakage",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures related.packs host_hardening",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures statusType binding",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures superseded record without supersededBy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures url on a host outside the shared list",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures record with neither retrievedAt nor contentSha256",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures names the replacement when a citation is superseded",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list contains every register host and every pack-catalogue host",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list is the list the pack catalogue validates against",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "framework reference tables records where each filled table came from",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ],
+      "phaseManifest": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-mutant/phase.json",
+      "rawSha256": "c0c7022e77fc5ab618e0ee5b8f635dc8b2ddc217ec56278a79003a7b40e47b05"
+    },
+    {
+      "phase": "ratchet-restored",
+      "startedUtc": "2026-10-14T22:08:31.503665+00:00",
+      "durationMs": 879,
+      "cwd": "/private/tmp/p0-24-citation-causal-20261015/closure",
+      "command": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/citations/lintCitations.test.ts",
+        "tests/citations/checkCitationsCli.test.ts",
+        "--maxWorkers=1",
+        "--no-file-parallelism",
+        "--cache=false",
+        "--reporter=json",
+        "--outputFile=/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-restored/raw-tests.json"
+      ],
+      "exit": 0,
+      "runtime": {
+        "node": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesAbi": "127"
+      },
+      "raw": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-restored/raw-tests.json",
+      "stdout": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-restored/stdout.log",
+      "stderr": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-restored/stderr.log",
+      "changedPrivateInputs": [],
+      "protectedInputsUnchangedDuringRuntime": true,
+      "protectedInputCount": 4627,
+      "counts": {
+        "numTotalTests": 30,
+        "numPassedTests": 30,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "cases": [
+        {
+          "name": "check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses --update-baseline without --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI rejects an unknown flag",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "check-citations CLI prints a JSON summary with per-rule totals",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures covers the thirteen issue fixtures",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 reference whose record is in-force",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures malformed ATLAS id AML.T48",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures prompt injection labelled AML.T0048",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures mapping packId pii_detection_leakage",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures related.packs host_hardening",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures statusType binding",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures superseded record without supersededBy",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures url on a host outside the shared list",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures record with neither retrievedAt nor contentSha256",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures names the replacement when a citation is superseded",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list contains every register host and every pack-catalogue host",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "shared official host list is the list the pack catalogue validates against",
+          "status": "passed",
+          "failureFirstLine": null
+        },
+        {
+          "name": "framework reference tables records where each filled table came from",
+          "status": "passed",
+          "failureFirstLine": null
+        }
+      ],
+      "phaseManifest": "/private/tmp/p0-24-citation-causal-20261015/phases/ratchet-restored/phase.json",
+      "rawSha256": "6b063703ef18cfe1b4ae51aed12aab6ddffc0287c0ed5c7e463141fe677b3341"
+    }
+  ],
+  "resolverControl": {
+    "mutatedPrivateFile": "dist/compliance/citations/lint.js",
+    "exactChange": "Replace only the original resolvesPackId return expression with return true.",
+    "patch": "/private/tmp/p0-24-citation-causal-20261015/resolver.patch",
+    "patchSha256": "e75188bc3b23789ea314cd01738a8937a167a9dfc07e9de095ef6f61a5467d0d",
+    "actualAddedFailures": [
+      "lintCitations fixtures mapping packId pii_detection_leakage",
+      "lintCitations fixtures related.packs host_hardening",
+      "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+      "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _"
+    ],
+    "interpretation": "Both explicit CIT003 refusal fixtures fail. The missing near-miss finding also causes the original message assertion to throw, and the normalized-related.packs mixed control fails. These are real behavioral effects of the resolver mutation, not import/setup failures. All nine CLI cases and other linter controls remain passed in that mutant."
+  },
+  "ratchetControl": {
+    "mutatedPrivateFile": "scripts/check-citations.mjs",
+    "exactChange": "Replace only if(n>b) with if(false&&n>b) for pushing above-baseline findings; keep under-baseline, zero-tolerance, argument parsing, and baseline metadata checks.",
+    "patch": "/private/tmp/p0-24-citation-causal-20261015/ratchet.patch",
+    "patchSha256": "cad5577ad4c026e6078b906f04e874fc42c8dbe971ce05f96e874a071a154560",
+    "actualAddedFailures": [
+      "check-citations CLI exits 1 when a ratcheted count rises above its baseline"
+    ],
+    "actualFailure": "AssertionError: expected +0 to be 1 // Object.is equality",
+    "interpretation": "The original actual main routine accepts two CIT004 fixture findings against baseline one when the comparison is disabled. The other eight CLI cases and all 21 linter cases remain passed."
+  },
+  "adaptations": [
+    {
+      "path": "tests/citations/checkCitationsCli.test.ts",
+      "onlySourceToDistImportPrefix": true,
+      "replacements": 1,
+      "originalSha256": "033144efd88c3c8e0693394dd5d77447d05fa4a178078c0cd54829afe38ff927",
+      "privateSha256": "1498c6ad53a8b9e628c46bc521248e44b12d814c0fc54edc35457f961bc3506e",
+      "patch": "/private/tmp/p0-24-citation-causal-20261015/adaptations/checkCitationsCli.test.ts.patch"
+    },
+    {
+      "path": "tests/citations/lintCitations.test.ts",
+      "onlySourceToDistImportPrefix": true,
+      "replacements": 6,
+      "originalSha256": "d8ac693789c976e7cc84fe1ad020c4513f517d51c2188499315e8bc054c426ae",
+      "privateSha256": "28a8d3383aad7abb01158b093f93ed6aae19292f03060204753e5d4bccb71166",
+      "patch": "/private/tmp/p0-24-citation-causal-20261015/adaptations/lintCitations.test.ts.patch"
+    },
+    {
+      "path": "tests/setup/guardWorkspace.ts",
+      "onlySourceToDistImportPrefix": true,
+      "replacements": 4,
+      "originalSha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "privateSha256": "2bfa7cf6368e6dffaaaa4a68086bf57421fbc706398659bfadd34f8577747eac",
+      "patch": "/private/tmp/p0-24-citation-causal-20261015/adaptations/guardWorkspace.ts.patch"
+    }
+  ],
+  "adaptationBoundary": "Only ../../src/ becomes ../../dist/ in the copied linter/CLI import paths and copied guard cleanup import/type paths. All assertions, fixtures, callbacks, inputs, and guard policy remain byte-identical after reversing that import-prefix substitution. CLI script and remaining guard/config files are copied byte-identically. Exact transient diffs are retained.",
+  "execution": {
+    "node": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "modulesAbi": "127",
+    "vitest": "4.1.11",
+    "dependencyMode": "Private node_modules directory contains read-only package symlinks to the qualified parent Node22 install. Vite cache directories are regular owned private directories; Vitest result cache is disabled. No installation or rebuild.",
+    "childEnvironment": "Minimal private HOME/AMC_HOME and per-phase TMPDIR, explicit Node22 PATH, UTC/C, no provider keys; transport-deny preload retained. No process-global cwd changes.",
+    "originalWorkspaceGuardsRetained": true,
+    "configurationCopiedUnchanged": true,
+    "privateVitestResultCacheDisabled": true,
+    "privateViteCachesOwnRegularDirectories": [
+      {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite",
+        "isSymlink": false,
+        "resolved": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite"
+      },
+      {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite-temp",
+        "isSymlink": false,
+        "resolved": "/private/tmp/p0-24-citation-causal-20261015/closure/node_modules/.vite-temp"
+      }
+    ],
+    "noInstallOrRebuild": true,
+    "collectorBoundary": "These are the original fixture-driven pure-linter and script-main contracts. The CLI cases use their existing supported findings/baseline dependencies. No whole-package collector, legal-source fetch, expert review, currency approval, or model run was executed by this lane; root separately owns current collector/currency qualification."
+  },
+  "restoration": {
+    "privateProtectedFiles": 4627,
+    "fullCompiledFiles": 4529,
+    "allCopiedScripts": 85,
+    "fixturesPackagesConfigTestsImportClosureExactlyRestored": true,
+    "originalProtectedParentInputs": 2471,
+    "originalParentSourceScriptsCitationsTestsFixturesGuardsPackagesExact": true,
+    "sharedNativeReadOnlyBeforeAfter": {
+      "realpath": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 537320078,
+      "links": 1,
+      "bytes": 1931552
+    },
+    "sourcePins": {
+      "tests/citations/lintCitations.test.ts": "d8ac693789c976e7cc84fe1ad020c4513f517d51c2188499315e8bc054c426ae",
+      "tests/citations/checkCitationsCli.test.ts": "033144efd88c3c8e0693394dd5d77447d05fa4a178078c0cd54829afe38ff927",
+      "tests/fixtures/citations/cases.json": "3152a37dbf27c4b8b053b1f40c0fe5f6d99caeeb48ee25838e8d99fa50920939",
+      "src/compliance/citations/lint.ts": "35cc58ee94b64c32ad7aa9719dc61134384cd4a3677070c4ae02ab3b88cacf7f",
+      "scripts/check-citations.mjs": "300f7be119ae2289774fdc90ddaafbdd6ee1a1da3a020de1d6dd8ec9743bca6d",
+      "scripts/citations-baseline.json": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59",
+      "vitest.config.ts": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "tests/setup/repoWorkspaceGuard.global.ts": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "tests/setup/guardWorkspace.ts": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "tests/setup/repoWorkspaceGuard.ts": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "scripts/line-budgets.json": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe"
+    },
+    "beforeManifest": "/private/tmp/p0-24-citation-causal-20261015/setup-before.json",
+    "afterManifest": "/private/tmp/p0-24-citation-causal-20261015/after-runtime-restoration.json",
+    "finalParentManifest": "/private/tmp/p0-24-citation-causal-20261015/final-protected-parent-inputs.json",
+    "authorizedParentCountDocumentDifferences": [
+      {
+        "path": "CONTRIBUTING.md",
+        "beforeSha256": "5af3ba77f82438a449c2f52be802478da74525a0dab79cd8e9e66dbb20f0ba1c",
+        "nowSha256": "ba2d1f54f67fe94c2fc8b5507510f6e5a52bebb2d106ef2e577519600e1ed933"
+      },
+      {
+        "path": "README.md",
+        "beforeSha256": "acb2751e76a57dfaedd18d21542f86cc7b07f2a05d45e999690d384c52b52ea8",
+        "nowSha256": "c53c6ea477e2a5edc9099cdd46d883e9ec519efc6c748ce8f9c18c756274161d"
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "beforeSha256": "8ad32fc0d1cd9c64e0c9811799725195c722382959ae52d2e54e3bdd71661f8e",
+        "nowSha256": "26374366a8cdf1c1f8936442b6d502375e1bd07fdc8c3045fbc08ad628516c7a"
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "beforeSha256": "cc7113daf785243064eff280dfc18c9ded8d0bd6ecf66f29877cc74453fbe104",
+        "nowSha256": "13bd3e85bef3fb4c45de988cf9a37268955fc425798faa366d2d47d713fc3d75"
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "beforeSha256": "034667a0d8f6a9c97637ed79bdc65ef2f5670e95576a5ad23cc5516d65ea579a",
+        "nowSha256": "588af022cf907d72731e68f907cbf203f1b7a40cd03cf9c7fac6292abfc7213b"
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "beforeSha256": "793de82b238630afcdff4041e842879b3e57e35972504bbef3643f50e39af6c4",
+        "nowSha256": "b179c4ecd44c4d461e8891d868569aa9e1fe2d23f84c20628fffe445b5d1c3ed"
+      },
+      {
+        "path": "website/i18n.js",
+        "beforeSha256": "b5e9eb8b1fe6d9b2409c29c44a4e0b8032ca1b4ade9a55f58dd896ed3402ec1f",
+        "nowSha256": "4be226ac51815404d5bf8861802a81e49e0b62cb135071fb6e78a9cce7258fc0"
+      },
+      {
+        "path": "website/index.html",
+        "beforeSha256": "3e68d48455c8b49fd2d4217ae536d3ec4347147466f1dc11ce02dd5984b81e80",
+        "nowSha256": "2ae0119d4c2227eb0ec71d1b489958c593b9286ebb6874c02d200dc518d5ecc8"
+      },
+      {
+        "path": "website/lite.html",
+        "beforeSha256": "b20dd481ec643a5589e8871cd292be77cc64b42a814c4f49c376dad8923238de",
+        "nowSha256": "608ca03ba2118b2181d69f4e549448b726fdb2eb5028d85d45f8a3c71580c381"
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "beforeSha256": "5d0595645351dc6e2b0c8691d03dec8d3d1c03dec5076570b9bdc97305fcb799",
+        "nowSha256": "ba9309480f27f7d9003b926e371e711164d274e053dc2c492d1c1701486eba67"
+      }
+    ],
+    "initialMetadataObserverFailure": {
+      "exit": 1,
+      "error": "AssertionError",
+      "reason": "The first final metadata observer compared every tracked parent file with its initial snapshot while the parent performed authorized factual test-count documentation updates. The private closure inputs already matched exactly. The corrected scope check retains all ten observed differences and proves the 2,471 original source/scripts/citation tests/fixtures/guards/package inputs still match. No test assertion, input, runtime expectation or mutation outcome changed."
+    }
+  },
+  "baselinePolicy": {
+    "actualDefaultBaselineTotals": {
+      "CIT001": 0,
+      "CIT002": 3,
+      "CIT003": 0,
+      "CIT004": 620,
+      "CIT005": 0
+    },
+    "defaultBaselineSha256": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59",
+    "defaultBaselineNeverUpdatedByThisLane": true,
+    "privateFixtureBaselineUpdateOnly": "The unchanged CLI tests create and update their own fresh TMPDIR fixtures and remove them after each case. No real/default citation baseline update is used."
+  },
+  "graphNavigation": {
+    "graphSha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395",
+    "graphBytes": 45692207,
+    "nodes": 36459,
+    "selectedFromActualVocabulary": [
+      "citations",
+      "citation",
+      "lint",
+      "resolver",
+      "pack",
+      "baseline"
+    ],
+    "limits": "Stale graph built at4247e610, reviewed refresh0.9.56 versus installed0.9.74; navigation only, no refresh or current-source inference.",
+    "queryResult": "Broad query found208nodes,40shown,168truncated. Relevant current citation-linter symbols are not established by this stale graph; direct current source establishes the bounded contracts."
+  },
+  "preparationObservations": "Two exploratory reads assumed a nonexistent src/citations directory and a missing interpreter metadata file in the old private graph copy. Current imports established src/compliance/citations. A new owned graph copy used the installed interpreter and retained a truncated navigation query. These preparation observations are not runtime failures or proof of current code.",
+  "artifactIndex": {
+    "path": "/private/tmp/p0-24-citation-causal-20261015/artifact-index.json",
+    "sha256": "10872e54a487beb237fb3974932cebbc9dfee4e7caee54c717f89cfcf1f6fc0b",
+    "artifactCount": 44
+  },
+  "limits": "Passing these source contracts does not establish legal truth, current law, authoritative citation accuracy, expert/D-08 sign-off, complete framework coverage, whole P0-24/P0-25 Done, full suite/coverage/CI/release/live acceptance, Node24/Python behavior, or universal no-effects/race guarantees. Empty ISO/reference and experimental/unreviewed metadata semantics remain as supplied by current source. All sibling strict failures and inherited skips, pending decisions, paused/held work and 47 echo deferral remain open.",
+  "completion": "Runtime and all live source/compiled/native reads are complete. Exact private restoration was verified. No permanent source/test/baseline/guard/count edits or commits were made by this lane."
+}

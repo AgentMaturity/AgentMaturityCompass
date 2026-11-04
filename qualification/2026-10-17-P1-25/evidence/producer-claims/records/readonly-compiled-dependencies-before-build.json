@@ -1,0 +1,62 @@
+{
+  "schema": "p125pc-readonly-compiled-dependencies-before-build-observations/1",
+  "at": "2026-10-17T01:44:48.987725+00:00",
+  "pins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/ledger/ledger.js",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/ledger/ledger.js",
+      "bytes": 40649,
+      "sha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2",
+      "dev": 16777231,
+      "inode": 543831623,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/ledger/eventHash.js",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/ledger/eventHash.js",
+      "bytes": 1436,
+      "sha256": "8a2aff867e3771f8db189b44d8459e791c59ab6f09880af8bb789914dc544751",
+      "dev": 16777231,
+      "inode": 543831556,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/ledger/ledgerVerification.js",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/ledger/ledgerVerification.js",
+      "bytes": 31436,
+      "sha256": "3590018e331851153403757b6e2a7e9ff3f4f44814b212939e9dff85f109074b",
+      "dev": 16777231,
+      "inode": 543831621,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/ledger/sessionVerification.js",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/ledger/sessionVerification.js",
+      "bytes": 3060,
+      "sha256": "949b3881cd4d6d8c37146947a633cd7373658609b7990a929f74f754990de7e6",
+      "dev": 16777231,
+      "inode": 543831617,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/checkpoint.js",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/checkpoint.js",
+      "bytes": 19397,
+      "sha256": "1487bfee4e2a18b70e785c8f7e34b069d88013bccb737f80a2d28de8182d96ff",
+      "dev": 16777231,
+      "inode": 543833584,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/timeEvidence.js",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/time/timeEvidence.js",
+      "bytes": 2973,
+      "sha256": "4157ecf0aa60813bea6335f4a26fb13f7cb5b4ed4c3b86c6515b90b8295c1829",
+      "dev": 16777231,
+      "inode": 543831275,
+      "nlink": 1
+    }
+  ],
+  "notActiveImmutableRuntimePins": true,
+  "mustBindActualSourcePostBuildAndActualFreshBuildSeparately": true
+}

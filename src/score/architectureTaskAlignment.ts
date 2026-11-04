@@ -1,3 +1,6 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull, weightedMean } from "../utils/ratio.js";
+
 /**
  * Architecture-task alignment metrics.
  *
@@ -60,11 +63,14 @@ export interface ErrorAmplificationHotspot {
 }
 
 export interface ErrorAmplificationResult {
-  score: number; // 0..100 (higher means better containment)
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
+  score: number | null; // 0..100 (higher means better containment)
   amplificationDetected: boolean;
-  amplificationRatio: number;
-  independentErrorRate: number;
-  compoundedErrorRate: number;
+  amplificationRatio: number | null;
+  independentErrorRate: number | null;
+  compoundedErrorRate: number | null;
   hotspotStages: ErrorAmplificationHotspot[];
   recommendations: string[];
 }
@@ -250,11 +256,13 @@ export function scoreArchitectureTaskFit(
 export function detectErrorAmplification(stages: PipelineStageProfile[]): ErrorAmplificationResult {
   if (stages.length === 0) {
     return {
-      score: 100,
+      outcome: "not_evaluated", sampleSize: 0,
+      metricOutcomes: { score: "not_evaluated", amplificationRatio: "not_evaluated", independentErrorRate: "not_evaluated", compoundedErrorRate: "not_evaluated" },
+      score: null,
       amplificationDetected: false,
-      amplificationRatio: 1,
-      independentErrorRate: 0,
-      compoundedErrorRate: 0,
+      amplificationRatio: null,
+      independentErrorRate: null,
+      compoundedErrorRate: null,
       hotspotStages: [],
       recommendations: ["No pipeline stages were provided; no compounding path was evaluated."]
     };
@@ -266,6 +274,7 @@ export function detectErrorAmplification(stages: PipelineStageProfile[]): ErrorA
 
   for (const stage of stages) {
     const baseError = normalizeRate(stage.errorRate);
+    // One is the multiplicative identity: omitted propagation adds no amplification.
     const propagation = Math.max(0, stage.propagationFactor ?? 1);
     const detection = normalizeRate(stage.detectionCoverage ?? 0);
     const rollback = normalizeRate(stage.rollbackCoverage ?? 0);
@@ -297,19 +306,19 @@ export function detectErrorAmplification(stages: PipelineStageProfile[]): ErrorA
     }
   }
 
-  const compoundedErrorRate = round2(propagatedResidual);
-  const independentErrorRate = round2(independentResidual);
-  const amplificationRatio =
-    independentResidual <= 0.000001
-      ? compoundedErrorRate > 0
-        ? 2
-        : 1
-      : round2(compoundedErrorRate / independentResidual);
+  // Preserve positive denominators in JSON; rounding them to zero would contradict the relative metric.
+  const compoundedErrorRate = propagatedResidual;
+  const independentErrorRate = independentResidual;
+  const rawAmplificationRatio = ratioOrNull(propagatedResidual, independentResidual);
+  const amplificationRatio = rawAmplificationRatio === null ? null : round2(rawAmplificationRatio);
 
   const amplificationDetected =
-    stages.length > 1 && amplificationRatio > 1.2 && compoundedErrorRate > 0.03;
+    stages.length > 1 && amplificationRatio !== null && amplificationRatio > 1.2 && compoundedErrorRate > 0.03;
 
-  let score = 100 - Math.max(0, amplificationRatio - 1) * 55 - compoundedErrorRate * 220;
+  let score = weightedMean([
+    [amplificationRatio === null ? null : 100 - Math.max(0, amplificationRatio - 1) * 110, 0.5],
+    [100 - compoundedErrorRate * 440, 0.5],
+  ])!;
   score = clamp(score, 0, 100);
 
   const sortedHotspots = hotspotStages
@@ -331,6 +340,8 @@ export function detectErrorAmplification(stages: PipelineStageProfile[]): ErrorA
   }
 
   return {
+    outcome: "measured", sampleSize: stages.length,
+    metricOutcomes: { score: "measured", amplificationRatio: amplificationRatio === null ? "not_evaluated" : "measured", independentErrorRate: "measured", compoundedErrorRate: "measured" },
     score: Math.round(score),
     amplificationDetected,
     amplificationRatio,
@@ -346,6 +357,7 @@ export function scoreComplexityTax(
   architecture: ArchitectureProfile
 ): ComplexityTaxScore {
   const fit = scoreArchitectureTaskFit(task, architecture);
+  // Required complexity is a modeled ordinal scale clamped to [1, 10], not an evidence count.
   const required = Math.max(1, fit.requiredComplexity);
   const overProvision = Math.max(0, fit.complexityGap);
 
@@ -459,9 +471,11 @@ export function analyzeFailureModes(input: {
   const modes: FailureModeRisk[] = [];
 
   const cascadeLikelihood = clamp(
-    (input.architecture.orchestrationDepth / 8) * 0.35 +
-      Math.max(0, amplification.amplificationRatio - 1) * 0.45 +
-      (1 - validation) * 0.2,
+    weightedMean([
+      [input.architecture.orchestrationDepth / 8, 0.35],
+      [amplification.amplificationRatio === null ? null : Math.max(0, amplification.amplificationRatio - 1), 0.45],
+      [1 - validation, 0.2],
+    ])!,
     0,
     1
   );
@@ -568,9 +582,10 @@ export function analyzeFailureModes(input: {
   }
 
   const retryStormLikelihood = clamp(
-    retry * 0.4 +
-      (1 - breaker) * 0.35 +
-      Math.max(0, amplification.compoundedErrorRate - 0.05) * 2 * 0.25,
+    weightedMean([
+      [retry, 0.4], [1 - breaker, 0.35],
+      [amplification.compoundedErrorRate === null ? null : Math.max(0, amplification.compoundedErrorRate - 0.05) * 2, 0.25],
+    ])!,
     0,
     1
   );
@@ -750,11 +765,10 @@ export function evaluateArchitectureTaskAlignment(
 
   const overallScore = Math.round(
     clamp(
-      fit.score * 0.3 +
-        errorAmplification.score * 0.2 +
-        complexityTax.score * 0.2 +
-        redundancy.score * 0.2 +
-        (100 - failureModes.overallRiskScore) * 0.1,
+      weightedMean([
+        [fit.score, 0.3], [errorAmplification.score, 0.2], [complexityTax.score, 0.2],
+        [redundancy.score, 0.2], [100 - failureModes.overallRiskScore, 0.1],
+      ])!,
       0,
       100
     )
@@ -762,7 +776,7 @@ export function evaluateArchitectureTaskAlignment(
 
   const summary = [
     `Task-fit classification: ${fit.classification} (${fit.score}/100).`,
-    `Error amplification: ${errorAmplification.amplificationDetected ? "detected" : "not detected"} (ratio ${errorAmplification.amplificationRatio}).`,
+    `Error amplification: ${errorAmplification.amplificationDetected ? "detected" : "not detected"} (ratio ${errorAmplification.amplificationRatio === null ? "not evaluated" : errorAmplification.amplificationRatio}).`,
     `Complexity tax: ${complexityTax.classification} (${Math.round(complexityTax.taxRate * 100)}%).`,
     `Redundancy level: ${redundancy.level} (${redundancy.score}/100).`,
     `Failure-mode risk index: ${failureModes.overallRiskScore}/100.`

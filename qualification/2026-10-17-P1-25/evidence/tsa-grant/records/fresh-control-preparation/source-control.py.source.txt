@@ -1,0 +1,265 @@
+"""One explicit source-only operation; root supplies and reviews actual evidence first."""
+from pathlib import Path
+import datetime
+import hashlib
+import json
+import os
+import re
+import stat
+import subprocess
+import sys
+
+B = Path('/private/tmp/p1-25-grant-qualification-20261017')
+P = B / 'fresh-control-preparation'
+N = Path('/private/tmp/p1-39-post-typecheck-20261016')
+S = Path('/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass')
+R = Path('/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass')
+TARGET = 'src/time/tsaClient.ts'
+CORPUS = ('tests/time/tsaGrant.test.ts', 'tests/time/verifyTimestamp.test.ts')
+CONTROLS_SHA = '72426bacdef43659fba7c4c299b1da54687b7d94cf20c60011dafe1eab0f96e5'
+PROTECTED_SHA = '5ea619b92200115427bcccf2deb339f0b436f7cd1d1616fb9ff25d6b8f513198'
+PINSET_SHA = '7077824c86030863e607e7d19de0d67641cbada2edbdf5b680bda8b9085d2661'
+AUDIT_SHA = '0671f636048bb159b449362c00ad1949174be12160421b3f0ed81eadc93db359'
+
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+
+def load(path):
+    return json.loads(Path(path).read_text())
+
+
+def pin(path):
+    path = Path(path)
+    st = path.lstat()
+    assert stat.S_ISREG(st.st_mode) and st.st_nlink == 1 and path.resolve() == path, str(path)
+    data = path.read_bytes()
+    end = path.lstat()
+    assert (st.st_dev, st.st_ino, st.st_nlink, st.st_size, st.st_mtime_ns) == (end.st_dev, end.st_ino, end.st_nlink, end.st_size, end.st_mtime_ns), str(path)
+    return {'path': str(path), 'physicalPath': str(path.resolve()), 'bytes': len(data), 'sha256': sha(data),
+            'dev': st.st_dev, 'inode': st.st_ino, 'nlink': st.st_nlink}, data
+
+
+def verify(row, physical=False):
+    actual, data = pin(row['path'])
+    assert (actual['bytes'], actual['sha256']) == (row['bytes'], row['sha256']), row['path']
+    if physical:
+        assert all(actual[k] == row[k] for k in ('physicalPath', 'dev', 'inode', 'nlink')), row['path']
+    return actual, data
+
+
+def git(root, *args):
+    return subprocess.check_output(['git', '--no-optional-locks', *args], cwd=root)
+
+
+def inactive():
+    assert all(not (N / name).exists() for name in ('ACTIVE', 'ACTIVE.json', 'HALTED', 'HALTED.json'))
+
+
+def context():
+    inactive()
+    assert sha((B / 'protected-inputs.json').read_bytes()) == PROTECTED_SHA
+    assert sha((P / 'source-pinset.json').read_bytes()) == PINSET_SHA
+    assert sha((P / 'controls.json').read_bytes()) == CONTROLS_SHA
+    assert sha((B / 'audit-observed.py').read_bytes()) == AUDIT_SHA
+    protected, proposal = load(B / 'protected-inputs.json'), load(P / 'source-pinset.json')
+    binding = load(B / 'fresh-source-binding.json')
+    assert binding['schema'] == 'p125g-actual-fresh-source-binding/1'
+    assert binding['sourceRoot'] == str(S) and re.fullmatch('[0-9a-f]{40}', binding['sourceCommit'])
+    q = Path(binding['freshRoot'])
+    assert q.is_absolute() and q.resolve() == q and q.name == 'checkout' and q.parent.name.startswith('amc-clean-source-')
+    assert q not in (S, R) and str(q) not in {str(Path(row['path']).parents[4]) for row in protected['nativePins']}
+    assert len(protected['inputs']) == 135 and len(protected['nativePins']) == 8
+    assert {r['relativePath'] for r in binding['boundPaths']} == set(proposal['relativePaths'])
+    assert len(binding['boundPaths']) == len(proposal['relativePaths']) == 73
+    assert binding['compiledPairs'] == proposal['compiledPairs'] and len(binding['compiledPairs']) == 8
+    assert binding['existingNativePins'] == protected['nativePins']
+    helper = binding['helper']
+    assert helper['exit'] == 0 and helper['endedUtc'] and helper['groupAbsentByESRCH'] is True and helper['signalsOtherThanZeroSent'] is False
+    assert helper['cwd'] == str(R) and helper['head'] == helper['headAfter'] == protected['heldRHead']
+    assert helper['ownedProcess']['argv'] == ['/opt/homebrew/bin/pnpm', '--dir', str(S), 'exec', '/opt/homebrew/opt/node@22/bin/node', 'scripts/clean-source-check.mjs', '--keep']
+    assert binding['vitestCreditFromHelper'] is False and binding['prospectiveCountOrCompiledHashesAdopted'] is False
+    for root in (S, q):
+        assert git(root, 'rev-parse', 'HEAD').decode().strip() == binding['sourceCommit']
+        assert git(root, 'diff', '--cached', '--name-only') == b''
+    assert git(S, 'status', '--porcelain=v1') == b''
+    assert git(R, 'rev-parse', 'HEAD').decode().strip() == protected['heldRHead']
+    assert git(R, 'status', '--porcelain=v1').decode() == protected['heldRStatus']
+    assert git(R, 'diff', '--cached', '--name-only').decode() == protected['heldRStaged'] == ''
+    return binding, protected, q
+
+
+def preservation(binding, protected, q, mutant=None):
+    seen = set()
+    for row in binding['boundPaths']:
+        rel = row['relativePath']
+        assert not Path(rel).is_absolute() and '..' not in Path(rel).parts
+        for key, root in (('source', S), ('fresh', q)):
+            expected = row[key]
+            assert expected['path'] == str(root / rel)
+            actual, data = pin(root / rel)
+            assert all(actual[k] == expected[k] for k in ('physicalPath', 'dev', 'inode', 'nlink'))
+            assert (actual['dev'], actual['inode']) not in seen
+            seen.add((actual['dev'], actual['inode']))
+            digest, size = (mutant['sha256'], mutant['bytes']) if mutant and key == 'fresh' and rel == TARGET else (row['sha256'], row['bytes'])
+            assert (actual['sha256'], actual['bytes']) == (digest, size), str(root / rel)
+    for row in protected['inputs']:
+        verify(row)
+    natives = [*protected['nativePins'], binding['freshNative']]
+    assert binding['freshNative']['path'] == str(q / 'node_modules/better-sqlite3/build/Release/better_sqlite3.node')
+    native_ids = []
+    for row in natives:
+        actual, unused = verify(row, True)
+        native_ids.append((actual['dev'], actual['inode']))
+    assert len(set(native_ids)) == 9 and not (set(native_ids) & seen)
+    return {'selectedPathsEachRoot': len(binding['boundPaths']), 'compiledPairs': len(binding['compiledPairs']),
+            'protectedInputs': len(protected['inputs']), 'nativePhysicalPins': len(natives),
+            'allSelectedBytesAndPhysicalPinsExact': True, 'heldRHeadStatusIndexExact': True}
+
+
+def closed(phase, root):
+    outcome_path = B / (phase + '-outcome.json')
+    outcome_pin, unused = pin(outcome_path)
+    out = load(outcome_path)
+    command_path = N / ('command-' + phase) / 'command.json'
+    command_pin, unused = pin(command_path)
+    command = load(command_path)
+    assert command['phase'] == out['phase'] == phase and out['root'] == str(root)
+    assert command['endedUtc'] and command['groupAbsentByESRCH'] is True and command['signalsOtherThanZeroSent'] is False
+    assert out['groupAbsentByESRCH'] is True and out['signalsOtherThanZeroSent'] is False
+    assert command['cwd'] == str(R) and command['head'] == command['headAfter'] == load(B / 'protected-inputs.json')['heldRHead']
+    assert command['observed'] is True and command['exit'] == out['command']['exit']
+    assert command['cmd'] == out['command']['cmd'] and command['durationMs'] == out['command']['durationMs']
+    argv = command['ownedProcess']['argv']
+    assert argv[argv.index('--root') + 1] == str(root)
+    assert tuple(arg for arg in argv if arg in CORPUS) == CORPUS
+    for role in ('rawProducer', 'rawSnapshot', 'observer'):
+        verify(command['artifacts'][role])
+    assert out['rawObserverOrderedJoin'] is True and not out['unhandledErrors'] and not out['lateDiagnostics']
+    assert out['tests']['total'] == 19 and out['tests']['skipped'] == 0
+    assert out['tests']['passed'] + out['tests']['failed'] == 19
+    assert len(out['orderedIdentities']) == len({tuple(row) for row in out['orderedIdentities']}) == 19
+    assert {row[0] for row in out['orderedIdentities']} == set(CORPUS)
+    assert all(task['kind'] == 'test' for task in out['taskErrors'])
+    assert isinstance(out['hookTaskEntries'], int) and isinstance(out['individualHookValues'], int)
+    return out, outcome_pin, command_pin
+
+
+def green(phase, root):
+    out, outcome_pin, command_pin = closed(phase, root)
+    assert out['command']['exit'] == 0 and out['tests']['passed'] == 19 and out['tests']['failed'] == 0 and not out['taskErrors']
+    return out, outcome_pin, command_pin
+
+
+def write_json(path, value):
+    with path.open('x') as handle:
+        json.dump(value, handle, indent=2)
+        handle.write('\n')
+
+
+def guarded_write(target, expected, replacement, source):
+    source_pin, unused = pin(source)
+    before, data = pin(target)
+    assert data == expected and (before['dev'], before['inode']) != (source_pin['dev'], source_pin['inode'])
+    fd = os.open(target, os.O_RDWR | os.O_NOFOLLOW)
+    with os.fdopen(fd, 'r+b') as handle:
+        st = os.fstat(handle.fileno())
+        assert stat.S_ISREG(st.st_mode) and st.st_nlink == 1 and (st.st_dev, st.st_ino) == (before['dev'], before['inode'])
+        assert handle.read() == expected
+        again = target.lstat()
+        assert (again.st_dev, again.st_ino, again.st_nlink) == (st.st_dev, st.st_ino, 1) and target.resolve() == target
+        inactive()
+        handle.seek(0)
+        handle.truncate(0)
+        assert handle.write(replacement) == len(replacement)
+        handle.flush()
+        os.fsync(handle.fileno())
+    after, actual = pin(target)
+    assert actual == replacement and (after['dev'], after['inode']) == (before['dev'], before['inode'])
+    return before, after
+
+
+def main():
+    mode, number = sys.argv[1:]
+    assert mode in ('apply', 'restore') and number in ('1', '2')
+    binding, protected, q = context()
+    operator = load(P / 'controls.json')['operators'][int(number) - 1]
+    assert operator['target'] == TARGET and operator['id'] == ('ORDER', 'DROP-VALID-GRANT')[int(number) - 1]
+    target = q / TARGET
+    record_path = B / ('m' + number + '-' + mode + '.json')
+    prepared_path = B / ('m' + number + '-' + mode + '-prepared.json')
+    original = B / ('m' + number + '-original.ts')
+    patch_path = B / ('m' + number + '.patch')
+    assert not record_path.exists() and not prepared_path.exists()
+    source, source_pin, source_command = green('p125g-source-combined', S)
+    canonical, canonical_pin, canonical_command = green('p125g-fresh-canonical', q)
+    assert source['orderedIdentities'] == canonical['orderedIdentities']
+    assert (source['hookTaskEntries'], source['individualHookValues']) == (canonical['hookTaskEntries'], canonical['individualHookValues'])
+    common = {'at': datetime.datetime.now(datetime.timezone.utc).isoformat(), 'mode': mode, 'operator': operator['id'],
+              'sourceCommit': binding['sourceCommit'], 'target': str(target), 'binding': pin(B / 'fresh-source-binding.json')[0],
+              'sourceOutcome': source_pin, 'canonicalOutcome': canonical_pin,
+              'compiledMutation': False, 'nativeMutation': False, 'automaticRestoreOrRetry': False,
+              'regularSingleLinkCheckedBeforeWrite': True, 'sourceOnlyMutant': True}
+    if mode == 'apply':
+        assert git(q, 'status', '--porcelain=v1') == b'' and not original.exists() and not patch_path.exists()
+        preserved = preservation(binding, protected, q)
+        if number != '1':
+            previous = str(int(number) - 1)
+            restored = load(B / ('m' + previous + '-restore.json'))
+            assert restored['sourceCommit'] == binding['sourceCommit'] and restored['byteExact'] is True
+            previous_green, unused, unused2 = green('p125g-restore' + previous, q)
+            assert previous_green['orderedIdentities'] == canonical['orderedIdentities']
+            assert (previous_green['hookTaskEntries'], previous_green['individualHookValues']) == (canonical['hookTaskEntries'], canonical['individualHookValues'])
+        before = target.read_bytes()
+        assert (len(before), sha(before)) == (operator['original']['bytes'], operator['original']['sha256'])
+        old, new = operator['before'].encode(), operator['after'].encode()
+        assert before.count(old) == operator['matchCountRequired'] == 1
+        proposed = before.replace(old, new, 1)
+        assert (len(proposed), sha(proposed)) == (operator['proposedWholeFile']['bytes'], operator['proposedWholeFile']['sha256'])
+        with original.open('xb') as handle:
+            handle.write(before)
+        write_json(prepared_path, {**common, 'original': pin(original)[0], 'expectedMutant': operator['proposedWholeFile'], 'preservationBeforeWrite': preserved})
+        physical_before, physical_after = guarded_write(target, before, proposed, S / TARGET)
+        patch = git(q, 'diff', '--', TARGET)
+        with patch_path.open('xb') as handle:
+            handle.write(patch)
+        assert patch and git(q, 'diff', '--name-only').decode().splitlines() == [TARGET]
+        preservation(binding, protected, q, operator['proposedWholeFile'])
+        record = {**common, 'sourceBefore': sha(before), 'mutant': sha(proposed), 'patchSha256': sha(patch),
+                  'patchCapturedFromLiveMutant': True, 'targetBefore': physical_before, 'targetAfter': physical_after}
+    else:
+        outcome, outcome_pin, command_pin = closed('p125g-m' + number, q)
+        assert outcome['command']['exit'] == 1 and outcome['tests']['failed'] > 0
+        assert outcome['orderedIdentities'] == canonical['orderedIdentities']
+        assert (outcome['hookTaskEntries'], outcome['individualHookValues']) == (canonical['hookTaskEntries'], canonical['individualHookValues'])
+        classification_path = B / ('m' + number + '-classification.json')
+        classification = load(classification_path)
+        assert classification['phase'] == outcome['phase'] and classification['sourceCommit'] == binding['sourceCommit']
+        assert classification['operator'] == operator['id'] and classification['outcomeSha256'] == outcome_pin['sha256']
+        assert classification['rootAllFailuresRead'] is True and classification['allFailuresClassified'] is True
+        assert classification['firstSensitiveAssertionRead'] is True and classification['noHookOrEnvironmentFailure'] is True
+        assert isinstance(classification['firstSensitiveAssertion'], str) and classification['firstSensitiveAssertion'].strip()
+        assert isinstance(classification['masking'], (str, list)) and classification['masking']
+        applied = load(B / ('m' + number + '-apply.json'))
+        assert applied['sourceCommit'] == binding['sourceCommit'] and applied['operator'] == operator['id']
+        assert applied['mutant'] == operator['proposedWholeFile']['sha256']
+        assert git(q, 'status', '--porcelain=v1').decode().splitlines() == [' M ' + TARGET]
+        preserved = preservation(binding, protected, q, operator['proposedWholeFile'])
+        before = target.read_bytes()
+        original_pin, restored_bytes = pin(original)
+        assert (len(restored_bytes), sha(restored_bytes)) == (operator['original']['bytes'], operator['original']['sha256'])
+        assert restored_bytes == (S / TARGET).read_bytes() and sha(before) == applied['mutant']
+        write_json(prepared_path, {**common, 'original': original_pin, 'outcome': outcome_pin, 'classification': pin(classification_path)[0], 'apply': pin(B / ('m' + number + '-apply.json'))[0], 'preservationBeforeWrite': preserved})
+        physical_before, physical_after = guarded_write(target, before, restored_bytes, S / TARGET)
+        assert git(q, 'status', '--porcelain=v1') == b''
+        preserved_after = preservation(binding, protected, q)
+        record = {**common, 'restored': sha(restored_bytes), 'byteExact': True, 'checkoutClean': True,
+                  'outcome': outcome_pin, 'classification': pin(classification_path)[0],
+                  'targetBefore': physical_before, 'targetAfter': physical_after, 'preservationAfterRestore': preserved_after}
+    write_json(record_path, record)
+    print(json.dumps(record))
+
+
+if __name__ == '__main__':
+    main()

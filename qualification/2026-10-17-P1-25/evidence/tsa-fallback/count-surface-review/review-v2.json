@@ -1,0 +1,81 @@
+{
+  "schema": "p125-fallback-count-surface-static-review/1",
+  "at": "2026-10-16T22:16:25.883847+00:00",
+  "sourceHead": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "branch": "codex/p1-25-fallback-qualification",
+  "generator": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+    "bytes": 9141,
+    "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+  },
+  "actualCountRed": {
+    "phase": "p125f-counts-before",
+    "command": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/command.json",
+      "bytes": 1358,
+      "sha256": "b0f134061014699d40730751b1e3c881f779613cb94d0d6b4ccc7b73f73d6163"
+    },
+    "log": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/stdout-stderr.log",
+      "bytes": 1436,
+      "sha256": "e688944294e77493bcfdb36adbb6cbf3e6178b9a6ceed2587bce68213b653d9a"
+    },
+    "ownedGroupRecord": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "5549302a861f149e8ada2b2a5008458dd2aade2846d866bae5b9121560b9c54b"
+    },
+    "exit": 1,
+    "durationMs": 535,
+    "published": 1692,
+    "actual": 1693
+  },
+  "pathCount": 10,
+  "numericSpans": 15,
+  "formattedSpans": 14,
+  "encodedBadgeSpans": 1,
+  "allTenBeforeHashesMatchB34ActualAfter": true,
+  "allOtherAuthoredBytesExactInCandidate": true,
+  "allTwentyClaudeHeldRCountPinsExact": true,
+  "allThirtySixHeldPinsExact": true,
+  "heldRunnerHead18RowsAndEmptyIndexExact": true,
+  "native7BytesAndPhysicalPinsExact": true,
+  "all1820TargetPinsRead": true,
+  "all182FullSelectedTargetHistoryReadsRetained": true,
+  "all182StatusReadsRetained": true,
+  "deduplicatedFullHistoryPayloads": 14,
+  "prior181DeltasOnlyS10ExpectedB34CountAdvance": true,
+  "newClientQIncluded": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout",
+  "gitFailures": [],
+  "nonemptyCountScopeStatusRoots": [
+    "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass"
+  ],
+  "sourceDirtyOnlyAdmittedTest": true,
+  "proposalSchema": {
+    "candidateDelta.paths": "array of ten relative path strings",
+    "candidateDelta.pathCount": "integer 10",
+    "candidateDelta.surfaces": "array of ten before/spans/after records"
+  },
+  "missingReservationLimitation": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "missingReservationReprobed": false,
+  "blockers": [],
+  "rootNext": "Current hosted/D15/freeze and exact root admission precede the ordinary unchanged generator. Actual output must match all ten anticipated whole-file hashes and fifteen numeric spans; any extra delta needs separate review.",
+  "noExecutionCredit": true,
+  "allHumanHoldsRetained": true,
+  "privateLargeObservation": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/ownership-observations.json",
+    "bytes": 2036915,
+    "sha256": "9ba3511f3a829ac242554659b7c99a9b67826766aebef74b51cc6c2c19244b20"
+  },
+  "privateOriginalsPublished": false,
+  "preferredProse": "README-v2.md",
+  "priorReviewPreserved": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/count-surface-review/review.json",
+    "bytes": 3327,
+    "sha256": "e5a19314742546b69720a3c3f8f43d41b85f850fade26933fef229647e2ce634"
+  }
+}

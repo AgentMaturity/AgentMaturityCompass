@@ -1,0 +1,2 @@
+{"scan":"dead-code","baseline":2568,"current":2621,"new":0,"stale":0,"accepted":53}
+No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped

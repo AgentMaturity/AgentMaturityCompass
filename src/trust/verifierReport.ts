@@ -24,14 +24,38 @@ const anchoringSchema = z.strictObject({
 });
 
 /**
- * One report for every verifier. Scope, freshness, completeness and satisfaction stay "not-evaluated" until P1-06,
- * except that freshness fails on a claimed time outside the attested window and states the time basis (P1-25).
+ * The normative reason codes per dimension (P1-06 step 5). The standalone verifier (packages/verifier) reports them in
+ * `reasonCodes`; tests/verifier/parityWithAmc.test.ts keeps this list equal to the package's.
+ */
+export const REASON_CODES = {
+  integrity: ["MALFORMED", "UNKNOWN_FIELD", "UNSUPPORTED_VERSION", "DIGEST_MISMATCH", "SIGNATURE_INVALID"],
+  issuerAdmission: ["ISSUER_NOT_PINNED", "ISSUER_WRONG_PURPOSE", "ISSUER_REVOKED", "ISSUER_DISTRUSTED", "KEY_NOT_YET_VALID",
+    "KEY_EXPIRED", "TRUST_LIST_EXPIRED", "TRUST_LIST_SIGNATURE_INVALID", "UNANCHORED", "ROLLBACK_DETECTED"],
+  scope: ["SCOPE_MISMATCH", "FOREIGN_EVIDENCE"],
+  freshness: ["ATTESTATION_EXPIRED", "NOT_YET_VALID", "REPLAYED_OR_SUPERSEDED", "CLAIMED_TIME_BEFORE_KEY_VALIDITY"],
+  completeness: ["EMPTY_EVIDENCE", "EVIDENCE_MISSING", "CONTRADICTORY_EVIDENCE", "OUTCOME_UNKNOWN"],
+  satisfaction: ["CLAIMED_RESULT_FAILED", "NOT_RECOMPUTABLE"]
+} as const;
+const reasonCodesSchema = z.strictObject({
+  integrity: z.array(z.enum(REASON_CODES.integrity)),
+  issuerAdmission: z.array(z.enum(REASON_CODES.issuerAdmission)),
+  scope: z.array(z.enum(REASON_CODES.scope)),
+  freshness: z.array(z.enum(REASON_CODES.freshness)),
+  completeness: z.array(z.enum(REASON_CODES.completeness)),
+  satisfaction: z.array(z.enum(REASON_CODES.satisfaction))
+});
+
+/**
+ * One report for every verifier. AMC's own verify commands leave scope, freshness, completeness and satisfaction
+ * "not-evaluated", except that freshness fails on a claimed time outside the attested window and states the time basis
+ * (P1-25); the standalone verifier (P1-06, `amc-verify`) evaluates all six and names each reason in `reasonCodes`.
  */
 export const verifierReportSchema = z.strictObject({
   type: z.literal("amc.verifier-report"),
   version: z.literal(1),
   artifact: z.strictObject({ kind: z.string(), path: z.string(), sha256: z.string() }),
-  verifier: z.strictObject({ name: z.literal("agent-maturity-compass"), version: z.string() }),
+  /** "agent-maturity-compass" for AMC's verify commands, "amc-verify" for the standalone verifier, or another implementation's name. */
+  verifier: z.strictObject({ name: z.string().min(1), version: z.string() }),
   verifiedAt: z.string(),
   asOf: z.string(),
   integrity: z.strictObject({ status: dimensionStatus, errors: z.array(z.string()) }),
@@ -43,6 +67,8 @@ export const verifierReportSchema = z.strictObject({
   freshness: reasons,
   completeness: reasons,
   satisfaction: reasons,
+  /** P1-06: the normative reason codes behind each dimension's status. */
+  reasonCodes: reasonCodesSchema.optional(),
   trusted: z.boolean(),
   overrides: z.array(z.enum(["allow-unpinned", "allow-unanchored"])),
   warnings: z.array(z.string())

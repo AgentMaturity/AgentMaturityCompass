@@ -1,0 +1,36 @@
+{
+  "phase": "p112-m2",
+  "rootAllFailuresRead": true,
+  "sourceCommit": "305aba3d0cbd7a5dc84a2b96425c3cd0236bcf71",
+  "operator": "lease-presence",
+  "outcomeSha256": "72be478e657ddb8d4ac4df8ba483adbc32456c98668bf5fb973ae68c100894a9",
+  "noHookOrEnvironmentFailure": true,
+  "classification": "Two semantic assertion failures after removal of explicit lease refusal. Separate requirement gets undefined; combined identity requirement falls through to principal denial instead of earlier lease denial. Earlier supplied-lease neutral positives passed.",
+  "failures": [
+    {
+      "file": "tests/policy/compiledPolicyGuard.test.ts",
+      "line": 118,
+      "test": "requires the already-derived authorization to carry its lease identity",
+      "expected": "IDENTITY_UNRESOLVED exact control/version denial",
+      "received": "undefined"
+    },
+    {
+      "file": "tests/policy/compiledPolicyGuard.test.ts",
+      "line": 135,
+      "test": "preserves lease-before-principal refusal when both identity requirements apply",
+      "expected": "IDENTITY_UNRESOLVED exact control/version denial",
+      "received": "PRINCIPAL_UNRESOLVED exact control/version denial"
+    }
+  ],
+  "maskedAssertions": [
+    {
+      "line": 119,
+      "reason": "Null lease assertion follows failing absent-authorization assertion in same body; no separate mutant witness credit."
+    },
+    {
+      "line": 137,
+      "reason": "OS-user principal assertion follows failing precedence assertion; no separate mutant witness credit."
+    }
+  ],
+  "scope": "Pure helper typed-input consumption and precedence only."
+}

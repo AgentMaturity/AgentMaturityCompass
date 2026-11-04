@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:freeze /Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass
+> node scripts/check-freeze.mjs
+
+Freeze guard passed: {"cliCommandPaths":1236,"cliInventoryPaths":1236,"stationPacks":41,"stationPackQuestions":632}

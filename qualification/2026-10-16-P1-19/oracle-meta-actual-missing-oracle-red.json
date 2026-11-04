@@ -1,0 +1,213 @@
+{
+  "capturedUtc": "2026-10-15T22:40:39.305881+00:00",
+  "state": "Actual missing-oracle RED after genuine producer success; no oracle source applied",
+  "phase": "p119-oracle-missing-positive-v3",
+  "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+  "exit": 1,
+  "durationMs": 2090,
+  "ownedPgid": 2459,
+  "ownedGroupESRCH": true,
+  "definedTests": 8,
+  "executedTests": 1,
+  "failedTests": 1,
+  "skippedTests": 7,
+  "failedAt": "requireClosed for oracle-1 after exact MODULE_NOT_FOUND",
+  "producerChildren": [
+    {
+      "label": "initializer",
+      "pid": 2462,
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/private/tmp/lhfo-d11M9g/producer.mjs",
+        "init",
+        "/private/tmp/lhfo-d11M9g/producer-config.json"
+      ],
+      "exit": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "probes": [
+        "ESRCH"
+      ],
+      "truncated": false,
+      "captureErrors": [],
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "observedOutputBytes": {
+        "stdout": 0,
+        "stderr": 0
+      },
+      "environmentKeys": [
+        "AMC_CONTROL_CHECKPOINT_DIR",
+        "AMC_GUARD_EVENTS_DB_PATH",
+        "AMC_GUARD_RECEIPTS_WORKSPACE",
+        "AMC_HOME",
+        "AMC_LEDGER_SQLITE_SYNCHRONOUS",
+        "AMC_NO_SIGN",
+        "AMC_OTEL_ENABLED",
+        "AMC_VAULT_PASSPHRASE",
+        "AMC_VAULT_REMEMBER",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "LANG",
+        "LC_ALL",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR",
+        "TZ"
+      ],
+      "processGroup": "Inherited guarded outer group; only PID absence checked here"
+    },
+    {
+      "label": "producer",
+      "pid": 2465,
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/private/tmp/lhfo-d11M9g/producer.mjs",
+        "produce",
+        "/private/tmp/lhfo-d11M9g/produce-config.json"
+      ],
+      "exit": 0,
+      "signal": null,
+      "spawnError": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "probes": [
+        "ESRCH"
+      ],
+      "truncated": false,
+      "captureErrors": [],
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      },
+      "observedOutputBytes": {
+        "stdout": 0,
+        "stderr": 0
+      },
+      "environmentKeys": [
+        "AMC_CONTROL_CHECKPOINT_DIR",
+        "AMC_GUARD_EVENTS_DB_PATH",
+        "AMC_GUARD_RECEIPTS_WORKSPACE",
+        "AMC_HOME",
+        "AMC_LEDGER_SQLITE_SYNCHRONOUS",
+        "AMC_NO_SIGN",
+        "AMC_OTEL_ENABLED",
+        "AMC_VAULT_PASSPHRASE",
+        "AMC_VAULT_REMEMBER",
+        "GIT_NO_LAZY_FETCH",
+        "HOME",
+        "LANG",
+        "LC_ALL",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR",
+        "TZ"
+      ],
+      "processGroup": "Inherited guarded outer group; only PID absence checked here"
+    },
+    {
+      "label": "oracle-1",
+      "pid": 2466,
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracle.mjs",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/cli.js",
+        "/private/tmp/lhfo-d11M9g/workspaces/p119-oracle-de96ae92-5143-4fa9-8f6e-32fd90025929",
+        "/private/tmp/lhfo-d11M9g/case.json",
+        "/private/tmp/lhfo-d11M9g/provider-evidence"
+      ],
+      "exit": 1,
+      "signal": null,
+      "spawnError": null,
+      "streamsClosed": true,
+      "absentByESRCH": true,
+      "probes": [
+        "ESRCH"
+      ],
+      "truncated": false,
+      "captureErrors": [],
+      "captured": {
+        "stdout": {
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "stderr": {
+          "bytes": 743,
+          "sha256": "4565a793719217df0b4d364536bc615384e55710bbaf41d703d6066ecec9fe63"
+        }
+      },
+      "observedOutputBytes": {
+        "stdout": 0,
+        "stderr": 743
+      },
+      "environmentKeys": [
+        "AMC_FINANCE_ORACLE_PINS_FILE",
+        "AMC_HOME",
+        "HOME",
+        "NO_COLOR",
+        "PATH",
+        "TMPDIR"
+      ],
+      "processGroup": "Inherited guarded outer group; only PID absence checked here"
+    }
+  ],
+  "actualProviderRoot": "/private/tmp/lhf-ETIJH1",
+  "providerPOSTs": 1,
+  "providerCommits": 1,
+  "providerLogRows": 11,
+  "retainedLauncherRoot": "/private/tmp/lhfo-d11M9g",
+  "pins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/raw.json",
+      "bytes": 5161,
+      "sha256": "d7624fdce5f8db92ce22a71e4b5fd111629b17e1ed8476d9671e4f4cc4194e9c"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/observer.json",
+      "bytes": 8722,
+      "sha256": "a03cd32777c6dea8f5f193b57ed79481bd9c46f2db652393099edd81aa5ead4d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/command.json",
+      "bytes": 2938,
+      "sha256": "89145ea407724cd59442e924efcc13fd328712c53d3bcba4e07c8d1510ed41b6"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/stdout-stderr.log",
+      "bytes": 22584,
+      "sha256": "0a5e3912c3c99311d65a064b4d57b01b00cf3850fc0d66a016b4107ee9395d11"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "6dd04bbb76f46770e4bc34ad9a5491828da1cc842dbfc8cc52a89ffc0b106826"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/oracle-1.stderr.log",
+      "bytes": 743,
+      "sha256": "4565a793719217df0b4d364536bc615384e55710bbaf41d703d6066ecec9fe63"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/public-observations.json",
+      "bytes": 10331,
+      "sha256": "9bdf88ff168512f046b96684cb653aee2ce58e16287a37445535b019c008a9ac"
+    }
+  ],
+  "limits": "Producer assertions and actual provider rows establish setup; no independent oracle verdict or full corpus pass exists. All historical and failed roots remain retained."
+}

@@ -1,0 +1,83 @@
+{
+  "at": "2026-10-16T22:25:58.285867+00:00",
+  "mode": "restore",
+  "operator": "F3-unpinned-dispatch",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/src/time/tsaClient.ts",
+  "binding": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-source-binding.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-source-binding.json",
+    "bytes": 88422,
+    "sha256": "2d45e6ae6c0632762ca7bc358744d4ba44686f913bc0a696eacb3c079df3d86f",
+    "dev": 16777231,
+    "inode": 543575822,
+    "nlink": 1
+  },
+  "sourceOutcome": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-source-combined-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-source-combined-outcome.json",
+    "bytes": 4249,
+    "sha256": "dc9f1e951177a6eb15ba853f65ef35afd94f9b6f9be75b5dceab637543b55cdd",
+    "dev": 16777231,
+    "inode": 543511354,
+    "nlink": 1
+  },
+  "canonicalOutcome": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-fresh-canonical-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-fresh-canonical-outcome.json",
+    "bytes": 4281,
+    "sha256": "f8dcd20623c0bb81d00c5b5deb41514a1b8c8f21cc20ab70b06b19cbf475258a",
+    "dev": 16777231,
+    "inode": 543576128,
+    "nlink": 1
+  },
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false,
+  "regularSingleLinkCheckedBeforeWrite": true,
+  "sourceOnlyMutant": true,
+  "original": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/m3-original.ts",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/m3-original.ts",
+    "bytes": 10927,
+    "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "dev": 16777231,
+    "inode": 543577511,
+    "nlink": 1
+  },
+  "outcome": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-m3-outcome.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/p125f-m3-outcome.json",
+    "bytes": 6800,
+    "sha256": "3e7c4afecdc5b62f6daea7236505be6d1a6d12b9cc7cbc4eab20703abf596b14",
+    "dev": 16777231,
+    "inode": 543578560,
+    "nlink": 1
+  },
+  "classification": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/m3-classification.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/m3-classification.json",
+    "bytes": 1678,
+    "sha256": "85126a31b0e9ed3cd2beb5740c098337f58586352621e8483fd842fae4b7abb5",
+    "dev": 16777231,
+    "inode": 543578570,
+    "nlink": 1
+  },
+  "apply": {
+    "path": "/private/tmp/p1-25-fallback-qualification-20261017/m3-apply.json",
+    "physicalPath": "/private/tmp/p1-25-fallback-qualification-20261017/m3-apply.json",
+    "bytes": 2818,
+    "sha256": "84cf418ed6ed920c83b0b301cd630360ee7f512d195689705cc0a7378781c2c3",
+    "dev": 16777231,
+    "inode": 543577514,
+    "nlink": 1
+  },
+  "preservationBeforeWrite": {
+    "selectedPathsEachRoot": 72,
+    "compiledPairs": 8,
+    "protectedInputs": 128,
+    "nativePhysicalPins": 8,
+    "allSelectedBytesAndPhysicalPinsExact": true,
+    "heldRHeadStatusIndexExact": true
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "issue": "P0-50",
+  "kind": "Independent read-only canonical receipt review",
+  "reviewedAt": "2026-10-14T15:38:39.685635+00:00",
+  "directory": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-50",
+  "testedSourceRevision": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "documentationCommit": "7b3595435ce9ca480e4e0d01b99a1468b2c3ad0c",
+  "acceptedBase": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "status": "ONE_DOCUMENTATION_CORRECTION_REQUIRED",
+  "productionOrAcceptanceDefects": [],
+  "findings": [
+    {
+      "priority": "low",
+      "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-50/README.md",
+      "line": 11,
+      "claim": "The actual full release gate executed all registered steps without --quick.",
+      "evidence": "Both actual full-release-gate.json and its summary record executed=19,total=21,skipped=2; per-file-coverage and live-deploy-health did not execute. Later counts are correct, but this opening sentence overstates execution.",
+      "replacement": "The actual full release gate ran without --quick: 19 of 21 planned steps executed and two were skipped.",
+      "requiredFollowup": "Refresh README artifact hash in receipt.json and rerun only the artifact validator after the documentation correction; no qualification replay is needed."
+    }
+  ],
+  "verified": {
+    "testedSourcePinnedAndDocumentationCommitHasOnly34QualificationFiles": true,
+    "canonicalArtifactCount": 34,
+    "canonicalFilesAtMost1MiB": true,
+    "all33ReferencedCanonicalArtifactHashesMatch": true,
+    "all6RawInputArtifactHashesAndSizesMatch": true,
+    "fullTests": {
+      "success": true,
+      "numTotalTests": 23125,
+      "numPassedTests": 23125,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numFailedTestSuites": 0,
+      "numPendingTestSuites": 0
+    },
+    "reportedFiles": 1610,
+    "allReportedFilesPassed": true,
+    "zeroAssertionReportedFiles": 0,
+    "performanceFiles": 4,
+    "performanceCases": 5,
+    "allFivePerformanceCasesPassed": true,
+    "fullGateCounts": {
+      "executed": 19,
+      "passed": 16,
+      "failed": 3,
+      "skipped": 2,
+      "total": 21
+    },
+    "fullGateExit": 1,
+    "quick": false,
+    "functions": {
+      "total": 31517,
+      "covered": 22723,
+      "skipped": 0,
+      "pct": 72.09
+    },
+    "unchangedFunctionFloor": 75,
+    "perFileFailureRows": 894,
+    "perFileAffectedFiles": 281,
+    "perFileMeasuredFiles": 2169,
+    "gatePerFileDependencySkipPreserved": true,
+    "sourceQuality": {
+      "duplicates": 1270,
+      "deadCode": 2787,
+      "allowFailure": false,
+      "waiver": false
+    },
+    "protectedPolicyPackageLockAndCoverageInputCount": 7,
+    "protectedInputsEqualAcceptedBaseAndRecordedHashes": true,
+    "httpCheckpointGroups": 15,
+    "httpActualReceiptHash": "5ccab8bf864aef7be233c864324ee42cba5010ec16d0229ebcb5175350d5601b",
+    "canonicalHttpReportsReceiptsManifestAndPatchesMatchOriginalDelegateFiles": true,
+    "bothFailedHttpAttemptsRetainedAndHashesMatch": true,
+    "stdioCheckpointGroups": 3,
+    "stdioExit": 0,
+    "stdioActualReceiptHash": "8e277e99544bc4b4e9f834ba05a41611217403b7859986e4ac2941d48aa20370",
+    "stdioSourceAndArtifactCliCorrespondence": true,
+    "existingStdioRunnerAndTwoHelpersEqualAcceptedBase": true,
+    "stdioBeforeAndAfterSourceHashesMatchCurrent": true,
+    "node22AndNode24FocusedAssertionsEach": 34,
+    "zeroFocusedFailedPendingTodo": true,
+    "node24ComponentInputHashesCorrespond": 17,
+    "mainAndClaudeHeadsAndCleanStatusMatchPreservationRecord": true,
+    "reservationBytesMatchPreservationRecord": true,
+    "productionAndToolsEqualP04771edSource": true,
+    "limitsRetained": [
+      "No Done/full-release/hosted-CI acceptance claim",
+      "Source-quality and global/per-file coverage blockers remain",
+      "Node24 units are separate from Node22 installed replay",
+      "HTTP historical protocol2025-11-25 only; no stateless2026 discovery, live TLS, external OAuth, live vendor or model qualification",
+      "Monitor key admission is explicit local pre-execution trust, not independent third-party certification",
+      "Cancellation/DELETE is disposal, not reversal of a committed remote effect",
+      "Health omission authorized only until P2-06",
+      "P0-29 explicitly skipped; its successors unchanged"
+    ]
+  },
+  "reviewedArtifactHashes": {
+    "README.md": "074b324005aad780c1f8d639f30ec8c62f64b69bcc9e2d0bb0d3fd5d6f2f76cb",
+    "receipt.json": "acbe36dc8ccb179e7092f9ffbb01e703889bea0f6d79675001038a9d07d0d790",
+    "full-release-gate-summary.json": "f3a5d7698d7e54596435f2fcdcef6d03bb3d8f3bc00c49c137c4353c328fc5cb",
+    "full-release-gate.json": "c18d61893d8b5505aa69ab8ba65beb6fff0b5e40ae47e6def8f124d711dcd420",
+    "integration-provenance.json": "723db658a39ee77b83e92b94053f170c6d35537e9c384c46b6d531f701a9e9d3",
+    "preservation-check.json": "6d067893bd98782bd4636849f2bac267098b9953a021a00821ad6bc5dbf2a037",
+    "component-input-correspondence.json": "43b452ccc33f4a524d1e22e9e5b8f8a703431d4520625e90273405afa10cc841",
+    "installed-stdio-recovery.json": "e89f3d45b34eeda62db761b17011d757901d13c2059ebfc7e303230910d3c56c",
+    "installed-http-qualification.json": "8a67aa78bac2648f02b51514b39810358f2674ed2208247f09eace9177ce6d4d",
+    "installed-http-15-checkpoint-receipt.json": "5ccab8bf864aef7be233c864324ee42cba5010ec16d0229ebcb5175350d5601b"
+  },
+  "execution": "Read and compare saved artifacts, raw reports, source bytes and Git objects only. No builds, tests, checks, installs, hosted calls, source or checkout edits occurred.",
+  "rootDisposition": {
+    "READMEExecutedSteps": "Corrected to19of21executed/twoskipped",
+    "correctionCommit": "10cfce9c0",
+    "scope": "Artifact-only wording/hash update; original reviewed source07125b76 unchanged"
+  }
+}

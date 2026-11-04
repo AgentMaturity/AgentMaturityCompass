@@ -1,0 +1,73 @@
+{
+  "sourceHead": "49cd72a2440fae02c45af17aee7ec109c84900c7",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "state": "EXPERIMENTAL_DRAFT",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "directHumanProof": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/user-directives.json",
+    "sha256": "69eaddd91e9719f83bc99c626320134193101815f4ea038b151d7cdb1340de6c",
+    "bytes": 2595
+  },
+  "directives": [
+    {
+      "questionToolCall": "call_9d7d890df93f4d3091f46596730cab25",
+      "question": "P2-30’s focused checks pass, but host load above 380 has stalled full qualification. How should I proceed?",
+      "exactHumanAnswer": "Prepare remaining draft handoffs with full-suite checks explicitly pending",
+      "applies": "Initial remaining draft handoffs only; record full NOT_RUN/tests null, not pass or qualified."
+    },
+    {
+      "questionToolCall": "call_1e421f56c09d4c85aa736702cbfb7ecc",
+      "question": "P1-34 requires a unique catalog version for each content change. The prepared patch bumps catalog/catalog.yaml from 0.1.0 to 0.1.1 and updates only P2-30’s appended changelog entry; both guard checks pass in a pure proposal. The brief restricts shared files to appended own rows. Should I apply this version bump for each overlay draft, or leave version bumps to Claude at landing?",
+      "exactHumanAnswer": "Leave version bumps to Claude at landing; hand off drafts with that check pending",
+      "applies": "No own catalog manifest bump in this initial Environment draft; actual guard failures remain explicit and an owner version ref is required."
+    },
+    {
+      "questionToolCall": "call_c0951fff91b545f78b7adb9aaec3ddf8",
+      "question": "The new required int merge changes only catalog/CHANGELOG.md; a concrete merge-tree proposal confirms every other tracked file is byte-identical. Your earlier instruction requires the full suite on final HEAD. After this run finishes, should I repeat it on the merged commit, or retain this measured run with byte-equivalence evidence and rerun the changelog checks?",
+      "exactHumanAnswer": "Repeat the full suite on merged HEAD (current policy)",
+      "applies": "Final merged product HEAD requires a new actual full suite; no byte-equivalence substitution or scoped-test total as full."
+    }
+  ],
+  "pendingOwnerLandingBundle": {
+    "review": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/owner-version-proposal-49cd/patch-review.json",
+      "sha256": "d2a8deb2a1c8e4f0c70e8ac8396e0d39aa0cda7b5593bbb5034b1ce527bb457f",
+      "bytes": 2382
+    },
+    "patch": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-16/owner-version-proposal-49cd/owner-catalog-bump.patch",
+      "sha256": "935b35efe49200ddde63aa4841114e484ba568828d5259d6de86fd697e5015ef",
+      "bytes": 3568
+    },
+    "applied": false,
+    "limit": "Recorded concrete proposal only. Claude must apply or recompute against actual landing int. No proposed guard result is a current source pass."
+  },
+  "fullSuite": {
+    "state": "NOT_RUN",
+    "command": null,
+    "exit": null,
+    "durationMs": null,
+    "totals": null,
+    "reason": "Authorized initial draft only. Final merged-HEAD full suite with two workers remains required; no equivalence shortcut."
+  },
+  "nativeQualificationValidation": {
+    "state": "NOT_RUN_AT_ASSEMBLY",
+    "exit": null,
+    "followup": "This snapshot precedes its own native validation. Root records the subsequent command and measured result off-tree and in the handoff."
+  },
+  "humanOpen": [
+    "D-14/D-10 grid cybersecurity and food safety experts",
+    "independent human review and sign-offs",
+    "P1-29 partner per domain and funded stewardship",
+    "D-04 licence and Sid promotion decision",
+    "primary-source/legal review and applicability/capacity/separate-order dates",
+    "manual safe-state and hazard assessment"
+  ],
+  "limits": [
+    "No fresh primary reads, third-party contact, production outcome or legal determination.",
+    "CEA reporting, P2-27 recall, runtime and pending reuse remain bounded by actual final-source documentation.",
+    "No catalog version bump or full qualification is claimed by this draft."
+  ]
+}

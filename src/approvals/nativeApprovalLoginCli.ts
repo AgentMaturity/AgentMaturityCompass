@@ -54,17 +54,19 @@ export function registerNativeApprovalLoginCommands(approvals: Command, io: Nati
     .requiredOption("--token-file <newpath>", "new private output file in an existing directory; never overwritten")
     .option("--ttl-minutes <n>", "session lifetime, integer 5–60 minutes", String(NATIVE_APPROVAL_TTL_MINUTES.default))
     .option("--password-stdin", "read at most 4096 UTF-8 password bytes from redirected stdin; never argv")
+    .option("--a4-comment-only", "mint a credential Studio admits only for A4 reads and comments (AMC_A4_SESSION_TOKEN_FILE for the A4 MCP tools)")
     .option("--json", "output identity, actual expiry and path metadata only; never a password or token")
-    .action(async (opts: { username: string; tokenFile: string; ttlMinutes: string; passwordStdin?: boolean; json?: boolean }) => {
+    .action(async (opts: { username: string; tokenFile: string; ttlMinutes: string; passwordStdin?: boolean; a4CommentOnly?: boolean; json?: boolean }) => {
       try {
         const ttlMinutes = /^[0-9]+$/.test(opts.ttlMinutes) ? Number(opts.ttlMinutes) : NaN;
         const receipt = await loginNativeApprovals({ workspace: process.cwd(), username: opts.username,
-          tokenFile: opts.tokenFile, ttlMinutes }, () => io.readPassword(opts.passwordStdin === true));
+          tokenFile: opts.tokenFile, ttlMinutes, a4CommentOnly: opts.a4CommentOnly === true }, () => io.readPassword(opts.passwordStdin === true));
         if (opts.json) io.log(JSON.stringify({ ok: true, ...receipt }, null, 2));
         else {
           io.log(`Logged in as ${JSON.stringify(receipt.username)} (${receipt.userId}); roles: ${receipt.roles.join(", ")}.`);
           io.log(`Expires: ${new Date(receipt.expiresTs).toISOString()}\nPrivate session file: ${receipt.tokenFile}`);
-          io.log("Use this file path when native chat asks for your authenticated approval session. Existing request roles, quorum and policy still apply.");
+          io.log(receipt.scope === "a4_comment" ? "Studio admits this session only for A4 reads and comments; name it in AMC_A4_SESSION_TOKEN_FILE for the A4 MCP tools."
+            : "Use this file path when native chat asks for your authenticated approval session. Existing request roles, quorum and policy still apply.");
         }
       } catch (error) {
         const code = error instanceof NativeApprovalLoginError ? error.code : "LOGIN_FAILED";

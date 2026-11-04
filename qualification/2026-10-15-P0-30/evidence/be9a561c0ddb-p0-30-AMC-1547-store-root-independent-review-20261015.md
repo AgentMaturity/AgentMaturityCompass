@@ -1,0 +1,17 @@
+# Independent AMC-1547 store-root supplement review
+
+No actionable findings were found in the frozen two-case packet.
+
+The actual initial baseline passes 2/2, and the unchanged parent/sibling cases measure 2 → 0 → 2 under the exact original source guard. Both mutant failures are candidate-result AssertionErrors at line 166. Zero cases are pending/todo, and no setup, pool, observer, timeout or cleanup error is used as a guard result. These are two registered cases repeated across four processes, producing eight observations.
+
+Every healthy strict-descendant read returns the exact expected plaintext length and SHA: parent 42 bytes, sibling 43 bytes. Both mutant candidate reads return ok with the same matching bytes. Intact and restored candidate reads return tampered with the exact descendant reason and no bytes. This demonstrates bounded legacy read-root sensitivity rather than a generic missing-path or permission error.
+
+The signed-row and healthy-read assertions pass before the mutant failure. Later snapshot/cleanup assertions are masked, but both reads, all three snapshots and cleanup were already retained. Independent comparison confirms before == afterHealthy == afterCandidate in all eight records. Parent snapshots have 26 named entries, sibling snapshots 27. They record names/types/modes/device/inode/link/size/file hashes and deliberately exclude times. Both planted objects and the input match the expected content, length, mode 0600 and single-link projection.
+
+Normal Ledger APIs produce the locally signed row. All eight records retain true event-hash and Node signature checks, with the snapshot monitor-public-file hash matching the captured PEM pin. The product canonical helper is reused; readSpilled itself does not authenticate the row. Initial key histories precede pin capture, and the pin precedes the tested row only. Final files overwrite intermediate records, and deleted raw signing inputs prevent complete offline replay. Local fixture authority is not independent external person or delegation evidence.
+
+The normal ledger/pool close sequence precedes read snapshots and runs again in cleanup, with no retained errors. All eight fixture roots are absent. This is same-process selected closure evidence, not a cold child, universal descriptor proof or repair of prior P0-27 corruption. Default 30-second deadlines, normal guards/setup, one worker and byte-exact criteria remain unchanged. Every actual case directly records Node v22.23.3/ABI 127.
+
+All 2,179 references match. The 7,739 source files, 4,529 compiled files and one new private file match the restored 12,269-file map. The exact TS mutant and patch reproduce as the sole source delta; dist and the test remain unchanged. All 157 protected pins, 2,094 prior references, five author/review inputs, two predecessor pins, eleven prior final file manifests, 307 links and native binary bytes and physical identity agree. The new case is absent from live source. Original qualification remains immutable, with its separate 170-registration/164-rendered-title correction preserved.
+
+No product import, runtime, test/rerun, parser/typecheck, build, install, network operation, Git command or source/input edit was performed by this reviewer. No encryption/publication/transport, full ledger/cold/race, provider/CLI/installed, full batch, Node24, full suite, release, Done or AMC-1522/P0-32 closure is claimed. All scoped reads are complete.

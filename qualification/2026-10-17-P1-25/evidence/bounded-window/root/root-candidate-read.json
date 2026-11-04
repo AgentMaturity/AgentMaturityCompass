@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-17T00:02:31.685703+00:00",
+  "sourceHead": "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+  "rootReadExistingFixtureAndCheckpointFlowPlusExactCompleteDeltasMatrixAndMapping": true,
+  "all11SealedOutputsExact": true,
+  "bothDeltasReproduceFromActualCurrentSource": true,
+  "old8211ByteCheckpointBodyBlockExact": true,
+  "wholeGrantC8cExact": true,
+  "oneNewLiteralCase": true,
+  "onlyTwoTestSideCandidates": true,
+  "independentCandidateReviewBlockers": [],
+  "zeroToleranceHeader457Assertion458Clarified": true,
+  "newPublicTwoBoundFactsRequireAuditorAdaptationBeforeReuse": true,
+  "noFuturePassFailureHooksOrChildCountsPredicted": true,
+  "sourceAllocationAndMaterializationStillPendingOwnershipHostedFreezeD15": true,
+  "allHoldsRetained": true
+}

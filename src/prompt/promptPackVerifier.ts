@@ -4,6 +4,7 @@ import { buildVerifierReport, checkDigestSignature, envelopePublicKey, workspace
 import { fileSha256 } from "../trust/signatureCheck.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
+import { canonicalize } from "../utils/json.js";
 import { inspectPromptPackArtifact } from "./promptPackArtifact.js";
 import { digestPromptPack } from "./promptPackSigner.js";
 
@@ -43,9 +44,13 @@ export function verifyPromptPackFile(params: {
   }
   try {
     const inspected = inspectPromptPackArtifact(params.file);
+    if (inspected.pack.checkpoints.lessonTransfer
+      && inspected.pack.bindings.providerFilesSha256 !== sha256Hex(canonicalize(inspected.providerFiles))) {
+      errors.push("lesson prompt provider files do not match the signed binding");
+    }
     const candidates = [params.publicKeyPath ? readUtf8(params.publicKeyPath) : null, inspected.signerPub, envelopePublicKey(inspected.signature.envelope)];
     const digest = digestPromptPack(inspected.pack);
-    const check = checkDigestSignature({ signature: "pack.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: inspected.signature.signature,
+    const check = checkDigestSignature({ signature: "pack.sig", purpose: "artifact-seal", digestHex: digest, signatureB64: inspected.signature.signature, envelope: inspected.signature.envelope,
       candidates, context: params.trust, claimedSignedAt: inspected.signature.signedTs });
     signatures.push(check.admission);
     if (digest !== inspected.signature.digestSha256) {
@@ -101,7 +106,7 @@ function verifyPromptSignatureObject(params: {
   if (!parsed.success) {
     return { verified: false, admission: null };
   }
-  const check = checkDigestSignature({ signature: "lint/lint.sig", purpose: "artifact-seal", digestHex: params.digestHex, signatureB64: parsed.data.signature,
+  const check = checkDigestSignature({ signature: "lint/lint.sig", purpose: "artifact-seal", digestHex: params.digestHex, signatureB64: parsed.data.signature, envelope: parsed.data.envelope,
     candidates: [...params.candidates, envelopePublicKey(parsed.data.envelope)], context: params.trust, claimedSignedAt: parsed.data.signedTs });
   const envelopeMatches = parsed.data.envelope === undefined || parsed.data.signature === parsed.data.envelope.sigB64;
   return { verified: check.verified && envelopeMatches, admission: check.admission };

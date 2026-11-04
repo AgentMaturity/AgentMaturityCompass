@@ -1,0 +1,628 @@
+{
+  "schema": "p124-source-inputs/1",
+  "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+  "branch": "codex/p1-24-qualification",
+  "base": "6b18871c69c0d3718ca4b8df4deb424492628347",
+  "productSourceChange": "None. Four missing tests, two factual DSH document replacements and ten generated count overlays only.",
+  "historicalBaseline": {
+    "pin": {
+      "path": "/private/tmp/p1-24-qualification-20261016/root-preflight.json",
+      "bytes": 8269,
+      "sha256": "14f013a1b4319e402d29e465c0722fa4a358206198c810a14c8fede9aba44420"
+    },
+    "head": "6b18871c69c0d3718ca4b8df4deb424492628347",
+    "rows": [
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/importOriginals.ts",
+          "bytes": 8521,
+          "sha256": "e3ce0a619048f84d8f35329aac427816f5f8fdd2dd38b34f08214338c804689c"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/importOriginals.ts",
+          "bytes": 8521,
+          "sha256": "e3ce0a619048f84d8f35329aac427816f5f8fdd2dd38b34f08214338c804689c"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/sourceFormatError.ts",
+          "bytes": 1050,
+          "sha256": "b8db65efcd39b69a6dd411ae59bb9f408bb14ede5f041ac651ed35b2682c1a5f"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/sourceFormatError.ts",
+          "bytes": 1050,
+          "sha256": "b8db65efcd39b69a6dd411ae59bb9f408bb14ede5f041ac651ed35b2682c1a5f"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/dshSessionImport.ts",
+          "bytes": 16054,
+          "sha256": "ede3e7e02ffa609468acc8dbcb0ad7cceb3e5ea805b77622b031304272f02ef9"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/dshSessionImport.ts",
+          "bytes": 16054,
+          "sha256": "ede3e7e02ffa609468acc8dbcb0ad7cceb3e5ea805b77622b031304272f02ef9"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/dshSessionContract.ts",
+          "bytes": 9596,
+          "sha256": "bdfe228ee9119f60e85e8d2fb0896f9dc8ce7abed42369ca549d62e5e09a79b3"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/dshSessionContract.ts",
+          "bytes": 9596,
+          "sha256": "bdfe228ee9119f60e85e8d2fb0896f9dc8ce7abed42369ca549d62e5e09a79b3"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/piSessionImport.ts",
+          "bytes": 20249,
+          "sha256": "0dac5dd10c9355eddf192a8d3d08f41772397f7bf8acb5071e920196376b1e10"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/piSessionImport.ts",
+          "bytes": 20249,
+          "sha256": "0dac5dd10c9355eddf192a8d3d08f41772397f7bf8acb5071e920196376b1e10"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/neutralImporter.ts",
+          "bytes": 43554,
+          "sha256": "ada80550a503430aceb484e42fa0a9cd78d3c2f70252052aa30604caa2726479"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/neutralImporter.ts",
+          "bytes": 43554,
+          "sha256": "ada80550a503430aceb484e42fa0a9cd78d3c2f70252052aa30604caa2726479"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/neutralImportMapping.ts",
+          "bytes": 16877,
+          "sha256": "1c6509f1c4088b236206db5edafe5b19bb7f239fb22319890c80bf9a9b643b76"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/importers/neutralImportMapping.ts",
+          "bytes": 16877,
+          "sha256": "1c6509f1c4088b236206db5edafe5b19bb7f239fb22319890c80bf9a9b643b76"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-import-commands.ts",
+          "bytes": 13369,
+          "sha256": "5d79d48e1e6389687f137c52372642aea576e9b852eada833186d98159944641"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-import-commands.ts",
+          "bytes": 13369,
+          "sha256": "5d79d48e1e6389687f137c52372642aea576e9b852eada833186d98159944641"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/gateway/requestFieldGuard.ts",
+          "bytes": 10355,
+          "sha256": "e37b362e82476c298e86a2d7bb62cdca9b8dec6ef9175b562183c9a6385085c7"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/gateway/requestFieldGuard.ts",
+          "bytes": 10355,
+          "sha256": "e37b362e82476c298e86a2d7bb62cdca9b8dec6ef9175b562183c9a6385085c7"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/gateway/server.ts",
+          "bytes": 68401,
+          "sha256": "aa01863e5ce19eb441c2253f5f7af829c43597ed575b1affcf1699204a746cb5"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/gateway/server.ts",
+          "bytes": 68401,
+          "sha256": "aa01863e5ce19eb441c2253f5f7af829c43597ed575b1affcf1699204a746cb5"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/gateway/config.ts",
+          "bytes": 18184,
+          "sha256": "bb3df0b574acfa7030d70cebc94e2be075e3f866dfc5956088aca1d8ef17afd9"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/gateway/config.ts",
+          "bytes": 18184,
+          "sha256": "bb3df0b574acfa7030d70cebc94e2be075e3f866dfc5956088aca1d8ef17afd9"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/storage/blobs/blobStore.ts",
+          "bytes": 12178,
+          "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/storage/blobs/blobStore.ts",
+          "bytes": 12178,
+          "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/storage/blobs/blobKeys.ts",
+          "bytes": 9331,
+          "sha256": "621760aae5d6439e8bf25e01220ad0bd9f0c50684fc6cfda48ed05c35552dd93"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/storage/blobs/blobKeys.ts",
+          "bytes": 9331,
+          "sha256": "621760aae5d6439e8bf25e01220ad0bd9f0c50684fc6cfda48ed05c35552dd93"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/storage/blobs/blobEncryptor.ts",
+          "bytes": 4408,
+          "sha256": "1fbb25cd436a3d78ef9f2477a24eefb674eff96206b4d3c59a97b4dbc9cf449a"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/storage/blobs/blobEncryptor.ts",
+          "bytes": 4408,
+          "sha256": "1fbb25cd436a3d78ef9f2477a24eefb674eff96206b4d3c59a97b4dbc9cf449a"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ops/policy.ts",
+          "bytes": 6472,
+          "sha256": "cd0cee51e3207c191d74acedbed08579396a5d11c63d5c430b1384d94fe92b44"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ops/policy.ts",
+          "bytes": 6472,
+          "sha256": "cd0cee51e3207c191d74acedbed08579396a5d11c63d5c430b1384d94fe92b44"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/adapters/deepseek-harness.md",
+          "bytes": 16652,
+          "sha256": "a8ad895035c1200be5f4ae34c4a7a77c716c72f1af0766ef89fd68b8545d485c"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/adapters/deepseek-harness.md",
+          "bytes": 17959,
+          "sha256": "167fd518b868923c8693c6ee97b808413a029c50c0bd4e1a545a1de51a59df75"
+        },
+        "matchesHistorical": false,
+        "exception": "Admitted two factual DSH doc replacements"
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/import-original-bytes.md",
+          "bytes": 3273,
+          "sha256": "2659c095ef367b2470b7b9eed2d1348bb0f40a3f19f5aa0f2adf594da2cf0320"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/import-original-bytes.md",
+          "bytes": 3273,
+          "sha256": "2659c095ef367b2470b7b9eed2d1348bb0f40a3f19f5aa0f2adf594da2cf0320"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/import-api-retention.md",
+          "bytes": 309,
+          "sha256": "1bd9e24a4bd4e79a9fb6b4a2bd06b3eaa55d900c420b42d817f5788c31ccf158"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/import-api-retention.md",
+          "bytes": 309,
+          "sha256": "1bd9e24a4bd4e79a9fb6b4a2bd06b3eaa55d900c420b42d817f5788c31ccf158"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/neutralImporter.test.ts",
+          "bytes": 16811,
+          "sha256": "99164c15364cee66ee2e33e539d7fe1b9c197816ce3f22550e4b470e01e01421"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/neutralImporter.test.ts",
+          "bytes": 16811,
+          "sha256": "99164c15364cee66ee2e33e539d7fe1b9c197816ce3f22550e4b470e01e01421"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/neutralImportMapping.test.ts",
+          "bytes": 12916,
+          "sha256": "9510fb35a0003e4f0049b5d2284a6bbbc00ab4584302fdd5e4bd6b6b7ecd5421"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/neutralImportMapping.test.ts",
+          "bytes": 12916,
+          "sha256": "9510fb35a0003e4f0049b5d2284a6bbbc00ab4584302fdd5e4bd6b6b7ecd5421"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/piSessionImport.test.ts",
+          "bytes": 11777,
+          "sha256": "ea613d06fe2e50ff99e35b548e47d6e6bff4feb66db463d6399bb2e7aae8b208"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/piSessionImport.test.ts",
+          "bytes": 11777,
+          "sha256": "ea613d06fe2e50ff99e35b548e47d6e6bff4feb66db463d6399bb2e7aae8b208"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/piSessionImportBoundaries.test.ts",
+          "bytes": 8537,
+          "sha256": "1618865e8107a6de99ef93157562929f51085b753713fc12f224a7a19f00d692"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/piSessionImportBoundaries.test.ts",
+          "bytes": 8537,
+          "sha256": "1618865e8107a6de99ef93157562929f51085b753713fc12f224a7a19f00d692"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/neutralImportReview.test.ts",
+          "bytes": 5093,
+          "sha256": "e5916a74a4b2da612306e3492d6b7ae36939dfd09fe589a1dbabcce100ba2a97"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/neutralImportReview.test.ts",
+          "bytes": 5093,
+          "sha256": "e5916a74a4b2da612306e3492d6b7ae36939dfd09fe589a1dbabcce100ba2a97"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/storage/blobKeyNoVault.test.ts",
+          "bytes": 6986,
+          "sha256": "eee15094e3e2adddc3cf37850fa0247bf78cd0bbd7037499752b59b372839664"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/storage/blobKeyNoVault.test.ts",
+          "bytes": 6986,
+          "sha256": "eee15094e3e2adddc3cf37850fa0247bf78cd0bbd7037499752b59b372839664"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/gatewayAndSupervise.test.ts",
+          "bytes": 13166,
+          "sha256": "aab9e3e8bba8161d0fe67d53bd99e7e5b5c637b800e58853a9448d298c86f825"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/gatewayAndSupervise.test.ts",
+          "bytes": 13166,
+          "sha256": "aab9e3e8bba8161d0fe67d53bd99e7e5b5c637b800e58853a9448d298c86f825"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/gatewayCredentialIsolation.test.ts",
+          "bytes": 3492,
+          "sha256": "cc34a634861af00476de09eab77101ae66956b4ee241c2818a6ed27473f61600"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/gatewayCredentialIsolation.test.ts",
+          "bytes": 3492,
+          "sha256": "cc34a634861af00476de09eab77101ae66956b4ee241c2818a6ed27473f61600"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/credentialsGatewaySeam.test.ts",
+          "bytes": 12506,
+          "sha256": "2e5bbf4a05b1f0a00b9ee313038ca6998a88f3ac8e75ab6debddc14d6e34d81c"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/credentialsGatewaySeam.test.ts",
+          "bytes": 12506,
+          "sha256": "2e5bbf4a05b1f0a00b9ee313038ca6998a88f3ac8e75ab6debddc14d6e34d81c"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+          "bytes": 1324,
+          "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+          "bytes": 1324,
+          "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+          "bytes": 3675,
+          "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+          "bytes": 3675,
+          "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+          "bytes": 1894,
+          "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+          "bytes": 1894,
+          "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      },
+      {
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+          "bytes": 1133,
+          "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+        },
+        "current": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+          "bytes": 1133,
+          "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+        },
+        "matchesHistorical": true,
+        "exception": null
+      }
+    ],
+    "unchanged": 30,
+    "expectedDocException": 1
+  },
+  "exactCandidate15": [
+    {
+      "relativePath": "README.md",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+        "bytes": 59828,
+        "sha256": "0ea904abbf32e7bc0334b457735ea2d6d2060f15f039d96872011fbc5a1498dd"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "f492477cd9a569e28014f01fdc61e463207c8a3780fd27ea0b0e1c824b54b9b2"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "website/index.html",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+        "bytes": 43520,
+        "sha256": "e9bbfcd0144e0440aa26bc5fe6d9612d7d20b06400e60ab1687cc5b578f120dc"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "website/lite.html",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+        "bytes": 11197,
+        "sha256": "85ded49355a2e8d7861512ad3e3902db9401eb6cf9315f25862df8692ba06dc2"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+        "bytes": 44169,
+        "sha256": "c452fb156b6e19ed47579b140b8e8244927850dc2fdce05badcf5a8f92060734"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "67df8a4f97629b03f54301eea7614f9d955153061d3bd912a42919c2229481f9"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "d02330a7330aa13f13072d9686d179650cd4be29523bc146fe88eb150c29d1de"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "979d0a610b3d149e9909db89aa65b712fa55b4d0cb340cfcce2cad8690e2cfad"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "bd8c076d51a4705608e410c4ec5f43a2b030097dc33e6f228bd6fda98acfbd56"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "00980c0268e2d08d076460d0252cf11a279456ee5d1b1a091553077bbf128e99"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "docs/adapters/deepseek-harness.md",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/adapters/deepseek-harness.md",
+        "bytes": 17959,
+        "sha256": "167fd518b868923c8693c6ee97b808413a029c50c0bd4e1a545a1de51a59df75"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "tests/importOriginals.test.ts",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/importOriginals.test.ts",
+        "bytes": 19250,
+        "sha256": "15511fb28cff4113e8e4338386911d788db65f5a2ecb1a95debe907e7f66da3d"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "tests/dshSessionImport.test.ts",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/dshSessionImport.test.ts",
+        "bytes": 10089,
+        "sha256": "4dcf540bcb3cc9376a2c68e034908672ab5098e903bc4ed3bff47304002d1e14"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "tests/piDurableDetection.test.ts",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/piDurableDetection.test.ts",
+        "bytes": 7872,
+        "sha256": "bb39debf334997fb4ee1aa24940e38d8e58acde44474e3ae051b335de29715ce"
+      },
+      "matchesPrecommitPin": true
+    },
+    {
+      "relativePath": "tests/requestFieldGuard.test.ts",
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/requestFieldGuard.test.ts",
+        "bytes": 27011,
+        "sha256": "7c55b3d1a74ee2c27f51ed8e8e1c36cf61436478dbaf1193d2a097a6e429433a"
+      },
+      "matchesPrecommitPin": true
+    }
+  ],
+  "fresh40InputAndNativeBinding": {
+    "path": "/private/tmp/p1-24-qualification-20261016/fresh-source-binding.json",
+    "bytes": 16233,
+    "sha256": "55c4855511c5f64907090ca2bf2994c2d17f2ada66e6d3d7615306c1acf3c729"
+  },
+  "finalRestoration": {
+    "path": "/private/tmp/p1-24-qualification-20261016/final-restoration.json",
+    "bytes": 434,
+    "sha256": "2cd48916df306e20fdb619cef884891c51873ac320b7afb467569ede48a05723"
+  },
+  "preservationBoundary": "Author checked these selected current R bytes. Whole-source equality and full native lifecycle are attributed to the closed root/fresh evidence, not independently reimplemented by this metadata author.",
+  "hostContext": {
+    "node": "22.23.3",
+    "pnpm": "10.33.0",
+    "os": "macOS26.6.2 (25G83), Darwin25.6.0",
+    "arch": "arm64",
+    "source": "Same-host prior closed P117 receipt context plus actual Node22 command path and clean-source frozen install/build; no new host-fingerprint command run by packet author.",
+    "priorReceipt": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-17/receipt.json",
+      "bytes": 14235,
+      "sha256": "fb8168a050e1b19cbb1ec4a16bbef2118321b78a7ce16ce25e3264f62087959b"
+    }
+  },
+  "schemaAndValidator": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    }
+  ],
+  "normalTestTimeoutMs": 30000,
+  "schemaOrValidatorChanged": false,
+  "runtimeByPacketAuthor": false
+}

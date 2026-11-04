@@ -1,0 +1,67 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-LOG-04
+version: "0.1.0"
+support: experimental
+layer: 0
+family: logging-and-retention
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: WORM export
+statement: Evidence is exported to write-once storage with a verifiable manifest.
+riskRationale: >-
+  Evidence kept only where the operator can rewrite it cannot stand against the operator.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    Evidence bundles are exported to write-once storage with a signed manifest that a verifier checks.
+  parameters: []
+  manualDuty:
+    duty: Export evidence to write-once storage and verify the manifest.
+    ownerRole: ciso
+    cadence: monthly and at each incident
+    evidenceOfPerformance: The export manifest and its verification.
+tests:
+  - id: L0-LOG-04-T1
+    type: configuration_check
+    oracle: { kind: signed_config, observes: The storage configuration and the export manifest. }
+    fixtures:
+      positive: [L0-LOG-04/positive/evidence-valid.json]
+      negative:
+        - L0-LOG-04/negative/evidence-contradictory.json
+        - L0-LOG-04/negative/evidence-cross-tenant.json
+        - L0-LOG-04/negative/evidence-empty.json
+        - L0-LOG-04/negative/evidence-replayed.json
+        - L0-LOG-04/negative/evidence-stale.json
+        - L0-LOG-04/negative/evidence-violation.json
+    passCriteria: The target is write-once and the manifest verifies.
+    attempts: 1
+  - id: L0-LOG-04-T2
+    type: drill
+    oracle: { kind: system_of_record, observes: A restore from the write-once store. }
+    fixtures:
+      positive: [L0-LOG-04/positive/evidence-valid-t2.json]
+      negative: [L0-LOG-04/negative/evidence-violation-t2.json]
+    passCriteria: A drill restores an export whose manifest verifies.
+    attempts: 1
+evidence:
+  - id: L0-LOG-04-E1
+    producer: amc.evidence.wormExport
+    bindingFields: [deploymentId, controlId]
+    freshness: { maxAgeDays: 60 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [deployment_version]
+owner: { role: ciso }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

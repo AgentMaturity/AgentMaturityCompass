@@ -1,6 +1,21 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { resolveAgentId } from "../fleet/paths.js";
-import { activeFreezeStatus, liftFreeze } from "./freezeEngine.js";
-import { runDriftCheck, writeDriftCheckReport } from "./driftDetector.js";
+import { activeFreezeStatus, liftFreeze, liftFreezeAsync, liftFreezeForAuthority } from "./freezeEngine.js";
+import { dispatchAlert } from "./alerts.js";
+import { runDriftCheck, runDriftCheckAsync, runDriftCheckForAuthority, writeDriftCheckReport, driftPostPublicationError, driftNotEvaluated,
+  driftNotEvaluatedAlert, type DriftCheckResult } from "./driftDetector.js";
+
+/** Drift that could not be evaluated alerts the owner; an alert that cannot be delivered is said in the result, never swallowed. */
+async function alertWhenNotEvaluated<T extends DriftCheckResult>(workspace: string, result: T): Promise<T> {
+  if (!driftNotEvaluated(result)) return result;
+  try {
+    await dispatchAlert(workspace, driftNotEvaluatedAlert(result));
+    return result;
+  } catch (error) {
+    return { ...result, reasons: [...result.reasons, `ALERT_NOT_DELIVERED: ${error instanceof Error ? error.message : String(error)}`] };
+  }
+}
 import { renderDriftMarkdown } from "./driftReport.js";
 
 export async function driftCheckCli(params: {
@@ -14,10 +29,10 @@ export async function driftCheckCli(params: {
   reasons: string[];
 }> {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  const result = await runDriftCheck({
+  const result = await alertWhenNotEvaluated(params.workspace, await runDriftCheck({
     workspace: params.workspace,
     agentId
-  });
+  }));
   return {
     agentId,
     triggered: result.triggered,
@@ -75,3 +90,33 @@ export function freezeLiftCli(params: {
     reason: params.reason
   });
 }
+
+/** Maintained checked CLI/SDK path; old wrapper remains the callback-absent registry compatibility branch. */
+export async function driftCheckCliAsync(params: Parameters<typeof driftCheckCli>[0]): ReturnType<typeof driftCheckCli> {
+  const captured = { ...params }, agentId = resolveAgentId(captured.workspace, captured.agentId);
+  return alertWhenNotEvaluated(captured.workspace, await runDriftCheckAsync({ workspace: captured.workspace, agentId }));
+}
+/** Internal router/Studio handoff. No actor claims or functions are accepted from request bodies. */
+export async function driftCheckCliForAuthority(params: Parameters<typeof driftCheckCli>[0], beforePublish: () => void): ReturnType<typeof driftCheckCli> {
+  const captured = { ...params }, agentId = resolveAgentId(captured.workspace, captured.agentId);
+  return alertWhenNotEvaluated(captured.workspace, await runDriftCheckForAuthority({ workspace: captured.workspace, agentId }, beforePublish));
+}
+export async function driftReportCliAsync(input: Parameters<typeof driftReportCli>[0]): ReturnType<typeof driftReportCli> {
+  const params = { ...input }, agentId = resolveAgentId(params.workspace, params.agentId), markdown = renderDriftMarkdown({ workspace: params.workspace, agentId });
+  if (!params.outFile) return { markdown, outFile: null };
+  const target = join(params.workspace, params.outFile);
+  const read = (): Buffer | null => { try { return readFileSync(target); } catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; } };
+  const before = read(), result = await runDriftCheckAsync({ workspace: params.workspace, agentId });
+  try {
+    const current = read(); if (before === null ? current !== null : current === null || !before.equals(current)) throw new Error("drift report destination changed while signing was prepared");
+    return { markdown, outFile: writeDriftCheckReport({ workspace: params.workspace, agentId, outFile: params.outFile, result }) };
+  } catch (error) { throw driftPostPublicationError(params.workspace, result, "report-output", error); }
+}
+export async function freezeLiftCliAsync(params: Parameters<typeof freezeLiftCli>[0]): Promise<{ liftPath: string }> {
+  return liftFreezeAsync({ ...params });
+}
+/** Internal trusted router handoff, not a root SDK actor option. */
+export async function freezeLiftCliForAuthority(params: Parameters<typeof freezeLiftCli>[0], beforePublish: () => void): Promise<{ liftPath: string }> {
+  return liftFreezeForAuthority({ ...params }, beforePublish);
+}
+export { driftNotEvaluated } from "./driftDetector.js";

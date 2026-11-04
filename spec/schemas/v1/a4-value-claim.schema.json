@@ -18,7 +18,10 @@
         "envelope": {
           "properties": {
             "alg": {
-              "const": "ed25519",
+              "enum": [
+                "ed25519",
+                "ecdsa-p256-sha256"
+              ],
               "type": "string"
             },
             "fingerprint": {
@@ -41,6 +44,14 @@
             },
             "signer": {
               "properties": {
+                "attestationBasis": {
+                  "enum": [
+                    "configured",
+                    "provider-metadata",
+                    "provider-reported"
+                  ],
+                  "type": "string"
+                },
                 "attestationLevel": {
                   "enum": [
                     "SOFTWARE",
@@ -192,13 +203,9 @@
                   "type": "string"
                 },
                 "eligibleLevel": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "entitlement": {
@@ -517,13 +524,9 @@
                   "type": "string"
                 },
                 "eligibleLevel": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "entitlement": {
@@ -850,13 +853,9 @@
           "type": "string"
         },
         "target": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "string",
+            "null"
           ]
         }
       },
@@ -901,13 +900,9 @@
               "type": "string"
             },
             "eligibleLevel": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "number",
+                "null"
               ]
             },
             "entitlement": {
@@ -1160,23 +1155,15 @@
           "type": "object"
         },
         "reason": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "string",
+            "null"
           ]
         },
         "reviewer": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "string",
+            "null"
           ]
         },
         "status": {

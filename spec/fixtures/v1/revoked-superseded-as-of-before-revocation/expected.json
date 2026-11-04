@@ -1,0 +1,14 @@
+{
+  "case": "revoked-superseded-as-of-before-revocation",
+  "normative": true,
+  "dimensions": {
+    "integrity": "pass",
+    "issuerAdmission": "pass",
+    "scope": "pass",
+    "freshness": "pass",
+    "completeness": "pass",
+    "satisfaction": "pass"
+  },
+  "reasonCodes": {},
+  "exitCode": 0
+}

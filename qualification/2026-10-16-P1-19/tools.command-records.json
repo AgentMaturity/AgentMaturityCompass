@@ -1,0 +1,1224 @@
+{
+  "schema": "p119-tools-command-records/1",
+  "records": [
+    {
+      "phase": "p119-finance-tools-missing-positive",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts -t 'a genuine two-role factory execution has one effect and passes the independent cold oracle' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-missing-positive.producer.json",
+      "exit": 1,
+      "durationMs": 1874,
+      "startedUtc": "2026-10-15T23:11:30.755494+00:00",
+      "endedUtc": "2026-10-15T23:11:32.641570+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-missing-positive/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 7561,
+        "ownedPgid": 7561,
+        "observedPgidAfterLaunch": 7561,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOpsTools.test.ts",
+          "-t",
+          "a genuine two-role factory execution has one effect and passes the independent cold oracle",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-missing-positive.producer.json"
+        ],
+        "startedUtc": "2026-10-15T23:11:30.755494+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-missing-positive.producer.json",
+          "bytes": 8265,
+          "sha256": "cd9354b418b486b649bd34f39ced9f82cc9fe7a04f33d6759a808ebcffefd399"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-missing-positive/raw.json",
+          "bytes": 8265,
+          "sha256": "cd9354b418b486b649bd34f39ced9f82cc9fe7a04f33d6759a808ebcffefd399"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-missing-positive/observer.json",
+          "bytes": 13536,
+          "sha256": "f2beda620b942b28b39afb1e98a86b0f63413f9f766cc26022c5299ef2928362"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-v1-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc --noEmit",
+      "exit": 0,
+      "durationMs": 28862,
+      "startedUtc": "2026-10-15T23:13:07.906858+00:00",
+      "endedUtc": "2026-10-15T23:13:36.784377+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-typecheck/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 7896,
+        "ownedPgid": 7896,
+        "observedPgidAfterLaunch": 7896,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T23:13:07.906858+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-v1-build",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 34248,
+      "startedUtc": "2026-10-15T23:14:05.788565+00:00",
+      "endedUtc": "2026-10-15T23:14:40.049575+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-build/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 8045,
+        "ownedPgid": 8045,
+        "observedPgidAfterLaunch": 8045,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "build"
+        ],
+        "startedUtc": "2026-10-15T23:14:05.788565+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-v1-positive",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts -t 'a genuine two-role factory execution has one effect and passes the independent cold oracle' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-positive.producer.json",
+      "exit": 0,
+      "durationMs": 4481,
+      "startedUtc": "2026-10-15T23:14:53.146562+00:00",
+      "endedUtc": "2026-10-15T23:14:57.639959+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-positive/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 8239,
+        "ownedPgid": 8239,
+        "observedPgidAfterLaunch": 8239,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOpsTools.test.ts",
+          "-t",
+          "a genuine two-role factory execution has one effect and passes the independent cold oracle",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-positive.producer.json"
+        ],
+        "startedUtc": "2026-10-15T23:14:53.146562+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-positive.producer.json",
+          "bytes": 6847,
+          "sha256": "f272f3c729e8a7de2e073c3985b019865b3749b96384a4223a984dff48f7e1b2"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-positive/raw.json",
+          "bytes": 6847,
+          "sha256": "f272f3c729e8a7de2e073c3985b019865b3749b96384a4223a984dff48f7e1b2"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-positive/observer.json",
+          "bytes": 9493,
+          "sha256": "fd62fbf48b79943653305cef73fc1061bdcc96a0b9207df20703a3de070d226d"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-v1-all",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts tests/lighthouse/financePaymentContext.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-all.producer.json",
+      "exit": 1,
+      "durationMs": 44027,
+      "startedUtc": "2026-10-15T23:15:07.108090+00:00",
+      "endedUtc": "2026-10-15T23:15:51.148691+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-all/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 8273,
+        "ownedPgid": 8273,
+        "observedPgidAfterLaunch": 8273,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOpsTools.test.ts",
+          "tests/lighthouse/financePaymentContext.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-all.producer.json"
+        ],
+        "startedUtc": "2026-10-15T23:15:07.108090+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v1-all.producer.json",
+          "bytes": 14243,
+          "sha256": "383e84379cf9c7fe9e8f59bfe4abde6a5222a17bfd99e0265f7b60600548e3d9"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-all/raw.json",
+          "bytes": 14243,
+          "sha256": "383e84379cf9c7fe9e8f59bfe4abde6a5222a17bfd99e0265f7b60600548e3d9"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v1-all/observer.json",
+          "bytes": 20191,
+          "sha256": "c03517dcc09f6e49b4da3657d12537b2fc5069a8829962d59f2a64fb4ecdebc8"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-source-lint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3105,
+      "startedUtc": "2026-10-15T23:20:20.087977+00:00",
+      "endedUtc": "2026-10-15T23:20:23.204719+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-source-lint/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 9179,
+        "ownedPgid": 9179,
+        "observedPgidAfterLaunch": 9179,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "lint"
+        ],
+        "startedUtc": "2026-10-15T23:20:20.087977+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-v2-tests-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 39997,
+      "startedUtc": "2026-10-15T23:22:31.213368+00:00",
+      "endedUtc": "2026-10-15T23:23:11.226161+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-tests-typecheck/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 9462,
+        "ownedPgid": 9462,
+        "observedPgidAfterLaunch": 9462,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.tests.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T23:22:31.213368+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-v2-repaired-controls",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts tests/lighthouse/financePaymentContext.test.ts -t 'expired provider key indexes|a real durable-preimage persistence fault' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v2-repaired-controls.producer.json",
+      "exit": 0,
+      "durationMs": 5518,
+      "startedUtc": "2026-10-15T23:23:38.726896+00:00",
+      "endedUtc": "2026-10-15T23:23:44.257519+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-repaired-controls/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 9595,
+        "ownedPgid": 9595,
+        "observedPgidAfterLaunch": 9595,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOpsTools.test.ts",
+          "tests/lighthouse/financePaymentContext.test.ts",
+          "-t",
+          "expired provider key indexes|a real durable-preimage persistence fault",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v2-repaired-controls.producer.json"
+        ],
+        "startedUtc": "2026-10-15T23:23:38.726896+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-v2-repaired-controls.producer.json",
+          "bytes": 12755,
+          "sha256": "429ac81dfdb6028026a0012fa82063b0a0e2b2ff0043e182a3f8f08925827661"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-repaired-controls/raw.json",
+          "bytes": 12755,
+          "sha256": "429ac81dfdb6028026a0012fa82063b0a0e2b2ff0043e182a3f8f08925827661"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-v2-repaired-controls/observer.json",
+          "bytes": 17733,
+          "sha256": "824de654697026cb8ac067ef1b3521dd8531205e4766ea2426ee1107a5edfa2d"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-counts-before",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 342,
+      "startedUtc": "2026-10-15T23:24:40.010104+00:00",
+      "endedUtc": "2026-10-15T23:24:40.364109+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-before/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 9786,
+        "ownedPgid": 9786,
+        "observedPgidAfterLaunch": 9786,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-15T23:24:40.010104+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-counts-generate",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 226,
+      "startedUtc": "2026-10-15T23:24:46.198577+00:00",
+      "endedUtc": "2026-10-15T23:24:46.435642+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-generate/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 9803,
+        "ownedPgid": 9803,
+        "observedPgidAfterLaunch": 9803,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--write"
+        ],
+        "startedUtc": "2026-10-15T23:24:46.198577+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-report-contract-red",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts -t 'actual read results and the seed' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-red.producer.json",
+      "exit": 1,
+      "durationMs": 2259,
+      "startedUtc": "2026-10-15T23:26:47.836668+00:00",
+      "endedUtc": "2026-10-15T23:26:50.109190+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-red/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10028,
+        "ownedPgid": 10028,
+        "observedPgidAfterLaunch": 10028,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOpsTools.test.ts",
+          "-t",
+          "actual read results and the seed",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-red.producer.json"
+        ],
+        "startedUtc": "2026-10-15T23:26:47.836668+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-red.producer.json",
+          "bytes": 8160,
+          "sha256": "1dea43c9074fcf68e50573801a309f453fffccad64e8c3d2f224e9853f1559d5"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-red/raw.json",
+          "bytes": 8160,
+          "sha256": "1dea43c9074fcf68e50573801a309f453fffccad64e8c3d2f224e9853f1559d5"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-red/observer.json",
+          "bytes": 13854,
+          "sha256": "834bde37c4d125a16ca78b178ddff5c31283ad14f25d8fa02ce1b1c9b2f4d516"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-report-contract-build",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 33841,
+      "startedUtc": "2026-10-15T23:27:50.389034+00:00",
+      "endedUtc": "2026-10-15T23:28:24.241469+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-build/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10142,
+        "ownedPgid": 10142,
+        "observedPgidAfterLaunch": 10142,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "build"
+        ],
+        "startedUtc": "2026-10-15T23:27:50.389034+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-report-contract-green",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOpsTools.test.ts -t 'actual read results and the seed' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-green.producer.json",
+      "exit": 0,
+      "durationMs": 2286,
+      "startedUtc": "2026-10-15T23:28:29.656667+00:00",
+      "endedUtc": "2026-10-15T23:28:31.955353+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-green/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10277,
+        "ownedPgid": 10277,
+        "observedPgidAfterLaunch": 10277,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/lighthouse/financeOpsTools.test.ts",
+          "-t",
+          "actual read results and the seed",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-green.producer.json"
+        ],
+        "startedUtc": "2026-10-15T23:28:29.656667+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-report-contract-green.producer.json",
+          "bytes": 7158,
+          "sha256": "476ae1a4f5379a0fb9c055e72e80dd1c5e32bc1b5a71ddb8ccf61a5ce6f707c5"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-green/raw.json",
+          "bytes": 7158,
+          "sha256": "476ae1a4f5379a0fb9c055e72e80dd1c5e32bc1b5a71ddb8ccf61a5ce6f707c5"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-report-contract-green/observer.json",
+          "bytes": 9933,
+          "sha256": "7f261a9c358c0dcbc7fce8693c7edd468c1158798cf9a75c8216bc409a8457f7"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-final-tests-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40176,
+      "startedUtc": "2026-10-15T23:28:37.872287+00:00",
+      "endedUtc": "2026-10-15T23:29:18.063636+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-tests-typecheck/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10303,
+        "ownedPgid": 10303,
+        "observedPgidAfterLaunch": 10303,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.tests.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-15T23:28:37.872287+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-final-lint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3157,
+      "startedUtc": "2026-10-15T23:29:35.301590+00:00",
+      "endedUtc": "2026-10-15T23:29:38.470077+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-final-lint/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10417,
+        "ownedPgid": 10417,
+        "observedPgidAfterLaunch": 10417,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "pnpm",
+          "run",
+          "lint"
+        ],
+        "startedUtc": "2026-10-15T23:29:35.301590+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1502,
+      "startedUtc": "2026-10-15T23:29:38.520935+00:00",
+      "endedUtc": "2026-10-15T23:29:40.033636+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-freeze/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10461,
+        "ownedPgid": 10461,
+        "observedPgidAfterLaunch": 10461,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-freeze.mjs"
+        ],
+        "startedUtc": "2026-10-15T23:29:38.520935+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-counts-final",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 228,
+      "startedUtc": "2026-10-15T23:29:40.081597+00:00",
+      "endedUtc": "2026-10-15T23:29:40.320642+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-counts-final/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10483,
+        "ownedPgid": 10483,
+        "observedPgidAfterLaunch": 10483,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-15T23:29:40.081597+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-docs",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 159,
+      "startedUtc": "2026-10-15T23:29:40.369527+00:00",
+      "endedUtc": "2026-10-15T23:29:40.539904+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-docs/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10487,
+        "ownedPgid": 10487,
+        "observedPgidAfterLaunch": 10487,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/docs-drift-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T23:29:40.369527+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-architecture",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1568,
+      "startedUtc": "2026-10-15T23:29:40.588777+00:00",
+      "endedUtc": "2026-10-15T23:29:42.168836+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-architecture/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10491,
+        "ownedPgid": 10491,
+        "observedPgidAfterLaunch": 10491,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/architecture-boundaries-check.mjs"
+        ],
+        "startedUtc": "2026-10-15T23:29:40.588777+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-duplicates",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 462,
+      "startedUtc": "2026-10-15T23:29:42.219769+00:00",
+      "endedUtc": "2026-10-15T23:29:42.693635+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-duplicates/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10497,
+        "ownedPgid": 10497,
+        "observedPgidAfterLaunch": 10497,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "duplicates"
+        ],
+        "startedUtc": "2026-10-15T23:29:42.219769+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-deadcode",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2936,
+      "startedUtc": "2026-10-15T23:29:42.746782+00:00",
+      "endedUtc": "2026-10-15T23:29:45.694891+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10504,
+        "ownedPgid": 10504,
+        "observedPgidAfterLaunch": 10504,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "dead-code"
+        ],
+        "startedUtc": "2026-10-15T23:29:42.746782+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-deadcode-delta",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node --input-type=module -e 'import { createHash } from \"node:crypto\"; import { scanSourceQuality } from \"/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs\"; const baseline=scanSourceQuality(\"dead-code\",\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout\"); const current=scanSourceQuality(\"dead-code\",\"/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass\"); const before=new Set(baseline.findings),after=new Set(current.findings); console.log(JSON.stringify({schema:\"p119-deadcode-exact-delta/1\",baselineRoot:\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout\",currentRoot:\"/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass\",tool:current.tool,version:current.version,baselineCount:baseline.findings.length,currentCount:current.findings.length,added:current.findings.filter(x=>!before.has(x)),removed:baseline.findings.filter(x=>!after.has(x)),baselineFindings:baseline.findings,currentFindings:current.findings},null,2)); process.exitCode=current.findings.length?1:0;'",
+      "exit": 1,
+      "durationMs": 6117,
+      "startedUtc": "2026-10-15T23:31:02.737325+00:00",
+      "endedUtc": "2026-10-15T23:31:08.866438+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-deadcode-delta/stdout-stderr.log",
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "ownedProcess": {
+        "pid": 10647,
+        "ownedPgid": 10647,
+        "observedPgidAfterLaunch": 10647,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "--input-type=module",
+          "-e",
+          "import { createHash } from \"node:crypto\"; import { scanSourceQuality } from \"/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs\"; const baseline=scanSourceQuality(\"dead-code\",\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout\"); const current=scanSourceQuality(\"dead-code\",\"/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass\"); const before=new Set(baseline.findings),after=new Set(current.findings); console.log(JSON.stringify({schema:\"p119-deadcode-exact-delta/1\",baselineRoot:\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout\",currentRoot:\"/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass\",tool:current.tool,version:current.version,baselineCount:baseline.findings.length,currentCount:current.findings.length,added:current.findings.filter(x=>!before.has(x)),removed:baseline.findings.filter(x=>!after.has(x)),baselineFindings:baseline.findings,currentFindings:current.findings},null,2)); process.exitCode=current.findings.length?1:0;"
+        ],
+        "startedUtc": "2026-10-15T23:31:02.737325+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-clean-source",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 51615,
+      "startedUtc": "2026-10-15T23:32:26.855008+00:00",
+      "endedUtc": "2026-10-15T23:33:18.484627+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-clean-source/stdout-stderr.log",
+      "head": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+      "headAfter": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+      "ownedProcess": {
+        "pid": 10781,
+        "ownedPgid": 10781,
+        "observedPgidAfterLaunch": 10781,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/clean-source-check.mjs",
+          "--keep"
+        ],
+        "startedUtc": "2026-10-15T23:32:26.855008+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    {
+      "phase": "p119-finance-tools-fresh",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout --config /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout/vitest.config.ts tests/lighthouse/financeOpsTools.test.ts tests/lighthouse/financePaymentContext.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-fresh.producer.json",
+      "exit": 0,
+      "durationMs": 48156,
+      "startedUtc": "2026-10-15T23:34:14.133314+00:00",
+      "endedUtc": "2026-10-15T23:35:02.301695+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-fresh/stdout-stderr.log",
+      "head": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+      "headAfter": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+      "ownedProcess": {
+        "pid": 11249,
+        "ownedPgid": 11249,
+        "observedPgidAfterLaunch": 11249,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout",
+          "--config",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4oBTOJ/checkout/vitest.config.ts",
+          "tests/lighthouse/financeOpsTools.test.ts",
+          "tests/lighthouse/financePaymentContext.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-fresh.producer.json"
+        ],
+        "startedUtc": "2026-10-15T23:34:14.133314+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-finance-tools-fresh.producer.json",
+          "bytes": 13624,
+          "sha256": "f07a38f8d56e8bf0ddeaa7d6553ba74d253fe92afd99a9d12bed554b95024852"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-fresh/raw.json",
+          "bytes": 13624,
+          "sha256": "f07a38f8d56e8bf0ddeaa7d6553ba74d253fe92afd99a9d12bed554b95024852"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-fresh/observer.json",
+          "bytes": 17874,
+          "sha256": "f72021905af5ab1c453758626417e2cc14ebb2c9abdb8e27e7786151fa389f75"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    }
+  ],
+  "scopes": {
+    "p119-finance-tools-missing-positive": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "Vitest",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-v1-typecheck": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "default-source-project-compiler",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-v1-build": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "build",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-v1-positive": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "Vitest",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-v1-all": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "Vitest",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-source-lint": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-v2-tests-typecheck": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "project-test-compiler",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-v2-repaired-controls": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "Vitest",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-counts-before": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-counts-generate": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-report-contract-red": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "Vitest",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-report-contract-build": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "build",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-report-contract-green": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "Vitest",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-final-tests-typecheck": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "project-test-compiler",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-final-lint": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-freeze": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-counts-final": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-docs": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-architecture": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-duplicates": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-deadcode": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-deadcode-delta": {
+      "head": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "headAfter": "a365be2ed33042eb2cbe7d11dfb486c3a35537c7",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-clean-source": {
+      "head": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+      "headAfter": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+      "kind": "guard-or-metadata-check",
+      "exactCommandPreserved": true
+    },
+    "p119-finance-tools-fresh": {
+      "head": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+      "headAfter": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+      "kind": "Vitest",
+      "exactCommandPreserved": true
+    }
+  },
+  "nonzeroExitsAreRetained": true
+}

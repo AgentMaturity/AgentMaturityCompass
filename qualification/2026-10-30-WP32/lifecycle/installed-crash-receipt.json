@@ -1,0 +1,152 @@
+{
+  "schemaVersion": "amc-installed-crash-recovery/v1",
+  "ok": false,
+  "startedAt": "2026-10-30T06:43:38.156Z",
+  "runId": "cc8bbaf4-b8dd-49ef-9a1b-f90690c8a4a6",
+  "sourceCommit": "3e56038befcf845c23a4db5389bcb802a468ce96",
+  "sourceFiles": {
+    "scripts/installed-crash-recovery-check.mjs": "777c26d2c68ad15f85f6df4815ffe549fca4d8d8d6a9fb726b4aa09bf26fbf7f",
+    "scripts/lib/installedCrashMcpServer.mjs": "1ce79eba9a6db019b6054e909453ba055d43c72e23e652036f1f582e677e611c",
+    "scripts/lib/ownedProcessCommand.mjs": "cad3be3fdb81c13b74b6650a8fa719677d97333ac447a9d76538e855364ea560"
+  },
+  "artifactSha256": "26db8f832fd0923e114b887102d6f68c30b6c92b9cc373833eae210e1ee11b2b",
+  "expectedCliSha256": "4ae71faf18cd378c99edc8ca216a1b817dbfb0d2af3d1e8e5186655d472bbf20",
+  "runtime": {
+    "node": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "nodeSha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+    "npmSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "checks": [],
+  "commands": [
+    {
+      "label": "00-install",
+      "args": [
+        "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/bin/npm-cli.js",
+        "install",
+        "--no-audit",
+        "--no-fund",
+        "--loglevel=error",
+        "<tmp>/amc-platform-cev29n/agent-maturity-compass-1.2.0.tgz"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 69497
+    },
+    {
+      "label": "01-bootstrap",
+      "args": [
+        "bootstrap"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 70555
+    },
+    {
+      "label": "02-initialize",
+      "args": [
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 70724
+    },
+    {
+      "label": "03-firewall",
+      "args": [
+        "firewall",
+        "enable",
+        "--mode",
+        "block",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 70725
+    },
+    {
+      "label": "04-budget-sign",
+      "args": [
+        "budgets",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 70726
+    },
+    {
+      "label": "05-owner-login",
+      "args": [
+        "approvals",
+        "login",
+        "--username",
+        "crash-owner",
+        "--token-file",
+        "<scratch>/crash-1/private/approval-token",
+        "--password-stdin",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 70727
+    },
+    {
+      "label": "06-mcp-catalog",
+      "args": [
+        "agent-loop",
+        "mcp-catalog",
+        "--config",
+        "<scratch>/crash-1/private/mcp.json",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 70886
+    },
+    {
+      "label": "07-tools-sign",
+      "args": [
+        "tools",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 70914
+    }
+  ],
+  "limits": [
+    "Explicit deterministic stub provider and operator-trusted local stdio MCP tool; no live model or OS sandbox claim.",
+    "Monitor pin is captured locally before execution; it proves workspace-key consistency, not independent trust anchoring.",
+    "Artifact/source build correspondence is supplied by the release receipt; this runner independently pins artifact, installed CLI, and committed orchestration bytes.",
+    "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts."
+  ],
+  "installed": {
+    "publicNativeExport": "<scratch>/crash-1/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
+    "publicNativeExportSha256": "56e53416e19a6fd08cd3e43777bd25a48884e6b3354e02666c4c9bff7352a061",
+    "cliSha256": "4ae71faf18cd378c99edc8ca216a1b817dbfb0d2af3d1e8e5186655d472bbf20"
+  },
+  "preExecutionMonitorSha256": "dd2c98da964304e19faa4ddfd3a0ea4fd215528a8a48b76bd1c8749aa36f1dc3",
+  "error": "AMCNativeProtocolError: native agent output closed before client shutdown\n    at Socket.<anonymous> (file://<scratch>/crash-1/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js:373:27)\n    at Object.onceWrapper (node:events:633:28)\n    at Socket.emit (node:events:531:35)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)",
+  "closedProcesses": {
+    "writerPids": [],
+    "helperPids": [
+      70913
+    ],
+    "allObservedGone": true
+  },
+  "endedAt": "2026-10-30T06:44:05.647Z"
+}

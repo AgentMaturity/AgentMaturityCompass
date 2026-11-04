@@ -5,14 +5,13 @@
  */
 import { envelopeForLegacyResult, envelopeForPathPresence, envelopeForSelfAssessment } from "../claims/eligibility/adapters.js";
 import {
-  envelopeForAggregate, envelopeForAssuranceReport, envelopeForExecutedTest, envelopeForStoredRun, envelopeForUnverifiedResult,
-  isLegacyAmcVersion
+  envelopeForAggregate, envelopeForAssuranceReport, envelopeForExecutedTest, envelopeForFailedVerification, envelopeForStoredRun,
+  envelopeForUnverifiedResult, isLegacyAmcVersion
 } from "../claims/eligibility/adapters/results.js";
 import { formatClaimLabel, renderClaimLabel } from "../claims/eligibility/render.js";
 import type { ClaimEnvelope, ClaimKind, StatusDimensions } from "../claims/eligibility/types.js";
 import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
-import { loadRunReport } from "../diagnostic/runReportResolution.js";
-import { latestRunForAgent } from "../governor/actionPolicyEngine.js";
+import { latestDisplayRun, loadRunReport } from "../diagnostic/runReportResolution.js";
 import { assuranceReportClaim } from "../migration/legacy/classify.js";
 import { controlSurfaceScopeMessage, detectControlSurfaceScope } from "../score/controlSurfaceScope.js";
 import type { AssuranceReport, DiagnosticReport } from "../types.js";
@@ -112,8 +111,8 @@ export function selfAnswerClaim(producer: string, answers: readonly number[], re
 }
 
 /** The control-surface scorers: a file found is a path-presence result, nothing found is not evaluated. */
-export function controlSurfaceClaim(producer: string, result: { score: number; level: number }, root = process.cwd()): ClaimEnvelope {
-  const found = result.score > 0;
+export function controlSurfaceClaim(producer: string, result: { score: number | null; level: number }, root = process.cwd()): ClaimEnvelope {
+  const found = result.score !== null && result.score > 0;
   return envelopeForPathPresence({ producer, found, level: result.level, evidenceRefs: found ? [root] : [], now: Date.now() });
 }
 
@@ -156,7 +155,7 @@ export function fleetHealthClaim(health: { agents: readonly { agentId: string; r
 /** An organisation rollup over agents: each agent's latest run, seal-checked. */
 export function latestRunsClaim(producer: string, agentIds: readonly string[], workspace = process.cwd()): ClaimEnvelope {
   return aggregateClaim(producer, agentIds.flatMap((agentId) => {
-    const report = latestRunForAgent(workspace, agentId);
+    const report = latestDisplayRun(workspace, agentId)?.report;
     return report ? [runClaimEnvelope(report, workspace)] : [];
   }));
 }
@@ -164,17 +163,18 @@ export function latestRunsClaim(producer: string, agentIds: readonly string[], w
 /**
  * A certificate, passport, bundle or attestation: the claim of the run it carries (seal-checked, legacy below AMC
  * 1.2.0), else a legacy envelope when it records an AMC version below 1.2.0, else self-reported. Verifying the
- * artifact's signature proves integrity only; it never raises the kind.
+ * artifact's signature proves integrity only; it never raises the kind. `sealVerified: false` (a failed check, or no
+ * check, as in `cert inspect`) makes its evidence untrusted.
  */
 export function artifactClaim(producer: string, artifact: { run?: DiagnosticReport | null; sealVerified?: boolean;
   amcVersion?: string | null; recordCount?: number } = {}): ClaimEnvelope {
   const now = Date.now();
   if (artifact.run) return envelopeForStoredRun(artifact.run, { sealVerified: artifact.sealVerified === true, now });
-  if (artifact.amcVersion !== undefined && isLegacyAmcVersion(artifact.amcVersion)) {
-    return envelopeForLegacyResult({ producer, version: artifact.amcVersion ?? "none", method: "runtime_observation",
-      status: "NOT_EVALUATED", level: null, eventCount: artifact.recordCount ?? 1, now });
-  }
-  return unverifiedClaim(producer, artifact.recordCount ?? 1);
+  const claim = artifact.amcVersion !== undefined && isLegacyAmcVersion(artifact.amcVersion)
+    ? envelopeForLegacyResult({ producer, version: artifact.amcVersion ?? "none", method: "runtime_observation",
+      status: "NOT_EVALUATED", level: null, eventCount: artifact.recordCount ?? 1, now })
+    : unverifiedClaim(producer, artifact.recordCount ?? 1);
+  return artifact.sealVerified === false ? envelopeForFailedVerification(claim, true) : claim;
 }
 
 /**
@@ -202,4 +202,25 @@ export function runIdClaim(runId: string | null | undefined, agentId?: string, w
 export function runClaimEnvelope(report: DiagnosticReport, workspace = process.cwd(), now = Date.now()): ClaimEnvelope {
   const sealVerified = sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>);
   return envelopeForStoredRun(report, { sealVerified, now });
+}
+
+/**
+ * The latest run for a display-only command, or null when there is none. A run whose seal does not verify is still
+ * shown (noSign workspaces have no other kind) but labelled UNVERIFIED on stderr; gates never read runs through here.
+ */
+export function latestRunForDisplay(workspace: string, agentId: string): DiagnosticReport | null {
+  const latest = latestDisplayRun(workspace, agentId);
+  if (latest && !latest.verified) warnUnverifiedDisplayRun(latest.report.runId);
+  return latest?.report ?? null;
+}
+
+/** A run named by id (`--run`, `--previous-run`) for a display-only command, labelled like `latestRunForDisplay`. */
+export function namedRunForDisplay(workspace: string, runId: string, agentId: string): DiagnosticReport {
+  const report = loadRunReport(workspace, runId, agentId);
+  if (!sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>)) warnUnverifiedDisplayRun(report.runId);
+  return report;
+}
+
+function warnUnverifiedDisplayRun(runId: string): void {
+  console.error(`UNVERIFIED: diagnostic run ${runId} is not sealed by this workspace's run key; shown for display only, never used by a gate.`);
 }

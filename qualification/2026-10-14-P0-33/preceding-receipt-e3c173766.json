@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-33",
+  "date": "2026-10-14",
+  "commit": "e3c173766eaf9f73fd35ec43bd90032a5dac948a",
+  "branch": "codex/p0-33-current-qualification",
+  "node": "v22.23.3; scoped compatibility also v24.21.0",
+  "pnpm": "10.33.0",
+  "os": "Darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "node scripts/source-quality.mjs duplicates --base origin/main",
+      "exit": 0,
+      "durationMs": 1455
+    },
+    {
+      "cmd": "node scripts/source-quality.mjs dead-code --base origin/main",
+      "exit": 0,
+      "durationMs": 2928
+    },
+    {
+      "cmd": "pnpm run typecheck",
+      "exit": 0,
+      "durationMs": 29986
+    },
+    {
+      "cmd": "pnpm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 39808
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 4136
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 1,
+      "durationMs": 1104
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 643
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2841
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 1,
+      "durationMs": 2021
+    },
+    {
+      "cmd": "pnpm run check:qualification",
+      "exit": 0,
+      "durationMs": 419
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3003
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 665
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 425
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1936
+    },
+    {
+      "cmd": "pnpm run check:clean-source",
+      "exit": 0,
+      "durationMs": 55216
+    },
+    {
+      "cmd": "pnpm run check:qualification",
+      "exit": 0,
+      "durationMs": 323
+    }
+  ],
+  "tests": {
+    "passed": 699,
+    "failed": 0,
+    "skipped": 0,
+    "total": 699
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "48a58252f146a8f384255ad0874d261686c8c2ae40f161f0c708f3875bff6ed7"
+    },
+    {
+      "path": "checks-summary.json",
+      "sha256": "40529a9f3c9771c63e4ca43592c1fd7d5609627c4c48dafe0a94199f152fbe4d"
+    },
+    {
+      "path": "clean-source.log",
+      "sha256": "09d43b63c45a2943dc87eab49d4c64d28cfcf4b7ce6f4c9e883cba931c1b1959"
+    },
+    {
+      "path": "dead-code.log",
+      "sha256": "73cb0713c2fded2d59196c946c4c2c375b1a016940e304ca4c74c6ffcdf7a4d8"
+    },
+    {
+      "path": "duplicates.log",
+      "sha256": "34af1e1ebed560a71e4abb4b8b0a0301d9799c7d37154840e6839621a34c1655"
+    },
+    {
+      "path": "freeze.log",
+      "sha256": "2e86d09cbe72712e59cdc89d0af623f086769a71c4f15ba634e37b9efac620bb"
+    },
+    {
+      "path": "receipt-validation.log",
+      "sha256": "212f1f073fac816aef4f37d25d99ddcc6b444e65ef62a2ca9446a9b54e39f77e"
+    }
+  ],
+  "notes": "Bounded fixes only; broad P0-33 not Done. Scoped Node 22 counts combine latest distinct passing files; Node 24 has 50 additional compatibility checks. Initial counts exit 1 was resolved by placing tests in an existing file. check:freeze exit 1 remains the preserved P1-65 base exception blocker. Full coverage attempt was interrupted after three failures, exit 130, with no final report; two packaging failures pass serially but their coverage/concurrency causes are unresolved. The real docs source-link failure was fixed and passes on both Node majors. Original-CI mutation intentionally exited 1. Summary distinguishes source revisions, failures, limits, and final checks."
+}

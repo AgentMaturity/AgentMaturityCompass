@@ -1,0 +1,1710 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssues": [
+    "AMC-1513",
+    "AMC-1519"
+  ],
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T04:05:42.908135+00:00",
+  "state": "BOUNDED_PURE_AND_SCRIPTED_CONTROLS_COMPLETE_PENDING_ACTUAL_REVIEW",
+  "setup": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/setup.json",
+    "bytes": 11225,
+    "sha256": "9d9559128888d4b39dcb65471f9ca5adc587b9f6aa32fbc41f3d447ee0d98dcc"
+  },
+  "release": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/root-runtime-release.json",
+    "bytes": 2221,
+    "sha256": "56c1c2c25feb318d57f26896e77344da8e991c4ab08e196deb517b47f50590a2"
+  },
+  "driver": {
+    "path": "/private/tmp/p0-30-S7-control-sequence-20261015.py",
+    "bytes": 3336,
+    "sha256": "ca44739741411477081791f39f3a1f965e41f12977d25870b299c04029cec46c"
+  },
+  "continuationDriver": {
+    "path": "/private/tmp/p0-30-S7-continuation-sequence-20261015.py",
+    "bytes": 4486,
+    "sha256": "fb75a35ba3f81b1ede4bc404874063af48e28094d6ebfe122c290101bc402e2c"
+  },
+  "finalContinuationDriver": {
+    "path": "/private/tmp/p0-30-S7-final-continuation-sequence-20261015.py",
+    "bytes": 4619,
+    "sha256": "fcd5fd4bcfe2c6729d5dfa25877218eaa62ef2c21a71166a57eba1dfeb7515a7"
+  },
+  "secondSchedulerStop": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/M27-continuation-stop-root-classification.json",
+    "bytes": 2579,
+    "sha256": "f458ef6c1e908d1ec3c14c1f9fe3cc3ed16c4d55151792a6bf1c740e56ba3824"
+  },
+  "finalContinuationRelease": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/root-final-continuation-release.json",
+    "bytes": 3371,
+    "sha256": "6d98221b5b5eb5f6313f2d621eebdb8c6ae45821a760a020cd98bf3deb999393"
+  },
+  "finalContinuationJournal": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/final-continuation-sequence.jsonl",
+    "bytes": 1563,
+    "sha256": "1eaffdbc5f92c8ebb368bcdb9fa757a3aea709437576177c0ce77a5fc91dc239"
+  },
+  "originalSchedulerStop": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/M26-scheduler-stop-root-classification.json",
+    "bytes": 3426,
+    "sha256": "847bd668098801badb729df7b9d5e8255db7c750f13bdcf316ce1eb821b76baa"
+  },
+  "continuationRelease": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/root-continuation-release.json",
+    "bytes": 3204,
+    "sha256": "8337cc2373256609d426170494f96f16e5e6f02d084c0219c14c5d2d8e7d2187"
+  },
+  "continuationJournal": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/continuation-sequence.jsonl",
+    "bytes": 549,
+    "sha256": "870d1484c875cf2ba0011732b770511d0166758470f65b9e44490cb3cd1e927a"
+  },
+  "driverJournal": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/control-sequence.jsonl",
+    "bytes": 6209,
+    "sha256": "884afb216d2e634924d4dbead44d34affea0936f27d4e8fef09bc5c8e1bbaf65"
+  },
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 108747,
+    "sha256": "2bece2769f54688b65b3acf1cdac23ac1101867ef42c33ed78a52f18e88b7941"
+  },
+  "actualCommands": 45,
+  "corpusProcesses": 44,
+  "separateOriginalBaselines": {
+    "pure": 21,
+    "scriptedVerifier": 4
+  },
+  "uniqueOriginalCases": 25,
+  "caseExecutions": 703,
+  "failureExecutionsAcrossPrivateMutants": 21,
+  "distinctOriginalCasesThatFailUnderAtLeastOneControl": 14,
+  "controls": [
+    {
+      "index": 0,
+      "id": "S7-M01-bwrap-child-guard",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M01-bwrap-child-guard-matrix.json",
+        "bytes": 44045,
+        "sha256": "607fbe74cf61cd2670a103e4f59664752af8ec3be8a9ee813ff3984897875275"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M01-bwrap-child-guard-source-change.json",
+        "bytes": 1545,
+        "sha256": "6be9068e1c64de2c59988b26b9bdb0c754795a6a6b065f8a86cd6c8da5f6e4e9"
+      },
+      "counts": [
+        21,
+        17,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "bwrapCommandExit duplicate child or exit rows are refused",
+          "messages": [
+            "AssertionError: expected +0 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:63:100\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "bwrapCommandExit child pid 1.5 is refused",
+          "messages": [
+            "AssertionError: expected +0 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:68:80\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "bwrapCommandExit child pid 12 is refused",
+          "messages": [
+            "AssertionError: expected +0 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:68:80\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "bwrapCommandExit child pid 9007199254740992 is refused",
+          "messages": [
+            "AssertionError: expected +0 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:68:80\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Duplicate-child refusal fails before the duplicate-exit assertion in that body. Fractional, text and unsafe-integer positive child IDs also fail; nonpositive guard remains."
+    },
+    {
+      "index": 1,
+      "id": "S7-M02-bwrap-exit-before-child",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M02-bwrap-exit-before-child-matrix.json",
+        "bytes": 36124,
+        "sha256": "0a49d24493748a7f75946d73f69845d0721abde0d862d990eb461f7e77059e2b"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M02-bwrap-exit-before-child-source-change.json",
+        "bytes": 1519,
+        "sha256": "3282ed9d84c1c557a751f4b6296a5f9e8361d2c2bf6fc3c992dbd66171ca7767"
+      },
+      "counts": [
+        21,
+        20,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "bwrapCommandExit an exit code without a preceding child pid is refused",
+          "messages": [
+            "AssertionError: expected +0 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:59:79\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Exit-only refusal remains null at final return; the exit-before-later-child order assertion detects the missing preceding-child guard."
+    },
+    {
+      "index": 2,
+      "id": "S7-M03-bwrap-exit-dup",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M03-bwrap-exit-dup-matrix.json",
+        "bytes": 36008,
+        "sha256": "e0d1659b31d64cbda161dcdbebecc5ca8ac387bffc32ab6d649755567d0f2163"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M03-bwrap-exit-dup-source-change.json",
+        "bytes": 1503,
+        "sha256": "6398a7386883b8ff83fb371cf7c67b6ff0efa4c06b6396c355e3b3fa9b8ca25d"
+      },
+      "counts": [
+        21,
+        20,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "bwrapCommandExit duplicate child or exit rows are refused",
+          "messages": [
+            "AssertionError: expected 1 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:64:99\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Duplicate-child refusal passes first; duplicate-exit refusal then fails. Distinct from removal of the preceding-child guard."
+    },
+    {
+      "index": 3,
+      "id": "S7-M04-bwrap-exit-range",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M04-bwrap-exit-range-matrix.json",
+        "bytes": 36009,
+        "sha256": "4593ded1c65beefac3af892f0a37dedce2e479beb6427df3e39adecfb90c8b11"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M04-bwrap-exit-range-source-change.json",
+        "bytes": 1497,
+        "sha256": "7cee458dc98208ace814ee6b8dccdca7162ee612d98a30c5dd30d1cd6b6d3eaf"
+      },
+      "counts": [
+        21,
+        20,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "bwrapCommandExit exit code 256 is refused",
+          "messages": [
+            "AssertionError: expected 256 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:72:82\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Out-of-range256 exit receipt is admitted; other integer/type/range clauses remain."
+    },
+    {
+      "index": 4,
+      "id": "S7-M05-bwrap-nonobject-row",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M05-bwrap-nonobject-row-matrix.json",
+        "bytes": 36102,
+        "sha256": "16ca2b973fef898c875b2bd9e351bfbfa77a477b96d0e3e80e9a9e1c51abb556"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M05-bwrap-nonobject-row-source-change.json",
+        "bytes": 1559,
+        "sha256": "a28c300e40151726da32ee46baa152ddaf6cd26ac81ea68d6717ca5ac5481941"
+      },
+      "counts": [
+        21,
+        20,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "bwrapCommandExit row [1] is refused",
+          "messages": [
+            "AssertionError: expected +0 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:76:84\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Array row is admitted/ignored before final receipt; primitive in-operator exceptions still return null via unchanged catch. Do not infer all malformed rows admitted."
+    },
+    {
+      "index": 5,
+      "id": "S7-M06-bwrap-child-positive",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M06-bwrap-child-positive-matrix.json",
+        "bytes": 38701,
+        "sha256": "0428cd27a1590ed36bca7f7dbaf563bbc77708cf135f92cbca06a05849c522f6"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M06-bwrap-child-positive-source-change.json",
+        "bytes": 1503,
+        "sha256": "c1949c3741e90cbd04ea4178aaba64f6c20cad2b5e2113c7c930ca9f8c93dba0"
+      },
+      "counts": [
+        21,
+        19,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "bwrapCommandExit child pid 0 is refused",
+          "messages": [
+            "AssertionError: expected +0 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:68:80\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "bwrapCommandExit child pid -1 is refused",
+          "messages": [
+            "AssertionError: expected +0 to be null\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:68:80\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Nonpositive integer child IDs0/-1 are admitted; safe-integer/type refusal remains."
+    },
+    {
+      "index": 6,
+      "id": "S7-M07-bpf-arch-check",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M07-bpf-arch-check-matrix.json",
+        "bytes": 38871,
+        "sha256": "4c4f0a9d3b7da010171f5d9c838116538dfc6e9d5d0f890bacfcdb7df90758f4"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M07-bpf-arch-check-source-change.json",
+        "bytes": 1501,
+        "sha256": "651c818cdae225b1c2ad4eea7be921df5c0503560035ff486a6d9aa1d009af82"
+      },
+      "counts": [
+        21,
+        19,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+          "messages": [
+            "AssertionError: expected 327681 to be 2147483648 // Object.is equality\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:29:46\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "linuxSocketDenyFilter arm64 uses its own socket numbers and kills the x64 ABI",
+          "messages": [
+            "AssertionError: expected 327681 to be 2147483648 // Object.is equality\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:40:46\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Both foreign-architecture first verdicts fail. Later syscall loops and allowed calls in those two bodies are masked."
+    },
+    {
+      "index": 7,
+      "id": "S7-M08-bpf-x32-rule",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M08-bpf-x32-rule-matrix.json",
+        "bytes": 36154,
+        "sha256": "398e0b31ab8cce59deae01c57caed915d4fe0f210385530a3a3759967a3e9b09"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M08-bpf-x32-rule-source-change.json",
+        "bytes": 1557,
+        "sha256": "0892aa23b145162dadccd4a47f9d46c62ff93a78cc346b85d7f5205f81eedcbd"
+      },
+      "counts": [
+        21,
+        20,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+          "messages": [
+            "AssertionError: expected 2147418112 to be 327681 // Object.is equality\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:33:58\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Prior architecture and ordinary-denial loop checks pass; first x32 verdict fails, masking later x32/allowed assertions."
+    },
+    {
+      "index": 8,
+      "id": "S7-M09-bpf-io-uring",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M09-bpf-io-uring-matrix.json",
+        "bytes": 38768,
+        "sha256": "d3d5e06a5e117984b1bf045ed73588bbf9ea93187dab5bc99c9305ccda66f5ac"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M09-bpf-io-uring-source-change.json",
+        "bytes": 1427,
+        "sha256": "991c373d4bba874bfa261043f2ea9514a9be7635c4b9359d43e69c2816b3cc68"
+      },
+      "counts": [
+        21,
+        19,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+          "messages": [
+            "AssertionError: expected 2147418112 to be 327681 // Object.is equality\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:31:91\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "linuxSocketDenyFilter arm64 uses its own socket numbers and kills the x64 ABI",
+          "messages": [
+            "AssertionError: expected 2147418112 to be 327681 // Object.is equality\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:41:96\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Both supported-architecture denial loops fail first at io_uring425 after ordinary socket checks. Later426/427 and other assertions are masked."
+    },
+    {
+      "index": 9,
+      "id": "S7-M10-bpf-connect",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M10-bpf-connect-matrix.json",
+        "bytes": 36010,
+        "sha256": "98b632dd5fa7c7e251ded55136589ec712286353157172ec5965c30b8cfd5244"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M10-bpf-connect-source-change.json",
+        "bytes": 1419,
+        "sha256": "ee41a65f2d1cf2c6fd4afaa746d68b23db6fed79cc0da1e9e4531a12356b5b4b"
+      },
+      "counts": [
+        21,
+        20,
+        21
+      ],
+      "registered": 21,
+      "firstFailures": [
+        {
+          "name": "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+          "messages": [
+            "AssertionError: expected 2147418112 to be 327681 // Object.is equality\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts:31:91\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "meaningAndMasking": "x64 connect42 first fails after41/53 pass, masking later x64 checks; separate arm64 case remains unchanged."
+    },
+    {
+      "index": 12,
+      "id": "S7-M26-sdk-close-before-verify-753",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M26-sdk-close-before-verify-753-matrix.json",
+        "bytes": 19323,
+        "sha256": "3ec802a925e1af34169466176f041a6131fe2a71c60e2cf7ea92c3fce333c3b1"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M26-sdk-close-before-verify-753-source-change.json",
+        "bytes": 1847,
+        "sha256": "c598e51182af47dbb2d5e4f85e82bd2fc002c0313d10e6ddb236bf5a89ea09d0"
+      },
+      "counts": [
+        4,
+        3,
+        4
+      ],
+      "registered": 4,
+      "firstFailures": [
+        {
+          "name": "native SDK cold verification admission a live client never runs or promotes verification before close",
+          "messages": [
+            "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting\n    at _Assertion.__VITEST_REJECTS__ (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1570:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1659:22)\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts:50:50\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Premature live verification expected rejection fails; verifierRuns0 and later explicit-close checks are masked. Original afterEach still closes. Scripted receipt is not a genuine ledger."
+    },
+    {
+      "index": 13,
+      "id": "S7-M27-sdk-trust-anchor-789",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M27-sdk-trust-anchor-789-matrix.json",
+        "bytes": 21277,
+        "sha256": "62b2d83ca4a7a6134ad0d476a7787de624c4faf837e621aa0cd033d13a6892fc"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M27-sdk-trust-anchor-789-source-change.json",
+        "bytes": 1823,
+        "sha256": "85f6daef1de61de8cffd93899ab29992484ac4e8ba3a3c2b802b6a49637e919f"
+      },
+      "counts": [
+        4,
+        2,
+        4
+      ],
+      "registered": 4,
+      "firstFailures": [
+        {
+          "name": "native SDK cold verification admission an anchored receipt with a different expected fingerprint is refused",
+          "messages": [
+            "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting\n    at _Assertion.__VITEST_REJECTS__ (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1570:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1659:22)\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts:69:50\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "name": "native SDK cold verification admission an anchored receipt with no expected fingerprint is refused",
+          "messages": [
+            "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting\n    at _Assertion.__VITEST_REJECTS__ (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1570:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1659:22)\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts:69:50\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Both mismatched and missing expected-anchor rows resolve when refusal is required. Chosen unsigned peer fields are not cryptographic anchor evidence."
+    },
+    {
+      "index": 14,
+      "id": "S7-M28-sdk-trust-anchor-mismatch-only-789",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M28-sdk-trust-anchor-mismatch-only-789-matrix.json",
+        "bytes": 19384,
+        "sha256": "c600cbd1d134c81009a6b98cab378c91f0631373d2bc7668df0bfef824f39d22"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M28-sdk-trust-anchor-mismatch-only-789-source-change.json",
+        "bytes": 1833,
+        "sha256": "d44b325825e0afbeb0f4dd3c9dfe1393ca2d8d5b3b003e61787d38e0572032b7"
+      },
+      "counts": [
+        4,
+        3,
+        4
+      ],
+      "registered": 4,
+      "firstFailures": [
+        {
+          "name": "native SDK cold verification admission an anchored receipt with a different expected fingerprint is refused",
+          "messages": [
+            "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting\n    at _Assertion.__VITEST_REJECTS__ (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1570:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1659:22)\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts:69:50\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Only the reported mismatch row loses refusal; missing expected-anchor row retains its guard. Matching f/f positive remains."
+    },
+    {
+      "index": 15,
+      "id": "S7-M29-sdk-trust-anchor-missing-only-789",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M29-sdk-trust-anchor-missing-only-789-matrix.json",
+        "bytes": 19395,
+        "sha256": "f60c1f4d1e38da2f5fd3c20e3c421cfecc9f6e21b625b4db6cd2b5304abedb48"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M29-sdk-trust-anchor-missing-only-789-source-change.json",
+        "bytes": 2007,
+        "sha256": "45e009b80bcf0c67179a3b7f5c1b53afc50734365aa8e8e8356e93cb0de21f3f"
+      },
+      "counts": [
+        4,
+        3,
+        4
+      ],
+      "registered": 4,
+      "firstFailures": [
+        {
+          "name": "native SDK cold verification admission an anchored receipt with no expected fingerprint is refused",
+          "messages": [
+            "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting\n    at _Assertion.__VITEST_REJECTS__ (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1747:17)\n    at _Assertion.propertyGetter (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1570:27)\n    at Reflect.get (<anonymous>)\n    at Object.proxyGetter [as get] (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/chai/index.js:1659:22)\n    at /private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts:69:50\n    at file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "meaningAndMasking": "Only the missing expected-anchor row loses refusal; mismatch remains guarded. No independently authenticated monitor or genuine cold history is produced."
+    }
+  ],
+  "phases": [
+    {
+      "phase": "original-pure-bwrap-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/original-pure-bwrap-baseline/summary.json",
+        "bytes": 9888,
+        "sha256": "d163cb731259629facd45d7a04da25417bcf6d028744d97954a42bab6e323027"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/original-pure-bwrap-baseline/raw-tests.json",
+        "bytes": 5694,
+        "sha256": "e65e0539a13d7fd6058227291c124f650a5ba4a9589a0c4d8d3046941dd9473e"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/original-pure-bwrap-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "6c7002019c0161fee318fc1530f4282c4d5f87d6c86fdfc3b44043e9c5d8ae3c"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M01-bwrap-child-guard-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M01-bwrap-child-guard-baseline/summary.json",
+        "bytes": 9908,
+        "sha256": "a935cf3a4759cdbffe6a85290a5b00dc1fc77e3135d1e7186f3c08f69364d614"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M01-bwrap-child-guard-baseline/raw-tests.json",
+        "bytes": 5694,
+        "sha256": "8eb348d6a1ec5550ef7e3b97165724b18f41d48c631521b210d819cb9a53ce9e"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M01-bwrap-child-guard-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "3d43c5a1d367710af83c638e0b3748dd2f7198fa95a823fbfc09d9a929dbe965"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M01-bwrap-child-guard-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M01-bwrap-child-guard-mutant/summary.json",
+        "bytes": 20473,
+        "sha256": "907049e19ab22373e165898715ebd90330564ef01322065e4b4ff5b54f1cb5db"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M01-bwrap-child-guard-mutant/raw-tests.json",
+        "bytes": 10713,
+        "sha256": "afb4788df692edd1178146827e9fdb34723e44ff90949aea08988815b68f2b45"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M01-bwrap-child-guard-mutant/runtime-observer.json",
+        "bytes": 13987,
+        "sha256": "b37a096a36ee3c86a9a0f3ca441e4d268a5bf81452babdfa0fcc94ab53466dd2"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 17,
+        "numFailedTests": 4,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M01-bwrap-child-guard-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M01-bwrap-child-guard-restored/summary.json",
+        "bytes": 9909,
+        "sha256": "d434011bb53691c599bb56f43ca39db5e36559df4315da236776899571408d29"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M01-bwrap-child-guard-restored/raw-tests.json",
+        "bytes": 5694,
+        "sha256": "2e083a6034003dcf781f0e417411c1bd891897ade11c91f7a5c3a66018fb27f2"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M01-bwrap-child-guard-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "caafbfd6e5c02874c38d33c4d34ba0f0b1b6ed1427aacf3d4432264b7c9c7d6e"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M02-bwrap-exit-before-child-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M02-bwrap-exit-before-child-baseline/summary.json",
+        "bytes": 9934,
+        "sha256": "5fa2588a63e91499de828f78240c366567deadc145f2e66e1661e49cb1bd71da"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M02-bwrap-exit-before-child-baseline/raw-tests.json",
+        "bytes": 5696,
+        "sha256": "68c804431dd4fd2a5a8ddad82611524f804144220ae5077b50e3fad726326723"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M02-bwrap-exit-before-child-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "04ae3dcaa95eedd37f169051e92983243f3bc4dda546d80edc58d946a934bf70"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M02-bwrap-exit-before-child-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M02-bwrap-exit-before-child-mutant/summary.json",
+        "bytes": 12591,
+        "sha256": "6d05bb5df33029d7d8546c1f462d3f7f526d6417a8f08745ebc730d3b76217c5"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M02-bwrap-exit-before-child-mutant/raw-tests.json",
+        "bytes": 6949,
+        "sha256": "2697928cfe6784095a5a32151dc363f5a3daee9322a1d9503a7f660bb1252818"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M02-bwrap-exit-before-child-mutant/runtime-observer.json",
+        "bytes": 8423,
+        "sha256": "07aaccc1d9002a6ab7e172b2614ba91aec40c7113351fb6631f2d6c98d33a16a"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 20,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M02-bwrap-exit-before-child-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M02-bwrap-exit-before-child-restored/summary.json",
+        "bytes": 9924,
+        "sha256": "0b5c8e46b2f7b98543d409947d1c509a74e031416f8adb6ecb72ff4faeba1ff5"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M02-bwrap-exit-before-child-restored/raw-tests.json",
+        "bytes": 5686,
+        "sha256": "4df2e79f7c7aeb7496724d040936610a281290f1ca95d74bba68cb3ea6408054"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M02-bwrap-exit-before-child-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "203a2139b6541495de3664b6268243a5f0e9bdd6a6656c831c2529b814da29bb"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M03-bwrap-exit-dup-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M03-bwrap-exit-dup-baseline/summary.json",
+        "bytes": 9900,
+        "sha256": "0ccd80bb29823f50c4cc5df318acc7f2cee2956668e1bbdeda8dd01932ca262e"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M03-bwrap-exit-dup-baseline/raw-tests.json",
+        "bytes": 5697,
+        "sha256": "a1878826a03db67a72424b5c8aad9df78aaf7fab3f6caadf8e42b4865e12e8e6"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M03-bwrap-exit-dup-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "7594ad36a2b7081f567beac6d25a8d7ebd330c8e26c213e0c7e690920a601168"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M03-bwrap-exit-dup-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M03-bwrap-exit-dup-mutant/summary.json",
+        "bytes": 12541,
+        "sha256": "6cc7de5ce381aca63d26d3703b5b29ea7966294fc64061e3c4438f28a8468d12"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M03-bwrap-exit-dup-mutant/raw-tests.json",
+        "bytes": 6949,
+        "sha256": "07700c5b1de2f211ce6bac0b96220f53ccddf25a2ff454cd85d7a757173b692a"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M03-bwrap-exit-dup-mutant/runtime-observer.json",
+        "bytes": 8421,
+        "sha256": "1817aaf9f5a76128048e6e88e00cd9bc0695626298a3b2559fc5cd0da9e416f8"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 20,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M03-bwrap-exit-dup-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M03-bwrap-exit-dup-restored/summary.json",
+        "bytes": 9899,
+        "sha256": "b52ebdcf4a774bb24f3da1e6bb0ce3931d6d5d4fd7bfbeacbfe81d4786b76459"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M03-bwrap-exit-dup-restored/raw-tests.json",
+        "bytes": 5697,
+        "sha256": "ef7cc19d2ebecacdc9fb6f8f6b17fbb718827a9ef2f9c49434b8c507e4912d88"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M03-bwrap-exit-dup-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "c0c82f22ff0c69d839060ae986976fcf1c70a0fc6761e80520836fe6cf049c28"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M04-bwrap-exit-range-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M04-bwrap-exit-range-baseline/summary.json",
+        "bytes": 9905,
+        "sha256": "1cc3277c96282c824ef1416be2e28d1228d6b8f09a522bf5a68a32af154c7a81"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M04-bwrap-exit-range-baseline/raw-tests.json",
+        "bytes": 5695,
+        "sha256": "2dd53dcfca0d959b172032f8c91f577d131c8f1009a6efa755cc73819b6090be"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M04-bwrap-exit-range-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "9145da42eff7b0f7017936b291d1bce9b7c7cf823c8be1f5e832e8e084e88932"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M04-bwrap-exit-range-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M04-bwrap-exit-range-mutant/summary.json",
+        "bytes": 12536,
+        "sha256": "81b7ddfb76a72e395903c732762baf3ab50f2cb176813802b7d7394abddb66a9"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M04-bwrap-exit-range-mutant/raw-tests.json",
+        "bytes": 6950,
+        "sha256": "d98f212be23f28998d1d1bdaa79b235b0ec51fbd189050d7ee8b246d5c3d0662"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M04-bwrap-exit-range-mutant/runtime-observer.json",
+        "bytes": 8429,
+        "sha256": "b01bed6ae1b822bd93294675aef0a03416930165ac548ff4a059a2c79f9a6b10"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 20,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M04-bwrap-exit-range-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M04-bwrap-exit-range-restored/summary.json",
+        "bytes": 9908,
+        "sha256": "c0f8d104094014b9bc32104d2944c76841e3ed9795ebbba8598f0fdb9cb01d4b"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M04-bwrap-exit-range-restored/raw-tests.json",
+        "bytes": 5698,
+        "sha256": "89555bfccee546d7f729a9dd7a4e1aeb57fbc988dd24f81f60f9bc19280a1aa8"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M04-bwrap-exit-range-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "b6e5b3b81f8773d1290569ae7023caefee84c0d5d2177ae9140758305e8decb2"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M05-bwrap-nonobject-row-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M05-bwrap-nonobject-row-baseline/summary.json",
+        "bytes": 9918,
+        "sha256": "9bfc111d14ad6855d5c32f5cf5a87a42bb055998384c6a15378cb9134b27e605"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M05-bwrap-nonobject-row-baseline/raw-tests.json",
+        "bytes": 5696,
+        "sha256": "7d04028c9386723df8e5494710660bd410a9d7d34208e3dbbf73d605ec512a25"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M05-bwrap-nonobject-row-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "918cdc4261d29e9df3173fa4ec5583f8e49248f03d5780670aba38c27ffadfc9"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M05-bwrap-nonobject-row-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M05-bwrap-nonobject-row-mutant/summary.json",
+        "bytes": 12544,
+        "sha256": "5ad3190b706bb862793eaa314853e3e817a3b953ee6ce6aba10080329cf73b24"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M05-bwrap-nonobject-row-mutant/raw-tests.json",
+        "bytes": 6953,
+        "sha256": "a8f21620ead400d01a0963a4db4573a624a535b66854eb3dee18e48a6f9e1751"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M05-bwrap-nonobject-row-mutant/runtime-observer.json",
+        "bytes": 8423,
+        "sha256": "feb526f42b5a949d65897206042bc64c911eac512263fb42ff1bc9a31ed2e672"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 20,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M05-bwrap-nonobject-row-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M05-bwrap-nonobject-row-restored/summary.json",
+        "bytes": 9921,
+        "sha256": "95ea1598b19814f5dcc57d81b113c3b658e4d68664fc6210ec781e57e5cee50e"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M05-bwrap-nonobject-row-restored/raw-tests.json",
+        "bytes": 5699,
+        "sha256": "9b41fc719952cf0d3b6e899d3293b3290a12c4693ae81c5820afece3034db3ca"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M05-bwrap-nonobject-row-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "1b2c16a68b0693792a36c6aa2570cffad0e3a84b7d7e5c904d6c8fcc43f9b2e9"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M06-bwrap-child-positive-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M06-bwrap-child-positive-baseline/summary.json",
+        "bytes": 9919,
+        "sha256": "485ad3171fd4f66d41f9c2d774d2b6f4b419e6ded09688b8f17c63d7f19e3c8d"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M06-bwrap-child-positive-baseline/raw-tests.json",
+        "bytes": 5693,
+        "sha256": "1726cb41f5c4228c64c23df754378f596afd0502bd0a52f86cd8a287fb28dc71"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M06-bwrap-child-positive-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "c7ea752cc610e3ba8424d2b69cb52b29fdd7b674b3b3565a1e4a5bd6d1235cff"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M06-bwrap-child-positive-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M06-bwrap-child-positive-mutant/summary.json",
+        "bytes": 15182,
+        "sha256": "eed7764eeaee85ce8baa03266faac136625a70dbca2aa457714d21142b35324e"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M06-bwrap-child-positive-mutant/raw-tests.json",
+        "bytes": 8203,
+        "sha256": "9656d05b5f60f32656ce3af4bd4dcd664482e1daf415a8fc36aafae74d87cf13"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M06-bwrap-child-positive-mutant/runtime-observer.json",
+        "bytes": 10277,
+        "sha256": "30d4d12f61fe0b40d259249436bd01bf3e41e4c6a914668c15d24e062b8ed3f7"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 19,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M06-bwrap-child-positive-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M06-bwrap-child-positive-restored/summary.json",
+        "bytes": 9922,
+        "sha256": "cf852cec15d6eb4eeacf361626b5ae87dcc18d27595e09107d5bd24a7702bb95"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M06-bwrap-child-positive-restored/raw-tests.json",
+        "bytes": 5696,
+        "sha256": "a567ee0e6c538b5f59f87c4cdde66528fd2e56f87748ab5e9ddc7b479b2e8649"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M06-bwrap-child-positive-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "76f5069c83a202a12de56b458a569310d1e7384b30dfdfa41a0db66dadc2ce63"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M07-bpf-arch-check-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M07-bpf-arch-check-baseline/summary.json",
+        "bytes": 9892,
+        "sha256": "42e54ae5e8c2d281d573b3e48e2d1c73366abac3689ed732e82fba4e0f4a70d0"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M07-bpf-arch-check-baseline/raw-tests.json",
+        "bytes": 5690,
+        "sha256": "0487f60c643043ab60f212323360c2a1f86dc8732701fae74d11e62a8d4e2cab"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M07-bpf-arch-check-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "f10adae0daf71628ca2ad025040ae0dfe98ce781dac3d545d69786502b47beda"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M07-bpf-arch-check-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M07-bpf-arch-check-mutant/summary.json",
+        "bytes": 15397,
+        "sha256": "81594902c6de326c61bd1878735388d561209bfb3b531991fc765fc96075ca21"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M07-bpf-arch-check-mutant/raw-tests.json",
+        "bytes": 8264,
+        "sha256": "ed32bbcebad2ad236648fe0e370e03ce631f9db115459db0f1065f4f2f697680"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M07-bpf-arch-check-mutant/runtime-observer.json",
+        "bytes": 10453,
+        "sha256": "770f13bea815b3d61dbd95397869f4a1c9c1ae0eff5438037aa98a7396120001"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 19,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M07-bpf-arch-check-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M07-bpf-arch-check-restored/summary.json",
+        "bytes": 9900,
+        "sha256": "4ed1e2c8df6f3411fdc28ede40248ef0d6b7227d93f8849008f2782381e48997"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M07-bpf-arch-check-restored/raw-tests.json",
+        "bytes": 5698,
+        "sha256": "e71b142bcd88d2b89f04d95c2c074733fbb353587bcd6a3a0182522d78a18f17"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M07-bpf-arch-check-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "1b01d160f28e5d2a77090193f8335b4a24f139f6812631bf6c7cb2c456674ba0"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M08-bpf-x32-rule-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M08-bpf-x32-rule-baseline/summary.json",
+        "bytes": 9884,
+        "sha256": "7c92f42f9f4f11e31956b729a31873213b2a9dcd2c9ea5edb04811a3acaa0bc9"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M08-bpf-x32-rule-baseline/raw-tests.json",
+        "bytes": 5690,
+        "sha256": "abf7d3114e80f535b4f09cac5dc446e7810ab6c78fd6456c1fd2a808ba4afe97"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M08-bpf-x32-rule-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "8abb1928d3188dacc064aaa264d976a2c77f54bb137ca38823bd6ec589b2316b"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M08-bpf-x32-rule-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M08-bpf-x32-rule-mutant/summary.json",
+        "bytes": 12659,
+        "sha256": "561a1c5a5b9910c89605e1a0dcc7702b949c573fb67bbbbec7c199a1076a74e6"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M08-bpf-x32-rule-mutant/raw-tests.json",
+        "bytes": 6984,
+        "sha256": "caa4f7b9970dd448fb9661a5f8676a56f5032b7adf510c019ac9db1ae2caba25"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M08-bpf-x32-rule-mutant/runtime-observer.json",
+        "bytes": 8511,
+        "sha256": "45f142a3a031d60a8543cba161f64b6d0ad43c5c4c5f6b14114eff931abbe7cc"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 20,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M08-bpf-x32-rule-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M08-bpf-x32-rule-restored/summary.json",
+        "bytes": 9887,
+        "sha256": "fd358cd3bb81d4f39da2766bebe93b4154452149866589605ee168e80e170499"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M08-bpf-x32-rule-restored/raw-tests.json",
+        "bytes": 5693,
+        "sha256": "a4ed5b62749c1664ee315b92df381a90cf88ab61623f418955f02ad509c85ed5"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M08-bpf-x32-rule-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "2adc4950d52c4a2aa534e360429187c35e256f9450c49e5865996977a21e437a"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M09-bpf-io-uring-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M09-bpf-io-uring-baseline/summary.json",
+        "bytes": 9881,
+        "sha256": "eb6c917952686227073fc73a762d7c14ecdabf62f2cd0b17d54d0653dc51050d"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M09-bpf-io-uring-baseline/raw-tests.json",
+        "bytes": 5687,
+        "sha256": "34dc25a58fd587b2f15ee828e093c49d24ddbea2c318fbc1073d765ca53bc8b3"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M09-bpf-io-uring-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "c49580573d6073b451199dcdc303e31e354af285f9140a3ba59edcfcf307900b"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M09-bpf-io-uring-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M09-bpf-io-uring-mutant/summary.json",
+        "bytes": 15391,
+        "sha256": "f8f4d3180fdd787984af71999aea7574ae4255759ea927b2bc3399c8c61913bf"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M09-bpf-io-uring-mutant/raw-tests.json",
+        "bytes": 8266,
+        "sha256": "f70674bc4157c157ee28987dfee5892a1962bd20f33194457563ea557f870817"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M09-bpf-io-uring-mutant/runtime-observer.json",
+        "bytes": 10453,
+        "sha256": "84a630b6d4d3df89924f36f8c6be41eb6c8e1ed769de10847354aa7b5467a979"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 19,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M09-bpf-io-uring-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M09-bpf-io-uring-restored/summary.json",
+        "bytes": 9886,
+        "sha256": "2773c0c6a2003dc7718e69881454767c1163df3638839f528a23568227c9e61d"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M09-bpf-io-uring-restored/raw-tests.json",
+        "bytes": 5690,
+        "sha256": "565286b21088fc33e9359422b11c4f308b84766b6842e22447f865ae1c1464b2"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M09-bpf-io-uring-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "6fcae1536109dda9778e177bdd6dcf90ee3fe8f38e1605b649e6314b1af2cf37"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M10-bpf-connect-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M10-bpf-connect-baseline/summary.json",
+        "bytes": 9885,
+        "sha256": "333203b8de47904b5bccc5faa7397a31872b070d0fcbf714911e26ebd4522b4e"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M10-bpf-connect-baseline/raw-tests.json",
+        "bytes": 5694,
+        "sha256": "1b747fe0f6ceaddbb30fa03be5b9606a91fff906fbd8752547b7e632126530db"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M10-bpf-connect-baseline/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "89355b59989aa0bd89e9a5d5200f7714855e7d2784c396dc9431e7644911419c"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M10-bpf-connect-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M10-bpf-connect-mutant/summary.json",
+        "bytes": 12653,
+        "sha256": "1fdc66f6a9388e0bbdbef3673022c45ea02f2568de6789d7e4e0683a3b791659"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M10-bpf-connect-mutant/raw-tests.json",
+        "bytes": 6982,
+        "sha256": "86bdd5d68d1e32de5751d32069d703ab0f0fd2ce2566d0828284e65684386b7a"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M10-bpf-connect-mutant/runtime-observer.json",
+        "bytes": 8511,
+        "sha256": "d3adf70916ccb351bb84717757c0821949cb87231531329ef6a4cabc4bfce12c"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 20,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M10-bpf-connect-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M10-bpf-connect-restored/summary.json",
+        "bytes": 9885,
+        "sha256": "47fbd789304b7ddf4963e9b8ee8089316c520b149b159fb1b06b213039c1496f"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M10-bpf-connect-restored/raw-tests.json",
+        "bytes": 5695,
+        "sha256": "8a433d915a08a3ce1ea024ce6416400e221b773b23024714288f94ea5da7105b"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M10-bpf-connect-restored/runtime-observer.json",
+        "bytes": 6569,
+        "sha256": "df134a9ee6ba29a8beb49cef1359000b1526bea874ce1b1f5ac9acb0c58a0d15"
+      },
+      "counts": {
+        "numTotalTests": 21,
+        "numPassedTests": 21,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "original-scripted-native-verifier-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/original-scripted-native-verifier-baseline/summary.json",
+        "bytes": 4833,
+        "sha256": "88dd1ccbe0160b3bb247fab7e1135311a0f1b24c2fdf01919f88de6fe9e26290"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/original-scripted-native-verifier-baseline/raw-tests.json",
+        "bytes": 2101,
+        "sha256": "30d83a77b5e55a762567bbcc08552f36b9ba7ebecf73f9f9a78516bab4ea63b4"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/original-scripted-native-verifier-baseline/runtime-observer.json",
+        "bytes": 2534,
+        "sha256": "ac5fae828a443b55f5d762789738f20ec825b2f3b026d5a977a72b8641376263"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M26-sdk-close-before-verify-753-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M26-sdk-close-before-verify-753-baseline/summary.json",
+        "bytes": 4837,
+        "sha256": "3bc8c8de119c104b1f06c3ca37382e994ffb9e5146c93d6a9dd54e57cb89ba43"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M26-sdk-close-before-verify-753-baseline/raw-tests.json",
+        "bytes": 2102,
+        "sha256": "c9e67e4995e3f8b67c8fe7df3514868833002ebf3d5755507d172bc047edb17b"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M26-sdk-close-before-verify-753-baseline/runtime-observer.json",
+        "bytes": 2534,
+        "sha256": "4981ac0ca0507e2fed680fb76f3356da435fb633a5c7776f2a648ecf0fc322a9"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M26-sdk-close-before-verify-753-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M26-sdk-close-before-verify-753-mutant/summary.json",
+        "bytes": 6876,
+        "sha256": "417f357e3af1ce2d678fa85dad471c44dc58b41d70674a2643db42136226e00b"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M26-sdk-close-before-verify-753-mutant/raw-tests.json",
+        "bytes": 3029,
+        "sha256": "2fafac439ce2a9f90e60b4b08a0cc475d9c02276523833217ed1551bfd8941a1"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M26-sdk-close-before-verify-753-mutant/runtime-observer.json",
+        "bytes": 5369,
+        "sha256": "14551a494fabae01310efc330e4db07daaaf4f66908470d7fd1dec93e3f07ff3"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 3,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M26-sdk-close-before-verify-753-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M26-sdk-close-before-verify-753-restored/summary.json",
+        "bytes": 4836,
+        "sha256": "410ed504e05c095f4bc1f82e1ef5014a2e35754524343297fbcdb16d05a1a120"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M26-sdk-close-before-verify-753-restored/raw-tests.json",
+        "bytes": 2100,
+        "sha256": "a4cd689742251649f657e3fedff2a8741814674e2aa33c3195d0fb42e57f0f54"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M26-sdk-close-before-verify-753-restored/runtime-observer.json",
+        "bytes": 2534,
+        "sha256": "5b51ab8bb79f08f3f6d652325dfdb86588e93e1cad60a7031aba686e653ac726"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M27-sdk-trust-anchor-789-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M27-sdk-trust-anchor-789-baseline/summary.json",
+        "bytes": 4809,
+        "sha256": "94bf5571d8f80b0fa681ed83682bae0e882721e127fb1a5a2194be81a6487f31"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M27-sdk-trust-anchor-789-baseline/raw-tests.json",
+        "bytes": 2101,
+        "sha256": "80f89c7ccef82c388cc4a8df94fb77133fd2a380ee9754e6e2000e7a21bd51ca"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M27-sdk-trust-anchor-789-baseline/runtime-observer.json",
+        "bytes": 2534,
+        "sha256": "e0d529e2143b90fc77ff86fe202a99132f05c425f224a563377a8021df9a7b52"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M27-sdk-trust-anchor-789-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M27-sdk-trust-anchor-789-mutant/summary.json",
+        "bytes": 8894,
+        "sha256": "ac6adb04f1dd013e1da010a0865cc967b286bd0909716ae38a6e32afbb4c515d"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M27-sdk-trust-anchor-789-mutant/raw-tests.json",
+        "bytes": 3953,
+        "sha256": "e24dfc4a0d6dd2a7f39c741eda6145f0583e90e19d6c0bd723abd8b7305d9258"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M27-sdk-trust-anchor-789-mutant/runtime-observer.json",
+        "bytes": 8560,
+        "sha256": "4acc32ad9bed9aea63c469e878c8390a771001ca5cad4abaf22a5cd54d56b9e4"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 2,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M27-sdk-trust-anchor-789-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M27-sdk-trust-anchor-789-restored/summary.json",
+        "bytes": 4801,
+        "sha256": "0dbe01ec3ff616e260beb992c4eb0bace67ba288a532998aa42b66af1f8d0770"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M27-sdk-trust-anchor-789-restored/raw-tests.json",
+        "bytes": 2094,
+        "sha256": "093545693c76fe56a7dc3542535cdc37dbd2531163df213a80392b9495a6c45e"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M27-sdk-trust-anchor-789-restored/runtime-observer.json",
+        "bytes": 2534,
+        "sha256": "a1f51a94ed685f71457d7882a230e7daa7e90df7f23238fbaef5f99b11bae39a"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M28-sdk-trust-anchor-mismatch-only-789-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M28-sdk-trust-anchor-mismatch-only-789-baseline/summary.json",
+        "bytes": 4865,
+        "sha256": "90bee879be105427b3b9fd57b352ae69ae8553f7c5ee144cfd65b2eba08b2196"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M28-sdk-trust-anchor-mismatch-only-789-baseline/raw-tests.json",
+        "bytes": 2102,
+        "sha256": "a7bf3c3b2a43862f18f9669cfca5f5bac212b6fa582b7d12ab471825e699b33f"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M28-sdk-trust-anchor-mismatch-only-789-baseline/runtime-observer.json",
+        "bytes": 2534,
+        "sha256": "1279a2df0064cd6e85e1536136e4df01f2d76d8957d9940f888832adbba8c822"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M28-sdk-trust-anchor-mismatch-only-789-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M28-sdk-trust-anchor-mismatch-only-789-mutant/summary.json",
+        "bytes": 6901,
+        "sha256": "8b20784914204e1facbb6b69ab15799055c2ba24ddb91836fc8c4c246aa737c4"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M28-sdk-trust-anchor-mismatch-only-789-mutant/raw-tests.json",
+        "bytes": 3020,
+        "sha256": "617aa9a4fa43c55316801fe331f735dd42f95dedd43f48d34f045684f9c0f4d0"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M28-sdk-trust-anchor-mismatch-only-789-mutant/runtime-observer.json",
+        "bytes": 5611,
+        "sha256": "befc7e7c92305fe14c18867bcc93af6a613d5706c1bc57a388c44ed2171f2a36"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 3,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M28-sdk-trust-anchor-mismatch-only-789-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M28-sdk-trust-anchor-mismatch-only-789-restored/summary.json",
+        "bytes": 4865,
+        "sha256": "26f338a9e77d197c0e64d031acde4b5f3075b0f10079e4f64f2b33dcebed4a86"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M28-sdk-trust-anchor-mismatch-only-789-restored/raw-tests.json",
+        "bytes": 2102,
+        "sha256": "e4e80f740b91e910e6b7ed9acfa2ab869803ae923bd46bb65816283e46dda148"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M28-sdk-trust-anchor-mismatch-only-789-restored/runtime-observer.json",
+        "bytes": 2534,
+        "sha256": "e1a1e33e535eb68a91455711df87db628cef5976d94c7232db84d01d172e916f"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M29-sdk-trust-anchor-missing-only-789-baseline",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M29-sdk-trust-anchor-missing-only-789-baseline/summary.json",
+        "bytes": 4861,
+        "sha256": "e92f27d1a298c7796156ade338b95a51341183b14663d3106f7577d634dacfb5"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M29-sdk-trust-anchor-missing-only-789-baseline/raw-tests.json",
+        "bytes": 2102,
+        "sha256": "882c35fdec11a1b8e5ac88ab0193c45e36af5c039dd0c379c1eeffccd00835bd"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M29-sdk-trust-anchor-missing-only-789-baseline/runtime-observer.json",
+        "bytes": 2534,
+        "sha256": "8efb488c0b7384159cb73589c7816a49259271163868720c4262a7603512b9f5"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    },
+    {
+      "phase": "S7-M29-sdk-trust-anchor-missing-only-789-mutant",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M29-sdk-trust-anchor-missing-only-789-mutant/summary.json",
+        "bytes": 6745,
+        "sha256": "af38a9ecda3781e0d8224f31c3283d8f6536cb2aeeda9c95cf5bf540f7ac506e"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M29-sdk-trust-anchor-missing-only-789-mutant/raw-tests.json",
+        "bytes": 2953,
+        "sha256": "1539366c0a4fcf79ba5fc358d2b1c3c36f967f6d974cce1d8673c5e4ba4e77c2"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M29-sdk-trust-anchor-missing-only-789-mutant/runtime-observer.json",
+        "bytes": 5407,
+        "sha256": "5e41a8d3dbc13e52bf97d956d47c31006eb760722cd75d6ae4679dd3681a32ec"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 3,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 1
+    },
+    {
+      "phase": "S7-M29-sdk-trust-anchor-missing-only-789-restored",
+      "summary": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M29-sdk-trust-anchor-missing-only-789-restored/summary.json",
+        "bytes": 4861,
+        "sha256": "e3fca224aa5a2ff149d59eb23db42841fc01ea120b665f0e61498875bcc2e52d"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M29-sdk-trust-anchor-missing-only-789-restored/raw-tests.json",
+        "bytes": 2102,
+        "sha256": "69c9601ca147765cbb393e1ac2b054ecbb5e448d4405aad756f08f25f754cd3d"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/phases/S7-M29-sdk-trust-anchor-missing-only-789-restored/runtime-observer.json",
+        "bytes": 2534,
+        "sha256": "76c4159479d91fb44f2fbb6c9905115fa211e1201c7399374c64629fee2f87ef"
+      },
+      "counts": {
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "exit": 0
+    }
+  ],
+  "preservation": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/root-final-readonly-preservation.json",
+    "bytes": 971,
+    "sha256": "5311d65192f04a938395ce73582f9a4cfddca8906f9ffbfe3e3bf88d77454da8"
+  },
+  "finalClosure": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/full-closure-final.json",
+    "bytes": 1399777,
+    "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/runtime-artifact-index.json",
+    "bytes": 1218493,
+    "sha256": "ac2a16d3be820bd26d047a91966b3d97f778311c629ba2bb9a616c6319409494"
+  },
+  "indexReferenceCount": 4881,
+  "counting": "The same21 and4 original cases recur.703 executions,14 controls and repeated failures are not703 unique tests. Original harness43/two recipes are not executed here; old41/55/53 and76-batch expectations remain separate.",
+  "limits": [
+    "Pure constructed status JSON and generated-filter evaluator test model decisions only. No Bubblewrap/kernel/seccomp/Linux confinement or privilege is exercised.",
+    "Real SDK/scripted stdio peers choose unsigned receipt fields; no independent key authority, actual signed writer, SQLite cold roundtrip/history or real verifier truth is established. Fresh verifier subprocess is not a cryptographic ledger proof.",
+    "Exact source guards only; no original tests/helpers/configs/imports/assertions/deadlines/cleanup changes, adapters, compiler/build or dist mutation.",
+    "Zero recorded outer signals/actions/errors is not a universal per-child exit/signal/ABI or all-filesystem-effects proof.",
+    "Normal Git/base freeze and required duplicate 1269/dead-code 2751 prerequisites remain unwaived; no installed/fullsuite/coverage/Node24/hosted/G0/release/Done/dependency closure."
+  ],
+  "harnessPending": "The original harness43 route and two recipes are hard-blocked by this controller. A separately owned observer proposal is not runtime approval.",
+  "formalAcceptanceClosed": false,
+  "allRuntimeFinished": true,
+  "allRootFreezeReadsFinished": true
+}

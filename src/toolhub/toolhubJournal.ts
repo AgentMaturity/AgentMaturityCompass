@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 import { openActionJournal, type ActionJournal } from "../actions/actionJournal.js";
 import { authorizationIntentFor, bindAuthorization, recheckAuthorization } from "../actions/authorize.js";
 import { authorizationRecordDigest } from "../actions/authorizationRecord.js";
+import { lifecycleAdmission } from "../lifecycle/reassessment.js";
 import { ActionBlocked, type EffectState, type ReceiptState } from "../actions/receiptStates.js";
 import { openLedger, type Ledger } from "../ledger/ledger.js";
 import { DefiniteFailureError, type ToolExecution } from "../tools/toolTypes.js";
@@ -11,12 +12,16 @@ import type { ActionClass, ExecutionMode } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
-import { hashToolBlastRadiusConsent, type ToolBlastRadiusConsent } from "./blastRadiusConsent.js";
-import { appendToolEvidenceWithReceipt } from "./toolhubReceipts.js";
+import type { ToolBlastRadiusConsent } from "./blastRadiusConsent.js";
+import { appendToolEvidenceWithReceipt, redactedEvidenceValue } from "./toolhubReceipts.js";
 import type { ToolDefinition } from "./toolsSchema.js";
 
-export const isJournaledToolhubExecution = (mode: ExecutionMode, actionClass: ActionClass): boolean =>
-  mode === "EXECUTE" && actionClass !== "READ_ONLY" && actionClass !== "WRITE_LOW";
+/**
+ * Journaled: executions above WRITE_LOW, and any execution an approval authorizes (`approved`), whose approval the
+ * journal's recheck spends, so a failed effect leaves an execution to reconcile instead of a spent approval (P1-02).
+ */
+export const isJournaledToolhubExecution = (mode: ExecutionMode, actionClass: ActionClass, approved = false): boolean =>
+  mode === "EXECUTE" && (approved || (actionClass !== "READ_ONLY" && actionClass !== "WRITE_LOW"));
 
 export function toolhubExecutionId(workspaceId: string, intentId: string): string {
   return `exec_${sha256Hex(`toolhub:${workspaceId}:${intentId}`).slice(0, 32)}`;
@@ -32,6 +37,12 @@ const executionFor = (call: Call): ToolExecution => ({
   parentToken: null, name: call.toolName, agentId: call.agentId, actionClass: call.actionClass,
   arguments: call.args, requestedMode: call.requestedMode, effectiveMode: call.effectiveMode
 });
+
+/** P2-23: why lifecycle admission holds an unjournaled ToolHub call (a read or low-impact write), or null. */
+export function toolhubLifecycleHold(workspace: string, agentId: string, actionClass: ActionClass): string | null {
+  const admission = lifecycleAdmission(workspace, agentId, { actionClass });
+  return admission.ok ? null : admission.reason;
+}
 
 /** Protected facts for intent creation, or null when invalid; dispatch still binds and denies invalid authorization. */
 export function toolhubApprovalIntent(call: Call): Record<string, unknown> | null {
@@ -214,17 +225,19 @@ export function openToolhubExecutionEvidence(input: EvidenceInput, actionMetadat
   let resultReceipt: string | undefined;
   let closed = false;
   let sealed = false;
-  const blastRadiusConsentHash = hashToolBlastRadiusConsent(input.blastRadiusConsent);
+  // The consent quotes argument paths; in an opted-in workspace its meta copy and digest are over the redacted copy.
+  const blastRadiusConsent = redactedEvidenceValue(input.workspace, input.blastRadiusConsent);
+  const blastRadiusConsentHash = sha256Hex(canonicalize(blastRadiusConsent));
   const common = { executionId: input.executionId, intentId: input.intentId, requestedMode: input.requestedMode,
     effectiveMode: input.effectiveMode, actionClass: input.actionClass, approvalId: input.approvalId, blastRadiusConsentHash };
   try {
     ledger.startSession({ sessionId, runtime: "unknown", binaryPath: "amc-toolhub", binarySha256: "toolhub" });
     const action = appendToolEvidenceWithReceipt({ ledger, workspace: input.workspace, sessionId, agentId: input.agentId,
       toolName: input.toolName, eventType: "tool_action", extraMeta: { ...common, execTicketValid: input.execTicketValid,
-        approvalDecisionReceiptId: input.approvalDecisionReceiptId, blastRadiusConsent: input.blastRadiusConsent, ...actionMetadata },
+        approvalDecisionReceiptId: input.approvalDecisionReceiptId, blastRadiusConsent, ...actionMetadata },
       payload: { ...common, args: input.args, workOrderId: input.workOrderId, execTicketProvided: input.execTicketProvided,
         execTicketValid: input.execTicketValid, approvalDecisionReceiptId: input.approvalDecisionReceiptId,
-        blastRadiusConsent: input.blastRadiusConsent, ...actionMetadata } });
+        blastRadiusConsent, ...actionMetadata } });
     eventIds.push(action.eventId);
     return {
       ledger, sessionId, eventIds, actionReceipt: action.receipt,

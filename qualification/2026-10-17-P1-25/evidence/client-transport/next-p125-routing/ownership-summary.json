@@ -1,0 +1,30 @@
+{
+  "sourceHead": "5beb3eae69b08f2e895520c7f459e1465780beeb",
+  "sourceBranch": "codex/p1-25-client-qualification",
+  "sourceStatus": "",
+  "sourceIndex": "",
+  "roots": 181,
+  "targetChecks": 724,
+  "primaryNextLaneChecks": 362,
+  "presentTargets": [],
+  "targetStatusesNonempty": [],
+  "selectedSourceStatusesNonempty": [],
+  "historyAuthorities": 14,
+  "historiesNonempty": [],
+  "sourceVariants": {
+    "src/time/tsaClient.ts": 2,
+    "src/time/checkpoint.ts": 3,
+    "src/time/timeEvidence.ts": 1,
+    "src/time/verifyTimestamp.ts": 1,
+    "src/trust/verifierReport.ts": 3,
+    "src/assurance/certificate.ts": 6,
+    "src/session/sessionService.ts": 8,
+    "docs/TRUSTED_TIME.md": 2,
+    "tests/time/tsaClient.test.ts": 1,
+    "tests/time/verifyTimestamp.test.ts": 1
+  },
+  "presentSourcePins": 817,
+  "all36HeldPinsExact": true,
+  "heldRunnerExact": true,
+  "gitFailures": []
+}

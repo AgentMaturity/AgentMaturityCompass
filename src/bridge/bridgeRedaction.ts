@@ -1,5 +1,8 @@
 import { redactSecrets } from "../shield/redaction/redactSecrets.js";
 import { createHash } from "node:crypto";
+import { MAX_REQUEST_SCAN_CHARS, protectedWalk, redactJsonLeaves } from "../dataflow/detectors.js";
+import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
+import { SCRUB_PLACEHOLDER } from "../exec/outputCollector.js";
 import { canonicalize } from "../utils/json.js";
 
 
@@ -24,6 +27,77 @@ function clip(value: string, maxChars: number): string {
  */
 export function redactBridgeText(input: string): string {
   return redactSecrets(input, () => "<AMC_REDACTED>").redacted;
+}
+
+/** The anonymous placeholder bridge evidence stores in place of a finding; a delegate's folded answer drops it. */
+export const BRIDGE_REDACTED_MARKER = "<AMC_REDACTED>";
+// What one call may scan with the detectors before its whole value is replaced: less than the gateway's per-body budget,
+// because the bridge's event loop also answers hook control decisions.
+const MAX_BRIDGE_SCAN_CHARS = MAX_REQUEST_SCAN_CHARS / 4;
+
+/**
+ * Redaction for what the bridge STORES as evidence: telemetry text, telemetry object payloads and `POST /bridge/evidence`
+ * payloads, and the stored argv of adapter runs and monitored processes (and, where the workspace opted in, their output:
+ * `processOutputRedactor`). Secrets always, as `redactBridgeText` (every key and leaf of a JSON payload). In a workspace
+ * that opted in to protected-data redaction (P2-02, read once per redactor) the protected-data walk runs first
+ * (`protectedWalk`, as in the gateway, `key` being a value's member or flag name), with the same anonymous marker for each
+ * finding and for a unit or line it cannot read (over the per-text limit, a zero byte, as UTF-16 output read as UTF-8 has,
+ * a rounded JSON integer), and then the secret table, so JSON reaches the walk intact. Each `text` or `json` call may scan
+ * MAX_BRIDGE_SCAN_CHARS; past that, or on any failure of the walk, the whole value stored is the marker. Text the bridge
+ * hands back to an agent (control responses, deny reasons, `amc wrap`'s terminal output) keeps secrets-only
+ * `redactBridgeText`, so an opted-in workspace's detectors never alter what an agent is told. `replace` is what a walk
+ * finding is stored as (the marker unless a caller keeps a keyword, `processOutputRedactor`).
+ */
+export function bridgeEvidenceRedactor(workspace: string,
+  replace: (finding: { readonly detector: string }) => string = () => BRIDGE_REDACTED_MARKER):
+  { readonly text: (input: string, key?: string) => string; readonly json: (value: unknown) => unknown } {
+  if (!protectedDataOptedIn(workspace)) {
+    return Object.freeze({ text: (input: string) => redactBridgeText(input), json: (value: unknown) => redactJsonLeaves(value, redactBridgeText) });
+  }
+  const walkFor = () => protectedWalk({ budget: MAX_BRIDGE_SCAN_CHARS, replace, opaque: () => BRIDGE_REDACTED_MARKER });
+  const guarded = <R>(redact: () => R): R | typeof BRIDGE_REDACTED_MARKER => { try { return redact(); } catch { return BRIDGE_REDACTED_MARKER; } };
+  return Object.freeze({
+    text: (input: string, key?: string) => guarded(() => redactBridgeText(walkFor().text(input, key))),
+    json: (value: unknown) => guarded(() => redactJsonLeaves(walkFor().value(value), redactBridgeText))
+  });
+}
+
+/**
+ * The stored output rows of adapter runs and monitored processes (stdout, stderr, forwarded stdin). Where the workspace
+ * opted in to protected-data redaction (P2-02), `bridgeEvidenceRedactor`'s text. Elsewhere the payload as it was before:
+ * the diagnostic's transcript audits (POLICY_VIOLATION) and a delegated child's folded answer read these rows, and the
+ * shared secret table would take out the keyword (`api_key=...`) or the plain value (a password-less connection string)
+ * they need. Opted in, a finding's value is replaced and its keyword kept: the walk replaces an `api_key` or `password`
+ * value only, and a PEM private key block whole, so its replacement keeps the label the audit reads.
+ */
+export function processOutputRedactor(workspace: string): (payload: string | Buffer) => string | Buffer {
+  if (!protectedDataOptedIn(workspace)) return (payload) => payload;
+  const evidence = bridgeEvidenceRedactor(workspace,
+    (finding) => finding.detector === "private_key" ? `PRIVATE KEY ${BRIDGE_REDACTED_MARKER}` : BRIDGE_REDACTED_MARKER);
+  return (payload) => evidence.text(typeof payload === "string" ? payload : payload.toString("utf8"));
+}
+
+/**
+ * The flag an argument is the value of (`--password` for `hunter2`), as a member name. curl's `-u name:password` is a
+ * password; docker's `-u 1000:1000` (uid:gid) is not.
+ */
+function flagMember(flag: string | undefined, value: string): string | undefined {
+  const name = /^--?([A-Za-z][\w.-]*)$/.exec(flag ?? "")?.[1];
+  return name !== undefined && /^(?:u|user)$/.test(name) && value.includes(":") && !/^\d+:\d+$/.test(value) ? "password" : name;
+}
+
+/**
+ * A process's command and arguments as evidence stores them (P2-02): `scrubValues`, AMC's own lease and the vault
+ * passphrase replaced as the output scrub replaces them, then the secret table and, where the workspace opted in, the
+ * protected-data detectors (`bridgeEvidenceRedactor`), each argument under the flag before it as its member name, so
+ * `--password hunter2` and `--mrn A1234567` are checked as `--password=hunter2` is. The process runs with the real ones.
+ */
+export function recordedArgv(workspace: string, command: string, args: readonly string[], scrubValues: readonly string[] = []):
+  { readonly command: string; readonly args: readonly string[] } {
+  const secrets = [...scrubValues, process.env.AMC_LEASE ?? "", process.env.AMC_VAULT_PASSPHRASE ?? ""].filter((value) => value.length >= 8);
+  const scrub = (text: string) => secrets.reduce((out, secret) => out.split(secret).join(SCRUB_PLACEHOLDER), text);
+  const evidence = bridgeEvidenceRedactor(workspace);
+  return { command: evidence.text(scrub(command)), args: args.map((arg, index) => evidence.text(scrub(arg), flagMember(args[index - 1], arg))) };
 }
 
 export function bridgeSha256(bytes: Buffer | string): string {

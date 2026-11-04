@@ -1,0 +1,29 @@
+{
+  "schema": "p125-private-source-control-design/1",
+  "at": "2026-10-16T18:40:54.455208+00:00",
+  "state": "UNEXECUTED_NOT_ALLOCATED",
+  "source": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+    "bytes": 16478,
+    "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89"
+  },
+  "operators": [
+    {
+      "id": "m1",
+      "scope": "src/time/verifyTimestamp.ts",
+      "old": "    if (info.imprintAlgorithm !== \"2.16.840.1.101.3.4.2.1\" || info.imprint !== input.expectedDigestHex.toLowerCase()) {\n      fail(\"TST_IMPRINT_MISMATCH\", \"the token's messageImprint is not the expected sha256\");\n    }\n",
+      "new": "",
+      "witness": "Wrong expected digest on unchanged real valid token must fail its refusal assertion when comparison is removed.",
+      "canonicalPositiveRequired": true
+    },
+    {
+      "id": "m2",
+      "scope": "src/time/verifyTimestamp.ts",
+      "old": "  return fail(\"TST_UNTRUSTED_TSA\", `no path from TSA certificate \"${signer.subject.replace(/\\n/g, \", \")}\" to a pinned TSA anchor`);",
+      "new": "  return { path, anchor: anchors[0]!.anchor };",
+      "witness": "Accept a cryptographically valid carried chain under a supplied unrelated nonempty anchor. Wrong-anchor refusal assertion must fail; signature/imprint/nonce/EKU/date remain checked. Empty-anchor input may become malformed; do not call that the primary witness.",
+      "canonicalPositiveRequired": true
+    }
+  ],
+  "boundary": "Root may later apply one operator at a time only in a new owned fresh clone after source commit/canonical run. Require exact original bytes, original restoration, identical full test inventory, natural process closure and restored run before next operator. No production checkout/compiled mutation, freeze bypass, or full acceptance claim."
+}

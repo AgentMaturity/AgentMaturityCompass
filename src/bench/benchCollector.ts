@@ -1,19 +1,22 @@
+import { median as arithmeticMedian } from "../experiments/stats.js";
+import { countBenchAuditRows, countReadonlyBenchAuditEvents, latestReadonlyBenchAssuranceByPack } from "./benchReadOnlyInputs.js";
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { LayerName, OutcomeReport } from "../types.js";
+import type { DiagnosticReport, LayerName, OutcomeReport } from "../types.js";
 import { parseWindowToMs } from "../utils/time.js";
 import { pathExists, readUtf8 } from "../utils/fs.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { loadRunReport } from "../diagnostic/runner.js";
+import { listTrustedRuns } from "../governor/runTrust.js";
 import { computeFailureRiskIndices } from "../assurance/indices.js";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
 import { verifyPluginWorkspace } from "../plugins/pluginApi.js";
 import { loadTrustConfig } from "../trust/trustConfig.js";
-import { loadLatestOrgScorecard } from "../org/orgScorecard.js";
-import { collectForecastSignals } from "../forecast/forecastSignals.js";
-import { loadLatestForecastArtifact } from "../forecast/forecastStore.js";
+import { loadVerifiedLatestOrgScorecard, type loadLatestOrgScorecard } from "../org/orgScorecard.js";
+import { collectForecastSignals, captureForecastSignals, type ForecastSignalBundle } from "../forecast/forecastSignals.js";
+import { forecastScopeLatestPath, loadVerifiedForecastArtifact } from "../forecast/forecastStore.js";
 import { openLedger } from "../ledger/ledger.js";
 import { readTransparencyEntries } from "../transparency/logChain.js";
+import { canonicalize } from "../utils/json.js";
 import { hashId } from "./benchRedaction.js";
 import { benchArtifactSchema, type BenchArtifact, type BenchBuildMeta } from "./benchSchema.js";
 import type { BenchPolicy } from "./benchPolicySchema.js";
@@ -34,22 +37,9 @@ function parseOutcomeReport(file: string): OutcomeReport | null {
   }
 }
 
-function listAgentRuns(workspace: string, agentId: string): Array<ReturnType<typeof loadRunReport>> {
-  const dir = getAgentPaths(workspace, agentId).runsDir;
-  if (!pathExists(dir)) {
-    return [];
-  }
-  return readdirSync(dir)
-    .filter((name) => name.endsWith(".json"))
-    .map((name) => {
-      try {
-        return JSON.parse(readUtf8(join(dir, name))) as ReturnType<typeof loadRunReport>;
-      } catch {
-        return null;
-      }
-    })
-    .filter((row): row is ReturnType<typeof loadRunReport> => row !== null)
-    .sort((a, b) => a.ts - b.ts);
+/** Trusted runs only, oldest first: an edited, copied or unanchored run, or a thinned history, refuses a signed bench. */
+function listAgentRuns(workspace: string, agentId: string): DiagnosticReport[] {
+  return listTrustedRuns(workspace, agentId).reverse();
 }
 
 function listAgentOutcomeReports(workspace: string, agentId: string): OutcomeReport[] {
@@ -77,14 +67,12 @@ function latestInWindow<T extends { ts: number }>(rows: T[], startTs: number, en
   return latest;
 }
 
-function layerMapFromRun(run: ReturnType<typeof loadRunReport>): Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number> {
-  const base = {
-    strategicOps: 0,
-    leadership: 0,
-    culture: 0,
-    resilience: 0,
-    skills: 0
-  };
+type LayerMap = Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number | null>;
+/** Every layer not evaluated (null) until a run or scorecard measures it. */
+const unmeasuredLayers = (): LayerMap => ({ strategicOps: null, leadership: null, culture: null, resilience: null, skills: null });
+
+function layerMapFromRun(run: DiagnosticReport): LayerMap {
+  const base = unmeasuredLayers();
   for (const layer of run.layerScores) {
     const key = LAYER_KEY_BY_NAME[layer.layerName as LayerName];
     if (!key) {
@@ -95,14 +83,8 @@ function layerMapFromRun(run: ReturnType<typeof loadRunReport>): Record<"strateg
   return base;
 }
 
-function layerMapFromNode(node: NonNullable<ReturnType<typeof loadLatestOrgScorecard>>["nodes"][number]): Record<"strategicOps" | "leadership" | "culture" | "resilience" | "skills", number> {
-  const base = {
-    strategicOps: 0,
-    leadership: 0,
-    culture: 0,
-    resilience: 0,
-    skills: 0
-  };
+function layerMapFromNode(node: NonNullable<ReturnType<typeof loadLatestOrgScorecard>>["nodes"][number]): LayerMap {
+  const base = unmeasuredLayers();
   for (const layer of node.layerScores) {
     const key = LAYER_KEY_BY_NAME[layer.layerName as LayerName];
     if (!key) {
@@ -124,11 +106,14 @@ function mapTrustLabel(input: string): "LOW" | "MEDIUM" | "HIGH" {
   return "MEDIUM";
 }
 
-function derivedTrustLabel(params: {
-  integrityIndex: number;
-  correlationRatio: number;
-  observedShare: number;
+/** Trust label from the evidence gates; shared with the audit binder. */
+export function derivedTrustLabel(params: {
+  integrityIndex: number | null;
+  correlationRatio: number | null;
+  observedShare: number | null;
 }): "LOW" | "MEDIUM" | "HIGH" {
+  // An unmeasured signal never earns a label above LOW.
+  if (params.integrityIndex === null || params.correlationRatio === null || params.observedShare === null) return "LOW";
   if (params.observedShare >= 0.7 && params.integrityIndex >= 0.9 && params.correlationRatio >= 0.9) {
     return "HIGH";
   }
@@ -138,44 +123,20 @@ function derivedTrustLabel(params: {
   return "LOW";
 }
 
-function valueDimensionsFromOutcome(report: OutcomeReport | null): {
-  emotionalValue: number;
-  functionalValue: number;
-  economicValue: number;
-  brandValue: number;
-  lifetimeValue: number;
-  valueScore: number;
-} {
-  if (!report) {
-    return {
-      emotionalValue: 0,
-      functionalValue: 0,
-      economicValue: 0,
-      brandValue: 0,
-      lifetimeValue: 0,
-      valueScore: 0
-    };
-  }
-  return {
-    emotionalValue: Number((report.categoryScores.Emotional ?? 0).toFixed(6)),
-    functionalValue: Number((report.categoryScores.Functional ?? 0).toFixed(6)),
-    economicValue: Number((report.categoryScores.Economic ?? 0).toFixed(6)),
-    brandValue: Number((report.categoryScores.Brand ?? 0).toFixed(6)),
-    lifetimeValue: Number((report.categoryScores.Lifetime ?? 0).toFixed(6)),
-    valueScore: Number(report.valueScore.toFixed(6))
-  };
-}
+type ValueDims = Record<"emotionalValue" | "functionalValue" | "economicValue" | "brandValue" | "lifetimeValue" | "valueScore", number | null>;
+const round6 = (value: number | null | undefined): number | null =>
+  typeof value === "number" && Number.isFinite(value) ? Number(value.toFixed(6)) : null;
 
-function parseMeta(metaJson: string): Record<string, unknown> {
-  try {
-    const parsed = JSON.parse(metaJson) as unknown;
-    if (parsed && typeof parsed === "object") {
-      return parsed as Record<string, unknown>;
-    }
-    return {};
-  } catch {
-    return {};
-  }
+/** A category the outcome report did not score is not evaluated (null), never 0. */
+function valueDimensionsFromOutcome(report: OutcomeReport): ValueDims {
+  return {
+    emotionalValue: round6(report.categoryScores.Emotional),
+    functionalValue: round6(report.categoryScores.Functional),
+    economicValue: round6(report.categoryScores.Economic),
+    brandValue: round6(report.categoryScores.Brand),
+    lifetimeValue: round6(report.categoryScores.Lifetime),
+    valueScore: round6(report.valueScore)
+  };
 }
 
 function countAuditEvents(params: {
@@ -186,32 +147,19 @@ function countAuditEvents(params: {
 }): number {
   const ledger = openLedger(params.workspace);
   try {
-    const events = ledger.getEventsBetween(params.startTs, params.endTs);
-    const auditSet = new Set(params.auditTypes);
-    return events
-      .filter((event) => event.event_type === "audit")
-      .filter((event) => {
-        const meta = parseMeta(event.meta_json);
-        const auditType = typeof meta.auditType === "string" ? meta.auditType : null;
-        return Boolean(auditType && auditSet.has(auditType));
-      })
-      .length;
+    return countBenchAuditRows(ledger.getEventsBetween(params.startTs, params.endTs), params.auditTypes);
   } finally {
     ledger.close();
   }
 }
 
+// Bench artifacts retain six-decimal serialization around experiments/stats.ts midpoint median.
 function median(values: number[]): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const sorted = values.slice().sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 0) {
-    return Number((((sorted[mid - 1] ?? 0) + (sorted[mid] ?? 0)) / 2).toFixed(6));
-  }
-  return Number((sorted[mid] ?? 0).toFixed(6));
+  return Number(arithmeticMedian(values).toFixed(6));
 }
+
+const mean6 = (values: number[]): number => Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(6));
+const nullableMap = <T>(value: number | null, map: (value: number) => T): T | null => (value === null ? null : map(value));
 
 function resolveWindow(windowDays: number): { startTs: number; endTs: number; days: number } {
   const ms = parseWindowToMs(`${windowDays}d`);
@@ -223,16 +171,13 @@ function resolveWindow(windowDays: number): { startTs: number; endTs: number; da
   };
 }
 
-function latestSeriesValue(
-  series:
-    | Array<{ ts: number; value: number }>
-    | undefined
-): number {
-  if (!series || series.length === 0) {
-    return 0;
-  }
-  return Number((series[series.length - 1]?.value ?? 0).toFixed(6));
+/** The newest point of a series; null (not measured) when the series has none. */
+function latestSeriesValue(series: Array<{ ts: number; value: number }> | undefined): number | null {
+  return round6(series?.[series.length - 1]?.value);
 }
+
+/** A risk index with no series is unmeasured: score it as worst-case risk, never as risk 0 (= a perfect 100) (WP37). */
+const UNMEASURED_RISK = 100;
 
 function determineIncludedEventKinds(workspace: string, startTs: number, endTs: number): string[] {
   const allow = new Set([
@@ -288,7 +233,7 @@ export interface CollectedBenchData {
   runRefs: string[];
 }
 
-export function collectBenchData(params: {
+type BenchCollectionInput = {
   workspace: string;
   scopeType: "WORKSPACE" | "NODE" | "AGENT";
   scopeId: string;
@@ -300,25 +245,37 @@ export function collectBenchData(params: {
     agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
     deployment?: "single" | "host" | "k8s" | "compose";
   };
-}): CollectedBenchData {
-  const window = resolveWindow(params.windowDays);
-  const scopeIdHash = hashId(params.scopeId, params.policy.benchPolicy.privacy.hashTruncBytes);
-  const workspaceHash = hashId(params.workspace, params.policy.benchPolicy.privacy.hashTruncBytes);
+};
+export function collectBenchData(params: BenchCollectionInput): CollectedBenchData {
+  const window = resolveWindow(params.windowDays), identity = collectionIdentity(params), signals = collectForecastSignals({workspace:params.workspace,scope:{type:params.scopeType,id:params.scopeId},lookbackDays:Math.max(90,params.windowDays)});
+  return collectBenchDataWithInputs(params,window,signals,identity);
+}
+/** Internal selected-value capture: original window and actual forecast selector are retained, not refreshed after signing. */
+export function captureBenchData(input: BenchCollectionInput) {
+  const params = structuredClone(input);
+  const window = resolveWindow(params.windowDays), identity = collectionIdentity(params);
+  const signals = captureForecastSignals({workspace:params.workspace,scope:{type:params.scopeType,id:params.scopeId},lookbackDays:Math.max(90,params.windowDays)});
+  const collected = collectBenchDataWithInputs(params,window,signals.signals,identity,true), selected = canonicalize(collected);
+  return {collected,assertCurrent(){signals.assertCurrent();if(canonicalize(collectBenchDataWithInputs(params,window,signals.signals,identity,true))!==selected)throw new Error("selected bench inputs changed while signing");}};
+}
+function collectionIdentity(params:BenchCollectionInput){return {scopeIdHash:hashId(params.scopeId,params.policy.benchPolicy.privacy.hashTruncBytes),workspaceHash:hashId(params.workspace,params.policy.benchPolicy.privacy.hashTruncBytes)};}
+function collectBenchDataWithInputs(params: BenchCollectionInput, window: ReturnType<typeof resolveWindow>, signals: ForecastSignalBundle, identity:ReturnType<typeof collectionIdentity>, readOnly = false): CollectedBenchData {
+  const {scopeIdHash,workspaceHash} = identity;
+  const countSelectedAudit = readOnly ? countReadonlyBenchAuditEvents : countAuditEvents, selectedAssurance = readOnly ? latestReadonlyBenchAssuranceByPack : latestAssuranceByPack;
   const scope = { type: params.scopeType, id: params.scopeId };
-  const signals = collectForecastSignals({
-    workspace: params.workspace,
-    scope,
-    lookbackDays: Math.max(90, params.windowDays)
-  });
-  const latestForecast = loadLatestForecastArtifact(params.workspace, scope);
-
-  const evidenceGateReasons: string[] = [];
-  const observedShare = Number((signals.evidence.observedShare ?? 0).toFixed(6));
-  const attestedShare = Number((signals.evidence.attestedShare ?? 0).toFixed(6));
-  const selfReportedShare = Number((signals.evidence.selfReportedShare ?? 0).toFixed(6));
-  const integrityIndex = Number((signals.evidence.latestIntegrityIndex ?? 0).toFixed(6));
-  const correlationRatio = Number((signals.evidence.latestCorrelationRatio ?? 0).toFixed(6));
-  const observedRuns = signals.evidence.observedRuns ?? 0;
+  // Signed inputs only: an unsigned or tampered forecast, scorecard or signal file is absent and named as a gate reason.
+  const latestForecast = loadVerifiedForecastArtifact(params.workspace, scope);
+  const evidenceGateReasons: string[] = signals.ignoredInputs.map((input) => `UNVERIFIED_INPUT_IGNORED:${input}`);
+  if (latestForecast === null && pathExists(forecastScopeLatestPath(params.workspace, scope))) evidenceGateReasons.push("UNVERIFIED_INPUT_IGNORED:latest forecast");
+  // No run in the lookback measured the evidence mix or an integrity index: null (not evaluated), not the bundle's 0.
+  const measuredRuns = signals.runRefs.length > 0;
+  const evidenceCoverage = measuredRuns ? { observedShare: Number(signals.evidence.observedShare.toFixed(6)),
+    attestedShare: Number(signals.evidence.attestedShare.toFixed(6)),
+    selfReportedShare: Number(signals.evidence.selfReportedShare.toFixed(6)) } : null;
+  const observedShare = evidenceCoverage?.observedShare ?? null;
+  const integrityIndex = measuredRuns ? Number(signals.evidence.latestIntegrityIndex.toFixed(6)) : null;
+  const correlationRatio = round6(signals.evidence.latestCorrelationRatio);
+  const observedRuns = signals.evidence.observedRuns; // a real count: 0 runs is a measurement
   const runRefs = signals.runRefs;
 
   if (observedRuns < params.policy.benchPolicy.privacy.minRunsForAnyExport) {
@@ -338,13 +295,7 @@ export function collectBenchData(params: {
   });
 
   const maturityOverall = latestSeriesValue(signals.points.maturityOverall);
-  const layers = {
-    strategicOps: 0,
-    leadership: 0,
-    culture: 0,
-    resilience: 0,
-    skills: 0
-  };
+  const layers = unmeasuredLayers();
   const maturityQuestions: Array<{ qIdHash: string; score: number }> = [];
 
   if (params.scopeType === "AGENT") {
@@ -369,7 +320,8 @@ export function collectBenchData(params: {
       }
     }
   } else {
-    const scorecard = loadLatestOrgScorecard(params.workspace);
+    const { scorecard, ignored } = loadVerifiedLatestOrgScorecard(params.workspace);
+    if (ignored !== null) evidenceGateReasons.push(`UNVERIFIED_INPUT_IGNORED:${ignored}`);
     const node =
       params.scopeType === "WORKSPACE"
         ? scorecard?.summary.enterpriseRollup
@@ -394,27 +346,23 @@ export function collectBenchData(params: {
   }
 
   const risk = {
-    ecosystemFocusRisk: latestSeriesValue(signals.points.indices.EcosystemFocusRisk),
-    clarityPathRisk: latestSeriesValue(signals.points.indices.ClarityPathRisk),
-    economicSignificanceRisk: latestSeriesValue(signals.points.indices.EconomicSignificanceRisk),
-    riskAssuranceRisk: latestSeriesValue(signals.points.indices.RiskAssuranceRisk),
-    digitalDualityRisk: latestSeriesValue(signals.points.indices.DigitalDualityRisk)
+    ecosystemFocusRisk: latestSeriesValue(signals.points.indices.EcosystemFocusRisk) ?? UNMEASURED_RISK,
+    clarityPathRisk: latestSeriesValue(signals.points.indices.ClarityPathRisk) ?? UNMEASURED_RISK,
+    economicSignificanceRisk: latestSeriesValue(signals.points.indices.EconomicSignificanceRisk) ?? UNMEASURED_RISK,
+    riskAssuranceRisk: latestSeriesValue(signals.points.indices.RiskAssuranceRisk) ?? UNMEASURED_RISK,
+    digitalDualityRisk: latestSeriesValue(signals.points.indices.DigitalDualityRisk) ?? UNMEASURED_RISK
   };
 
-  let values = {
+  const seriesDims = {
     emotionalValue: latestSeriesValue(signals.points.value.EmotionalValue),
     functionalValue: latestSeriesValue(signals.points.value.FunctionalValue),
     economicValue: latestSeriesValue(signals.points.value.EconomicValue),
     brandValue: latestSeriesValue(signals.points.value.BrandValue),
-    lifetimeValue: latestSeriesValue(signals.points.value.LifetimeValue),
-    valueScore: 0
+    lifetimeValue: latestSeriesValue(signals.points.value.LifetimeValue)
   };
-  values.valueScore = Number(
-    (
-      (values.emotionalValue + values.functionalValue + values.economicValue + values.brandValue + values.lifetimeValue) /
-      5
-    ).toFixed(6)
-  );
+  // The score averages the measured dimensions only; with none measured it is not evaluated.
+  const measuredDims = Object.values(seriesDims).filter((value): value is number => value !== null);
+  let values: ValueDims = { ...seriesDims, valueScore: measuredDims.length > 0 ? mean6(measuredDims) : null };
 
   if (params.scopeType === "AGENT") {
     const agentId = resolveAgentId(params.workspace, params.scopeId);
@@ -424,27 +372,30 @@ export function collectBenchData(params: {
     }
   }
 
-  const pluginState = verifyPluginWorkspace({ workspace: params.workspace });
+  const pluginState = verifyPluginWorkspace({ workspace: params.workspace, readonly: readOnly });
   const operating = {
-    approvalsBacklogCount: Math.max(0, Math.round(latestSeriesValue(signals.points.operating.approval_backlog_size))),
-    approvalsMedianAgeHours: Number(latestSeriesValue(signals.points.operating.approval_backlog_age_hours).toFixed(6)),
-    budgetExceedEvents: countAuditEvents({
+    // No run in the window measured the approval backlog: not evaluated, not an empty queue.
+    approvalsBacklogCount: nullableMap(latestSeriesValue(signals.points.operating.approval_backlog_size), (value) => Math.max(0, Math.round(value))),
+    approvalsMedianAgeHours: latestSeriesValue(signals.points.operating.approval_backlog_age_hours),
+    budgetExceedEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
       endTs: window.endTs,
       auditTypes: ["BUDGET_EXCEEDED", "LEASE_RATE_LIMITED"]
     }),
-    toolhubDenialRate: Number(latestSeriesValue(signals.points.operating.toolhub_denial_rate).toFixed(6)),
-    freezeEvents: countAuditEvents({
+    // No run in the window measured a denial rate (no ToolHub actions): not measured, not a clean 0.
+    toolhubDenialRate: latestSeriesValue(signals.points.operating.toolhub_denial_rate),
+    freezeEvents: countSelectedAudit({
       workspace: params.workspace,
       startTs: window.startTs,
       endTs: window.endTs,
       auditTypes: ["FREEZE_APPLIED", "EXECUTE_FROZEN_ACTIVE"]
     }),
+    // No assurance pack run in the window: not evaluated (null), never a 0 score or 0 failures.
     assurance: {
-      latestScore: 0,
-      injectionFailures: 0,
-      exfilAttemptsDetected: 0
+      latestScore: null as number | null,
+      injectionFailures: null as number | null,
+      exfilAttemptsDetected: null as number | null
     },
     plugins: {
       integrity: pluginState.ok ? "PASS" as const : "FAIL" as const,
@@ -459,7 +410,7 @@ export function collectBenchData(params: {
 
   if (params.scopeType === "AGENT") {
     const agentId = resolveAgentId(params.workspace, params.scopeId);
-    const assurance = latestAssuranceByPack({
+    const assurance = selectedAssurance({
       workspace: params.workspace,
       agentId,
       windowStartTs: window.startTs,
@@ -472,8 +423,8 @@ export function collectBenchData(params: {
       );
       const injectionPack = assurance.get("injection");
       const exfilPack = assurance.get("exfiltration");
-      operating.assurance.injectionFailures = injectionPack ? injectionPack.failCount : 0;
-      operating.assurance.exfilAttemptsDetected = exfilPack ? exfilPack.failCount : 0;
+      operating.assurance.injectionFailures = injectionPack ? injectionPack.failCount : null;
+      operating.assurance.exfilAttemptsDetected = exfilPack ? exfilPack.failCount : null;
     }
   }
 
@@ -554,15 +505,11 @@ export function collectBenchData(params: {
       integrityIndex,
       correlationRatio,
       trustLabel: evidenceGateReasons.length > 0 ? "LOW" : trustLabel,
-      evidenceCoverage: {
-        observedShare,
-        attestedShare,
-        selfReportedShare
-      }
+      evidenceCoverage
     },
     metrics: {
       maturity: {
-        overall: Number(maturityOverall.toFixed(6)),
+        overall: maturityOverall,
         fiveLayers: {
           strategicOps: layers.strategicOps,
           leadership: layers.leadership,
@@ -597,7 +544,7 @@ export function collectBenchData(params: {
       operatingHealth: operating,
       forecastSummary: {
         status: forecastStatus,
-        maturityDeltaShort: maturityShort === null ? null : Number((maturityShort - maturityNow).toFixed(6)),
+        maturityDeltaShort: maturityShort === null || maturityNow === null ? null : Number((maturityShort - maturityNow).toFixed(6)),
         riskDeltaShort: riskShort === null ? null : Number((riskShort - riskNow).toFixed(6)),
         confidenceLabel,
         reasons: forecastReasons.map((reason) => reason.replace(/\s+/g, "_").slice(0, 64))
@@ -623,7 +570,7 @@ export function collectBenchData(params: {
     },
     sourceRefs: {
       runId: runRefs[runRefs.length - 1] ?? null,
-      orgScorecardComputedTs: params.scopeType === "AGENT" ? null : loadLatestOrgScorecard(params.workspace)?.computedAt ?? null,
+      orgScorecardComputedTs: params.scopeType === "AGENT" ? null : loadVerifiedLatestOrgScorecard(params.workspace).scorecard?.computedAt ?? null,
       outcomeReportId: null,
       forecastGeneratedTs: latestForecast?.generatedTs ?? null
     }

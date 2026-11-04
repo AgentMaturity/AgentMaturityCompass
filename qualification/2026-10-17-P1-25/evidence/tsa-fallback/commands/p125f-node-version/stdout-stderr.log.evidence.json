@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/tsa-fallback/commands/p125f-node-version/stdout-stderr.log",
+    "bytes": 61,
+    "sha256": "7ab8034b4f8d37c15aaeb23382c1a47b4eaa359c395fb7ec1ca6f86a7bc0bac6"
+  },
+  "dataBase64": "eyJub2RlIjoidjIyLjIzLjMiLCJhYmkiOiIxMjciLCJvcyI6ImRhcndpbiIsImFyY2giOiJhcm02NCJ9Cg==",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

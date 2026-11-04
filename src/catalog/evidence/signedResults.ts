@@ -75,7 +75,7 @@ export function readSignedControlResults(workspace: string, path: string): { val
   }
   const trust = loadTrustContext();
   const { admission } = checkDigestSignature({ signature: basename(sigPath), purpose: "artifact-seal", digestHex: digestSha256,
-    signatureB64: sig.signature, candidates: getPublicKeyHistory(root, "auditor"), context: trust, claimedSignedAt: sig.signedTs });
+    signatureB64: sig.signature, envelope: sig.envelope, candidates: getPublicKeyHistory(root, "auditor"), context: trust, claimedSignedAt: sig.signedTs });
   if (isKeyRefused(admission) || (trust.lists.length > 0 && admission.status !== "admitted")) {
     throw new Error(`${what} signer is not trusted (${admission.status}${admission.detail ? `: ${admission.detail}` : ""}); nothing was exported`);
   }

@@ -2,23 +2,29 @@
  * Maps merged catalog parameters onto the four enforcement points (P1-10): tool pipeline, approvals, egress and the
  * deletion executor. Only the parameters in PARAMETERS exist; any other name, a wrong type, a different strictness or a
  * point the binding does not list fails closed. `proposedSignedConfigs` start from the same defaults and zod schemas as
- * F1's operating-profile builders, so their shapes match what the signing commands accept. Nothing here writes a file;
- * activation is in activate.ts (P1-12).
+ * F1's operating-profile builders, so their shapes match what the signing commands accept; with the referenced F1
+ * profile's fragments (`fromOperatingProfile`) they start from those, and the plan's controls narrow them. The firewall
+ * fragment stays block, the strictest mode, whatever the profile says. The tools fragment starts from the caller's
+ * verified signed tools.yaml when it passes one (P1-10F), narrowed to the profile's tools. Nothing here reads or writes a
+ * file; activation is in activate.ts (P1-12).
  */
 import { defaultApprovalPolicy, approvalRuleForAction } from "../../approvals/approvalPolicyEngine.js";
-import { approvalPolicySchema } from "../../approvals/approvalPolicySchema.js";
+import { approvalPolicySchema, type ApprovalPolicy } from "../../approvals/approvalPolicySchema.js";
 import { USER_ROLES, type UserRole } from "../../auth/roles.js";
 import { budgetsSchema, defaultBudgets } from "../../budgets/budgets.js";
 import { ACTION_CLASSES } from "../../governor/actionCatalog.js";
 import { defaultActionPolicy } from "../../governor/actionPolicyEngine.js";
+import { actionPolicySchema } from "../../governor/actionPolicySchema.js";
+import { fragmentWeakenings } from "../../domains/operatingProfiles/operatingProfileActivation.js";
+import type { OperatingProfile } from "../../domains/operatingProfiles/operatingProfileTypes.js";
 import { defaultOpsPolicy, opsPolicySchema } from "../../ops/policy.js";
-import { defaultToolsConfig, toolsConfigSchema } from "../../toolhub/toolsSchema.js";
+import { defaultToolsConfig, toolsConfigSchema, type ToolsConfig } from "../../toolhub/toolsSchema.js";
 import type { ActionClass } from "../../types.js";
 import { digestOf } from "../digest.js";
 import type { LoadedCatalog } from "../loader.js";
 import type { ControlRecord, EnforcementPoint, Strictness } from "../types.js";
 import type { MergedParameter } from "./merge.js";
-import { CompileError, type ApprovalRule, type EffectiveRuntimePolicy, type ParamValue, type UnsupportedControl } from "./types.js";
+import { CompileError, type ApprovalRule, type EffectiveRuntimePolicy, type ParamValue, type SignedToolsInput, type UnsupportedControl } from "./types.js";
 
 interface ParamSpec { pattern: RegExp; point: EnforcementPoint; strictness: Strictness; check: (v: ParamValue) => boolean; expects: string }
 
@@ -36,6 +42,8 @@ export const PARAMETERS: readonly ParamSpec[] = [
   { pattern: /^toolPipeline\.visibleTools$/, point: "tool_pipeline", strictness: "intersection", check: listOf((s) => s.length > 0), expects: "a list of tool names" },
   { pattern: /^toolPipeline\.approvalRequiredFor$/, point: "tool_pipeline", strictness: "union", check: listOf(isActionClass), expects: "a list of action classes" },
   { pattern: /^toolPipeline\.(requireAgentLease|requirePrincipal)$/, point: "tool_pipeline", strictness: "true_wins", check: bool, expects: "a boolean" },
+  // P2-25: the longest lease a regulated profile issues or accepts.
+  { pattern: /^toolPipeline\.maxLeaseTtlMinutes$/, point: "tool_pipeline", strictness: "min", check: int(1), expects: "an integer >= 1" },
   { pattern: approval("requiredApprovals"), point: "approvals", strictness: "max", check: int(0), expects: "an integer >= 0" },
   { pattern: approval("requireDistinctUsers"), point: "approvals", strictness: "true_wins", check: bool, expects: "a boolean" },
   { pattern: approval("rolesAllowed"), point: "approvals", strictness: "intersection", check: listOf(isRole), expects: `a list of ${USER_ROLES.join(", ")}` },
@@ -48,7 +56,8 @@ export const PARAMETERS: readonly ParamSpec[] = [
 /** Tool-pipeline parameters and the guard that enforces them. */
 const GUARD_OF: Readonly<Record<string, string>> = {
   "toolPipeline.requireAgentLease": "identity-binding",
-  "toolPipeline.requirePrincipal": "identity-binding"
+  "toolPipeline.requirePrincipal": "identity-binding",
+  "toolPipeline.maxLeaseTtlMinutes": "identity-binding"
 };
 /**
  * Guards the native tool pipeline registers (src/agent/agentToolset.ts). identity-binding is enforced inside the
@@ -85,15 +94,16 @@ export function absentEnforcement(controls: ControlRecord[]): UnsupportedControl
 const ids = (rows: MergedParameter[]): string[] => [...new Set(rows.flatMap((r) => r.controlIds))].sort();
 const last = (name: string): string => name.slice(name.lastIndexOf(".") + 1);
 
-function approvalRules(params: MergedParameter[]): EffectiveRuntimePolicy["approvals"] {
-  const defaults = defaultApprovalPolicy();
+type Fragments = OperatingProfile["proposedSignedConfigs"];
+
+function approvalRules(params: MergedParameter[], defaults: ApprovalPolicy): EffectiveRuntimePolicy["approvals"] {
   const out: EffectiveRuntimePolicy["approvals"] = {};
   for (const ac of ACTION_CLASSES) {
     const rows = params.filter((p) => p.name.startsWith(`approvals.${ac}.`));
     if (rows.length === 0) continue;
     const value = (field: string) => rows.find((r) => r.name === `approvals.${ac}.${field}`)?.value ?? undefined;
     const base = approvalRuleForAction(defaults, ac);
-    // Never looser than the shipped default rule; an unresolved value leaves the default in place. No common role
+    // Never looser than the base rule (the shipped default, or the operating profile's); an unresolved value leaves the default in place. No common role
     // leaves nobody able to approve, which denies.
     const roles = value("rolesAllowed") as string[] | undefined;
     const rule: ApprovalRule = {
@@ -109,8 +119,8 @@ function approvalRules(params: MergedParameter[]): EffectiveRuntimePolicy["appro
 }
 
 function proposedConfigs(approvals: EffectiveRuntimePolicy["approvals"], visibleTools: string[] | undefined,
-  retention: Record<string, number>, agentIds: string[]): EffectiveRuntimePolicy["proposedSignedConfigs"] {
-  const approvalPolicy = defaultApprovalPolicy();
+  retention: Record<string, number>, agentIds: string[], signedTools: ToolsConfig | undefined, seed: Fragments | undefined): EffectiveRuntimePolicy["proposedSignedConfigs"] {
+  const approvalPolicy = seed ? approvalPolicySchema.parse(seed.approvalPolicy) : defaultApprovalPolicy();
   for (const [ac, rule] of Object.entries(approvals) as Array<[ActionClass, ApprovalRule]>) {
     approvalPolicy.approvalPolicy.actionClasses[ac] = {
       ...approvalRuleForAction(approvalPolicy, ac),
@@ -120,9 +130,14 @@ function proposedConfigs(approvals: EffectiveRuntimePolicy["approvals"], visible
       ttlMinutes: rule.ttlMinutes
     };
   }
-  const tools = defaultToolsConfig();
-  if (visibleTools) tools.tools.allowedTools = tools.tools.allowedTools.filter((t) => visibleTools.includes(t.name));
-  const ops = defaultOpsPolicy();
+  // P1-10F: the verified signed tools.yaml the caller passed, else the profile's or the built-in defaults; the plan's
+  // controls narrow any of them, and the profile's tool names narrow a signed tools.yaml.
+  const seedTools = seed ? toolsConfigSchema.parse(seed.tools) : undefined;
+  const base = signedTools ?? seedTools ?? defaultToolsConfig();
+  const named = signedTools && seedTools ? seedTools.tools.allowedTools.map((t) => t.name) : null;
+  const tools = { tools: { ...base.tools, allowedTools: base.tools.allowedTools.filter((t) => (!visibleTools || visibleTools.includes(t.name)) && (!named || named.includes(t.name))) } };
+  const ops = seed ? opsPolicySchema.parse(seed.opsPolicy) : defaultOpsPolicy();
+  const seedBudgets = seed ? budgetsSchema.parse(seed.budgets).budgets.perAgent : {};
   const keep = ops.opsPolicy.retention;
   if (retention.auditLog !== undefined) keep.keepArchiveSegmentsDays = retention.auditLog;
   if (retention.payloads !== undefined) {
@@ -131,28 +146,42 @@ function proposedConfigs(approvals: EffectiveRuntimePolicy["approvals"], visible
   }
   return {
     approvalPolicy: approvalPolicySchema.parse(approvalPolicy),
-    budgets: budgetsSchema.parse({ budgets: { version: 1, perAgent: Object.fromEntries(agentIds.map((id) => [id, defaultBudgets(id).budgets.perAgent[id]])) } }),
+    budgets: budgetsSchema.parse({ budgets: { version: 1, perAgent: Object.fromEntries(agentIds.map((id) => [id, seedBudgets[id] ?? defaultBudgets(id).budgets.perAgent[id]])) } }),
     tools: toolsConfigSchema.parse(tools),
-    actionPolicy: defaultActionPolicy(),
+    actionPolicy: seed ? actionPolicySchema.parse(seed.actionPolicy) : defaultActionPolicy(),
     // What activation reads from a firewall fragment; block is the strictest mode.
     firewall: { mode: "block", failClosedOnMissingPolicy: true },
     opsPolicy: opsPolicySchema.parse(ops)
   };
 }
 
-/** The effective runtime policy. An unresolved parameter (value null) is left out; such a plan is blocked anyway. */
-export function buildRuntimePolicy(parameters: Map<string, MergedParameter>, agentIds: string[]): EffectiveRuntimePolicy {
+/**
+ * The effective runtime policy. An unresolved parameter (value null) is left out; such a plan is blocked anyway. With
+ * `signedTools` the visible tools are its tools the plan's controls permit, and the plan records its digest. With
+ * `fromOperatingProfile` the fragments start from the profile's; any weakening against the plan without it refuses.
+ */
+export function buildRuntimePolicy(parameters: Map<string, MergedParameter>, agentIds: string[], signedTools?: SignedToolsInput,
+  fromOperatingProfile?: Fragments): EffectiveRuntimePolicy {
   const all = [...parameters.values()];
   const under = (prefix: string) => all.filter((p) => p.name.startsWith(prefix));
   const value = (name: string): ParamValue | undefined => parameters.get(name)?.value ?? undefined;
-  const approvals = approvalRules(under("approvals."));
+  const approvals = approvalRules(under("approvals."), fromOperatingProfile ? approvalPolicySchema.parse(fromOperatingProfile.approvalPolicy) : defaultApprovalPolicy());
   const guards = new Map<string, MergedParameter[]>();
   for (const p of all) {
     const guard = GUARD_OF[p.name];
     if (guard && p.value !== null) guards.set(guard, [...(guards.get(guard) ?? []), p]);
   }
   const retentionDays = Object.fromEntries(under("deletion.retentionDays.").filter((p) => p.value !== null).map((p) => [last(p.name), p.value as number]));
-  const proposedSignedConfigs = proposedConfigs(approvals, value("toolPipeline.visibleTools") as string[] | undefined, retentionDays, agentIds);
+  const configs = (rules: typeof approvals, seed?: Fragments) =>
+    proposedConfigs(rules, value("toolPipeline.visibleTools") as string[] | undefined, retentionDays, agentIds, signedTools?.config, seed);
+  const proposedSignedConfigs = configs(approvals, fromOperatingProfile);
+  if (fromOperatingProfile) {
+    // Retention has two legitimate strict directions (the catalog's `none`), so the profile's retention days stand;
+    // signing and activation still flag a shorter one against the previous or active plan.
+    const weaker = fragmentWeakenings(configs(approvalRules(under("approvals."), defaultApprovalPolicy())) as Fragments, proposedSignedConfigs as Fragments)
+      .filter((w) => !w.startsWith("opsPolicy: retention."));
+    if (weaker.length > 0) throw new CompileError("OPERATING_PROFILE_WEAKENS", `the referenced operating profile weakens the plan: ${weaker.slice(0, 5).join("; ")}`);
+  }
   const approvalPolicy = approvalPolicySchema.parse(proposedSignedConfigs.approvalPolicy);
   const approvalRequiredFor = new Set([
     ...((value("toolPipeline.approvalRequiredFor") as ActionClass[] | undefined) ?? []),
@@ -163,7 +192,8 @@ export function buildRuntimePolicy(parameters: Map<string, MergedParameter>, age
       visibleTools: toolsConfigSchema.parse(proposedSignedConfigs.tools).tools.allowedTools.map((t) => t.name).sort(),
       approvalRequiredFor: [...approvalRequiredFor].sort(),
       guards: [...guards.entries()].sort(([a], [b]) => (a < b ? -1 : 1))
-        .map(([id, rows]) => ({ id, params: Object.fromEntries(rows.map((r) => [last(r.name), r.value as ParamValue])), controlIds: ids(rows) }))
+        .map(([id, rows]) => ({ id, params: Object.fromEntries(rows.map((r) => [last(r.name), r.value as ParamValue])), controlIds: ids(rows) })),
+      ...(signedTools ? { toolsConfigSha256: signedTools.sha256 } : {})
     },
     approvals,
     egress: { mode: "deny_by_default" as const, allowHosts: (value("egress.allowHosts") as string[] | undefined) ?? [], processorAllowlist: [], controlIds: ids(under("egress.")) },

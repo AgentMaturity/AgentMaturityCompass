@@ -1,0 +1,484 @@
+{
+  "issue": "P0-52",
+  "title": "Harden federation import and close its follow-ups 3\u20136 (PR #57, 044abba1)",
+  "mode": "Read-only next-serial preflight; no P0-52 runtime or implementation executed",
+  "createdAt": "2026-10-14T18:28:49.365571+00:00",
+  "priority": {
+    "plan": "Issues.md:62,69",
+    "priority": "High",
+    "due": "2026-10-07",
+    "route": "Agent-Doable",
+    "listedDependencies": [],
+    "status": "In review: merged/untested",
+    "serialInstruction": "After root closes P0-51 bounded receipt and qualifies P0-46. No parallel P0-52 implementation.",
+    "comparison": "P0-46/P0-51/P0-52 share High priority/date and no index blockers. P0-51 was selected first for the urgent P0-55 dependency chain, P0-46 next by parent; P0-52 is the remaining same-date seam. P0-54 is High/due12-Oct but already merged and reserved A4 implementation stays held. Other high open items are later-due or human/expert/reservation constrained; old Done never proves present acceptance. P0-52 is a follow-up, not a GATE-G0 blocker (GATE-G0:28)."
+  },
+  "authority": {
+    "planInputs": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+        "sameAsPriorVerifiedHandoff": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+        "sameAsPriorVerifiedHandoff": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+        "sameAsPriorVerifiedHandoff": true
+      },
+      {
+        "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+        "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+        "sameAsPriorVerifiedHandoff": true
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+        "sameAsPriorVerifiedHandoff": true
+      }
+    ],
+    "standaloneSpecRecovered": false,
+    "contract": "No durable specs/P0-52.md or dedicated qualification/*P0-52 folder found. Use actual PR57 body, accepted follow-up commit84ee7e319, plan index and dated pending-checks18\u201322/49 as the bounded contract; do not invent a full standalone acceptance checklist.",
+    "pr57": {
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/57",
+      "title": "[P0-52] Security: federation and benchmark imports cannot write outside their directories",
+      "state": "MERGED",
+      "mergedAt": "2026-10-07T04:44:20Z",
+      "mergeCommit": "7c8549c6aaeb902d8806aa2ff56406d530b8c52f",
+      "privateRead": "/private/tmp/p0-52-pr57-readonly-20261014.json",
+      "sha256": "d0a1e1e10876fe2bd9984c32f9c5cdb79b8adace797492d6e8af933a2a2b62bc"
+    },
+    "pendingChecks": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+      "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870",
+      "lines": [
+        18,
+        22,
+        49
+      ]
+    },
+    "decisionD15": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0"
+    }
+  },
+  "refs": {
+    "7c8549c6a": {
+      "sha": "7c8549c6aaeb902d8806aa2ff56406d530b8c52f",
+      "ancestorAccepted5ea": true
+    },
+    "84ee7e319": {
+      "sha": "84ee7e31915688a0d4e18481eaff3e8bd1af0f84",
+      "ancestorAccepted5ea": true
+    },
+    "24526e4a6": {
+      "sha": "24526e4a69f06ecae0df743cf0b7d483e8f601a1",
+      "ancestorAccepted5ea": true
+    },
+    "044abba18": {
+      "sha": "044abba186cca9003fec1a73f1a87e55ea40d98a",
+      "ancestorAccepted5ea": true
+    }
+  },
+  "sourceComparison": {
+    "path": "/private/tmp/p0-52-source-comparison-20261014.json",
+    "sha256": "4b6b284ce62c47f4a5a92aa3c816ba8d0ea0c6d38f38ff40a210c9475dc1bc07",
+    "refs": {
+      "accepted": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "ownedBase": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+      "held": "3b4a673c8f6fc11a947279054979e977f95b34d1"
+    },
+    "rows": [
+      {
+        "path": "src/federation/federationSync.ts",
+        "workingSha256": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce",
+        "hashes": {
+          "accepted": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce",
+          "ownedBase": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce",
+          "held": "a91c5d067d887ba54e75285ff43e421bec80cafbdcde0b6e107d97ce082cc3ce"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "src/federation/federationStore.ts",
+        "workingSha256": "a2eba944db547fd275d08290766ff1c0e152ab3ed0b7bf641d6fce04c994bd87",
+        "hashes": {
+          "accepted": "a2eba944db547fd275d08290766ff1c0e152ab3ed0b7bf641d6fce04c994bd87",
+          "ownedBase": "a2eba944db547fd275d08290766ff1c0e152ab3ed0b7bf641d6fce04c994bd87",
+          "held": "5bc573acabf595028dc4c5ce177cb4a0b3a232e4da4bf8b2993eade3afb363ce"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": false
+      },
+      {
+        "path": "src/federation/federationSchema.ts",
+        "workingSha256": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9",
+        "hashes": {
+          "accepted": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9",
+          "ownedBase": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9",
+          "held": "f83e5710f7ee0fe93d5bb150f9123de02f124de92040741accd6ab001d8c89a9"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "src/benchmarks/benchImport.ts",
+        "workingSha256": "9148079951dfd7bf00348dafe4654bba5c16f0f1ea470766c4f0b5903b757964",
+        "hashes": {
+          "accepted": "9148079951dfd7bf00348dafe4654bba5c16f0f1ea470766c4f0b5903b757964",
+          "ownedBase": "9148079951dfd7bf00348dafe4654bba5c16f0f1ea470766c4f0b5903b757964",
+          "held": "9148079951dfd7bf00348dafe4654bba5c16f0f1ea470766c4f0b5903b757964"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "src/benchmarks/benchSchema.ts",
+        "workingSha256": "f024723dbe928d63741a221026d0b4cf04305a9479856a47db42eca6b485c23d",
+        "hashes": {
+          "accepted": "f024723dbe928d63741a221026d0b4cf04305a9479856a47db42eca6b485c23d",
+          "ownedBase": "f024723dbe928d63741a221026d0b4cf04305a9479856a47db42eca6b485c23d",
+          "held": "f024723dbe928d63741a221026d0b4cf04305a9479856a47db42eca6b485c23d"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "src/benchmarks/benchVerify.ts",
+        "workingSha256": "9a09401485306b90eb2855b903508c01cad61214d29ef7ce49fb33df8ac9ec78",
+        "hashes": {
+          "accepted": "9a09401485306b90eb2855b903508c01cad61214d29ef7ce49fb33df8ac9ec78",
+          "ownedBase": "9a09401485306b90eb2855b903508c01cad61214d29ef7ce49fb33df8ac9ec78",
+          "held": "9a09401485306b90eb2855b903508c01cad61214d29ef7ce49fb33df8ac9ec78"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "src/bench/benchRegistryStore.ts",
+        "workingSha256": "068c136aba2cda29f1789dfc2dd3e24fbfd87cf9728827d25866b825db255073",
+        "hashes": {
+          "accepted": "068c136aba2cda29f1789dfc2dd3e24fbfd87cf9728827d25866b825db255073",
+          "ownedBase": "068c136aba2cda29f1789dfc2dd3e24fbfd87cf9728827d25866b825db255073",
+          "held": "068c136aba2cda29f1789dfc2dd3e24fbfd87cf9728827d25866b825db255073"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "src/utils/pathSafety.ts",
+        "workingSha256": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+        "hashes": {
+          "accepted": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+          "ownedBase": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768",
+          "held": "e5cece43a2dcdf2640f39180aaedf1d29f6e87ac00b4fe326244bb4d8ebdf768"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "src/verify/verifyAll.ts",
+        "workingSha256": "1163c4c63bfaa71d42289af5fb37e3346c6b88d467f1b673c8c79c67b4e0eaf3",
+        "hashes": {
+          "accepted": "1163c4c63bfaa71d42289af5fb37e3346c6b88d467f1b673c8c79c67b4e0eaf3",
+          "ownedBase": "1163c4c63bfaa71d42289af5fb37e3346c6b88d467f1b673c8c79c67b4e0eaf3",
+          "held": "1163c4c63bfaa71d42289af5fb37e3346c6b88d467f1b673c8c79c67b4e0eaf3"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "src/federation/federationCli.ts",
+        "workingSha256": "2613ca7e3746dadc2239b5a2bca138380cfc4c6d6ef64ad574f88c6d2d4271ac",
+        "hashes": {
+          "accepted": "2613ca7e3746dadc2239b5a2bca138380cfc4c6d6ef64ad574f88c6d2d4271ac",
+          "ownedBase": "2613ca7e3746dadc2239b5a2bca138380cfc4c6d6ef64ad574f88c6d2d4271ac",
+          "held": "2613ca7e3746dadc2239b5a2bca138380cfc4c6d6ef64ad574f88c6d2d4271ac"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "tests/federationImportContainment.test.ts",
+        "workingSha256": "b4d4fcf98735fb2052d73caa0abcd3afab9e8742fe8afa36daa3139d170813ed",
+        "hashes": {
+          "accepted": "b4d4fcf98735fb2052d73caa0abcd3afab9e8742fe8afa36daa3139d170813ed",
+          "ownedBase": "b4d4fcf98735fb2052d73caa0abcd3afab9e8742fe8afa36daa3139d170813ed",
+          "held": "b4d4fcf98735fb2052d73caa0abcd3afab9e8742fe8afa36daa3139d170813ed"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "tests/benchIdContainment.test.ts",
+        "workingSha256": "02249ca3c27bbe25c8ab443f9090d5e6dc3d2f609c0f02337782aceea3e77be7",
+        "hashes": {
+          "accepted": "02249ca3c27bbe25c8ab443f9090d5e6dc3d2f609c0f02337782aceea3e77be7",
+          "ownedBase": "02249ca3c27bbe25c8ab443f9090d5e6dc3d2f609c0f02337782aceea3e77be7",
+          "held": "02249ca3c27bbe25c8ab443f9090d5e6dc3d2f609c0f02337782aceea3e77be7"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "tests/federationComplianceIntegrationMerkle.test.ts",
+        "workingSha256": "42c4dcf89049504439394f549f27a703ecbe495978e2af01a7e83486d3554add",
+        "hashes": {
+          "accepted": "42c4dcf89049504439394f549f27a703ecbe495978e2af01a7e83486d3554add",
+          "ownedBase": "42c4dcf89049504439394f549f27a703ecbe495978e2af01a7e83486d3554add",
+          "held": "42c4dcf89049504439394f549f27a703ecbe495978e2af01a7e83486d3554add"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "tests/verifyFreshWorkspacePassport.test.ts",
+        "workingSha256": "bc31fa835874b66b3ff76bf2babb9cd42dcbe2acf60a700cdac32ed836dfb3c6",
+        "hashes": {
+          "accepted": "bc31fa835874b66b3ff76bf2babb9cd42dcbe2acf60a700cdac32ed836dfb3c6",
+          "ownedBase": "bc31fa835874b66b3ff76bf2babb9cd42dcbe2acf60a700cdac32ed836dfb3c6",
+          "held": "bc31fa835874b66b3ff76bf2babb9cd42dcbe2acf60a700cdac32ed836dfb3c6"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "docs/FEDERATION.md",
+        "workingSha256": "73711d2fe13e51a79c01a3a40fc355ac1db50f7edba8ea37bd7173568c1f8b36",
+        "hashes": {
+          "accepted": "73711d2fe13e51a79c01a3a40fc355ac1db50f7edba8ea37bd7173568c1f8b36",
+          "ownedBase": "73711d2fe13e51a79c01a3a40fc355ac1db50f7edba8ea37bd7173568c1f8b36",
+          "held": "73711d2fe13e51a79c01a3a40fc355ac1db50f7edba8ea37bd7173568c1f8b36"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": ".changeset/federation-import-containment.md",
+        "workingSha256": "28dfedfe7c7cbb68000623f128113a293f308776902235cbc8d83a7f6ac9696f",
+        "hashes": {
+          "accepted": "28dfedfe7c7cbb68000623f128113a293f308776902235cbc8d83a7f6ac9696f",
+          "ownedBase": "28dfedfe7c7cbb68000623f128113a293f308776902235cbc8d83a7f6ac9696f",
+          "held": "28dfedfe7c7cbb68000623f128113a293f308776902235cbc8d83a7f6ac9696f"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": ".changeset/federation-import-replay.md",
+        "workingSha256": "a7f332fa5e0180556a0b6d6d0f56c885a2e7df92914af3a71df13c1f728ae649",
+        "hashes": {
+          "accepted": "a7f332fa5e0180556a0b6d6d0f56c885a2e7df92914af3a71df13c1f728ae649",
+          "ownedBase": "a7f332fa5e0180556a0b6d6d0f56c885a2e7df92914af3a71df13c1f728ae649",
+          "held": "a7f332fa5e0180556a0b6d6d0f56c885a2e7df92914af3a71df13c1f728ae649"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      },
+      {
+        "path": "unused-code/plan-edits/manifest.json",
+        "workingSha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+        "hashes": {
+          "accepted": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+          "ownedBase": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+          "held": "8924e889f1c7d6fe43773f77d0a29dc530add8172971b9b4d502ff1c479a2e40"
+        },
+        "matchesAccepted": false,
+        "heldMatchesAccepted": false
+      },
+      {
+        "path": "unused-code/plan-edits/P0-52/src/federation/federationStore.ts.landed",
+        "workingSha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7",
+        "hashes": {
+          "accepted": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7",
+          "ownedBase": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7",
+          "held": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
+        },
+        "matchesAccepted": true,
+        "heldMatchesAccepted": true
+      }
+    ],
+    "summary": "All 18 inspected P0-52 source/test/docs/archive paths match accepted 5ea and owned 3b08. The whole manifest has two extra predecessor registrations but no changed existing rows. Held federationStore differs in signing API; preserve its getSigningKey(config-signature) candidate separately and do not overlay it."
+  },
+  "requirements": [
+    {
+      "requirement": "Original containment: safe manifest IDs and relative member paths, containment at verify/copy/use, admitted publisher identity names the inbox rather than claimed org.",
+      "implemented": "federationSchema.ts:10-63;pathSafety.ts:8-24;federationSync.ts:318-334,369-375,445-453",
+      "existingProof": "federationImportContainment.test.ts:150-289 has real signed positive/negative packages and explicit point-of-use schema-bypass controls. Current execution remains unrun."
+    },
+    {
+      "requirement": "Benchmark and registry import IDs cannot escape their import directories; verifyAll reports local escaping metadata as FAIL.",
+      "implemented": "benchmarks/benchSchema.ts,benchImport.ts:41-70;bench/benchRegistryStore.ts importedBenchPath;verify/verifyAll.ts bench-artifacts guard",
+      "existingProof": "benchIdContainment.test.ts:97-177;verifyFreshWorkspacePassport.test.ts:70-78. The federation unsafe-bench case filters out inbox contents and does not prove atomic no-effects."
+    },
+    {
+      "requirement": "The second federation extraction must match each admitted member and envelope before any write and as each staged copy is written.",
+      "implemented": "federationSync.ts:297,415-421,449-469",
+      "existingProof": "federationImportContainment.test.ts:291-323 swaps real archives through the actual extractor wrapper for five member/envelope variants. Double extraction is retained; the PR lists a single-extraction redesign as a separate follow-up."
+    },
+    {
+      "requirement": "Follow-up 3: pre-admit every benchmark signer and benchId before any package write; stage beside final location and commit inbox package in one rename.",
+      "implemented": "federationSync.ts:459-474;benchImport.ts:41-48",
+      "remainingProof": "Use a genuine admitted package containing unadmitted benchmark(s), assert inbox and benchmark-store name/content/link snapshots unchanged, then pin the benchmark issuer and prove regular import. Current integration only asserts stats count 0 after trust refusal."
+    },
+    {
+      "requirement": "Follow-up 4: unsafe operator peerId is refused before the peer file path or write.",
+      "implemented": "federationStore.ts:165-193",
+      "remainingProof": "Real addFederationPeer negative operations with valid key and unsafe IDs, unchanged existing peers/sentinels, plus valid UUID/dotted/max-length control. Preserve the legacy unsafe signed peer record fallback already tested."
+    },
+    {
+      "requirement": "Follow-up 5: config orgId is safe when config is written and loaded, rather than only at export.",
+      "implemented": "federationSchema.ts:24-40;federationStore.ts:125-147",
+      "remainingProof": "Real initFederationStore/loadFederationConfig invalid orgId controls and valid generated UUID; assert invalid input never writes an unsafe target or overwrites an existing config."
+    },
+    {
+      "requirement": "Follow-up 6: same publisher cannot replay a manifestId or roll back below prior createdTs; unreadable imported manifest blocks further imports.",
+      "implemented": "federationSync.ts:386-413,447",
+      "remainingProof": "Genuine signed same-publisher replay/older/newer/equal-time distinct-ID and cross-publisher controls, preserving previous bytes on refusals; unreadable/invalid prior manifest controls. No direct cases recovered for these guards."
+    },
+    {
+      "requirement": "Current qualification and mutation evidence, final source/static/freeze checks, broader CI/release obligation remain honest.",
+      "remainingProof": "PR57 checked historic local suite/mutations but leaves merged fullci.yml and release:gate unchecked. The plan marks follow-ups merged/untested; no dedicated current P0-52 receipt is present."
+    }
+  ],
+  "sourceConcerns": [
+    {
+      "classification": "Source-derived concern; not reproduced here",
+      "title": "Publisher replay/rollback history can move with a peer alias",
+      "source": "federationSync.ts:369-375,391-413,445-447",
+      "mechanism": "The history bucket is current admitted peerId, or key-prefix only when no safe peer is found. Adding a peer for an already trust-list-admitted key or adding a lexically earlier alias for the same key changes the bucket scanned. A previously imported manifest may then be accepted again despite the same signing publisher.",
+      "nextWitness": "Use existing operatorTrustHome and genuine export: import under key-derived bucket, add a peer for that same key, replay the exact package and require refusal with old state unchanged. Then use a distinct older package to test rollback across the alias transition."
+    },
+    {
+      "classification": "Source-derived adjacent containment concern; not reproduced here",
+      "title": "Destination containment is lexical and does not admit existing parent links",
+      "source": "pathSafety.ts:17-24;federationSync.ts:445-469;utils/fs.ts ensureDir/writeFileAtomic",
+      "mechanism": "containedPath checks resolved path spelling. Staging directory creation and writes can follow a preexisting inbox or admitted-publisher parent symlink. Safe tar extraction addresses archive members, not these destination parents.",
+      "nextWitness": "First prove a genuine regular import, then plant only a fixture-owned inbox/publisher directory link to a fixture-owned sibling and observe actual target effects. Retain any RED. Do not infer a symlink-free or atomic-race guarantee from current traversal tests."
+    },
+    {
+      "classification": "Atomicity and race scope limit; requires separate proof before stronger claim",
+      "title": "Atomic inbox rename is not a transaction with benchmark ingestion",
+      "source": "federationSync.ts:471-485;benchImport.ts:51-74",
+      "mechanism": "The complete package is renamed into inbox before benchmark ingestion writes into another store. A filesystem failure there can leave a committed complete package and partial or absent benchmark state; replay may subsequently refuse retry. admitBenchmark does not reserve writable destination state.",
+      "nextWitness": "A fixture-owned non-directory destination or another real IO refusal can clarify failure semantics without mocking producer/handler success. Existing requirement explicitly promises pre-trust checks and a complete inbox package, not a cross-store transaction."
+    },
+    {
+      "classification": "Adjacent existing source risk; outside automatic original-fix recreation",
+      "title": "Standalone benchmark ingestion still verifies and extracts separately",
+      "source": "benchImport.ts:51-70;benchVerify.ts verifyBenchmarkArtifact",
+      "mechanism": "importOne admits bytes from one extraction and copies a second extraction without the federation member/envelope rehash adapter. Any broader TOCTOU claim about benchmark ingest needs a real replacement witness; current PR57 swaps only the outer federation bundle."
+    }
+  ],
+  "ownershipAndFreeze": {
+    "reservationsPath": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "reservationsSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "explicitP052OrCorePathMatchRecovered": false,
+    "genericReservation": "RESERVATIONS1496 says every non-E17/non-Codex Agent-Doable item, though its listed keys omit P0-52. Absence of an exact match is not blanket production-edit clearance. Existing-source owned test qualification is the next authorized seam; root rechecks ownership before any source repair.",
+    "protected": "RESERVATIONS1583-1588 protects src/a4/**, A4assets, sharedCLI/registry/REPL/freeze; API/Studio and held/P2-02/privacy scopes remain outside this lane. No Claude message sent.",
+    "freezeActive": true,
+    "allowedExceptionIncludesP052": false,
+    "freezeBaseline": {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    "d15VerifiedRows": [
+      {
+        "path": "src/federation/federationStore.ts",
+        "issue": "P0-52",
+        "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+        "archivePath": "unused-code/plan-edits/P0-52/src/federation/federationStore.ts.landed",
+        "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7"
+      },
+      {
+        "path": "src/bench/benchRegistryStore.ts",
+        "issue": "P0-09",
+        "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+        "archivePath": "unused-code/plan-edits/P0-09/src/bench/benchRegistryStore.ts.landed",
+        "sha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c"
+      }
+    ],
+    "archiveVerification": "Both selected archives hash to their rows and equal git show baseCommit:path, with baseCommit ancestor of HEAD. FederationStore is already snapshotted under P0-52; benchRegistryStore under P0-09. Reuse these rows; do not overwrite originals or resnapshot registered paths. Other path absence does not authorize bypassing parity. Snapshot any newly identified frozen file before its first change/rebuild under the recorded rule, if a repair is later authorized.",
+    "lineBudgets": [
+      {
+        "path": "src/federation/federationSync.ts",
+        "currentLines": 510,
+        "genericCap": 800
+      },
+      {
+        "path": "src/federation/federationStore.ts",
+        "currentLines": 218,
+        "genericCap": 800
+      },
+      {
+        "path": "src/benchmarks/benchImport.ts",
+        "currentLines": 103,
+        "genericCap": 800
+      },
+      {
+        "path": "tests/federationImportContainment.test.ts",
+        "currentLines": 323,
+        "genericCap": 800
+      }
+    ]
+  },
+  "qualificationCommands": {
+    "executeNow": false,
+    "setup": [
+      "Node 22.23.3 (or separately qualified Node 24), explicit binary plus task-scoped PATH, pnpm 10.33.0 frozen install and ordinary build in a new root-owned tree from the final measured P0-46 source. No accepted/held source overlay.",
+      "Fresh private HOME/AMC_HOME, real local test keys and operator trust roots, no model/live transport/activation or tracked .amc writes; verify owned native SQLite ABI before execution."
+    ],
+    "existingFocused": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/federationImportContainment.test.ts tests/benchIdContainment.test.ts tests/federationComplianceIntegrationMerkle.test.ts tests/verifyFreshWorkspacePassport.test.ts --reporter=json --outputFile=<unique-private-raw-json>",
+    "parityFocused": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/privateModuleHelperVisibility.test.ts tests/planEditsManifest.test.ts --reporter=json --outputFile=<unique-private-parity-json>",
+    "functionalCLI": [
+      "federate init --org <fixture-org>",
+      "federate peer add --peerId <safe-id> --name <fixture-name> --pubkey <independently-captured-publisher-file>",
+      "federate export --out <owned-package.amcfed>",
+      "federate verify-bundle <owned-package.amcfed> --pubkey <operator-pin> --json",
+      "federate import <owned-package.amcfed>"
+    ],
+    "CLIControls": "Use argv arrays and real generated archives. init/export/import have no --json flag here; parser/help-only errors do not qualify behavior. Prove import outputs and real file/stat effects, unknown publisher refusal, independent benchmark issuer refusal, and actual replay/rollback outcomes. Strict claims and existing CLI registry stay unchanged.",
+    "smallestTestSlice": "Prefer extending tests/federationImportContainment.test.ts and reusing its actual craftPackage/peerPair/operatorTrustHome helpers; add controlled createdTs option and follow-up 3-6 operations instead of copying large fixtures into another test. Add only a bounded genuine benchmark fixture for atomic trust refusal. Current file 323 lines; generic cap 800.",
+    "mutationPlan": "Use an owned compiled/source fixture copy and one guard removal per witness: pre-benchmark admission, same-ID replay, older-time rollback, unreadable-prior refusal, safe peer/config IDs, identity naming, member/envelope hashes and point-of-use containment. Real causal RED plus unchanged accept control, exact hash restore. Do not mutate accepted archives, waive checks or treat recorded13 historic mutants as current proof.",
+    "finalStatic": [
+      "typecheck",
+      "typecheck:tests",
+      "lint",
+      "check:counts",
+      "check:docs-drift",
+      "check:architecture-boundaries",
+      "check:clean-source",
+      "check:freeze",
+      "check:qualification"
+    ],
+    "broaderOutstanding": [
+      "Full test and coverage/floors on pinned source remain independent. PR57 specifically retains merged fullci.yml and release:gate debt; no CI trigger, publish or Done transition is authorized by this preflight."
+    ]
+  },
+  "graphNavigation": {
+    "original": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+    "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395",
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "nodes": 36459,
+    "privateCopy": "/private/tmp/p0-52-graph-navigation-w8xr443v",
+    "query": "graphify query federation federationSync import containment --budget 900",
+    "log": "/private/tmp/p0-52-graph-navigation-w8xr443v/query.log",
+    "logSha256": "939837fbd7fda4c8173468fe13146f86f769d616a5d80031eaed5cd7fc60d1f5",
+    "found": 88,
+    "shown": 29,
+    "truncated": true,
+    "installedVersion": "0.9.74",
+    "projectRefreshPin": "0.9.56 (scripts/graphify-navigation.py:4,226-227)",
+    "meaning": "Stale navigation only. Existing graph query performed on a private copy before detailed source flow review; no refresh/model extraction/watcher/server. Current direct source and commit pins are authoritative. Original graph hash is unchanged. Current direct user AGENTS preference permits scoped Graphify despite older downloaded contract stop wording."
+  },
+  "limitations": [
+    "No P0-52 module import, fixture generation, tests, build, install, server, source/test/notes/tracker/ref/archive edit, hosted mutation or Claude message occurred. Read-only ghPR57 fetch and private graph/preflight artifacts are the only new external/private observations.",
+    "Historical PR57 reported 22,656 tests and 13 restored mutants at its old source; this is not a current qualified receipt. Follow-up 3\u20136 source was merged under the coding-only order and needs its own current behavior assertions.",
+    "No full issue Done/gate/release/live status is inferred. P0-22 inherited failures, skipped P0-29 decisions and P0-51 explicit-pin precedence conflict remain."
+  ]
+}

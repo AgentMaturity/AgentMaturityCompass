@@ -1,0 +1,423 @@
+{
+  "kind": "Actual P0-50 full release gate; assertion correctness passed, full acceptance blocked",
+  "sourceCommit": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "command": "npm run release:gate -- --out tmp/p0-50-qualification/full-release-gate.json --json",
+  "exit": 1,
+  "durationMs": 915537,
+  "quick": false,
+  "gateStatus": "failed",
+  "counts": {
+    "executed": 19,
+    "passed": 16,
+    "failed": 3,
+    "skipped": 2,
+    "total": 21
+  },
+  "stepOutcomes": [
+    {
+      "id": "console-js-syntax",
+      "command": "node --check src/console/assets/app.js",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:04:50.711Z",
+      "endedAt": "2026-10-14T15:04:50.761Z",
+      "remediation": null,
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "openapi-parse",
+      "command": "node -e import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:04:50.761Z",
+      "endedAt": "2026-10-14T15:04:50.973Z",
+      "remediation": null,
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "typecheck",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:04:50.973Z",
+      "endedAt": "2026-10-14T15:05:17.031Z",
+      "remediation": null,
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "typecheck-tests",
+      "command": "npm run typecheck:tests",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:05:17.031Z",
+      "endedAt": "2026-10-14T15:05:52.773Z",
+      "remediation": null,
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:05:52.773Z",
+      "endedAt": "2026-10-14T15:06:22.725Z",
+      "remediation": null,
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "lint",
+      "command": "npm run lint",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:22.725Z",
+      "endedAt": "2026-10-14T15:06:26.596Z",
+      "remediation": null,
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "source-duplicates",
+      "command": "npm run check:duplicates",
+      "status": "failed",
+      "startedAt": "2026-10-14T15:06:26.596Z",
+      "endedAt": "2026-10-14T15:06:27.967Z",
+      "remediation": "Review duplicate findings; existing debt needs an explicit disposition, never an automatic waiver.",
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "source-dead-code",
+      "command": "npm run check:dead-code",
+      "status": "failed",
+      "startedAt": "2026-10-14T15:06:27.967Z",
+      "endedAt": "2026-10-14T15:06:31.862Z",
+      "remediation": "Verify reachability and dependencies before removing code or accepting existing debt.",
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "package-lint",
+      "command": "npm run check:package",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:31.862Z",
+      "endedAt": "2026-10-14T15:06:35.481Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "citations",
+      "command": "npm run check:citations",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:35.482Z",
+      "endedAt": "2026-10-14T15:06:35.802Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "packed-install",
+      "command": "node scripts/packed-install-check.mjs --no-build",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:35.802Z",
+      "endedAt": "2026-10-14T15:06:54.596Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "gap-0626-adversarial-regression",
+      "command": "npx vitest run tests/gap0626AdversarialRegression.test.ts",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:06:54.596Z",
+      "endedAt": "2026-10-14T15:06:58.700Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "full-test-suite",
+      "command": "npx vitest run --coverage --reporter=dot --reporter=json --outputFile.json=/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tmp/release-gate/vitest-SY7Wza/results.json",
+      "status": "failed",
+      "startedAt": "2026-10-14T15:06:58.700Z",
+      "endedAt": "2026-10-14T15:17:40.781Z",
+      "remediation": "Fix the full Vitest suite before release.",
+      "needs": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "per-file-coverage",
+      "command": null,
+      "status": "skipped",
+      "startedAt": "2026-10-14T15:17:41.193Z",
+      "endedAt": "2026-10-14T15:17:41.193Z",
+      "remediation": "Required gates did not pass: full-test-suite; stale or missing evidence cannot qualify this check.",
+      "needs": [
+        "full-test-suite"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "command-inventory",
+      "command": "node dist/cli.js commands --markdown --out /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-m35hCR/CLI_COMMAND_INVENTORY.md",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:41.193Z",
+      "endedAt": "2026-10-14T15:17:41.999Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "architecture-boundaries",
+      "command": "node scripts/architecture-boundaries-check.mjs",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:42.000Z",
+      "endedAt": "2026-10-14T15:17:43.455Z",
+      "remediation": null,
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "docs-drift-public-naming",
+      "command": "npm run check:docs-drift",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:43.455Z",
+      "endedAt": "2026-10-14T15:17:43.727Z",
+      "remediation": null,
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "runtime-dependency-audit",
+      "command": "npm run audit:runtime",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:43.727Z",
+      "endedAt": "2026-10-14T15:17:44.388Z",
+      "remediation": null,
+      "needs": [],
+      "allowFailure": false
+    },
+    {
+      "id": "cli-and-domain-smoke",
+      "command": "node dist/cli.js --help && node dist/cli.js domain pack list --json",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:44.391Z",
+      "endedAt": "2026-10-14T15:17:45.923Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "install-persona-qa",
+      "command": "npm run qa:install-personas -- --json --out tmp/persona-install-qa/latest.json",
+      "status": "passed",
+      "startedAt": "2026-10-14T15:17:45.924Z",
+      "endedAt": "2026-10-14T15:20:06.078Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "live-deploy-health",
+      "command": null,
+      "status": "skipped",
+      "startedAt": "2026-10-14T15:20:06.078Z",
+      "endedAt": "2026-10-14T15:20:06.078Z",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health.",
+      "needs": [],
+      "allowFailure": false
+    }
+  ],
+  "tests": {
+    "success": true,
+    "numTotalTests": 23125,
+    "numPassedTests": 23125,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "numFailedTestSuites": 0,
+    "numPendingTestSuites": 0
+  },
+  "actualReportedFiles": 1610,
+  "performance": [
+    {
+      "file": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tests/performance/ingestPipeline.performance.test.ts",
+      "cases": [
+        {
+          "name": "performance: ingestion pipeline batch append outperforms per-event append for bulk ingest payloads",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tests/performance/ledgerConcurrency.performance.test.ts",
+      "cases": [
+        {
+          "name": "performance: ledger concurrent append maintains integrity under interleaved concurrent writers",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tests/performance/scoringEngine.performance.test.ts",
+      "cases": [
+        {
+          "name": "performance: scoring engine scales from 1 to 100 to 10,000 agents without superlinear blow-up",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "file": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tests/performance/sessionSpine.performance.test.ts",
+      "cases": [
+        {
+          "name": "session spine throughput blob-backed content events sustain the floor and do not degrade super-linearly",
+          "status": "passed"
+        },
+        {
+          "name": "session spine throughput control-plane events (no blob) sustain the floor and do not degrade super-linearly",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "coverage": {
+    "lines": {
+      "total": 153816,
+      "covered": 104249,
+      "skipped": 0,
+      "pct": 67.77
+    },
+    "statements": {
+      "total": 172563,
+      "covered": 113884,
+      "skipped": 0,
+      "pct": 65.99
+    },
+    "functions": {
+      "total": 31517,
+      "covered": 22723,
+      "skipped": 0,
+      "pct": 72.09
+    },
+    "branches": {
+      "total": 137723,
+      "covered": 83982,
+      "skipped": 0,
+      "pct": 60.97
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "additionalCoveredFunctionsNeededWithFixedDenominator": 915,
+  "perFileAudit": {
+    "exit": 1,
+    "failureRows": 894,
+    "affectedFiles": 281,
+    "measuredFiles": 2169,
+    "status": "failed",
+    "gateStepRemainsSkipped": true,
+    "purpose": "Independent diagnostic on fresh report, not a replacement pass for the gate dependency skip"
+  },
+  "sourceQuality": {
+    "duplicates": 1270,
+    "deadCode": 2787,
+    "allowFailure": false,
+    "waiver": false
+  },
+  "authorizedHealthDecision": {
+    "text": "live-deploy-health skipped: no supported deployment until D-03 names one (written skip until P2-06).",
+    "until": "P2-06",
+    "scope": "Live deployment health only; no whole-gate/deployment qualification"
+  },
+  "protectedInputs": {
+    "scripts/release-gate.mjs": {
+      "sha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+      "matchesAcceptedBase": true
+    },
+    "scripts/check-freeze.mjs": {
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "matchesAcceptedBase": true
+    },
+    "vitest.config.ts": {
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "matchesAcceptedBase": true
+    },
+    "scripts/per-file-coverage.mjs": {
+      "sha256": "ce5b1fcaa4d81cfb7c14cd6fe3d9f26d0563f9ce7f19f9a746cdcf8b817cffb3",
+      "matchesAcceptedBase": true
+    },
+    "scripts/quality/coverage-baseline.json": {
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+      "matchesAcceptedBase": true
+    },
+    "package.json": {
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "matchesAcceptedBase": true
+    },
+    "pnpm-lock.yaml": {
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "matchesAcceptedBase": true
+    }
+  },
+  "rawArtifacts": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tmp/p0-50-qualification/full-release-gate.json",
+      "bytes": 39897,
+      "sha256": "c18d61893d8b5505aa69ab8ba65beb6fff0b5e40ae47e6def8f124d711dcd420"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tmp/release-gate/vitest-SY7Wza/results.json",
+      "bytes": 54623093,
+      "sha256": "0c57272242759a39968dbc48718a62ea296a4b3c8ce54f8f31703ccd252a1efe"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/tmp/p0-50-qualification/full-vitest-results.json",
+      "bytes": 54623093,
+      "sha256": "0c57272242759a39968dbc48718a62ea296a4b3c8ce54f8f31703ccd252a1efe"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/coverage/coverage-summary.json",
+      "bytes": 744652,
+      "sha256": "b7def069c8bd6c03f215a58d1c74e0136c751f4f4c13bb0a09901e72c1f88b8f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+      "bytes": 636550,
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+    },
+    {
+      "path": "/private/tmp/p0-50-integration-per-file-coverage-audit-20261014.log",
+      "bytes": 126325,
+      "sha256": "9714b488acb680311202a4de56daa873eb31a97ef2deb439393d4ad861cf01c1"
+    }
+  ],
+  "qualificationLimits": [
+    "Actual full-test assertions pass; command exits1 because function coverage72.09% is below75. Required source-duplicates/dead-code also fail.",
+    "Per-file gate remains skipped through dependency; independent actual audit records894 rows across281 files.",
+    "No lowering floors, policy edits, baseline/exclusion edits, dead-code removal or ownership clearance inferred.",
+    "No hosted CI, full qualification, publication, deployment, tracker completion, OS confinement or real-provider claim.",
+    "Normal freeze after gate build passed; initial missingdist failure retained, not bypassed."
+  ]
+}

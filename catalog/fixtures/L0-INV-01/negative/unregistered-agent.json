@@ -1,0 +1,15 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-INV-01",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "agent_config",
+    "agentId": "fixture-agent",
+    "entry": "missing"
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "signature_missing"
+  }
+}

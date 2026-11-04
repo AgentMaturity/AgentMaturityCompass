@@ -1,6 +1,7 @@
-import { readFileSync } from "node:fs";
+export { createBenchComparisonAsync } from "./benchComparisonAsync.js";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { pathExists, readUtf8 } from "../utils/fs.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { sha256Hex } from "../utils/hash.js";
 import { resolveAgentId } from "../fleet/paths.js";
@@ -8,7 +9,12 @@ import { collectBenchData } from "./benchCollector.js";
 import { loadBenchPolicy, saveBenchComparison } from "./benchPolicyStore.js";
 import { benchArtifactSchema, benchComparisonSchema, type BenchArtifact, type BenchComparison } from "./benchSchema.js";
 import { flattenBenchMetrics, kMedoidsPeerGroup, percentileTable } from "./benchPercentiles.js";
-import { listImportedBenchArtifacts } from "./benchRegistryClient.js";
+import { authenticatedImportedBenchVersion } from "./benchRegistryClient.js";
+import { importedBenchPath, listImportedBenches } from "./benchRegistryStore.js";
+import { verifyBenchArtifactFile } from "./benchVerifier.js";
+import { loadTrustContext, untrustedReasons, withPins } from "../trust/index.js";
+import { canonicalize } from "../utils/json.js";
+import { captureBenchImportFiles } from "./benchImportPublication.js";
 
 function localBenchFromScope(params: {
   workspace: string;
@@ -33,27 +39,30 @@ function localBenchFromScope(params: {
   return benchArtifactSchema.parse(collected.bench);
 }
 
-function loadImportedBenchObjects(workspace: string): Array<{ bench: BenchArtifact; registryId: string }> {
-  const imports = listImportedBenchArtifacts(workspace);
+export function loadImportedBenchObjects(workspace: string): Array<{ bench: BenchArtifact; registryId: string }> {
+  const imports = listImportedBenches(workspace, { strict: true });
   const out: Array<{ bench: BenchArtifact; registryId: string }> = [];
   for (const row of imports) {
-    const artifactPath = join(workspace, ".amc", "bench", "imports", "benches", row.benchId, row.version, "bench.amcbench");
-    if (!pathExists(artifactPath)) {
-      continue;
-    }
-    // Best-effort read of extracted bench.json is not guaranteed; fallback to parsing bundle not required for comparer.
-    const extractedBenchPath = join(workspace, ".amc", "bench", "imports", "benches", row.benchId, row.version, "bench.json");
-    if (!pathExists(extractedBenchPath)) {
-      continue;
-    }
+    const paths = importedBenchPath(workspace, row.benchId, row.version);
+    const operator = loadTrustContext();
+    const selected = authenticatedImportedBenchVersion(workspace, row, operator);
+    const members = captureBenchImportFiles(workspace, [paths.artifactPath, paths.benchJsonPath]);
+    const archive = members[0]!.bytes, extracted = members[1]!.bytes;
+    if (archive === null || extracted === null) throw new Error(`bench import artifact or extracted JSON missing: ${row.benchId}@${row.version}`);
+    // Verify a private byte snapshot: the imported path is workspace-writable while tar verification runs.
+    const stage = mkdtempSync(join(tmpdir(), "amc-bench-compare-"));
     try {
-      const bench = benchArtifactSchema.parse(JSON.parse(readUtf8(extractedBenchPath)) as unknown);
-      out.push({
-        bench,
-        registryId: row.registryId
-      });
-    } catch {
-      // skip malformed imports
+      const file = join(stage, "candidate.amcbench");
+      writeFileSync(file, archive, { mode: 0o600 });
+      const trust = withPins(operator, [{ keyId: selected.signerFingerprint, purposes: ["artifact-seal"], origin: "signed bench registry index" }]);
+      const verified = verifyBenchArtifactFile({ file, trust });
+      if (!verified.ok || !verified.bench) throw new Error(`bench artifact verify failed: ${untrustedReasons(verified.report).join("; ")}`);
+      if (verified.fileSha256 !== selected.sha256 || verified.bench.benchId !== row.benchId) throw new Error("verified bench does not match the selected signed registry item");
+      const bench = benchArtifactSchema.parse(JSON.parse(extracted.toString("utf8")) as unknown);
+      if (canonicalize(bench) !== canonicalize(verified.bench)) throw new Error("extracted bench JSON does not match verified artifact");
+      out.push({ bench: verified.bench, registryId: row.registryId });
+    } finally {
+      rmSync(stage, { recursive: true, force: true });
     }
   }
   return out;
@@ -63,39 +72,30 @@ function riskToScore(risk: number): number {
   return 100 - Math.max(0, Math.min(100, risk));
 }
 
+/** Weighted sum of 0..1 parts; null (not evaluated) when any part was not measured. */
+function weightedComposite(parts: Array<[number | null, number]>): number | null {
+  if (parts.some(([value]) => value === null)) return null;
+  return Number(parts.reduce((sum, [value, weight]) => sum + (value as number) * weight * 100, 0).toFixed(6));
+}
+
 function compositeScores(params: {
   local: BenchArtifact;
   policyWeights: ReturnType<typeof loadBenchPolicy>["benchPolicy"]["weights"];
 }): {
-  ecosystemAlignmentScore: number;
-  riskAssuranceScore: number;
-  digitalDualityReadiness: number;
+  ecosystemAlignmentScore: number | null;
+  riskAssuranceScore: number | null;
+  digitalDualityReadiness: number | null;
 } {
   const w = params.policyWeights;
-  const ecosystemAlignmentScore = Number(
-    (
-      (riskToScore(params.local.metrics.strategyFailureRisks.ecosystemFocusRisk) / 100) * w.ecosystemAlignment.ecosystemFocusRisk * 100 +
-      (params.local.metrics.valueDimensions.emotionalValue / 100) * w.ecosystemAlignment.emotionalValue * 100 +
-      (params.local.metrics.valueDimensions.brandValue / 100) * w.ecosystemAlignment.brandValue * 100
-    ).toFixed(6)
-  );
-  const riskAssuranceScore = Number(
-    (
-      (riskToScore(params.local.metrics.strategyFailureRisks.riskAssuranceRisk) / 100) * w.riskAssurance.riskAssuranceRisk * 100 +
-      params.local.evidence.integrityIndex * w.riskAssurance.integrityIndex * 100 +
-      params.local.evidence.correlationRatio * w.riskAssurance.correlationRatio * 100
-    ).toFixed(6)
-  );
-  const digitalDualityReadiness = Number(
-    (
-      (riskToScore(params.local.metrics.strategyFailureRisks.digitalDualityRisk) / 100) * w.digitalDuality.digitalDualityRisk * 100 +
-      (params.local.metrics.maturity.fiveLayers.strategicOps / 5) * w.digitalDuality.toolGovernanceMaturity * 100
-    ).toFixed(6)
-  );
+  const { valueDimensions: values, strategyFailureRisks: risks, maturity } = params.local.metrics;
+  const ratio = (value: number | null, scale: number) => (value === null ? null : value / scale);
   return {
-    ecosystemAlignmentScore,
-    riskAssuranceScore,
-    digitalDualityReadiness
+    ecosystemAlignmentScore: weightedComposite([[riskToScore(risks.ecosystemFocusRisk) / 100, w.ecosystemAlignment.ecosystemFocusRisk],
+      [ratio(values.emotionalValue, 100), w.ecosystemAlignment.emotionalValue], [ratio(values.brandValue, 100), w.ecosystemAlignment.brandValue]]),
+    riskAssuranceScore: weightedComposite([[riskToScore(risks.riskAssuranceRisk) / 100, w.riskAssurance.riskAssuranceRisk],
+      [params.local.evidence.integrityIndex, w.riskAssurance.integrityIndex], [params.local.evidence.correlationRatio, w.riskAssurance.correlationRatio]]),
+    digitalDualityReadiness: weightedComposite([[riskToScore(risks.digitalDualityRisk) / 100, w.digitalDuality.digitalDualityRisk],
+      [ratio(maturity.fiveLayers.strategicOps, 5), w.digitalDuality.toolGovernanceMaturity]])
   };
 }
 
@@ -118,19 +118,8 @@ function warningSummary(local: BenchArtifact, population: BenchArtifact[]): stri
   return warnings;
 }
 
-export function createBenchComparison(params: {
-  workspace: string;
-  scope: "workspace" | "node" | "agent";
-  id: string;
-  against?: "imported" | `registry:${string}`;
-}): {
-  comparison: BenchComparison;
-  path: string;
-  sigPath: string;
-  transparencyHash: string;
-} {
-  const local = localBenchFromScope(params);
-  const loaded = loadImportedBenchObjects(params.workspace);
+/** Existing diagnostic comparison recipe, with actual selected values supplied by each producer. */
+export function benchComparisonWithInputs(params: {against?:"imported"|`registry:${string}`}, local:BenchArtifact, loaded:ReturnType<typeof loadImportedBenchObjects>, policy:ReturnType<typeof loadBenchPolicy>) {
   const populationRows =
     params.against && params.against.startsWith("registry:")
       ? loaded.filter((row) => row.registryId === params.against!.slice("registry:".length))
@@ -138,9 +127,10 @@ export function createBenchComparison(params: {
   const population = populationRows.map((row) => row.bench);
   const localFlat = flattenBenchMetrics(local);
   const populationFlat = population.map((row) => flattenBenchMetrics(row));
-  const percentiles = percentileTable(localFlat, populationFlat.length > 0 ? populationFlat : [localFlat]);
+  // No imported population → no percentile (WP37): ranking the local bench against itself read 100th on every metric.
+  const percentiles: Record<string, number | null> = populationFlat.length > 0 ? percentileTable(localFlat, populationFlat)
+    : Object.fromEntries(Object.keys(percentileTable(localFlat, [localFlat])).map((key) => [key, null]));
   const peer = kMedoidsPeerGroup(localFlat, populationFlat.length > 0 ? populationFlat : [localFlat]);
-  const policy = loadBenchPolicy(params.workspace);
   const comparison = benchComparisonSchema.parse({
     v: 1,
     generatedTs: Date.now(),
@@ -165,6 +155,22 @@ export function createBenchComparison(params: {
     peerGroup: peer,
     warnings: warningSummary(local, population)
   });
+  return comparison;
+}
+
+export function createBenchComparison(params: {
+  workspace: string;
+  scope: "workspace" | "node" | "agent";
+  id: string;
+  against?: "imported" | `registry:${string}`;
+}): {
+  comparison: BenchComparison;
+  path: string;
+  sigPath: string;
+  transparencyHash: string;
+} {
+  const local = localBenchFromScope(params);
+  const comparison = benchComparisonWithInputs(params,local,loadImportedBenchObjects(params.workspace),loadBenchPolicy(params.workspace));
   const saved = saveBenchComparison(params.workspace, comparison);
   const transparency = appendTransparencyEntry({
     workspace: params.workspace,

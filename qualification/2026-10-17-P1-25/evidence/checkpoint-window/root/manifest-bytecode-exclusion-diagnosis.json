@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-16T23:52:17.835780+00:00",
+  "operation": "Actual manifest review before any assembler execution",
+  "priorManifest": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/assembly-manifest.json",
+    "bytes": 148701,
+    "sha256": "d677c9b196de66fb1a70ab627967c85dad173fd1cdc9ca71f39388e75d2a9105"
+  },
+  "excludedPayload": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/__pycache__/source-control.cpython-314.pyc",
+    "bytes": 33811,
+    "sha256": "7ce30e30c792c84c2783acbed03a031f0b1eb75863af3b08616a86aeefe23e82",
+    "target": "evidence/checkpoint-window/preparation/fresh-control-preparation/__pycache__/source-control.cpython-314.pyc"
+  },
+  "reason": "Generated Python bytecode is executable and outside inert-source publication scope.",
+  "successorManifest": "assembly-manifest-v2.json",
+  "sourceBytecodePreservedPrivately": true,
+  "noEncodingRenamingDeletionOrGuardRelaxation": true,
+  "builderNowExcludesCompiledHelpersAndNativeSuffixes": true,
+  "noAssemblerProductSourceIndexQaExecutionOrWrites": true
+}

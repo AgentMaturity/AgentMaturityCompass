@@ -1,0 +1,78 @@
+{
+  "node": "v25.5.0",
+  "platform": "darwin arm64",
+  "results": [
+    {
+      "label": "read-subset",
+      "signExit": 0,
+      "signOk": true,
+      "loopExit": 1,
+      "loopError": "tool writes are scoped to: (nothing) | this process is not OS-confined (no launcher declared an OS confinement (AMC_CONFINEMENT_PROBE_DIR unset) and this process created and removed /tmp/.amc-confinement-probe-74967-af01c19ed521 outside any workspace root; AMC does not re-exec itself under a sandbox profile, and a worker thread cannot be confined by a subprocess sandbox); tool writes are bounded b",
+      "providerRequests": 2,
+      "advertisedTools": [
+        "amc_fs_read_QHS8AldVEeIypX1YupDUp9Pm-ykW041vGj1KacJG-rs",
+        "glob",
+        "grep"
+      ],
+      "toolResults": [
+        "{\"isError\":false,\"output\":\"installed read-only fixture bytes (read-subset)\",\"type\":\"amc.tool-result\",\"version\":1}"
+      ],
+      "readSucceeded": true,
+      "forbiddenWritten": false,
+      "summary": {
+        "requests": 2,
+        "toolCalls": 1,
+        "unsignedRows": 0
+      },
+      "verifyExit": 0,
+      "verifyOk": true
+    },
+    {
+      "label": "empty-subset",
+      "signExit": 0,
+      "signOk": true,
+      "loopExit": 1,
+      "loopError": "the workspace toolset is not ready: |   - the signed tool allowlist grants no supported native capability with its exact name, action class and context \u2014 review .amc/tools.yaml, then run: amc tools sign",
+      "providerRequests": 0,
+      "advertisedTools": [],
+      "toolResults": [],
+      "readSucceeded": false,
+      "forbiddenWritten": false,
+      "summary": null,
+      "verifyExit": null,
+      "verifyOk": null
+    },
+    {
+      "label": "digest-mismatch",
+      "signExit": 0,
+      "signOk": true,
+      "loopExit": 1,
+      "loopError": "the workspace toolset is not ready: |   - tool allowlist is not verifiable (digest mismatch) \u2014 inspect: amc tools verify",
+      "providerRequests": 0,
+      "advertisedTools": [],
+      "toolResults": [],
+      "readSucceeded": false,
+      "forbiddenWritten": false,
+      "summary": null,
+      "verifyExit": null,
+      "verifyOk": null
+    },
+    {
+      "label": "mcp-identity-on-native-body",
+      "signExit": 0,
+      "signOk": true,
+      "loopExit": 1,
+      "loopError": "the workspace toolset is not ready: |   - the signed tool allowlist grants no supported native capability with its exact name, action class and context \u2014 review .amc/tools.yaml, then run: amc tools sign",
+      "providerRequests": 0,
+      "advertisedTools": [],
+      "toolResults": [],
+      "readSucceeded": false,
+      "forbiddenWritten": false,
+      "summary": null,
+      "verifyExit": null,
+      "verifyOk": null
+    }
+  ],
+  "environment": "local macOS arm64 (not CI); installed from npm pack of rtd/p0-30-security-mutations at 910a63ba (product source identical to 91678253) into a temporary npm prefix; loopback model fixture, synthetic credential",
+  "note": "read-subset: the second model response asks for the unadvertised name fs_write; the turn ends with a failed request (no tool call row, no file), so the CLI exits 1 with the run summary on stdout; agent-loop verify --expect-monitor returns ok. The other three scenarios refuse before any provider request."
+}

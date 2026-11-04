@@ -1,0 +1,27 @@
+{
+  "schema": "amc-p139-oauth-first/1",
+  "label": "redirect-target",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-mrxzdL",
+  "observations": {
+    "requestsFromRefusedRedirect": 0
+  },
+  "requests": [],
+  "clients": [],
+  "sockets": [],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "productionCallbackServerCloseObserved": false,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

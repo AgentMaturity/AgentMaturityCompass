@@ -1,0 +1,165 @@
+[
+ {
+  "label": "enforced at tool_pipeline",
+  "release": "enforced",
+  "path": "native",
+  "enforcementBoundary": "tool_pipeline",
+  "evidenceTier": "observed",
+  "supported": "supported",
+  "reason": null,
+  "notCovered": [
+   "the shell (decideNativeShell) is confined by linux-bwrap or macos-seatbelt and refused when no backend is available; it has no enforcement boundary (enforcement none) only under the operator's macOS unconfined opt-in",
+   "agent behaviour on the stub provider is not evaluated (synthetic_example)"
+  ],
+  "source": "design §13 (amc.a4-integration-claim/v1)",
+  "conformanceReceipt": null
+ },
+ {
+  "label": "enforced at hook:PreToolUse",
+  "release": "enforced",
+  "path": "claude-code",
+  "enforcementBoundary": "hook:PreToolUse",
+  "evidenceTier": "observed",
+  "supported": "supported",
+  "reason": null,
+  "notCovered": [
+   "OS containment and Claude Code's own sandbox",
+   "sessions in which Claude Code ran none of AMC's hooks, and sessions without a registration (not governed)",
+   "every hook AMC does not install",
+   "Linux and Windows binaries (Linux packages pinned, not run against AMC; Windows not verified)",
+   "commands an allowed call starts",
+   "@anthropic-ai/claude-code versions other than 2.1.296"
+  ],
+  "source": "docs/adapters/manifests/claude-code.json (amc.adapter-claim-manifest/v1)",
+  "conformanceReceipt": {
+   "sha256": "7adc12dc0f1b164d798fa0407fb5eb124281a2206fc0db5330cfbbcaa1d9dd84",
+   "pinnedVersion": "2.1.296"
+  }
+ },
+ {
+  "label": "enforced at pi:tool_call",
+  "release": "enforced",
+  "path": "pi",
+  "enforcementBoundary": "pi:tool_call",
+  "evidenceTier": "observed",
+  "supported": "supported",
+  "reason": null,
+  "notCovered": [
+   "OS containment: Pi has no sandbox, and extensions run with the rights of the account that started Pi",
+   "effects that bypass tool_call: another extension's own I/O, Pi Durable",
+   "an extension that rewrites Pi's tool registry itself",
+   "sessions in which Pi did not load AMC's extension (reported as not governed)",
+   "commands an allowed call starts",
+   "@earendil-works/pi-coding-agent versions other than 1.0.2, 1.0.4"
+  ],
+  "source": "docs/adapters/manifests/pi.json (amc.adapter-claim-manifest/v1)",
+  "conformanceReceipt": {
+   "sha256": "d421dee044667b319373812087aa511ab79d3c2bf948f3f6f6eecda0ffeeca70",
+   "pinnedVersion": "1.0.2, 1.0.4"
+  }
+ },
+ {
+  "label": "preview",
+  "release": "observed",
+  "path": "langgraph",
+  "enforcementBoundary": "gateway",
+  "evidenceTier": "observed",
+  "supported": "preview",
+  "reason": "P1-54 (ToolHub-bridged calls observed, not journaled)",
+  "notCovered": [
+   "tool calls are not intercepted (gateway sees model traffic only)",
+   "imported traces are self_reported, originals retained (P1-24)"
+  ],
+  "source": "design §13 (amc.a4-integration-claim/v1)",
+  "conformanceReceipt": null
+ },
+ {
+  "label": "preview",
+  "release": "observed",
+  "path": "langchain",
+  "enforcementBoundary": "gateway",
+  "evidenceTier": "observed",
+  "supported": "preview",
+  "reason": "P1-54 (ToolHub-bridged calls observed, not journaled)",
+  "notCovered": [
+   "tool calls are not intercepted (gateway sees model traffic only)",
+   "imported traces are self_reported, originals retained (P1-24)"
+  ],
+  "source": "design §13 (amc.a4-integration-claim/v1)",
+  "conformanceReceipt": null
+ },
+ {
+  "label": "preview",
+  "release": "observed",
+  "path": "crewai",
+  "enforcementBoundary": "gateway",
+  "evidenceTier": "observed",
+  "supported": "preview",
+  "reason": "P1-54 (ToolHub-bridged calls observed, not journaled)",
+  "notCovered": [
+   "tool calls are not intercepted (gateway sees model traffic only)",
+   "imported traces are self_reported, originals retained (P1-24)"
+  ],
+  "source": "design §13 (amc.a4-integration-claim/v1)",
+  "conformanceReceipt": null
+ },
+ {
+  "label": "preview",
+  "release": "observed",
+  "path": "openai-agents",
+  "enforcementBoundary": "gateway",
+  "evidenceTier": "observed",
+  "supported": "preview",
+  "reason": "P1-54 (ToolHub-bridged calls observed, not journaled)",
+  "notCovered": [
+   "tool calls are not intercepted (gateway sees model traffic only)",
+   "imported traces are self_reported, originals retained (P1-24)"
+  ],
+  "source": "design §13 (amc.a4-integration-claim/v1)",
+  "conformanceReceipt": null
+ },
+ {
+  "label": "preview",
+  "release": "observed",
+  "path": "vercel-ai",
+  "enforcementBoundary": "gateway",
+  "evidenceTier": "observed",
+  "supported": "preview",
+  "reason": "P1-54 (ToolHub-bridged calls observed, not journaled)",
+  "notCovered": [
+   "tool calls are not intercepted (gateway sees model traffic only)",
+   "imported traces are self_reported, originals retained (P1-24)"
+  ],
+  "source": "design §13 (amc.a4-integration-claim/v1)",
+  "conformanceReceipt": null
+ },
+ {
+  "label": "preview",
+  "release": "none",
+  "path": "generic-http",
+  "enforcementBoundary": "gateway",
+  "evidenceTier": "self_reported",
+  "supported": "preview",
+  "reason": "observe-only through the gateway",
+  "notCovered": [
+   "tool calls are not intercepted (gateway sees model traffic only)",
+   "imported traces are self_reported, originals retained (P1-24)"
+  ],
+  "source": "design §13 (amc.a4-integration-claim/v1)",
+  "conformanceReceipt": null
+ },
+ {
+  "label": "preview",
+  "release": "none",
+  "path": "other",
+  "enforcementBoundary": "none",
+  "evidenceTier": "self_reported",
+  "supported": "preview",
+  "reason": "no integration path; only what the operator reports",
+  "notCovered": [
+   "nothing is enforced or observed by AMC"
+  ],
+  "source": "design §13 (amc.a4-integration-claim/v1)",
+  "conformanceReceipt": null
+ }
+]

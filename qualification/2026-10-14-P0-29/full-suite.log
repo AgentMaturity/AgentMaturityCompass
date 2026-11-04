@@ -1,0 +1,117 @@
+
+> agent-maturity-compass@1.2.0 pretest
+> npm run build
+
+
+> agent-maturity-compass@1.2.0 prebuild
+> npm run clean
+
+
+> agent-maturity-compass@1.2.0 clean
+> node scripts/clean-dist.mjs
+
+
+> agent-maturity-compass@1.2.0 build
+> tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build
+
+
+> agent-maturity-compass@1.2.0 copy-assets
+> node scripts/copy-build-assets.mjs
+
+bundle-kernel: dist/kernel/amcRuntime.js 385 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp
+
+> agent-maturity-compass@1.2.0 api:build
+> node scripts/build-standalone-api.mjs
+
+
+> agent-maturity-compass@1.2.0 test
+> vitest run --reporter=json --outputFile=/private/tmp/p0-29-full-suite-20261014.json
+
+error: option '--no-delegate-stop' argument 'undefined' is invalid. --delegate-stop and --no-delegate-stop cannot be combined.
+error: option '--delegate-stop <condition>' argument 'max-turns:1' is invalid. --delegate-stop and --no-delegate-stop cannot be combined.
+SIMULATE
+{"ok":true,"model":"gpt-test"}
+/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33
+  throw new EgressBlocked(decision, controlResult);
+        ^
+
+EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none
+    at block (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)
+    at context (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)
+    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)
+    at SessionService.open (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)
+    at <anonymous> (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/tests/fixtures/jsonlWriterResumeWorker.ts:43:11)
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  decision: {
+    verdict: 'blocked',
+    reason: 'registry_unverifiable',
+    detail: 'active_policy_unverifiable',
+    ruleIds: []
+  },
+  controlResult: {
+    status: 'not_evaluated',
+    controlIds: [],
+    reason: 'registry_unverifiable'
+  }
+}
+
+Node.js v22.23.3
+/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33
+  throw new EgressBlocked(decision, controlResult);
+        ^
+
+EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none
+    at block (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)
+    at context (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)
+    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)
+    at SessionService.open (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)
+    at <anonymous> (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/tests/fixtures/jsonlWriterResumeWorker.ts:43:11)
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  decision: {
+    verdict: 'blocked',
+    reason: 'registry_unverifiable',
+    detail: 'active_policy_unverifiable',
+    ruleIds: []
+  },
+  controlResult: {
+    status: 'not_evaluated',
+    controlIds: [],
+    reason: 'registry_unverifiable'
+  }
+}
+
+Node.js v22.23.3
+/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33
+  throw new EgressBlocked(decision, controlResult);
+        ^
+
+EgressBlocked: Residency egress blocked: registry_unverifiable (active_policy_unverifiable); destination=unregistered; rules=none
+    at block (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:33:9)
+    at context (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:42:78)
+    at assertStorageAdmission (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/residency/checkEgress.ts:126:17)
+    at SessionService.open (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/src/session/sessionService.ts:146:5)
+    at <anonymous> (/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/tests/fixtures/jsonlWriterResumeWorker.ts:43:11)
+    at ModuleJob.run (node:internal/modules/esm/module_job:343:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:681:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:117:5) {
+  decision: {
+    verdict: 'blocked',
+    reason: 'registry_unverifiable',
+    detail: 'active_policy_unverifiable',
+    ruleIds: []
+  },
+  controlResult: {
+    status: 'not_evaluated',
+    controlIds: [],
+    reason: 'registry_unverifiable'
+  }
+}
+
+Node.js v22.23.3

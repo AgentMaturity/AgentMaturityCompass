@@ -1,0 +1,292 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "reviewer": "/root/native_race_static_review",
+  "decision": "SEALED_PREPARATION_VERIFIED_NO_RUNTIME_RELEASE",
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "scope": "Independent measured setup/source/hash/stat audit of completed sealed preparation only. Reuses unchanged full code/recipe and actual original-corpora reviews by exact pins. Does not execute/import/parse/compile the controller or product.",
+  "blockingFindings": [],
+  "findings": [],
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorizationProvided": false,
+  "sealedInputs": {
+    "setup": {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/setup.json",
+      "bytes": 6138,
+      "sha256": "782e8f05272eccad954f372f2ce686b9f408b962cce70aae17811fb7506853ec"
+    },
+    "index": {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/setup-index.json",
+      "bytes": 2623,
+      "sha256": "83422e1b1f1922731b3ef145274d64548925669ed9a5523249b54992f5c26760"
+    },
+    "preparationSummary": {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/preparation-summary.json",
+      "bytes": 1252,
+      "sha256": "2b7c7fe820e703c6657d9710ec023232e80d6abc74c12eb4199f73b26a4641b2"
+    },
+    "controller": {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/driver/controller.py",
+      "bytes": 28317,
+      "sha256": "5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878"
+    },
+    "proposal": {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/proposal.json",
+      "bytes": 2735,
+      "sha256": "74b34ab3fd8943b6d573ef8277cb6f187a43efe05edd04e7909129fac86db9e9"
+    },
+    "physicalManifest": {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+      "bytes": 5036200,
+      "sha256": "75ee14d53d89d3552fa8a48d6a6c57102cf782fed90e1483c61be58551813bb8"
+    },
+    "caseIdentities": {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/case-identities.json",
+      "bytes": 2209,
+      "sha256": "94c9ff968471bc6cc3be324e7241df7d23a8677673e34627b021563c20e9c8dc"
+    },
+    "preservation": {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/preservation.json",
+      "bytes": 50800,
+      "sha256": "0264617d15daa39ea7c52dfa01d4a391f1ceb33bfc608a877170722b8bc68d35"
+    }
+  },
+  "checks": {
+    "ownInputPinsChecked": 10,
+    "indexPinsChecked": 11,
+    "immutableExternalPinsChecked": 221,
+    "allExact": true,
+    "ownAndIndexOrderExact": true,
+    "setupIndexAcyclic": true,
+    "physical": {
+      "source": 8362,
+      "dist": 4529,
+      "total": 12891,
+      "parentUniqueInodes": 12891,
+      "privateUniqueInodes": 12891,
+      "inodeOverlap": 0,
+      "physicalFailures": [],
+      "allParentAndPrivateRegularSingleLinkExactModes": true,
+      "allMembershipExact": true,
+      "links": [
+        {
+          "relativePath": "node_modules",
+          "target": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+          "resolved": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules"
+        }
+      ],
+      "privateGitAbsent": true
+    },
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538824643,
+      "nlink": 1,
+      "mode": 493
+    },
+    "currentInbox": {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+      "bytes": 876841,
+      "sha256": "fd4f5e769f2ad1d3c548b5c76b1dd3f00af155d92f47b6cc5c6b1442fced1b8b"
+    },
+    "actualOriginalIdentitySets": {
+      "map": 7,
+      "recording": 7
+    },
+    "identitySetsEqualClosedRawReports": true,
+    "allThreeRecipeNormalizationsExact": true,
+    "preparedControllerCopyByteExact": true,
+    "allBoundReviewsExactAndNonblocking": true,
+    "noRuntimeMarkersOrPhaseReleaseArtifacts": true,
+    "noPrivateGit": true,
+    "mutantWritten": false,
+    "controllerExecuted": false,
+    "controllerImportedParsedOrCompiled": false,
+    "liveJournalReadOrPinned": false
+  },
+  "recipes": [
+    {
+      "id": "C1-map-missing-path-fail-open",
+      "file": "scripts/check-threat-model.mjs",
+      "corpus": "map",
+      "baselineSha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+      "proposedMutantSha256": "363ba9d901a0075c74705f13bc0d73efbb8a60d3f9cd506b6d1d281324a3d4f9",
+      "anchorExactlyOnce": true
+    },
+    {
+      "id": "C2-tool-recorder-error-propagates",
+      "file": "src/tools/toolPipeline.ts",
+      "corpus": "recording",
+      "baselineSha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794",
+      "proposedMutantSha256": "3a7f58aae191b877cea66f308648c0a330ad46c56259135dc14bf5828929eea0",
+      "anchorExactlyOnce": true
+    },
+    {
+      "id": "L1-optional-historical-literal-whole-branch-removal",
+      "file": "scripts/check-threat-model.mjs",
+      "corpus": "map",
+      "baselineSha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+      "proposedMutantSha256": "c843f26336d00d65286202d0f56102ceee75ced5d0cc7048bbbd196b241e8ccc",
+      "anchorExactlyOnce": true
+    }
+  ],
+  "sourceAndModuleRoute": {
+    "parentRoot": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+    "copyRoot": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+    "copiedFiles": 12891,
+    "sourceFiles": 8362,
+    "compiledFiles": 4529,
+    "corpora": {
+      "map": [
+        "tests/threatModelMap.test.ts"
+      ],
+      "recording": [
+        "tests/toolEvidenceRecording.test.ts"
+      ]
+    },
+    "originalTestConfigGuardsHelpersFixturesUnchanged": true,
+    "originalTestTimeoutMs": 30000,
+    "sourceOnly": true,
+    "compiledEditOrImportAdapter": false,
+    "moduleRoot": "Vitest launches the borrowed parent CLI with cwd=private closure; original config/setup/tests resolve in that closure. Map test resolves scripts/check-threat-model.mjs from cwd; that copied MJS derives its repository root from import.meta.url. Ajv/Vitest/native dependencies resolve through the sole explicit parent node_modules symlink. No product or shared parent path is retargeted by an import adapter.",
+    "copyMeaning": "Independent physical copy without.git is valid for these source-mode map/recording tests. It is not a normal Git/freeze qualification root or an independent dependency install."
+  },
+  "reusedReviews": {
+    "original": {
+      "path": "/private/tmp/p0-11-original-corpora-independent-review-20261015.json",
+      "bytes": 23426,
+      "sha256": "ad9128b687def99c672387e0c33ab1926a53082bb0b5087fa8a28905cb1d537a"
+    },
+    "code": {
+      "path": "/private/tmp/p0-11-controller-code-static-review-20261015.json",
+      "bytes": 5353,
+      "sha256": "94899d5f0c2c54ba5625432c1a24942102f447a946f34e0a30b7e940d2323aba"
+    },
+    "recipes": {
+      "path": "/private/tmp/p0-11-recipes-static-review-20261015.json",
+      "bytes": 21585,
+      "sha256": "b7619c6e45d47c4782a6cd7be7607f4debc8a8180c649aa16e99a8b7a9b7b278"
+    },
+    "scope": "Prior full controller review remains unchanged. This audit additionally reads executing copy's proposal/input/classifier/lifecycle/release sections and measures real setup rather than treating static field names as completed proof."
+  },
+  "releaseContract": {
+    "requiredToken": "START_P011_CAUSAL_<exact-control-id>",
+    "requiredHashFields": {
+      "setupSha256": "782e8f05272eccad954f372f2ce686b9f408b962cce70aae17811fb7506853ec",
+      "controllerSha256": "5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878",
+      "proposalSha256": "74b34ab3fd8943b6d573ef8277cb6f187a43efe05edd04e7909129fac86db9e9",
+      "sourceManifestSha256": "757fc432259404ed8b4db216b0627e07ac60159aea801dd9dc3b6c129048871e",
+      "compiledManifestSha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48",
+      "preservationSha256": "0264617d15daa39ea7c52dfa01d4a391f1ceb33bfc608a877170722b8bc68d35",
+      "observerSha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447",
+      "setupIndexSha256": "83422e1b1f1922731b3ef145274d64548925669ed9a5523249b54992f5c26760",
+      "caseIdentitiesSha256": "94c9ff968471bc6cc3be324e7241df7d23a8677673e34627b021563c20e9c8dc"
+    },
+    "requiredPaths": [
+      "setupPath",
+      "setupIndexPath",
+      "controllerPath",
+      "closureRoot",
+      "parentRoot",
+      "control"
+    ],
+    "oneControlPerExplicitRootRelease": true,
+    "releasePresentAtAudit": false,
+    "startedMarkersPresentAtAudit": false
+  },
+  "lateSeparateNormalFreeze": {
+    "rootProof": {
+      "path": "/private/tmp/p0-11-causal-root-sealed-input-verification-20261015.json",
+      "bytes": 2515,
+      "sha256": "f0e93980ecf307cc50ac8fa74b85d8d8b87839fcfaa3fe7b0d31ff50e2d2fce0"
+    },
+    "command": {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-pre-causal-normal-freeze/command.json",
+      "bytes": 1164,
+      "sha256": "1d7411985045b4e004f27aca123354993b96fb4b03cd84612659d1b23775acf8"
+    },
+    "log": {
+      "path": "/private/tmp/p0-11-qualification-20261015/command-pre-causal-normal-freeze/stdout-stderr.log",
+      "bytes": 263,
+      "sha256": "17ac9e80ad69ccdd78e618bf1d34e73bf6af2bd517f757ff24c2ec9131ea06d3"
+    },
+    "observedRecordedExit": 0,
+    "durationMs": 1611,
+    "headBeforeAfter": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "normalCounts": {
+      "cliCommandPaths": 1236,
+      "cliInventoryPaths": 1236,
+      "stationPacks": 41,
+      "stationPackQuestions": 632
+    },
+    "meaning": "Separate command completed on the genuine parent root after the earlier setup was sealed. Its command/log/rootproof pins were read and matched; no earlier setup was amended. This guard success is not a START release or a quality waiver."
+  },
+  "processAndObserverContract": {
+    "actualRuntimeMeasuredHere": false,
+    "argv": "Full unchanged original7-case selected corpus; --cache=false --maxWorkers=1 --no-file-parallelism plus default/json/private reporter. No filter/skip or original config/helper/deadline alteration.",
+    "environmentKeys": [
+      "PATH",
+      "HOME",
+      "TMPDIR",
+      "NODE_ENV",
+      "NO_COLOR",
+      "GIT_NO_LAZY_FETCH",
+      "AMC_P021_RUNTIME_OBSERVER_PATH"
+    ],
+    "environmentLimit": "Seven explicit keys/privateHOME/TMPDIR and borrowed dependencies; no OS/network/cache isolation.",
+    "outerWaitSeconds": 420,
+    "terminatingSignals": false,
+    "retry": false,
+    "ownedGroupProbe": "Signal0 for at most5 seconds at50ms; positiveESRCH required before classification/source restoration/next phase. This does not prove universal detached-descendant absence.",
+    "uncertainty": "ACTIVE/HALTED retained on launch/wait/group/observer/hash/classification uncertainty. No automatic restoration on exception, process signal, cleanup or phase retry.",
+    "observer": "Exclusive wx run-end receipt with actualPID/cwd/case/error/hook binding; raw matching identities and normal0/1 required. Observer precedes global teardown, so full process streams and12 knownlate/globalguard patterns remain separately gated.",
+    "C2ErrorGate": "Only C2mutant's named original recorder test may have nonAssertionError: exact Error/message 'the evidence store is unreachable' and callback202/await206/record306 frames in raw+observer. Missing frame or arbitrary error remains incomplete, not a kill.",
+    "survivorRule": "All-green mutant explicitly survivor; raw/process nonzero alone is not semantic sensitivity."
+  },
+  "meaningAndRemainingLimits": [
+    "C1 keeps the missing-file continue while removing its diagnostic; it can test semantic invalid-reference admission. Actual failure/status/masking must still be measured.",
+    "L1 removes the entire branch; readFileSync can still refuse with caughtENOENT. A changed diagnostic at originaltest30 is not invalid-fixture admission, and does not close the strict literal missing-path-passes criterion. Keep C1/L1 separate.",
+    "C2 propagates the same original callback error; rethrow need not add an insertedthrow frame. Await206 can reject before outcome assertions210–213. This is a real injected READ_ONLY callback throw, not a durable-store outage or journal reconciliation.",
+    "Telemetry inner queue catch and outer pipeline recorder catch coexist. Ordinary fixture batch transaction completes before queue; nested caller transactions use savepoints, so universal outer durable commit is not proved.",
+    "Original4corpora7/2/5/7 remain distinct; only map7 and recording7 repeat here. No full21/9single invocation, newunique corpus or16channel enforcement claim follows.",
+    "Sid residual-risk/status review, ASI re-verification/experimental label, stale mapstamp and colliding historical follow-up keys remain unresolved.",
+    "1269duplicates/2751dead-code required failures and priorP029/P022/P023/P051/P024/P021/P045/P019/P020/P030/trust/held/sourceownership/P202/pendingtransfer gaps remain unwaived. No fullsuite/Node24/hosted/PR/merge/release/G0/Done or formal dependency closure.",
+    "5036200-byte physical manifest stays private/unsplit; its pin supports this review, not a canonical file-size exemption. Only selected dependency helpers/native are pinned, not the entire cache/dependency universe."
+  ],
+  "preparationIssue": {
+    "pin": {
+      "path": "/private/tmp/p0-11-copy-helper-authoring-issue-20261015.json",
+      "bytes": 488,
+      "sha256": "c9ba516b4082c5415977261f7693bc381e4dfcb46ec380e36621fbe4df4d55a8"
+    },
+    "recordedMeaning": "Outer preparation-writer quoting produced SyntaxError before any statement ran; issue says no helper/directory/product/controller write/import occurred. Corrected helper later created metadata/copy. This is preserved authoring history, not a controller/test failure or rerun.",
+    "correctedHelper": {
+      "path": "/private/tmp/p0-11-prepare-causal-copy-20261015.py",
+      "bytes": 12636,
+      "sha256": "a34e4f0491272921aa871a8c04443a4711e46f198e61b9a5da3fd8ed324e18da"
+    }
+  },
+  "method": "Python standard-library read/hash/lstat/stat/membership comparison only: all parent/private12891 records, device/inode/mode/nlink/size/SHA, exact file membership, full disjoint inode universes,221 external+10 own+11 index refs; direct raw identity and normalizedrecipe equality/in-memory candidate hashes. Source sections were read as text; no source module/parser/controller/fixture execution.",
+  "performed": {
+    "productRuntime": false,
+    "controllerImportParserCompilerExecution": false,
+    "testsBuildInstallFingerprint": false,
+    "gitCommands": false,
+    "network": false,
+    "processProbesOrSignals": false,
+    "copyOrSourceMutation": false,
+    "setupOrProducerEdits": false,
+    "liveJournalRead": false,
+    "writes": "Only NEW sealed-setup independent review JSON/MD pair."
+  },
+  "allReadsFinished": true,
+  "capturedUtc": "2026-10-15T06:41:23.330053+00:00",
+  "markdown": {
+    "path": "/private/tmp/p0-11-controller-sealed-setup-review-20261015.md",
+    "bytes": 3178,
+    "sha256": "5c7976bf076d45f9bf08adec369b8ca768252a1e7f115471ce813812987bf370"
+  }
+}

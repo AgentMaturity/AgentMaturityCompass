@@ -1,0 +1,146 @@
+{
+  "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+  "baselineHead": "83641bceb68659737d7678daeff3fbb2728e2301",
+  "phase": "completed_historical_before_P1_42_required_integration",
+  "tests": {
+    "total": 25181,
+    "passed": 25161,
+    "failed": 13,
+    "skipped": 7
+  },
+  "files": {
+    "total": 1735,
+    "passed": 1725,
+    "failed": 8,
+    "skipped": 2
+  },
+  "failures": [
+    {
+      "file": "tests/nativeManagedRecovery.test.ts",
+      "assertions": [
+        {
+          "title": "reattached jsonl native controller retains approval quorum, accounting and validation pins",
+          "messages": [
+            "AssertionError: expected 'unavailable' to be 'passed' // Object.is equality\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/nativeManagedRecovery.test.ts:89:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "message": ""
+    },
+    {
+      "file": "tests/publicDocsGraph.test.ts",
+      "assertions": [
+        {
+          "title": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+          "messages": [
+            "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "message": ""
+    },
+    {
+      "file": "tests/releaseEngineeringPack.test.ts",
+      "assertions": [
+        {
+          "title": "release engineering pack packs and verifies a signed .amcrelease bundle and prints summary",
+          "messages": [
+            "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/releaseEngineeringPack.test.ts:42:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        }
+      ],
+      "message": ""
+    },
+    {
+      "file": "tests/releaseSecretScanCoverage.test.ts",
+      "assertions": [
+        {
+          "title": "release secret scanner content coverage shares entry budgets across every nested npm archive",
+          "messages": [
+            "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/releaseSecretScanCoverage.test.ts:184:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        }
+      ],
+      "message": ""
+    },
+    {
+      "file": "tests/sessionStoreConformance.test.ts",
+      "assertions": [
+        {
+          "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks unsigned",
+          "messages": [
+            "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        },
+        {
+          "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks broken-session-seq",
+          "messages": [
+            "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        },
+        {
+          "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks truncating",
+          "messages": [
+            "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        },
+        {
+          "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks lying-capability",
+          "messages": [
+            "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        },
+        {
+          "title": "the conformance suite has teeth (mutation tests) fails a backend that breaks idempotent-seal",
+          "messages": [
+            "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:300:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        },
+        {
+          "title": "the conformance suite has teeth (mutation tests) the signature mutation is caught ONLY by the signature rule",
+          "messages": [
+            "Error: STACK_TRACE_ERROR\n    at task (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1784:27)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1817:16)\n    at Object.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1563:28)\n    at chain (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:599:14)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/sessionStoreConformance.test.ts:309:3\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:40\n    at runWithSuite (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2258:8)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1889:10)\n    at Object.collect (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1893:54)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        }
+      ],
+      "message": ""
+    },
+    {
+      "file": "tests/compliance/evidenceBinding.test.ts",
+      "assertions": [
+        {
+          "title": "source-literal enumeration every source literal in src is classified",
+          "messages": [
+            "AssertionError: expected [ 'defaults', 'signed-tools-yaml' ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/compliance/evidenceBinding.test.ts:102:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "message": ""
+    },
+    {
+      "file": "tests/performance/sessionSpine.performance.test.ts",
+      "assertions": [
+        {
+          "title": "session spine throughput blob-backed content events sustain the floor and do not degrade super-linearly",
+          "messages": [
+            "AssertionError: content throughput 61 ev/s: expected 60.63639718176726 to be greater than 150\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/performance/sessionSpine.performance.test.ts:86:78\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "message": ""
+    },
+    {
+      "file": "tests/storage/blobIndexChainSig.test.ts",
+      "assertions": [
+        {
+          "title": "blob index chain-head signature does not read the whole index to append \u2014 cost is flat as the index grows",
+          "messages": [
+            "AssertionError: late 636.6ms vs early 140.6ms: expected 636.5683330000029 to be less than 612.3268319999988\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/storage/blobIndexChainSig.test.ts:116:80\n    at withWorkspace (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/storage/blobIndexChainSig.test.ts:33:12)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/tests/storage/blobIndexChainSig.test.ts:100:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+          ]
+        }
+      ],
+      "message": ""
+    }
+  ],
+  "note": "None of the failed files is an edited P2-30 test. Only MCP graph and session throughput are already reproduced on baseline83641; remaining baseline probes run separately. No final-source claim after new integration."
+}

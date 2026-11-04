@@ -1,0 +1,18 @@
+{
+  "schema": "p111-whole-issue-gaps/1",
+  "at": "2026-10-16T19:38:34.075555+00:00",
+  "wholeIssueDone": false,
+  "boundedScope": "Typed evaluator rule tests and their local qualification only.",
+  "gaps": [
+    "Public complianceContext still supplies plan:null and unknown tenant/deployment/subject. Typed plan fixtures do not establish signed compilation or public positive-report integration.",
+    "Already-derived ItemProvenance, foreignReceipt, verdict and review inputs do not prove real ledger, receipt, external-authority, trust-list or approval signature admission. The raw meta.trustTier loader path is outside this test seam.",
+    "The four local source controls exercise tenant, recorded-time freshness, typed tier consumption and replay rules. The attribute-tier control is not the full specification's raw meta.trustTier mutation. Real generateComplianceReport decisive comparisons against origin/main remain unqualified.",
+    "An empty report currently returns a null score when nothing was evaluated, preserved by existing coverage tests; the specification asks for zero. Derived not_evaluated currently maps to NOT_EVALUATED, while one specification step says UNKNOWN.",
+    "Trusted violation tests use applicable context. P0-08 can override a failure for not_applicable applicability; this bounded cohort does not settle the full decision-table wording.",
+    "Complete CLI/matrix/Studio surface acceptance, the complete suite and coverage, required decision-table documentation and changeset, and a merged PR remain unqualified. Numeric inventory maintenance is not the requested semantic documentation.",
+    "Global quality remains RED at1268 duplicate and2724 dead-code findings before and after. No waiver, baseline adoption or quality-check edit is authorized or claimed."
+  ],
+  "ownership": "Existing Claude source, tests and authored documentation remain protected. The shared reservation file is missing; its last-known binding and private pending append remain, with no release or current delta inferred. These are recorded implementation/acceptance gaps, not invented human approvals.",
+  "holds": "P1-01 gaps; P0-29 successor decisions; P0-22 empty results; D-03 health skip until P2-06; P0-09/P0-51 revoked-key precedence; P0-24 expert wording; P2-02 pause/P2-27 echo; P1-06 ownership; P1-02 combinations; private SAML/Okta/Entra inputs; ignored D15 provider archive staging; F37 skip. All remain unchanged.",
+  "next": "After this bounded receipt closes, continue P1-12 by current plan priority and downstream dependency depth. No PR, push, merge, release or tracker Done."
+}

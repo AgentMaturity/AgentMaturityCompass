@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "issue": "P0-22",
+  "createdAt": "2026-10-14T15:49:10.290854+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass",
+  "baseHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "status": "The legacy-row reproduction fails before repair and all ten fleet cases pass after repair. Awaiting root review and required qualification checks.",
+  "qualified": false,
+  "sourceScope": [
+    "src/fleet/fleetScoring.ts",
+    "tests/fleetScoring.test.ts"
+  ],
+  "committed": false,
+  "implementation": "Only the member claim cell now uses the existing canonical renderClaimLabel.kindLabel and existing markdownCell escaping. The aggregate envelope, status and other rows are unchanged. Missing member map entries still print a dash, as before; that separate audit finding was outside this repair assignment.",
+  "lineBudget": {
+    "file": "src/fleet/fleetScoring.ts",
+    "effectiveCap": 800,
+    "actualArchitectureCount": 800,
+    "baselineChanged": false
+  },
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/fleet/fleetScoring.ts",
+      "beforeSha256": "e541449179c7ed82a9edf936461ae9a39623817766f0c59e51be3ee336572896",
+      "afterSha256": "d3cd518d67098de05da446c5c9faa22eea664c4cf2e70e00ae3ef8fe8260b602",
+      "beforeLines": 799,
+      "afterLines": 800
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/fleetScoring.test.ts",
+      "beforeSha256": "25aa3b875688396d2f3ad4d518436dcac2e5750c82185a0e65d523973aa9ef22",
+      "afterSha256": "1c7cd5f5d85778f829357b9a6e74d6c2b60cbd6ca438c99cb7fd8736474ddfac",
+      "beforeLines": 253,
+      "afterLines": 276
+    }
+  ],
+  "phases": [
+    {
+      "phase": "red",
+      "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH node node_modules/vitest/vitest.mjs run tests/fleetScoring.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-22-fleet-legacy-red-20261014.json",
+      "exitCode": 1,
+      "counts": {
+        "success": false,
+        "numTotalTests": 10,
+        "numPassedTests": 9,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "report": "/private/tmp/p0-22-fleet-legacy-red-20261014.json",
+      "reportSha256": "12f71859128142c5caedb9258ad34b9f336be0d0d67b597ca8211bb9d12c1dab",
+      "log": "/private/tmp/p0-22-fleet-legacy-red-20261014.log",
+      "logSha256": "df344617f29e0c18af105332abb0183b013482cda0898530a7c987182ed32559",
+      "meaning": "The new legacy member assertion failed; all original fleet tests passed."
+    },
+    {
+      "phase": "green",
+      "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH node node_modules/vitest/vitest.mjs run tests/fleetScoring.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-22-fleet-legacy-green-20261014.json",
+      "exitCode": 1,
+      "counts": {
+        "success": false,
+        "numTotalTests": 10,
+        "numPassedTests": 0,
+        "numFailedTests": 10,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "report": "/private/tmp/p0-22-fleet-legacy-green-20261014.json",
+      "reportSha256": "4edf213bddaded345ec94a41a4a95758783c014e8bd866a7e95c323e293f00c4",
+      "log": "/private/tmp/p0-22-fleet-legacy-green-20261014.log",
+      "logSha256": "9dfb47bee40091eaa6dd0288c6a94a173f1ab1d2174ad362634a7dacabc3d09b",
+      "meaning": "All ten cases failed on Node25 ABI141 SQLite binary under Node22 ABI127. This is an environment failure, not an app behavior result."
+    },
+    {
+      "phase": "green-repaired-node22",
+      "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/fleetScoring.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-22-fleet-legacy-green-repaired-20261014.json",
+      "exitCode": 0,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "report": "/private/tmp/p0-22-fleet-legacy-green-repaired-20261014.json",
+      "reportSha256": "a791c1c51a9e333b071ef886474f3b7b668e74366c676dc3c570067871e36841",
+      "log": "/private/tmp/p0-22-fleet-legacy-green-repaired-20261014.log",
+      "logSha256": "48ec5d05534b1df4bfc8a6d1e9d3246a840934479aa3aac7aefa8ca1a4b787dc",
+      "durationInLog": "6.29 seconds",
+      "meaning": "All nine original fleet tests and the new mixed legacy/current-member regression pass."
+    }
+  ],
+  "patch": "/private/tmp/p0-22-fleet-legacy-repair-20261014.patch",
+  "patchSha256": "2d4a9faf8bced05bc9c4d4880639e6aaafe066ada0d908fd47c8bd079950480c",
+  "next": "Root reviews the bounded diff, rebuilds and runs required source/test types, lint, architecture/line budget, freeze and remaining P0-22 acceptance before committing. This component result does not mark the whole issue Done.",
+  "componentTestPassed": true,
+  "updatedAt": "2026-10-14T15:50:48.770246+00:00",
+  "nativeDependency": {
+    "scope": "owned P0-22 worktree only",
+    "repairPerformedBy": "root",
+    "rootReportedCause": "A signature-only helper fell through an absent nvm PATH to Node25 and the CLI adapted the owned native dependency.",
+    "beforeSha256": "381dcb4cc3bc2bed1ae5457313bdd58501b8365c4c36c0c347fec2db7b77ebbc",
+    "afterSha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "afterLinks": 1,
+    "runtime": "Node22.23.3 ABI127; executable and PATH explicitly pinned for final green"
+  },
+  "protectedInputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/claims/eligibility/adapters/results.ts",
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/claims/eligibility/render.ts",
+      "sha256": "274b20ebbef6a2a3746ef88ceea552a2717a94e61b264698e6a4afd48791b1da",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "matchesHead": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "matchesHead": true
+    }
+  ]
+}

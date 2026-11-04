@@ -1,0 +1,750 @@
+{
+  "kind": "Read-only next-key routing after bounded P0-27 qualification. No next-item runtime, tests, build, live dist read, repository write, status closure or Claude message was performed.",
+  "capturedUtc": "2026-10-14T20:50:00.090450+00:00",
+  "workspace": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+  "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "primaryMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "heldPendingMain": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+  "heldIsCurrentAncestor": false,
+  "observedState": {
+    "initialHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+    "initialStatus": "Four pending new qualification files; no tracked production change.",
+    "finalHead": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+    "finalGitStatus": "",
+    "rootCommitDelta": [
+      "CONTRIBUTING.md",
+      "README.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/content/show-hn-draft.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "tests/assuranceSessionQualification.test.ts",
+      "tests/budgetIntegrityQualification.test.ts",
+      "tests/controlCheckpointQualification.test.ts",
+      "tests/evidenceAgentFilterQualification.test.ts",
+      "website/i18n.js",
+      "website/index.html",
+      "website/lite.html",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "srcChangeFrom1291": false,
+    "explanation": "Root committed the four tests and measured docs/website count updates during this read-only pass. The final current state is clean, not four uncommitted files."
+  },
+  "inputHashes": [
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-19.md",
+      "sha256": "6cdeabe21d7f1512dbf5919e554daedeb8182e9457b894db473582d8131d404b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-55.md",
+      "sha256": "d77a082bd93e1dd71c16063854c1be74d574a0d9b73ecffdbc890bf31783398d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-27.md",
+      "sha256": "dcfab371fdb076e688ab79d1ea9e471c16e68088f46ea1cde4c240283067a889"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+      "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870"
+    }
+  ],
+  "sourceComparisons": [
+    {
+      "path": "src/assurance/scenarioGrading.ts",
+      "sha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "lines": 93,
+      "mainSha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "matches_main": true,
+      "heldSha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "matches_held": true,
+      "original1291Sha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "sha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "lines": 343,
+      "mainSha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "matches_main": true,
+      "heldSha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "matches_held": true,
+      "original1291Sha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/scorers.ts",
+      "sha256": "46a1c75c36b7c8ba4d3b619eb2aff1d14c4ebc0333251f46f342df82a5a53cea",
+      "lines": 54,
+      "mainSha256": "46a1c75c36b7c8ba4d3b619eb2aff1d14c4ebc0333251f46f342df82a5a53cea",
+      "matches_main": true,
+      "heldSha256": "46a1c75c36b7c8ba4d3b619eb2aff1d14c4ebc0333251f46f342df82a5a53cea",
+      "matches_held": true,
+      "original1291Sha256": "46a1c75c36b7c8ba4d3b619eb2aff1d14c4ebc0333251f46f342df82a5a53cea",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "lines": 975,
+      "mainSha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "matches_main": true,
+      "heldSha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "matches_held": true,
+      "original1291Sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "lines": 288,
+      "mainSha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "matches_main": true,
+      "heldSha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "matches_held": true,
+      "original1291Sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/agentResponder.ts",
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "lines": 597,
+      "mainSha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "matches_main": true,
+      "heldSha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "matches_held": true,
+      "original1291Sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/assuranceFindings.ts",
+      "sha256": "0521777e1b8946b79729a87b671433687b0aa0d037b184d54560613f1c28879b",
+      "lines": 68,
+      "mainSha256": "0521777e1b8946b79729a87b671433687b0aa0d037b184d54560613f1c28879b",
+      "matches_main": true,
+      "heldSha256": "0521777e1b8946b79729a87b671433687b0aa0d037b184d54560613f1c28879b",
+      "matches_held": true,
+      "original1291Sha256": "0521777e1b8946b79729a87b671433687b0aa0d037b184d54560613f1c28879b",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/assuranceSchema.ts",
+      "sha256": "8444586cbf5c3521e4592a9a40baa58394a14edb4405d7bc38d2390ae15baa8f",
+      "lines": 247,
+      "mainSha256": "8444586cbf5c3521e4592a9a40baa58394a14edb4405d7bc38d2390ae15baa8f",
+      "matches_main": true,
+      "heldSha256": "8444586cbf5c3521e4592a9a40baa58394a14edb4405d7bc38d2390ae15baa8f",
+      "matches_held": true,
+      "original1291Sha256": "8444586cbf5c3521e4592a9a40baa58394a14edb4405d7bc38d2390ae15baa8f",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/assurancePolicyStore.ts",
+      "sha256": "8fd209dabfd5734f9642893672eba7ffa7dd93a0e557a9b3151a275b58aa2e40",
+      "lines": 302,
+      "mainSha256": "8fd209dabfd5734f9642893672eba7ffa7dd93a0e557a9b3151a275b58aa2e40",
+      "matches_main": true,
+      "heldSha256": "8fd209dabfd5734f9642893672eba7ffa7dd93a0e557a9b3151a275b58aa2e40",
+      "matches_held": true,
+      "original1291Sha256": "8fd209dabfd5734f9642893672eba7ffa7dd93a0e557a9b3151a275b58aa2e40",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "sha256": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "lines": 75,
+      "mainSha256": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "matches_main": true,
+      "heldSha256": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "matches_held": true,
+      "original1291Sha256": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/redteam/runner.ts",
+      "sha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "lines": 649,
+      "mainSha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "matches_main": true,
+      "heldSha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "matches_held": true,
+      "original1291Sha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/catalog/evidence/mappingAdapter.ts",
+      "sha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "lines": 219,
+      "mainSha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "matches_main": true,
+      "heldSha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "matches_held": true,
+      "original1291Sha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "lines": 356,
+      "mainSha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "matches_main": true,
+      "heldSha256": "b8608fad01c9c7c453c2100a0a1b2937336b83ea6e5eb3939b823e5271f20478",
+      "matches_held": false,
+      "original1291Sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/types.ts",
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "lines": 3694,
+      "mainSha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "matches_main": true,
+      "heldSha256": "8a3392b07a0bb284fc59802d46fc779d48175ef216e9ebf30570350c76240a5b",
+      "matches_held": false,
+      "original1291Sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/claims/eligibility/exampleMode.ts",
+      "sha256": "a5a8379e6b2eb37d9bb7ab6e59ae1abadb5f6e19a5694fd13667c28b79a0a76f",
+      "lines": 92,
+      "mainSha256": "a5a8379e6b2eb37d9bb7ab6e59ae1abadb5f6e19a5694fd13667c28b79a0a76f",
+      "matches_main": true,
+      "heldSha256": "a5a8379e6b2eb37d9bb7ab6e59ae1abadb5f6e19a5694fd13667c28b79a0a76f",
+      "matches_held": true,
+      "original1291Sha256": "a5a8379e6b2eb37d9bb7ab6e59ae1abadb5f6e19a5694fd13667c28b79a0a76f",
+      "matches_original1291": true
+    },
+    {
+      "path": "tests/helpers/fakeAgentServer.ts",
+      "sha256": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+      "lines": 180,
+      "mainSha256": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+      "matches_main": true,
+      "heldSha256": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+      "matches_held": true,
+      "original1291Sha256": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/packs/industryPackManifest.ts",
+      "sha256": "7a0a926bfc0f3dbbc249ecc63a09df97aa764338ae8a57e606f8984a81ee6ca6",
+      "lines": 471,
+      "mainSha256": "7a0a926bfc0f3dbbc249ecc63a09df97aa764338ae8a57e606f8984a81ee6ca6",
+      "matches_main": true,
+      "heldSha256": "7a0a926bfc0f3dbbc249ecc63a09df97aa764338ae8a57e606f8984a81ee6ca6",
+      "matches_held": true,
+      "original1291Sha256": "7a0a926bfc0f3dbbc249ecc63a09df97aa764338ae8a57e606f8984a81ee6ca6",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/assurance/packs/index.ts",
+      "sha256": "ef7acc6ac3dd7ba874042fe1d140ed35ce67a723af30716c37f12c19c95ea17b",
+      "lines": 351,
+      "mainSha256": "ef7acc6ac3dd7ba874042fe1d140ed35ce67a723af30716c37f12c19c95ea17b",
+      "matches_main": true,
+      "heldSha256": "ef7acc6ac3dd7ba874042fe1d140ed35ce67a723af30716c37f12c19c95ea17b",
+      "matches_held": true,
+      "original1291Sha256": "ef7acc6ac3dd7ba874042fe1d140ed35ce67a723af30716c37f12c19c95ea17b",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "lines": 24430,
+      "mainSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "matches_main": true,
+      "heldSha256": "aab9e5a84ab6270ff9a5e08b9fad8858c79ac9547c232251c74e8ddf295a2cc1",
+      "matches_held": false,
+      "original1291Sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "lines": 314,
+      "mainSha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "matches_main": true,
+      "heldSha256": "26f1e09753fde699947a4beca4af2f8a6f3ac55bba1b39b96ca9748822bce8c1",
+      "matches_held": false,
+      "original1291Sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "matches_original1291": true
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "lines": 520,
+      "mainSha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "matches_main": true,
+      "heldSha256": "22a5e5add0f7bbc7d0d7facdea094ae1b67509cda330e983d99a85cf840a12da",
+      "matches_held": false,
+      "original1291Sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "matches_original1291": true
+    },
+    {
+      "path": "scripts/graphify-navigation.py",
+      "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "lines": 369,
+      "mainSha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "matches_main": true,
+      "heldSha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "matches_held": true,
+      "original1291Sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "matches_original1291": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "lines": 32,
+      "mainSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "matches_main": true,
+      "heldSha256": "58e2947e1841bac02d119827c08ee01477f345fc9f63131d569ed1637483eab7",
+      "matches_held": false,
+      "original1291Sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "matches_original1291": true
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "lines": 66,
+      "mainSha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "matches_main": true,
+      "heldSha256": "e5d013fe693d36dccc508ab4cb8a119e2c5faba67016c671c6704b6e03a48f7e",
+      "matches_held": false,
+      "original1291Sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "matches_original1291": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "lines": 405,
+      "mainSha256": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+      "matches_main": false,
+      "heldSha256": "8924e889f1c7d6fe43773f77d0a29dc530add8172971b9b4d502ff1c479a2e40",
+      "matches_held": false,
+      "original1291Sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "matches_original1291": true
+    }
+  ],
+  "acceptedAncestry": {
+    "P0-13": {
+      "commit": "dc444dc6ba5bf7c43d2eaf2e48fbe79cb420ebfd",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-17": {
+      "commit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-25": {
+      "commit": "b4ca425cc12c48b83477ab260a06454f5874bc73",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-19_original": {
+      "commit": "3aa75a1196417570f9199980c290dad36a55dea3",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-19_v1_followup": {
+      "commit": "da093617408162ac38a3a01a52bf9e4209fca292",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-55_followups": {
+      "commit": "5d4740de268e513bfa63e6fecb3cd3fa1cb2a48b",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    }
+  },
+  "verifiedD15Registrations": [
+    {
+      "path": "src/assurance/assurancePolicyStore.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/assurance/assurancePolicyStore.ts.landed",
+      "sha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/assurance/assuranceStore.ts.landed",
+      "sha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "issue": "P0-19",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-19/src/assurance/validators.ts.landed",
+      "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "issue": "P0-17",
+      "baseCommit": "6b899a60c7ba3b605fed78e9257901e84b93c871",
+      "archivePath": "unused-code/plan-edits/P0-17/src/compliance/complianceEngine.ts.landed",
+      "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/types.ts",
+      "issue": "P0-44",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
+      "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "archiveAndBaseBytesVerified": true
+    }
+  ],
+  "existingTestHashes": [
+    {
+      "path": "tests/assuranceLab.test.ts",
+      "sha256": "1be062745968429e010387a4929d963c6eef923b9d8343055faee1c30fe628f6"
+    },
+    {
+      "path": "tests/assuranceAgentResponder.test.ts",
+      "sha256": "4e2aaba81d0e12e63fa571902e63770511a0cef24892d858765f5dd679e24b30"
+    },
+    {
+      "path": "tests/regulatoryAssurancePacks.test.ts",
+      "sha256": "b5601b3e44b127b677bdf351b78cd74c359c157726a6cf8ae91f04fc09d97853"
+    },
+    {
+      "path": "tests/assurance/industryPackFailClosed.test.ts",
+      "sha256": "0fe16ae6c7727ea1aa381c35a4611b6d814098800c4212b4565009cb41798b32"
+    },
+    {
+      "path": "tests/compliance/complianceFailClosed.test.ts",
+      "sha256": "0f503d86bb822b93308a46144f8a107cf08e7084982e4f9d8dfcb91fbdf64297"
+    },
+    {
+      "path": "tests/redteam.test.ts",
+      "sha256": "dc060dd4394fbac18421f8d57cfd7b0599aaee11aa40e519743581f3a2e70237"
+    },
+    {
+      "path": "tests/validators.test.ts",
+      "sha256": "290c6970177de5d1414a36371e8447a388d5d2d94c4516441b39b836b092bca7"
+    },
+    {
+      "path": "tests/assuranceScenarioContextParity.test.ts",
+      "sha256": "0c2220eb87d67d239523f5cb4db805c3cb9c49cce586c02fc95757fbbc8535da"
+    },
+    {
+      "path": "tests/assurance/inMemoryStorePersistence.test.ts",
+      "sha256": "732cb3236df44a0b3aded8f2756a27be71bfa38f9c77c7a7d93966f6e2e016ac"
+    }
+  ],
+  "newCommittedQualificationTests": [
+    {
+      "path": "tests/assuranceSessionQualification.test.ts",
+      "sha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+      "lines": 200
+    },
+    {
+      "path": "tests/budgetIntegrityQualification.test.ts",
+      "sha256": "1e3eae62d2c49bccafd36f9ae0a6a3e442cfa57c27f8be217a08b1c1f55dfff8",
+      "lines": 180
+    },
+    {
+      "path": "tests/controlCheckpointQualification.test.ts",
+      "sha256": "7569ac285ff36b9e8cb1e4f8878d2b71be614ab4f752c444d6ebb0d98686dbcd",
+      "lines": 114
+    },
+    {
+      "path": "tests/evidenceAgentFilterQualification.test.ts",
+      "sha256": "33ee082ab1d053fd7821c2936ea8cd9fcc0324273c2fe1e1778214786d889c79",
+      "lines": 180
+    }
+  ],
+  "graph": {
+    "copy": "/private/tmp/p0-52-graph-navigation-w8xr443v",
+    "nodes": 36459,
+    "originalGraphMtime": "2026-09-08 12:39:47 IST",
+    "bytes": 45692207,
+    "reviewedVersion": "0.9.56",
+    "installedVersion": "0.9.74",
+    "queryLogs": [
+      {
+        "path": "/private/tmp/p0-27-next-routing-graph-query-20261015.log",
+        "sha256": "6dcc5bba360ede194c25b1a9ae8a6486c9a4541852afa77718d5b256d2860a88"
+      },
+      {
+        "path": "/private/tmp/p0-27-next-routing-grader-graph-query-20261015.log",
+        "sha256": "3d326bd3a15423520328c2457a42ffffc9ed02dc698446bd9a4f569141d1849e"
+      },
+      {
+        "path": "/private/tmp/p0-27-next-routing-validator-graph-query-20261015.log",
+        "sha256": "e3da69a9c6afcfcaa8e57e9693709d65ca190b78992a2dc7ac0862a92ec7dfc0"
+      }
+    ],
+    "limits": "The broad query found 83 nodes and displayed 58; a filename query matched documentation only. The refined baseRefusalChecks/validateInjectionResponse/validateExfiltrationResponse query found 40 and displayed 36 relevant nodes. The stale graph is navigation only; direct source establishes current behavior. No refresh/watch/server was used."
+  },
+  "recommendation": {
+    "nextKey": "P0-19",
+    "priority": "High",
+    "due": "2026-10-22",
+    "planRow": "Issues.md:29",
+    "dependencies": [
+      "P0-13",
+      "P0-17",
+      "P0-25"
+    ],
+    "sourceDependenciesAvailable": true,
+    "basis": "P0-19 is the next bounded High qualification slice due October 22. Urgent P0-55 is due October 21, but whole acceptance still depends on unresolved P0-20/P0-22/P0-27/P0-51 contracts and reserved API/shared paths. P0-19 also advances P1-48, P2-27 and G0 without resuming those implementations.",
+    "condition": "Root must finish the bounded P0-27 final receipt and assign a fresh owned P0-19 workspace from the actual accepted final pin. Re-read reservations and readiness before any test/runtime; this report grants no production ownership.",
+    "scope": "Use the actual accepted gradeScenarioReply and existing producers, stores, canonical hash/signing and fixtures. Qualify grading, stored tool-call inconclusive/parity, verifier and v1 no-findings behavior; do not reimplement the grader or redesign echo validators."
+  },
+  "sourceFindings": [
+    {
+      "path": "src/assurance/scenarioGrading.ts",
+      "lines": [
+        25,
+        29,
+        34,
+        53,
+        66,
+        69,
+        74,
+        82,
+        90
+      ],
+      "finding": "A shared grader dispatches structured callbacks, otherwise refuses nonempty tool calls even alongside prose, then token claims, then ungradable missing/synthetic industry evidence. Graded measurements keep 70-20n partial credit. Packs use their weakest method; only structured/executed are regulatedEligible."
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "lines": [
+        38,
+        45,
+        95,
+        119
+      ],
+      "finding": "The existing secret regex is stateless, bare policy is not a refusal, and a protected-system leak is checked even with refusal text. These are accepted fixes, not instructions to rewrite them."
+    },
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "lines": [
+        433,
+        450,
+        455,
+        457,
+        579,
+        612,
+        628,
+        634,
+        712
+      ],
+      "finding": "Tool calls reach report and evidence writer. Inconclusive rows have pass false/zero scores/HIGH audit and exact prompt/response refs. All-inconclusive reports are insufficient evidence. Verification skips regrading and rejects pass or nonzero-score inconclusive rows."
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "lines": [
+        127,
+        139,
+        141,
+        153
+      ],
+      "finding": "Canonical {text,toolCalls} is included in the response digest when calls exist, meta.toolCallCount is recorded, and existing redaction is applied. No-call replies preserve the plain-text legacy digest."
+    },
+    {
+      "path": "src/redteam/runner.ts",
+      "lines": [
+        516,
+        529,
+        532,
+        574
+      ],
+      "finding": "Actual red-team uses the same grader and preserves tool calls, but its current mode is unsigned-local; inconclusive rows are excluded from measured pass/fail and vulnerabilities. This is not signed portable or executed-tool evidence."
+    },
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "lines": [
+        265,
+        273
+      ],
+      "finding": "Accepted v1 follow-up marks inconclusive rows and excludes them from findings/counts. Related schema and findingsFromScenarioResults preserve this; narrow runtime must qualify actual stored artifacts."
+    },
+    {
+      "path": "src/catalog/evidence/mappingAdapter.ts",
+      "lines": [
+        136,
+        140,
+        147
+      ],
+      "finding": "The current assurance compliance eligibility guard is here, not the old complianceEngine branch. Genuine keyword/token-claim/older missing-field pack results are untrusted and not evaluated. No built-in validateToolCalls or structured/executed declaration was found; do not invent one."
+    }
+  ],
+  "existingCoverage": [
+    {
+      "path": "tests/assuranceLab.test.ts",
+      "lines": [
+        111,
+        112,
+        115
+      ],
+      "contract": "Actual assurance regex/refusal/leak/repeated-secret regressions already exist. tests/validators.test.ts imports Shield validators and does not test assurance regexes; correct the earlier routing interpretation."
+    },
+    {
+      "path": "tests/regulatoryAssurancePacks.test.ts",
+      "lines": [
+        26,
+        35,
+        74
+      ],
+      "contract": "Real token-claim scenarios use the actual grader and assert token_claim inconclusive; local prompt artifact-hint controls exist."
+    },
+    {
+      "path": "tests/assurance/industryPackFailClosed.test.ts",
+      "lines": [
+        202,
+        238,
+        249
+      ],
+      "contract": "Real loopback endpoint industry runs assert target/session attribution and missing/canned replies zero-score inconclusive, insufficient evidence and excluded pass/fail counts. Full stored tool-call/verifier/v1 assertions are absent."
+    },
+    {
+      "path": "tests/assuranceAgentResponder.test.ts",
+      "lines": [
+        97,
+        110
+      ],
+      "contract": "Parsing and inconclusive aggregate exclusion exist. Source-presence tests do not prove actual tool-call-only endpoint behavior."
+    },
+    {
+      "path": "tests/compliance/complianceFailClosed.test.ts",
+      "lines": [
+        352,
+        365
+      ],
+      "contract": "Genuine sealed keyword/legacy-field and all-inconclusive report controls exist. Reuse current signing/map fixtures for additional token-claim controls."
+    },
+    {
+      "path": "tests/redteam.test.ts",
+      "lines": [
+        106
+      ],
+      "contract": "Actual loopback endpoint baseline exists; tool-call/inconclusive parity assertions were not found."
+    }
+  ],
+  "missingNamedSpecFiles": [
+    "tests/assurance/scenarioGrading.test.ts",
+    "tests/assurance/runnerInconclusive.test.ts",
+    "tests/assurance/promptAnswerLeak.test.ts"
+  ],
+  "proposedSlices": [
+    {
+      "order": 1,
+      "newFile": "tests/assuranceGradingQualification.test.ts",
+      "scope": "New file only after root assignment; no product/helper/original-test edits.",
+      "actualParams": "Use getAssurancePack industry/text/token scenarios and their buildPrompt/context. Empty text and the existing EXAMPLE_ASSURANCE_REPLY exercise actual industry refusal; harmless AgentToolCall {name:\"read_owned_fixture\",arguments:{path:\"fixture.txt\"}} exercises text-only and text-plus-tool dispatch.",
+      "contracts": [
+        "Missing/canned evidence is ungradable_evidence with no measured score.",
+        "Tool-only/mixed prose cannot pass text-only scenarios and gives tool_calls_ungraded.",
+        "Actual token claims stay inconclusive.",
+        "A finite callback descriptor can test actual structured dispatch/order but is explicitly a test control, not a built-in executed pack.",
+        "Actual scoring, aggregate and weakest-method helpers keep measured partial credit and exclude inconclusive rows.",
+        "Reuse existing assuranceLab regex controls rather than replacing them."
+      ]
+    },
+    {
+      "order": 2,
+      "newFile": "tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "scope": "Separate new file only after root assignment; no source/helper/old-test edits.",
+      "fixture": "Fresh initWorkspace({workspacePath,agentId:\"default\",trustBoundaryMode:\"isolated\"}); sibling HOME/AMC_HOME. Capture monitor/auditor public pins immediately after initialization and before producer calls; reuse current genuine trust/signing verification. Scoped process environment is restored.",
+      "endpoint": "Existing startFakeAgentServer({toolCalls:()=>[{name:\"read_owned_fixture\",arguments:{path:\"fixture.txt\"}}]}) returns content:null and tool_calls on loopback; the real responder/parser/runner are used. No external provider/model/live licence or tool execution is claimed.",
+      "assuranceParams": {
+        "agentId": "default",
+        "packIds": [
+          "injection"
+        ],
+        "mode": "sandbox",
+        "window": "1d",
+        "noSign": false
+      },
+      "redteamParams": {
+        "agentId": "default",
+        "plugins": [
+          "injection"
+        ],
+        "strategies": [
+          "direct"
+        ],
+        "noSign": true
+      },
+      "contracts": [
+        "Exact scenarios/calls are zero-score inconclusive and insufficient evidence, with no measured pass/fail fabrication.",
+        "Report calls and real response ledger canonical payload/meta.toolCallCount/digest agree; refs use exact session/run attribution.",
+        "Actual monitor signatures, session seal and run hash/seal verify under independent pins; local signing does not promote SELF_REPORTED fixture provenance.",
+        "Actual verifyAssuranceRun accepts the genuine all-inconclusive report without determinism errors; score-bearing/pass-marked fixture controls refuse with hash/seal side conditions retained.",
+        "Loaded v1 run/findings artifacts preserve inconclusive flags, INSUFFICIENT_EVIDENCE, empty findings and zero counts; measured-failure controls still produce findings.",
+        "Actual injection/direct red-team parity has no measured pass/fail/vulnerabilities while remaining unsigned-local.",
+        "Record all names/bytes/DB/WAL/SHM and semantic rows separately. Do not claim blanket filesystem immutability, authentication or executed tools."
+      ]
+    },
+    {
+      "order": 3,
+      "newFile": "tests/assuranceComplianceEligibilityQualification.test.ts",
+      "scope": "Optional separately assigned file only if existing meaningful controls lack required token-claim evidence.",
+      "fixture": "Reuse genuine locally sealed assurance report/map fixture from tests/compliance/complianceFailClosed.test.ts, current generateComplianceReport and mappingAdapter; no invented regulated artifacts, applicability or evidence-array waiver.",
+      "contracts": [
+        "Keyword, token-claim and old missing fields do not produce a regulated pass.",
+        "Current compiled-plan applicability and insufficient/untrusted semantics remain; no forced positive result from missing applicability.",
+        "Structured/executed descriptors are fixture controls, not a claim that such a built-in executed pack exists."
+      ]
+    }
+  ],
+  "futureCommands": [
+    "After parent receipt, fresh workspace and build readiness: pnpm exec vitest run tests/assuranceLab.test.ts tests/assuranceAgentResponder.test.ts tests/regulatoryAssurancePacks.test.ts tests/assurance/industryPackFailClosed.test.ts tests/compliance/complianceFailClosed.test.ts tests/redteam.test.ts --reporter=json --outputFile=<unique-private-file>",
+    "Run newly assigned qualification files in distinct journal phases with explicit Node22 executable/PATH and private raw stdout/stderr/effects. Root owns frozen install/build, typechecks, lint, counts, freeze, docs, architecture and final receipt."
+  ],
+  "futureMutationPlan": {
+    "state": "Planning only; new root authorization/readiness and immutable private inputs are required. No mutation was performed in this preflight.",
+    "routes": [
+      "Remove only actual ungradable branch: missing/canned grade controls fail.",
+      "Ignore only nonempty tool calls in text scenarios: tool-only/mixed reply controls fail.",
+      "Restore only a secret regex global flag: repeated-call control fails.",
+      "Force keyword eligibility at the actual producer helper: genuine keyword compliance control fails while existing applicability is retained."
+    ],
+    "protocol": "Baseline, exact private diff, mutant and restoration on separate copies. Never mutate live source/dist. Preserve parser/import/fixture failures as such rather than claimed killed mutations."
+  },
+  "freezeAndOwnership": {
+    "freezeActive": true,
+    "P019Exception": false,
+    "rule": "No CLI inventory growth, shared CLI/registry/REPL/freeze/budget/floor edits, archive re-registration or restoration-test weakening. Existing validator archive is verified under D-15; absence of a reservation is not broad production clearance.",
+    "reservations": "RESERVATIONS.md:1490\u20131502 reserves P2-27 and other Claude lanes. Lines1583\u20131588 preserve A4 and shared CLI/registry/REPL coordination; lines1603\u20131617 document held privacy/native composition work. User pause overrides historical unblocked notes."
+  },
+  "preservedDebt": [
+    "P2-27 owns 47 in-scope echo scenarios retained at pending-checks.md:54 and excluded by P0-55. Do not redesign regex validators, count echoes as measured evidence, resume P2-27 or close whole P0-19.",
+    "Paused P2-02/tokenization, held P1-78/native/A4/privacy source, primary/main and Claude trees remain preserved; held pending-main is not imported.",
+    "Current parent mixed CLI/SQLite observations remain retained. Coordination sidecars and other named effects are separate from semantic row isolation and persistent-byte assertions; this pass makes no blanket no-effects or parent runtime acceptance claim.",
+    "P0-27 strict tagged-system exclusion remains RED alongside accepted direct metadata compatibility.",
+    "P0-20 shared output-line/exit70 decision remains pending; helper qualification is not shared-source or authenticated HTTP approval.",
+    "P0-52 narrow alias-history/destination decision remains pending.",
+    "P0-29 successor and P0-22 empty-result skips remain unresolved.",
+    "P0-51 pinned compromised-signer precedence contradictions remain RED.",
+    "P0-55 whole urgent acceptance, authenticated API/Studio, remaining writers/session inventory and release/G0 remain unclosed."
+  ],
+  "retainedP027Receipt": {
+    "path": "/private/tmp/p0-27-checkpoint-export-qualification-20261015.json",
+    "sha256": "0868b7e884b77f29c2dd5815bd9363c48841c4adb2e99b4ab8e872742d4484f4",
+    "counts": "Checkpoint 13/13; export 10/11 strict tagged-system RED; private causal 4/3/4 and 10/7/10. Initial private SQLite coordination failure retained."
+  }
+}

@@ -1,0 +1,831 @@
+{
+  "kind": "P0-23 read-only preflight, not qualification or completion",
+  "atUtc": "2026-10-14T16:48:59.059432+00:00",
+  "key": "P0-23",
+  "priority": "Urgent",
+  "due": "2026-10-24",
+  "route": "Agent-Doable",
+  "nextEligibleAction": "After the parent finishes bounded P0-22 qualification, begin a serial owned P0-23 MCP response test slice. No implementation has started in this preflight.",
+  "authority": [
+    "The user requested serial current-plan priority and dependencies, preserving Claude work and freeze checks.",
+    "The parent reports the user explicitly left the P0-22 empty JSON contract unresolved and authorized moving on after bounded qualification. This is not a waiver of P0-23 acceptance.",
+    "P0-23 remains In review in the October 9 supplied plan snapshot; historical merged source and labels do not establish current behavioral qualification."
+  ],
+  "dependencies": {
+    "keys": [
+      "P0-08",
+      "P0-15",
+      "P0-21"
+    ],
+    "mergedOnAcceptedSource": [
+      {
+        "key": "P0-08",
+        "commit": "1e5915d592fd5e3d99d5ba1dd6c2b91ce7fec4bb",
+        "ancestorOfAccepted": true
+      },
+      {
+        "key": "P0-15",
+        "commit": "421c38d2015f2afd937d26a6f545eae4f65f5041",
+        "ancestorOfAccepted": true
+      },
+      {
+        "key": "P0-21",
+        "commit": "42e0e3a7d5846472f0c4c385ea4f65cd645416fc",
+        "ancestorOfAccepted": true
+      }
+    ],
+    "P0-22": "Related serial predecessor, not a declared P0-23 dependency. The parent still owns its final guard and qualification."
+  },
+  "sources": {
+    "acceptedMain": {
+      "path": "/Users/sid/AgentMaturityCompass",
+      "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "status": "Clean during this audit"
+    },
+    "ownedP0-22": {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass",
+      "head": "07125b76cb17ecf063f19b914085a5bfc968df35",
+      "status": "Parent-owned uncommitted fleet/lab/test/snapshot and approved documentation work remains untouched."
+    },
+    "p0-23OriginalCommits": [
+      "d7f428581be2f83c46afc3eaf074784e1c0c051a",
+      "bef04ce9f58a31fabfc22fad800e7625e9f6ff72"
+    ],
+    "inputs": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-23.md",
+        "sha256": "468e694e7989aacbf26f3101efa52bf0e734c64a81946daaf216a8683ce9ff1b"
+      },
+      {
+        "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+        "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+      },
+      {
+        "path": "/private/tmp/p0-23-static-source-inventory-20261014.json",
+        "sha256": "a561d25bb71ce08b0294dfbcce45594dd4e1409b28a26f03d7c63bb1a49d7455"
+      }
+    ],
+    "checkedSourceHashes": [
+      {
+        "path": "src/mcp/amcMcpServer.ts",
+        "acceptedSha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+        "ownedSha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+        "equal": true,
+        "lines": 772
+      },
+      {
+        "path": "src/mcp/mcpClaimOutput.ts",
+        "acceptedSha256": "10e7132ff8f81ff8f116e97728dabd601bf5b8c72ced079a6f3b26c9944d9e9e",
+        "ownedSha256": "10e7132ff8f81ff8f116e97728dabd601bf5b8c72ced079a6f3b26c9944d9e9e",
+        "equal": true,
+        "lines": 35
+      },
+      {
+        "path": "src/domains/industryPacks.ts",
+        "acceptedSha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7",
+        "ownedSha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7",
+        "equal": true,
+        "lines": 2603
+      },
+      {
+        "path": "src/domains/domainEvidence.ts",
+        "acceptedSha256": "964e0eccddeced986aa6e6f68358cb6e30ecf1b6901edc7761a11566d90c545a",
+        "ownedSha256": "964e0eccddeced986aa6e6f68358cb6e30ecf1b6901edc7761a11566d90c545a",
+        "equal": true,
+        "lines": 33
+      },
+      {
+        "path": "src/api/apiHelpers.ts",
+        "acceptedSha256": "d645ef39b25422ae3dd2a771c3555daedafe134c07afb6ed9b7508fd30ffc46a",
+        "ownedSha256": "d645ef39b25422ae3dd2a771c3555daedafe134c07afb6ed9b7508fd30ffc46a",
+        "equal": true,
+        "lines": 180
+      },
+      {
+        "path": "src/api/resultRouteRegistry.ts",
+        "acceptedSha256": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+        "ownedSha256": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+        "equal": true,
+        "lines": 219
+      },
+      {
+        "path": "src/api/index.ts",
+        "acceptedSha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+        "ownedSha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+        "equal": true,
+        "lines": 574
+      },
+      {
+        "path": "src/studio/studioClaimOutput.ts",
+        "acceptedSha256": "c29e8ca0cc2e7fbe6ff6748c385def883fcb92dcc7962d53881f1beb13d53ac7",
+        "ownedSha256": "c29e8ca0cc2e7fbe6ff6748c385def883fcb92dcc7962d53881f1beb13d53ac7",
+        "equal": true,
+        "lines": 48
+      },
+      {
+        "path": "src/studio/studioServer.ts",
+        "acceptedSha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+        "ownedSha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+        "equal": true,
+        "lines": 8857
+      },
+      {
+        "path": "src/studio/openapi.ts",
+        "acceptedSha256": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+        "ownedSha256": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+        "equal": true,
+        "lines": 2211
+      },
+      {
+        "path": "src/console/assets/components/claimBadge.js",
+        "acceptedSha256": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+        "ownedSha256": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+        "equal": true,
+        "lines": 85
+      },
+      {
+        "path": "src/console/assets/app.js",
+        "acceptedSha256": "6bdee3f49798480be259852993fdead87c6dc6faa2333751318ec25da1ed058a",
+        "ownedSha256": "6bdee3f49798480be259852993fdead87c6dc6faa2333751318ec25da1ed058a",
+        "equal": true,
+        "lines": 3946
+      },
+      {
+        "path": "src/console/assets/api.js",
+        "acceptedSha256": "5b2a6be7c376b1e575f0d9cab3d36ee1d9da3d22f2e10de090a1fe5e76f7df23",
+        "ownedSha256": "5b2a6be7c376b1e575f0d9cab3d36ee1d9da3d22f2e10de090a1fe5e76f7df23",
+        "equal": true,
+        "lines": 199
+      },
+      {
+        "path": "src/cli.ts",
+        "acceptedSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+        "ownedSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+        "equal": true,
+        "lines": 24430
+      },
+      {
+        "path": "src/cli/resultCommandRegistry.ts",
+        "acceptedSha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+        "ownedSha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+        "equal": true,
+        "lines": 314
+      },
+      {
+        "path": "src/repl/replParser.ts",
+        "acceptedSha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+        "ownedSha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+        "equal": true,
+        "lines": 520
+      },
+      {
+        "path": "scripts/freeze-baseline.json",
+        "acceptedSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "ownedSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "equal": true,
+        "lines": 32
+      },
+      {
+        "path": "scripts/line-budgets.json",
+        "acceptedSha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+        "ownedSha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+        "equal": true,
+        "lines": 66
+      },
+      {
+        "path": "website/openapi.yaml",
+        "acceptedSha256": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+        "ownedSha256": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+        "equal": true,
+        "lines": 16056
+      },
+      {
+        "path": "tests/mcpServer.test.ts",
+        "acceptedSha256": "b69d6035b38eaa0c284d3e41dd27e2af8b464a4fce9a2ebdc57c974c09ff13ed",
+        "ownedSha256": "b69d6035b38eaa0c284d3e41dd27e2af8b464a4fce9a2ebdc57c974c09ff13ed",
+        "equal": true,
+        "lines": 211
+      },
+      {
+        "path": "tests/industryPackSchema.test.ts",
+        "acceptedSha256": "19dae14eea0dc504e2e98863e075a264d75ec967b2677ce3af24698be64fe146",
+        "ownedSha256": "19dae14eea0dc504e2e98863e075a264d75ec967b2677ce3af24698be64fe146",
+        "equal": true,
+        "lines": 159
+      },
+      {
+        "path": "tests/claims/claimLabels.test.ts",
+        "acceptedSha256": "0864308cdb341524b1dfdbe17216ae62ebcc612f1c9501797caf720b1b59997a",
+        "ownedSha256": "0864308cdb341524b1dfdbe17216ae62ebcc612f1c9501797caf720b1b59997a",
+        "equal": true,
+        "lines": 108
+      },
+      {
+        "path": "tests/openapiContracts.test.ts",
+        "acceptedSha256": "976d3544005b55a62efaed6b90b8c702d381dc9e9765910cd537d39ac724c183",
+        "ownedSha256": "976d3544005b55a62efaed6b90b8c702d381dc9e9765910cd537d39ac724c183",
+        "equal": true,
+        "lines": 155
+      }
+    ],
+    "allCheckedP0-23AndProtectedInputsEqual": true
+  },
+  "graph": {
+    "command": "graphify query \"claim mcp api studio badge route result\" --budget 1800",
+    "path": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+    "nodeCount": 36459,
+    "mtimeUtc": "2026-09-08T07:09:47.313812+00:00",
+    "queryFound": 286,
+    "queryShown": 60,
+    "installedVersion": "0.9.74",
+    "repositoryRefreshPin": "0.9.56",
+    "role": "Stale navigation only; source was verified directly. No refresh, watcher or server was started.",
+    "log": "/private/tmp/p0-23-graph-navigation-20261014.log"
+  },
+  "inventory": {
+    "defaultMcpTools": 11,
+    "originalP0-23Tools": 10,
+    "gatedA4PreviewTools": 5,
+    "apiResultRoutes": 113,
+    "nonA4ApiResultRoutes": 107,
+    "a4ApiResultRoutes": 6,
+    "studioResultRoutes": 30,
+    "savedOpenApiDocumentedApiResultRoutes": 57,
+    "savedOpenApiWithClaimResultReference": 57,
+    "savedOpenApiMissingApiResultRoutes": 56,
+    "scopeMethod": "Literal registry entries plus explicit provider-drift expansion names were inspected statically. No application module or route factory was executed.",
+    "fullMissingRouteList": [
+      {
+        "method": "GET",
+        "path": "/api/v1/score/evidence-drilldown/:runId/:questionId",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/industry/adjust",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/score/industry/models",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/score/industry/model/:industryId",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/lane/safety-research",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/judge-calibration",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/live-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/trust/verify-claim",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/trust/transitive",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/trust/decay",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/trust/inherited",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/passport/trust-token/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/passport/trust-token/translate",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/badge/export",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/bundle/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/bundle/inspect",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/bundle/diff",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/bundle/export",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/bom/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/enforce/formal/certificate",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/enforce/formal/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/assurance",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/assurance",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/assurance/:runId",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/assurance/history",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/assurance/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/assurance/workspace/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/assurance/lab/:packName",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/assurance/cert",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/assurance/cert/latest",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/assurance/cert/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/benchmarks/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/red-team/run",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/trust-pipeline/run",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/compliance/regulatory/check",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/incidents/:id/clocks",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/promptfoo-provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/inspect-provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/tensorzero-provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/helm-provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/score/patronus-provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/benchmarks/provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/benchmarks/promptfoo-provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/benchmarks/inspect-provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/benchmarks/tensorzero-provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/benchmarks/helm-provider-drift",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/replay-corpus/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/live-drift/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/judge-calibration/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/provider-drift/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/promptfoo-provider-drift/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/inspect-provider-drift/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/tensorzero-provider-drift/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/helm-provider-drift/verify",
+        "documented": false,
+        "hasClaimRef": false
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/shield/patronus-provider-drift/verify",
+        "documented": false,
+        "hasClaimRef": false
+      }
+    ]
+  },
+  "existingMeaningfulCoverage": [
+    "tests/industryPackSchema.test.ts:69-74 covers all four inherited names and a real own ID.",
+    "tests/claims/claimLabels.test.ts:98-108 compares console legend to the canonical HTML legend and checks one neutral self-reported not-evaluated badge.",
+    "tests/openapiContracts.test.ts:79-98 checks ClaimResult references only for routes it finds documented; this is partial coverage.",
+    "tests/industryPackEntitlement.test.ts tests local entitlement verification, signed-proof tampering and unavailable checkout semantics; tests/industryPackWeightingPaymentInvariance.test.ts covers scoring/payment invariance, separately from Studio/MCP response claims."
+  ],
+  "requiredNamedFiles": [
+    {
+      "path": "tests/mcpClaimLabels.test.ts",
+      "existsAccepted": false,
+      "existsOwned": false
+    },
+    {
+      "path": "tests/getPackByIdOwnKeys.test.ts",
+      "existsAccepted": false,
+      "existsOwned": false
+    },
+    {
+      "path": "tests/apiClaimLabels.test.ts",
+      "existsAccepted": false,
+      "existsOwned": false
+    },
+    {
+      "path": "tests/studioClaimLabels.test.ts",
+      "existsAccepted": false,
+      "existsOwned": false
+    },
+    {
+      "path": "tests/consoleClaimBadge.test.ts",
+      "existsAccepted": false,
+      "existsOwned": false
+    }
+  ],
+  "findings": [
+    {
+      "id": "P023-R1",
+      "kind": "Confirmed static acceptance gap",
+      "title": "Published OpenAPI omits 56 registered API result routes",
+      "evidence": [
+        "src/api/resultRouteRegistry.ts:64-113 contains 113 routes: 107 non-A4 routes and six A4 routes. Literal entries and the three explicit provider-drift expansions were enumerated without importing application code.",
+        "Saved website/openapi.yaml documents 57 registered routes, and all 57 reference ClaimResult. The remaining 56 are absent. All six A4 routes are among the documented 57.",
+        "tests/openapiContracts.test.ts:85-97 continues when an operation is missing and requires only at least 51 documented routes. src/api/resultRouteRegistry.ts:203-216 likewise silently skips absent operations."
+      ],
+      "nextContract": "Require each in-scope registry method and normalized path to exist and reference ClaimResult in both saved and freshly generated contracts. Keep held A4 route behavior unchanged. The existing permissive threshold must not replace exact route accounting.",
+      "runtimeStatus": "No generator, API request or test was executed."
+    },
+    {
+      "id": "P023-R2",
+      "kind": "Source-inferred behavior risk requiring reproduction",
+      "title": "Sealed legacy diagnostic claims bypass the stored-run downgrade",
+      "evidence": [
+        "src/api/resultRouteRegistry.ts:138-141 directly calls envelopeForDiagnosticReport after sealedRunReportVerifies. Studio reuses that registry helper.",
+        "src/mcp/mcpClaimOutput.ts:32-34 uses loadDomainEvidence; src/domains/domainEvidence.ts:26-32 directly calls envelopeForDiagnosticReport after seal verification.",
+        "src/claims/eligibility/adapters.ts:85-104 derives the kind from VALID status and observed coverage, with no AMC version check.",
+        "src/claims/eligibility/adapters/results.ts:32-49 uses isLegacyAmcVersion and preserves Legacy (1.x), self-reported even for a correctly sealed legacy report."
+      ],
+      "nextContract": "Use a real owned-workspace auditor seal over a 1.1.1 report with observed coverage. Check actual MCP text and structuredContent, dispatched API JSON and Studio JSON against the same stored-run semantics. Keep current sealed and current unsealed controls. Retain a real RED before proposing a bounded canonical-adapter repair.",
+      "runtimeStatus": "A legacy mismatch is inferred from the source paths; no fresh failure or exploit was executed."
+    },
+    {
+      "id": "P023-R3",
+      "kind": "Source-inferred behavior risk requiring reproduction",
+      "title": "The page claim strip can retain prior labels across in-place reloads",
+      "evidence": [
+        "src/console/assets/components/claimBadge.js:73-84 accumulates claims in a Map keyed by claimLabel and returns reset().",
+        "src/console/assets/app.js:3944 discards the returned reset handle.",
+        "src/console/assets/passport.js:122-146 rerenders the page after create and export without resetting the strip."
+      ],
+      "nextContract": "Drive the actual strip subscription through a first result and a lowered replacement, then a page reload/reset. Confirm that a prior stronger label is removed. Do not claim browser proof from a pure HTML helper test.",
+      "runtimeStatus": "No DOM or browser execution occurred. Accumulation follows from the current source; its visible effect still requires a bounded contract."
+    },
+    {
+      "id": "P023-R4",
+      "kind": "Confirmed test coverage gap with preserved extension",
+      "title": "MCP response qualification is absent; the specification count is stale",
+      "evidence": [
+        "src/mcp/amcMcpServer.ts:107-123 includes the ten original tools, the P1-17 amc_incident_clocks extension, and gated A4 metadata.",
+        "tests/mcpServer.test.ts:37-60 intentionally pins 11 default tools. Its remaining tests inspect CLI configuration, metadata and workspace error behavior; tests/mcpServerTools.test.ts only tests workspace paths.",
+        "No existing test imports createAmcMcpServer or InMemoryTransport to exercise these ten actual AMC tool responses.",
+        "src/mcp/mcpClaimOutput.ts:15-23 separates original text from the canonical claim text block and attaches structuredContent, preserving parseable JSON output."
+      ],
+      "nextContract": "Keep 11 default tools and the hidden A4 preview extension. Exercise the ten original tool handlers through SDK Client and InMemoryTransport with actual workspace fixtures; add the incident extension separately using its existing fixture. Parse structuredContent statusDimensions, compare canonical words and the docs pointer, and test empty/unbound results without inventing an evaluated score.",
+      "runtimeStatus": "Existing tests were read, not run. Do not restore the obsolete count of ten or enable AMC_A4_PREVIEW."
+    },
+    {
+      "id": "P023-R5",
+      "kind": "Implemented source guard with meaningful existing unit coverage",
+      "title": "Own-key pack lookup is implemented; MCP-level refusal remains unqualified",
+      "evidence": [
+        "src/domains/industryPacks.ts:2509-2512 uses Object.hasOwn for getPackById.",
+        "tests/industryPackSchema.test.ts:69-74 checks __proto__, constructor, toString and hasOwnProperty plus a real ID.",
+        "src/mcp/amcMcpServer.ts:385-405 checks entitlement before lookup, then returns Unknown sector pack on missing IDs.",
+        "src/domains/packSelfAssessment.ts:29-47 derives a regulated self-assessment envelope and eligibleLevel from canonical numeric-self-answer rules."
+      ],
+      "nextContract": "Reuse the existing own-key test instead of duplicating a new test file. Add actual SDK calls with an authorized local fixture entitlement so prototype names reach lookup rather than the paywall. All-5 real pack answers must remain self_reported and not evaluated for regulated claims, with no certification or trust upgrade. Preserve the entitlement gate and avoid live checkout or activation requests.",
+      "runtimeStatus": "No MCP call, entitlement mutation or mutation test was executed."
+    },
+    {
+      "id": "P023-R6",
+      "kind": "Confirmed test coverage and schema-contract gaps",
+      "title": "API dispatcher and list claims lack actual response contracts",
+      "evidence": [
+        "src/api/index.ts:532-535 binds the matched result route; src/api/apiHelpers.ts applies its labeller in apiSuccess. Direct router tests alone do not exercise this binding.",
+        "src/api/resultRouteRegistry.ts:155-162 attaches fields beside single results and a nested claim on object list items, while primitive and null items pass through.",
+        "src/api/resultRouteRegistry.ts:191-198 adds a list item claim property but does not make that property required.",
+        "No result-route keyword inventory with reasoned exclusions or dedicated API claim response suite was found. tests/apiRouters.test.ts mocks report producers and calls routers directly."
+      ],
+      "nextContract": "First qualify representative single, nonempty list, regulated and unbound responses through handleApiRoute or an owned loopback Studio server. Expand to exact in-scope registry accounting with route fixtures and reasoned non-result exclusions. Preserve refusal responses, access policy, body limits and non-JSON formats. Record malformed/empty lists explicitly; do not silently invent aggregate claims.",
+      "runtimeStatus": "No dispatch or HTTP request ran. Shared empty-array contract policy remains unresolved and must not be changed as a side effect."
+    },
+    {
+      "id": "P023-R7",
+      "kind": "Implemented wiring with insufficient route and page qualification",
+      "title": "Studio labels and legends exist but are not proven across listed outputs",
+      "evidence": [
+        "src/studio/studioClaimOutput.ts:11-29 registers 30 result routes. bindStudioResultRoute at src/studio/studioServer.ts:1718 and withClaimBody at :450 cover successful JSON objects.",
+        "src/studio/studioClaimOutput.ts:43-47 leaves non-object, null, array and non-2xx bodies untouched.",
+        "src/console/assets/api.js:107-119 collects top-level claims and nested item.claim objects; app.js:3944 installs the strip.",
+        "claimBadge.js:26-30 includes the six original legend pages and preserves two later A4 page names. tests/claims/claimLabels.test.ts:98-108 checks exact legend parity and one self-reported not-evaluated badge only.",
+        "src/studio/studioServer.ts:8608-8654 retains catalog/detail entitlement behavior and truth-rule note."
+      ],
+      "nextContract": "Use existing startStudioApiServer fixture patterns on port 0 to prove actual listed successful responses, paid/unpaid catalog claim equality and entitlement notes. Cover all four kinds plus not-evaluated reason, HTML escaping, tooltip dimensions and legend link in the actual badge helper. Add page/subscription checks and any required browser evidence only after owning the scope; do not enable A4 preview.",
+      "runtimeStatus": "No server, screenshot or badge execution occurred."
+    }
+  ],
+  "ownership": {
+    "readOnlyEligible": true,
+    "ownedTestsFirstEligibleAfterP0-22": true,
+    "sourceEditClearance": "No source edit clearance is asserted by this preflight. No dedicated current P0-23 issue reservation was found in the explicit reserved item list at RESERVATIONS:1496-1504; earlier shared-path reservations still require reconciliation before editing.",
+    "heldPaths": [
+      "src/a4/**",
+      "src/console/assets/a4*.js",
+      "src/api/index.ts",
+      "src/api/accessPolicy.ts",
+      "src/api/resultRouteRegistry.ts",
+      "src/studio/studioServer.ts",
+      "src/studio/openapi.ts",
+      "approvals and retained shared Studio paths"
+    ],
+    "holdEvidence": [
+      "RESERVATIONS:1114-1121 retains API index/accessPolicy/resultRouteRegistry/approvals/Studio ownership for P1-58 onward.",
+      "RESERVATIONS:1541 releases wave-5 paths except A4; it is not an explicit global release of the older API/Studio holds.",
+      "RESERVATIONS:1587-1588 retains shared CLI/registry/REPL coordination requirements.",
+      "RESERVATIONS:1606-1616 identifies later held P2-02 tokenization/privacy paths."
+    ],
+    "pausedExcluded": [
+      "P2-02 tokenization/redaction and native composition",
+      "A4 preview/Activate/held pending-main merges",
+      "Unapproved P1-65 freeze baseline exception from held source",
+      "P0-29 unresolved successor decisions",
+      "Live deployment, checkout, publishing and credential changes"
+    ],
+    "communication": "No Claude message or reservation edit was sent."
+  },
+  "decisions": {
+    "D-06": "The recovered decision remains a Needs-Sid plan snapshot; no fresh approval was found in the inspected handoff or pending checks. P0-23 label and payment-truth qualification can proceed under either commercial option. Gate retirement belongs to P1-51 and is excluded. Do not infer a commercial decision from existing entitlement code.",
+    "P0-22EmptyJson": "Retain the user-directed unresolved contract. Document any analogous P0-23 raw-array/empty-list behavior separately, without changing the criteria or silently manufacturing records."
+  },
+  "lineBudgets": {
+    "genericCap": 800,
+    "mcpServerPhysicalLines": 772,
+    "studioServerPhysicalLines": 8857,
+    "studioServerBudget": 8858,
+    "openapiPhysicalLines": 2211,
+    "openapiBudget": 2212,
+    "resultRouteRegistryPhysicalLines": 219,
+    "rule": "Check using the actual architecture script before any future edit; do not raise budgets or freeze baselines."
+  },
+  "boundedQualificationOrder": [
+    {
+      "phase": 1,
+      "scope": "Owned tests plus existing MCP/helper source only after a real RED and parent scope review",
+      "contracts": [
+        "SDK listTools preserves 11 default names, including the ten original tools; A4 preview remains disabled.",
+        "Actual ten-tool text and structuredContent labels parse and agree with canonical fields.",
+        "Inherited pack IDs reach the own-key guard with local fixture entitlement and fail Unknown sector pack.",
+        "All-5 pack answers stay self-reported, regulated not evaluated and never certified.",
+        "Current sealed, current unsealed and sealed 1.1.1 report claims remain distinct; preserve original JSON first text block."
+      ],
+      "reuse": [
+        "tests/mcpServer.test.ts",
+        "tests/industryPackSchema.test.ts",
+        "Existing transparency/diagnostic/entitlement fixtures and resetRateLimiter"
+      ]
+    },
+    {
+      "phase": 2,
+      "scope": "Owned tests may inspect shared APIs; source repair waits for ownership reconciliation",
+      "contracts": [
+        "Dispatch representative non-A4 single and list routes through the actual success labeller.",
+        "Exact non-A4 registry coverage and reasoned exclusions; every required OpenAPI operation must exist.",
+        "ClaimResult list schemas require nested claim fields.",
+        "Canonical legacy parity across API and Studio; preserve actual refusals and non-JSON formats."
+      ]
+    },
+    {
+      "phase": 3,
+      "scope": "Studio and original console page qualification after ownership reconciliation",
+      "contracts": [
+        "Loopback port-0 server responses for the 30 listed Studio routes, with meaningful owned fixtures.",
+        "Paid/unpaid catalog claim fields and pack entitlement note remain identical in truth.",
+        "All four badge kinds, neutral not-evaluated reason, escaping, dimensions tooltip and legend link.",
+        "Strip reload removes prior labels; six original legend pages and actual screenshots or equivalent page execution evidence."
+      ]
+    }
+  ],
+  "futureCommands": {
+    "note": "Illustrative commands for the parent after creating or selecting an owned P0-23 branch, not commands executed in this audit. Only run newly named files after adding them. Avoid npx or new installs; use pinned existing dependency runtime.",
+    "focusedMcp": "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts tests/mcpServer.test.ts tests/industryPackSchema.test.ts --reporter=json --outputFile=/private/tmp/p0-23-mcp-actual.json",
+    "finalChecks": [
+      "The owned build and typecheck/typecheck:tests/lint checks",
+      "The complete source suite and architecture/docs/API-reference/no-fabrication checks",
+      "The existing freeze check without baseline or exception bypass",
+      "Controlled own-key and statusDimensions mutations with exact restored hashes",
+      "Review actual transcripts, API responses and required page evidence; report unresolved acceptance plainly"
+    ]
+  },
+  "execution": {
+    "tests": 0,
+    "builds": 0,
+    "installs": 0,
+    "servers": 0,
+    "applicationImports": 0,
+    "sourceEdits": 0,
+    "trackerEdits": 0,
+    "claudeMessages": 0,
+    "privateArtifactsOnly": true,
+    "performed": "Read-only graph navigation, source/test/docs reads, Git ancestry/status reads, SHA-256 comparison and static saved-YAML registry analysis using installed dependencies."
+  },
+  "limits": [
+    "No passing or failing runtime test claim is made.",
+    "The complete dynamic API/Studio router keyword inventory, generated OpenAPI output and actual route responses still require qualification.",
+    "No dependency or platform certification follows from source availability.",
+    "This preflight does not close P0-23, reset user skips, widen source ownership or resume paused work."
+  ]
+}

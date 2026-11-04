@@ -1,0 +1,183 @@
+{
+  "utc": "2026-10-15T08:39:48.141307+00:00",
+  "root": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+  "parent": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+  "trackedCount": 8751,
+  "compiledCount": 4529,
+  "physicalCopies": 13280,
+  "probe": "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+  "probeSha256": "0b09ff2ad62cd487bd1cd997024f2464e89de8c4130d400d181fe3658bc093ab",
+  "children": [
+    {
+      "phase": "baseline-receipt",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+        "receipt",
+        "/private/tmp/p1-01-source-strip-control-20261015/copy"
+      ],
+      "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+      "pid": 39982,
+      "exit": 0,
+      "expectedExit": 0,
+      "durationMs": 204,
+      "ownedGroupProbes": [
+        {
+          "utc": "2026-10-15T08:39:11.680577+00:00",
+          "signal": 0,
+          "errno": 3,
+          "absentByESRCH": true
+        }
+      ],
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "baseline-schemas",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/gen-spec-schemas.mjs",
+        "--check"
+      ],
+      "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+      "pid": 39983,
+      "exit": 0,
+      "expectedExit": 0,
+      "durationMs": 435,
+      "ownedGroupProbes": [
+        {
+          "utc": "2026-10-15T08:39:12.115773+00:00",
+          "signal": 0,
+          "errno": 3,
+          "absentByESRCH": true
+        }
+      ],
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "mutant-compile",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.json"
+      ],
+      "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+      "pid": 39987,
+      "exit": 0,
+      "expectedExit": 0,
+      "durationMs": 29720,
+      "ownedGroupProbes": [
+        {
+          "utc": "2026-10-15T08:39:42.658695+00:00",
+          "signal": 0,
+          "errno": 3,
+          "absentByESRCH": true
+        }
+      ],
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "mutant-receipt",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+        "receipt",
+        "/private/tmp/p1-01-source-strip-control-20261015/copy"
+      ],
+      "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+      "pid": 40041,
+      "exit": 1,
+      "expectedExit": 1,
+      "durationMs": 197,
+      "ownedGroupProbes": [
+        {
+          "utc": "2026-10-15T08:39:44.940854+00:00",
+          "signal": 0,
+          "errno": 3,
+          "absentByESRCH": true
+        }
+      ],
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "mutant-schemas",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/gen-spec-schemas.mjs",
+        "--check"
+      ],
+      "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+      "pid": 40042,
+      "exit": 1,
+      "expectedExit": 1,
+      "durationMs": 438,
+      "ownedGroupProbes": [
+        {
+          "utc": "2026-10-15T08:39:45.378842+00:00",
+          "signal": 0,
+          "errno": 3,
+          "absentByESRCH": true
+        }
+      ],
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "restored-receipt",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+        "receipt",
+        "/private/tmp/p1-01-source-strip-control-20261015/copy"
+      ],
+      "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+      "pid": 40043,
+      "exit": 0,
+      "expectedExit": 0,
+      "durationMs": 184,
+      "ownedGroupProbes": [
+        {
+          "utc": "2026-10-15T08:39:46.851577+00:00",
+          "signal": 0,
+          "errno": 3,
+          "absentByESRCH": true
+        }
+      ],
+      "signalsOtherThanZeroSent": false
+    },
+    {
+      "phase": "restored-schemas",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/gen-spec-schemas.mjs",
+        "--check"
+      ],
+      "cwd": "/private/tmp/p1-01-source-strip-control-20261015/copy",
+      "pid": 40044,
+      "exit": 0,
+      "expectedExit": 0,
+      "durationMs": 446,
+      "ownedGroupProbes": [
+        {
+          "utc": "2026-10-15T08:39:47.297441+00:00",
+          "signal": 0,
+          "errno": 3,
+          "absentByESRCH": true
+        }
+      ],
+      "signalsOtherThanZeroSent": false
+    }
+  ],
+  "nativeBefore": {
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "inode": 539021299,
+    "nlink": 1
+  },
+  "nativeAfter": {
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "inode": 539021299,
+    "nlink": 1
+  },
+  "allOriginalBytesRestored": true,
+  "parentUnchanged": true,
+  "boundary": "Two narrow receipt/schema sensitivity checks; no full-suite, independent-authority, network or universal descendant-isolation claim."
+}

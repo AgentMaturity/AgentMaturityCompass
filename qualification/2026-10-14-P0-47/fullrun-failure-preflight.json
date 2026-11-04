@@ -1,0 +1,200 @@
+{
+  "schemaVersion": 1,
+  "issue": "P0-47",
+  "status": "READONLY_BOUNDED_FAILURE_REUSE_PREFLIGHT",
+  "candidateCommit": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "currentRunReport": "/private/tmp/p0-47-full-correctness-20261014.json",
+  "currentRunLog": "/private/tmp/p0-47-full-correctness-20261014.log",
+  "scope": "Only the displayed five earlier failure files. Other final-report failures are a separate follow-on audit. No whole-run totals or pass claim here.",
+  "preservedP0_33Commit": "7d5d8335bf973900fb9a9d9d331471b1b366ef8b",
+  "preservedSource": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014",
+  "sourceComparisons": [
+    {
+      "path": "src/api/enforceRouter.ts",
+      "currentSha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+      "preservedP0_33Sha256": "bd66a7a3054594c3a1506b5472ee6d874993e9d853c9aa7582d607e4b74fac10",
+      "byteEqual": true
+    },
+    {
+      "path": "src/enforce/formalVerification.ts",
+      "currentSha256": "1dd97466d0e72617f7e3c8218c29af5dd6ef09ac3103c0f4d8be9cc027afcecb",
+      "preservedP0_33Sha256": "1dd97466d0e72617f7e3c8218c29af5dd6ef09ac3103c0f4d8be9cc027afcecb",
+      "byteEqual": true
+    },
+    {
+      "path": "src/trust/verifierReport.ts",
+      "currentSha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2",
+      "preservedP0_33Sha256": "38c0d8ba1dd44ba10fac3b12a34d63f9ce1c894e9d61c1785fb00f7dcd6c091e",
+      "byteEqual": false
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "currentSha256": "a08af5a16b73589f47ba3ebf8a74bb17b6e715fb1bf53bab369fef8436486e17",
+      "preservedP0_33Sha256": "a08af5a16b73589f47ba3ebf8a74bb17b6e715fb1bf53bab369fef8436486e17",
+      "byteEqual": true
+    },
+    {
+      "path": "src/diagnostic/levelSemantics.ts",
+      "currentSha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "preservedP0_33Sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841",
+      "byteEqual": true
+    },
+    {
+      "path": "src/guide/guideGenerator.ts",
+      "currentSha256": "bb856e03a9ef141ce98bbac79ff0b5669a6d7393300bee6a78d1d9700a6b8b03",
+      "preservedP0_33Sha256": "bb856e03a9ef141ce98bbac79ff0b5669a6d7393300bee6a78d1d9700a6b8b03",
+      "byteEqual": true
+    },
+    {
+      "path": "src/identity/oidc/jwtVerify.ts",
+      "currentSha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792",
+      "preservedP0_33Sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792",
+      "byteEqual": true
+    },
+    {
+      "path": "src/identity/oidc/oidcClient.ts",
+      "currentSha256": "03c58431ef2607e2aa792d914306b68ddb9ca40059e9800c2da286aeccf091f4",
+      "preservedP0_33Sha256": "03c58431ef2607e2aa792d914306b68ddb9ca40059e9800c2da286aeccf091f4",
+      "byteEqual": true
+    },
+    {
+      "path": "src/identity/oidc/oidcRoutes.ts",
+      "currentSha256": "0016abef4cff9012c141656dff6b28b2b74c9a36c6e4efe9a5df43d40d18b9d6",
+      "preservedP0_33Sha256": "0016abef4cff9012c141656dff6b28b2b74c9a36c6e4efe9a5df43d40d18b9d6",
+      "byteEqual": true
+    },
+    {
+      "path": "src/studio/nativeTaskService.ts",
+      "currentSha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+      "preservedP0_33Sha256": "989bcb477091c155508308443e4b30afb9d7209f673171f6f5cd8a82a3385369",
+      "byteEqual": false
+    },
+    {
+      "path": "src/sdk/nativeAgentClient.ts",
+      "currentSha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+      "preservedP0_33Sha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+      "byteEqual": true
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "currentSha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "preservedP0_33Sha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "byteEqual": true
+    },
+    {
+      "path": "src/credentials/credentialsPaths.ts",
+      "currentSha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+      "preservedP0_33Sha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+      "byteEqual": true
+    },
+    {
+      "path": "src/budgets/budgets.ts",
+      "currentSha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c",
+      "preservedP0_33Sha256": "e16006aba2c8f4123b014aba5f5163a44633d5109925b8dd436853eec989d948",
+      "byteEqual": false
+    }
+  ],
+  "findings": [
+    {
+      "domain": "apiRouters formal certificate",
+      "ownership": "Production source comments identify P0-51/P0-55 trust admission; the defect is the test mock contract.",
+      "rootCause": "Mock verifyFormalCertificate returns {valid:true} with no issues. Current enforceRouter supplies result.issues to unsignedArtifactReport and buildVerifierReport reads integrityErrors.length, producing the observed500 route failure.",
+      "currentEvidence": [
+        "tests/apiRouters.test.ts:288",
+        "src/api/enforceRouter.ts:464",
+        "src/api/enforceRouter.ts:468",
+        "src/trust/verifierReport.ts:69"
+      ],
+      "boundedLead": "Add issues:[] to the mock and assert actual response valid:false/integrityValid:true/status:UNTRUSTED. No cryptographic/trust production change.",
+      "confidence": "Confirmed source/legacy failure evidence; exact current test hunk is unexecuted."
+    },
+    {
+      "domain": "question score explainability metadata",
+      "ownership": "P1-07 level semantics, not new source metadata or a runtime capability.",
+      "rootCause": "Both tests demand legacy release-gate advice despite finalLevel4/targetL5. Current repairHintFor first invokes notEvaluatedLevel; current L4/L5 gates explicitly have no registered continuity/scoped-attestation emitter. Guide advice likewise exposes NOT_EVALUATED and an empty evidence-needed list.",
+      "currentEvidence": [
+        "src/diagnostic/questionScoreExplainability.ts:2579",
+        "src/diagnostic/levelSemantics.ts:46",
+        "src/guide/guideGenerator.ts"
+      ],
+      "boundedLead": "Reuse only the existing P1-07 NOT_EVALUATED hint/guide/passport expectations. Keep source refs, accepted/rejected evidence, score fields, row hashes and metadata-only boundaries unchanged.",
+      "confidence": "Confirmed current source; questionScoreExplainability, levelSemantics and guideGenerator production byte comparison recorded."
+    },
+    {
+      "domain": "enterprise OIDC fixture",
+      "ownership": "Current P2-07 algorithm and transport admission.",
+      "rootCause": "Fake issuer uses EdDSA and HTTP without literal-loopback opt-in. Current jwtVerify allows only RS256/PS256/ES256 and enforces HTTPS unless literal loopback is explicitly opted in; login therefore refuses before callback assertions. The affirmative-email fixture also expects401 although current missing/unverified-email route returns403.",
+      "currentEvidence": [
+        "src/identity/oidc/jwtVerify.ts:13",
+        "src/identity/oidc/jwtVerify.ts:26",
+        "src/identity/oidc/oidcRoutes.ts"
+      ],
+      "boundedLead": "Use real RSA2048/SHA256 signing, narrowly scoped loopback vi.stubEnv with restoration, and retained HTTP-refusal/email-proof/bad-state/bad-nonce/bad-signature/missing-email assertions. No production acceptance widening.",
+      "confidence": "Confirmed current source; three OIDC production files byte-equal to preserved P0-33."
+    },
+    {
+      "domain": "API security JWT expiry/nonce fixture",
+      "ownership": "Current P2-07 algorithm and transport admission.",
+      "rootCause": "HTTP validation rejects the old issuer before expiry/nonce checks; EdDSA is also outside current permitted algorithms. The old assertion consequently sees generic verification failure instead of expired.",
+      "boundedLead": "Reuse the actual RSA2048 fixture and scoped loopback opt-in while retaining expiry and nonce negatives and adding explicit unsupported-EdDSA/private-destination/non-opted-HTTP negatives. No production change.",
+      "confidence": "Confirmed current source; direct current-core byte comparison and retained old main-CI error first line."
+    },
+    {
+      "domain": "native operator home",
+      "ownership": "Current signed-control journal outside-workspace checkpoint admission, with later native production ownership kept separate.",
+      "rootCause": "Original fixture passes <workspace>/operator-home as HOME; default HOME/.amc/control-checkpoints lies inside the governed workspace and is refused. A controlled same-case experiment and the entire unchanged-assertion file on Node24 confirm that changing only home placement/paired cleanup resolves the observed startup failures at that scope.",
+      "controlledEvidence": "/private/tmp/p0-47-native-fixture-diagnosis-20261014.json",
+      "confidence": "Controlled Node24/file scope confirmed; not an active Node22 whole-run pass.",
+      "excludedReuse": "Do not copy the P0-33 full native test or production file, closed/sealed verdict expectations, new budget/lease/moving-ledger tests, or reserved private/P165/A4 changes."
+    }
+  ],
+  "boundedTestProposals": [
+    {
+      "path": "tests/apiRouters.test.ts",
+      "currentSha256": "64fe33c9b184db17c8abc522cd7435a3c53af4e4672b82c3550dda551a27b748",
+      "proposedSha256": "5724a984520a581a14c21d8f8ab835b54a88400c15fd31580dacb240d2efd6a9",
+      "proposedBytes": 109910,
+      "exactUnifiedDiff": "--- a/tests/apiRouters.test.ts\n+++ b/tests/apiRouters.test.ts\n@@ -285,7 +285,7 @@\n \n   boundedModelCheck: vi.fn(() => ({ verified: true })),\n   generateTLASpec: vi.fn(() => \"---- MODULE Spec ----\"),\n-  verifyFormalCertificate: vi.fn(() => ({ valid: true })),\n+  verifyFormalCertificate: vi.fn(() => ({ valid: true, issues: [] as string[] })),\n \n   collectVerifierEvidence: vi.fn(async () => ({ rows: [1] })),\n   renderVerifierEvidenceJson: vi.fn(() => ({ exported: true })),\n@@ -1670,7 +1670,9 @@\n     await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/evaluate\", method: \"POST\", body: { action: \"deploy\", tool: \"kubectl\", agentId: \"agent-1\", context: { env: \"prod\" } } });\n     await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/verify\", method: \"POST\", body: { property: { id: \"p1\", name: \"Safe\", description: \"desc\", formula: \"G safe\", kind: \"safety\", severity: \"high\" }, agentState: { ok: true } } });\n     await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/tla-spec\", method: \"POST\" });\n-    await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/certificate\", method: \"POST\", body: { certificate: { proof: true } } });\n+    const certificate = await assertJsonRoute(handleEnforceRoute as any, { pathname: \"/api/v1/enforce/formal/certificate\", method: \"POST\", body: { certificate: { proof: true } } });\n+    // P0-51: an unkeyed proof certificate is never an authentic artifact, even when its hash checks out.\n+    expect(certificate).toMatchObject({ valid: false, integrityValid: true, status: \"UNTRUSTED\" });\n   });\n \n   test(\"evidence router covers status, list, gaps, ingest, collect, export, attest, and bundle routes\", async () => {\n",
+      "applied": false,
+      "source": "Bounded relevant Claude fixture changes from preserved P0-33; apiRouters excludes unrelated purpose-key/audience hunks."
+    },
+    {
+      "path": "tests/questionScoreExplainability.test.ts",
+      "currentSha256": "4787cfbbfc9c95ab8566cb0afbf8242e0e474a1ed51a2d49c6b6ea031c493e0a",
+      "proposedSha256": "ab951b6e17a1fe25bec5f24edc373214744e6032055fec2bc49539250ac968a7",
+      "proposedBytes": 301896,
+      "exactUnifiedDiff": "--- a/tests/questionScoreExplainability.test.ts\n+++ b/tests/questionScoreExplainability.test.ts\n@@ -6928,7 +6928,8 @@\n           reason: expect.stringContaining(\"DOI/OpenAlex/Zenodo metadata confirms source relevance only\"),\n         }),\n       ],\n-      repairHint: expect.stringContaining(\"release gates\"),\n+      // P1-07: AMC-1.3's L5 is not evaluated, so the hint names it and its reason instead of release-gate advice.\n+      repairHint: expect.stringContaining(\"Target L5: Not evaluated: L5 needs a scoped attestation\"),\n       status: \"ready\",\n       reproducibleEvalPacks: [\n         expect.objectContaining({\n@@ -6956,8 +6957,9 @@\n     expect(guideMarkdown).toContain(\"Accepted evidence IDs: ev-gap-0634-eval-pack, ev-gap-0634-signed-ledgers, ev-gap-0634-ci\");\n     expect(guideMarkdown).toContain(\"ev-gap-0634-paper-metadata-only\");\n     expect(guideMarkdown).toContain(\"Repair hint:\");\n-    expect(guide.sections[0]?.evidenceNeeded.join(\"\\n\")).toContain(\"DOI/OpenAlex/Zenodo metadata\");\n-    expect(guide.sections[0]?.evidenceNeeded.join(\"\\n\")).toContain(\"cognitive-retrieval preprint\");\n+    // P1-07: AMC-1.3's L4 is not evaluated, so the section gives that reason and lists no evidence to collect for it.\n+    expect(guide.sections[0]?.notEvaluated).toContain(\"Not evaluated: L4 needs continuity\");\n+    expect(guide.sections[0]?.evidenceNeeded).toEqual([]);\n \n     const passport = passportJsonSchema.parse({\n       v: 1,\n@@ -7020,7 +7022,7 @@\n       questionId: \"AMC-1.3\",\n       acceptedEvidenceIds: [\"ev-gap-0634-eval-pack\", \"ev-gap-0634-signed-ledgers\", \"ev-gap-0634-ci\"],\n       rejectedEvidenceReasons: [expect.objectContaining({ evidenceId: \"ev-gap-0634-paper-metadata-only\" })],\n-      repairHint: expect.stringContaining(\"release gates\"),\n+      repairHint: expect.stringContaining(\"Target L5: Not evaluated\"),\n     });\n   });\n \n@@ -7145,7 +7147,8 @@\n           reason: expect.stringContaining(\"repository metadata is source context only\"),\n         }),\n       ],\n-      repairHint: expect.stringContaining(\"release gates\"),\n+      // P1-07: AMC-1.3's L5 is not evaluated, so the hint names it and its reason instead of release-gate advice.\n+      repairHint: expect.stringContaining(\"Target L5: Not evaluated: L5 needs a scoped attestation\"),\n       status: \"ready\",\n       reproducibleEvalPacks: [\n         expect.objectContaining({\n@@ -7171,7 +7174,9 @@\n     expect(guideMarkdown).toContain(\"Accepted evidence IDs: ev-uptrain-eval-pack, ev-uptrain-signed-ledgers\");\n     expect(guideMarkdown).toContain(\"ev-uptrain-repo-metadata-only\");\n     expect(guideMarkdown).toContain(\"Repair hint:\");\n-    expect(guide.sections[0]?.evidenceNeeded.join(\"\\n\")).toContain(\"UpTrain repository metadata\");\n+    // P1-07: AMC-1.3's L4 is not evaluated, so the section gives that reason and lists no evidence to collect for it.\n+    expect(guide.sections[0]?.notEvaluated).toContain(\"Not evaluated: L4 needs continuity\");\n+    expect(guide.sections[0]?.evidenceNeeded).toEqual([]);\n \n     const passport = passportJsonSchema.parse({\n       v: 1,\n@@ -7232,7 +7237,7 @@\n       questionId: \"AMC-1.3\",\n       acceptedEvidenceIds: [\"ev-uptrain-eval-pack\", \"ev-uptrain-signed-ledgers\"],\n       rejectedEvidenceReasons: [expect.objectContaining({ evidenceId: \"ev-uptrain-repo-metadata-only\" })],\n-      repairHint: expect.stringContaining(\"release gates\"),\n+      repairHint: expect.stringContaining(\"Target L5: Not evaluated\"),\n     });\n   });\n \n",
+      "applied": false,
+      "source": "Bounded relevant Claude fixture changes from preserved P0-33; apiRouters excludes unrelated purpose-key/audience hunks."
+    },
+    {
+      "path": "tests/enterpriseSsoScim.test.ts",
+      "currentSha256": "361742db0c03b657f46bfdce126fdc2d06043aa6e447c2524de017725cac20b5",
+      "proposedSha256": "8458813ecb3596f66931306d3a7aabd76807d466274d1cdcfc2f1980336a4d1e",
+      "proposedBytes": 32492,
+      "exactUnifiedDiff": "--- a/tests/enterpriseSsoScim.test.ts\n+++ b/tests/enterpriseSsoScim.test.ts\n@@ -3,7 +3,7 @@\n import { mkdtempSync, readFileSync, rmSync, writeFileSync } from \"node:fs\";\n import { join } from \"node:path\";\n import { tmpdir } from \"node:os\";\n-import { afterEach, describe, expect, test } from \"vitest\";\n+import { afterEach, describe, expect, test, vi } from \"vitest\";\n import { initWorkspace } from \"../src/workspace.js\";\n import { canonicalize } from \"../src/utils/json.js\";\n import { createHostUser, createWorkspaceRecord, findHostUserById, initHostDb, rolesForUserIdInWorkspace } from \"../src/workspaces/hostDb.js\";\n@@ -29,6 +29,7 @@\n }\n \n afterEach(() => {\n+  vi.unstubAllEnvs();\n   while (roots.length > 0) {\n     const dir = roots.pop();\n     if (dir) {\n@@ -121,20 +122,20 @@\n   return { hostDir, workspaceDir };\n }\n \n-function jwtSignEdDsa(params: {\n+function jwtSignRs256(params: {\n   privateKeyPem: string;\n   kid: string;\n   payload: Record<string, unknown>;\n }): string {\n   const header = {\n-    alg: \"EdDSA\",\n+    alg: \"RS256\",\n     typ: \"JWT\",\n     kid: params.kid\n   };\n   const encodedHeader = b64url(JSON.stringify(header));\n   const encodedPayload = b64url(JSON.stringify(params.payload));\n   const input = `${encodedHeader}.${encodedPayload}`;\n-  const signature = sign(null, Buffer.from(input, \"utf8\"), params.privateKeyPem);\n+  const signature = sign(\"sha256\", Buffer.from(input, \"utf8\"), params.privateKeyPem);\n   return `${input}.${b64url(signature)}`;\n }\n \n@@ -149,7 +150,8 @@\n   close: () => Promise<void>;\n } {\n   const kid = params.kid ?? \"oidc-test-kid\";\n-  const keyPair = generateKeyPairSync(\"ed25519\");\n+  // P2-07 admits RS256, PS256 and ES256 only; EdDSA is refused.\n+  const keyPair = generateKeyPairSync(\"rsa\", { modulusLength: 2048 });\n   const privateKeyPem = keyPair.privateKey.export({ format: \"pem\", type: \"pkcs8\" }).toString();\n   const publicJwk = keyPair.publicKey.export({ format: \"jwk\" }) as Record<string, unknown>;\n   const codeNonce = new Map<string, string>();\n@@ -178,7 +180,7 @@\n             {\n               ...publicJwk,\n               kid,\n-              alg: \"EdDSA\",\n+              alg: \"RS256\",\n               use: \"sig\"\n             }\n           ]\n@@ -234,7 +236,7 @@\n       if (code !== \"noemail\") {\n         payload.email = \"sso-user@example.com\";\n       }\n-      const idToken = jwtSignEdDsa({\n+      const idToken = jwtSignRs256({\n         privateKeyPem,\n         kid,\n         payload\n@@ -361,6 +363,16 @@\n     });\n \n     try {\n+      // P2-07: an HTTP identity provider is refused unless the loopback development opt-in is set.\n+      const refused = await httpCall({\n+        url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/testoidc/login`,\n+        method: \"GET\"\n+      });\n+      expect(refused.status).toBe(400);\n+      expect(refused.headers.location).toBeUndefined();\n+\n+      // This fake IdP is the test's subject and listens on literal 127.0.0.1 over HTTP.\n+      vi.stubEnv(\"AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK\", \"1\");\n       const login = await httpCall({\n         url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/testoidc/login`,\n         method: \"GET\"\n@@ -447,6 +459,8 @@\n     });\n \n     try {\n+      // This fake IdP is the test's subject and listens on literal 127.0.0.1 over HTTP.\n+      vi.stubEnv(\"AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK\", \"1\");\n       const login = await httpCall({\n         url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/oidcemailproof/login`,\n         method: \"GET\"\n@@ -461,7 +475,9 @@\n         url: String(authorize.headers.location ?? \"\"),\n         method: \"GET\"\n       });\n-      expect(callback.status).toBe(401);\n+      // P2-07 reports \"OIDC email not verified\", which the router answers 403 like a missing email.\n+      expect(callback.status).toBe(403);\n+      expect(callback.body).toContain(\"email not verified\");\n       expect(parseSetCookie(callback.headers)).not.toContain(\"amc_session=\");\n     } finally {\n       await host.close();\n@@ -502,6 +518,8 @@\n     });\n \n     try {\n+      // This fake IdP is the test's subject and listens on literal 127.0.0.1 over HTTP.\n+      vi.stubEnv(\"AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK\", \"1\");\n       const login = await httpCall({\n         url: `http://127.0.0.1:${routerPort}/host/api/auth/oidc/oidcsec/login`,\n         method: \"GET\"\n",
+      "applied": false,
+      "source": "Bounded relevant Claude fixture changes from preserved P0-33; apiRouters excludes unrelated purpose-key/audience hunks."
+    },
+    {
+      "path": "tests/security/api-security.test.ts",
+      "currentSha256": "a571872a971327c9c8a12beba875f2a0536a81165da539501627a72d4571be54",
+      "proposedSha256": "4e57d8cfa5e122ddad248e60438c94354b230ade8bc551972b80e91282421c1d",
+      "proposedBytes": 21008,
+      "exactUnifiedDiff": "--- a/tests/security/api-security.test.ts\n+++ b/tests/security/api-security.test.ts\n@@ -3,7 +3,7 @@\n import { mkdtempSync, rmSync } from \"node:fs\";\n import { tmpdir } from \"node:os\";\n import { join } from \"node:path\";\n-import { afterEach, describe, expect, test } from \"vitest\";\n+import { afterEach, describe, expect, test, vi } from \"vitest\";\n import { initWorkspace } from \"../../src/workspace.js\";\n import { loadAssurancePolicy, saveAssurancePolicy } from \"../../src/assurance/assurancePolicyStore.js\";\n import { startStudioApiServer } from \"../../src/studio/studioServer.js\";\n@@ -14,7 +14,7 @@\n import { initHostDb, createHostUser, createWorkspaceRecord, grantMembership } from \"../../src/workspaces/hostDb.js\";\n import { hostWorkspaceDir } from \"../../src/workspaces/workspacePaths.js\";\n import { startWorkspaceRouter } from \"../../src/workspaces/workspaceRouter.js\";\n-import { verifyJwtIdToken } from \"../../src/identity/oidc/jwtVerify.js\";\n+import { validateOidcUrl, verifyJwtIdToken } from \"../../src/identity/oidc/jwtVerify.js\";\n \n const roots: string[] = [];\n \n@@ -504,18 +504,21 @@\n     }\n   }, 30_000);\n \n-  test(\"OIDC JWT verifier rejects expired and nonce-mismatched tokens\", async () => {\n-    const keyPair = generateKeyPairSync(\"ed25519\");\n+  test(\"OIDC JWT verifier rejects expired, nonce-mismatched, EdDSA and non-loopback-opt-in HTTP tokens\", async () => {\n+    // P2-07 admits RS256, PS256 and ES256 only.\n+    const keyPair = generateKeyPairSync(\"rsa\", { modulusLength: 2048 });\n+    const edKeyPair = generateKeyPairSync(\"ed25519\");\n     const kid = \"security-test-kid\";\n     const issuerPort = await pickFreePort();\n     const issuer = `http://127.0.0.1:${issuerPort}`;\n     const audience = \"amc-security-audience\";\n     const jwk = keyPair.publicKey.export({ format: \"jwk\" }) as Record<string, unknown>;\n+    const edJwk = edKeyPair.publicKey.export({ format: \"jwk\" }) as Record<string, unknown>;\n     const server = createServer((req, res) => {\n       if ((req.url ?? \"\").startsWith(\"/jwks\")) {\n         res.statusCode = 200;\n         res.setHeader(\"content-type\", \"application/json\");\n-        res.end(JSON.stringify({ keys: [{ ...jwk, kid, alg: \"EdDSA\", use: \"sig\" }] }));\n+        res.end(JSON.stringify({ keys: [{ ...jwk, kid, alg: \"RS256\", use: \"sig\" }, { ...edJwk, kid: \"ed-kid\", alg: \"EdDSA\", use: \"sig\" }] }));\n         return;\n       }\n       res.statusCode = 404;\n@@ -524,13 +527,29 @@\n     await new Promise<void>((resolvePromise) => server.listen(issuerPort, \"127.0.0.1\", () => resolvePromise()));\n     try {\n       const nowSec = Math.floor(Date.now() / 1000);\n-      const encodeJwt = (claims: Record<string, unknown>): string => {\n-        const header = toBase64Url(Buffer.from(JSON.stringify({ alg: \"EdDSA\", typ: \"JWT\", kid }), \"utf8\"));\n+      const encodeJwt = (claims: Record<string, unknown>, eddsa = false): string => {\n+        const header = toBase64Url(Buffer.from(JSON.stringify({ alg: eddsa ? \"EdDSA\" : \"RS256\", typ: \"JWT\", kid: eddsa ? \"ed-kid\" : kid }), \"utf8\"));\n         const payload = toBase64Url(Buffer.from(JSON.stringify(claims), \"utf8\"));\n         const signingInput = Buffer.from(`${header}.${payload}`, \"utf8\");\n-        const signature = signDetached(null, signingInput, keyPair.privateKey);\n+        const signature = eddsa ? signDetached(null, signingInput, edKeyPair.privateKey) : signDetached(\"sha256\", signingInput, keyPair.privateKey);\n         return `${header}.${payload}.${toBase64Url(signature)}`;\n       };\n+      const verifyAt = (token: string) => verifyJwtIdToken({\n+        token, issuer, audience, jwksUri: `${issuer}/jwks`, nonce: \"expected-nonce\", clockSkewSeconds: 0\n+      });\n+      const validClaims = { iss: issuer, aud: audience, sub: \"oidc-user-1\", nonce: \"expected-nonce\", exp: nowSec + 600, iat: nowSec };\n+\n+      // P2-07: an HTTP issuer is refused unless the loopback development opt-in is set.\n+      expect(await verifyAt(encodeJwt(validClaims))).toEqual({ ok: false, error: \"id_token verification failed\" });\n+      expect(() => validateOidcUrl(\"http://idp.example.com\")).toThrow(\"OIDC HTTPS required\");\n+      expect(() => validateOidcUrl(\"https://10.0.0.1\")).toThrow(\"OIDC private destination refused\");\n+      // The fake issuer is this test's subject and listens on literal 127.0.0.1 over HTTP.\n+      vi.stubEnv(\"AMC_IDENTITY_ALLOW_INSECURE_LOOPBACK\", \"1\");\n+      // The opt-in covers literal loopback only, never another private address or plain HTTP elsewhere.\n+      expect(() => validateOidcUrl(\"https://10.0.0.1\")).toThrow(\"OIDC private destination refused\");\n+      expect(() => validateOidcUrl(\"http://localhost:8080\")).toThrow(\"OIDC HTTPS required\");\n+      expect((await verifyAt(encodeJwt(validClaims))).ok).toBe(true);\n+      expect(await verifyAt(encodeJwt(validClaims, true))).toEqual({ ok: false, error: \"unsupported jwt alg\" });\n \n       const expiredToken = encodeJwt({\n         iss: issuer,\n@@ -574,6 +593,7 @@\n         expect(nonceMismatch.error).toContain(\"nonce mismatch\");\n       }\n     } finally {\n+      vi.unstubAllEnvs();\n       await new Promise<void>((resolvePromise) => server.close(() => resolvePromise()));\n     }\n   });\n",
+      "applied": false,
+      "source": "Bounded relevant Claude fixture changes from preserved P0-33; apiRouters excludes unrelated purpose-key/audience hunks."
+    }
+  ],
+  "limitations": [
+    "No active Node22 candidate source was edited, no runner was stopped, and no new Node22 tests/builds were run.",
+    "The four proposals are reviewable hypothetical hunks, not applied or newly qualified changes. Apply only after source-stable full run finishes and any applicable freeze/snapshot checks are satisfied.",
+    "The native controlled fixture test was restored exactly and production stayed unchanged.",
+    "Preserved P0-33 code is not wholesale current-main proof or permission to integrate unrelated Claude production changes."
+  ],
+  "nextValidation": [
+    "Run the affected current files on Node22 and Node24 after bounded changes, preserving all assertions/security negatives.",
+    "Run typecheck:tests/lint/freeze/clean-source as applicable. Retain actual JSON/rawlogs, failure details and source hashes.",
+    "Keep global/per-file coverage floors and all remaining failures strict; passing focused tests does not qualify the whole task."
+  ]
+}

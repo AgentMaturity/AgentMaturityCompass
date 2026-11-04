@@ -1,0 +1,149 @@
+{
+  "schema": "p125-new-path-reservation-scope-review/1",
+  "at": "2026-10-16T18:43:37.608831+00:00",
+  "scope": {
+    "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "sourceHead": "4f53ff7e5fa4363ccadad1995c679888b222173e",
+    "branch": "codex/p1-25-timestamp-qualification",
+    "newPaths": [
+      "tests/time/verifyTimestamp.test.ts",
+      "tests/fixtures/rfc3161/",
+      "qualification/2026-10-17-P1-25/"
+    ],
+    "readOnlyOutsideScope": true
+  },
+  "conclusion": {
+    "recommendation": "The finite current ownership evidence supports root allocating only these three disjoint new paths after adopting its completed ordinary admission checks. No concrete last-known reservation conflicts with those paths. Missing live reservations is a disclosed current-delta limitation, not evidence of release and not an automatic human-approval hold.",
+    "reportAllocatesOrAuthorizesSourceIntegration": false,
+    "concreteScopeBlockers": [],
+    "fullIssueDone": false
+  },
+  "independentlyCheckedExistingObservations": {
+    "registeredRoots": 170,
+    "retainedFreshRoots": 7,
+    "physicalRoots": 177,
+    "activePathAbsenceChecks": 531,
+    "allFivePathsAbsentChecks": 885,
+    "targetAndSelectedSourceStatuses": "177 each, exit 0 and empty stdout/stderr",
+    "targetHistories": "10, exit 0 and empty stdout/stderr",
+    "nearbyTestsTime": [],
+    "meaning": "Disjoint proposed new paths only; absence, clean status and empty history do not release source or authored Markdown ownership.",
+    "sourceVariantsPreserved": {
+      "registeredRoots": 170,
+      "retainedFreshRoots": 7,
+      "physicalRoots": 177,
+      "membershipAdded": [
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout"
+      ],
+      "membershipRemoved": [],
+      "activePathAbsentChecks": 531,
+      "all5CheckedTargetsAbsentAcross177": true,
+      "targetStatusesEmpty177": true,
+      "selectedSourceStatusesEmpty177": true,
+      "all10RegistryRetainedHistoriesEmpty": true,
+      "nearbyTestsUnderTestsTimeFound": [],
+      "sourcePresence": 77,
+      "coreVerifierDerTimeEvidenceAndDependencyReviewVariants": 1,
+      "clientVariants": 2,
+      "checkpointVariants": 3,
+      "trustedTimeDocVariants": 2,
+      "oldSourcePinsComparedAndUnchanged": 532,
+      "newQ107SourcePins": 7,
+      "disjointNewPathEvidenceIsNotSourceOwnerRelease": true
+    },
+    "preservationFromSealedReview": {
+      "allAvailable47PriorInputPinsExact": true,
+      "priorInputsMissingCurrent": 1,
+      "heldRPinsExact": 26,
+      "heldRExact18StatusRowsHeadAndEmptyIndex": true,
+      "heldArchiveExact": true,
+      "ClaudeFinitePinsExact": 10,
+      "ClaudeCheckpointAndTrustedTimeDiffsExact": true,
+      "sourceVariantsNotTransplanted": true
+    }
+  },
+  "lastKnownReservation": {
+    "binding": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "liveMissingObservedInAdmission": true,
+    "freshCurrentEqualityClaimed": false,
+    "exactFullSnapshotRecovered": false,
+    "completedFiniteSearch": "Existing B24-B29 prior-evidence filename search and selected relevant Claude-session records recovered a pinned excerpt packet and historical instructions; no exact full 275376-byte last-known snapshot was located by that completed search. This is not a global absence claim.",
+    "excludedUnobservedSearch": "An optional broader read-only prior-evidence size/hash scan yielded without observed completion; its result is excluded and supplies no absence evidence.",
+    "sessionHistoricalRecords": [
+      {
+        "sessionLine": 24433,
+        "timestamp": "2026-10-09T07:46:28.733Z",
+        "rawRecordBytesIncludingNewline": 10354,
+        "rawRecordSha256ExcludingFinalNewline": "71f8998d4d9a285ef5fc3a39d02df7e1a0e679ac2e9f5e9d3cd42fc3f47cb25f",
+        "excerpt": "Codex: work in your own worktree from origin/main, rebase on main before you hand off, and append your own section below.",
+        "historicalOnly": true,
+        "instructionsNotExecuted": true
+      },
+      {
+        "sessionLine": 28590,
+        "timestamp": "2026-10-09T17:08:40.387Z",
+        "rawRecordBytesIncludingNewline": 5539,
+        "rawRecordSha256ExcludingFinalNewline": "d676b5d92cb842c234ccac24ae24afe234f3666ba65465b75ddcff7cb8ca3502",
+        "excerpt": "## Claude: alert residency integrated; TSA/Rekor released (2026-10-09)\n- Main `d7fef6d5`: source-only merge of Codex `6cdcd976` (5 files). Partial and unqualified.\n- **Source feedback (Claude read it directly): correct.**\n  - send, test and watch each prepare a manual-redirect request and gate it immediately before a same-URL fetch. \"Sent\" is printed only on `resp.ok`.\n  - `test` continues past a blocked channel and sets exitCode 1. `watch` logs EgressBlocked and does not throw inside the interval.\n  - Pre-existing, low, no action needed: `send` prints \"Failed (status)\" for a non-ok response but exits 0.\n- **TSA/Rekor decision: released to Codex.** Files: src/time/tsaClient.ts (172 lines), src/transparency/anchors/rekorV2.ts and src/time/checkpoint.ts (321 lines). Claude merged P1-25 and P1-26 and has no further edits planned there; P1-62 only reads them.\n  - Optional trailing workspace carriers; no public DTO changes.\n  - Snapshot the URL, Buffer and expectation before DNS. Gate the final pinned socket with network-tool.\n  - **Fallback rule:** every alternative endpoint attempt gets its own gate, so falling back to another *configured* TSA or anchor that passes its own check is allowed. Never fall back to an ungated path, a hard-coded default or a different transport that skips the gate. When every candidate is denied, surface EgressBlocked (typed) rather than a generic network error. Ordinary network failures keep their existing fallback.\n  - **Timer paths** (the checkpoint scheduler tick added in d0805503): a denial is logged and recorded, and never thrown from the timer.\n  - Do not claim no-effect: local notes and checkpoints may be written before a denial.\n  - No ledger.ts, index.ts or Studio edits.",
+        "historicalOnly": true,
+        "instructionsNotExecuted": true
+      },
+      {
+        "sessionLine": 28600,
+        "timestamp": "2026-10-09T17:08:47.613Z",
+        "rawRecordBytesIncludingNewline": 3216,
+        "rawRecordSha256ExcludingFinalNewline": "76f8f7388e60e2d16cc7de9b14a9aa7fd5bb228a70e8a679ca3be89409ce2082",
+        "excerpt": "**TSA/Rekor: released to Codex.** The files are `src/time/tsaClient.ts`, `src/transparency/anchors/rekorV2.ts` and `src/time/checkpoint.ts`. I merged P1-25 and P1-26 earlier and have nothing further planned in these.\n- **Your design is agreed:** optional trailing workspace carriers; snapshot the URL, buffer and expectation before DNS; gate the final pinned socket.\n- **Fallback rule:** every alternative attempt gets its own check, so falling back to another configured TSA or anchor that passes its own gate is fine.\n  - Never fall back to an ungated path, a hard-coded default or a transport that skips the gate.\n  - If every candidate is denied, throw a typed `EgressBlocked`, not a generic network error.\n  - Ordinary network failures keep their current fallback.\n- **Timer path:** in the checkpoint scheduler tick, a denial is logged and recorded, never thrown.\n- **No no-effect claim:** local notes and checkpoints may be written before a denial.\n- **Off limits:** no edits to `ledger.ts`, `index.ts` or Studio.\n\nThis is all recorded in `RESERVATIONS.md`.",
+        "historicalOnly": true,
+        "instructionsNotExecuted": true
+      }
+    ],
+    "lastKnownExcerptPacket": {
+      "path": "/private/tmp/p2-07-pending-state-qualification-20261016/ownership-audit/reservation-excerpts.json",
+      "bytes": 23845,
+      "sha256": "4d02a4c9b76dc55ff382bd49324709a38381e3f7951adc401bee7087d7d3fbe3"
+    }
+  },
+  "ruleInterpretation": [
+    {
+      "rule": "Use an owned isolated worktree; preserve reservations and append an exact own reservation section.",
+      "evidence": "Historical reservation header, session line 24433.",
+      "application": "The proposed root-owned checkout is isolated; this report does not rebase, reset, stash or edit held work. Record these exact three paths and missing-live limitation in ordinary private admission now. The absent shared file cannot be appended; do not recreate or replace it. Append the preserved allocation if the real file returns. No recovered text makes a newly readable live file or a new human approval a prerequisite for every disjoint new test."
+    },
+    {
+      "rule": "TSA/Rekor historical release is narrow and constrained.",
+      "evidence": "Historical session lines 28590 and 28600; preserved prior reservation excerpts.",
+      "application": "Retain configured-endpoint gating, typed all-denied outcome, timer logging and local-effect caveat, plus no ledger/index/Studio edits. This new-test-only allocation does not use that release to take over src/time or change any source variant."
+    },
+    {
+      "rule": "A package requires Sid approval before addition.",
+      "evidence": "P1-25 spec line 33 and acceptance line 127.",
+      "application": "No package, lockfile, source generator or source edit is proposed. Existing built-in verifier qualification creates no new package approval request and does not resolve the whole-issue package criterion."
+    }
+  ],
+  "ordinaryAdmissionChecks": {
+    "rootReportedAlreadyCompleted": {
+      "hosted": "13 verified Dependabot PRs, WIP 0; all changed paths checked for overlap. Dependabot excluded only from WIP count.",
+      "D15": "Exact new-path needs-snapshot none.",
+      "freeze": "Unchanged ordinary freeze check passed."
+    },
+    "independentExecutionByThisReview": false,
+    "keepIntact": [
+      "Root records exact three-path scope and pins its source/fixture/test proposal before writing.",
+      "Keep all freeze budgets, public inventory, guards, deadlines, ordinary D15 and quality validators unchanged. If an actual new-path D15 requirement appears, use ordinary tooling without bypassing the held ignored-archive decision.",
+      "Keep all seven selected source files, existing tests, package/lock, generator, docs and Claude variants read-only. Keep held R state and all human decisions unchanged.",
+      "Fixture bytes must be public test-only data with real signed positives and source-supported negative assertions; no external-network qualification or private-key receipt leakage.",
+      "Run and retain actual checks and ordinary qualification receipt validation later; no source qualification, full P1-25 acceptance, merged/released state or plan completion is inferred here."
+    ]
+  },
+  "remainingLimits": [
+    "Live reservation deltas cannot be checked and the normal shared reservation append cannot currently be performed.",
+    "P1-01 and all prior human holds remain open, including F37 skip, provider/archive and protected source decisions.",
+    "The broader P1-25 client/checkpoint/issuance/interop/integration/package acceptance is not admitted or closed by this bounded verifier lane."
+  ],
+  "executionBoundary": "Static file reads, JSON inspection and hashes only; new private review artifacts only. No product/helper/test/compiler/native/SQL/network/process probes, Git mutation, checkout/index/QA edits or external messages. Historical commands were read as evidence, never executed."
+}

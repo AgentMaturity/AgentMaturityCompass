@@ -1,0 +1,20 @@
+{
+  "rootReadActualFailures": true,
+  "causalWitnessEstablished": true,
+  "unexplainedFailures": [],
+  "actual": {
+    "passed": 82,
+    "total": 85,
+    "failed": 3,
+    "directWitnesses": [
+      "synthetic persisted rules341 missing R1",
+      "genuine original assurance439 missing R1"
+    ],
+    "prerequisiteFailure": "log-tamper358 lost positive two-record log; downstream tamper assertions masked, no direct tamper sensitivity credited",
+    "passingDistinctCase": "receipt signature tamper remains passed; it requires a verified receipt, not two records"
+  },
+  "cleanupErrors": 0,
+  "publicRecords": 10,
+  "environmentAndNativeUnchanged": true,
+  "sourceOnlyControl": true
+}

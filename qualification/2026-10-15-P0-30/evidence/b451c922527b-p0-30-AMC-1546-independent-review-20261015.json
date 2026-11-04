@@ -1,0 +1,1096 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1546",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "kind": "independent actual original-corpus and two source-guard receipt review",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T01:15:45.039653+00:00",
+  "status": "PASS_WITH_BOUNDED_LIMITS",
+  "findings": [],
+  "scope": "Frozen AMC-1546 packet only: own unchanged combined30 baseline and two unchanged binding20 B/M/R controls. No Portal1508 runtime namespace was read. Prior packet contents were checked only as pinned bytes/complete closures, not reinterpreted.",
+  "freeze": "All actual packet reads followed the explicit freeze notice. Only commands-frozen.jsonl was read; no tests or code runtime were repeated.",
+  "verification": {
+    "receipt": {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.json",
+      "bytes": 31431,
+      "sha256": "7f3268cc7bdbe333255c956631e6ed55df9fc536b1976de17fe5248c6f3e0275"
+    },
+    "markdown": {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.md",
+      "bytes": 2522,
+      "sha256": "ef56efd20406fbdc44d328de6b48d0405be7ddcf4a77b5ddf6ea45964c0a8665"
+    },
+    "index": {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/artifact-index.json",
+      "bytes": 366956,
+      "sha256": "1c8aeee438947396eb2923381c4f657a93fcf89bc9de85630c72ce8680acfe57"
+    },
+    "indexRefsChecked": 1512,
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "completePrivateClosure": 12268,
+    "protectedPins": 89,
+    "priorRefs": 1334,
+    "priorClosuresDirectlyChecked": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268
+      }
+    ],
+    "latePredecessorPins": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-independent-review-20261015.json",
+        "bytes": 128759,
+        "sha256": "96d92711ed37a6f581e8af72e4f74b5c210a3c7e13a57642c5606ba6aae718a1"
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1542-root-bounded-outcome-20261015.json",
+        "bytes": 6424,
+        "sha256": "81218e954ed7c1e7932a87019e047d6ead68ccce092f4d89ea8ce32fa365e377"
+      }
+    ],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "dependencyLinks": 307,
+    "mutations": [
+      {
+        "id": "P30-1546-mixed-credentials",
+        "sourceTarget": "src/studio/agentCredentialAuth.ts",
+        "sourceLine": 92,
+        "matches": 1,
+        "sourceFind": "if (first === undefined || grants.some(grant => grant.agentId !== first.agentId)) return null;",
+        "sourceReplace": "if (first === undefined) return null;",
+        "originalSha256": "bd3243a7d0c068476d4ab61300e98a0c78926a146708a8081378a62a183eb06d",
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/P30-1546-mixed-credentials-mutant-source.ts",
+          "bytes": 4222,
+          "sha256": "3f05868b65a8b1a748c95260ba956878a06f808713f9c5fd7095ebb519505768"
+        },
+        "patch": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/P30-1546-mixed-credentials.patch",
+          "bytes": 446,
+          "sha256": "331604cd99915c7a7c341fc2bbeedfc3a0077f7ee92c345cd97c02450cf72ed6"
+        },
+        "soleDelta": "src/studio/agentCredentialAuth.ts",
+        "restoredEntries": 12268,
+        "unchangedCompiled": 4529
+      },
+      {
+        "id": "P30-1546-lease-narrowing",
+        "sourceTarget": "src/studio/agentCredentialAuth.ts",
+        "sourceLine": 94,
+        "matches": 1,
+        "sourceFind": "for (const grant of grants.slice(1)) {",
+        "sourceReplace": "for (const grant of grants.slice(grants.length)) {",
+        "originalSha256": "bd3243a7d0c068476d4ab61300e98a0c78926a146708a8081378a62a183eb06d",
+        "frozenMutant": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/P30-1546-lease-narrowing-mutant-source.ts",
+          "bytes": 4291,
+          "sha256": "709c89ecec945dff843172f68933b332993757f9b398f40e56a6fffa40a14974"
+        },
+        "patch": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/P30-1546-lease-narrowing.patch",
+          "bytes": 575,
+          "sha256": "b66ccdce12cbbf49572a609554e1bc333203f9645451de9afa1a4c75bc9e3856"
+        },
+        "soleDelta": "src/studio/agentCredentialAuth.ts",
+        "restoredEntries": 12268,
+        "unchangedCompiled": 4529
+      }
+    ],
+    "phaseRecords": 10,
+    "testProcesses": 7,
+    "rawPhases": [
+      {
+        "phase": "combined-original-thirty-baseline",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/combined-original-thirty-baseline/raw-tests.json",
+          "bytes": 13748,
+          "sha256": "16c30cedbfeee561748305cf28e88f80a5e0d0ee30182f046cc8b7f1e900a92e"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/combined-original-thirty-baseline/command.json",
+          "bytes": 1743,
+          "sha256": "46d37814d1506c42d1e680fa6c4e1ca0780cb93310043e97740eaca52d153075"
+        },
+        "counts": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "success": true,
+        "exit": 0,
+        "names": [
+          "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+          "Studio binds agent identity before ToolHub execution accepts matching Authorization bearer and lease with a real one-time approved write",
+          "Studio binds agent identity before ToolHub execution retains lease-only execution and rejects a mismatched lease before any tool effect",
+          "Studio binds agent identity before ToolHub execution does not let a static token replace the existing required execution lease",
+          "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+          "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+          "all supplied credential scopes and validity constraints bind rejects revoked supplied leases on all scope-only routes while preserving static-only compatibility",
+          "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+          "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+          "all supplied credential scopes and validity constraints bind refuses a disabled query carrier even when a valid static token is present",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a valid static token hides a revoked lease",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a narrower lease can be dropped and a real write dispatched",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicated static-token and lease headers instead of trusting a merged or first value",
+          "human and legacy credential compatibility is explicit retains human session and bootstrap admin precedence over irrelevant invalid agent credentials",
+          "human and legacy credential compatibility is explicit preserves lease-only checks/read routes and refuses identity substitution on execution reads",
+          "agent token scopes come from the signed action policy, not a constant omits toolhub:execute when no signed rule allows execute and records the granting policy",
+          "agent token scopes come from the signed action policy, not a constant grants execute only for the action classes the signed policy allows",
+          "agent token scopes come from the signed action policy, not a constant refuses to mint a token under an unsigned policy and names the file that refused",
+          "agent token scopes come from the signed action policy, not a constant never widens an already issued token when the live policy later widens",
+          "agent token scopes come from the signed action policy, not a constant derives a lease-backed grant from the lease's own scopes and names why classes fall back to the policy",
+          "agent token scopes come from the signed action policy, not a constant reads a legacy scopes-only meta as granting no execute action class",
+          "Studio enforces the token's execute action classes at /toolhub/execute refuses a WRITE_LOW execute from a token whose grant stops at READ_ONLY, naming the grant and how to widen it",
+          "Studio enforces the token's execute action classes at /toolhub/execute names the signed action policy when a policy-derived token lacks toolhub:execute",
+          "Studio enforces the token's execute action classes at /toolhub/execute keeps a lease-only execute governed by the live signed policy and says so",
+          "Studio enforces the token's execute action classes at /toolhub/execute lists agents without minting a token when the action policy is unsigned"
+        ],
+        "failures": [],
+        "durationMs": 11756,
+        "perFile": [
+          {
+            "file": "studioAgentCredentialBinding.test.ts",
+            "cases": 20,
+            "passed": 20
+          },
+          {
+            "file": "studioAgentTokenScopes.test.ts",
+            "cases": 10,
+            "passed": 10
+          }
+        ]
+      },
+      {
+        "phase": "P30-1546-mixed-credentials-baseline",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-baseline/raw-tests.json",
+          "bytes": 9156,
+          "sha256": "55dc8a2eb9cb2ec92c0f1b001395f4460b59d990a5953e98145b2afe7bb2d4f6"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-baseline/command.json",
+          "bytes": 1712,
+          "sha256": "6e403543fac96dc4f132842316d7cdf89867c017b2e2954145f45528d5a8a02c"
+        },
+        "counts": {
+          "numTotalTests": 20,
+          "numPassedTests": 20,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "success": true,
+        "exit": 0,
+        "names": [
+          "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+          "Studio binds agent identity before ToolHub execution accepts matching Authorization bearer and lease with a real one-time approved write",
+          "Studio binds agent identity before ToolHub execution retains lease-only execution and rejects a mismatched lease before any tool effect",
+          "Studio binds agent identity before ToolHub execution does not let a static token replace the existing required execution lease",
+          "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+          "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+          "all supplied credential scopes and validity constraints bind rejects revoked supplied leases on all scope-only routes while preserving static-only compatibility",
+          "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+          "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+          "all supplied credential scopes and validity constraints bind refuses a disabled query carrier even when a valid static token is present",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a valid static token hides a revoked lease",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a narrower lease can be dropped and a real write dispatched",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicated static-token and lease headers instead of trusting a merged or first value",
+          "human and legacy credential compatibility is explicit retains human session and bootstrap admin precedence over irrelevant invalid agent credentials",
+          "human and legacy credential compatibility is explicit preserves lease-only checks/read routes and refuses identity substitution on execution reads"
+        ],
+        "failures": [],
+        "durationMs": 8750,
+        "perFile": [
+          {
+            "file": "studioAgentCredentialBinding.test.ts",
+            "cases": 20,
+            "passed": 20
+          }
+        ]
+      },
+      {
+        "phase": "P30-1546-mixed-credentials-mutant",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-mutant/raw-tests.json",
+          "bytes": 21659,
+          "sha256": "482447127677c5cb84fc8e7917ef3a8a3b7a67b5f2617c9fb7b4e5c48234cfba"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-mutant/command.json",
+          "bytes": 1703,
+          "sha256": "959e691e7a0e25c31431f2f2b45a9f7f3d28347480773a272c193cefd84e9a1d"
+        },
+        "counts": {
+          "numTotalTests": 20,
+          "numPassedTests": 17,
+          "numFailedTests": 3,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "success": false,
+        "exit": 1,
+        "names": [
+          "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+          "Studio binds agent identity before ToolHub execution accepts matching Authorization bearer and lease with a real one-time approved write",
+          "Studio binds agent identity before ToolHub execution retains lease-only execution and rejects a mismatched lease before any tool effect",
+          "Studio binds agent identity before ToolHub execution does not let a static token replace the existing required execution lease",
+          "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+          "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+          "all supplied credential scopes and validity constraints bind rejects revoked supplied leases on all scope-only routes while preserving static-only compatibility",
+          "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+          "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+          "all supplied credential scopes and validity constraints bind refuses a disabled query carrier even when a valid static token is present",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a valid static token hides a revoked lease",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a narrower lease can be dropped and a real write dispatched",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicated static-token and lease headers instead of trusting a merged or first value",
+          "human and legacy credential compatibility is explicit retains human session and bootstrap admin precedence over irrelevant invalid agent credentials",
+          "human and legacy credential compatibility is explicit preserves lease-only checks/read routes and refuses identity substitution on execution reads"
+        ],
+        "failures": [
+          {
+            "name": "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:204:42"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 403,
+                "expected": 401
+              }
+            ],
+            "fullFailureMessageSha256": "4850e455e5901ecab4abff76d19ccfd8f448fc0d31747ceef3049e29d2b1fae9",
+            "firstMessage": "AssertionError: {\"error\":\"scope does not include this agent\"}: expected 403 to be 401 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:305:46"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 401
+              }
+            ],
+            "fullFailureMessageSha256": "35104bf1bb809b35d1de089d5ea4fa8750f2337f37aba755f16b99ebc81b7ec6",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 401 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:322:46"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 401
+              }
+            ],
+            "fullFailureMessageSha256": "be41624ce09496a9ee9d4a5d1f8a28959e5efaf0f3e41cf2466ed9643c8c763d",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 401 // Object.is equality"
+          }
+        ],
+        "durationMs": 8930,
+        "perFile": [
+          {
+            "file": "studioAgentCredentialBinding.test.ts",
+            "cases": 20,
+            "passed": 17
+          }
+        ]
+      },
+      {
+        "phase": "P30-1546-mixed-credentials-restored",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-restored/raw-tests.json",
+          "bytes": 9152,
+          "sha256": "689534a9c4c6a29e0ff006d0d0c5290fa8633b6deaf45483bb3a4b23d5d43f0d"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-mixed-credentials-restored/command.json",
+          "bytes": 1712,
+          "sha256": "63186e9dc1460e0932bb3804a2471deb69febaefb417c9e12f64458e668a7c2f"
+        },
+        "counts": {
+          "numTotalTests": 20,
+          "numPassedTests": 20,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "success": true,
+        "exit": 0,
+        "names": [
+          "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+          "Studio binds agent identity before ToolHub execution accepts matching Authorization bearer and lease with a real one-time approved write",
+          "Studio binds agent identity before ToolHub execution retains lease-only execution and rejects a mismatched lease before any tool effect",
+          "Studio binds agent identity before ToolHub execution does not let a static token replace the existing required execution lease",
+          "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+          "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+          "all supplied credential scopes and validity constraints bind rejects revoked supplied leases on all scope-only routes while preserving static-only compatibility",
+          "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+          "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+          "all supplied credential scopes and validity constraints bind refuses a disabled query carrier even when a valid static token is present",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a valid static token hides a revoked lease",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a narrower lease can be dropped and a real write dispatched",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicated static-token and lease headers instead of trusting a merged or first value",
+          "human and legacy credential compatibility is explicit retains human session and bootstrap admin precedence over irrelevant invalid agent credentials",
+          "human and legacy credential compatibility is explicit preserves lease-only checks/read routes and refuses identity substitution on execution reads"
+        ],
+        "failures": [],
+        "durationMs": 8785,
+        "perFile": [
+          {
+            "file": "studioAgentCredentialBinding.test.ts",
+            "cases": 20,
+            "passed": 20
+          }
+        ]
+      },
+      {
+        "phase": "P30-1546-lease-narrowing-baseline",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-baseline/raw-tests.json",
+          "bytes": 9154,
+          "sha256": "b4870640f5c9d10200259cbe88b05d130c7f697f9bd97a98553980fa6caf2752"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-baseline/command.json",
+          "bytes": 1698,
+          "sha256": "8a41af225ed9845a9087ce95ce193a3e7519dd5e45b32d7f53b8c9b26904015e"
+        },
+        "counts": {
+          "numTotalTests": 20,
+          "numPassedTests": 20,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "success": true,
+        "exit": 0,
+        "names": [
+          "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+          "Studio binds agent identity before ToolHub execution accepts matching Authorization bearer and lease with a real one-time approved write",
+          "Studio binds agent identity before ToolHub execution retains lease-only execution and rejects a mismatched lease before any tool effect",
+          "Studio binds agent identity before ToolHub execution does not let a static token replace the existing required execution lease",
+          "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+          "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+          "all supplied credential scopes and validity constraints bind rejects revoked supplied leases on all scope-only routes while preserving static-only compatibility",
+          "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+          "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+          "all supplied credential scopes and validity constraints bind refuses a disabled query carrier even when a valid static token is present",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a valid static token hides a revoked lease",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a narrower lease can be dropped and a real write dispatched",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicated static-token and lease headers instead of trusting a merged or first value",
+          "human and legacy credential compatibility is explicit retains human session and bootstrap admin precedence over irrelevant invalid agent credentials",
+          "human and legacy credential compatibility is explicit preserves lease-only checks/read routes and refuses identity substitution on execution reads"
+        ],
+        "failures": [],
+        "durationMs": 8756,
+        "perFile": [
+          {
+            "file": "studioAgentCredentialBinding.test.ts",
+            "cases": 20,
+            "passed": 20
+          }
+        ]
+      },
+      {
+        "phase": "P30-1546-lease-narrowing-mutant",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-mutant/raw-tests.json",
+          "bytes": 51333,
+          "sha256": "813f1e1ef85c8347274121d6005c0ee5a9bd29e78d810e83d107598618214b41"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-mutant/command.json",
+          "bytes": 1689,
+          "sha256": "f0fda623c1715739200ec178e1107932a9e314feb4d0a0a73b4bc13f48b851ab"
+        },
+        "counts": {
+          "numTotalTests": 20,
+          "numPassedTests": 13,
+          "numFailedTests": 7,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "success": false,
+        "exit": 1,
+        "names": [
+          "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+          "Studio binds agent identity before ToolHub execution accepts matching Authorization bearer and lease with a real one-time approved write",
+          "Studio binds agent identity before ToolHub execution retains lease-only execution and rejects a mismatched lease before any tool effect",
+          "Studio binds agent identity before ToolHub execution does not let a static token replace the existing required execution lease",
+          "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+          "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+          "all supplied credential scopes and validity constraints bind rejects revoked supplied leases on all scope-only routes while preserving static-only compatibility",
+          "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+          "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+          "all supplied credential scopes and validity constraints bind refuses a disabled query carrier even when a valid static token is present",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a valid static token hides a revoked lease",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a narrower lease can be dropped and a real write dispatched",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicated static-token and lease headers instead of trusting a merged or first value",
+          "human and legacy credential compatibility is explicit retains human session and bootstrap admin precedence over irrelevant invalid agent credentials",
+          "human and legacy credential compatibility is explicit preserves lease-only checks/read routes and refuses identity substitution on execution reads"
+        ],
+        "failures": [
+          {
+            "name": "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:251:64"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "51539b3e7dc5f917c735ca97e17f456a530d18025a3e2b2334f7b92a73ca956e",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:281:46"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "9680ed4fbcda4d431f83392e58c0473e1a6b70e70351652bb8713f3c6d66faee",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          }
+        ],
+        "durationMs": 8774,
+        "perFile": [
+          {
+            "file": "studioAgentCredentialBinding.test.ts",
+            "cases": 20,
+            "passed": 13
+          }
+        ]
+      },
+      {
+        "phase": "P30-1546-lease-narrowing-restored",
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-restored/raw-tests.json",
+          "bytes": 9156,
+          "sha256": "f60a645d42140494f1ff20826b2b0aeba22379ee6717a5d6a00d4c8316ee3d0f"
+        },
+        "command": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/phases/P30-1546-lease-narrowing-restored/command.json",
+          "bytes": 1698,
+          "sha256": "21b64f370863d4d9489bd8ad470140c2bc1933b75d1b066da49dcbe871ba9bc3"
+        },
+        "counts": {
+          "numTotalTests": 20,
+          "numPassedTests": 20,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0
+        },
+        "success": true,
+        "exit": 0,
+        "names": [
+          "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+          "Studio binds agent identity before ToolHub execution accepts matching Authorization bearer and lease with a real one-time approved write",
+          "Studio binds agent identity before ToolHub execution retains lease-only execution and rejects a mismatched lease before any tool effect",
+          "Studio binds agent identity before ToolHub execution does not let a static token replace the existing required execution lease",
+          "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+          "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+          "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+          "all supplied credential scopes and validity constraints bind rejects revoked supplied leases on all scope-only routes while preserving static-only compatibility",
+          "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+          "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+          "all supplied credential scopes and validity constraints bind refuses a disabled query carrier even when a valid static token is present",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a valid static token hides a revoked lease",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicate Authorization before a narrower lease can be dropped and a real write dispatched",
+          "raw duplicate carrier lines cannot disappear during HTTP normalization rejects duplicated static-token and lease headers instead of trusting a merged or first value",
+          "human and legacy credential compatibility is explicit retains human session and bootstrap admin precedence over irrelevant invalid agent credentials",
+          "human and legacy credential compatibility is explicit preserves lease-only checks/read routes and refuses identity substitution on execution reads"
+        ],
+        "failures": [],
+        "durationMs": 8824,
+        "perFile": [
+          {
+            "file": "studioAgentCredentialBinding.test.ts",
+            "cases": 20,
+            "passed": 20
+          }
+        ]
+      }
+    ],
+    "controls": [
+      {
+        "id": "P30-1546-mixed-credentials",
+        "passedCounts": [
+          20,
+          17,
+          20
+        ],
+        "failures": [
+          {
+            "name": "Studio binds agent identity before ToolHub execution refuses A's static token with B's lease before fs.write, receipt creation or approval consumption",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:204:42"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 403,
+                "expected": 401
+              }
+            ],
+            "fullFailureMessageSha256": "4850e455e5901ecab4abff76d19ccfd8f448fc0d31747ceef3049e29d2b1fae9",
+            "firstMessage": "AssertionError: {\"error\":\"scope does not include this agent\"}: expected 403 to be 401 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not let another valid lease hide a revoked or invalid lower-priority carrier",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:305:46"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 401
+              }
+            ],
+            "fullFailureMessageSha256": "35104bf1bb809b35d1de089d5ea4fa8750f2337f37aba755f16b99ebc81b7ec6",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 401 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind rejects malformed, empty and conflicting credentials without static-token fallback",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:322:46"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 401
+              }
+            ],
+            "fullFailureMessageSha256": "be41624ce09496a9ee9d4a5d1f8a28959e5efaf0f3e41cf2466ed9643c8c763d",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 401 // Object.is equality"
+          }
+        ],
+        "sameNamesCriteria": true,
+        "sourceRestoredExact": true,
+        "compiledUnchanged": true
+      },
+      {
+        "id": "P30-1546-lease-narrowing",
+        "passedCounts": [
+          20,
+          13,
+          20
+        ],
+        "failures": [
+          {
+            "name": "all supplied credential scopes and validity constraints bind intersects the static token and narrower lease on every scope-only endpoint",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:251:64"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "51539b3e7dc5f917c735ca97e17f456a530d18025a3e2b2334f7b92a73ca956e",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-amc-lease beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-api-key beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in x-goog-api-key beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in api-key beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind does not ignore a narrower lease in authorization beside a static identity",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:264:44"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "20515cd561ef3240dca4a5b07f70afd8932bbd8b40ddca6181969e8e9de9fdf9",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          },
+          {
+            "name": "all supplied credential scopes and validity constraints bind intersects multiple valid lease carriers rather than accepting the first carrier's wider scope",
+            "status": "failed",
+            "kind": "AssertionError",
+            "locations": [
+              "studioAgentCredentialBinding.test.ts:281:46"
+            ],
+            "actualExpectedStatusPairs": [
+              {
+                "actual": 200,
+                "expected": 403
+              }
+            ],
+            "fullFailureMessageSha256": "9680ed4fbcda4d431f83392e58c0473e1a6b70e70351652bb8713f3c6d66faee",
+            "firstMessage": "l}],\"total\":11,\"derivedView\":true,\"recorded\":false,\"proofEligible\":false,\"claimBoundary\":\"This read-only view proves only the declared context in the currently signed ToolHub allowlist. It does not discover a live server, prove availability, verify an MCP attestation, or prove an invocation.\"}: expected 200 to be 403 // Object.is equality"
+          }
+        ],
+        "sameNamesCriteria": true,
+        "sourceRestoredExact": true,
+        "compiledUnchanged": true
+      }
+    ],
+    "launcherFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "independentRootRaw": {
+      "path": "/private/tmp/p0-30-AMC-1546-unchanged-two-file-baseline-20261015.json",
+      "bytes": 13786,
+      "sha256": "9b9deb04d38d6bf97329116cc8f86dade5fce67a84b9134f6fe3cd34d1f916b1"
+    },
+    "rootEnvironmentBoundaryPreserved": "Root wrapper copies os.environ with Node22PATH/privateHOME. It does not inherit this private lane allowlisted-env claim.",
+    "noGitMetadata": true,
+    "currentDirectBytesExact": true,
+    "unchangedOriginalTestsConfigSetupGuard": true
+  },
+  "additionalEvidencePins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/controller.py",
+      "bytes": 9063,
+      "sha256": "51116db61c2f0be80ed095d08f543ed600e37da556a6ae15df0b18bdff3b9e21"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/prepare.py",
+      "bytes": 7841,
+      "sha256": "aa8c2b73686d665f642dfb73ce9eb1163f579d2e27898ca3d6700e856fc02fdd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/finalize.py",
+      "bytes": 15630,
+      "sha256": "2ee6cf7b7ea6cdaa13674f454db41f45c8261f473980f8a91d84e1ba11b7f398"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/recipes.json",
+      "bytes": 1941,
+      "sha256": "38d2906da00e57e7749e2692d16188c1f51c427c133728f3acd27aba82381abc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/root-runtime-release.json",
+      "bytes": 604,
+      "sha256": "75bc4989c0b4c0cd42220ebcbbd9d6efe82e70c4285da4e592b8e4ba58d59eb0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/setup-prepared.json",
+      "bytes": 7728,
+      "sha256": "59bf266ae8466630eb8c1732026576c64839b7045009a653fda724b6a492ba00"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/setup-prepared.md",
+      "bytes": 1903,
+      "sha256": "2088c2dcae231f958c383bfff50b241e0cae9c59d140df209b9d099044c454b6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 2726,
+      "sha256": "c420421ea74d573376a1af0cadd84f1973691ac34a9e00d0de427cff5ddb5f54"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 14455,
+      "sha256": "3a2e116d270aec533e4d0a716f4ad50f11eb1db0640864d4641b8eed5f90ab95"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/semantic-classification.json",
+      "bytes": 65732,
+      "sha256": "bab9316939ccf3cc5e4d4f0549cb38821b78dba1a878d0059010457cd90154e0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure/tests/studioAgentCredentialBinding.test.ts",
+      "bytes": 25124,
+      "sha256": "ae9eb796f2e0e8fc8591fbbccb9b2ae1559ee7de09a06f5ddd88581d09186697"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure/tests/studioAgentTokenScopes.test.ts",
+      "bytes": 18146,
+      "sha256": "7bed2e206ea6a664e3cb0d2fe6f1a4a5eb75b8b0fd593748762305d3b3ab5a6d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure/src/studio/agentCredentialAuth.ts",
+      "bytes": 4279,
+      "sha256": "bd3243a7d0c068476d4ab61300e98a0c78926a146708a8081378a62a183eb06d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/closure/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1546-1508-readiness-20261015.json",
+      "bytes": 62033,
+      "sha256": "327e2cf745e8c97144bb6dd3bd26e50c4362049e87f2e018a8191a3ad7859cc3"
+    }
+  ],
+  "corpusAndRuntime": {
+    "actual": "The own combined baseline has 20 binding+10 tokenScope registered cases, all 30 passed. Each mutant uses exactly the same 20 binding names and original generator inputs/criteria, with source restored before the next phase. Seven test processes yield 150 repeated case instances, not 150 distinct cases.",
+    "sourceMode": "Actual commands use the explicit Node22 Vitest launcher in the independent source copy with maxWorkers=1, no file parallelism, no cache and both default/JSON reporters. Original ../src imports, config, global/per-file workspace guards and cleanup remain exact; no compiler, compiled import adapter, child/dist test invocation or criterion change was introduced.",
+    "deadlines": "All 20 binding expansions use their existing 45,000 ms deadline and 10,000 ms node:http request timeout. Six tokenScope cases use normal 30,000 ms; the four HTTP tokenScope cases use existing 45,000 ms and 10,000 ms requests.",
+    "ABI": "Only the separate current launcher process directly prints Node v22.23.3, actual Cellar22 executable and ABI127. Explicit launcher selection does not invent a separate per-test-worker ABI observation.",
+    "rootIndependent": "The separately pinned root 30/30 raw report was verified. Its wrapper copies os.environ with Node22PATH/privateHOME, so it is not given this private lane allowlisted-environment guarantee; fresh fixtures are not described as identical physical keys/rows across runs."
+  },
+  "exactRecipeMeaning": [
+    {
+      "id": "P30-1546-mixed-credentials",
+      "sourceLine": 92,
+      "old": "if (first === undefined || grants.some(grant => grant.agentId !== first.agentId)) return null;",
+      "new": "if (first === undefined) return null;",
+      "meaning": "Exactly the historical recovered identity-consistency guard deletion. The current source needle matches once and the retained mutant/patch/full manifest independently reproduce only that TS condition change."
+    },
+    {
+      "id": "P30-1546-lease-narrowing",
+      "sourceLine": 94,
+      "old": "for (const grant of grants.slice(1)) {",
+      "new": "for (const grant of grants.slice(grants.length)) {",
+      "meaning": "Exactly the recovered scope-intersection loop omission. The current source needle matches once, the frozen mutated source and full sole-delta manifest match its reconstruction, and all compiled bytes remain unchanged."
+    }
+  ],
+  "firstAssertionsAndMasking": [
+    {
+      "control": "mixed-credentials",
+      "evidence": "binding204;masked205-209",
+      "observed": "Actual HTTP 403 with scope does not include this agent rather than the required initial 401.",
+      "meaning": "The first authentication identity barrier is weakened, but a later route identity check still refuses. This failed case does not establish an unauthorized fs.write. Its sentinel absence, execution-row equality, full approval equality and matching-agent positive execution are not reached after line 204; they are not credited as mutant effects. They do pass in the intact baseline/restoration."
+    },
+    {
+      "control": "mixed-credentials",
+      "evidence": "binding305/322",
+      "observed": "Both raw failures contain actual HTTP 200 trusted ToolHub context bodies instead of 401.",
+      "meaning": "These are actual read-route admissions, not transport failure or merely source presence. The loop iteration index is not retained, so do not identify every secondary/invalid credential as independently admitted or credit later loop entries from this trace."
+    },
+    {
+      "control": "lease-narrowing",
+      "evidence": "binding251",
+      "observed": "Actual HTTP 200 trusted ToolHub context instead of 403 after an earlier static-only 200 control.",
+      "meaning": "The narrowed credential fails to restrict the reached scope-only read. This first failing assertion masks later routes, body scope checks and later receipt-only positive/negative controls at254-256 in that mutant case. Do not claim every named route was causally exercised by the failure."
+    },
+    {
+      "control": "lease-narrowing",
+      "evidence": "binding264 five named carrier expansions",
+      "observed": "Each separate x-amc-lease/x-api-key/x-goog-api-key/api-key/authorization case records actual HTTP 200 instead of 403.",
+      "meaning": "All five carriers have a directly named measured failing case. Each stops before its later full-lease accepted control at265-269; those controls pass only where reached in intact baseline/restoration."
+    },
+    {
+      "control": "lease-narrowing",
+      "evidence": "binding281",
+      "observed": "Actual HTTP 200 instead of 403 within the multiple-carrier loop.",
+      "meaning": "The first recorded failure prevents qualification of subsequent carrier-pair entries; the trace retains no separate iteration index. The full case passes in baseline/restoration."
+    }
+  ],
+  "actualFailureClassification": {
+    "total": 10,
+    "types": "All ten raw failures are original AssertionErrors with exact status/location/message hashes independently recomputed. All seven phases retain expected complete cases, zero pending/todo, empty suite setup messages and no executionError. No import, transform/type, HTTP bind/request/timeout, signal or cleanup error was treated as a guard kill.",
+    "formalLimit": "TokenScopes10 is a formal intact baseline only in this packet. The two authenticateStudioAgent mutations do not causally qualify every scopeRefusal, token producer or agentExecuteClassCheck branch.",
+    "behaviorLimit": "Read-only ToolHub context is a view of signed configured allowlist context, not discovery, actual MCP invocation, provider availability or a model operation."
+  },
+  "preservation": {
+    "actual": "All 1,512 index references and 89 unique protected pins match. All 1,334 prior references and two late predecessor review/outcome pins match exact before/after bodies. Seven referenced prior full closures were directly rehashed without content re-analysis. Native bytes/device/inode/nlink and 307 dependency links match.",
+    "source": "Current root/private source 7,739 and compiled 4,529 match the initial source 58 images. Both reconstructed one-target mutant manifests preserve every other entry; both full 12,268 restored manifests and current full closure equal prepared bytes. Original tests/helpers/config/guards/timeouts and source imports are unchanged.",
+    "scope": "The private copy has independent physical source files and no .git metadata; it is not literal fresh-clone proof. Regular-file closure excludes dependencies and symlinks, checked separately as resolver links/native identity. Retained checkpoints/current hashes do not constitute an OS-wide continuous write audit.",
+    "lateInputs": "The predecessor guard independent review and root bounded outcome were captured as separate runtime-input pins and remain exact. Original setup chronology is frozen separately from final qualification."
+  },
+  "limits": [
+    "Original complete intact/restored assertions reach real local approved file writes, one-time approval consumption, attributed tool rows and returned receipts where defined. A failed mutant assertion cannot be credited with later file/row/approval assertions or subsequent route/carrier entries.",
+    "Synthetic signed action-policy and diagnostic control inputs deliberately isolate credential authorization. They do not prove measured maturity, real operators, external identity, third-party attestation, provider/model behavior or independent receipt crypto verification. Physical fixture preimages are cleaned; no offline crypto replay follows.",
+    "This review performed no product import, TypeScript parser/typecheck, tests/reruns, compilation/build/install, network request, Git operation or source/input/held/prior-packet edit. Only the assigned review pair was written.",
+    "No Portal test, route or mutation was selected by these commands, and the later 1508 namespace was neither read nor changed. No source ownership clearance or freeze bypass, held transfer, permanent test/counter/doc change, compiled/installed route, all-auth-flow, tenant/race, whole P0-30, old held batch, Node24, full suite, coverage, hosted CI, G0, release or Done acceptance follows."
+  ],
+  "operations": {
+    "productImports": 0,
+    "TypeScriptParserSyntaxTypeChecks": 0,
+    "testsOrReruns": 0,
+    "compilerBuildInstall": 0,
+    "network": 0,
+    "Git": 0,
+    "sourceInputPriorOrLaterNamespaceWrites": 0,
+    "writesOnly": [
+      "/private/tmp/p0-30-AMC-1546-independent-review-20261015.json",
+      "/private/tmp/p0-30-AMC-1546-independent-review-20261015.md"
+    ]
+  },
+  "allReadsFinished": true
+}

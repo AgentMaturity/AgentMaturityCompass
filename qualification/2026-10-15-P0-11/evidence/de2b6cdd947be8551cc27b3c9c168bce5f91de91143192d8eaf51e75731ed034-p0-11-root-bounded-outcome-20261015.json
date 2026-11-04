@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "capturedUtc": "2026-10-15T06:53:56.917792+00:00",
+  "source": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "decision": "BOUND_EXISTING_SOURCE_EVIDENCE_AND_CONTINUE_WITH_FORMAL_GAPS_OPEN",
+  "formalAcceptanceClosed": false,
+  "dependencyReady": false,
+  "done": false,
+  "packet": {
+    "path": "/private/tmp/p0-11-bounded-qualification-20261015.json",
+    "bytes": 70959,
+    "sha256": "b6aa7d4281ea76cce222dc4186d985efb837936910bac1ae5783153f2bd8d26d"
+  },
+  "causal": {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015.json",
+    "bytes": 88229,
+    "sha256": "86a94bff3755d5856808fb5c0f7edfe7cbc21605355030a4e5eb6482678f4d17"
+  },
+  "index": {
+    "path": "/private/tmp/p0-11-causal-qualification-20261015/runtime-artifact-index.json",
+    "bytes": 83753,
+    "sha256": "cbb4b53af633b4879df157c1357df1c325310c64980f83cc7dd02f240ba874ed"
+  },
+  "review": {
+    "path": "/private/tmp/p0-11-bounded-independent-review-20261015.json",
+    "bytes": 25410,
+    "sha256": "a7f2f420e7b92a9030ebfff6efbdb56f21bb7b9d7b3286da83130adc6ae86a1d"
+  },
+  "runtimeAttribution": {
+    "path": "/private/tmp/p0-11-root-runtime-attribution-20261015.json",
+    "bytes": 920,
+    "sha256": "9a2c12d209e85a4d5f1a72997cce3fd2fb21a745653797be3156daf5c4da6f32"
+  },
+  "rootCausalAttribution": {
+    "path": "/private/tmp/p0-11-root-causal-attribution-20261015.json",
+    "bytes": 4543,
+    "sha256": "275a99bc5f718abdfedd3d3688d99fc8645e4e0b47c2e859b5036f89b9e2a564"
+  },
+  "blockingPacketFindings": [],
+  "independentFindingsPreserved": [
+    {
+      "id": "A1",
+      "kind": "bounded-result",
+      "finding": "Originalmap7/telemetry2/preview5/recording7 pass in4separate invocations,21 unique registrations across4files. Primary9 spans2runs. Three controls use map7 or recording7 in9phases:63 repeat executions,60passes,3bodyfailures(2AssertionErrors and1exact original callbackError),2distinct failedfile/titlepairs.14existing registrations repeat; no new tests or whole-control survivor."
+    },
+    {
+      "id": "A2",
+      "kind": "semantic-guard-sensitivity",
+      "finding": "C1 7\u21926\u21927 removes missing-path error accumulation while retaining continue. Actual child status0 fails original test29:20 expected1 with AssertionError 'expected +0 to be 1 // Object.is equality'. Diagnostics30\u201331 are masked. Other6mutant cases pass. This observes invalid-reference admission under that exact semantic control, not16-channel enforcement or the historical literal whole-branch-removal criterion."
+    },
+    {
+      "id": "A3",
+      "kind": "exact-genuine-body-error",
+      "finding": "C2 7\u21926\u21927 propagates the original injected callback's Error 'the evidence store is unreachable'. Raw/observer retain matching callback202:15,pipeline306:19,await206:21 frames. The await rejects before outcome assertions210\u2013213; these later values are not observed. Other6cases pass. This is direct READ_ONLY callback propagation, not a policy denial or a genuine durable-store/journaled-effect outage."
+    },
+    {
+      "id": "A4",
+      "kind": "open-literal-mutation-criterion",
+      "finding": "L1 7\u21926\u21927 removes the whole missing-file branch. Original status assertion29 passes, establishing child status1; diagnostic assertion30:20 then fails expected 'channel network-egress'. Full observer actual retains caught ENOENT on noSuchFile.ts, while its message is abbreviated. Assertion31 is masked. This is diagnostic sensitivity and continues to refuse the invalid fixture. The strict historical requirement that the missing-path fixture pass after literal removal remains open."
+    },
+    {
+      "id": "A5",
+      "kind": "packet-and-preservation",
+      "finding": "All359 index refs and363 unique recursive pin triples match. Frozen20-row root journal equals the closed original byte-for-byte and the exact phase/argv/exit contract:16zero and4intended checker fixture1. These commands are separate from9causal processes. Final8362source+4529dist=12891 parent/private bytes and recorded lstat fields are exact, with disjoint12891-inode universes,nlink1 and sole borrowedlink. Native538824643,221external+10own pins and current inbox are preserved; noACTIVE/HALTED."
+    },
+    {
+      "id": "A6",
+      "kind": "open-formal-truth-gaps",
+      "finding": "Sid residual-risk/status review, ASI re-verification/experimental labels, stale mapstamp and colliding historical successor keys remain open. Text/schema/path checks do not prove16channel behavioral enforcement. Real local SQLite+stubbed exporter/fetch, disabled preview and direct callback failure retain different meanings.1269duplicate/2751dead-code quality failures and all prior ownership/trust/fullsuite/hosted/PR/merge/release/G0/Done gaps remain unwaived."
+    }
+  ],
+  "originalRuns": {
+    "separatePassedCounts": [
+      7,
+      2,
+      5,
+      7
+    ],
+    "uniqueFileTitleRegistrations": 21,
+    "files": 4,
+    "primaryReceiptTests": 9,
+    "primaryAggregateAcrossTwoRuns": true,
+    "single9Or21CaseRunClaimed": false
+  },
+  "causalCounts": {
+    "total": 63,
+    "passed": 60,
+    "failed": 3,
+    "pending": 0,
+    "todo": 0
+  },
+  "failureKinds": {
+    "body-assertion": 2,
+    "exact-genuine-recorder-error-propagation": 1
+  },
+  "distinctFailedCases": 2,
+  "survivingControls": [],
+  "actualAttribution": "C1 catches invalid-reference admission at map29:20 (actual0,expected1), maskingdiagnostics30\u201331. C2 propagates the genuine callback Error at202:15/pipeline306:19/await206:21, masking210\u2013213. L1stillrefuses byENOENT; status29passes, diagnostic30:20fails and31masked. L1provesdiagnostic sensitivity, notinvalid-map admission; strictliteralmissing-path-passes criterion staysopen. Each matrix7\u21926\u21927 withrestorationexact.",
+  "rootJournal": {
+    "frozen": {
+      "path": "/private/tmp/p0-11-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 29638,
+      "sha256": "f1d769c08ecc1948a2cc3ffbed391ab22e7dbc53f260e0225b66a7f4406e7176"
+    },
+    "count": 20,
+    "exit0": 16,
+    "specificExpectedNegativeCheckerExit1": 4,
+    "guardsAllExit0": true,
+    "causalProcessesCountedSeparately": 9
+  },
+  "preservation": {
+    "final": {
+      "path": "/private/tmp/p0-11-qualification-20261015/final-source-preservation.json",
+      "bytes": 2832,
+      "sha256": "f3cd8c9a030493ef686ca1caabbf02372723660f1154041c5d042a646a360e53"
+    },
+    "trackedBefore": 8362,
+    "compiled": 4529,
+    "physicalCopy": 12891,
+    "nativeInode": 538824643,
+    "noProductSourceChange": true,
+    "sourceControlsRestored": true
+  },
+  "unwaivedQuality": {
+    "duplicateFindings": 1269,
+    "deadCodeFindings": 2751,
+    "status": "failed, not rerun or waived in P011"
+  },
+  "remainingAcceptance": [
+    "Formal acceptance is false; bounded evidence awaits independent actual review after freezing.",
+    "Original map 7 / telemetry 2 / preview 5 / recording 7 are four separate runs, 21 distinct registrations across 4 files. Primary 9 aggregates two runs, not one 9-case process. Nine causal phases repeat 14 distinct existing registrations: 63 executions, no new tests.",
+    "C1 semantic missing-path error removal retains continue. Status assertion 29 can mask diagnostic assertions 30-31. C1 is not historical literal L1.",
+    "L1 whole-branch removal can still refuse through ENOENT while changed text fails an output assertion. No invalid-map admission or historical pass-after-removal acceptance follows from nonzero/diagnostic sensitivity.",
+    "C2 rethrows the SAME original callback Error, possibly rejecting at await 206 before assertions 210-213. Preserve callback202/body-await 206/record306 frames, not inserted throwline. This is not a genuine durable-store outage, policy denial or journaled-effect reconciliation.",
+    "Actual AssertionErrors, exact C2 Error and survivors are derived from finished records. Generic setup/native/timeout/hook/late/pending/process uncertainty is never a kill; masked later assertions remain unobserved.",
+    "Map tests invoke actual Node MJS checker, not built amc. Text/schema/path checks are not sixteen-channel enforcement. Original checker children inherit environment, have no explicit timeout and no separately retained child PID/streams.",
+    "Telemetry has genuine workspace/vault/governed fs.read/SQLite plus throwing-exporter/canned-fetch seams. Ordinary fixture batch transaction completes before queue; nested callers may use savepoints, not universal outer durable commits. No real collector outage, independent seal or fully cold/WAL-free proof.",
+    "Preview 5 observes disabled serialization. Recording 7 uses local audit/metric rows plus direct READ_ONLY echo and genuinely throwing callback. No protected-effect or actual evidence-store failure claim.",
+    "Original wrappers inherit environment. Absent endpoint overrides/default loopback is preflight, not zero network/credential/OS isolation. Causal seven-key environment borrows parent dependencies, not complete dependency/cache/transport isolation.",
+    "Only owned process groups receive signal 0 probes after normal exits. Reporter precedes global teardown; full exits/streams/known banners are checked. The 420s supervisor sends no terminating signal and preserves original 30s deadlines; detached descendants are not universally excluded.",
+    "Current 16 channels / 8 failure rows are legitimate later coverage. Sid residual-risk/status review, ASI experimental/re-verify titles, stale stamp, occupied P1-56/57/58 proposed keys and complete behavioral truth remain open.",
+    "Required duplicate 1269 / dead 2751 source-quality debt remains failed/unwaived with prior exact-code attribution. Fullsuite/coverage/Node24/hosted/PR+merge/release/formal dependency/G0/Done are not established.",
+    "All earlier strict gaps/user skips, shared/Claude/A4/paused P2-02 holds and pending transfers remain intact. Historical Done is not acceptance or ownership clearance."
+  ],
+  "ownership": "All Claude/shared/A4/pausedP202 reservations, userP029skip/P022unresolved/D03healthskipuntilP206 and pendingP052/P020/P019transfers plus all earlier strict gaps remain unchanged. No human approval, transfer or formal prerequisite closure is inferred.",
+  "next": {
+    "key": "P0-41",
+    "mode": "Readiness and boundedqualification after canonicalpreservation/freeze checks. Missing originaltests require newlyauthored/reviewedfixturestatedasnew; no --online/externalposting/measurement/target/statusclaim."
+  },
+  "hashCycleBoundary": "Outcome precedes finalboundcanonicalbuilder and doesnotpin its futurebody; later postcommithandoff maybindboth."
+}

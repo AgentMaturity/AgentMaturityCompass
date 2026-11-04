@@ -1,0 +1,40 @@
+{
+  "issue": "P0-51",
+  "kind": "Independent read-only F4 helper, hook and fixture review",
+  "createdAt": "2026-10-14T18:09:03.218892+00:00",
+  "findings": [],
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/src/transparency/proofArchiveOutput.ts",
+      "sha256": "f88a87377cadc226294c6432df25e732cb94817baf5d100ceef32de01b421760"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/src/transparency/merkleIndexStore.ts",
+      "sha256": "f59f267bd79bfa35ab20601f126e4bf8f7283eef629454ddd171ae2ee3d8c7df"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/transparencyProofExportContainment.test.ts",
+      "sha256": "e9e981cf0a0fff4633368f332764522a159f3860e3cdcea13db6a2fb658d69e9"
+    }
+  ],
+  "observations": [
+    "proofArchiveOutput.ts:19-31 retains the operator workspace-root alias, classifies output lexically and refuses static links below the physical workspace root. Explicit ordinary output outside the workspace remains supported at22-23 and60-63.",
+    "proofArchiveOutput.ts:33-46 admits only a regular single-link leaf, opens without O_TRUNC and with O_NOFOLLOW/O_NONBLOCK, checks fd/name device/inode and realpath; ftruncate is after these checks and Linux proc-fd inspection at50-53.",
+    "merkleIndexStore.ts:229-236 directs tar stdout to the admitted fd rather than reopening output by filename. Failure still throws and finally closes the fd.",
+    "transparencyProofExportContainment.test.ts:71-147 has genuine signed positive controls for internal/external/overwrite/new-parent/root-alias outputs and static linked-parent/linked-leaf/hardlink/nonfile refusals. The review did not rerun those tests."
+  ],
+  "limits": [
+    "O_CREAT atproofArchiveOutput.ts:39 can create a new empty leaf before a later refusal; directory creation is also an observable effect. This is not an absolute no-effects guard.",
+    "A parent, inode or hardlink swap after checks is not atomically confined on either Linux or macOS. Linux proc-fd inspection adds evidence about the opened path; macOS has best-effort parent/name checks. No race witness was run in this read-only review.",
+    "Caller-selected external parent paths are resolved through realpathParent; refusal of all aliases outside the workspace is not the public library contract."
+  ],
+  "mutations": {
+    "source": false,
+    "tests": false,
+    "dependencies": false,
+    "dist": false,
+    "build": false,
+    "runtime": false
+  },
+  "result": "No actionable defect found within the declared static-link refusal and best-effort race scope."
+}

@@ -1,0 +1,52 @@
+{
+  "schema": "p111-current-scope-refresh-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/seal.json",
+      "bytes": 2190,
+      "sha256": "bfaba211afd019057257f0486a8654b852e8d1db7b7adb547bb8aff8cd8712db"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/review.json",
+      "bytes": 8907,
+      "sha256": "77185bd18223bc003f541816aa4c97371736e8f7b36c72e2f058bccebbd8caba"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/observations.json",
+      "bytes": 1401803,
+      "sha256": "2cb500b6a5617091b1998938f2aca6904cf9921714100c0457e89844798b7cb3"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/loader-correction.json",
+      "bytes": 115042,
+      "sha256": "8de1ff770fc4ac36f241377e6b12ee55bf8c69d18278cf9cc5d82a6900df8fef"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/next-p111-admission/source-history-and-preservation.json",
+      "bytes": 15630,
+      "sha256": "22d8c28fae5a8ec0fc32c60572a2c7cef3224dbd5ebb8ef3db0c1f39c9860b8a"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/observations.json",
+      "bytes": 1203480,
+      "sha256": "3db70585e96a7ff22c7d1ff8d6176da81c299656fa0eb78c18279e0cc49acd12"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/pending-reservation-entry.md",
+      "bytes": 1615,
+      "sha256": "f14c853219f5a3beb026d5a76433c4df69b3db9f11c1b20f7705908f029faead"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/review.json",
+      "bytes": 5096,
+      "sha256": "a74fb8571a1ef4ca8a6a554582dec720f0dbb43518e0658a71cbac39634b7405"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/README.md",
+      "bytes": 1578,
+      "sha256": "f83eaff83d022f747f7e65a4611103463d088fb9fea7b54dd2f4e9ed59666ffe"
+    }
+  ]
+}

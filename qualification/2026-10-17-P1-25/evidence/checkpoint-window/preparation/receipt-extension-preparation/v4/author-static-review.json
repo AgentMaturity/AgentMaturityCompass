@@ -1,0 +1,17 @@
+{
+  "schema": "p125-checkpoint-private-receipt-v4-author-static-review/1",
+  "at": "2026-10-16T23:47:40.694750+00:00",
+  "blockers": [],
+  "v3AndActualEvidencePreserved": true,
+  "exactlyThreeNarrowTextSubstitutions": true,
+  "reverseSubstitutionsEqualV3": true,
+  "failedCommandPinBoundToSelectedFailedPhase": true,
+  "threeRawRolePinsBoundBeforeTheirReads": true,
+  "logPathAndRawEqualityGuardsRetained": true,
+  "actualCommandRoleSchemaRead": true,
+  "actualOutcomeFactsUnchanged": true,
+  "templateUnreadyAndActualPinsUnfilled": true,
+  "helperImportedParsedCompiledExecuted": false,
+  "sourceIndexQaWrites": false,
+  "independentReviewRequiredBeforeUse": true
+}

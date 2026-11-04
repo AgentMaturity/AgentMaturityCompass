@@ -1,0 +1,279 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-29",
+  "date": "2026-10-14",
+  "commit": "af209a0ee6e714448ff95c7201fe1a6a2b7493cf",
+  "branch": "codex/p0-29-current-qualification",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run check:counts",
+      "exit": 1,
+      "durationMs": 471
+    },
+    {
+      "cmd": "npm run gen-counts",
+      "exit": 0,
+      "durationMs": 324
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 487
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 557
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 2459
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2657
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 4236
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/gapRegisterReconciliation.test.ts --reporter=json --outputFile=/private/tmp/p0-29-focused-20261014.json",
+      "exit": 1,
+      "durationMs": 7557
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 38983
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/gapRegisterReconciliation.test.ts --reporter=json --outputFile=/private/tmp/p0-29-focused-restored-20261014.json",
+      "exit": 1,
+      "durationMs": 9663
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/gapRegisterReconciliation.test.ts --reporter=json --outputFile=/private/tmp/p0-29-focused-final-20261014.json",
+      "exit": 1,
+      "durationMs": 11048
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/gapRegisterReconciliation.test.ts --reporter=json --outputFile=/private/tmp/p0-29-focused-leaf-corrected-20261014.json",
+      "exit": 1,
+      "durationMs": 11950
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/gapRegisterReconciliation.test.ts --reporter=json --outputFile=/private/tmp/p0-29-focused-citation-corrected-20261014.json",
+      "exit": 1,
+      "durationMs": 11747
+    },
+    {
+      "cmd": "npm test -- --reporter=json --outputFile=/private/tmp/p0-29-full-suite-20261014.json",
+      "exit": 130,
+      "durationMs": 235168
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/gapRegisterReconciliation.test.ts -t 'candidate IDs equal the register exactly and supplemental IDs never replace originals' --reporter=json --outputFile=/private/tmp/p0-29-mutation-missing-row-guard-present-20261014.json",
+      "exit": 1,
+      "durationMs": 804
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/gapRegisterReconciliation.test.ts -t 'candidate IDs equal the register exactly and supplemental IDs never replace originals' --reporter=json --outputFile=/private/tmp/p0-29-mutation-missing-row-guard-disabled-20261014.json",
+      "exit": 0,
+      "durationMs": 682
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/gapRegisterReconciliation.test.ts -t 'candidate IDs equal the register exactly and supplemental IDs never replace originals' --reporter=json --outputFile=/private/tmp/p0-29-mutation-guard-and-data-restored-20261014.json",
+      "exit": 0,
+      "durationMs": 682
+    }
+  ],
+  "tests": {
+    "total": 14,
+    "passed": 13,
+    "failed": 1,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "assigned-route-scope-audit.json",
+      "sha256": "92e6676eb0e4d0964543aa3bd605be5e395e6b3248ac2a74542f7ec021f70ef9"
+    },
+    {
+      "path": "assigned-route-scope-audit.md",
+      "sha256": "c22db0fec1611aa8259b1b59fe315e0670061b84bc6f5953607fb302b123d5be"
+    },
+    {
+      "path": "commands.jsonl",
+      "sha256": "09b940d0b58928df6a95b60ba61663f789d7e2d58e1454a4450b342b75f4833b"
+    },
+    {
+      "path": "continuation-decision.json",
+      "sha256": "5b983139b9bb6550f62d4234e46189914720660b13049a249117fe8eadb55039"
+    },
+    {
+      "path": "counts-before.log",
+      "sha256": "9b09d069e7e62a51a133c9a7433fc6aae8da4e25a7ffcee5d067a84c3c6fae1b"
+    },
+    {
+      "path": "counts-generate.log",
+      "sha256": "c97ef4b9ff3c72dc865e798870d720eff9a229a5f89136957f3a49fd8a696e26"
+    },
+    {
+      "path": "existing-routing-key-catalog.json",
+      "sha256": "cfe6a806f57e80f7d71d44e0924ae8fed159df14b8992f210be04b46ff52e18e"
+    },
+    {
+      "path": "final-g1-g3-source-review.json",
+      "sha256": "6b30df41507d29100ec56b52a5b8f05b0b113264374366b9ca420266abeb6dcc"
+    },
+    {
+      "path": "final-g1-g3-source-review.md",
+      "sha256": "5e2f2a6e54ca21db746baef7d5509320af14e3504664a8870d6263aa47de6ed3"
+    },
+    {
+      "path": "final-g4-g8-source-review.json",
+      "sha256": "484f276c340846107dff0fb32b89f0005bf91c419c6eff61cf67b310d3124aa0"
+    },
+    {
+      "path": "final-g4-g8-source-review.md",
+      "sha256": "04bb33a7bfd6b30306c9ed502f4a7e655ec0487cf6c4b9ecfbf79973f3fe9a48"
+    },
+    {
+      "path": "focused-citation-corrected.json",
+      "sha256": "3ed4dd80f08ef027ef5db42255de8d9b1d4e08c20157a685ebad408e71110fec"
+    },
+    {
+      "path": "focused-citation-corrected.log",
+      "sha256": "87712ff6b6d2247f16185d1b12e8f2d28d2de244566b41d37066e4521a27c3dc"
+    },
+    {
+      "path": "focused-final.json",
+      "sha256": "dfcbb03e3322f488886043e61efc899f3c0d86f04e0bd673c4f419a4d816cbb1"
+    },
+    {
+      "path": "focused-final.log",
+      "sha256": "78d63615f5ddc8eccb64b3d67e9a196671d78726aca85dcc7c087d0c48a773b8"
+    },
+    {
+      "path": "focused-leaf-corrected.json",
+      "sha256": "1e1f231425cf8481b1390937bf97faa6f35b3f9a63d975af2265d0f644674c1d"
+    },
+    {
+      "path": "focused-leaf-corrected.log",
+      "sha256": "fd723c29359d64cf614eadc0f1155f09127fe4887587a106abf60cf50b307765"
+    },
+    {
+      "path": "focused-restored.json",
+      "sha256": "ba71c75d80bc6700b7bf1aadd94f686af2a0ea44a2e267425168da07b79c5ebc"
+    },
+    {
+      "path": "focused-restored.log",
+      "sha256": "e6b1f5d2f0bf08d6499fb1eb2285d02a874d0b4a01bd99da33767df75f9f1c62"
+    },
+    {
+      "path": "focused.json",
+      "sha256": "0cb82f78a45c02cc45d9b99f097091924c214d6bcc435bdfd2a6ef9d2e3c70c0"
+    },
+    {
+      "path": "focused.log",
+      "sha256": "55401bf1c2059246cf520d5625d9e74562e0be38433c3c3ff0742e6006055783"
+    },
+    {
+      "path": "full-suite.log",
+      "sha256": "4feabf61d2cc4f564ee7641a745b733c534e1ae76ed94b9a5ae7cdd862dc2337"
+    },
+    {
+      "path": "historical-original-reconciliation.md",
+      "sha256": "dcd3d044e34d9b8f5e6fbb97d56f91aab29f66490e304f6d862165c7aaebc980"
+    },
+    {
+      "path": "lint.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898"
+    },
+    {
+      "path": "membership-guard-and-data-restored.json",
+      "sha256": "895795e6c58c802f5426e51e63d7bbc42324e089f219d07be17de1f3ac4a00ba"
+    },
+    {
+      "path": "membership-guard-and-data-restored.log",
+      "sha256": "ee9c6ec73586aa6dc63d580593f1b534b1a50b09a2bb305fe18e2294bdab0d6c"
+    },
+    {
+      "path": "membership-missing-row-guard-disabled.json",
+      "sha256": "1a09874369f8d8bebf477e16db171b9da3498c513801e2fdec1f1c8f311bab68"
+    },
+    {
+      "path": "membership-missing-row-guard-disabled.log",
+      "sha256": "623527503f74cd5d0e71fd9078ffe8c3c338c3a51d1e6744a50eda19029385e9"
+    },
+    {
+      "path": "membership-missing-row-guard-present.json",
+      "sha256": "931ba946dbe9ea07deb4faff60b10adcec499cf283291961ad2d9f7de997b099"
+    },
+    {
+      "path": "membership-missing-row-guard-present.log",
+      "sha256": "0ff8e6282e6280f41a980cc5f0f8ca39b0b77e5dfdf0e2b9f67e36fe98acd77b"
+    },
+    {
+      "path": "membership-mutation-summary.json",
+      "sha256": "6c723e690c589a8b4afdb5d6f743a4e1503c6b4297d8d8238cd0b46bff6a4906"
+    },
+    {
+      "path": "needs-successor-decisions.json",
+      "sha256": "10e56b9457c49910c80bd45bc052111af94514084f027676d7a8c263f5c97314"
+    },
+    {
+      "path": "needs-successor-decisions.md",
+      "sha256": "f6d334e9dc08c059699cda5e51c9f46b035f498db46adcb1b6f2cd543891aa11"
+    },
+    {
+      "path": "preservation-checks.json",
+      "sha256": "ce35964a258c9e1b1224c64eb8d0bf2577c52f65909fd5e912299166a3325466"
+    },
+    {
+      "path": "red.json",
+      "sha256": "c66aaa83c793bcb4dcb9425d7a9cad0829abf6ae464be991687673d57e74830a"
+    },
+    {
+      "path": "red.log",
+      "sha256": "793bd364ca3f7e1f9de043347fd5418dfe37209d7f4774450cc44f315e59e592"
+    },
+    {
+      "path": "source-acceptance.md",
+      "sha256": "21c836e2688b71c54ac1e8aca3fe71a2483ae651d69b8a7efb55c02ec9113678"
+    },
+    {
+      "path": "source-refresh-summary.json",
+      "sha256": "8af6da2e8c754d51345653674039a5afcce060dafc6c65b0c6e8bd39b3035a31"
+    },
+    {
+      "path": "static-architecture.log",
+      "sha256": "1ddf0c2656c0342d67ff0a5dc2839c4ccdce1bb4bc254f42a473b9803679f374"
+    },
+    {
+      "path": "static-counts.log",
+      "sha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630"
+    },
+    {
+      "path": "static-docs.log",
+      "sha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0"
+    },
+    {
+      "path": "static-freeze.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811"
+    },
+    {
+      "path": "typecheck-tests.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    }
+  ],
+  "notes": "Blocked candidate; not Done. tests describes the latest complete focused 14-test run only; the strict successor case fails38actualnullroutes. Several earlier red runs preserve diagnostic failures. Membership mutation filtered13othercases each; it is an isolated guard proof, not whole acceptance. Full npm test was stopped on direct user skip, exit130 after235168ms, no finalJSON; no broad passing count inferred. Static checks passed in the preceding source phase; subsequent changes correct documentation witnesses and count assertions. Original2filedraft and allClaude/paused scope preserved. Current MAIN source citations are main5ea; candidate owncodeaf209. Source and assigned-route review conflicts are additional unresolved debt; no assignments or trackercloseouts invented. User authorized continuing toP0-47, no acceptance waiver. Final G4-G8 source review flags G8-14 final-status scope defect, G6-04 empty current absence witness, and additional incomplete citation ranges. Assigned-route audit identifies5partialscope mappings and G6-08 historical-proof wording debt. These are preserved without edits after direct user skip."
+}

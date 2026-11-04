@@ -1,0 +1,1370 @@
+{
+  "kind": "P1-01-current-source-readonly-readiness",
+  "date": "2026-10-15",
+  "decision": "BOUNDED_EXISTING_SOURCE_QUALIFICATION_READY_WITH_FORMAL_GAPS",
+  "blockingFindings": [],
+  "acceptedBase": {
+    "root": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+    "head": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+    "freshQualificationRoot": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+    "productionSourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "selectedSourcePaths": 36,
+    "allSelectedFreshRootBytesEqual": true,
+    "readOnlyGitDiffProduction58ToAcceptedSelectedPaths": "empty"
+  },
+  "navigation": {
+    "graphPath": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+    "graphSha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395",
+    "graphBytes": 45692207,
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "nodeCount": 36459,
+    "query": "contract schema json standard evidence receipt acceptance generation drift",
+    "budget": 1400,
+    "queryExitCode": 0,
+    "freshness": "stale; no src/contracts source_file nodes; navigation only; direct source verified; no refresh/save/watch/server"
+  },
+  "plan": {
+    "key": "P1-01",
+    "priority": "Urgent",
+    "gate": "G1",
+    "due": "2026-11-20",
+    "status": "In review",
+    "dependencies": [
+      "P0-08",
+      "P0-09"
+    ],
+    "dependencyMeaning": "Current Issues.md records both dependencies Done. This readiness review does not independently close their formal acceptance, the P0-51 follow-up, or any remaining portable trust surface. The P1-01 recovered spec expressly permits the rest of the contract pipeline with trust-list as follow-up if its source is absent; current source reuses that existing trust-list schema. No blanket G0 runtime prohibition is inferred.",
+    "historicalQualification": "Tracked P0-09 receipt has historical focused tests and explicit follow-up limits; not a current full-dependency rerun."
+  },
+  "ownership": {
+    "allowed": "Read/check existing source, schemas and fixtures; privately observe the current pipeline without adopting held code. No shared source edit is necessary for the bounded checks.",
+    "sharedReservedPaths": [
+      "spec/schemas/index.json",
+      "src/contracts/v1/a4*.ts",
+      "spec/schemas/v1/a4-*.schema.json",
+      "tests/fixtures/contracts/a4-*",
+      "spec/ACCEPTANCE_RULES.md A4 section"
+    ],
+    "qualificationIsNotTransfer": true,
+    "otherHolds": "P165 remains unapproved; P202 stays paused; inherited 1269 duplicate/2751 dead quality findings are not waived; user excludes Dependabot from WIP; no new admission or ownership inference."
+  },
+  "actualFlow": [
+    {
+      "path": "src/contracts/index.ts:63-133",
+      "meaning": "29 CONTRACTS entries (10 core,3 catalog,16 A4), eight standard artifact schemas and one external-evidence schema yield38 published names. Claim, signature, trust-list and report schemas are re-exports of actual source, not copies. z.toJSONSchema target draft2020-12/io=input keeps unknown-member behavior honest; sorted canonical JSON and stable IDs."
+    },
+    {
+      "path": "scripts/gen-spec-schemas.mjs:16-83",
+      "meaning": "--check loads actual dist/contracts/index.js, compares38 schema files and index byte-for-byte, then evaluates immediate valid/invalid JSON files with actual Zod and installed Ajv2020. --write deletes obsolete schemas and rewrites all output: do not run on accepted source or shared A4/index as a routine check."
+    },
+    {
+      "path": "src/evidence/exporter.ts:334-369",
+      "meaning": "Builds each row from ledger and provenance-derived claimKind, then assertContract(evidence-event) refuses the whole export on first schema violation. This review inspected the binding; no new exporter runtime/invalid-ledger witness was run."
+    },
+    {
+      "path": "src/standard/standardGenerator.ts:35-40;src/standard/standardSchema.ts:10-20,36-45",
+      "meaning": "Standard generation selects the nine standard/external schemas from the shared publication list. It does not publish every core/A4 contract into a workspace standard directory."
+    },
+    {
+      "path": ".github/workflows/ci.yml:86-90;.github/workflows/pages.yml:9,53",
+      "meaning": "Main CI builds before check:schemas; Pages trigger includes spec/** and builds the artifact through build:pages. This is static workflow wiring, not hosted CI/deployment evidence."
+    },
+    {
+      "path": "scripts/build-pages-site.mjs:140-167,243-306",
+      "meaning": "copySpec checks indexed file hash and agentmaturity.co origin, writes conventional and actual ID paths (external old URL included), copies index and renders two HTML pages. Full Pages build also prepares output, copies website/guides/fonts and launches pinned TypeDoc. Probe publication mode only reads root-produced output; it does not rebuild or copy."
+    }
+  ],
+  "fixtureInventory": {
+    "allJson": 84,
+    "generatorEligible": 75,
+    "coreEligible": 41,
+    "a4Eligible": 34,
+    "eligibleContractDirectories": 25,
+    "outsideParityJson": [
+      "a4-record/builder-approved-own-revision.json",
+      "a4-record/dangling-evidence-ref.json",
+      "a4-record/deleted-evidence-ref.json",
+      "a4-record/second-vote-lands.json",
+      "a4-record/stale-approval.json",
+      "a4-record/tampered-transition.json",
+      "a4-record/trust/amc-trust-list.json",
+      "a4-record/trust/trust-roots.json",
+      "a4-record/valid.json"
+    ],
+    "outsideMeaning": "These are seven A4 record vectors (two valid/five invalid according to their README) plus two trust inputs, for a separate semantic verifier lane. Do not silently count them as generator parity cases or transfer their ownership.",
+    "contractsWithoutEligibleFixtureDirs": [
+      "a4-record",
+      "control-record",
+      "pack-manifest",
+      "catalog-lock"
+    ],
+    "all38IndexedHashesMatchByIndependentFileHash": true,
+    "generatorDoesNotEnforceFixtureCompletenessFloor": true
+  },
+  "existingCorpora": [
+    {
+      "path": "tests/standardSchemaCaveat.test.ts",
+      "registeredCasesStatic": 1,
+      "scope": "Temporary genuine workspace; nine generated standard/external schema bytes compared to committed files, IDs/comment/shape checks; normal cleanup. Actual source imports, no CLI child."
+    },
+    {
+      "path": "tests/externalEvidenceProfile.test.ts",
+      "registeredCasesStatic": 15,
+      "arithmetic": "8 ordinary +7 test.each corruptions",
+      "scope": "Synthetic profile shape/digest/signature/admission fixture behavior. Local software signing keys; no external producer truth."
+    },
+    {
+      "path": "tests/pagesWorkflowRuntime.test.ts",
+      "registeredCasesStatic": 3,
+      "scope": "Optional adjacent workflow-text assertions; not publication byte/runtime proof and not needed to inflate the original16 scope."
+    }
+  ],
+  "missingRequiredAcceptance": {
+    "directoryAbsent": "tests/contracts",
+    "specifiedAbsentPaths": [
+      "tests/contracts/contractParity.test.ts",
+      "tests/contracts/zodJsonSchemaBehaviour.test.ts",
+      "tests/contracts/schemaGeneration.test.ts",
+      "tests/contracts/acceptanceRuleVectors.test.ts",
+      "tests/contracts/pagesPublication.test.ts",
+      "tests/contracts/exporterContract.test.ts"
+    ],
+    "additionalLimits": [
+      "No permanent required contract test suite was added or adopted by this task.",
+      "Generator parity does not cover semantic/refinement rules or every contract.",
+      "Evidence-event exported rows omit portable hash preimage fields; ACCEPTANCE_RULES expressly says export-only hash recomputation is not evaluated.",
+      "Receipt shape acceptance does not establish legal state transitions, reconciliation authority, actual receipt minting, signature validity or issuer admission.",
+      "No fullsuite, Node24, hosted CI, deployed-ID HTTP check, release/pack, external identity, formal acceptance or tracker Done claim.",
+      "spec/README still labels receipt/authorization as contract-only while adjacent current source/acceptance docs describe emitters; wording freshness is an acceptance/documentation follow-up, not runtime-failure proof."
+    ]
+  },
+  "minimalCommandsProposedOnly": [
+    "npm run check:schemas",
+    "node node_modules/vitest/vitest.mjs run tests/standardSchemaCaveat.test.ts tests/externalEvidenceProfile.test.ts --reporter=json --outputFile=<fresh-raw-path>",
+    "node scripts/build-pages-site.mjs --out <fresh-owned-absolute-output>",
+    "node /private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs vectors <ROOT>",
+    "node /private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs receipt <ROOT>",
+    "node /private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs publication <ROOT> <existing-Pages-output>",
+    "Original normal freeze/no-fabrication/architecture/docs/counts checks through the unchanged root wrapper as root assigns."
+  ],
+  "likelyFailureInterpretation": "No product failure is inferred from static review. A missing dist produces generator exit2; stale generated bytes or Zod/Ajv fixture disagreement produces exit1; the required tests/contracts directory remains absent even if an invocation matching another file exits0. Root separately reported actual check:schemas0 (38/75) and Pages build0; this report did not execute or audit their raw records.",
+  "supplement": {
+    "path": "/private/tmp/p1-01-contract-probe-v2-prepared-20261015.mjs",
+    "bytes": 8360,
+    "sha256": "0b09ff2ad62cd487bd1cd997024f2464e89de8c4130d400d181fe3658bc093ab",
+    "unexecuted": true,
+    "interface": "node PROBE vectors|receipt|publication|all ROOT [existing-Pages-output]",
+    "modes": {
+      "vectors": "Actual built canonicalize/canonicalMetadataForHash compared with independent literal canonical text and two documented SHA256 vectors; no signature or full-ledger verification.",
+      "receipt": "Actual authorized fixture; healthy acceptance then same object plus one unrecognized top-level member. Actual Zod/assertContract and committed Ajv results retained before assertions. Shape only; mode separate from publication/vectors.",
+      "publication": "Independently hash38 literal names; verify fixed IDs, indexed digests, current schema bytes, both conventional and ID-path Pages bytes, exact copied index, two HTML titles/heading/vector markers. Existing artifact only; not full HTML equivalence or deployed HTTP."
+    },
+    "effects": "Only reads plus stdout/stderr; no spawn/build/copy/delete/file writes. Product module imports occur only when root later executes; no import/parser/runtime was done during preparation.",
+    "version1Preserved": {
+      "path": "/private/tmp/p1-01-contract-probe-prepared-20261015.mjs",
+      "sha256": "c5c395f95edcafa17d43280a2ffbfec602b2245a927997fbcc063465fc245a1a",
+      "reason": "Superseded unexecuted CLI argument order and wider seven-state witness by root exact interface/single authorized witness request."
+    }
+  },
+  "causalProposal": {
+    "unexecuted": true,
+    "owner": "root owns any future private copy/controller/release",
+    "target": "src/contracts/v1/receipt.ts",
+    "sourceSha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20",
+    "originalExact": "  z.strictObject({ ...v2Fields, state: z.enum([\"requested\", \"authorized\", \"started\", \"outcome_unknown\"]) }),",
+    "mutantExact": "  z.strictObject({ ...v2Fields, state: z.enum([\"requested\", \"authorized\", \"started\", \"outcome_unknown\"]) }).passthrough(),",
+    "originalOccurrences": 1,
+    "derivedMutantSourceSha256": "e04ba8153eb7035f7b6273875b39463863c34ec6ed0c4a13ad811354d2bd8864",
+    "scope": "First V2 branch only: requested/authorized/started/outcome_unknown. Rebuild future owned full physical copy with unchanged tsc path; pin compiled receipt as loaded. No regeneration, no root or shared A4 edit, no source adoption.",
+    "requiredObservers": "Baseline/check/probe then exact source patch+build, no-generator-write stale check and receipt mode, restore original source+build and both checks. Ordinary original tests/guards/config/deadlines remain unchanged. Actual counts/kill classification await root runtime and independent audit.",
+    "predictedSensitivityNotResult": "Fresh generated receipt bytes should differ from committed schema; extra top-level authorized member should become accepted in built Zod/assertContract while unchanged committed Ajv still refuses. All healthy positive observations must precede the specific extra-member AssertionError. Source branch affects four states, but the final probe only claims actual authorized witness.",
+    "interpretation": "This source-owned one-branch passthrough is a concrete sensitivity control, not a claim that the recovered exact historical mutation was previously run or a production failure."
+  },
+  "fixScopeIfNecessary": {
+    "firstChoice": "No production repair is justified by this static review; observe existing source first.",
+    "permanentTestGap": "Any later approved permanent test addition can be confined to tests/contracts/* or one explicit contract qualification test; preserve original helpers/config/assertions/guards and shared A4/index.",
+    "coreSourceIfActualFailure": "Only a proven core defect should motivate a narrowly owned change in src/contracts/v1/{receipt,evidenceEvent,authorizationRecord,controlResult,scopedAttestation,common}.ts or generator/core-index/exporter path implicated by evidence. src/contracts/index.ts and gen:schemas touch A4 transitively, so coordinate any actual shared output/source edit rather than infer clearance."
+  },
+  "sourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/contracts/index.ts",
+      "relativePath": "src/contracts/index.ts",
+      "bytes": 8308,
+      "sha256": "5cd1a9079ccf194093965f7f7ba127aca108faa1e0fb795007527287dde9bd1b",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/contracts/v1/common.ts",
+      "relativePath": "src/contracts/v1/common.ts",
+      "bytes": 796,
+      "sha256": "968ad85a0fa59a226e22371f7d8917cfe9fe493690f8c2a2a52a9200637b6f00",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/contracts/v1/receipt.ts",
+      "relativePath": "src/contracts/v1/receipt.ts",
+      "bytes": 2606,
+      "sha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/contracts/v1/evidenceEvent.ts",
+      "relativePath": "src/contracts/v1/evidenceEvent.ts",
+      "bytes": 2639,
+      "sha256": "7ce34caf58283938fea6343768cc519a108da9932a99fad63a2e055ccba1c97a",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/contracts/v1/controlResult.ts",
+      "relativePath": "src/contracts/v1/controlResult.ts",
+      "bytes": 1390,
+      "sha256": "7bb9faecc32910b707902c96e53a94ffc45350cd2a1f8badfdf6aca774fcc9e4",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "relativePath": "src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/contracts/v1/scopedAttestation.ts",
+      "relativePath": "src/contracts/v1/scopedAttestation.ts",
+      "bytes": 1215,
+      "sha256": "9eae38448160e9eb817730bf68b5f10fb72044ee8299c8fb49c4df2615c2f206",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/claims/eligibility/schemas.ts",
+      "relativePath": "src/claims/eligibility/schemas.ts",
+      "bytes": 2608,
+      "sha256": "693398d39f327b0053d40d79d0bfa26ad78b829a2b8c978113f78cf93a8c0d96",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "relativePath": "src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/trust/verifierReport.ts",
+      "relativePath": "src/trust/verifierReport.ts",
+      "bytes": 6887,
+      "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/crypto/signing/signatureEnvelope.ts",
+      "relativePath": "src/crypto/signing/signatureEnvelope.ts",
+      "bytes": 2237,
+      "sha256": "586626d236555f99ce51a53a8e438814f376ad5af2ac5b82bb6b1fb3fa16b6e7",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/evidence/exporter.ts",
+      "relativePath": "src/evidence/exporter.ts",
+      "bytes": 17623,
+      "sha256": "30837bbe636fcae29331041f6cb4f7aa314687034d7f0416f0dde55bed31041a",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/standard/standardGenerator.ts",
+      "relativePath": "src/standard/standardGenerator.ts",
+      "bytes": 9234,
+      "sha256": "707aace133019e440e9709abedbce925ab5dd35d060556e01040d087bcc60af4",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/standard/standardSchema.ts",
+      "relativePath": "src/standard/standardSchema.ts",
+      "bytes": 3394,
+      "sha256": "87dabcdbac2eb402c1b654adb88c5caede7312a9c67772404936a89fa974bbe9",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/standard/externalEvidenceProfile.ts",
+      "relativePath": "src/standard/externalEvidenceProfile.ts",
+      "bytes": 16961,
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "relativePath": "src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/src/ledger/eventHash.ts",
+      "relativePath": "src/ledger/eventHash.ts",
+      "bytes": 1726,
+      "sha256": "da31a26164e9fee0752619a67e7f78790082d5a1c14cf95e72f716192b6ca06a",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/scripts/gen-spec-schemas.mjs",
+      "relativePath": "scripts/gen-spec-schemas.mjs",
+      "bytes": 4307,
+      "sha256": "48ba5eedc013bef2c20a106d61a2948c56163f4779900b84aad196d431303e22",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/scripts/build-pages-site.mjs",
+      "relativePath": "scripts/build-pages-site.mjs",
+      "bytes": 14553,
+      "sha256": "33ff3ac2dd0cf1f49c0ac77806cccaa1a01990b3fc4a1790f7b4647c1300756a",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/scripts/lib/published-installer-version.mjs",
+      "relativePath": "scripts/lib/published-installer-version.mjs",
+      "bytes": 1613,
+      "sha256": "bf962dd5deded55166928ad0d1cfdfad42e2610b4891b56a0cb1226bbb7a0c66",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/README.md",
+      "relativePath": "spec/README.md",
+      "bytes": 3828,
+      "sha256": "7126d8a496c5e28359bfc4b0dc3860489679eb5db7ed39b7c994d8fa69eca56b",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/ACCEPTANCE_RULES.md",
+      "relativePath": "spec/ACCEPTANCE_RULES.md",
+      "bytes": 34039,
+      "sha256": "af79570a16abbf50945778dadf2563f1e60ee95e7850f3f5a8e6cff0fad6d794",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/index.json",
+      "relativePath": "spec/schemas/index.json",
+      "bytes": 8467,
+      "sha256": "ef869ba2c25c14902b537893e3663c30b821516daa39abf60891a1e1df44f339",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/standardSchemaCaveat.test.ts",
+      "relativePath": "tests/standardSchemaCaveat.test.ts",
+      "bytes": 2574,
+      "sha256": "5c03f8cbbee2c9a619f7fead8d49c2324709f7f133aa53916b45d19aa1f5a127",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "relativePath": "tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/pagesWorkflowRuntime.test.ts",
+      "relativePath": "tests/pagesWorkflowRuntime.test.ts",
+      "bytes": 2240,
+      "sha256": "52266660f1b1e30cbcf6a1fadfe82474ebad42288f6565d8a98aea63b5c7c15a",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/evidenceAgentFilterQualification.test.ts",
+      "relativePath": "tests/evidenceAgentFilterQualification.test.ts",
+      "bytes": 12485,
+      "sha256": "33ee082ab1d053fd7821c2936ea8cd9fcc0324273c2fe1e1778214786d889c79",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/valid/authorized.json",
+      "relativePath": "tests/fixtures/contracts/receipt/valid/authorized.json",
+      "bytes": 609,
+      "sha256": "aa6d322383c5fb01cd5c0be29e713707c548d163382f00c0ce7364968f26bba1",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/.github/workflows/ci.yml",
+      "relativePath": ".github/workflows/ci.yml",
+      "bytes": 14134,
+      "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/.github/workflows/pages.yml",
+      "relativePath": ".github/workflows/pages.yml",
+      "bytes": 1382,
+      "sha256": "460095c4a24f55eb92ae2aba12dc180fab9c592f58bda964624308d0ab406160",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/package.json",
+      "relativePath": "package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "relativePath": "pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/vitest.config.ts",
+      "relativePath": "vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "freshP1RootByteEqual": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "freshP1RootByteEqual": true
+    }
+  ],
+  "fixturePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-conformance-statement/invalid/claim-kind-certified.json",
+      "relativePath": "a4-conformance-statement/invalid/claim-kind-certified.json",
+      "bytes": 1738,
+      "sha256": "2ffda747dc92a5c34bbb308247ee121bed708d6b4390d008d6f20d58d0d0711b",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-conformance-statement/invalid/not-evaluated-without-reason.json",
+      "relativePath": "a4-conformance-statement/invalid/not-evaluated-without-reason.json",
+      "bytes": 1629,
+      "sha256": "3883de9303f4ce8ad9c3b8f42fa1460f2b54dbd56253256e0cb363982743a272",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-conformance-statement/valid/example.json",
+      "relativePath": "a4-conformance-statement/valid/example.json",
+      "bytes": 1710,
+      "sha256": "4e46415a85ed0b41655dd7c90fe09c0e6f9eee82e524aff4b497263c89383399",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-decision/invalid/claim-kind-certified.json",
+      "relativePath": "a4-decision/invalid/claim-kind-certified.json",
+      "bytes": 1223,
+      "sha256": "a757e1561e9ec2d7e4dae6abdfc552afae16a9dafc122ee2aa0a9031e5f1c452",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-decision/valid/example.json",
+      "relativePath": "a4-decision/valid/example.json",
+      "bytes": 1227,
+      "sha256": "53bf509c6170b55ca6be9e32890052cfa72cdc094f515958ca90fcdce555ce9f",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-deployment-receipt/invalid/claim-kind-certified.json",
+      "relativePath": "a4-deployment-receipt/invalid/claim-kind-certified.json",
+      "bytes": 759,
+      "sha256": "19e4462955e1ec60215204aea9a939c9d986a61f2babf041e76cd3446a007250",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-deployment-receipt/valid/example.json",
+      "relativePath": "a4-deployment-receipt/valid/example.json",
+      "bytes": 763,
+      "sha256": "ec2a26f183fd4ccf863e581d4b16e0a8296fdb2b08650544188bf90665623574",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-gate/invalid/claim-kind-certified.json",
+      "relativePath": "a4-gate/invalid/claim-kind-certified.json",
+      "bytes": 5042,
+      "sha256": "676df6569dd83b4aa594fa4ee54739c20fdac72632c2474d1258519724fa8c67",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-gate/valid/example.json",
+      "relativePath": "a4-gate/valid/example.json",
+      "bytes": 5014,
+      "sha256": "2e24605a2d6fc0c74dae85915c11d7b8357fb872627a8d200ebf61224da41453",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-gate-policy/invalid/claim-kind-certified.json",
+      "relativePath": "a4-gate-policy/invalid/claim-kind-certified.json",
+      "bytes": 1363,
+      "sha256": "4f33f4cd2bf86791b372239cd6db58f4b440c57ebb48521e967fb054a14fca1e",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-gate-policy/valid/example.json",
+      "relativePath": "a4-gate-policy/valid/example.json",
+      "bytes": 1335,
+      "sha256": "1520c0b4b9ad55931e78dd370f88947a6f6a2f63cbdb097322705375c2fb5d1f",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-integration-claim/invalid/claim-kind-certified.json",
+      "relativePath": "a4-integration-claim/invalid/claim-kind-certified.json",
+      "bytes": 260,
+      "sha256": "1b4f2148a02d61ab5ee32504900a6182526b9c271488830f2d14f76ea546cb94",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-integration-claim/valid/example.json",
+      "relativePath": "a4-integration-claim/valid/example.json",
+      "bytes": 232,
+      "sha256": "608b2ea38757a6be7a0534120932428cc0d7193e6900f46d819f3272d1fe9838",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-intent/invalid/claim-kind-certified.json",
+      "relativePath": "a4-intent/invalid/claim-kind-certified.json",
+      "bytes": 807,
+      "sha256": "d176b5daca4a9dda3e0355aac46f17afed8d58115872c886928d7997096cb102",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-intent/valid/example.json",
+      "relativePath": "a4-intent/valid/example.json",
+      "bytes": 779,
+      "sha256": "7d13fe5da6ca537be37919ddd178f2b817f2726f45bd9e00be5606285288bc97",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-package/invalid/claim-kind-certified.json",
+      "relativePath": "a4-package/invalid/claim-kind-certified.json",
+      "bytes": 2465,
+      "sha256": "039a8ec3b361847ed979075cb171f2c376a4941ff150d4dd14b9034965d9070c",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-package/valid/example.json",
+      "relativePath": "a4-package/valid/example.json",
+      "bytes": 2437,
+      "sha256": "c5705e7b9d3e8eef75cfcf75648fc4b48af48e122feeee0acd46540c90379841",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-project/invalid/claim-kind-certified.json",
+      "relativePath": "a4-project/invalid/claim-kind-certified.json",
+      "bytes": 751,
+      "sha256": "d90eedfc5eae25a605b35f4678a965c169d581595b574454d516d4b74b5b7600",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-project/valid/example.json",
+      "relativePath": "a4-project/valid/example.json",
+      "bytes": 723,
+      "sha256": "ad9a9467e40d82a7208ea659869516a860abaf3cf58cec6f77070566ef5d8660",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-readiness/invalid/claim-kind-certified.json",
+      "relativePath": "a4-readiness/invalid/claim-kind-certified.json",
+      "bytes": 2811,
+      "sha256": "5c5524ea586431cba7cbc896125288d27cb087b3075e60efbeaecc0168786232",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-readiness/invalid/collapsed-lane.json",
+      "relativePath": "a4-readiness/invalid/collapsed-lane.json",
+      "bytes": 3138,
+      "sha256": "6760869d77fe37a2b9d99c3bf2d5ccad25d7cbbe9a2a44a67d27ed3316c6713f",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-readiness/invalid/integrity-item-with-claim.json",
+      "relativePath": "a4-readiness/invalid/integrity-item-with-claim.json",
+      "bytes": 3391,
+      "sha256": "f93c1cc28d087d344dec97b78b895fdc5caaabd3e1b6c2da235c94e10b1d8811",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-readiness/valid/example.json",
+      "relativePath": "a4-readiness/valid/example.json",
+      "bytes": 2783,
+      "sha256": "13372888cfb87559224fe96fb51858353cbf39e93bee4c75cd3b133c896877d5",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-record/builder-approved-own-revision.json",
+      "relativePath": "a4-record/builder-approved-own-revision.json",
+      "bytes": 135273,
+      "sha256": "4dc5a698f59349249d454c95cade20da03e02be03d7ee86eee604f147f279664",
+      "parityEligible": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-record/dangling-evidence-ref.json",
+      "relativePath": "a4-record/dangling-evidence-ref.json",
+      "bytes": 82037,
+      "sha256": "20df636cced2fed6c3d2c285f451215ce9b3b55b7e8a4110796813ce1e66cde0",
+      "parityEligible": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-record/deleted-evidence-ref.json",
+      "relativePath": "a4-record/deleted-evidence-ref.json",
+      "bytes": 83235,
+      "sha256": "013e30fe93ed08040d3163d78d4987e63aa6861b235fbefbeea0cd3db23aaf8c",
+      "parityEligible": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-record/second-vote-lands.json",
+      "relativePath": "a4-record/second-vote-lands.json",
+      "bytes": 100436,
+      "sha256": "0614f15a4090de750e5ae615d6d150b90906f97a5ba64c313718761baa9b6d43",
+      "parityEligible": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-record/stale-approval.json",
+      "relativePath": "a4-record/stale-approval.json",
+      "bytes": 93982,
+      "sha256": "ed8671fc418ffbbc8d461ab597f63fbb0249b2519d6f919985e0bc6d4e194c50",
+      "parityEligible": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-record/tampered-transition.json",
+      "relativePath": "a4-record/tampered-transition.json",
+      "bytes": 83914,
+      "sha256": "e4838452bd16a9c7eef0b0d1b86240b522eadbde3a8bcda8c0b2d431ae5019dc",
+      "parityEligible": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-record/trust/amc-trust-list.json",
+      "relativePath": "a4-record/trust/amc-trust-list.json",
+      "bytes": 1624,
+      "sha256": "3699d0bd99e0a49c4eb295c87f42f65c2cf40ea4b41e366c744a2e6f2ed33fc9",
+      "parityEligible": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-record/trust/trust-roots.json",
+      "relativePath": "a4-record/trust/trust-roots.json",
+      "bytes": 137,
+      "sha256": "37d9916b59ac48b330fc71de950a95d137f00de2d63ef8de0df2d03eab367d45",
+      "parityEligible": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-record/valid.json",
+      "relativePath": "a4-record/valid.json",
+      "bytes": 83914,
+      "sha256": "31d1dbba02189c35b7425c6d4660d47c663f7997bd95fbd44e21e12c47f19724",
+      "parityEligible": false
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-release/invalid/claim-kind-certified.json",
+      "relativePath": "a4-release/invalid/claim-kind-certified.json",
+      "bytes": 6803,
+      "sha256": "707d89909679a75e5c873926dcea2f4f01ef7263f022ec3635462d7c06e79bf9",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-release/valid/example.json",
+      "relativePath": "a4-release/valid/example.json",
+      "bytes": 6775,
+      "sha256": "b47f5fa5484e8b7a8b548a7a30fff3b0b75128dc7814ab03391bb67b0a6248f1",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-revision/invalid/claim-kind-certified.json",
+      "relativePath": "a4-revision/invalid/claim-kind-certified.json",
+      "bytes": 1759,
+      "sha256": "12c4c74fc5d69ea71dbd6282c80f77ebe66ac2278d5fd32b69d31407f274c35b",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-revision/valid/example.json",
+      "relativePath": "a4-revision/valid/example.json",
+      "bytes": 1731,
+      "sha256": "b18aaaf7e125cb6943a989d4fc765b83160d039ec76a63bbe480fb3f02becccc",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-rollback-receipt/invalid/claim-kind-certified.json",
+      "relativePath": "a4-rollback-receipt/invalid/claim-kind-certified.json",
+      "bytes": 593,
+      "sha256": "7f3297ef652d9a82021ee145f8e785e944e1ba3adba961129e275231e0d132ad",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-rollback-receipt/valid/example.json",
+      "relativePath": "a4-rollback-receipt/valid/example.json",
+      "bytes": 597,
+      "sha256": "6c5ed2d98594ea81ddb8eb1ec8403a371044c4dacf36fbbbf7ac45dbaf1c5914",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-transition/invalid/claim-kind-certified.json",
+      "relativePath": "a4-transition/invalid/claim-kind-certified.json",
+      "bytes": 472,
+      "sha256": "a79a5382429b213dac17d9a6f7a65d54babb1dbced3899622839b1e242431c3f",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-transition/valid/example.json",
+      "relativePath": "a4-transition/valid/example.json",
+      "bytes": 444,
+      "sha256": "42185cf4ab0dafbe6eab58d35fb074992f49b7ed9ba314a358926098b0339ed8",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-value-claim/invalid/claim-kind-certified.json",
+      "relativePath": "a4-value-claim/invalid/claim-kind-certified.json",
+      "bytes": 2330,
+      "sha256": "8aa88273e4163d1ac2325a29e823b6f0152f88a00f794d83d32c7921c68c04b5",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-value-claim/invalid/observed-value-without-resolved-ref.json",
+      "relativePath": "a4-value-claim/invalid/observed-value-without-resolved-ref.json",
+      "bytes": 2302,
+      "sha256": "7084924327ae9259fb7a38b4f7999e5785abb8f2d8c64cdd7cbe08f1864ead19",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/a4-value-claim/valid/example.json",
+      "relativePath": "a4-value-claim/valid/example.json",
+      "bytes": 2302,
+      "sha256": "e6179007901dfb4fb346e53e3995a268e4f19e3537d505eddc4bd0f839129779",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/authorization-record/invalid/amount-as-number.json",
+      "relativePath": "authorization-record/invalid/amount-as-number.json",
+      "bytes": 2552,
+      "sha256": "d702a9b3bf6d93539b73d667ea5dcfa7d7c66b933f475b5a44ee8fff1ef0ba70",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/authorization-record/invalid/missing-compiled-policy-digest.json",
+      "relativePath": "authorization-record/invalid/missing-compiled-policy-digest.json",
+      "bytes": 2520,
+      "sha256": "5bb4c5903a6d34029641142f1eabc4966792087048c3dd153a3351589ae8951b",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/authorization-record/invalid/unknown-nested-field.json",
+      "relativePath": "authorization-record/invalid/unknown-nested-field.json",
+      "bytes": 2574,
+      "sha256": "ffe21a63bf7e89005d86da9a67b17f08b50ea2e61ad8b2ff102fa3b59f8727dc",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/authorization-record/valid/financial-transfer.json",
+      "relativePath": "authorization-record/valid/financial-transfer.json",
+      "bytes": 2554,
+      "sha256": "8a06448ea9067dd38bef6a722fea47cb2337fcdde26f2dff4097f246a999a3e2",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/claim-envelope/invalid/claim-kind-certified.json",
+      "relativePath": "claim-envelope/invalid/claim-kind-certified.json",
+      "bytes": 454,
+      "sha256": "634f4f063c38195804a793de5af9ec8893990403048246a49a22cd1bb48c3480",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/claim-envelope/invalid/unknown-nested-field.json",
+      "relativePath": "claim-envelope/invalid/unknown-nested-field.json",
+      "bytes": 482,
+      "sha256": "276d627100e70ca141eb8dc6d46d3245415ea79243a7b87dc8fce24ee25fd48d",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/claim-envelope/valid/self-reported.json",
+      "relativePath": "claim-envelope/valid/self-reported.json",
+      "bytes": 458,
+      "sha256": "e5d1fa50c9d3c8af2f7afccb3096bc1d3540185fa43dae291b49fb36cc15d001",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/control-result/invalid/claim-kind-certified.json",
+      "relativePath": "control-result/invalid/claim-kind-certified.json",
+      "bytes": 522,
+      "sha256": "0ee1065f1a67fa314aab76131880956b28fbfbd180554c648ce1b78adf987603",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/control-result/invalid/pass-not-applicable.json",
+      "relativePath": "control-result/invalid/pass-not-applicable.json",
+      "bytes": 551,
+      "sha256": "6d5d974ffde331389e9634b7d3136eb2b53e3936684698d93f6329df28c45b55",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/control-result/invalid/pass-with-incomplete-evidence.json",
+      "relativePath": "control-result/invalid/pass-with-incomplete-evidence.json",
+      "bytes": 521,
+      "sha256": "cf253474e6319e23fcdef3a1143985c1c9080b173c6fa1095f7ec7c59100b1ff",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/control-result/valid/not-evaluated.json",
+      "relativePath": "control-result/valid/not-evaluated.json",
+      "bytes": 523,
+      "sha256": "2380fe2b03bab135bfe43d93c7ccfd2aaa96459333b9d1fb4e17ea338a22ad6c",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/control-result/valid/pass.json",
+      "relativePath": "control-result/valid/pass.json",
+      "bytes": 521,
+      "sha256": "cecdab0d687a5478c6f65f7dc9a0670b8287730f99d809c7303fcdec50144f83",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/evidence-event/invalid/claim-kind-certified.json",
+      "relativePath": "evidence-event/invalid/claim-kind-certified.json",
+      "bytes": 785,
+      "sha256": "b959df05f16e0eb9028540bd2d36f3ea3cdcc37b5dc83065bca40853117e2ca4",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/evidence-event/invalid/unknown-event-type.json",
+      "relativePath": "evidence-event/invalid/unknown-event-type.json",
+      "bytes": 787,
+      "sha256": "fe47e410aaeedc2dc77c27865e4572296fcca150b172af5489c13e4cd5ab00e6",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/evidence-event/invalid/unknown-top-level-field.json",
+      "relativePath": "evidence-event/invalid/unknown-top-level-field.json",
+      "bytes": 811,
+      "sha256": "b1334d01bd676d139d457a14a0d5056a02f5ed76dcea9d1b800809f74b57e87e",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/evidence-event/valid/chained-row.json",
+      "relativePath": "evidence-event/valid/chained-row.json",
+      "bytes": 904,
+      "sha256": "c54bd5401dc87da49632d8b9971b230ba2f565d36a5b484418cc5c41e195bcf4",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/evidence-event/valid/first-row.json",
+      "relativePath": "evidence-event/valid/first-row.json",
+      "bytes": 784,
+      "sha256": "03ddc6cc3a604fea153c194fd5aa85eb7a1383f0d6fd656c5262eac09c78ebae",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/legacy-receipt/invalid/missing-event-hash.json",
+      "relativePath": "legacy-receipt/invalid/missing-event-hash.json",
+      "bytes": 267,
+      "sha256": "fa002f9df33841269a5cb234327d3e8ad170bf36849f4bb23f393e96b3ab737e",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/legacy-receipt/invalid/unknown-kind.json",
+      "relativePath": "legacy-receipt/invalid/unknown-kind.json",
+      "bytes": 347,
+      "sha256": "3c94c3aac7e2ec62af47f02b7a1d3bfc7060276014ef5ab53c8ef2f87df9f4f5",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/legacy-receipt/valid/chained.json",
+      "relativePath": "legacy-receipt/valid/chained.json",
+      "bytes": 426,
+      "sha256": "efb0a9e3c30bec1b134b8d6a12d9441986d3dbd981562d8fc28ef8ec67d75125",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/legacy-receipt/valid/tool-action.json",
+      "relativePath": "legacy-receipt/valid/tool-action.json",
+      "bytes": 351,
+      "sha256": "0b7a72750386d1399bb7d7c01ad466adda7dd2e5181a7f102eef7c5b91988c00",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/invalid/denied-without-reason.json",
+      "relativePath": "receipt/invalid/denied-without-reason.json",
+      "bytes": 605,
+      "sha256": "c53c0ae1a61022ecaa61b4c16281effd365c8626800b783484a086fd9a38830d",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/invalid/enforced-without-boundary.json",
+      "relativePath": "receipt/invalid/enforced-without-boundary.json",
+      "bytes": 576,
+      "sha256": "debfb2681173f1f4fa19767048afe8dc1b75c726591a2f1b4a51e67c3156a19d",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/invalid/reason-on-completed.json",
+      "relativePath": "receipt/invalid/reason-on-completed.json",
+      "bytes": 628,
+      "sha256": "ebca6f92baed7de365dc6c2625df99aba9b5ea64181f66f72dcd6f09d205a0ee",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/invalid/state-succeeded.json",
+      "relativePath": "receipt/invalid/state-succeeded.json",
+      "bytes": 608,
+      "sha256": "3f402860108b0bf5852f43a10bd25bde628b237e60aeaa4a366b06b71c40696d",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/invalid/unknown-nested-field.json",
+      "relativePath": "receipt/invalid/unknown-nested-field.json",
+      "bytes": 597,
+      "sha256": "ea5d91880383830cd7de07682117fa6670c5f52d20548a0dd30f7407a93830cb",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/valid/authorized.json",
+      "relativePath": "receipt/valid/authorized.json",
+      "bytes": 609,
+      "sha256": "aa6d322383c5fb01cd5c0be29e713707c548d163382f00c0ce7364968f26bba1",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/valid/completed-after-outcome-unknown.json",
+      "relativePath": "receipt/valid/completed-after-outcome-unknown.json",
+      "bytes": 788,
+      "sha256": "61c3e92e3827909cf524df99841e8de5c6a5c913d2e1f5a45d663524874c6926",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/receipt/valid/denied-with-reason.json",
+      "relativePath": "receipt/valid/denied-with-reason.json",
+      "bytes": 637,
+      "sha256": "f2b888ec9725e6132078bfafa20c31be8a4efe027d950c74e5179e98ecdf9e13",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/scoped-attestation/invalid/missing-expires-at.json",
+      "relativePath": "scoped-attestation/invalid/missing-expires-at.json",
+      "bytes": 1339,
+      "sha256": "8656f9d7d2d9d60b0d99f6db54ddfb47c2e530cb815efbad823b05b7f7b74793",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/scoped-attestation/invalid/unknown-top-level-field.json",
+      "relativePath": "scoped-attestation/invalid/unknown-top-level-field.json",
+      "bytes": 1403,
+      "sha256": "24b2bbf30d3dcd277212212e199addc45e33e8d827f9d58c3d2d1ddc66d96f8d",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/scoped-attestation/valid/monthly-window.json",
+      "relativePath": "scoped-attestation/valid/monthly-window.json",
+      "bytes": 1382,
+      "sha256": "7e073b874f24a3cca4e3836ebfdf088093b5a85ff2636bc0c798d0e30e1e9455",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/signature-envelope/invalid/missing-fingerprint.json",
+      "relativePath": "signature-envelope/invalid/missing-fingerprint.json",
+      "bytes": 412,
+      "sha256": "68b36d39c745d6166fe42d32dd1d87f6041e799633d97c0598be3b3615b62cf9",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/signature-envelope/valid/extra-member-ignored.json",
+      "relativePath": "signature-envelope/valid/extra-member-ignored.json",
+      "bytes": 533,
+      "sha256": "2ee451b6ffb309f1122aba710db6f74bf8c11c54f1c790345db56816a8412558",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/signature-envelope/valid/vault-software.json",
+      "relativePath": "signature-envelope/valid/vault-software.json",
+      "bytes": 497,
+      "sha256": "93b7f2b0c5c992e5d7a817c0fb19fa10a34181172ba1847919ec57972b7c8cea",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/trust-list/invalid/key-without-purposes.json",
+      "relativePath": "trust-list/invalid/key-without-purposes.json",
+      "bytes": 1042,
+      "sha256": "a8fef7ffcec289709ccd1e10adb56875f6f7d9c47886066db686b6f2ab9a85ff",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/trust-list/invalid/unknown-nested-field.json",
+      "relativePath": "trust-list/invalid/unknown-nested-field.json",
+      "bytes": 1136,
+      "sha256": "4a93dd91383c0d9f937025ef30d4d6bda337bbfd7d0871e344e41ac7acbab998",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/trust-list/valid/one-attestation-key.json",
+      "relativePath": "trust-list/valid/one-attestation-key.json",
+      "bytes": 1111,
+      "sha256": "b2e69b88be1c83c8659c559c3ea65f589a7173d5dadb7558a3a1417febfb5498",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/verifier-report/invalid/one-merged-status.json",
+      "relativePath": "verifier-report/invalid/one-merged-status.json",
+      "bytes": 1262,
+      "sha256": "f90190486037de6e2cca167a0dba6aea60479459f6a173345762ab174f815396",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/verifier-report/invalid/status-spelled-not_evaluated.json",
+      "relativePath": "verifier-report/invalid/status-spelled-not_evaluated.json",
+      "bytes": 1242,
+      "sha256": "99904fb9706866ebad6709a27d32887d11035836e65a58d0245a2dc834f866ea",
+      "parityEligible": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/fixtures/contracts/verifier-report/valid/pinned-issuer.json",
+      "relativePath": "verifier-report/valid/pinned-issuer.json",
+      "bytes": 1242,
+      "sha256": "e6cb4b43c04cd7e5bec567053891ce77289ca9e8e34f4f48fa4e16e3abd0993f",
+      "parityEligible": true
+    }
+  ],
+  "schemaPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-conformance-statement.schema.json",
+      "name": "a4-conformance-statement.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-conformance-statement.schema.json",
+      "bytes": 24475,
+      "sha256": "fb61776a00ccfb5fbfd696d7d1c855d64c06577675638c975c3ea2fb7d53fde8",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-decision.schema.json",
+      "name": "a4-decision.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-decision.schema.json",
+      "bytes": 5859,
+      "sha256": "c4d867d06c04cd7a245037c1debec960af8ca128759b3e4094777152172467a6",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-deployment-receipt.schema.json",
+      "name": "a4-deployment-receipt.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-deployment-receipt.schema.json",
+      "bytes": 3953,
+      "sha256": "c0b830ffdc0148e07d3b867bb06d9a52835e437ff94bb3c65d70eeb56189a225",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-gate-policy.schema.json",
+      "name": "a4-gate-policy.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-gate-policy.schema.json",
+      "bytes": 22332,
+      "sha256": "45be4ad9c95f2998e1b646d79d1b6f28bbdecb97491c8e00b39d9248724eb315",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-gate.schema.json",
+      "name": "a4-gate.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-gate.schema.json",
+      "bytes": 18906,
+      "sha256": "8b4bebab787e3b58d3abf770746f7b2652bd43158950b1819abd227975276bd0",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-integration-claim.schema.json",
+      "name": "a4-integration-claim.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-integration-claim.schema.json",
+      "bytes": 2001,
+      "sha256": "7240b74fc3fa61020ad6f0042157f905a967c32567767e36647df7012909e821",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-intent.schema.json",
+      "name": "a4-intent.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-intent.schema.json",
+      "bytes": 2133,
+      "sha256": "d51b647ee31f437f7ef89fcbc851ce4de20d9c8f4563b3d813cee7675b85ec14",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-package.schema.json",
+      "name": "a4-package.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-package.schema.json",
+      "bytes": 10645,
+      "sha256": "1aaf90d632990850801b3e4ce1e480506d1627f7626e11762a5e69d718870616",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-project.schema.json",
+      "name": "a4-project.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-project.schema.json",
+      "bytes": 4218,
+      "sha256": "404459e3def4008012b320598dd314e50270f69a345e089bfe86607b9a07fec6",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-readiness.schema.json",
+      "name": "a4-readiness.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-readiness.schema.json",
+      "bytes": 94936,
+      "sha256": "f4ce96bbd89cdd690d4ec3aaa7b6f35e2463418284e5e5b8d0e56ec110092616",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-record.schema.json",
+      "name": "a4-record.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-record.schema.json",
+      "bytes": 9417,
+      "sha256": "abdcc82c10fe5a19b170ba1f0886e3a16cc4de902bc86608d8bbd823527c3ca0",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-release.schema.json",
+      "name": "a4-release.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-release.schema.json",
+      "bytes": 56050,
+      "sha256": "1e2ef794a7d80ac73c78d0026ff97fe4e73964e2a8aec6846ce18262d21bffcd",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-revision.schema.json",
+      "name": "a4-revision.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-revision.schema.json",
+      "bytes": 12131,
+      "sha256": "9aad269632ba21633d6bc1926c91381198ac938db1433fed2cfe5305482cacbc",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-rollback-receipt.schema.json",
+      "name": "a4-rollback-receipt.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-rollback-receipt.schema.json",
+      "bytes": 2322,
+      "sha256": "7200a1e318ecf2b8521bce0c18d8bde8cddc61aaf0cb6c94fb6c1e3e3ec74bf7",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-transition.schema.json",
+      "name": "a4-transition.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-transition.schema.json",
+      "bytes": 2728,
+      "sha256": "81f41c4c6321efa8ac8a17abc2a4690e76da83a52f07e31a8eb8a3b33b06323c",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/a4-value-claim.schema.json",
+      "name": "a4-value-claim.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/a4-value-claim.schema.json",
+      "bytes": 37889,
+      "sha256": "5158210381faa741d114937c1c5d226e124e0fd5ae9eb1752a07d98f3cbc7c86",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/amcaudit.schema.json",
+      "name": "amcaudit.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/amcaudit.schema.json",
+      "bytes": 31180,
+      "sha256": "7ec9cb7ec49311ae6960a0de8f3b0f56f1c6245b626afd5d78de4a9abcba9c6d",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/amcbench.schema.json",
+      "name": "amcbench.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/amcbench.schema.json",
+      "bytes": 16491,
+      "sha256": "5a55092f837c8cb29b8eef4df6c79dff81e9cbce0c39c40685349989131c1127",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/amccert.schema.json",
+      "name": "amccert.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/amccert.schema.json",
+      "bytes": 5113,
+      "sha256": "48ecf24965fb6bba6c0c1eb1cfe7d3ff22b23bc6f05d2a8f283adc2f5317aa0a",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/amcpass.schema.json",
+      "name": "amcpass.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/amcpass.schema.json",
+      "bytes": 22167,
+      "sha256": "5a558ea9b0b7dc200798481d8b15255c3b22e2165a80b1da668eebc83007188e",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/amcprompt.schema.json",
+      "name": "amcprompt.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/amcprompt.schema.json",
+      "bytes": 9560,
+      "sha256": "ac9ea37f606dc1c49190865b3d990af6b0137712afc790593a2497fa6e272a4e",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/amcproof.schema.json",
+      "name": "amcproof.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/amcproof.schema.json",
+      "bytes": 4594,
+      "sha256": "6a646762e364bf1419853e74a652f7aad37180ee08b7b5c112999f5c0478d8dd",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/authorization-record.schema.json",
+      "name": "authorization-record.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/authorization-record.schema.json",
+      "bytes": 14589,
+      "sha256": "93c50b8e80c49a8d831f990c6899be765be1f66066df3673797a01f730f5e36f",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/catalog-lock.schema.json",
+      "name": "catalog-lock.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/catalog-lock.schema.json",
+      "bytes": 5509,
+      "sha256": "e6046296d2a36de818dc0c90e61fae4129b7d8c93c726273206fe5278d3b4e5a",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/claim-envelope.schema.json",
+      "name": "claim-envelope.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/claim-envelope.schema.json",
+      "bytes": 6417,
+      "sha256": "4f6e86e990419e882a984e1da270180a7f98b18b59d4de362a6222a498201567",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/control-record.schema.json",
+      "name": "control-record.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/control-record.schema.json",
+      "bytes": 31029,
+      "sha256": "bb8a3a363a8091b3c0cf9283d3bafc39ff43a908818ff08d8da6de8ff83da0d2",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/control-result.schema.json",
+      "name": "control-result.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/control-result.schema.json",
+      "bytes": 9635,
+      "sha256": "f0c65d000622ab671c15a00f348e6d62e668b3e178a8c6529522fb46620e75b6",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/evidence-event.schema.json",
+      "name": "evidence-event.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/evidence-event.schema.json",
+      "bytes": 4615,
+      "sha256": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/external-evidence.schema.json",
+      "name": "external-evidence.schema.json",
+      "id": "https://agentmaturity.co/standards/external-evidence/v1/schema.json",
+      "bytes": 8449,
+      "sha256": "62a9620f9b866cae338399e1388e46a24ff62cfc7c8d00789a47a64aaab6e023",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/legacy-receipt.schema.json",
+      "name": "legacy-receipt.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/legacy-receipt.schema.json",
+      "bytes": 1570,
+      "sha256": "785f6e6fb9c69e7c27d7dabc2d1e6346d482908e15f511a313aeb23e83fbd9fb",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/pack-manifest.schema.json",
+      "name": "pack-manifest.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/pack-manifest.schema.json",
+      "bytes": 3730,
+      "sha256": "3b437f5e203d30f68ce5a89d864af6c0e3d49153d4e80eb4389338e77fe71b79",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/receipt.schema.json",
+      "name": "receipt.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/receipt.schema.json",
+      "bytes": 11129,
+      "sha256": "858bb4712a4edb484538c82fdf6dcb58b3dae4364c9e519f33524cdd6cec52c6",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/registry.bench.schema.json",
+      "name": "registry.bench.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/registry.bench.schema.json",
+      "bytes": 4135,
+      "sha256": "29de696c9b0e7386cccaa3444d3ed8c6a78ead43ce62c891b46b4b6a1df8aaf0",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/registry.passport.schema.json",
+      "name": "registry.passport.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/registry.passport.schema.json",
+      "bytes": 491,
+      "sha256": "14c67aa3f3c81ca4dc1d8460b305e4997bbaaa35cedb231e279756972b4770b9",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/scoped-attestation.schema.json",
+      "name": "scoped-attestation.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/scoped-attestation.schema.json",
+      "bytes": 5273,
+      "sha256": "dcfbf0beade62578c1fe69e83d5ad241e443bcaed1513c43196d6bed2c6da5df",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/signature-envelope.schema.json",
+      "name": "signature-envelope.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/signature-envelope.schema.json",
+      "bytes": 1381,
+      "sha256": "52a074984a9c3aff81c3ded09929b1095479027e202c96660ca9ec74a4eb28b8",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/trust-list.schema.json",
+      "name": "trust-list.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/trust-list.schema.json",
+      "bytes": 10735,
+      "sha256": "2b6af58b33879b08373990e9fc3d0b9144d81758557df2641d8a626c7be165d5",
+      "indexHashMatches": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/spec/schemas/v1/verifier-report.schema.json",
+      "name": "verifier-report.schema.json",
+      "id": "https://agentmaturity.co/spec/schemas/v1/verifier-report.schema.json",
+      "bytes": 13959,
+      "sha256": "2078d2ca3175b36aabe92b1fb5163c4fb1c7b0b39ceb0aa4f57fad9a6b972927",
+      "indexHashMatches": true
+    }
+  ],
+  "externalPlanSpecReservationPins": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-01.md",
+      "bytes": 15658,
+      "sha256": "4d9743e9bbbdba999f36ccf45ec7d6e5252ada6267c2bb498da88e19ab43ad57"
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "bytes": 78486,
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    }
+  ],
+  "formalAcceptanceClosed": false,
+  "testsRunByReviewer": false,
+  "productImportsByReviewer": false,
+  "sourceOrOriginalEvidenceWrites": false,
+  "allReadsFinished": true
+}

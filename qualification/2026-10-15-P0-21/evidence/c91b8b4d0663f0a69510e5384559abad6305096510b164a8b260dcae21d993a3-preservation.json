@@ -1,0 +1,195 @@
+{
+  "parentRoot": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+  "closureRoot": "/private/tmp/p0-21-causal-qualification-20261015/closure",
+  "nodeModulesLink": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/closure/node_modules",
+    "target": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules",
+    "resolved": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules"
+  },
+  "borrowedNative": {
+    "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "device": 16777231,
+    "inode": 538645305,
+    "nlink": 1,
+    "mode": 493
+  },
+  "immutableInputs": [
+    {
+      "path": "/private/tmp/p0-21-causal-readonly-plan-v2-20261015.json",
+      "bytes": 30558,
+      "sha256": "601d76733ddd9a834baa2ceb86501d782977005d62d98c78c9183f6a6a3987f4"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-readonly-plan-v2-20261015.md",
+      "bytes": 2755,
+      "sha256": "5867ba934ea312c6a6a4ca597dc9c63f566a65950acd4d60563ac15faea165de"
+    },
+    {
+      "path": "/private/tmp/p0-21-readonly-readiness-v2-20261015.json",
+      "bytes": 63104,
+      "sha256": "0d6d0d47b68c29cc60c2c5d430f6c4f3ed8e7157514b4462bc7686530b35d348"
+    },
+    {
+      "path": "/private/tmp/p0-21-readonly-readiness-v2-20261015.md",
+      "bytes": 3296,
+      "sha256": "c79d19a20a3f3d901ddc6f7c620c1433b51ae64fd07f876bdfaa63d9f36b0949"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/initial-preflight.json",
+      "bytes": 15064,
+      "sha256": "b039ec6dd5834b494623d6a1ddc3c4415675d829532c38e4ca3c30835de62802"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/tracked-source-before.json",
+      "bytes": 948064,
+      "sha256": "33488a499321073557a83b7a4e8446f1c7e4744f0c05fbc6edf27fb26f9c4caf"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/compiled-after-build.json",
+      "bytes": 485185,
+      "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/runtime-fingerprint.cjs",
+      "bytes": 1147,
+      "sha256": "2457017b6cdafb1560f98c90c2fa48815b839ed7c31eca8ff873b3a2dff53f7e"
+    },
+    {
+      "path": "/private/tmp/p0-21-runtime-fingerprint-20261015.log",
+      "bytes": 737,
+      "sha256": "46cb7ab921acf2c641d081efbcc470ca2783e8c0949c2def46411f657ae666a8"
+    },
+    {
+      "path": "/private/tmp/p0-25-canonical-postcommit-handoff-20261015.json",
+      "bytes": 3756,
+      "sha256": "fc1d63929ab12b7cced3a9d8d85cec562b44e775193fd3b64de9b3561dcc40cb"
+    },
+    {
+      "path": "/private/tmp/p0-21-original-core-20261015.json",
+      "bytes": 13531,
+      "sha256": "5956cd0924105ed8af8c535a0d9a9e5700f9bedcc684dc012f983d97393ac9e2"
+    },
+    {
+      "path": "/private/tmp/p0-21-original-core-20261015.log",
+      "bytes": 756,
+      "sha256": "ca86226e2433acbe6a56afdce4619cdcd7752deca2aa8286eaf52c62790ce15d"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observers/original-core.json",
+      "bytes": 20673,
+      "sha256": "a184fdece85e47d6d25d4e6730bfa21157598b152a3e15cc8a067ea9df5ceacb"
+    },
+    {
+      "path": "/private/tmp/p0-21-original-cli-20261015.json",
+      "bytes": 5336,
+      "sha256": "11395d84ec62ac0282a2f3c0b027c934b525c461ee006dcdf1bab2a90e36b925"
+    },
+    {
+      "path": "/private/tmp/p0-21-original-cli-20261015.log",
+      "bytes": 1283,
+      "sha256": "0ff82949f54c37bdb3799f3a4db37f13d03e6d75a681e2d1b35d4bbc88270d41"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observers/original-cli.json",
+      "bytes": 7690,
+      "sha256": "8b7547cd2f35a3de1c8918cc234298d4ce6e5599780be0cb39b6992cc27fc2f3"
+    },
+    {
+      "path": "/private/tmp/p0-21-original-consumers-20261015.json",
+      "bytes": 15550,
+      "sha256": "7922b303999bdc675f210fe4613f803fc19cee76b3060f68a7f0874007d8e32d"
+    },
+    {
+      "path": "/private/tmp/p0-21-original-consumers-20261015.log",
+      "bytes": 543,
+      "sha256": "c2c535d81692936b3bcf1034871d5f5fadfd0442bec1a29687f23eedee9d6f08"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observers/original-consumers.json",
+      "bytes": 21993,
+      "sha256": "8a147dbc48d51bcbc96fa1e15754e12a4f620fc3c16713bc2937a078eacfff83"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "bytes": 43,
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/package.json",
+      "bytes": 5932,
+      "sha256": "a28126d97bcaf567da5bed69443b7f3bcd9a7a8c38c8b66e554686b6bb2c10e0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/cli.js",
+      "bytes": 284,
+      "sha256": "35346c38bc8e52886ebd7d013d5de64ef5adde9ccec0435c8fac3cc9b6368f3c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/config.js",
+      "bytes": 464,
+      "sha256": "0ab30953d20f3f2c9662d4ea4d174dc0506483e0afaf02fd84713bbc391972cd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js",
+      "bytes": 498779,
+      "sha256": "a236001d048380e2c67d05423fc9ea3f26b07ee019ba8d6e622082f29d49102e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/cac.uFydS1Z4.js",
+      "bytes": 96007,
+      "sha256": "27cc9365d180bee3da005fe6c4d485868caf9d8f54280759eea28842836af549"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/package.json",
+      "bytes": 1158,
+      "sha256": "357e56773a82d3aa95bf920a54ea7f91575d02e6b156d9d7719ea485708e6837"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/index.js",
+      "bytes": 595,
+      "sha256": "61a758d5e6d41e0928c92bfd5ab7152bde625d90b97a08b269dc5a0438485d35"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js",
+      "bytes": 119176,
+      "sha256": "bf6af6d2f4469911879a67e83b8f9e7b20332cf42795032c53457b10ccc1c617"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vite/package.json",
+      "bytes": 5093,
+      "sha256": "4e41dd20c7a12e7e70915b235c0bf5b5158ec6709c1390804128af0867d6d6d9"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+      "bytes": 872054,
+      "sha256": "dd1c3388ae4ad7906c87911576900af023d19701bae42c4e6128c79f776a5dd3"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "bytes": 67024,
+      "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+    }
+  ],
+  "inboxBoundary": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+    "prefixBytes": 869806,
+    "prefixSha256": "d262c7c652d0b2791a8da350f5c999933fef11038e419939eae23244b69710f7",
+    "appendBytes": 2248,
+    "appendSha256": "377de81b549049c22b7d75b32e0d55d056bb8fdf5681100f441368ae6f783de6",
+    "newBytes": 872054,
+    "newSha256": "dd1c3388ae4ad7906c87911576900af023d19701bae42c4e6128c79f776a5dd3",
+    "prefixPreservedExact": true
+  },
+  "sourceCount": 7945,
+  "compiledCount": 4529,
+  "totalCount": 12474,
+  "sourceKind": "Independent physical filesystem copy; no .git and no Git clone claim. Borrowed dependency resolver is the sole intentional symlink.",
+  "dependencyLimit": "No independent install or OS/transport isolation. Only pinned runtime helper/native bytes and identity are checked; no universal dependency/cache immutability claim. --cache=false is planned."
+}

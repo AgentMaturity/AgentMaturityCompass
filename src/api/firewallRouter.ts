@@ -1,6 +1,7 @@
 import { resolve } from "node:path";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { z } from "zod";
+import { KeyProviderError } from "../keys/provider.js";
 import { apiError, apiSuccess, bodyJson, isRequestBodyError, queryParam } from "./apiHelpers.js";
 import {
   evaluateRuntimeFirewall,
@@ -24,6 +25,11 @@ const firewallMigrationBodySchema = z.object({
 }).strict();
 
 function firewallErrorStatus(error: unknown): number {
+  if (error instanceof KeyProviderError) return error.status;
+  if (error && typeof error === "object" && "code" in error) {
+    if (error.code === "AUTHORIZATION") return 403;
+    if (error.code === "PUBLICATION") return 409;
+  }
   if (isRequestBodyError(error)) return error.statusCode;
   if (error instanceof z.ZodError) return 400;
   const message = error instanceof Error ? error.message.toLowerCase() : "";
@@ -76,9 +82,15 @@ export async function handleFirewallRoute(
   method: string,
   req: IncomingMessage,
   res: ServerResponse,
-  workspace = process.cwd()
+  workspace = process.cwd(),
+  revalidateAuthority?: () => boolean
 ): Promise<boolean> {
   if (!pathname.startsWith("/api/v1/firewall")) return false;
+  const currentActor = () => {
+    if (revalidateAuthority?.() !== false) return true;
+    if (!res.headersSent) apiError(res, 403, "Current control mutation authority refused.");
+    return false;
+  };
 
   if (pathname === "/api/v1/firewall/status" && method === "GET") {
     apiSuccess(res, runtimeFirewallStatus(workspace));
@@ -87,15 +99,26 @@ export async function handleFirewallRoute(
 
   if (pathname === "/api/v1/firewall/enable" && method === "POST") {
     try {
+      if (!currentActor()) return true;
       const body = firewallEnableBodySchema.parse(await bodyJson<unknown>(req));
-      const out = writeRuntimeFirewallPolicy({
+      if (!currentActor()) return true;
+      const input = {
         workspace,
         mode: parseMode(body.mode ?? "warn"),
         enabled: body.enabled ?? true,
         failClosedOnMissingPolicy: body.failClosedOnMissingPolicy ?? true
-      });
+      };
+      let out: ReturnType<typeof writeRuntimeFirewallPolicy>;
+      if (revalidateAuthority === undefined) out = writeRuntimeFirewallPolicy(input);
+      else {
+        const policy = await import("../runtime/firewallPolicyAsync.js");
+        if (!currentActor()) return true;
+        out = await policy.writeRuntimeFirewallPolicyForHandler(input, revalidateAuthority);
+      }
+      if (res.headersSent) return true;
       apiSuccess(res, out, 201);
     } catch (err) {
+      if (res.headersSent) return true;
       apiError(res, firewallErrorStatus(err), err instanceof Error ? err.message : "could not enable Runtime Firewall");
     }
     return true;
@@ -103,13 +126,24 @@ export async function handleFirewallRoute(
 
   if (pathname === "/api/v1/firewall/migrate-signature" && method === "POST") {
     try {
+      if (!currentActor()) return true;
       const body = firewallMigrationBodySchema.parse(await bodyJson<unknown>(req));
-      const out = migrateRuntimeFirewallPolicySignature({
+      if (!currentActor()) return true;
+      const input = {
         workspace,
         approveLegacyArtifactKind: body.approveLegacyArtifactKind
-      });
+      };
+      let out: ReturnType<typeof migrateRuntimeFirewallPolicySignature>;
+      if (revalidateAuthority === undefined) out = migrateRuntimeFirewallPolicySignature(input);
+      else {
+        const policy = await import("../runtime/firewallPolicyAsync.js");
+        if (!currentActor()) return true;
+        out = await policy.migrateRuntimeFirewallPolicyForHandler(input, revalidateAuthority);
+      }
+      if (res.headersSent) return true;
       apiSuccess(res, out, 201);
     } catch (err) {
+      if (res.headersSent) return true;
       apiError(res, firewallErrorStatus(err), err instanceof Error ? err.message : "could not migrate Runtime Firewall policy");
     }
     return true;

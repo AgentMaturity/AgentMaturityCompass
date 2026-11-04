@@ -1,16 +1,20 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { byDimensionFromRun, byDimensionFromOrgNode } from "./binderDimensions.js";
+import { readAuditAssurancePolicy, readAuditMechanicTuning, readAuditRetentionCount, readAuditWorkspaceRecord } from "./binderReadOnlyInputs.js";
+import { readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { loadAssurancePolicy, verifyAssurancePolicySignature } from "../assurance/assurancePolicyStore.js";
 import { latestAssuranceCertificateSummary, latestAssuranceRun } from "../assurance/assuranceStore.js";
 import { verifyAdaptersConfigSignature } from "../adapters/adapterConfigStore.js";
 import { verifyBenchRegistriesSignature } from "../bench/benchPolicyStore.js";
+import { derivedTrustLabel } from "../bench/benchCollector.js";
 import { verifyBridgeConfigSignature } from "../bridge/bridgeConfigStore.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
 import { canonPath } from "../canon/canonLoader.js";
 import { cgxLatestGraphPath, cgxLatestPackPath } from "../cgx/cgxStore.js";
 import { diagnosticBankPath } from "../diagnostic/bank/bankLoader.js";
-import { loadRunReport } from "../diagnostic/runner.js";
+import { questionBank } from "../diagnostic/questionBank.js";
+import { latestTrustedRun } from "../governor/actionPolicyEngine.js";
 import { resolveAgentId } from "../fleet/paths.js";
 import { verifyLedgerIntegrity, openLedger } from "../ledger/ledger.js";
 import { mechanicTargetsPath } from "../mechanic/targetsStore.js";
@@ -93,7 +97,7 @@ interface FactCatalog {
   toolDenialsObserved: FactResult;
 }
 
-interface BinderCollectResult {
+export interface BinderCollectResult {
   binder: AuditBinderJson;
   includedEventKinds: string[];
   calculationManifest: Record<string, unknown>;
@@ -160,20 +164,6 @@ function insufficient(reason: string, refs: string[] = []): FactResult {
   };
 }
 
-function trustLabelFromSignals(params: {
-  integrityIndex: number;
-  correlationRatio: number;
-  observedShare: number;
-}): "LOW" | "MEDIUM" | "HIGH" {
-  if (params.integrityIndex >= 0.9 && params.correlationRatio >= 0.9 && params.observedShare >= 0.7) {
-    return "HIGH";
-  }
-  if (params.integrityIndex >= 0.75 && params.correlationRatio >= 0.75 && params.observedShare >= 0.5) {
-    return "MEDIUM";
-  }
-  return "LOW";
-}
-
 function mapRunTrustLabel(input: string): "LOW" | "MEDIUM" | "HIGH" {
   const text = input.toUpperCase();
   if (text.includes("HIGH")) {
@@ -183,78 +173,6 @@ function mapRunTrustLabel(input: string): "LOW" | "MEDIUM" | "HIGH" {
     return "LOW";
   }
   return "MEDIUM";
-}
-
-function findLatestAgentRunId(workspace: string, agentId: string): string | null {
-  const runsDir = join(workspace, ".amc", "agents", agentId, "runs");
-  if (!pathExists(runsDir)) {
-    return null;
-  }
-  const files = readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) return null;
-  return files[files.length - 1]!.replace(/\.json$/, "");
-}
-
-function byDimensionFromRun(run: ReturnType<typeof loadRunReport>): {
-  DIM1: number | null;
-  DIM2: number | null;
-  DIM3: number | null;
-  DIM4: number | null;
-  DIM5: number | null;
-} {
-  const out = {
-    DIM1: null as number | null,
-    DIM2: null as number | null,
-    DIM3: null as number | null,
-    DIM4: null as number | null,
-    DIM5: null as number | null
-  };
-  for (const layer of run.layerScores) {
-    if (layer.layerName === "Strategic Agent Operations") {
-      out.DIM1 = Number(layer.avgFinalLevel.toFixed(6));
-    } else if (layer.layerName === "Leadership & Autonomy") {
-      out.DIM2 = Number(layer.avgFinalLevel.toFixed(6));
-    } else if (layer.layerName === "Culture & Alignment") {
-      out.DIM3 = Number(layer.avgFinalLevel.toFixed(6));
-    } else if (layer.layerName === "Resilience") {
-      out.DIM4 = Number(layer.avgFinalLevel.toFixed(6));
-    } else if (layer.layerName === "Skills") {
-      out.DIM5 = Number(layer.avgFinalLevel.toFixed(6));
-    }
-  }
-  return out;
-}
-
-function byDimensionFromOrgNode(node: NonNullable<ReturnType<typeof loadLatestOrgScorecard>>["nodes"][number]): {
-  DIM1: number | null;
-  DIM2: number | null;
-  DIM3: number | null;
-  DIM4: number | null;
-  DIM5: number | null;
-} {
-  const out = {
-    DIM1: null as number | null,
-    DIM2: null as number | null,
-    DIM3: null as number | null,
-    DIM4: null as number | null,
-    DIM5: null as number | null
-  };
-  for (const layer of node.layerScores) {
-    if (layer.layerName === "Strategic Agent Operations") {
-      out.DIM1 = Number(layer.median.toFixed(6));
-    } else if (layer.layerName === "Leadership & Autonomy") {
-      out.DIM2 = Number(layer.median.toFixed(6));
-    } else if (layer.layerName === "Culture & Alignment") {
-      out.DIM3 = Number(layer.median.toFixed(6));
-    } else if (layer.layerName === "Resilience") {
-      out.DIM4 = Number(layer.median.toFixed(6));
-    } else if (layer.layerName === "Skills") {
-      out.DIM5 = Number(layer.median.toFixed(6));
-    }
-  }
-  return out;
 }
 
 function inferHostDir(workspace: string): string | null {
@@ -384,8 +302,8 @@ function evaluateControl(params: {
   control: AuditMapFile["auditMap"]["controlFamilies"][number]["controls"][number];
   kindChecks: Record<string, { ok: boolean; refs: string[] }>;
   checkFacts: FactCatalog;
-  integrityIndex: number;
-  correlationRatio: number;
+  integrityIndex: number | null;
+  correlationRatio: number | null;
 }): {
   status: "PASS" | "FAIL" | "INSUFFICIENT_EVIDENCE";
   reasons: string[];
@@ -394,12 +312,12 @@ function evaluateControl(params: {
   const reasons: string[] = [];
   const evidenceRefs: string[] = [];
 
-  if (params.integrityIndex < params.control.evidenceRequirements.strongClaimGates.minIntegrityIndex) {
-    reasons.push("GATE_FAIL_INTEGRITY");
-  }
-  if (params.correlationRatio < params.control.evidenceRequirements.strongClaimGates.minCorrelationRatio) {
-    reasons.push("GATE_FAIL_CORRELATION");
-  }
+  // Not measured never meets a minimum above 0, and says so; a minimum of 0 sets no requirement.
+  const gates = params.control.evidenceRequirements.strongClaimGates;
+  if (params.integrityIndex === null) { if (gates.minIntegrityIndex > 0) reasons.push("GATE_FAIL_INTEGRITY_NOT_MEASURED"); }
+  else if (params.integrityIndex < gates.minIntegrityIndex) reasons.push("GATE_FAIL_INTEGRITY");
+  if (params.correlationRatio === null) { if (gates.minCorrelationRatio > 0) reasons.push("GATE_FAIL_CORRELATION_NOT_MEASURED"); }
+  else if (params.correlationRatio < gates.minCorrelationRatio) reasons.push("GATE_FAIL_CORRELATION");
 
   let missingKind = false;
   for (const kind of params.control.evidenceRequirements.requiredKinds) {
@@ -474,7 +392,7 @@ function scopeFromInput(workspace: string, scope: ScopeInput): ScopeInput {
   };
 }
 
-export async function collectAuditBinderData(params: {
+export type AuditBinderCollectionInput = {
   workspace: string;
   scope: ScopeInput;
   policy: AuditPolicy;
@@ -482,7 +400,10 @@ export async function collectAuditBinderData(params: {
   nowTs?: number;
   request?: EvidenceRequest | null;
   trust?: import("../trust/trustContext.js").TrustContext;
-}): Promise<BinderCollectResult> {
+};
+
+/** Local observation only; the maintained publisher selects readonly, non-initializing readers. */
+export function collectAuditBinderLocalData(params: AuditBinderCollectionInput, readOnly = false) {
   const nowTs = Number.isFinite(Number(params.nowTs)) ? Number(params.nowTs) : Date.now();
   const scope = scopeFromInput(params.workspace, params.scope);
   const windowStartTs = nowTs - parseWindowToMs("30d");
@@ -491,13 +412,14 @@ export async function collectAuditBinderData(params: {
     .sort((a, b) => a.ts - b.ts);
   const eventsByType = eventRefsByType(transparencyEntries.map((entry) => ({ type: entry.type, hash: entry.hash })));
 
-  const ledger = openLedger(params.workspace);
+  const ledger = openLedger(params.workspace, readOnly ? { readonly: true } : {});
+  let selectedWindowEvents: ReturnType<typeof ledger.getEventsBetween> = [];
   const auditTypeRefs = new Map<string, string[]>();
   let truthguardCount = 0;
   let toolDeniedCount = 0;
   let providerAllowlistEvents = 0;
   try {
-    const events = ledger.getEventsBetween(windowStartTs, nowTs);
+    const events = ledger.getEventsBetween(windowStartTs, nowTs); selectedWindowEvents = events;
     for (const event of events) {
       if (event.event_type === "output_validated") {
         truthguardCount += 1;
@@ -530,7 +452,7 @@ export async function collectAuditBinderData(params: {
       return null;
     }
     try {
-      return getWorkspaceRecord(hostDir, workspaceIdFromDirectory(params.workspace));
+      return readOnly ? readAuditWorkspaceRecord(hostDir, workspaceIdFromDirectory(params.workspace)) : getWorkspaceRecord(hostDir, workspaceIdFromDirectory(params.workspace));
     } catch {
       return null;
     }
@@ -546,19 +468,18 @@ export async function collectAuditBinderData(params: {
   const bridgeSig = verifyBridgeConfigSignature(params.workspace);
   const adaptersSig = verifyAdaptersConfigSignature(params.workspace);
   const benchRegistrySig = verifyBenchRegistriesSignature(params.workspace);
-  const pluginVerify = verifyPluginWorkspace({ workspace: params.workspace });
+  const pluginVerify = verifyPluginWorkspace({ workspace: params.workspace, readonly: readOnly });
   const tlogVerify = verifyTransparencyLog(params.workspace);
   const merkleVerify = verifyTransparencyMerkle(params.workspace);
-  const ledgerVerify = await verifyLedgerIntegrity(params.workspace);
+  const ledgerVerify = verifyLedgerIntegrity(params.workspace);
 
-  const retention = retentionStatusCli(params.workspace);
+  const retention = readOnly ? { segmentCount: readAuditRetentionCount(params.workspace) } : retentionStatusCli(params.workspace);
   const assuranceRun = latestAssuranceRun(params.workspace);
   const assuranceCert = latestAssuranceCertificateSummary(params.workspace);
-  const assurancePolicy = loadAssurancePolicy(params.workspace);
+  const assurancePolicy = readOnly ? readAuditAssurancePolicy(params.workspace) : loadAssurancePolicy(params.workspace);
 
   const trust = loadTrustConfig(params.workspace);
   const conformance = binderConformanceRun(params.workspace, scope.type === "AGENT" ? scope.id : null, params.policy.auditPolicy.privacy.hashTruncBytes, params.trust);
-  const notary = await checkNotaryTrust(params.workspace).catch(() => null);
 
   const opsPolicy = loadOpsPolicy(params.workspace);
 
@@ -739,10 +660,7 @@ export async function collectAuditBinderData(params: {
         : insufficient("no tool denial events in window")
   };
 
-  const kindChecks = mapEvidenceKinds({
-    eventsByType,
-    facts
-  });
+  const kindChecks = mapEvidenceKinds({ eventsByType, facts });
 
   let maturityOverall: number | null = null;
   let maturityByDim: { DIM1: number | null; DIM2: number | null; DIM3: number | null; DIM4: number | null; DIM5: number | null } = {
@@ -752,37 +670,36 @@ export async function collectAuditBinderData(params: {
     DIM4: null,
     DIM5: null
   };
-  let unknownQuestionsCount = 0;
   let maturityRefs: string[] = [];
   let maturityNotes: string[] = [];
 
-  let integrityIndex = 0;
-  let correlationRatio = 0;
-  let observedShare = 0;
-  let attestedShare = 0;
-  let selfReportedShare = 1;
+  // Every question counts as unknown until a trusted run or org scorecard measures it, never a measured 0.
+  let unknownQuestionsCount = questionBank.length;
+  let integrityIndex: number | null = null;
+  let correlationRatio: number | null = null;
+  let evidenceCoverage: { observedShare: number; attestedShare: number; selfReportedShare: number } | null = null;
   let trustLabel: "LOW" | "MEDIUM" | "HIGH" = "LOW";
   let runCount = 0;
 
   if (scope.type === "AGENT") {
-    const runId = findLatestAgentRunId(params.workspace, scope.id);
-    if (runId) {
-      const run = loadRunReport(params.workspace, runId, scope.id);
+    // The agent's trusted run only (WP37, run trust); a tampered, copied, unanchored or rolled-back run blocks it.
+    const { run, refusal } = latestTrustedRun(params.workspace, scope.id);
+    if (run) {
       assertNotExample(run, "included in an audit binder");
       maturityOverall = Number((run.layerScores.reduce((sum, row) => sum + row.avgFinalLevel, 0) / Math.max(1, run.layerScores.length)).toFixed(6));
       maturityByDim = byDimensionFromRun(run);
       unknownQuestionsCount = run.questionScores.filter((row) => row.finalLevel <= 1).length;
       integrityIndex = Number(run.integrityIndex.toFixed(6));
-      correlationRatio = Number(run.correlationRatio.toFixed(6));
-      observedShare = Number((run.evidenceTrustCoverage?.observed ?? 0).toFixed(6));
-      attestedShare = Number((run.evidenceTrustCoverage?.attested ?? 0).toFixed(6));
-      selfReportedShare = Number((run.evidenceTrustCoverage?.selfReported ?? 1).toFixed(6));
+      correlationRatio = run.correlationRatio === null ? null : Number(run.correlationRatio.toFixed(6));
+      evidenceCoverage = run.evidenceTrustCoverage ? { observedShare: Number(run.evidenceTrustCoverage.observed.toFixed(6)),
+        attestedShare: Number(run.evidenceTrustCoverage.attested.toFixed(6)),
+        selfReportedShare: Number(run.evidenceTrustCoverage.selfReported.toFixed(6)) } : null;
       trustLabel = mapRunTrustLabel(run.trustLabel);
       runCount = 1;
       maturityRefs = dedupeSorted([sha256Hex(Buffer.from(run.runId, "utf8"))]);
       maturityNotes = dedupeSorted(run.evidenceToCollectNext.slice(0, 6));
     } else {
-      maturityNotes = ["No agent diagnostic runs were found."];
+      maturityNotes = [refusal ? `Unverifiable agent diagnostic runs block the latest result: ${refusal}.` : "No sealed agent diagnostic runs were found."];
     }
   } else {
     const scorecard = loadLatestOrgScorecard(params.workspace);
@@ -797,9 +714,9 @@ export async function collectAuditBinderData(params: {
       unknownQuestionsCount = node.questionScores.filter((row) => row.median <= 1).length;
       integrityIndex = Number(node.integrityIndex.toFixed(6));
       correlationRatio = Number(node.confidence.medianCorrelationRatio.toFixed(6));
-      observedShare = Number(node.evidenceCoverage.observedRatio.toFixed(6));
-      attestedShare = Number(node.evidenceCoverage.attestedRatio.toFixed(6));
-      selfReportedShare = Number(node.evidenceCoverage.selfReportedRatio.toFixed(6));
+      evidenceCoverage = { observedShare: Number(node.evidenceCoverage.observedRatio.toFixed(6)),
+        attestedShare: Number(node.evidenceCoverage.attestedRatio.toFixed(6)),
+        selfReportedShare: Number(node.evidenceCoverage.selfReportedRatio.toFixed(6)) };
       trustLabel = mapRunTrustLabel(node.trustLabel);
       runCount = node.runRefs.length;
       maturityRefs = dedupeSorted([...(node.transparencyRefs ?? []), ...(node.runRefs ?? []).map((row) => sha256Hex(Buffer.from(row, "utf8")))]);
@@ -809,17 +726,11 @@ export async function collectAuditBinderData(params: {
     }
   }
 
-  if (integrityIndex <= 0 || correlationRatio <= 0) {
-    // Fallback to trust evidence from trust mode if no diagnostic/org data exists.
-    integrityIndex = integrityIndex > 0 ? integrityIndex : 0;
-    correlationRatio = correlationRatio > 0 ? correlationRatio : 0;
-  }
-
   if (trustLabel === "LOW") {
-    trustLabel = trustLabelFromSignals({
+    trustLabel = derivedTrustLabel({
       integrityIndex,
       correlationRatio,
-      observedShare
+      observedShare: evidenceCoverage?.observedShare ?? null
     });
   }
 
@@ -827,12 +738,11 @@ export async function collectAuditBinderData(params: {
   if (runCount < params.policy.auditPolicy.gates.minRunsForStrongClaims) {
     strongClaimFailures.push(`MIN_RUNS_NOT_MET:${runCount}<${params.policy.auditPolicy.gates.minRunsForStrongClaims}`);
   }
-  if (integrityIndex < params.policy.auditPolicy.gates.minIntegrityIndexForStrongClaims) {
-    strongClaimFailures.push("MIN_INTEGRITY_NOT_MET");
-  }
-  if (correlationRatio < params.policy.auditPolicy.gates.minCorrelationRatioForStrongClaims) {
-    strongClaimFailures.push("MIN_CORRELATION_NOT_MET");
-  }
+  const auditGates = params.policy.auditPolicy.gates;
+  if (integrityIndex === null) { if (auditGates.minIntegrityIndexForStrongClaims > 0) strongClaimFailures.push("MIN_INTEGRITY_NOT_MEASURED"); }
+  else if (integrityIndex < auditGates.minIntegrityIndexForStrongClaims) strongClaimFailures.push("MIN_INTEGRITY_NOT_MET");
+  if (correlationRatio === null) { if (auditGates.minCorrelationRatioForStrongClaims > 0) strongClaimFailures.push("MIN_CORRELATION_NOT_MEASURED"); }
+  else if (correlationRatio < auditGates.minCorrelationRatioForStrongClaims) strongClaimFailures.push("MIN_CORRELATION_NOT_MET");
 
   const maturityStatus =
     maturityOverall === null || strongClaimFailures.length > 0
@@ -891,7 +801,7 @@ export async function collectAuditBinderData(params: {
 
   const tuning = (() => {
     try {
-      return loadMechanicTuning(params.workspace).mechanicTuning.knobs;
+      return (readOnly ? readAuditMechanicTuning(params.workspace) : loadMechanicTuning(params.workspace)).mechanicTuning.knobs;
     } catch {
       return null;
     }
@@ -1008,21 +918,14 @@ export async function collectAuditBinderData(params: {
       idHash: truncateHash(scopeHashInput, params.policy.auditPolicy.privacy.hashTruncBytes)
     },
     trust: {
-      integrityIndex: Number(integrityIndex.toFixed(6)),
-      correlationRatio: Number(correlationRatio.toFixed(6)),
+      integrityIndex,
+      correlationRatio,
       trustLabel,
-      evidenceCoverage: {
-        observedShare: Number(observedShare.toFixed(6)),
-        attestedShare: Number(attestedShare.toFixed(6)),
-        selfReportedShare: Number(selfReportedShare.toFixed(6))
-      },
+      evidenceCoverage,
       notary: {
         enabled: trust.trust.mode === "NOTARY",
-        fingerprint: trust.trust.mode === "NOTARY" ? notary?.currentFingerprint ?? trust.trust.notary.pinnedPubkeyFingerprint : null,
-        attestationAgeMinutes:
-          trust.trust.mode === "NOTARY" && Number.isFinite(Number(notary?.lastAttestationTs ?? NaN))
-            ? Number((((nowTs - Number(notary?.lastAttestationTs ?? nowTs)) / 60_000).toFixed(3)))
-            : null
+        fingerprint: trust.trust.mode === "NOTARY" ? trust.trust.notary.pinnedPubkeyFingerprint : null,
+        attestationAgeMinutes: null
       }
     },
     bindings: {
@@ -1120,7 +1023,7 @@ export async function collectAuditBinderData(params: {
       recurrence: {
         diagnosticCadence: {
           configuredHours: tuning?.diagnosticCadenceHours ?? null,
-          lastRunTs: scope.type === "AGENT" ? (findLatestAgentRunId(params.workspace, scope.id) ? loadRunReport(params.workspace, findLatestAgentRunId(params.workspace, scope.id)!, scope.id).ts : null) : (loadLatestOrgScorecard(params.workspace)?.computedAt ?? null),
+          lastRunTs: scope.type === "AGENT" ? (latestTrustedRun(params.workspace, scope.id).run?.ts ?? null) : (loadLatestOrgScorecard(params.workspace)?.computedAt ?? null),
           nextRunTs: tuning?.diagnosticCadenceHours && maturityOverall !== null
             ? nowTs + tuning.diagnosticCadenceHours * 60 * 60 * 1000
             : null,
@@ -1161,5 +1064,22 @@ export async function collectAuditBinderData(params: {
     }
   });
 
-  return { binder, includedEventKinds, calculationManifest, sourceEventHashes, conformanceFiles: conformance.files };
+  return { binder, includedEventKinds, calculationManifest, sourceEventHashes, conformanceFiles: conformance.files, selectedWindowEvents };
+}
+
+/** One actual remote health observation; it is never repeated by a final negative callback. */
+export async function completeAuditBinderCollection(local: ReturnType<typeof collectAuditBinderLocalData>, workspace: string): Promise<BinderCollectResult> {
+  const notary = await checkNotaryTrust(workspace).catch(() => null);
+  const collected: BinderCollectResult = { binder: local.binder, includedEventKinds: local.includedEventKinds, calculationManifest: local.calculationManifest,
+    sourceEventHashes: local.sourceEventHashes, conformanceFiles: local.conformanceFiles };
+  if (collected.binder.trust.notary.enabled) collected.binder.trust.notary = {
+    enabled: true, fingerprint: notary?.currentFingerprint ?? collected.binder.trust.notary.fingerprint,
+    attestationAgeMinutes: Number.isFinite(Number(notary?.lastAttestationTs ?? NaN))
+      ? Number(((collected.binder.generatedTs - Number(notary?.lastAttestationTs ?? collected.binder.generatedTs)) / 60_000).toFixed(3)) : null
+  };
+  return collected;
+}
+
+export async function collectAuditBinderData(params: AuditBinderCollectionInput): Promise<BinderCollectResult> {
+  return completeAuditBinderCollection(collectAuditBinderLocalData(params), params.workspace);
 }

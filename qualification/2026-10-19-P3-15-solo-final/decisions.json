@@ -1,0 +1,47 @@
+{
+  "item": "P3-15",
+  "support": "experimental",
+  "review": "pending",
+  "promotion": "none",
+  "legalReview": null,
+  "experts": {
+    "studentPrivacyCounsel": null,
+    "accessibilitySpecialist": null
+  },
+  "manualWcagAssessor": null,
+  "partner": null,
+  "sidPromotionApproval": null,
+  "thirdPartyContact": false,
+  "sourceReadsThisItem": false,
+  "unverifiedInstrumentCandidates": 15,
+  "missingDependency": "P2-27 two-institution FERPA executed fixture; all 3 export scenarios remain not_evaluated",
+  "otherOpenItems": [
+    "primary/legal/domain/risk review",
+    "manual criterion-level WCAG assessment",
+    "P1-29 partner",
+    "funded stewardship",
+    "D-04 licence",
+    "Sid promotion"
+  ],
+  "tddAndHistory": {
+    "compositionRed": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/composition-red/command.json",
+      "sha256": "2fc3f8ff6c833381cb238473719f6397702a0f64ac982b41cec4e63f82d47f5f",
+      "bytes": 2629
+    },
+    "mistakenGovAbsenceExpectationRetained": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/composition-green/command.json",
+      "sha256": "1ede8556f7ea05c5255fbcb9764f77659206619940ea744f00bfa5aa7cf82af1",
+      "bytes": 3401
+    },
+    "correctedCompositionGreen": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/solo-20261019/composition-green-v2/command.json",
+      "sha256": "5850cec21b444e4ea7b0c574e978fbecb2730f463c9ecfaaa38054e078d2ef3f",
+      "bytes": 3406
+    },
+    "existingGuardCoverage": "Five new cases test existing guards: initial GREEN, then intended mutation RED. No new-feature RED claim.",
+    "oldReceipt": "qualification/2026-10-19-P3-15/receipt.json remains byte-identical at original a625 source.",
+    "oldMutationMetadata": "Historical top initialGreenReportSha256 names the broader formal report; nested isolated report ref remains authoritative. Original packet already discloses this and is unchanged. The current22-run binds actual standalone initial report."
+  },
+  "scope": "Local macOS arm64, not CI. No src/domains, compiler/schema/loader/validate, reserved path, deletion, production wiring, legal approval, push or publication."
+}

@@ -1,0 +1,603 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 10808,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/verifyTimestamp.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts"
+  ],
+  "testCount": 47,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "353594614",
+      "name": "tests/time/verifyTimestamp.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/verifyTimestamp.test.ts",
+      "state": "pass",
+      "hooks": {
+        "beforeAll": "pass",
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_0",
+      "name": "tests/time/verifyTimestamp.test.ts verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+      "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_1",
+      "name": "tests/time/verifyTimestamp.test.ts verifies the granted response and returns its exact signed CMS token bytes",
+      "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_2",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a different expected digest for the unchanged genuine signed token",
+      "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_3",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a different expected nonce for the unchanged genuine signed token",
+      "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_4",
+      "name": "tests/time/verifyTimestamp.test.ts refuses the independently located signed-attribute corruption",
+      "fullName": "refuses the independently located signed-attribute corruption",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_5",
+      "name": "tests/time/verifyTimestamp.test.ts refuses the genuine token under a different real root with the same permitted policy",
+      "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_6",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a policy excluded by the correctly pinned real root",
+      "fullName": "refuses a policy excluded by the correctly pinned real root",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_7",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a genuinely signed TSA certificate without an EKU extension",
+      "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_8",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+      "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_9",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+      "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_10",
+      "name": "tests/time/verifyTimestamp.test.ts refuses explicit rejection status before requiring a timestamp token",
+      "fullName": "refuses explicit rejection status before requiring a timestamp token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_11",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a truncated copy of the genuine token",
+      "fullName": "refuses a truncated copy of the genuine token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_12",
+      "name": "tests/time/verifyTimestamp.test.ts refuses 65537 bytes at the token size boundary before DER parsing",
+      "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_13",
+      "name": "tests/time/verifyTimestamp.test.ts keeps claimed time separate from the genuine attested upper bound",
+      "fullName": "keeps claimed time separate from the genuine attested upper bound",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_14",
+      "name": "tests/time/verifyTimestamp.test.ts keeps an artifact without a timestamp at claimed time",
+      "fullName": "keeps an artifact without a timestamp at claimed time",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_15",
+      "name": "tests/time/verifyTimestamp.test.ts reports an untrusted TSA as a warning while the artifact time stays claimed",
+      "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_16",
+      "name": "tests/time/verifyTimestamp.test.ts reports a broken supplied token as an artifact integrity error",
+      "fullName": "reports a broken supplied token as an artifact integrity error",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-879314786",
+      "name": "tests/trust/trustList.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-879314786_0",
+      "name": "tests/trust/trustList.test.ts signed trust lists",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_0",
+      "name": "tests/trust/trustList.test.ts signed trust lists a list signed by a pinned root parses, with the spec's signed bytes",
+      "fullName": "signed trust lists a list signed by a pinned root parses, with the spec's signed bytes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_1",
+      "name": "tests/trust/trustList.test.ts signed trust lists a list signed by an unpinned root gives TRUST_LIST_SIGNATURE_INVALID",
+      "fullName": "signed trust lists a list signed by an unpinned root gives TRUST_LIST_SIGNATURE_INVALID",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_2",
+      "name": "tests/trust/trustList.test.ts signed trust lists a purpose added after signing invalidates the list",
+      "fullName": "signed trust lists a purpose added after signing invalidates the list",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_3",
+      "name": "tests/trust/trustList.test.ts signed trust lists a signature whose public key does not hash to its key id is refused",
+      "fullName": "signed trust lists a signature whose public key does not hash to its key id is refused",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_4",
+      "name": "tests/trust/trustList.test.ts signed trust lists an expired list gives TRUST_LIST_EXPIRED",
+      "fullName": "signed trust lists an expired list gives TRUST_LIST_EXPIRED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_5",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses duplicate key id",
+      "fullName": "signed trust lists refuses duplicate key id",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_6",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses empty purposes",
+      "fullName": "signed trust lists refuses empty purposes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_7",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses duplicate purposes",
+      "fullName": "signed trust lists refuses duplicate purposes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_8",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses revokedAt without a reason",
+      "fullName": "signed trust lists refuses revokedAt without a reason",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_9",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses validTo not after validFrom",
+      "fullName": "signed trust lists refuses validTo not after validFrom",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_10",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a PEM whose sha256 is not the key id",
+      "fullName": "signed trust lists refuses a PEM whose sha256 is not the key id",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_11",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an RSA key",
+      "fullName": "signed trust lists refuses an RSA key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_12",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a private key in place of the public key",
+      "fullName": "signed trust lists refuses a private key in place of the public key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_13",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a non-canonical (CRLF) PEM",
+      "fullName": "signed trust lists refuses a non-canonical (CRLF) PEM",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_14",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an unknown entry field",
+      "fullName": "signed trust lists refuses an unknown entry field",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_15",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an unknown list field",
+      "fullName": "signed trust lists refuses an unknown list field",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_16",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a non-UTC time",
+      "fullName": "signed trust lists refuses a non-UTC time",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_17",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an evidence-authority key without authority",
+      "fullName": "signed trust lists refuses an evidence-authority key without authority",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_18",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a bad list id",
+      "fullName": "signed trust lists refuses a bad list id",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_19",
+      "name": "tests/trust/trustList.test.ts signed trust lists accepts an evidence-authority key that carries its authority, and a dated revocation with a reason",
+      "fullName": "signed trust lists accepts an evidence-authority key that carries its authority, and a dated revocation with a reason",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_20",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an unknown signature field",
+      "fullName": "signed trust lists refuses an unknown signature field",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_0_21",
+      "name": "tests/trust/trustList.test.ts signed trust lists accepts 4,096 distinct entries and refuses 4,097 on the size limit",
+      "fullName": "signed trust lists accepts 4,096 distinct entries and refuses 4,097 on the size limit",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-879314786_1",
+      "name": "tests/trust/trustList.test.ts trust-list files",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_1_0",
+      "name": "tests/trust/trustList.test.ts trust-list files a reordered JSON file still verifies",
+      "fullName": "trust-list files a reordered JSON file still verifies",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_1_1",
+      "name": "tests/trust/trustList.test.ts trust-list files refuses a __proto__ field at any level, which a parsed object would otherwise drop",
+      "fullName": "trust-list files refuses a __proto__ field at any level, which a parsed object would otherwise drop",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-879314786_1_2",
+      "name": "tests/trust/trustList.test.ts trust-list files refuses files over 1 MiB and symlinks",
+      "fullName": "trust-list files refuses files over 1 MiB and symlinks",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "596330972",
+      "name": "tests/trust/verifierReport.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "596330972_0",
+      "name": "tests/trust/verifierReport.test.ts VerifierReportV1",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "596330972_0_0",
+      "name": "tests/trust/verifierReport.test.ts VerifierReportV1 trusts only intact artifacts whose every signature is admitted, and leaves P1-06 dimensions not evaluated",
+      "fullName": "VerifierReportV1 trusts only intact artifacts whose every signature is admitted, and leaves P1-06 dimensions not evaluated",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "596330972_0_1",
+      "name": "tests/trust/verifierReport.test.ts VerifierReportV1 is untrusted on integrity errors, refused or missing signatures, and unanchored ledgers",
+      "fullName": "VerifierReportV1 is untrusted on integrity errors, refused or missing signatures, and unanchored ledgers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "596330972_0_2",
+      "name": "tests/trust/verifierReport.test.ts VerifierReportV1 records allow flags as overrides and never turns them into trust",
+      "fullName": "VerifierReportV1 records allow flags as overrides and never turns them into trust",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "596330972_0_3",
+      "name": "tests/trust/verifierReport.test.ts VerifierReportV1 labels workspace self-trust as a self-check",
+      "fullName": "VerifierReportV1 labels workspace self-trust as a self-check",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "596330972_0_4",
+      "name": "tests/trust/verifierReport.test.ts VerifierReportV1 parses the documented example and refuses unknown fields",
+      "fullName": "VerifierReportV1 parses the documented example and refuses unknown fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

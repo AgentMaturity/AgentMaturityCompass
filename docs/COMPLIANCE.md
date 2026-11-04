@@ -8,13 +8,13 @@ AMC compliance reports are **evidence-linked signals**, not legal certifications
   - required evidence event types with minimum OBSERVED ratio
   - required assurance pack score thresholds
   - required absence of denylisted audit events
-- Produces, per category, the five status dimensions (`dimensions`: applicability, evidence, result, enforcement, review), a derived `claimKind`, the `admitted` and `rejected` evidence refs with reasons, `notEvaluatedReasons`, and `result` and `evidence` copied from the dimensions. The decision table is in [catalog/CONTROL_RECORD.md](catalog/CONTROL_RECORD.md#status-dimensions).
+- Produces, per category, the five status dimensions (`dimensions`: applicability, evidence, result, enforcement, review), a derived `claimKind`, the `admitted` and `rejected` evidence refs with reasons, `notEvaluatedReasons`, and `result` and `evidence` copied from the dimensions. The decision table is in [catalog/CONTROL_RECORD.md](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/docs/catalog/CONTROL_RECORD.md#status-dimensions).
 - Keeps a derived `status` for one more minor release: `SATISFIED` (result `pass`), `MISSING` (`fail`) or `NOT_EVALUATED` (`not_evaluated`). It never emits `PARTIAL` or `UNKNOWN`; those appear only in reports written by earlier versions.
 - Includes exact evidence references (event IDs/hashes, run context) and a "what to collect next" checklist.
 
 ## Evidence Binding and Not Evaluated
 Each requirement runs through the catalog evidence evaluator (`evaluateControl`, P1-11). A record counts only when all of these hold; otherwise it is rejected with a reason and the requirement is **not evaluated**, never a pass:
-- **Verified in the same read.** Ledger records count only when the whole hash chain verifies and its head carries the workspace monitor-key signature; binding fields are read from the bytes the chain covers, and a record whose receipt does not verify, or commits to another record, is rejected. The monitor key is the workspace's own, so this is a local audit trail, not a portable verdict.
+- **Verified in the same read.** Ledger records count only when the whole hash chain verifies and its head carries the workspace monitor-key signature; binding fields are read from the bytes the chain covers, and a record whose receipt does not verify, or commits to another record, is rejected. The monitor key is the workspace's own, so this is a local audit trail, not a portable verdict. Every report re-verifies the whole chain from its bytes: a cached verified head would not notice an earlier row whose bytes changed while its stored hash did not.
 - **Bound to the control.** The event's `meta.controlIds` names the mapping id (for example `"controlIds": ["nist_map"]`), or the event is an `audit` whose audit type is listed in the requirement's optional `auditTypes`. An event of a listed type that names no control is coincidental and counts for nothing.
 - **Belongs to the subject.** `meta.agentId` must equal the reported agent; an event without an agent id belongs to nobody (it is not credited to `default`). Workspace `system` session events (diagnostic findings) count as positive evidence only for a mapping with `binding: { scope: workspace }`; for the default agent scope they can only fail a control.
 - **Comes from an admitted producer.** Only AMC runtime evidence is admitted. Events whose `meta.source` marks them as imported (`eval_import`, `import`, `watch`, `attested_ingest`, chat exports), manual (`manual`, `operator`, `feedback.ingest`), external (`webhook`) or synthetic (`dogfood-maturity`, `meta.provenance: dogfood`, `meta.claimKind: synthetic_example`) leave the requirement not evaluated with evidence `untrusted`. Too few OBSERVED events for `minObservedRatio` is also `untrusted`.
@@ -30,7 +30,7 @@ Per category: any failed requirement fails it (`MISSING`); a pass needs every re
 
 Applicability: no compiled plan records yet whether a control applies to this deployment (P1-10), so applicability is `unresolved` and a category with sufficient evidence is still `NOT_EVALUATED`. Only a failure is evaluated until then.
 
-Coverage: only a pass earns credit; `PARTIAL` and `UNKNOWN` earn nothing, and `NOT_EVALUATED` earns 0 and stays in the denominator. `coverage.score` is `null` when no category was evaluated, and the CLI prints `Coverage: not evaluated (0 of N categories passed or failed)`. A report is evidence of conformity, not a certification.
+Coverage: only an observed or independently reviewed pass earns credit (a self-reported pass counts as not evaluated); `PARTIAL` and `UNKNOWN` earn nothing, and `NOT_EVALUATED` earns 0 and stays in the denominator. `coverage.score` is `null` when no category was evaluated, and the CLI prints `Coverage: not evaluated (0 of N categories passed or failed)`. A report is evidence of conformity, not a certification.
 
 ## Built-in Framework Families
 - `SOC2` (Trust Services categories)

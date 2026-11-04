@@ -1,0 +1,5 @@
+{"scan":"dead-code","baseline":2704,"current":2721,"new":2,"stale":0,"accepted":15}
+new dead-code finding 43b101117e5f1e1994bf190dff180290f6c59d79d2fb5bd33e82cfa855032792: tests/catalog/stations/technology/markingVerifier.ts exports {"name":"verifyMarking"}
+new dead-code finding 62e776a6d2e411068f09a49b7534d35642b478b5bba18a753d29d209b9d22f19: tests/catalog/stations/technology/harness.ts exports {"name":"catalog"}
+Fix each new finding, or accept one: npm run quality:baseline -- dead-code --accept <id> --reason "<why, 20+ characters>"
+No source-quality baseline at origin/main (merge-base ebfa106dc45a): one-time bootstrap, base check skipped

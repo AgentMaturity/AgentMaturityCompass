@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-16T22:22:02.845601+00:00",
+  "operation": "Read-only stdlib source review metadata comparison",
+  "error": "KeyError: beforePrivateCopy",
+  "cause": "The fallback count proposal has a different private-before field name from the preceding client proposal; no source checker or product ran.",
+  "completedBeforeStop": "Read-only current head/parent/status/index/committed range whitespace and eleven committed blob comparisons; count comparison stopped before using that row.",
+  "sourceIndexQaWrites": false,
+  "productOrHelperExecution": false,
+  "correction": "Read the actual proposal schema and continue with its exact private-before pin field."
+}

@@ -1,0 +1,458 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "capturedUtc": "2026-10-15T06:33:00.496773+00:00",
+  "scope": "Independent static review of root-selected C1,C2,L1 exact source recipes; no execution or plan modification.",
+  "decision": "NO_BLOCKING_RECIPE_FINDINGS_WITH_EXPLICIT_SCOPE_LIMITS",
+  "findings": [],
+  "blockingFindings": [],
+  "plan": {
+    "path": "/private/tmp/p0-11-causal-readonly-plan-20261015.json",
+    "bytes": 47054,
+    "sha256": "154463c7ef958626a2fc7c2426343abd5184fddf8b754c9088ff07abbbd2e1b3"
+  },
+  "planMarkdown": {
+    "path": "/private/tmp/p0-11-causal-readonly-plan-20261015.md",
+    "bytes": 6006,
+    "sha256": "a9ea642e4c93d5ff55d1fc9de149b107949596d7786487c0c0d5d99c9a46d159"
+  },
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+    "currentHead": "fa3c3e5554f8a4013fb50cc373a4b5d644e6924e",
+    "planInspectedSource": "2024f25c79973987b44a4a1298488d55ee0d6227",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "mappedDirectPinsChecked": 38,
+    "allMappedPinsMatch": true
+  },
+  "selectedControls": [
+    {
+      "id": "C1-map-missing-path-fail-open",
+      "target": "scripts/check-threat-model.mjs",
+      "currentTarget": {
+        "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/check-threat-model.mjs",
+        "bytes": 3560,
+        "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b"
+      },
+      "anchorOccurrences": 1,
+      "find": "      if (!existsSync(file)) {\n        errors.push(`channel ${channel.id}: ${path} does not exist`);\n        continue;\n      }",
+      "replace": "      if (!existsSync(file)) {\n        continue;\n      }",
+      "proposedBytes": 3490,
+      "proposedSha256": "363ba9d901a0075c74705f13bc0d73efbb8a60d3f9cd506b6d1d281324a3d4f9",
+      "matchesFrozenPlan": true,
+      "corpus": {
+        "files": [
+          "tests/threatModelMap.test.ts"
+        ],
+        "staticDefinitions": 7
+      },
+      "mutantWritten": false
+    },
+    {
+      "id": "C2-tool-recorder-error-propagates",
+      "target": "src/tools/toolPipeline.ts",
+      "currentTarget": {
+        "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+        "bytes": 29435,
+        "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794"
+      },
+      "anchorOccurrences": 1,
+      "find": "      } catch {\n        // The guarantee belongs HERE, not to each recorder.",
+      "replace": "      } catch (error) {\n        throw error;\n        // The guarantee belongs HERE, not to each recorder.",
+      "proposedBytes": 29464,
+      "proposedSha256": "3a7f58aae191b877cea66f308648c0a330ad46c56259135dc14bf5828929eea0",
+      "matchesFrozenPlan": true,
+      "corpus": {
+        "files": [
+          "tests/toolEvidenceRecording.test.ts"
+        ],
+        "staticDefinitions": 7
+      },
+      "mutantWritten": false
+    },
+    {
+      "id": "L1-optional-historical-literal-whole-branch-removal",
+      "target": "scripts/check-threat-model.mjs",
+      "currentTarget": {
+        "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/check-threat-model.mjs",
+        "bytes": 3560,
+        "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b"
+      },
+      "anchorOccurrences": 1,
+      "find": "      if (!existsSync(file)) {\n        errors.push(`channel ${channel.id}: ${path} does not exist`);\n        continue;\n      }",
+      "replace": "",
+      "proposedBytes": 3434,
+      "proposedSha256": "c843f26336d00d65286202d0f56102ceee75ced5d0cc7048bbbd196b241e8ccc",
+      "matchesFrozenPlan": true,
+      "corpus": {
+        "files": [
+          "tests/threatModelMap.test.ts"
+        ],
+        "staticDefinitions": 7
+      },
+      "mutantWritten": false
+    }
+  ],
+  "selectedOrder": [
+    "C1-map-missing-path-fail-open",
+    "C2-tool-recorder-error-propagates",
+    "L1-optional-historical-literal-whole-branch-removal"
+  ],
+  "optionalInnerControlSelected": false,
+  "meaningAndMasking": {
+    "C1": {
+      "source": "scripts/check-threat-model.mjs:55-58",
+      "expectedFirstAssertion": "tests/threatModelMap.test.ts:29",
+      "maskedIfFirstFails": [
+        "tests/threatModelMap.test.ts:30",
+        "tests/threatModelMap.test.ts:31"
+      ],
+      "meaning": "Potential invalid-reference status0 admission; actual full BMR decides.",
+      "notEstablished": "Channel enforcement behavior or unrecorded later assertions."
+    },
+    "L1": {
+      "source": "scripts/check-threat-model.mjs:55-59,75-82",
+      "expectedStatus": "Invalid fixture remains status1 via caught ENOENT.",
+      "expectedFirstChangedDiagnosticAssertion": "tests/threatModelMap.test.ts:30",
+      "maskedLater": "tests/threatModelMap.test.ts:31",
+      "meaning": "Historical literal observer is separate from semantic C1; no inferred fail-open.",
+      "strictSpecCriterion": "RecoveredP011spec100 requires missing-path fixture pass after removal; retain gap unless actual evidence establishes that behavior."
+    },
+    "C2": {
+      "source": "src/tools/toolPipeline.ts:305-331",
+      "originalNamedCase": "returns the tool's real outcome when the recorder throws",
+      "originalCallback": "tests/toolEvidenceRecording.test.ts:200-202",
+      "await": "tests/toolEvidenceRecording.test.ts:206",
+      "exactOriginalErrorName": "Error",
+      "exactOriginalErrorMessage": "the evidence store is unreachable",
+      "maskedIfAwaitRejects": [
+        "tests/toolEvidenceRecording.test.ts:210",
+        "tests/toolEvidenceRecording.test.ts:211",
+        "tests/toolEvidenceRecording.test.ts:212",
+        "tests/toolEvidenceRecording.test.ts:213"
+      ],
+      "futureClassificationGate": "Only C2 mutant namedcase with exact callback error/frame and matching serialized raw/observer source evidence after normal fixture/hooks/process completion; do not admit arbitrary Error.",
+      "stackLimit": "Same-object rethrow preserves original creation stack; newly inserted throw frame is not guaranteed.",
+      "notEstablished": "Real durable-store outage, policy denial, journaled-effect failure or independent signed-store evidence."
+    }
+  },
+  "telemetryPrecision": {
+    "writeBeforeQueue": "src/ledger/ledger.ts:623-651",
+    "transactionHelper": {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/ledger/ledgerSessionTransactions.ts",
+      "bytes": 3032,
+      "sha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72"
+    },
+    "nestedTransactionLimit": "ledgerSessionTransactions.ts:9 uses savepoint when db.inTransaction; only nonnested path commits at12. No universal outer-commit/crash-durability claim.",
+    "outerMask": "src/tools/toolPipeline.ts:305-331 can preserve call outcome after recorder failure.",
+    "fixtureLimits": "Originaltelemetry2 mocks record or fetch and reads via second SQLite connection while writer open; initialization precedes spies; inherited endpoint/env boundary remains."
+  },
+  "preservationContract": [
+    "Full original map7 forC1 andL1; full original recording7 forC2, without filters/skips/adapters.",
+    "Original config/global/per-file guards,30s timeout, fixtures/helpers/cleanup preserved.",
+    "MJS checker child uses actual process.execPath and module-relative root; source-only target, no dist/compile adaptation.",
+    "Actual BMR, raw errors/process/late/hook state and exact restoration must later be retained; no predicted failure totals are results.",
+    "Primarymap7+telemetry2, preview5 and recording7 baselines remain separate.",
+    "No equivalence, hidden setup-kill or restored-live-target inference."
+  ],
+  "sourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/security/THREAT_MODEL.md",
+      "bytes": 49246,
+      "sha256": "816600297a6dbc51487b993172ccd3b7ac920593582baba53c5d35f6873398fa",
+      "relativePath": "docs/security/THREAT_MODEL.md",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/security/channel-map.json",
+      "bytes": 20174,
+      "sha256": "261c15667a63b6a815dba312e6f2dce0d0d1b01cf02d1b282a33d060070d449e",
+      "relativePath": "docs/security/channel-map.json",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/security/channel-map.schema.json",
+      "bytes": 2669,
+      "sha256": "6d11b2bf91471c4da936d793e686d755f147d444bed09600994c5a2d8c7cce42",
+      "relativePath": "docs/security/channel-map.schema.json",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/THREAT_MODEL.md",
+      "bytes": 403,
+      "sha256": "9172c2a1e3c9b25eced0fb70972658158ea658f5090936f3b681e1f8dbaa40d3",
+      "relativePath": "docs/THREAT_MODEL.md",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/archive/THREAT_MODEL-2026-02.md",
+      "bytes": 2943,
+      "sha256": "6449f0bc83aa43fed09986238fc2c98757c5f0667d8ac1db29667a1ca762de28",
+      "relativePath": "docs/archive/THREAT_MODEL-2026-02.md",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/HARDENING.md",
+      "bytes": 1598,
+      "sha256": "7ac55a463b818f70d415472e900cdc992ff22e907310d152ac53499296530d6a",
+      "relativePath": "docs/HARDENING.md",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/READING_ORDER.md",
+      "bytes": 15006,
+      "sha256": "9348552e0dbba4aba2c5075970943231298f5f87c86dacdae1787b9c99002b1c",
+      "relativePath": "docs/READING_ORDER.md",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/SECURITY_COMPLIANCE_QUICKSTART.md",
+      "bytes": 873,
+      "sha256": "fbf932970bfb250de91121430ff8903b28787d609977119f5cbedac85130c298",
+      "relativePath": "docs/SECURITY_COMPLIANCE_QUICKSTART.md",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/check-threat-model.mjs",
+      "bytes": 3560,
+      "sha256": "e1e74e7d7cd426e84120fd4d0b937f26c89829f1f2015005c8b9cbfd985e8a4b",
+      "relativePath": "scripts/check-threat-model.mjs",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "relativePath": "package.json",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "relativePath": "pnpm-lock.yaml",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/.github/workflows/ci.yml",
+      "bytes": 14134,
+      "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6",
+      "relativePath": ".github/workflows/ci.yml",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "relativePath": "vitest.config.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 29435,
+      "sha256": "de0791037badc8d0abc62642527d87e7a6030d1d364e322c30995d187ccaf794",
+      "relativePath": "src/tools/toolPipeline.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162",
+      "relativePath": "src/tools/toolEvidence.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+      "bytes": 29046,
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546",
+      "relativePath": "src/agent/agentToolset.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "relativePath": "src/ledger/ledger.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/persistence/jsonl/jsonlSessionEventStore.ts",
+      "bytes": 18803,
+      "sha256": "0d835399a02ebb3ce8b22daee1eccfcf4864dc1533342657d39983a5d3f79a5c",
+      "relativePath": "src/persistence/jsonl/jsonlSessionEventStore.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/observability/otelExporter.ts",
+      "bytes": 29231,
+      "sha256": "8e6fee4594df8b74c87e3fa0b583888cbe1bb126195a4f49d2ddf973390a9d58",
+      "relativePath": "src/observability/otelExporter.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/observability/otelExportTransport.ts",
+      "bytes": 3282,
+      "sha256": "b47298f37f681a75c68919d8c8de0b7dfe700281ac357ab8780b1195bbfe71b3",
+      "relativePath": "src/observability/otelExportTransport.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/observability/telemetryDrops.ts",
+      "bytes": 705,
+      "sha256": "3648fb9dd42536b2822f6e97fe984c0cd103c4ee2fea05f563d0a1cfee4bbe96",
+      "relativePath": "src/observability/telemetryDrops.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/ops/otelExporter.ts",
+      "bytes": 13248,
+      "sha256": "250eb6d4ebe930eaef7f1e8df4a47ae75eddabe2ab373ba09b171aaf91cb18ab",
+      "relativePath": "src/ops/otelExporter.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4",
+      "relativePath": "src/actions/actionJournal.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "relativePath": "scripts/freeze-baseline.json",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "relativePath": "scripts/check-freeze.mjs",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/graphify-navigation.py",
+      "bytes": 23480,
+      "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "relativePath": "scripts/graphify-navigation.py",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/threatModelMap.test.ts",
+      "bytes": 3263,
+      "sha256": "47741b152a40bdfd164fa8b5708d243c530248043e2d3fd4fa1c7a380c046d30",
+      "relativePath": "tests/threatModelMap.test.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/telemetryExporterFailure.test.ts",
+      "bytes": 4746,
+      "sha256": "fcf694842227d513eaf52e2c62c57910ccbb332e420cf82f38a57bc29d836e16",
+      "relativePath": "tests/telemetryExporterFailure.test.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/observabilityOtelExporter.test.ts",
+      "bytes": 5975,
+      "sha256": "4bab25e8a2d72c4c9c2d703a45434a15b5f5005c89aa8d7f1e5f6287568986d4",
+      "relativePath": "tests/observabilityOtelExporter.test.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/toolEvidenceRecording.test.ts",
+      "bytes": 11449,
+      "sha256": "8dcbb281f950c7f0f60cf50e9b2e3c1c620db985b684b7c2005885818bc73168",
+      "relativePath": "tests/toolEvidenceRecording.test.ts",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/bad-owner.json",
+      "bytes": 867,
+      "sha256": "05a6739b2a7b881cb62e5f76cc55b4ebc190876041a48bed33a3c6a327c8150e",
+      "relativePath": "tests/fixtures/threat-model/bad-owner.json",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/missing-path.json",
+      "bytes": 869,
+      "sha256": "fd72bcc1821a8461370a3624be441e9f51ad53c0d9008f0294d2cf7e8e440f77",
+      "relativePath": "tests/fixtures/threat-model/missing-path.json",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/missing-symbol.json",
+      "bytes": 868,
+      "sha256": "012beba72e467ed34a0b56626c444864df13e19d00b04c6d21a08231675eb967",
+      "relativePath": "tests/fixtures/threat-model/missing-symbol.json",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/orphan-failure-row.json",
+      "bytes": 791,
+      "sha256": "2d6292637d403a8dbcbf43fc15213c76cf6c076b6f245ed9d6db73f7e71a049d",
+      "relativePath": "tests/fixtures/threat-model/orphan-failure-row.json",
+      "matchesFrozenPlan": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/fixtures/threat-model/valid.json",
+      "bytes": 867,
+      "sha256": "d5b5e641c830ccb5c0ca5014b5b5e44f7a324818494522694631e94bf6887661",
+      "relativePath": "tests/fixtures/threat-model/valid.json",
+      "matchesFrozenPlan": true
+    }
+  ],
+  "additionalSourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/src/ledger/ledgerSessionTransactions.ts",
+      "bytes": 3032,
+      "sha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-11.md",
+      "bytes": 16346,
+      "sha256": "ebf31f8e80615b05a449c62a0ef02da996fca57e12d770fe5226872a4ba5d4e8"
+    }
+  ],
+  "limits": [
+    "Static proposed-hash expansion only, no mutant files or runtime.",
+    "No Sid residual-risk approval or fullmap behavior/freshness/key-collision resolution.",
+    "Inherited unwaived1269duplicates/2751dead and prior formal/held/paused gaps unchanged.",
+    "Root-selected third literal diagnostic does not silently waive the old required pass-after-removal criterion."
+  ],
+  "performed": {
+    "productImportsParserAstCompileSyntaxTestBuildInstallRuntime": false,
+    "mutantClosureControllerOrSourceWrites": false,
+    "producerOrGitChanges": false,
+    "writes": "Only NEW static recipe review JSON/MD pair."
+  },
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorizationProvided": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-11-recipes-static-review-20261015.md",
+    "bytes": 5159,
+    "sha256": "8d86900942fd1dc460012bc27b75aab1d2d57633ea6aa39d90ef32ce5b40aee0"
+  }
+}

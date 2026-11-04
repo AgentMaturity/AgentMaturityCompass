@@ -4,7 +4,9 @@
  * dimensions come from the shared service in src/claims/eligibility, never from the tool.
  */
 import { claimFields, envelopeForUnboundResult, type ClaimEnvelope, type ClaimMethod } from "../claims/eligibility/index.js";
-import { loadDomainEvidence } from "../domains/domainEvidence.js";
+import { envelopeForStoredRun } from "../claims/eligibility/adapters/results.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
+import { resolveRunReport } from "../diagnostic/runReportResolution.js";
 
 export const CLAIM_KINDS_POINTER = "Claim kinds: see docs/CLAIM_KINDS.md";
 
@@ -28,8 +30,15 @@ export function unboundClaim(producer: string, method: ClaimMethod, regulated = 
   return envelopeForUnboundResult({ producer, method, regulated, now: Date.now() });
 }
 
-/** The claim of an agent's sealed diagnostic run (the latest by default), or not evaluated without one. */
+/** The canonical stored-run claim: legacy and unsealed records cannot become observed through MCP. */
 export function agentRunClaim(workspace: string, agentId: string, runId = "latest"): ClaimEnvelope {
-  return loadDomainEvidence(workspace, agentId, Date.now(), runId).envelope
-    ?? unboundClaim(`diagnostic:${agentId}`, "runtime_observation");
+  try {
+    const { report } = resolveRunReport(workspace, runId, agentId);
+    return envelopeForStoredRun(report, {
+      sealVerified: sealedRunReportVerifies(workspace, report as unknown as Record<string, unknown>),
+      now: Date.now()
+    });
+  } catch {
+    return unboundClaim(`diagnostic:${agentId}`, "runtime_observation");
+  }
 }

@@ -1,0 +1,306 @@
+{
+  "control": "P041-M1-missing-source-zero",
+  "plan": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/plan-bound.json",
+    "bytes": 32806,
+    "sha256": "9888941998eb409295712feb80bc4a3c386fbbd33fbadd89db5f6ffb57da0c20"
+  },
+  "release": {
+    "path": "/private/tmp/p0-41-causal-qualification-v2-20261015/release--P041-M1-missing-source-zero.json",
+    "bytes": 1204,
+    "sha256": "5170dfe9e45bba1769ddf43862e2507722893f6de5d30d0da8b83f6bab85b481"
+  },
+  "baseline": {
+    "classification": "passed",
+    "total": 27,
+    "passed": 27,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "failures": [],
+    "killClaim": false,
+    "formalAcceptanceClosed": false,
+    "ownedGroupAbsentByESRCH": true,
+    "cliArtifactRoot": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M1-missing-source-zero--baseline"
+  },
+  "mutant": {
+    "classification": "body-assertions-observed-awaiting-root-source-attribution",
+    "total": 27,
+    "passed": 19,
+    "failed": 8,
+    "pending": 0,
+    "todo": 0,
+    "failures": [
+      {
+        "file": "tests/p041ProgramMetricsQualification.test.ts",
+        "fullName": "P041 supplied-input and genuine local Git qualification Q2 missing evidence stays null before any status or current-value assertions",
+        "rawFailureMessages": [
+          "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:248:27\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "observerErrors": [
+          {
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "\u001b[32m- Expected:\u001b[39m\nnull\n\n\u001b[31m+ Received:\u001b[39m\n0",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:248:27\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 248,
+                "column": 27
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "file": "tests/p041ProgramMetricsQualification.test.ts",
+        "fullName": "P041 supplied-input and genuine local Git qualification Q4 absent registered report, workflow and JSON inputs remain pending",
+        "rawFailureMessages": [
+          "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:277:37\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "observerErrors": [
+          {
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "\u001b[32m- Expected:\u001b[39m\nnull\n\n\u001b[31m+ Received:\u001b[39m\n0",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:277:37\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 277,
+                "column": 37
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "file": "tests/p041ProgramMetricsQualification.test.ts",
+        "fullName": "P041 supplied-input and genuine local Git qualification Q6a an empty assertion list stays null before later nonvacuity checks",
+        "rawFailureMessages": [
+          "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:300:25\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "observerErrors": [
+          {
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "\u001b[32m- Expected:\u001b[39m\nnull\n\n\u001b[31m+ Received:\u001b[39m\n0",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:300:25\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 300,
+                "column": 25
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "file": "tests/p041ProgramMetricsQualification.test.ts",
+        "fullName": "P041 supplied-input and genuine local Git qualification Q6c duplicate matching report paths refuse rather than double count",
+        "rawFailureMessages": [
+          "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:325:54\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "observerErrors": [
+          {
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "\u001b[32m- Expected:\u001b[39m\nnull\n\n\u001b[31m+ Received:\u001b[39m\n0",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:325:54\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 325,
+                "column": 54
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "file": "tests/p041ProgramMetricsQualification.test.ts",
+        "fullName": "P041 supplied-input and genuine local Git qualification Q7b absent, unknown, conflicting and unsupported YAML jobs remain pending",
+        "rawFailureMessages": [
+          "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:355:92\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "observerErrors": [
+          {
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "\u001b[32m- Expected:\u001b[39m\nnull\n\n\u001b[31m+ Received:\u001b[39m\n0",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:355:92\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 355,
+                "column": 92
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "file": "tests/p041ProgramMetricsQualification.test.ts",
+        "fullName": "P041 supplied-input and genuine local Git qualification Q8a a dated sourced manual zero is measured while malformed provenance refuses",
+        "rawFailureMessages": [
+          "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:370:53\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "observerErrors": [
+          {
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "\u001b[32m- Expected:\u001b[39m\nnull\n\n\u001b[31m+ Received:\u001b[39m\n0",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:370:53\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 370,
+                "column": 53
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "file": "tests/p041ProgramMetricsQualification.test.ts",
+        "fullName": "P041 supplied-input and genuine local Git qualification Q8b registered JSON zero, escaped pointers, absence and malformed values stay distinct",
+        "rawFailureMessages": [
+          "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:392:92\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "observerErrors": [
+          {
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "showDiff": true,
+            "operator": "strictEqual",
+            "diff": "\u001b[32m- Expected:\u001b[39m\nnull\n\n\u001b[31m+ Received:\u001b[39m\n0",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected +0 to be null\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:392:92\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 392,
+                "column": 92
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "file": "tests/p041ProgramMetricsQualification.test.ts",
+        "fullName": "P041 supplied-input and genuine local Git qualification Q9b genuine CLI JSON returns 15 rows, declared seven and fourteen pending values",
+        "rawFailureMessages": [
+          "AssertionError: expected [] to have a length of 14 but got +0\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1389:20)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:415:65\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+        ],
+        "observerErrors": [
+          {
+            "message": "expected [] to have a length of 14 but got +0",
+            "actual": "0",
+            "expected": "14",
+            "showDiff": true,
+            "diff": "\u001b[32m- Expected\u001b[39m\n\u001b[31m+ Received\u001b[39m\n\n\u001b[32m- 14\u001b[39m\n\u001b[31m+ 0\u001b[39m",
+            "name": "AssertionError",
+            "ok": false,
+            "stack": "AssertionError: expected [] to have a length of 14 but got +0\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1389:20)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts:415:65\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+            "stacks": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 415,
+                "column": 65
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "killClaim": false,
+    "formalAcceptanceClosed": false,
+    "ownedGroupAbsentByESRCH": true,
+    "cliArtifactRoot": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M1-missing-source-zero--mutant"
+  },
+  "restored": {
+    "classification": "passed",
+    "total": 27,
+    "passed": 27,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "failures": [],
+    "killClaim": false,
+    "formalAcceptanceClosed": false,
+    "ownedGroupAbsentByESRCH": true,
+    "cliArtifactRoot": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M1-missing-source-zero--restored"
+  },
+  "restoredExactly": true,
+  "finalPreservation": {
+    "capturedUtc": "2026-10-15T07:34:53.308620+00:00",
+    "parentSourceChecked": 8574,
+    "parentCompiledChecked": 4529,
+    "privateFilesChecked": 13104,
+    "native": {
+      "bytes": 1931552,
+      "device": 16777231,
+      "inode": 538905647,
+      "mode": 493,
+      "nlink": 1,
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    "targetSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+    "privateHashMapSha256": "0bc8d1c0184e73336c30d0fd5c8198168c23848600e6766e4ab1f2c37408167b",
+    "parentDelta": [],
+    "privateUnexpectedDelta": [],
+    "externalPinDelta": [],
+    "limits": "Tracked manifest bytes and owned group only; no universal cache/network/OS/detached-descendant isolation."
+  },
+  "verdict": "body-assertion-sensitivity-awaiting-root-first-frame-and-masking-audit",
+  "killClaim": false,
+  "formalAcceptanceClosed": false,
+  "limits": [
+    "NEW fixture, not historical coverage or a program outcome measurement.",
+    "Observer precedes global teardown; actual exit/full streams checked separately.",
+    "Owned group only; detached descendants/cache/network/OS isolation not universal."
+  ]
+}

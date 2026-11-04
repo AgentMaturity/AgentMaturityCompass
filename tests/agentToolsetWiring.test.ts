@@ -2,11 +2,12 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync, existsSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { initWorkspace } from "../src/workspace.js";
+import { openLedger } from "../src/ledger/ledger.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { agentToolset, checkToolsetReadiness } from "../src/agent/agentToolset.js";
 import { defineTool } from "../src/tools/toolRegistry.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 /**
  * Phase 4, wired to the loop.
@@ -50,7 +51,11 @@ function bareWorkspace(): string {
   process.env["AMC_VAULT_PASSPHRASE"] = prior ?? PASS;
   const dir = realpathSync(mkdtempSync(join(tmpdir(), "amc-wire-")));
   dirs.push(dir);
-  initWorkspace({ workspacePath: dir, trustBoundaryMode: "isolated" });
+  initWorkspaceWithoutActionPolicy({ workspacePath: dir, trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
+  // P1-78: a toolset with no session writer records only into a session the ledger holds open.
+  const ledger = openLedger(dir);
+  ledger.startSession({ sessionId: "toolset-test-session", runtime: "amc", binaryPath: "test", binarySha256: "test" });
+  ledger.close();
   return dir;
 }
 
@@ -156,7 +161,7 @@ describe("the loop is offered the real tools", () => {
       name: "internal.only",
       actionClass: "READ_ONLY",
       description: "dispatched by other code, never by the model",
-      body: () => ({ output: "" })
+      body: () => ({ ok: true, output: "" })
     }));
 
     const names = (toolset.seam.schemas() ?? []).map((schema) => schema.name);

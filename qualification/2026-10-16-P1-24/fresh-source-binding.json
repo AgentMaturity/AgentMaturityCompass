@@ -1,0 +1,402 @@
+{
+  "schema": "p124-fresh-source-binding/1",
+  "capturedUtc": "2026-10-16T10:16:25.949091+00:00",
+  "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+  "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+  "sourceCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "status": "",
+  "corpus": [
+    "tests/importOriginals.test.ts",
+    "tests/dshSessionImport.test.ts",
+    "tests/piDurableDetection.test.ts",
+    "tests/requestFieldGuard.test.ts",
+    "tests/neutralImportMapping.test.ts",
+    "tests/piSessionImport.test.ts",
+    "tests/neutralImporter.test.ts"
+  ],
+  "corpusAndSource": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/.changeset/import-api-retention.md",
+      "bytes": 309,
+      "sha256": "1bd9e24a4bd4e79a9fb6b4a2bd06b3eaa55d900c420b42d817f5788c31ccf158",
+      "dev": 16777231,
+      "inode": 542032162,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/.changeset/import-original-bytes.md",
+      "bytes": 3273,
+      "sha256": "2659c095ef367b2470b7b9eed2d1348bb0f40a3f19f5aa0f2adf594da2cf0320",
+      "dev": 16777231,
+      "inode": 542032163,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/docs/adapters/deepseek-harness.md",
+      "bytes": 17959,
+      "sha256": "167fd518b868923c8693c6ee97b808413a029c50c0bd4e1a545a1de51a59df75",
+      "dev": 16777231,
+      "inode": 542033369,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "dev": 16777231,
+      "inode": 542034396,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "dev": 16777231,
+      "inode": 542034836,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "dev": 16777231,
+      "inode": 542036403,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/scripts/quality/coverage-baseline.json",
+      "bytes": 636550,
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+      "dev": 16777231,
+      "inode": 542036442,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "dev": 16777231,
+      "inode": 542036450,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/cli-import-commands.ts",
+      "bytes": 13369,
+      "sha256": "5d79d48e1e6389687f137c52372642aea576e9b852eada833186d98159944641",
+      "dev": 16777231,
+      "inode": 542037219,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/gateway/config.ts",
+      "bytes": 18184,
+      "sha256": "bb3df0b574acfa7030d70cebc94e2be075e3f866dfc5956088aca1d8ef17afd9",
+      "dev": 16777231,
+      "inode": 542037843,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/gateway/requestFieldGuard.ts",
+      "bytes": 10355,
+      "sha256": "e37b362e82476c298e86a2d7bb62cdca9b8dec6ef9175b562183c9a6385085c7",
+      "dev": 16777231,
+      "inode": 542037846,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/gateway/server.ts",
+      "bytes": 68401,
+      "sha256": "aa01863e5ce19eb441c2253f5f7af829c43597ed575b1affcf1699204a746cb5",
+      "dev": 16777231,
+      "inode": 542037847,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/dshSessionContract.ts",
+      "bytes": 9596,
+      "sha256": "bdfe228ee9119f60e85e8d2fb0896f9dc8ce7abed42369ca549d62e5e09a79b3",
+      "dev": 16777231,
+      "inode": 542037910,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/dshSessionImport.ts",
+      "bytes": 16054,
+      "sha256": "ede3e7e02ffa609468acc8dbcb0ad7cceb3e5ea805b77622b031304272f02ef9",
+      "dev": 16777231,
+      "inode": 542037911,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/importOriginals.ts",
+      "bytes": 8521,
+      "sha256": "e3ce0a619048f84d8f35329aac427816f5f8fdd2dd38b34f08214338c804689c",
+      "dev": 16777231,
+      "inode": 542037913,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/neutralImportMapping.ts",
+      "bytes": 16877,
+      "sha256": "1c6509f1c4088b236206db5edafe5b19bb7f239fb22319890c80bf9a9b643b76",
+      "dev": 16777231,
+      "inode": 542037914,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/neutralImporter.ts",
+      "bytes": 43554,
+      "sha256": "ada80550a503430aceb484e42fa0a9cd78d3c2f70252052aa30604caa2726479",
+      "dev": 16777231,
+      "inode": 542037916,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/piSessionImport.ts",
+      "bytes": 20249,
+      "sha256": "0dac5dd10c9355eddf192a8d3d08f41772397f7bf8acb5071e920196376b1e10",
+      "dev": 16777231,
+      "inode": 542037917,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/importers/sourceFormatError.ts",
+      "bytes": 1050,
+      "sha256": "b8db65efcd39b69a6dd411ae59bb9f408bb14ede5f041ac651ed35b2682c1a5f",
+      "dev": 16777231,
+      "inode": 542037919,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/ops/policy.ts",
+      "bytes": 6472,
+      "sha256": "cd0cee51e3207c191d74acedbed08579396a5d11c63d5c430b1384d94fe92b44",
+      "dev": 16777231,
+      "inode": 542038250,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/storage/blobs/blobEncryptor.ts",
+      "bytes": 4408,
+      "sha256": "1fbb25cd436a3d78ef9f2477a24eefb674eff96206b4d3c59a97b4dbc9cf449a",
+      "dev": 16777231,
+      "inode": 542038843,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/storage/blobs/blobKeys.ts",
+      "bytes": 9331,
+      "sha256": "621760aae5d6439e8bf25e01220ad0bd9f0c50684fc6cfda48ed05c35552dd93",
+      "dev": 16777231,
+      "inode": 542038844,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/src/storage/blobs/blobStore.ts",
+      "bytes": 12178,
+      "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277",
+      "dev": 16777231,
+      "inode": 542038846,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/credentialsGatewaySeam.test.ts",
+      "bytes": 12506,
+      "sha256": "2e5bbf4a05b1f0a00b9ee313038ca6998a88f3ac8e75ab6debddc14d6e34d81c",
+      "dev": 16777231,
+      "inode": 542039467,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+      "bytes": 10089,
+      "sha256": "4dcf540bcb3cc9376a2c68e034908672ab5098e903bc4ed3bff47304002d1e14",
+      "dev": 16777231,
+      "inode": 542039535,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/gatewayAndSupervise.test.ts",
+      "bytes": 13166,
+      "sha256": "aab9e3e8bba8161d0fe67d53bd99e7e5b5c637b800e58853a9448d298c86f825",
+      "dev": 16777231,
+      "inode": 542040450,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/gatewayCredentialIsolation.test.ts",
+      "bytes": 3492,
+      "sha256": "cc34a634861af00476de09eab77101ae66956b4ee241c2818a6ed27473f61600",
+      "dev": 16777231,
+      "inode": 542040451,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/importOriginals.test.ts",
+      "bytes": 19250,
+      "sha256": "15511fb28cff4113e8e4338386911d788db65f5a2ecb1a95debe907e7f66da3d",
+      "dev": 16777231,
+      "inode": 542040529,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/neutralImportMapping.test.ts",
+      "bytes": 12916,
+      "sha256": "9510fb35a0003e4f0049b5d2284a6bbbc00ab4584302fdd5e4bd6b6b7ecd5421",
+      "dev": 16777231,
+      "inode": 542040748,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/neutralImportReview.test.ts",
+      "bytes": 5093,
+      "sha256": "e5916a74a4b2da612306e3492d6b7ae36939dfd09fe589a1dbabcce100ba2a97",
+      "dev": 16777231,
+      "inode": 542040749,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/neutralImporter.test.ts",
+      "bytes": 16811,
+      "sha256": "99164c15364cee66ee2e33e539d7fe1b9c197816ce3f22550e4b470e01e01421",
+      "dev": 16777231,
+      "inode": 542040750,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+      "bytes": 7872,
+      "sha256": "bb39debf334997fb4ee1aa24940e38d8e58acde44474e3ae051b335de29715ce",
+      "dev": 16777231,
+      "inode": 542040820,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts",
+      "bytes": 11777,
+      "sha256": "ea613d06fe2e50ff99e35b548e47d6e6bff4feb66db463d6399bb2e7aae8b208",
+      "dev": 16777231,
+      "inode": 542040821,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImportBoundaries.test.ts",
+      "bytes": 8537,
+      "sha256": "1618865e8107a6de99ef93157562929f51085b753713fc12f224a7a19f00d692",
+      "dev": 16777231,
+      "inode": 542040822,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/requestFieldGuard.test.ts",
+      "bytes": 27011,
+      "sha256": "7c55b3d1a74ee2c27f51ed8e8e1c36cf61436478dbaf1193d2a097a6e429433a",
+      "dev": 16777231,
+      "inode": 542040927,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+      "dev": 16777231,
+      "inode": 542041031,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "dev": 16777231,
+      "inode": 542041034,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "dev": 16777231,
+      "inode": 542041035,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/storage/blobKeyNoVault.test.ts",
+      "bytes": 6986,
+      "sha256": "eee15094e3e2adddc3cf37850fa0247bf78cd0bbd7037499752b59b372839664",
+      "dev": 16777231,
+      "inode": 542041078,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "dev": 16777231,
+      "inode": 542042193,
+      "nlink": 1
+    }
+  ],
+  "nativeSource": {
+    "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 539175547,
+    "nlink": 1
+  },
+  "nativeFresh": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 542078588,
+    "nlink": 1
+  },
+  "borrowedRunner": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+  "runnerPin": {
+    "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+    "bytes": 43,
+    "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+    "dev": 16777231,
+    "inode": 539152709,
+    "nlink": 1
+  },
+  "cleanSourceCommand": {
+    "phase": "p124-clean-source",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+    "exit": 0,
+    "durationMs": 47229,
+    "startedUtc": "2026-10-16T10:12:29.743550+00:00",
+    "endedUtc": "2026-10-16T10:13:16.980622+00:00",
+    "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p124-clean-source/stdout-stderr.log",
+    "head": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+    "headAfter": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+    "ownedProcess": {
+      "pid": 33358,
+      "ownedPgid": 33358,
+      "observedPgidAfterLaunch": 33358,
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "scripts/clean-source-check.mjs",
+        "--keep"
+      ],
+      "startedUtc": "2026-10-16T10:12:29.743550+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH"
+      ]
+    },
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observed": false,
+    "artifacts": {},
+    "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+  },
+  "testTimeoutMs": 30000,
+  "fullAcceptance": false
+}

@@ -1,0 +1,57 @@
+{
+  "kind": "P1-01-unexecuted-canonical-builder-preparation",
+  "builder": {
+    "path": "/private/tmp/p1-01-build-canonical-packet-prepared-20261015.py",
+    "bytes": 14982,
+    "sha256": "9f500ed7f3f18dc1df733dc342c1a44e5a6356c6574ebb33cf9362f2143ad7ae"
+  },
+  "unexecuted": true,
+  "allPreparationReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "qualificationWrites": false,
+  "source": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+  "output": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/qualification/2026-10-15-P1-01",
+  "bindingState": "FINAL_BINDINGS=None; root must author a NEW bound version after actual completion and final review/outcome.",
+  "fixedPaths": {
+    "frozenJournal": "/private/tmp/p1-01-qualification-20261015/commands-frozen.jsonl",
+    "closedFlag": "/private/tmp/p1-01-qualification-20261015/commands-closed.json",
+    "controlResult": "/private/tmp/p1-01-source-strip-control-20261015/result.json",
+    "actualReview": "/private/tmp/p1-01-bounded-independent-actual-review-20261015.json",
+    "rootOutcome": "/private/tmp/p1-01-root-outcome-20261015.json"
+  },
+  "requiredAdditionalBindings": {
+    "privateManifests": "Pins with exactly one tracked/compiled/pages/physical/failedControlIndex role, plus any other frozen indices. Bodies excluded even below cap; tracked8751/compiled4529 hash/size/mode checked before Q writes.",
+    "curatedInputs": "Explicit frozen pins for probe/readiness/static/controller/audit-Markdown metadata root selects. All copied sources have original path/bytes/sha256 in one canonical map.",
+    "runtime": "Measured node,pnpm,os,arch strings; not guessed from packaging host.",
+    "nonzeroRootExits": "Exact final closed phase->exit map including inherited quality and failed control-attempt rows; no predicted journal length.",
+    "auditContract": "allReadsFinished true; at least one explicit blocking field, all present blocking fields empty; formalAcceptanceClosed false; source+closed-journal+successful-control hashes bound. Root outcome must also bind audit hash."
+  },
+  "scopeCounts": {
+    "primaryReceiptTests": "Only original16/16 from raw and actual identities.",
+    "separate": "38 schemas,75 parity fixtures,9 A4 record/trust JSON outside layout,3 parent Node probe modes; actual root journal length;7 successful strip-control children;3 failed literal-passthrough children. No unique-case inflation or homogenized run."
+  },
+  "failedLiteralAttempt": {
+    "root": "/private/tmp/p1-01-source-control-20261015",
+    "requiredMarkers": [
+      "ACTIVE.json",
+      "HALTED.json"
+    ],
+    "actualChildExits": [
+      0,
+      0,
+      2
+    ],
+    "noOverallResult": true,
+    "boundary": "Compilation TS2339 stopped before mutant-negative checks or restoration. Preserve source/copy/dist/index privately; copy only compact failure metadata/streams. Literal passthrough criterion remains open."
+  },
+  "selection": "B/newC/failedC top-level compact metadata plus actual per-command raw/observer/streams and child launch/result/streams. Do not recurse into product/copy/Pages/dependency/home/store/tmp/mutant-input trees. No fixture-source bodies. Every copied file <=1MiB, regular, byte-exact, no prohibited key/credential filenames or private-key marker. Large artifacts remain unsplit private refs.",
+  "writeOrder": "All planned prerequisites/selection verified before Q mkdir; nontransactional byte-exclusive output; no cleanup or retry on partial write. Receipt hashes all other generated/copied artifacts; no self-hash cycle.",
+  "preparationOnly": "No imports/parser/typecheck/compile/product runtime/Git mutation or builder execution. The first authoring heredoc failed Python parsing before any output-file open; this was metadata authoring only, not product/runtime failure. Direct patch then produced this inert builder.",
+  "remainingGaps": [
+    "Permanent tests/contracts suite absent.",
+    "Exact literal-passthrough spec control remains open.",
+    "No lifecycle/authority/truth or portable-export-hash acceptance.",
+    "No fullsuite/coverage/Node24/hostedCI/release/pack/deployedHTTP/formal dependency closure/Done.",
+    "Shared A4/index/source/paused/pending-transfer/quality boundaries unchanged."
+  ]
+}

@@ -1,0 +1,97 @@
+{
+  "kind": "amc.p206-mutations/1",
+  "commit": "7f38251c4 (mutations applied to the working tree before the commit, each restored after its run)",
+  "mutations": [
+    {
+      "id": "M1",
+      "guard": "evaluateResults: a not_run check counts as a failure",
+      "mutation": "not_run checks skipped (counted as passed)",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: 2 tests failed"
+    },
+    {
+      "id": "M2",
+      "guard": "laneStatus: only receipts for the same commit count",
+      "mutation": "receipts from any commit accepted",
+      "test": "tests/platformMatrixGenerator.test.ts",
+      "result": "killed: 'a receipt from another commit is not run' failed (the docs/PLATFORM_MATRIX.md test also failed because that file did not exist yet)"
+    },
+    {
+      "id": "M3",
+      "guard": "main: empty recovery targets exit 2",
+      "mutation": "target problems ignored",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: 1 test failed"
+    },
+    {
+      "id": "M4",
+      "guard": "laneStatus: doctor native-modules must PASS",
+      "mutation": "native-modules check ignored",
+      "test": "tests/platformMatrixGenerator.test.ts",
+      "result": "killed: native-modules test failed (plus the then-missing docs/PLATFORM_MATRIX.md test)"
+    },
+    {
+      "id": "M5",
+      "guard": "runChecks: HA-only checks are not run without --ha",
+      "mutation": "haOnly ignored",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: 1 test failed"
+    },
+    {
+      "id": "M6",
+      "guard": "networkpolicy.yaml: metrics admitted only from metrics.namespaceSelector",
+      "mutation": "namespaceSelector replaced by {} (any namespace)",
+      "test": "tests/helmChartMetrics.test.ts",
+      "result": "killed: 1 test failed"
+    },
+    {
+      "id": "R1",
+      "guard": "check-qualification-receipts.mjs skips only the reference-deployment definition folder",
+      "mutation": "red run: the new test against the pre-change checker",
+      "test": "tests/qualificationReceipts.test.ts",
+      "result": "red before the change (1 failed), green after (20 passed)"
+    },
+    {
+      "id": "M7",
+      "guard": "isRestoredPrefix: beyond the shared prefix only the restore's own BACKUP_RESTORED audit rows are allowed",
+      "mutation": "any trailing rows accepted",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: 1 test failed"
+    },
+    {
+      "id": "M8",
+      "guard": "imageUnderTest is N (--image-b)",
+      "mutation": "imageUnderTest returns N-1",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: INS-1 and BR image tests failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
+    },
+    {
+      "id": "M9",
+      "guard": "INS-1 installs N",
+      "mutation": "INS-1 installs --image-a",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: INS-1 image test failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
+    },
+    {
+      "id": "M10",
+      "guard": "BR restore pods run N",
+      "mutation": "restore pod uses --image-a",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: BR restore pod test failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
+    },
+    {
+      "id": "M11",
+      "guard": "UPG-1 runs on its own <release>-upg release",
+      "mutation": "UPG-1 on the main release",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: UPG-1 release test failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
+    },
+    {
+      "id": "M12",
+      "guard": "RB-2 continues the upgrade release",
+      "mutation": "RB-2 on the main release",
+      "test": "tests/referenceDeploymentHarness.test.ts",
+      "result": "killed: RB-2 test failed (H1/H2 fix, branch rtd/w7-p2-06-rerun)"
+    }
+  ]
+}

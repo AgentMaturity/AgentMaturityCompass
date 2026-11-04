@@ -40,6 +40,10 @@
  *   - Anything that is not an {@link LlmError}. An unclassified throw has no
  *     provider facts for a policy to read, and guessing one is how a terminal
  *     failure retries forever.
+ *   - A protected-data refusal ({@link DataFlowRefused}, P2-02). Admission
+ *     refuses at prepare, before a header exists; the refusal is recorded as a
+ *     `DATA_FLOW_REFUSED` audit row and thrown, because the same request would
+ *     be refused again.
  *
  * WHY AN UNWRITABLE `loop/retry` IS FATAL TO THE STEP. If the row cannot be
  * committed, the log cannot explain the second header that is about to appear —
@@ -48,6 +52,8 @@
  * Evidence first: AMC does not take an action it cannot record.
  */
 import { recordProviderOutage } from "../actions/actionRecovery.js";
+import { DataFlowRefused } from "../dataflow/purposePolicy.js";
+import type { PreparedCall } from "../llm/adapter/llmRuntime.js";
 import type { SettledStream } from "../llm/adapter/streamRecorder.js";
 import { isLlmError } from "../llm/llmFailure.js";
 import type { LlmFailure } from "../llm/llmFailure.js";
@@ -233,16 +239,29 @@ export async function dispatchStepRequest(
   step: number,
   signal: AbortSignal
 ): Promise<SettledStream> {
+  // Pinned once per STEP (D11): a retry re-sends on the adapter the step's first attempt pinned, so a route replaced or
+  // removed during the backoff cannot change which adapter answers this step.
+  let pinned: PreparedCall["route"] | undefined = init.route.pinned;
   for (let attempt = 1; ; attempt += 1) {
     signal.throwIfAborted();
-    const call = init.llm.prepare({
-      providerId: init.route.providerId,
-      model: init.route.model,
-      params: init.route.params,
-      systemPromptEventId: init.systemPromptEventId,
-      tools: init.tools,
-      signal
-    });
+    let call: PreparedCall;
+    try {
+      call = init.llm.prepare({
+        providerId: init.route.providerId,
+        model: init.route.model,
+        params: init.route.params,
+        systemPromptEventId: init.systemPromptEventId,
+        tools: init.tools,
+        signal,
+        ...(pinned === undefined ? {} : { pinned })
+      });
+    } catch (error: unknown) {
+      // P2-02: protected-data admission refused before any header or dispatch. A decision, not a provider failure: recorded
+      // by its code, reason and registry identifiers (never the refused content) and never retried.
+      if (error instanceof DataFlowRefused) init.session.recordProjectedEvidence({ eventType: "audit", payload: "", meta: error.evidence() });
+      throw error;
+    }
+    pinned ??= call.route;
 
     try {
       // The chunks are folded and recorded inside the seam; the loop pulls them

@@ -1,0 +1,52 @@
+{
+  "schema": "p135-static-ownership-seal/1",
+  "at": "2026-10-16T16:23:56.001520+00:00",
+  "blockers": [],
+  "registeredRoots": 170,
+  "retainedFreshRoots": 5,
+  "physicalRoots": 175,
+  "runtimeOrAcceptanceClaim": false,
+  "inputPins": 49,
+  "preparationStopsPin": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/preparation-stops.json",
+    "bytes": 1183,
+    "sha256": "167684bc5acca7d7169a85530ee98af1bb07d9c87d25bd3c9230d9847c3b2379"
+  },
+  "files": [
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/review.json",
+      "bytes": 9371,
+      "sha256": "fb40c36fdef635d5b78b1e8037831997ea2e03db4bc87d61705e5a9d51d188a5"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/README.md",
+      "bytes": 2262,
+      "sha256": "5a8a86ea99dab3bee945b5fb4f57fed2e1c4c196af078150712cd1f71eb97b90"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/pins.json",
+      "bytes": 12518,
+      "sha256": "596382738937cafdfb554d9bb9b3ad017efbabbfd0574c3dc7932c10651b8037"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/observations.json",
+      "bytes": 914012,
+      "sha256": "bb6a32fd82c87b49193b53029ca7c51238d5b69ea9cd0ad7db448cd437ce6c8f"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/preservation.json",
+      "bytes": 364967,
+      "sha256": "994ac3b95d394e62ec29430f2b4d1a5ea6e112621eb85421b574b8dcf1952375"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/production-presence-comparison.json",
+      "bytes": 244288,
+      "sha256": "9f959cca99e771aa55989097af246f09fc77b713c022ac6b476d2e71498d016e"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/ownership-audit/preparation-stops.json",
+      "bytes": 1183,
+      "sha256": "167684bc5acca7d7169a85530ee98af1bb07d9c87d25bd3c9230d9847c3b2379"
+    }
+  ]
+}

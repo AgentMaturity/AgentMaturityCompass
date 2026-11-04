@@ -216,6 +216,7 @@ export async function startFixture(options) {
           if (payeeMatch) {
             const before = payees.get(payeeMatch[1]); if (!before) fail('payee_not_found', 404);
             if (!exact(parsed, ['destinationToken']) || typeof parsed.destinationToken !== 'string' || !/^dst-[A-Za-z0-9_-]{1,100}$/.test(parsed.destinationToken)) fail('invalid_body');
+            if (before.version >= Number.MAX_SAFE_INTEGER) fail('payee_version_exhausted', 409);
             const payee = { ...before, destinationToken: parsed.destinationToken, version: before.version + 1, updatedAt: new Date().toISOString() };
             log.append('admin', { requestId, action: 'payee_update', payee }); payees.set(payee.payeeId, payee);
             return send(req, res, requestId, 200, { payee: payeeView(payee) });

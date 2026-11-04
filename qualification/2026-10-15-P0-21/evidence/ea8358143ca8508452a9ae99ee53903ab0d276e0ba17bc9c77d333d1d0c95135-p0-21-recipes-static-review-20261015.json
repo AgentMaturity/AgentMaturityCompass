@@ -1,0 +1,707 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-21",
+  "reviewKind": "Independent read-only static review of five exact recipes plus root C6 proposal",
+  "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+  "productionAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "state": "NO_BLOCKING_RECIPE_FINDINGS_RUNTIME_UNAUTHORIZED",
+  "findings": [],
+  "blockingFindings": 0,
+  "verification": {
+    "errors": [],
+    "planPin": {
+      "path": "/private/tmp/p0-21-causal-readonly-plan-v2-20261015.json",
+      "bytes": 30558,
+      "sha256": "601d76733ddd9a834baa2ceb86501d782977005d62d98c78c9183f6a6a3987f4"
+    },
+    "currentRoot": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+    "pairedInputPins": [
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/claims/eligibility/evaluate.js",
+          "bytes": 5715,
+          "sha256": "c68e95772bcb7636d61923df2b878ac169c6966222db7ce40f20bf4ab6bdd8b1"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/claims/eligibility/evaluate.js",
+          "bytes": 5715,
+          "sha256": "c68e95772bcb7636d61923df2b878ac169c6966222db7ce40f20bf4ab6bdd8b1"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/diagnostic/gates.js",
+          "bytes": 9269,
+          "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/diagnostic/gates.js",
+          "bytes": 9269,
+          "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/diagnostic/questionBank.js",
+          "bytes": 304412,
+          "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/diagnostic/questionBank.js",
+          "bytes": 304412,
+          "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/dist/score/units.js",
+          "bytes": 1194,
+          "sha256": "cdc13d44af5f897491eb71789a4aace6f46d0487f13d1709e3c88b9efeaed397"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/score/units.js",
+          "bytes": 1194,
+          "sha256": "cdc13d44af5f897491eb71789a4aace6f46d0487f13d1709e3c88b9efeaed397"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/docs/SCORING_METHODOLOGY.md",
+          "bytes": 828603,
+          "sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/docs/SCORING_METHODOLOGY.md",
+          "bytes": 828603,
+          "sha256": "c19cbb4f8afefedc79e5b73cab15463b311e1035a326251af4cdf619aa88bf80"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/package.json",
+          "bytes": 8631,
+          "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/package.json",
+          "bytes": 8631,
+          "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+          "bytes": 155432,
+          "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+          "bytes": 155432,
+          "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+          "bytes": 9946,
+          "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+          "bytes": 9946,
+          "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+          "bytes": 554,
+          "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+          "bytes": 554,
+          "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+          "bytes": 8482,
+          "sha256": "c7b666c37c3b7348164002ccb2ad21a85c16d60e92d50ec6a417436ef279c497"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+          "bytes": 8482,
+          "sha256": "c7b666c37c3b7348164002ccb2ad21a85c16d60e92d50ec6a417436ef279c497"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+          "bytes": 5777,
+          "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+          "bytes": 5777,
+          "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "bytes": 12211,
+          "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+          "bytes": 12211,
+          "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+          "bytes": 12985,
+          "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+          "bytes": 12985,
+          "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+          "bytes": 3431,
+          "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+          "bytes": 3431,
+          "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+          "bytes": 9684,
+          "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+          "bytes": 9684,
+          "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+          "bytes": 12367,
+          "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+          "bytes": 12367,
+          "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+          "bytes": 287500,
+          "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+          "bytes": 287500,
+          "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+          "bytes": 26330,
+          "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+          "bytes": 26330,
+          "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+          "bytes": 621751,
+          "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+          "bytes": 621751,
+          "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/domains/packSelfAssessment.ts",
+          "bytes": 2580,
+          "sha256": "620d7530aad40f170f7932462f479e9974b178dab1b497df4a9ff4b3f582379e"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/domains/packSelfAssessment.ts",
+          "bytes": 2580,
+          "sha256": "620d7530aad40f170f7932462f479e9974b178dab1b497df4a9ff4b3f582379e"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/score/units.ts",
+          "bytes": 2022,
+          "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/score/units.ts",
+          "bytes": 2022,
+          "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/claims/claimEligibility.test.ts",
+          "bytes": 11384,
+          "sha256": "d5afe1a4c02b488108bba0964b332ab1adab335ea66ddfd2acbaa8d3092807c4"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/claims/claimEligibility.test.ts",
+          "bytes": 11384,
+          "sha256": "d5afe1a4c02b488108bba0964b332ab1adab335ea66ddfd2acbaa8d3092807c4"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+          "bytes": 1890,
+          "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+          "bytes": 1890,
+          "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/logisticsIndustryPack.test.ts",
+          "bytes": 2360,
+          "sha256": "1cc9c645873c45848a1aaaaba2d349de9258221b200132978f191906d5130dfc"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/logisticsIndustryPack.test.ts",
+          "bytes": 2360,
+          "sha256": "1cc9c645873c45848a1aaaaba2d349de9258221b200132978f191906d5130dfc"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+          "bytes": 8422,
+          "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+          "bytes": 8422,
+          "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+          "bytes": 1934,
+          "sha256": "15a8a89ebc46ce78a164c20f99c9fdb082da5100cf4e47bf9adcec9a5cb63543"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+          "bytes": 1934,
+          "sha256": "15a8a89ebc46ce78a164c20f99c9fdb082da5100cf4e47bf9adcec9a5cb63543"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+          "bytes": 4018,
+          "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+          "bytes": 4018,
+          "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+          "bytes": 11833,
+          "sha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+          "bytes": 11833,
+          "sha256": "5905d72f1f4a446c62c9ad910111a05b2789cb64350052d455a1de8b050bdd3c"
+        }
+      },
+      {
+        "originalPlanPin": {
+          "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/vitest.config.ts",
+          "bytes": 1324,
+          "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+        },
+        "currentP021Pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/vitest.config.ts",
+          "bytes": 1324,
+          "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+        }
+      }
+    ],
+    "recipeAnchors": [
+      {
+        "id": "P021-C1-likert-origin",
+        "source": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/score/units.ts",
+            "bytes": 2022,
+            "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+          },
+          "occurrences": 1,
+          "line": 40,
+          "find": "return percent(((x - 1) / 4) * 100);",
+          "replace": "return percent((x / 5) * 100);"
+        },
+        "compiledAlternative": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/score/units.js",
+            "bytes": 1194,
+            "sha256": "cdc13d44af5f897491eb71789a4aace6f46d0487f13d1709e3c88b9efeaed397"
+          },
+          "occurrences": 1,
+          "line": 21,
+          "find": "return percent(((x - 1) / 4) * 100);",
+          "replace": "return percent((x / 5) * 100);"
+        }
+      },
+      {
+        "id": "P021-C2-L2-threshold",
+        "source": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/score/units.ts",
+            "bytes": 2022,
+            "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+          },
+          "occurrences": 1,
+          "line": 57,
+          "find": "if (p >= 30) return level(2);",
+          "replace": "if (p >= 35) return level(2);"
+        },
+        "compiledAlternative": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/score/units.js",
+            "bytes": 1194,
+            "sha256": "cdc13d44af5f897491eb71789a4aace6f46d0487f13d1709e3c88b9efeaed397"
+          },
+          "occurrences": 1,
+          "line": 38,
+          "find": "if (p >= 30)\n        return level(2);",
+          "replace": "if (p >= 35)\n        return level(2);"
+        }
+      },
+      {
+        "id": "P021-C3-numeric-self-eligible-cap",
+        "source": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+            "bytes": 5777,
+            "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0"
+          },
+          "occurrences": 1,
+          "line": 68,
+          "find": "    if (level !== null && level > 1) reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n    level = capAtOne(level);",
+          "replace": "    if (level !== null && level > 1) reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n    level = input.proposed.level;"
+        },
+        "compiledAlternative": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/claims/eligibility/evaluate.js",
+            "bytes": 5715,
+            "sha256": "c68e95772bcb7636d61923df2b878ac169c6966222db7ce40f20bf4ab6bdd8b1"
+          },
+          "occurrences": 1,
+          "line": 56,
+          "find": "            reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n        level = capAtOne(level);",
+          "replace": "            reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n        level = input.proposed.level;"
+        }
+      },
+      {
+        "id": "P021-C4-base-L3-self-tier",
+        "source": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+            "bytes": 287500,
+            "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+          },
+          "occurrences": 1,
+          "line": 152,
+          "find": ": level >= 2 // P0-21: self-reported evidence caps at L1",
+          "replace": ": level >= 2 && level !== 3 // P0-21: self-reported evidence caps at L1"
+        },
+        "compiledAlternative": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/diagnostic/questionBank.js",
+            "bytes": 304412,
+            "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f"
+          },
+          "occurrences": 1,
+          "line": 122,
+          "find": ": level >= 2 // P0-21: self-reported evidence caps at L1",
+          "replace": ": level >= 2 && level !== 3 // P0-21: self-reported evidence caps at L1"
+        }
+      },
+      {
+        "id": "P021-C5-default-gate-self-tier",
+        "source": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+            "bytes": 9684,
+            "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+          },
+          "occurrences": 1,
+          "line": 91,
+          "find": ": [\"OBSERVED\", \"ATTESTED\"]; // self-reported evidence never meets a gate that names no tiers",
+          "replace": ": [\"OBSERVED\", \"ATTESTED\", \"SELF_REPORTED\"]; // self-reported evidence never meets a gate that names no tiers"
+        },
+        "compiledAlternative": {
+          "pin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/diagnostic/gates.js",
+            "bytes": 9269,
+            "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98"
+          },
+          "occurrences": 1,
+          "line": 68,
+          "find": ": [\"OBSERVED\", \"ATTESTED\"]; // self-reported evidence never meets a gate that names no tiers",
+          "replace": ": [\"OBSERVED\", \"ATTESTED\", \"SELF_REPORTED\"]; // self-reported evidence never meets a gate that names no tiers"
+        }
+      }
+    ],
+    "C6": {
+      "source": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/domains/domainAssessmentEngine.ts",
+        "bytes": 8075,
+        "sha256": "191a628a588bdcf40fcf9897df53d06946164ffbfd227df5e6aaebb58fa10c57"
+      },
+      "edits": [
+        {
+          "find": "return likert(domainQuestionScores[question.id] ?? 1);",
+          "replace": "return (domainQuestionScores[question.id] ?? 1) as Likert1to5;",
+          "occurrences": 1,
+          "line": 69
+        },
+        {
+          "find": "const score = likertToPercent(answerFor(question, domainQuestionScores));",
+          "replace": "const raw = answerFor(question, domainQuestionScores);\n    const score = raw <= 5 ? (raw / 5) * 100 : raw;",
+          "occurrences": 1,
+          "line": 84
+        }
+      ]
+    },
+    "assertionLines": {
+      "tests/scoreUnits.test.ts": [
+        {
+          "line": 47,
+          "text": "      expect(percentToLevel(percent(p)), `percent ${p}`).toBe(expected);"
+        }
+      ],
+      "tests/domainAssessmentUnits.test.ts": [
+        {
+          "line": 23,
+          "text": "    expect(() => assessDomain(input(3, 6))).toThrow(new RangeError(\"Likert answer must be an integer 1-5, got 6\"));"
+        },
+        {
+          "line": 27,
+          "text": "    expect(() => assessDomain(input(3, 80))).toThrow(RangeError);"
+        },
+        {
+          "line": 31,
+          "text": "    expect(() => assessDomain(input(7, 3))).toThrow(new RangeError(\"Level must be an integer 0-5, got 7\"));"
+        },
+        {
+          "line": 36,
+          "text": "    expect(result.baseScore).toBe(60); // L3 -> 60%"
+        },
+        {
+          "line": 37,
+          "text": "    expect(result.domainScore).toBe(50); // Likert 3 -> 50%"
+        },
+        {
+          "line": 38,
+          "text": "    expect(result.compositeScore).toBe(56);"
+        },
+        {
+          "line": 39,
+          "text": "    expect(result.level).toBe(\"L3\"); // the one level table: 55 <= 56 < 75"
+        }
+      ],
+      "tests/selfReportedLevelCap.test.ts": [
+        {
+          "line": 42,
+          "text": "    expect(supportedLevel(evidence(\"SELF_REPORTED\"))).toBeLessThanOrEqual(1);"
+        },
+        {
+          "line": 55,
+          "text": "    expect(supportedLevel(imported)).toBe(1);"
+        },
+        {
+          "line": 56,
+          "text": "    expect(supportedLevel([...imported, ...evidence(\"SELF_REPORTED\")])).toBe(1);"
+        },
+        {
+          "line": 61,
+          "text": "    expect(supportedLevel(evidence(\"OBSERVED\"))).toBe(2);"
+        },
+        {
+          "line": 67,
+          "text": "        expect(gate.acceptedTrustTiers ?? [], `${question.id} L${gate.level}`).not.toContain(\"SELF_REPORTED\");"
+        },
+        {
+          "line": 77,
+          "text": "    expect(evaluateGate(gate, evidence(\"SELF_REPORTED\")).pass).toBe(false);"
+        },
+        {
+          "line": 78,
+          "text": "    expect(evaluateGate(gate, evidence(\"ATTESTED\")).pass).toBe(true);"
+        }
+      ],
+      "tests/scoreUnits.test.ts.conversions": [
+        {
+          "line": 35,
+          "text": "expect(likertToPercent(likert(5))).toBe(100);"
+        },
+        {
+          "line": 36,
+          "text": "expect(likertToPercent(likert(1))).toBe(0);"
+        },
+        {
+          "line": 37,
+          "text": "expect(likertToPercent(likert(3))).toBe(50);"
+        }
+      ]
+    }
+  },
+  "recipeInterpretations": [
+    {
+      "id": "P021-C1-likert-origin",
+      "staticMeaning": "The single converter formula changes validated answers1/3/5 from0/50/100 to20/60/100, retaining finite percentage validation. This is conversion-origin sensitivity, not raw6 admission or historical size normalization.",
+      "predictedFirstAssertions": "Standalone conversion5 at35 remains100; conversion1 at36 is the first mismatch. Later3/level/fraction assertions37\u201339 in that case are masked. Domain valid-units baseScore60 at36 remains; domainScore60 versus50 first mismatches37 and masks composite38/level39.",
+      "limits": "All-5 scoring alone can stay green. No assertion outcome or fail count is measured in this review."
+    },
+    {
+      "id": "P021-C2-L2-threshold",
+      "staticMeaning": "The exact30 branch moves to35. The shared one-table thresholds55/75/90 and all other conversion/validation code remain untouched.",
+      "predictedFirstAssertions": "The literal loop checks0 and29.9 before30; at47 the30 row now returnsL1 rather thanL2. Subsequent54.9/55/74.9/75/89.9/90/100 rows in that body are masked after the first failure.",
+      "limits": "This is direct boundary sensitivity. Existing domain56 and all-5100 are above35 and do not independently exercise this boundary."
+    },
+    {
+      "id": "P021-C3-numeric-self-eligible-cap",
+      "staticMeaning": "The two-line numeric-specific context is exact-once. Its cap removal leaves the separate weak-method cap, kind/incomplete-evidence treatment, regulated positive block, applicability and later evidence checks unchanged. Null proposed level remains null. Numeric all-5 input can expose eligibleLevel5 while raw score remains5/100.",
+      "predictedFirstAssertions": "Original pack loop first mismatches eligibleLevel\u22641 at noCertification78; only the first reached pack is observed before the loop aborts, masking percentage79/certified80 and later packs. Independent audit loop first mismatches101 after /3, absent-certified and self-reported checks98\u2013100; completeness102 and markdown103\u2013107 then mask. Logistics first mismatches eligibleLevel1 at54 after raw level5/percentage100; certified55 masks.",
+      "limits": "Do not call this a regulated pass or full certification leak. Other status dimensions continue to refuse a positive regulated result. Optional direct eligibility tests are outside the fixed37 corpus."
+    },
+    {
+      "id": "P021-C4-base-L3-self-tier",
+      "staticMeaning": "Only baseL3 falls through to the default SELF_REPORTED tier list; L2/L4/L5 base conditions remain. The original questionBank policy assertion67 directly sees an unoverriddenL3 array, even where levelGates adds notEvaluated.",
+      "predictedFirstAssertions": "The policy-array loop can first fail at an originalL3 gate; subsequent question/gate iterations in that case are masked. Runtime cap cases may remain green.",
+      "limits": "Mapped L2 gates rebuild accepted tiers toOBSERVED, effective provenance still filters emitters, and AMC-5.29/all current mappedL3 lists remain empty/notEvaluated. No signed self-reported row reachingL3 is established. Preserve the original OBSERVED positive exactlyL2 and all current maps/emitter/reader trust."
+    },
+    {
+      "id": "P021-C5-default-gate-self-tier",
+      "staticMeaning": "The unnamed-tier fallback alone includesSELF_REPORTED. The existing direct evaluateGate fixture has matching stdout events across sufficient sessions/days with no extra mustInclude requirements, so its helper refusal is directly sensitive.",
+      "predictedFirstAssertions": "The SELF_REPORTED false assertion77 is the first mismatch; the later ATTESTED positive78 is masked.",
+      "limits": "These are hand-shaped already-parsed typed rows. This does not prove authenticated stored provenance, real signed evidence admission or a full diagnostic higher-level promotion."
+    },
+    {
+      "id": "P021-C6-representative-historical-size-regression",
+      "staticMeaning": "Root's two exact-once edits cast answerFor without validating and reinterpret each weighted answer by raw<=5 ? raw/5*100 : raw. Both edits stay in one source file and must be classified as a two-site compound control, not an exact reconstruction of an old source file.",
+      "necessityOfBothSites": "Changing only the converter loop leaves answerFor's rejection intact. Changing only answerFor leaves the current explicit converter, which can still throw at its percent guard for raw6/80. Both edits together reach the intended bounded size regression.",
+      "predictedFirstAssertions": "Original domain raw6 and raw80 expected-throw assertions23 and27 should fail because the weighted loop admits per-answer6% and80%. These are loop inputs, not final aggregate percentages. The separate original base7 assertion31 should remain protected by unchanged averageScores/level validation. Valid3 maps to60: base60 passes36, domainScore50 fails37, and composite38/level39 mask.",
+      "limits": "C6 changes domain-engine validation/interpretation only; standalone units, other guards, maps, OBSERVEDL2 and audit/3 remain untouched. The TypeScript cast proves no runtime validity. No new raw edge, clamping, old-file equality or production fix is inferred."
+    }
+  ],
+  "fixedCorpus": {
+    "files": [
+      "tests/scoreUnits.test.ts",
+      "tests/domainAssessmentUnits.test.ts",
+      "tests/noCertificationFromSelfAssessment.test.ts",
+      "tests/selfReportedLevelCap.test.ts",
+      "tests/logisticsIndustryPack.test.ts",
+      "tests/transparencyReport.test.ts"
+    ],
+    "staticRegistrations": 37,
+    "arithmetic": "4+4+7+5+2+15; transparency has13 single it registrations plus2 explicit it.each rows.",
+    "parentReportedCurrentBaselines": "Root reports existing core37, CLI14 and consumers48 passing. This recipe-only review did not inspect their actual runtime packets or repeat them.",
+    "notCombined": "Only unchanged core37 is proposed for each private B/M/R. CLI14/consumers48 are separate observations, not added to every control's count."
+  },
+  "mandatoryPreservation": [
+    "All five source find strings and compiled alternative anchors are exact-once and pinned. Compiled alternatives are navigation/compatibility evidence only; source-mode controls must not edit dist or silently run a compiler.",
+    "C6 has exactly two explicit edits in one source file; planned mutation metadata must preserve both locations and the compound interpretation.",
+    "Original imports/tests/assertions/helpers/config/guards/deadlines, OBSERVEDL2, current maps/provenance and industry audit schema/3/signature verification stay unchanged. Private mutant imports may become unused; that is not permission to adapt original imports or build/lint the mutant.",
+    "Before runtime, root must separately review the finished controller/setup/copy/dependency/native/ACTIVE/group proof and explicitly release only the agreed scope. No partial controller, staging copy or active phase was read here.",
+    "The proposed new12474-file copy and borrowed node_modules symlink are not an independent install or OS write isolation. This review verifies no staging or cleanup receipt; those remain separate preparation scope.",
+    "Every actual baseline, first assertion, possible survivor, masking, infrastructure error, group termination and exact restoration must be retained. A nonzero exit alone is not a semantic kill; a prediction here is not execution."
+  ],
+  "scopeLimits": [
+    "No current source/test mutation, parser/import/compiler/test, native load, process signal, network, Git or product runtime occurred.",
+    "No new witness/test is needed to make these exact existing assertion paths statically reviewable. A new unsupported L3 map or provenance bypass would change another boundary and is unauthorized.",
+    "No formalDone, Node24/fullsuite/coverage/installed/hosted/release/quality-floor waiver, ownership transfer or closure of existing P0/P2/Claude/shared-source holds follows."
+  ],
+  "operations": {
+    "sourceTextJSONHashReads": true,
+    "partialControllerReads": 0,
+    "privateCopyReads": 0,
+    "productImportsOrParsers": 0,
+    "runtimeTestsOrCompiler": 0,
+    "sourceWrites": 0,
+    "network": 0,
+    "GitCommands": 0,
+    "writes": "Only this new recipe static-review pair."
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "additionalInputPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/domains/domainAssessmentEngine.ts",
+      "bytes": 8075,
+      "sha256": "191a628a588bdcf40fcf9897df53d06946164ffbfd227df5e6aaebb58fa10c57"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/score/domainPacks.ts",
+      "bytes": 38665,
+      "sha256": "4f01d76961a0db3deed76cb01c7a86d0b6cb1525566b163d42e8adf25832cbaf"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    }
+  ],
+  "capturedUtc": "2026-10-15T05:03:21.695456+00:00",
+  "allReadsFinishedUtc": "2026-10-15T05:03:21.695456+00:00"
+}

@@ -1,0 +1,260 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-41",
+  "kind": "private-static-causal-recipe-preparation",
+  "capturedUtc": "2026-10-15T07:11:14.769188+00:00",
+  "scope": "Independent source-only review of readinessQ1–Q13 and two exact single-anchor program-metrics controls. No original/new fixture was executed; active author files were not read. Only this new private pair is written.",
+  "decision": {
+    "blockingRecipeFindings": [],
+    "staticallyPlausibleControls": true,
+    "parserOrTypeVerified": false,
+    "runtimeAuthorized": false,
+    "fixtureOrSetupApproved": false,
+    "formalAcceptanceClosed": false
+  },
+  "source": {
+    "readRoot": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+    "productionCodeAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "matchesFrozenReadinessScriptPin": true,
+    "newP041RootActivationProof": "Not performed by this review; root must bind actual current source/copy/fixture/controller/setup before any future causal release."
+  },
+  "originalVsNew": {
+    "originalScript": "Unchanged23978B/e7f77e... source script; named exports CANONICAL_METRIC_IDS and computeMetrics.",
+    "historicalRequestedTest": "tests/programMetrics.test.ts absent in frozen readiness; no original corpus count established.",
+    "newFixture": "Q1–Q13 are scenario groups for the separately authored NEW private fixture. They are not13 collected tests or historical passing coverage. Actual finite registrations, full source and case identities must be frozen/reviewed separately.",
+    "authorFilesRead": false
+  },
+  "recipes": [
+    {
+      "id": "P041-M1-missing-source-zero",
+      "file": "scripts/program-metrics.mjs",
+      "find": "  return { value: null, current: `not measured (${reason}: ${metric.owner ?? \"owner not registered\"})`,\n    status: \"not_measured\", source: null, asOf: null };",
+      "replacement": "  return measured(0, \"PRIVATE MUTATION: missing source\");",
+      "occurrences": 1,
+      "findBytes": 159,
+      "findSha256": "d117ced1081d6540cad0ac5c4aedf7537df3eb65a1e42a9dce1ee97a8527ac21",
+      "replacementBytes": 57,
+      "replacementSha256": "ad8e269dc61b6fe59c769e25a5727393fe477509e52ae26550a30e3136db700b",
+      "baselineBytes": 23978,
+      "baselineSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+      "proposedMutantBytes": 23876,
+      "proposedMutantSha256": "3bae4d74178f588d98b1d960582b15e5754b80b9c0114bb83e15dc1781273ee6",
+      "matchesReadinessDerivedBytesAndHash": true,
+      "firstLine": 88,
+      "lastLine": 89,
+      "baselineFullSourcePreservedOutsideExactAnchor": true,
+      "mutantWritten": false,
+      "executed": false,
+      "parserOrTypecheckRun": false,
+      "sourceAnalysis": {
+        "locatedAt": "pending(), lines87–90; measured() declaration91–93; computeMetrics default213 and manual215–217",
+        "bindingAndSyntax": "Existing function declaration measured is hoisted; function arguments and return statement are valid existing ECMAScript forms. No import/path change, removed brace, dangling identifier or removed declaration. No parser/typecheck was run.",
+        "typeLimit": "The .mjs script is JavaScript; allowJs:true supports its direct import in tests and checkJs is not enabled in the read configs. Actual new fixture TypeScript/inferred usages were not reviewed. Unused pending parameters are not syntax errors and no noUnusedParameters option is present.",
+        "conditionalConsequence": "In canonical supplied data, release_cadence is first missing row and gets value0/current0/statusmeasured/sourcePRIVATE MUTATION: missing source/asOfnull; critical_gaps_open is overwritten by the genuine declared register count7. This is source inference, not a measured mutant outcome.",
+        "requiredFirstAssertion": "Q2: after locating release_cadence in canonical result, assert row.value === null before status, current wording, source, asOf or target assertions. Then cover every14 missing row explicitly.",
+        "masking": "If that assertion fails in future runtime, later metadata checks in that case are masked; retain first error rather than claiming all downstream expectations executed.",
+        "scope": "One pending return only. It affects pending values across manual, absent Vitest/CI/JSON and invalid-source paths; it does not change validation errors, gap count or legitimate measured0 paths.",
+        "killClaim": false
+      }
+    },
+    {
+      "id": "P041-M2-vacuous-file-pass",
+      "file": "scripts/program-metrics.mjs",
+      "find": "      if (file.status !== \"passed\" || !assertions?.length || assertions.some(assertion => assertion.status !== \"passed\")) complete = false;",
+      "replacement": "      if (file.status !== \"passed\") complete = false;",
+      "occurrences": 1,
+      "findBytes": 139,
+      "findSha256": "8942bd6621efe51754b770ae608de23c8cce1606645bffb90c6c959a12074c28",
+      "replacementBytes": 53,
+      "replacementSha256": "8e7a58206115ed39ab45ce5f26b92a8e51ee640c54f9cd442ce4387e615a5bd1",
+      "baselineBytes": 23978,
+      "baselineSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+      "proposedMutantBytes": 23892,
+      "proposedMutantSha256": "440b3fb3ecad99f95a0e1bc74c6cd4e6e70be88e651204e580bb04d2c80001f8",
+      "matchesReadinessDerivedBytesAndHash": true,
+      "firstLine": 125,
+      "lastLine": 125,
+      "baselineFullSourcePreservedOutsideExactAnchor": true,
+      "mutantWritten": false,
+      "executed": false,
+      "parserOrTypecheckRun": false,
+      "sourceAnalysis": {
+        "locatedAt": "vitestValue completeness at125; failed branch124; missing result122",
+        "bindingAndSyntax": "The replacement retains a complete if statement. file and complete stay in scope. assertions remains used by the unchanged failure branch124. No new dependency/path/binding and no obvious syntax-invalid transformation by manual source inspection.",
+        "typeLimit": "No parser/typecheck or actual new fixture review occurred; .mjs import remains the unchanged source path.",
+        "conditionalConsequence": "For a valid claim_kind_surfaces registration with CLI:[onepath], the other four arrays empty, and exactly one matching file statuspassed/assertionResults:[], baseline reaches evaluated0 and returns pending null; M2 keeps CLI complete and computes value1/partially_measured with four pending surfaces. This is a conditional source analysis, not a kill or execution result.",
+        "requiredFirstAssertion": "Q6: use a valid registered repo/vitest metric and valid report with passed file/empty assertions; first assert that metric row.value === null. Only then assert status/current/source/asOf/surfaceStatuses.",
+        "masking": "An empty-assertion first null failure masks later status/source/surface checks in that case. Missing assertions and allskipped/todo/pending lists can be separate finite variants, not inferred executions.",
+        "preservedGuards": "Failed file or failed assertion still sets allPassedfalse at124. Missing registered file still sets completefalse at122. Duplicate matches still add error at121. Do not count those unchanged guards as this recipe's mutation effect.",
+        "scope": "One completeness predicate only; does not turn failed assertions into passes, remove report validation, bypass registrations or change JSON/CI logic.",
+        "killClaim": false,
+        "fixtureVariant": "The author reports five registered one-file surface paths with only the CLI passed/[] file supplied. The other four missing matches also yield four pending surfaces through122, so the same conditional null→1 distinction applies. Active draft source was not read; this is not an actual fixture code review."
+      }
+    }
+  ],
+  "finiteFixtureAssessment": {
+    "possibleWithinExistingTools": true,
+    "directImport": "Named direct .mjs import is compatible by source/config inspection: allowJs:true, NodeNext/ES2022, existing YAML dependency, entry guard373–375 invokes main only when the script is the entry URL. Direct computation itself uses supplied inputs; no Git/npm query is called through computeMetrics.",
+    "CLI": "Real Node child executing an unchanged script in a genuine owned Git fixture can observe committedHEAD source selection and structural closure refusal. Do not mock execFileSync, Git outputs, executable lookup or receipt identity. The script derives root from its own URL, so script must be physically under fixtureRoot/scripts with its data under fixtureRoot/docs/program.",
+    "history": "A finite set of genuine local commits can supply committed, missing, zero, nonexistent and nonancestor variants. Only future observed commands/results constitute evidence. A copied directory lacking legitimate Git is a refusal context, not positive provenance proof.",
+    "registrationCount": null,
+    "scenarioGroups": [
+      {
+        "id": "Q1",
+        "route": "Static/new fixture identity",
+        "requiredObservation": "Independent15 ID/label/owner/90 target-cell expectations and26 gap IDs/severity7/15/4; retains A4/em dashes.",
+        "limit": "Does not measure program outcomes or qualify source receipts."
+      },
+      {
+        "id": "Q2",
+        "route": "Direct compute",
+        "requiredObservation": "Canonical register count7; every other row value null before status/current/source/asOf checks.",
+        "limit": "M1-sensitive null assertion first; no measured release cadence from absent manual entry."
+      },
+      {
+        "id": "Q3",
+        "route": "Direct compute",
+        "requiredObservation": "Malformed closed declaration remains counted open with exact error; shaped synthetic closure changes declared count only.",
+        "limit": "No Git/signature/merged approval proof in pure function."
+      },
+      {
+        "id": "Q4",
+        "route": "Direct compute",
+        "requiredObservation": "Registered but absent Vitest/CI/JSON sources remain null, including empty/missing containers.",
+        "limit": "Use valid registrations so validation errors do not mask missing-evidence semantics."
+      },
+      {
+        "id": "Q5",
+        "route": "Direct compute",
+        "requiredObservation": "Supplied CLI/MCP complete pass, API failure, two missing surfaces produces2 passed/3 evaluated/2 pending.",
+        "limit": "Supplied reports are fixture data, not fresh5-surface audits."
+      },
+      {
+        "id": "Q6",
+        "route": "Direct compute",
+        "requiredObservation": "Passed file+[] first yields null; absent assertions/skipped/todo/pending variants; failed file/assertion and duplicate path diagnostics separately.",
+        "limit": "M2 targets nonvacuity/completeness; failed precedence/missing sibling guards stay unchanged."
+      },
+      {
+        "id": "Q7",
+        "route": "Direct compute",
+        "requiredObservation": "Finite synthetic runner/matrix variants distinguish configured families/unsupported or unknown pending.",
+        "limit": "No shell containment, host availability or actual cross-OS execution proof."
+      },
+      {
+        "id": "Q8",
+        "route": "Direct compute",
+        "requiredObservation": "Valid sourced manual0 and registered finite JSON0 are measured; missing/null remains pending, malformed provenance/pointers invalid.",
+        "limit": "Zero is allowed when sourced, never inferred from absence."
+      },
+      {
+        "id": "Q9",
+        "route": "Real Node CLI and genuine owned Git",
+        "requiredObservation": "Separatecheck/json/markdown/default child calls with committed canonical inputs.",
+        "limit": "Not one aggregated CLI run, no--online, no current metrics measurement."
+      },
+      {
+        "id": "Q10",
+        "route": "Real Node CLI and genuine owned Git",
+        "requiredObservation": "Dirty gaps cannot override HEAD; registered JSON comes from HEAD even with working copy missing/changed.",
+        "limit": "Structural local committed-input behavior, not receipt truth or merge approval."
+      },
+      {
+        "id": "Q11",
+        "route": "Real Node CLI and genuine owned Git",
+        "requiredObservation": "Invalid closure/manual/options/paths refuse with exact diagnostics, exit1 and no reassuring table/check output.",
+        "limit": "Each refusal variant requires its own explicit observation; child/tool error is not semantic success."
+      },
+      {
+        "id": "Q12",
+        "route": "Real Node CLI and genuine owned Git",
+        "requiredObservation": "Missing/untracked evidence, zero/nonexistent/nonancestor SHA refusal; genuine ancestor/committed path structural positive.",
+        "limit": "Local history/ancestry is not approved merge, independent signature or authentic qualification receipt."
+      },
+      {
+        "id": "Q13",
+        "route": "Real Node CLI and synthetic owned inputs",
+        "requiredObservation": "Funded/singleMaintainer column behavior and exact escaping of&,<,>,pipe,newlines.",
+        "limit": "Does not choose D01 policy; canonical table/source stays unchanged."
+      }
+    ]
+  },
+  "reviewLimits": [
+    "No predicted or observed mutant kill count, baseline pass count, original13-test claim or whole acceptance closure.",
+    "M1 and M2 are separate controls against identical original fixture/config/guards; never combine mutations or reuse a cached baseline import as mutant evidence.",
+    "Actual source mutation must remain private; all other source/data/config/helpers and repository root bytes remain fixed. Fresh process/worker evidence and actual first body assertions are needed for causal attribution.",
+    "Compile/import/hook/global guard, timeout, signal, missing reporter, pending/file/suite/unhandled errors are infrastructure, not a semantic kill.",
+    "Real Git checks establish committed path/ancestry, not independent signatures, reviewed merge, approved qualification, true declaration, full history authenticity or hostile-filesystem race safety.",
+    "Manual/JSON sourced numeric0 is legitimate; absent/null/unmeasured must remain distinct. CI matrix output counts configured families only.",
+    "No--online/npmview, Monday post, credential use, tracker update, source transfer, root/data edit, WIP/G1 clearance or public program measurement.",
+    "Normal freeze and quality1269/2751 debt, prior user skips/unresolved contracts/transfers, A4/shared-source/paused-scope boundaries and original30stest/Git5s/npm10s bounds remain unchanged."
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-41-readonly-readiness-20261015.json",
+      "bytes": 31386,
+      "sha256": "d140b27cb51b6b6f30fb5bdec2a8ca9e8eacdf138c58e563866f5e217031ff83"
+    },
+    {
+      "path": "/private/tmp/p0-41-readonly-readiness-20261015.md",
+      "bytes": 3989,
+      "sha256": "d644f6b9856c6359778cd5f9c37578764771e4bd44429c1434f74345f308a659"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/scripts/program-metrics.mjs",
+      "bytes": 23978,
+      "sha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/program/metrics.json",
+      "bytes": 5866,
+      "sha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/program/gaps.json",
+      "bytes": 16375,
+      "sha256": "bb7eded5387d9b4bb1782b23720042b7c5b26d7fbff119cefc9ceefe7095f006"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/docs/program/metrics-manual.json",
+      "bytes": 20,
+      "sha256": "364b37738032a28a72829f4d2192b70bd9353c9ee8dddfc5b70c2785f995d6ac"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    }
+  ],
+  "method": "Read exact source/config/readiness text; standard-library byte counts/SHA256 and string replacement in memory only. Neither derived mutant was written or parsed/imported/executed.",
+  "performed": {
+    "runtime": false,
+    "typecheck": false,
+    "parserOrCollector": false,
+    "Git": false,
+    "productImport": false,
+    "copyOrFixtureAuthoring": false,
+    "repoWrites": false,
+    "network": false,
+    "activeAuthorFileReads": false,
+    "privateReportPairOnly": true
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "allReadsFinishedAtUtc": "2026-10-15T07:13:36.824914+00:00",
+  "markdown": {
+    "path": "/private/tmp/p0-41-causal-recipe-static-preparation-20261015.md",
+    "bytes": 4048,
+    "sha256": "1394d9cf8ad48ac532cb56d0364daa0138cdb34acb91b0c2761b14c93f8937b6"
+  }
+}

@@ -8,11 +8,11 @@ import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
 import { extractPluginPackage, printPluginPackage, pluginKeygen, pluginPack, verifyPluginPackage } from "../src/plugins/pluginPackage.js";
 import { initPluginRegistry, publishPluginToRegistry, servePluginRegistry, verifyPluginRegistry } from "../src/plugins/pluginRegistry.js";
-import { browsePluginRegistryForWorkspace, initPluginWorkspace, requestPluginInstall, executePluginRequest } from "../src/plugins/pluginApi.js";
+import { browsePluginRegistryForWorkspace, initPluginWorkspace, requestPluginInstall, requestPluginRemove, executePluginRequest } from "../src/plugins/pluginApi.js";
 import { savePluginRegistriesConfig, defaultInstalledPluginsLock, pendingActionPath, pluginInstalledPackagePath, saveInstalledPluginsLock, verifyInstalledPluginsLock, savePluginOverrides } from "../src/plugins/pluginStore.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import { canonicalize } from "../src/utils/json.js";
-import { decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
+import { approvalStatusPayload, decideApprovalForIntent } from "../src/approvals/approvalEngine.js";
 import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { loadInstalledPluginAssets } from "../src/plugins/pluginLoader.js";
 import { ensureDir, readUtf8 } from "../src/utils/fs.js";
@@ -285,6 +285,7 @@ describe("plugin marketplace", () => {
 
     await expect(
       requestPluginInstall({
+        initiator: "test-operator",
         workspace: ws,
         agentId: "default",
         registryId: "local",
@@ -300,7 +301,7 @@ describe("plugin marketplace", () => {
     await expect(browsePluginRegistryForWorkspace({ workspace: ws, registryId: "local" })).rejects.toThrow("plugin registries signature invalid");
   });
 
-  test("workspace install is dual-control and tamper breaks readiness", async () => {
+  test.each(["reports application outcome", "tamper breaks readiness"])("workspace install is dual-control and %s", async (check) => {
     const ws = workspace();
     initPluginWorkspace({ workspace: ws });
     const keys = pluginKeygen({ outDir: join(ws, "keys") });
@@ -338,6 +339,7 @@ describe("plugin marketplace", () => {
     });
 
     const requested = await requestPluginInstall({
+      initiator: "test-operator",
       workspace: ws,
       agentId: "default",
       registryId: "local",
@@ -379,7 +381,22 @@ describe("plugin marketplace", () => {
       approvalRequestId: requested.approvalRequestId
     });
     expect(executed.action).toBe("install");
+    expect(executed).toMatchObject({ outcome: "installed-not-loaded" });
     expect(verifyInstalledPluginsLock(ws).valid).toBe(true);
+
+    const removal = requestPluginRemove({
+      initiator: "test-operator", workspace: ws, agentId: "default", pluginId: executed.pluginId
+    });
+    for (const role of ["OWNER", "AUDITOR"] as const) {
+      decideApprovalForIntent({
+        workspace: ws, agentId: "default", approvalId: removal.approvalRequestId,
+        decision: "APPROVED", mode: "EXECUTE", reason: "reviewed removal",
+        userId: `${role}-remove`, username: `${role}-remove`, userRoles: [role]
+      });
+    }
+    expect(executePluginRequest({ workspace: ws, approvalRequestId: removal.approvalRequestId }))
+      .toMatchObject({ action: "remove", outcome: "restart-required" });
+    if (check === "reports application outcome") return;
 
     const lockPath = join(ws, ".amc", "plugins", "installed.lock.json");
     writeFileSync(lockPath, `${readFileSync(lockPath, "utf8")}\n# tampered`);
@@ -441,6 +458,7 @@ describe("plugin marketplace", () => {
     });
 
     const requested = await requestPluginInstall({
+      initiator: "test-operator",
       workspace: ws,
       agentId: "default",
       registryId: "local",
@@ -488,6 +506,43 @@ describe("plugin marketplace", () => {
     writeFileSync(pendingPath, JSON.stringify({ ...pending, publisherFingerprint: null, riskCategory: "HIGH" }, null, 2));
     expect(() => executePluginRequest({ workspace: ws, approvalRequestId: requested.approvalRequestId }))
       .toThrow(/publisher not admitted: manifest\.sig \(artifact-seal\): not-pinned/);
+  });
+
+  test("DXA-19: the approval is consumed before the install effect, so a failed effect cannot be replayed", async () => {
+    const ws = workspace();
+    initPluginWorkspace({ workspace: ws });
+    const keys = pluginKeygen({ outDir: join(ws, "keys") });
+    const source = pluginSource({ root: ws, pluginId: "amc.plugin.fixture.install", version: "2.0.0",
+      contentFiles: [{ path: "learn/questions/AMC-I.1.md", content: "# install fixture\n" }] });
+    const packageFile = join(ws, "install-plugin.amcplug");
+    const packed = pluginPack({ inputDir: source, keyPath: keys.privateKeyPath, outFile: packageFile });
+    const registryDir = join(ws, "registry");
+    const registryInit = initPluginRegistry({ dir: registryDir, registryId: "local", registryName: "Local Registry" });
+    publishPluginToRegistry({ dir: registryDir, pluginFile: packageFile, registryKeyPath: join(registryDir, "registry.key") });
+    savePluginRegistriesConfig(ws, { pluginRegistries: { version: 1, registries: [{ id: "local", type: "file", base: registryDir,
+      pinnedRegistryPubkeyFingerprint: registryInit.fingerprint, allowPluginPublishers: [packed.manifest.signing.pubkeyFingerprint],
+      allowRiskCategories: ["LOW", "MEDIUM", "HIGH", "CRITICAL"], autoUpdate: false }] } });
+    const requested = await requestPluginInstall({ initiator: "test-operator", workspace: ws, agentId: "default", registryId: "local",
+      pluginRef: "amc.plugin.fixture.install@2.0.0", action: "install" });
+    for (const [user, role] of [["owner-1", "OWNER"], ["auditor-1", "AUDITOR"]] as const) {
+      decideApprovalForIntent({ workspace: ws, agentId: "default", approvalId: requested.approvalRequestId, decision: "APPROVED",
+        mode: "EXECUTE", reason: "approval", userId: user, username: user, userRoles: [role] });
+    }
+    const lockPath = join(ws, ".amc", "plugins", "installed.lock.json");
+    const lockBefore = readUtf8(lockPath);
+    // The install effect fails: a file sits where the plugin's install directory must go.
+    const blocker = join(ws, ".amc", "plugins", "installed", "amc.plugin.fixture.install");
+    mkdirSync(join(ws, ".amc", "plugins", "installed"), { recursive: true });
+    writeFileSync(blocker, "not a directory");
+    expect(() => executePluginRequest({ workspace: ws, approvalRequestId: requested.approvalRequestId })).toThrow();
+    expect(approvalStatusPayload({ workspace: ws, agentId: "default", approvalId: requested.approvalRequestId }).status,
+      "the approval was spent before the effect ran").toBe("CONSUMED");
+
+    rmSync(blocker);
+    expect(() => executePluginRequest({ workspace: ws, approvalRequestId: requested.approvalRequestId }))
+      .toThrow(/approval already consumed/);
+    expect(readUtf8(lockPath), "a replayed approval leaves the lock unchanged").toBe(lockBefore);
+    expect(readdirSync(join(ws, ".amc", "plugins", "installed")), "nothing was installed").toEqual([]);
   });
 
   test("override denied by default and allowed with signed overrides", () => {

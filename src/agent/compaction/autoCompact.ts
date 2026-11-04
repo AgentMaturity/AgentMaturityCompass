@@ -9,11 +9,14 @@
  * citing the measurement that fired it. The replaced rows and spill objects are
  * never touched: compaction changes what the model sees, not what was recorded.
  */
+import { DataFlowRefused } from "../../dataflow/purposePolicy.js";
 import type { SettledStream } from "../../llm/adapter/streamRecorder.js";
 import { isLlmError } from "../../llm/llmFailure.js";
 import { RequestEncodingError } from "../../llm/request/requestSpec.js";
+import { COMPACTION_PLAN_AUDIT } from "../../session/compactionRecovery.js";
 import { extractEnvelope, type TokenUsage } from "../../session/sessionTypes.js";
 import { describeLiveEntries, describeMeasuredLiveEntries, type LiveSurfaceEntry } from "../../session/surfaceCompaction.js";
+import { workspaceSelfTrust } from "../../trust/trustContext.js";
 import { fenceModelSummary, MODEL_SUMMARY_ROLE, PROMPT_TOKENS_FORMULA, SUMMARY_CLAIM_KIND, selectCompactionEntries,
   type AutomaticCompaction } from "../../session/surfaceCompactionValidation.js";
 import { foldSurfaceEntries } from "../../session/surfaceProjection.js";
@@ -84,9 +87,12 @@ function summaryText(settled: SettledStream | null): string | null {
   return text.length > 0 ? text : null;
 }
 
-/** A provider, budget or wire-encoding refusal skips the summary. AMC_ codes are AMC's own contract or evidence failures. */
+/**
+ * A provider, budget, wire-encoding or protected-data (P2-02, recorded by the retry layer) refusal skips the summary.
+ * AMC_ codes are AMC's own contract or evidence failures.
+ */
 function isRefusal(error: unknown): boolean {
-  return (isLlmError(error) && !error.code.startsWith("AMC_")) || error instanceof RequestEncodingError;
+  return (isLlmError(error) && !error.code.startsWith("AMC_")) || error instanceof RequestEncodingError || error instanceof DataFlowRefused;
 }
 
 export class AutoCompactor {
@@ -113,14 +119,16 @@ export class AutoCompactor {
       notify("the provider reported no usage for this step, so prompt size was not measured and automatic compaction did not run");
       return 0;
     }
-    if (pressure.ratio < this.config.threshold) return 0;
+    const reserve = this.config.reserveTokens;
+    if (reserve == null ? pressure.ratio < this.config.threshold : pressure.promptTokens < window - reserve) return 0;
     const measured = `prompt measured ${pressure.promptTokens} of ${window} declared tokens`;
     if (this.count >= this.config.maxPerTurn) {
       notify(`${measured}, but this turn already compacted ${this.count} time(s); no further automatic compaction`);
       return 0;
     }
     const trigger: Trigger = { kind: "automatic", promptTokens: pressure.promptTokens, contextWindowTokens: window,
-      threshold: this.config.threshold, ratio: pressure.ratio, measuredAtEventId, formula: pressure.formula };
+      threshold: this.config.threshold, ratio: pressure.ratio, measuredAtEventId, formula: pressure.formula,
+      ...(reserve == null ? {} : { reserveTokens: reserve }) };
     const pruned = this.prune(trigger);
     // Summarize when pruning found nothing, or when an earlier boundary of this turn already compacted and pressure is still high.
     const summarized = this.config.summarize && (pruned.length === 0 || this.count > 0) ? await this.summarize(turn, trigger, signal, notify) : NOTHING;
@@ -138,7 +146,7 @@ export class AutoCompactor {
   private prune(trigger: Trigger): readonly string[] {
     const { session } = this.init, events = session.readEvents();
     // Authenticates the whole session and replays earlier compactions before anything is selected.
-    const live = describeMeasuredLiveEntries(session.workspace, events);
+    const live = describeMeasuredLiveEntries(session.workspace, events, { trust: workspaceSelfTrust(session.workspace) });
     const at = positions(events), recent = recentSteps(events, this.config.keepRecentSteps);
     const uses = new Set(live.filter(entry => entry.kind === "tool_use").map(entry => entry.slot));
     const candidates = live.flatMap(entry => {
@@ -155,7 +163,7 @@ export class AutoCompactor {
 
   private async summarize(turn: number, trigger: Trigger, signal: AbortSignal, notify: Notify): Promise<Outcome> {
     const { session } = this.init, events = session.readEvents();
-    const live = describeMeasuredLiveEntries(session.workspace, events), at = positions(events);
+    const live = describeMeasuredLiveEntries(session.workspace, events, { trust: workspaceSelfTrust(session.workspace) }), at = positions(events);
     const cutoff = Math.min(turn, ...recentSteps(events, this.config.keepRecentSteps).map(kept => kept.turn ?? turn));
     const range = oldestCompletedTurns(live, at, cutoff), runs = summarizableRuns(range);
     const ids = (run: readonly LiveSurfaceEntry[]): readonly string[] => run.map(entry => entry.originEventId);
@@ -173,6 +181,9 @@ export class AutoCompactor {
     const targetBytes = target.reduce((sum, entry) => sum + (entry.bytes ?? 0), 0);
     const turns = new Set(range.map(entry => at.get(entry.originEventId)?.turn)).size;
 
+    // PI-025: the row right before the summary step names what it will replace and drop, so a resume can settle a crash.
+    const plan = { auditType: COMPACTION_PLAN_AUDIT, version: 1, turn, target: ids(target), earlier: earlier.map(ids) };
+    session.recordProjectedEvidence({ eventType: "audit", payload: JSON.stringify(plan), meta: plan });
     const opened = session.startStep(COMPACTION_SUMMARY_STEP);
     let settled: SettledStream | null = null, usage: TokenUsage | null = null, stopReason: string | null = null, failure: unknown = null;
     try {

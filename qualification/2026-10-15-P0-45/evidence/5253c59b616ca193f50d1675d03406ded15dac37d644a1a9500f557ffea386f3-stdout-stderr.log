@@ -1,0 +1,17 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass
+
+ ✓ tests/ledgerVerificationReadOnly.test.ts (10 tests) 7113ms
+   ✓ cold-process current vault verification reads encrypted evidence without trust mutations  1199ms
+   ✓ cold-process legacy vault verification reads encrypted evidence without trust mutations  1159ms
+   ✓ cold-process encrypted evidence fails closed for missing-passphrase without modifying disk  1087ms
+   ✓ cold-process encrypted evidence fails closed for wrong-passphrase without modifying disk  1122ms
+   ✓ cold-process encrypted evidence fails closed for missing-vault without modifying disk  1147ms
+   ✓ cold-process encrypted evidence fails closed for corrupt-vault without modifying disk  1062ms
+
+ Test Files  1 passed (1)
+      Tests  10 passed (10)
+   Start at  11:26:39
+   Duration  9.55s (transform 1.73s, setup 19ms, import 2.31s, tests 7.11s, environment 0ms)
+
+JSON report written to /private/tmp/p0-45-qualification-20261015/command-original-read-only/raw-producer.json

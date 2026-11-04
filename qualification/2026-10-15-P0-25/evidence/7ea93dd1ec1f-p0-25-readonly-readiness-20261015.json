@@ -1,0 +1,478 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T04:08:12.760507+00:00",
+  "key": "P0-25",
+  "state": "Read-only readiness, not activation, implementation, acceptance or Done approval.",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+    "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "basis": "Parent source anchor plus direct hashes. No Git or product runtime in this task."
+  },
+  "routing": {
+    "nextAfterP030Boundary": "P0-25",
+    "gate": "G0",
+    "priority": "High",
+    "due": "2026-10-21",
+    "blockedBy": [
+      "P0-02",
+      "P0-12"
+    ],
+    "blocks": [
+      "P0-19",
+      "P1-09",
+      "GATE-G0"
+    ],
+    "ordering": "Implementation Plan169-176: earliest open gate, Urgent before High, earlier due date, then dependent-chain depth. After current P0-30 bounded handoff, P0-25 precedes remaining High P0-21 due22Oct, P0-24 due25Oct, P0-26/P0-28 due28Oct. All existing skips/holds remain.",
+    "statusLimit": "Issues.md35 says historical Done. That does not qualify current behavior. P0-02/P0-12 have historical Done/source receipts; formal full dependency acceptance is not requalified here.",
+    "ownership": "RESERVATIONS1496 umbrella covers non-E17/non-Codex Agent-Doable work; omission of P0-25 is not clearance. Shared paths1588 remain coordinated. A fresh owned existing-source qualification lane must be assigned; any production repair needs exact scope/ownership/freeze/D15 checks."
+  },
+  "authority": {
+    "frozenRouting": {
+      "path": "/private/tmp/p0-18-next-key-readonly-routing-preflight-20261015.json",
+      "bytes": 215664,
+      "sha256": "a146f7b75cf2004213cf46563b9a9819f3c5b6d8708ba3605c1d43cceb937295"
+    },
+    "currentPlanInputs": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "bytes": 25110,
+        "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+        "matchesFrozenAuthority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "bytes": 38227,
+        "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+        "matchesFrozenAuthority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "bytes": 78486,
+        "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+        "matchesFrozenAuthority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+        "bytes": 47286,
+        "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+        "matchesFrozenAuthority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+        "matchesFrozenAuthority": true
+      }
+    ],
+    "exactRecoveredSpec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-25.md",
+      "bytes": 14004,
+      "sha256": "43834fb56a8fafd4705b65e66dfa54a49c278a91254afe8a40154d1e00592181"
+    },
+    "claudeReservation": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "claudePlanLimit": "Guessed ~/.claude/plans/frolicking-dreaming-clarke.md and ~/.claude/plans are absent. No other standalone Claude plan was established. Actual preserved reservation notes and recovered issue spec were read; no old Linear status overrides RTD authority."
+  },
+  "acceptance": [
+    "Actual npm run check:citations exits0 and runs after Build in CI build-test and release gate.",
+    "All11 mapping packId fixes resolve in actual registered packs; compoundThreat corrected and two unregistered related.packs removed; mappingPackRefs passes.",
+    "All13 issue fixtures and CLI contracts pass; resolver and ratchet mutations recorded. Current original suites contain21 linter+9 CLI cases, beyond the historical minimum.",
+    "Shared host list, citation record/schema, reference provenance, baseline and docs committed with per-rule counts. Register policy list must remain a subset; literal one-list acceptance needs attention because its checker reads policy.officialHosts.",
+    "Full suite, typecheck, typecheck:tests and lint pass; closing evidence includes PR, mergedSHA, totals, actual check JSON, baseline counts and hosted CI link. Readiness does not satisfy these."
+  ],
+  "sourceRoutes": {
+    "collector": "scripts/check-citations.mjs imports13 built module routes; lists real assurance packs, all mapping/domain/rubric/catalogue/anchor/framework/register references; lintCitations appliesCIT001\u2013CIT005.",
+    "cli": "Strict --json / --update-baseline --reason parsing; unknown/malformed options return1. Baseline writes are not authorized.",
+    "wiring": "package.json76 check:citations; ci.yml Build86 precedes Citation lint95-96 with ordinary failure propagation; release-gate182-184 citations needs build and timeout120000. No hosted execution occurred.",
+    "hostBoundary": "regulatorySchema118 re-exports shared hosts; linter uses same union. Register check reads JSON policy hosts, and existing lint test asserts that list is a subset. Do not choose new host or legal policy.",
+    "releaseTestBoundary": "Existing releaseGateExecution68-73 checks citation failure/needs-build through supported injected executor. It is executor-level evidence, not a real full release gate.",
+    "pins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/.github/workflows/ci.yml",
+        "bytes": 14134,
+        "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/docs/CITATIONS.md",
+        "bytes": 6066,
+        "sha256": "f714f3a0b646e07c07b3d4506583f40f96b53f4cd18b467ac59823e937fdc463"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/docs/program/citation-corrections.md",
+        "bytes": 15044,
+        "sha256": "9feef321bbbd3cefcb90dc769aee8e8f04d3ea9b0ff447ac30495cb2e0ed640b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/package.json",
+        "bytes": 8631,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "bytes": 155432,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-citations.mjs",
+        "bytes": 14165,
+        "sha256": "300f7be119ae2289774fdc90ddaafbdd6ee1a1da3a020de1d6dd8ec9743bca6d"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-regulatory-currency.mjs",
+        "bytes": 10338,
+        "sha256": "2e86a6035a4c389e498bbcaa92a21bfa671d4611fb66ffd7edfcd9de2fc1aff3"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/citations-baseline.json",
+        "bytes": 2413,
+        "sha256": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/lib/gateDag.mjs",
+        "bytes": 1712,
+        "sha256": "846ad3e74df8210ef04bd1d3ddb36702f3a28b50d84235b8e570a92249adc2bb"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/release-gate.mjs",
+        "bytes": 17338,
+        "sha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/assurance/packs/index.ts",
+        "bytes": 16079,
+        "sha256": "ef7acc6ac3dd7ba874042fe1d140ed35ce67a723af30716c37f12c19c95ea17b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/builtInMappings.ts",
+        "bytes": 71290,
+        "sha256": "6d0a44c467ec7a918b4fbd56f911cf897463b393bc2b2f46fc1bedf5278d73b5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/citationRecord.ts",
+        "bytes": 1708,
+        "sha256": "5e62a8c868bfffdb952055e408eea1b8c81db78cf151b30d7213a9771fc0f6f9"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/frameworkIds.ts",
+        "bytes": 2061,
+        "sha256": "a17b09ea9c8c7fa4459ae0cd9efdb8849009fd3638140c11a71f9f93f86b640f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/lint.ts",
+        "bytes": 7865,
+        "sha256": "35cc58ee94b64c32ad7aa9719dc61134384cd4a3677070c4ae02ab3b88cacf7f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/officialHosts.ts",
+        "bytes": 1932,
+        "sha256": "da2d28e320495df599cc87fcbf356faa6796a8f5d18fef8bda8893115761ba36"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/reference/atlas.json",
+        "bytes": 16945,
+        "sha256": "472ed81c037c7fadd3b29d5ef995abba8f111ad3a58f16dcf9876985e294a4f9"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/reference/iso42001AnnexA.json",
+        "bytes": 278,
+        "sha256": "415c9c5aa7c51f2e9b519a6c90dccfe9664e0ec57089281612125ba63a5fa545"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/reference/nistAiRmf.json",
+        "bytes": 17818,
+        "sha256": "3dc23935f3c7dc4a31357277854dcc28d4196fbea078dd7a20f3f9c6c2360aa1"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/supersededInstruments.ts",
+        "bytes": 2171,
+        "sha256": "cacff8b81e91e18c1c19af36d3919fd0bcaf8da43e9779194d197c399dc5b899"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/regulatory/register.json",
+        "bytes": 458334,
+        "sha256": "95e254f9d96b4908746fcc7147596682e9c968613db070ede3cc301a8b23b6e2"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/domains/domainRegistry.ts",
+        "bytes": 17145,
+        "sha256": "498b600bb76ee4e2726d8e5319efe7c042e58a6ad133c77aa1fc11754466d385"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+        "bytes": 26330,
+        "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+        "bytes": 621751,
+        "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/domains/packs/catalogueEu.ts",
+        "bytes": 22665,
+        "sha256": "55b4e5e86d081811b4f760860045bc15fee33c44cded4648dc224308cbf6c429"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/domains/packs/catalogueIntl.ts",
+        "bytes": 24947,
+        "sha256": "42c1f586a05bc19e271a91c678c9543e0354c6ffb929d394dd1af99cc46d9be8"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/domains/packs/catalogueUs.ts",
+        "bytes": 17062,
+        "sha256": "feaa6b3c653a4777d3484378287ef1c5ff73cb7f92550dffa103cd5226c4ddb2"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/domains/packs/regulatorySchema.ts",
+        "bytes": 12723,
+        "sha256": "61aaa47c94a3ba537390e1409de7d117211915d020bf1ca98bd2cf8b43762d61"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/score/crossFrameworkMapping.ts",
+        "bytes": 30532,
+        "sha256": "c40def13e74d79099544768e3f105159f6d08f212a23d0cb96607e1851d05ebc"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/score/domainPacks.ts",
+        "bytes": 38665,
+        "sha256": "4f01d76961a0db3deed76cb01c7a86d0b6cb1525566b163d42e8adf25832cbaf"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts",
+        "bytes": 10628,
+        "sha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/citations/checkCitationsCli.test.ts",
+        "bytes": 5280,
+        "sha256": "033144efd88c3c8e0693394dd5d77447d05fa4a178078c0cd54829afe38ff927"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/citations/lintCitations.test.ts",
+        "bytes": 5086,
+        "sha256": "d8ac693789c976e7cc84fe1ad020c4513f517d51c2188499315e8bc054c426ae"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/compliance/mappingPackRefs.test.ts",
+        "bytes": 1171,
+        "sha256": "1be04f21bdce6ea977d83751a29121f595b04bc5fb1286a4a97564c2839ca614"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/fixtures/citations/cases.json",
+        "bytes": 5107,
+        "sha256": "3152a37dbf27c4b8b053b1f40c0fe5f6d99caeeb48ee25838e8d99fa50920939"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/releaseGateExecution.test.ts",
+        "bytes": 13063,
+        "sha256": "34105e72f7323ae4dcd737bb2b44cb60382e69dc416639e58439f6c6be01500f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/releaseGateReceipt.test.ts",
+        "bytes": 2660,
+        "sha256": "d5421cb1170ed65e146d00d1c6754c50dadbaad500f2b2c4bd5c8f2768ea605f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+        "bytes": 18181,
+        "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      }
+    ]
+  },
+  "reuse": {
+    "receipt": {
+      "path": "/private/tmp/p0-24-citation-causal-qualification-20261015.json",
+      "bytes": 61638,
+      "sha256": "a05fb74b1c7e19e93f862187ed09cf2cb4be49a8179522343d0b3aa06999ef54"
+    },
+    "markdown": {
+      "path": "/private/tmp/p0-24-citation-causal-qualification-20261015.md",
+      "bytes": 4062,
+      "sha256": "19b2f9ae7f8aa59694ba887881f5247cf988d3ed7647e0a98cefe09919136bfd"
+    },
+    "index": {
+      "path": "/private/tmp/p0-24-citation-causal-20261015/artifact-index.json",
+      "bytes": 9587,
+      "sha256": "10872e54a487beb237fb3974932cebbc9dfee4e7caee54c717f89cfcf1f6fc0b"
+    },
+    "immutableInputManifests": [
+      {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/final-protected-parent-inputs.json",
+        "bytes": 268361,
+        "sha256": "2d424205d9cdf59620a4fe412060c3e764d29340cd693154f11f4cde445c7d9d"
+      },
+      {
+        "path": "/private/tmp/p0-24-citation-causal-20261015/after-runtime-restoration.json",
+        "bytes": 508597,
+        "sha256": "532d793d3ffe23cfe2138e36d79f04930fc0c206d2944f36862ee0db1fdb7a41"
+      }
+    ],
+    "currentExactComparisons": {
+      "direct14": {
+        "compared": 14,
+        "matched": 14,
+        "differences": [],
+        "allExact": true
+      },
+      "original2471": {
+        "compared": 2471,
+        "matched": 2471,
+        "differences": [],
+        "allExact": true
+      },
+      "compiled4529": {
+        "compared": 4529,
+        "matched": 4529,
+        "differences": [],
+        "allExact": true
+      }
+    },
+    "priorActualControls": {
+      "measuredSource": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+      "node": "v22.23.3",
+      "cases": 30,
+      "linter": 21,
+      "issueFixtures": 13,
+      "cli": 9,
+      "resolver": [
+        30,
+        26,
+        30
+      ],
+      "ratchet": [
+        30,
+        29,
+        30
+      ],
+      "pendingTodo": 0,
+      "method": "Same actual assertions/fixtures/config with import-prefix-only private compiled adaptation and full restoration. Frozen prior evidence, not new source58 execution."
+    },
+    "legitimateReuse": "Exact source/test/config/guard/package and compiled inputs match. Cite these existing causal controls; do not rerun unchanged matrices merely to rename them. Actual current collector process, execution wiring and full acceptance remain separate.",
+    "strictP024": {
+      "receipt": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015.json",
+        "bytes": 70317,
+        "sha256": "44c070e64894c54560de42727c233aaaebf695f280bcc06b6de035b18f2c492f"
+      },
+      "newCases": 23,
+      "passed": 22,
+      "failed": 1,
+      "failure": "strict ISO A.5 policy anchor assertion remains RED",
+      "noAcceptanceTransfer": true
+    }
+  },
+  "heldDebt": {
+    "baseline": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/citations-baseline.json",
+      "bytes": 2413,
+      "sha256": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59"
+    },
+    "counts": {
+      "CIT001": 0,
+      "CIT002": 3,
+      "CIT003": 0,
+      "CIT004": 620,
+      "CIT005": 0
+    },
+    "CIT002": "3: industryPackAudit.ts two ISO A.5 labels and crossFrameworkMapping.ts AML.T0019. Keep exact tolerance and counts.",
+    "CIT004": 620,
+    "strictISO": "No licensed clause choice or expert data; ISO reference stays deliberately empty. Do not convert an empty table or ratchet into a waiver.",
+    "expertCorrectionRows": 31,
+    "emptyExpertColumns": 31,
+    "allExperimentalAndUnapproved": true,
+    "references": {
+      "atlas": {
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/reference/atlas.json",
+          "bytes": 16945,
+          "sha256": "472ed81c037c7fadd3b29d5ef995abba8f111ad3a58f16dcf9876985e294a4f9"
+        },
+        "entries": 208
+      },
+      "nistAiRmf": {
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/reference/nistAiRmf.json",
+          "bytes": 17818,
+          "sha256": "3dc23935f3c7dc4a31357277854dcc28d4196fbea078dd7a20f3f9c6c2360aa1"
+        },
+        "entries": 72
+      },
+      "iso42001AnnexA": {
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/compliance/citations/reference/iso42001AnnexA.json",
+          "bytes": 278,
+          "sha256": "415c9c5aa7c51f2e9b519a6c90dccfe9664e0ec57089281612125ba63a5fa545"
+        },
+        "entries": 0
+      }
+    }
+  },
+  "safeNextActions": [
+    "Wait for P0-30 packet/handoff and explicit fresh P0-25 owned lane. Preserve existing root/Claude/harness/COPY, reservations and all prior packets.",
+    "Pin qualified Node22/pnpm/source, run normal freeze/D15 checks; ordinary build only the newly assigned lane, then run original citation and mapping corpus and actual check-citations --json with unique raw evidence.",
+    "Reuse exact-input P0-24 resolver/ratchet evidence. Inspect existing host subset, reference metadata and mapping assertions; no new duplicate permanent tests by default.",
+    "Measure required CI/release citation failure propagation at its actual scope with reviewed private controls if necessary. Executor fixtures are not genuine full gate/hosted proof. No hosted dispatch or fabricated successful step results.",
+    "Keep baseline updates, CIT002 tolerance changes, missing-pack registration, mapping deletion, expert clause selection, legal/current-source approval and shared workflow/release source edits outside this readiness authorization.",
+    "Record actual remaining full-suite/types/lint/coverage/Node24/hosted/PR+merge limitations. Preserve strict ISO and every inherited decision/skip/hold."
+  ],
+  "futureCommandsOnly": [
+    "pnpm install --frozen-lockfile",
+    "pnpm run build",
+    "pnpm exec vitest run tests/citations tests/compliance/mappingPackRefs.test.ts",
+    "npm run check:citations -- --json",
+    "npm run typecheck",
+    "npm run typecheck:tests",
+    "npm run lint",
+    "npm test",
+    "npm run release:gate"
+  ],
+  "observerNotes": [
+    "Read-only navigation included nonexistent root/specs and guessed standalone Claude-plan path; recovered pinned spec/reservations supplied actual authority.",
+    "First readiness writer exited1 before writing either report because a numeric-only Markdown filter counted30 and omitted row10a. Corrected observation explicitly includes alphanumeric row labels; source log unchanged and all31 expert cells remain empty. No criterion/product change.",
+    "No child dispatch or messages occurred in this task. A previously observed collaboration thread limit is not a fresh review or waiver.",
+    "Only stable ROOT source/dist and frozen P0-24/routing metadata/manifests were read; no mutable S7/harness phase or COPY bytes were read.",
+    "Recorded reference metadata is not current legal/ATLAS/NIST truth or expert approval; no source fetch or external authority check ran."
+  ],
+  "operations": {
+    "productRuntime": 0,
+    "imports": 0,
+    "tests": 0,
+    "builds": 0,
+    "installs": 0,
+    "mutations": 0,
+    "network": 0,
+    "git": 0,
+    "trackerWrites": 0,
+    "messages": 0,
+    "repoPriorReceiptWrites": 0
+  },
+  "allReadOnlyPreparationReadsFinished": true
+}

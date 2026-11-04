@@ -1,0 +1,9 @@
+{
+  "head": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+  "branch": "codex/p3-14-solo-final",
+  "status": "",
+  "gitLogIntToHead": "386a9a993 feat(catalog): integrate experimental Governance draft (P3-14)\ne6aeba545 fix(catalog): state Governance starter facts (P3-14)\nd7e9740dc docs(catalog): record landed Technology dependencies in Governance (P3-14)\n7e4ee30aa chore(catalog): bump the catalog to 0.1.2 for the Governance overlay draft (P3-14, at landing per Sid's deferral)\ne8794f7cd test(catalog): preserve Governance overlay integration expectations (P3-14)\n39ea602a4 merge: integrate Technology landing into Governance draft (P3-14)\n2d390da8a docs(qualification): hand off Governance draft with pending checks (P3-14)\n1aedd197c docs(catalog): record Governance draft change (P3-14)\n21523daa2 fix(catalog): cover Governance rows in shared checks (P3-14)\n119d14543 merge: integrate admission initialization fix (P3-14)\n45f7a42e4 test(catalog): exercise Governance draft oracles and evidence (P3-14)\nbf0845bc5 feat(catalog): draft Governance controls and dispositions (P3-14)\n873bd9f31 test(catalog): specify experimental Governance overlay (P3-14)\n",
+  "packetState": "OFF_TREE_PREVIEW_ONLY_NOT_INSTALLED"
+}

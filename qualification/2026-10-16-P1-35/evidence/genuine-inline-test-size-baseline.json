@@ -1,0 +1,172 @@
+{
+  "at": "2026-10-16T17:02:41.394370+00:00",
+  "phase": "p135-genuine-inline-repaired",
+  "tests": 10,
+  "passed": 9,
+  "failed": 1,
+  "raw": {
+    "numTotalTestSuites": 3,
+    "numPassedTestSuites": 1,
+    "numFailedTestSuites": 2,
+    "numPendingTestSuites": 0,
+    "numTotalTests": 10,
+    "numPassedTests": 9,
+    "numFailedTests": 1,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "snapshot": {
+      "added": 0,
+      "failure": false,
+      "filesAdded": 0,
+      "filesRemoved": 0,
+      "filesRemovedList": [],
+      "filesUnmatched": 0,
+      "filesUpdated": 0,
+      "matched": 0,
+      "total": 0,
+      "unchecked": 0,
+      "uncheckedKeysByFile": [],
+      "unmatched": 0,
+      "updated": 0,
+      "didUpdate": false
+    },
+    "startTime": 1792170054637,
+    "success": false,
+    "testResults": [
+      {
+        "assertionResults": [
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+            "status": "passed",
+            "title": "R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+            "duration": 4.895999999999731,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+            "status": "passed",
+            "title": "R4 never promotes operator-chosen ATTESTED legacy provenance",
+            "duration": 2.9580000000000837,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+            "status": "passed",
+            "title": "current public claim envelopes bypass the legacy classifier",
+            "duration": 2.558375000000069,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+            "status": "passed",
+            "title": "post-fix assurance without an envelope classifies as R5 self-reported",
+            "duration": 2.2712499999997817,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+            "status": "passed",
+            "title": "post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+            "duration": 2.3763749999998254,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+            "status": "passed",
+            "title": "dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+            "duration": 230.5555830000003,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+            "status": "passed",
+            "title": "an edited signed log line refuses further relabelling without changing originals",
+            "duration": 166.76262499999984,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 synthetic migration source contracts"
+            ],
+            "fullName": "P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+            "status": "passed",
+            "title": "a tampered migration receipt signature refuses its log and any further append",
+            "duration": 162.18975,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 genuine v1.1.1 generated originals"
+            ],
+            "fullName": "P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+            "status": "passed",
+            "title": "actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+            "duration": 43.282166999999845,
+            "failureMessages": [],
+            "meta": {},
+            "tags": []
+          },
+          {
+            "ancestorTitles": [
+              "P1-35 genuine v1.1.1 generated originals"
+            ],
+            "fullName": "P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+            "status": "failed",
+            "title": "real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+            "duration": 194.84645799999998,
+            "failureMessages": [
+              "Error: legacy bundle public-key view member size exceeds the 3000000-byte limit\n    at inspectTarGzipArchive (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/security/safeTarArchive.ts:143:13)\n    at fixtureTrust (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:205:58)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:457:47\n    at owned (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:65:11)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:456:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)"
+            ],
+            "meta": {},
+            "tags": []
+          }
+        ],
+        "startTime": 1792170057009,
+        "endTime": 1792170057821.8464,
+        "status": "failed",
+        "message": "",
+        "name": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts"
+      }
+    ]
+  },
+  "rootCause": "Test-only bundle public-key-view maxEntryBytes3000000 assumed smaller v3 run. Actual v4 embedded run.json3333257 bytes matches genuine diagnostic, bundle regular total3891578 remains below unchanged4000000 total limit.",
+  "proposedFix": "Derive this fixture-only member limit from exact already verified original candidate byte counts, as outer decoder already does; no product safeTar code/cap/test deadline changes.",
+  "failedRunPreserved": true
+}

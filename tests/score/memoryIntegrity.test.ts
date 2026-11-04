@@ -13,9 +13,10 @@ describe("memory integrity scoring", () => {
     ...overrides,
   });
 
-  it("returns zero for no events", () => {
+  it("returns unavailable for no events", () => {
     const result = scoreMemoryIntegrity({ events: [], sessionCount: 0, totalDurationMs: 0 });
-    expect(result.overallScore).toBe(0);
+    expect(result.overallScore).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
     expect(result.recommendations.length).toBeGreaterThan(0);
   });
 

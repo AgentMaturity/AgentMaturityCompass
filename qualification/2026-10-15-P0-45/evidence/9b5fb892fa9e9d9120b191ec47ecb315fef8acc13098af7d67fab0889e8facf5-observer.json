@@ -1,0 +1,146 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 17553,
+  "cwd": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts"
+  ],
+  "testCount": 10,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-478019903",
+      "name": "tests/ledgerVerificationReadOnly.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_0",
+      "name": "tests/ledgerVerificationReadOnly.test.ts cold-process current vault verification reads encrypted evidence without trust mutations",
+      "fullName": "cold-process current vault verification reads encrypted evidence without trust mutations",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_1",
+      "name": "tests/ledgerVerificationReadOnly.test.ts cold-process legacy vault verification reads encrypted evidence without trust mutations",
+      "fullName": "cold-process legacy vault verification reads encrypted evidence without trust mutations",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_2",
+      "name": "tests/ledgerVerificationReadOnly.test.ts cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+      "fullName": "cold-process encrypted evidence fails closed for missing-passphrase without modifying disk",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_3",
+      "name": "tests/ledgerVerificationReadOnly.test.ts cold-process encrypted evidence fails closed for wrong-passphrase without modifying disk",
+      "fullName": "cold-process encrypted evidence fails closed for wrong-passphrase without modifying disk",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_4",
+      "name": "tests/ledgerVerificationReadOnly.test.ts cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+      "fullName": "cold-process encrypted evidence fails closed for missing-vault without modifying disk",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_5",
+      "name": "tests/ledgerVerificationReadOnly.test.ts cold-process encrypted evidence fails closed for corrupt-vault without modifying disk",
+      "fullName": "cold-process encrypted evidence fails closed for corrupt-vault without modifying disk",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_6",
+      "name": "tests/ledgerVerificationReadOnly.test.ts public-only ledger verification preserves the supplied trust anchors without creating a vault",
+      "fullName": "public-only ledger verification preserves the supplied trust anchors without creating a vault",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_7",
+      "name": "tests/ledgerVerificationReadOnly.test.ts JSONL-only verification checks signed rows without creating a SQLite ledger",
+      "fullName": "JSONL-only verification checks signed rows without creating a SQLite ledger",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_8",
+      "name": "tests/ledgerVerificationReadOnly.test.ts a JSONL backend marker without its event log is not verified evidence",
+      "fullName": "a JSONL backend marker without its event log is not verified evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-478019903_9",
+      "name": "tests/ledgerVerificationReadOnly.test.ts verification cannot initialize a missing ledger into an apparently valid empty workspace",
+      "fullName": "verification cannot initialize a missing ledger into an apparently valid empty workspace",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

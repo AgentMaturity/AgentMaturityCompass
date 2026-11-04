@@ -215,13 +215,13 @@ describe("enforce resource manifest", () => {
 
   test("snapshots, verifies and restores a typed graph by the digest its manifest recorded", () => {
     withWorkspace((workspace) => {
-      const resource = "graph:.amc/fleet/typed-graphs/latest.json";
-      const graphPath = join(workspace, ".amc", "fleet", "typed-graphs", "latest.json");
+      const resource = "graph:.amc/fleet/typed-graphs/default/latest.json";
+      const graphPath = join(workspace, ".amc", "fleet", "typed-graphs", "default", "latest.json");
       const graph = (role: string) => ({
         schemaVersion: "2026-05-22",
         graphId: "g",
         createdAt: "2026-01-01T00:00:00Z",
-        nodes: [{ nodeId: "a", nodeType: "agent", role, inputs: [{ name: "i", schema: "text" }] }]
+        nodes: [{ nodeId: "a", agentId: "default", nodeType: "agent", role, inputs: [{ name: "i", schema: "text" }] }]
       });
       mkdirSync(join(workspace, ".amc"), { recursive: true });
       writeFileSync(join(workspace, ".amc", "guardrails.yaml"), "rules:\n  - allow\n", { encoding: "utf8", flag: "w" });
@@ -245,6 +245,26 @@ describe("enforce resource manifest", () => {
       });
       expect(removed.entries).toEqual([expect.objectContaining({ id: resource, status: "removed" })]);
       expect(existsSync(graphPath)).toBe(false);
+    });
+  });
+
+  test("another agent's typed graph leaves this agent's manifest current (A4 Aspire Build)", () => {
+    withWorkspace((workspace) => {
+      const graph = (agentId: string, role: string) => ({ schemaVersion: "2026-05-22", graphId: `a4-${agentId}`, createdAt: "2026-01-01T00:00:00Z",
+        nodes: [{ nodeId: "agent", agentId, nodeType: "agent", role, inputs: [{ name: "i", schema: "text" }] }] });
+      mkdirSync(join(workspace, ".amc"), { recursive: true });
+      writeTypedMultiAgentGraph({ workspace, graph: graph("agent-b", "b") });
+      writeEnforceResourceManifest({ workspace, agentId: "agent-b" });
+      expect(projectEnforceResourceLifecycleStatus({ workspace, agentId: "agent-b" }).state).toBe("ACTIVE");
+
+      writeTypedMultiAgentGraph({ workspace, graph: graph("agent-a", "a") });
+      expect(projectEnforceResourceLifecycleStatus({ workspace, agentId: "agent-b" }).state).toBe("ACTIVE");
+      expect(verifyEnforceResourceManifest({ workspace, agentId: "agent-b" }).valid).toBe(true);
+      // The fleet file stays the newest graph written, as a view.
+      expect(JSON.parse(readFileSync(join(workspace, ".amc", "fleet", "typed-graphs", "latest.json"), "utf8")).graphId).toBe("a4-agent-a");
+
+      writeTypedMultiAgentGraph({ workspace, graph: graph("agent-b", "b2") });
+      expect(projectEnforceResourceLifecycleStatus({ workspace, agentId: "agent-b" }).state).not.toBe("ACTIVE");
     });
   });
 });

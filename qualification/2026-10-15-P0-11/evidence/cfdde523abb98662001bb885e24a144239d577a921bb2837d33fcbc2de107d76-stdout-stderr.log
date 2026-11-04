@@ -1,0 +1,40 @@
+
+ RUN  v4.1.11 /private/tmp/p0-11-causal-qualification-20261015/closure
+
+ ❯ tests/threatModelMap.test.ts (7 tests | 1 failed) 582ms
+     ✓ a valid map passes 92ms
+     × a cited path that does not exist fails and names the entry 90ms
+     ✓ a symbol absent from its file fails 89ms
+     ✓ an owner that is not a plan key fails 90ms
+     ✓ a failure row with no test and no owner fails 101ms
+     ✓ the real channel map passes with 16 channels and 8 failure rows 115ms
+     ✓ the threat model document names every channel, failure row and ASI id in the map 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/threatModelMap.test.ts > check-threat-model > a cited path that does not exist fails and names the entry
+AssertionError: expected +0 to be 1 // Object.is equality
+
+- Expected
++ Received
+
+- 1
++ 0
+
+ ❯ tests/threatModelMap.test.ts:29:20
+     27|   test("a cited path that does not exist fails and names the entry", (…
+     28|     const { status, output } = check(`${FIXTURES}/missing-path.json`);
+     29|     expect(status).toBe(1);
+       |                    ^
+     30|     expect(output).toContain("channel network-egress");
+     31|     expect(output).toContain("src/tools/noSuchFile.ts does not exist");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 6 passed (7)
+   Start at  12:13:04
+   Duration  720ms (transform 13ms, setup 24ms, import 5ms, tests 582ms, environment 0ms)
+
+JSON report written to /private/tmp/p0-11-causal-qualification-20261015/phases/C1-map-missing-path-fail-open--mutant/raw.json

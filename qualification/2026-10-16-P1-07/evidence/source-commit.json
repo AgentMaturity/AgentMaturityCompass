@@ -1,0 +1,14 @@
+{
+  "at": "2026-10-16T18:10:43.091243+00:00",
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "parent": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "branch": "codex/p1-07-gate-qualification",
+  "files": 13,
+  "ordinaryCommit": true,
+  "sourceClean": true,
+  "freshQualificationPending": true,
+  "qualityGreen": false,
+  "fullP107Done": false,
+  "completePlanDone": false,
+  "commitOutput": "[codex/p1-07-gate-qualification 0e06b251a] test(diagnostic): qualify cumulative gates and native evidence\n 13 files changed, 751 insertions(+), 15 deletions(-)\n create mode 100644 tests/diagnostic/evidenceEmitterRegistry.test.ts\n create mode 100644 tests/diagnostic/levelCumulative.test.ts\n create mode 100644 tests/diagnostic/runtimeEvidenceEndToEnd.test.ts\n"
+}

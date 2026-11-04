@@ -1,0 +1,1885 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-21-bounded-independent-actual-review",
+  "reviewer": "native_race_static_review",
+  "decision": "BOUNDED_ACTUAL_EVIDENCE_VERIFIED_WITH_EXPLICIT_LIMITS",
+  "blockingPacketFindings": [],
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "reviewScope": {
+    "parentRoot": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+    "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "sourceAttribution": "Current parent/private contents independently checked against frozen source manifests and exact-source validation context; no new Git query.",
+    "authorship": "This reviewer did not author or execute the P0-21 product tests, controller, runtime or metadata freezer. Prior recipe/controller/setup static reviews are separately frozen. A delegated read-only source/assertion cross-check supplements this actual evidence audit.",
+    "noProductRuntimeOrReruns": true,
+    "noImportsParsersCompilers": true,
+    "noSourceMutationNetworkGitOrSignals": true,
+    "methods": [
+      "Independently parse retained JSON/text and compare file length/SHA-256 pins without product imports.",
+      "Cross-check all18 raw/observer identities, states, errors, source stack frames, counters and classification/result copies.",
+      "Verify root START tokens, eight v3 hash fields, version paths, prior-control order, actual argv/environment and observer PID bindings.",
+      "Compare exact single-file expected hash maps before/after phases and full restored current parent/private copy hashes, membership and physical identities.",
+      "Inspect all retained process exits, owned-group signal-zero ESRCH records, observer infrastructure/hooks and full known late diagnostics.",
+      "Check322 final index refs,166 nested packet reference occurrences, frozen-journal equality and explicit formal/quality boundaries."
+    ]
+  },
+  "counting": {
+    "originalRuns": [
+      {
+        "phase": "original-core",
+        "rawTotal": 37,
+        "rawPassed": 37,
+        "rawFailed": 0,
+        "rawPending": 0,
+        "rawTodo": 0,
+        "rawSuccess": true,
+        "observerCount": 37,
+        "observerPid": 10289,
+        "observerReason": "passed",
+        "unhandled": 0,
+        "infrastructureCount": 0,
+        "streamHits": [],
+        "pinsExact": true,
+        "files": 6
+      },
+      {
+        "phase": "original-cli",
+        "rawTotal": 14,
+        "rawPassed": 14,
+        "rawFailed": 0,
+        "rawPending": 0,
+        "rawTodo": 0,
+        "rawSuccess": true,
+        "observerCount": 14,
+        "observerPid": 10346,
+        "observerReason": "passed",
+        "unhandled": 0,
+        "infrastructureCount": 0,
+        "streamHits": [],
+        "pinsExact": true,
+        "files": 1
+      },
+      {
+        "phase": "original-consumers",
+        "rawTotal": 48,
+        "rawPassed": 48,
+        "rawFailed": 0,
+        "rawPending": 0,
+        "rawTodo": 0,
+        "rawSuccess": true,
+        "observerCount": 48,
+        "observerPid": 10463,
+        "observerReason": "passed",
+        "unhandled": 0,
+        "infrastructureCount": 0,
+        "streamHits": [],
+        "pinsExact": true,
+        "files": 4
+      }
+    ],
+    "originalDistinctFileTitleRegistrations": 99,
+    "originalRunCount": 3,
+    "originalFileCount": 11,
+    "single99CaseInvocationClaimed": false,
+    "causalOriginalCorpus": 37,
+    "causalPhaseCount": 18,
+    "causalControlCount": 6,
+    "causalRepeatedExecutions": 666,
+    "causalPassed": 655,
+    "causalBodyAssertionFailures": 11,
+    "causalDistinctFailedFileTitleCases": 10,
+    "causalNewUniqueCases": 0,
+    "mutantSurvivors": 0,
+    "rootCommandRows": 15,
+    "rootRecordsAreSeparateFromCausal18": true
+  },
+  "actualCausalInterpretation": [
+    {
+      "control": "P021-C1-likert-origin",
+      "counts": [
+        37,
+        35,
+        37
+      ],
+      "meaning": "Validated Likert origin regression observed: converter actual20 versus expected0; domain score actual60 versus expected50.",
+      "masking": "Maximum Likert5 conversion at scoreUnits:35 and domain baseScore60 at domainAssessmentUnits:36 passed before the failures. Score assertions37–39 and domain composite/level assertions38–39 are masked.",
+      "boundary": "Conversion sensitivity using valid units, not malformed-input admission."
+    },
+    {
+      "control": "P021-C2-L2-threshold",
+      "counts": [
+        37,
+        36,
+        37
+      ],
+      "meaning": "Percent30 returned actual level1 versus expected2 at scoreUnits:47:58.",
+      "masking": "Earlier table entries0/29.9 passed; table entries after30, including54.9, are masked.",
+      "boundary": "First observed boundary failure; no extrapolated assertion coverage."
+    },
+    {
+      "control": "P021-C3-numeric-self-eligible-cap",
+      "counts": [
+        37,
+        34,
+        37
+      ],
+      "meaning": "Removing only the numeric cap produced eligibleLevel actual5 versus expected1 or <=1 in logistics, first farm-to-fork pack and first audit-loop pack.",
+      "masking": "Logistics:55 certified-field absence is masked. The all-packs loop stops at farm-to-fork:78; subsequent percentage/certified checks and later packs are masked. Audit:101 stops the first pack before completeness/rendering/wording checks and later packs. Schema amc.industry-pack-audit/3 and self-reported fields are preceding assertions.",
+      "boundary": "Numeric eligibility regression, not positive regulated certification or proof of failure independently across all41 packs. Regulated blockPass, null/incomplete and separate weak-method cap remain unchanged."
+    },
+    {
+      "control": "P021-C4-base-L3-self-tier",
+      "counts": [
+        37,
+        36,
+        37
+      ],
+      "meaning": "Policy-array assertion at selfReportedLevelCap:67:84 found SELF_REPORTED in AMC-1.1 L3 tiers.",
+      "masking": "The first offending gate ends iteration; later gates/questions are masked. Behavioral cap/imported/OBSERVEDL2 cases remain passed.",
+      "boundary": "Registry-policy sensitivity only. Unsafe behavioral L3 admission or provenance-gate bypass was not observed; source maps/emitter admission limit the behavioral fixture."
+    },
+    {
+      "control": "P021-C5-default-gate-self-tier",
+      "counts": [
+        37,
+        36,
+        37
+      ],
+      "meaning": "evaluateGate with hand-shaped parsed SELF_REPORTED rows returned actualtrue versus expectedfalse at selfReportedLevelCap:77:64.",
+      "masking": "Subsequent ATTESTED positive assertion:78 is masked.",
+      "boundary": "Direct typed helper fixture; no authenticated stored rows, signed provenance or full intake path proof."
+    },
+    {
+      "control": "P021-C6-representative-raw-size",
+      "counts": [
+        37,
+        34,
+        37
+      ],
+      "meaning": "Two-site representative historical-size recipe removed raw6/raw80 exceptions at domainAssessmentUnits:23:45/:27:46 and produced domain score actual60 versus expected50 at:37:32.",
+      "masking": "Domain baseScore actual60 matched expected60 before domainScore failure; composite/level assertions38–39 are masked. Separate invalid base7 rejection case passed.",
+      "boundary": "Missing exceptions are observed. Formula interpreting individual raw6/raw80 answers as6%/80% is source inference; final6%/80% aggregate values were not measured. This is a representative two-site recipe, not an exact old-file restoration."
+    }
+  ],
+  "actualAssertionRecords": [
+    {
+      "control": "P021-C1-likert-origin",
+      "file": "tests/domainAssessmentUnits.test.ts",
+      "fullName": "domain engine takes typed units (P0-21) valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent",
+      "message": "expected 60 to be 50 // Object.is equality",
+      "errorName": "AssertionError",
+      "actual": "60",
+      "expected": "50",
+      "line": 37,
+      "column": 32,
+      "sourceAssertionLine": "expect(result.domainScore).toBe(50); // Likert 3 -> 50%",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+        "bytes": 1890,
+        "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+      }
+    },
+    {
+      "control": "P021-C1-likert-origin",
+      "file": "tests/scoreUnits.test.ts",
+      "fullName": "typed score units (P0-21) conversions are explicit",
+      "message": "expected 20 to be +0 // Object.is equality",
+      "errorName": "AssertionError",
+      "actual": "20",
+      "expected": "0",
+      "line": 36,
+      "column": 40,
+      "sourceAssertionLine": "expect(likertToPercent(likert(1))).toBe(0);",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+        "bytes": 1934,
+        "sha256": "15a8a89ebc46ce78a164c20f99c9fdb082da5100cf4e47bf9adcec9a5cb63543"
+      }
+    },
+    {
+      "control": "P021-C2-L2-threshold",
+      "file": "tests/scoreUnits.test.ts",
+      "fullName": "typed score units (P0-21) percentToLevel is the one level table: L2 starts at 30",
+      "message": "percent 30: expected 1 to be 2 // Object.is equality",
+      "errorName": "AssertionError",
+      "actual": "1",
+      "expected": "2",
+      "line": 47,
+      "column": 58,
+      "sourceAssertionLine": "expect(percentToLevel(percent(p)), `percent ${p}`).toBe(expected);",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+        "bytes": 1934,
+        "sha256": "15a8a89ebc46ce78a164c20f99c9fdb082da5100cf4e47bf9adcec9a5cb63543"
+      }
+    },
+    {
+      "control": "P021-C3-numeric-self-eligible-cap",
+      "file": "tests/logisticsIndustryPack.test.ts",
+      "fullName": "freight, 3PL, and warehouse industry pack scores concrete logistics controls and surfaces low-level compliance gaps",
+      "message": "expected 5 to be 1 // Object.is equality",
+      "errorName": "AssertionError",
+      "actual": "5",
+      "expected": "1",
+      "line": 54,
+      "column": 34,
+      "sourceAssertionLine": "expect(mature.eligibleLevel).toBe(1);",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/logisticsIndustryPack.test.ts",
+        "bytes": 2360,
+        "sha256": "1cc9c645873c45848a1aaaaba2d349de9258221b200132978f191906d5130dfc"
+      }
+    },
+    {
+      "control": "P021-C3-numeric-self-eligible-cap",
+      "file": "tests/noCertificationFromSelfAssessment.test.ts",
+      "fullName": "no certification from self-assessment (P0-21) all-5 answers on every registered pack are a complete self-assessment, not a certification",
+      "message": "farm-to-fork: expected 5 to be less than or equal to 1",
+      "errorName": "AssertionError",
+      "actual": 5,
+      "expected": 1,
+      "line": 78,
+      "column": 46,
+      "sourceAssertionLine": "expect(result.eligibleLevel!, pack.id).toBeLessThanOrEqual(1);",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+        "bytes": 8422,
+        "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+      }
+    },
+    {
+      "control": "P021-C3-numeric-self-eligible-cap",
+      "file": "tests/noCertificationFromSelfAssessment.test.ts",
+      "fullName": "no certification from self-assessment (P0-21) the pack audit reports a self-reported overall with no certified field",
+      "message": "expected 5 to be less than or equal to 1",
+      "errorName": "AssertionError",
+      "actual": 5,
+      "expected": 1,
+      "line": 101,
+      "column": 44,
+      "sourceAssertionLine": "expect(audit.overall.eligibleLevel!).toBeLessThanOrEqual(1);",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+        "bytes": 8422,
+        "sha256": "bd0e41ec108a46bb00414ad74c20b525ae0136b123c1896e28bc058b62c3e102"
+      }
+    },
+    {
+      "control": "P021-C4-base-L3-self-tier",
+      "file": "tests/selfReportedLevelCap.test.ts",
+      "fullName": "self-reported evidence caps at L1 (P0-21) no base gate at L2 or above accepts SELF_REPORTED",
+      "message": "AMC-1.1 L3: expected [ 'OBSERVED', 'ATTESTED', …(1) ] to not include 'SELF_REPORTED'",
+      "errorName": "AssertionError",
+      "actual": [
+        "OBSERVED",
+        "ATTESTED",
+        "SELF_REPORTED"
+      ],
+      "expected": null,
+      "line": 67,
+      "column": 84,
+      "sourceAssertionLine": "expect(gate.acceptedTrustTiers ?? [], `${question.id} L${gate.level}`).not.toContain(\"SELF_REPORTED\");",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+        "bytes": 4018,
+        "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+      }
+    },
+    {
+      "control": "P021-C5-default-gate-self-tier",
+      "file": "tests/selfReportedLevelCap.test.ts",
+      "fullName": "self-reported evidence caps at L1 (P0-21) a gate that lists no tiers defaults to OBSERVED and ATTESTED",
+      "message": "expected true to be false // Object.is equality",
+      "errorName": "AssertionError",
+      "actual": "true",
+      "expected": "false",
+      "line": 77,
+      "column": 64,
+      "sourceAssertionLine": "expect(evaluateGate(gate, evidence(\"SELF_REPORTED\")).pass).toBe(false);",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+        "bytes": 4018,
+        "sha256": "9bd9059516724dedf1901851b5ac2f24237248eda7d6c647004610611d4e6365"
+      }
+    },
+    {
+      "control": "P021-C6-representative-raw-size",
+      "file": "tests/domainAssessmentUnits.test.ts",
+      "fullName": "domain engine takes typed units (P0-21) a percentage passed as a Likert answer throws",
+      "message": "expected function to throw an error, but it didn't",
+      "errorName": "AssertionError",
+      "actual": null,
+      "expected": null,
+      "line": 27,
+      "column": 46,
+      "sourceAssertionLine": "expect(() => assessDomain(input(3, 80))).toThrow(RangeError);",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+        "bytes": 1890,
+        "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+      }
+    },
+    {
+      "control": "P021-C6-representative-raw-size",
+      "file": "tests/domainAssessmentUnits.test.ts",
+      "fullName": "domain engine takes typed units (P0-21) a raw 6 in domainQuestionScores throws instead of scoring 6%",
+      "message": "expected function to throw an error, but it didn't",
+      "errorName": "AssertionError",
+      "actual": null,
+      "expected": null,
+      "line": 23,
+      "column": 45,
+      "sourceAssertionLine": "expect(() => assessDomain(input(3, 6))).toThrow(new RangeError(\"Likert answer must be an integer 1-5, got 6\"));",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+        "bytes": 1890,
+        "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+      }
+    },
+    {
+      "control": "P021-C6-representative-raw-size",
+      "file": "tests/domainAssessmentUnits.test.ts",
+      "fullName": "domain engine takes typed units (P0-21) valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent",
+      "message": "expected 60 to be 50 // Object.is equality",
+      "errorName": "AssertionError",
+      "actual": "60",
+      "expected": "50",
+      "line": 37,
+      "column": 32,
+      "sourceAssertionLine": "expect(result.domainScore).toBe(50); // Likert 3 -> 50%",
+      "rawAndObserverMessageMultiplicity": [
+        1,
+        1
+      ],
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+        "bytes": 1890,
+        "sha256": "a443651c90db62faed2b8448ade66a9b5369b948c00e5ab2fbdd2a488dca869f"
+      }
+    }
+  ],
+  "reporterAbsentFieldMeaning": "null actual/expected in the compact assertion map means that reporter field was absent; it is not a claimed null product result. Exact message and source assertion establish no-throw/membership semantics.",
+  "phaseVerification": {
+    "failures": [],
+    "phaseCount": 18,
+    "controlCount": 6,
+    "totals": {
+      "executions": 666,
+      "passed": 655,
+      "failed": 11
+    },
+    "distinctFailedCases": 10,
+    "rows": [
+      {
+        "phase": "P021-C1-likert-origin--baseline",
+        "pid": 12548,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C1-likert-origin--mutant",
+        "pid": 12572,
+        "exit": 1,
+        "passed": 35,
+        "failed": 2,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C1-likert-origin--restored",
+        "pid": 12588,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C2-L2-threshold--baseline",
+        "pid": 12954,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C2-L2-threshold--mutant",
+        "pid": 12981,
+        "exit": 1,
+        "passed": 36,
+        "failed": 1,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C2-L2-threshold--restored",
+        "pid": 12991,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C3-numeric-self-eligible-cap--baseline",
+        "pid": 13065,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C3-numeric-self-eligible-cap--mutant",
+        "pid": 13080,
+        "exit": 1,
+        "passed": 34,
+        "failed": 3,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C3-numeric-self-eligible-cap--restored",
+        "pid": 13098,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C4-base-L3-self-tier--baseline",
+        "pid": 13197,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C4-base-L3-self-tier--mutant",
+        "pid": 13209,
+        "exit": 1,
+        "passed": 36,
+        "failed": 1,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C4-base-L3-self-tier--restored",
+        "pid": 13224,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C5-default-gate-self-tier--baseline",
+        "pid": 13259,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C5-default-gate-self-tier--mutant",
+        "pid": 13281,
+        "exit": 1,
+        "passed": 36,
+        "failed": 1,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C5-default-gate-self-tier--restored",
+        "pid": 13290,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C6-representative-raw-size--baseline",
+        "pid": 13323,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C6-representative-raw-size--mutant",
+        "pid": 13336,
+        "exit": 1,
+        "passed": 34,
+        "failed": 3,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      },
+      {
+        "phase": "P021-C6-representative-raw-size--restored",
+        "pid": 13352,
+        "exit": 0,
+        "passed": 37,
+        "failed": 0,
+        "esrchProbes": 1,
+        "knownLateHits": []
+      }
+    ],
+    "artifactPins": [
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/inputs-after.json",
+        "bytes": 830,
+        "sha256": "0d090473b21f01b3e6bbae1a68a7976672bd787123e6435d6755bd459c5891cc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/observer.json",
+        "bytes": 20517,
+        "sha256": "d857bf6fc1f9b6fee9311974bc6ff215d4f48fa2051da8f23c9e3e83bca6ef86"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/owned-process.json",
+        "bytes": 1557,
+        "sha256": "fdc4d59c3d46ed51f8b2931a3712e957fd604c1e5ed55b95c3e2aefdcfb526db"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/raw.json",
+        "bytes": 13471,
+        "sha256": "350719fed0cf82820d6473ee336bb3b6438052b9503711024db11611b9c640b0"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/stdout-stderr.log",
+        "bytes": 794,
+        "sha256": "88d5b43b380588238ab13edbf84bb94ab90d4cae49ab10c76c210624eb51c284"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/inputs-before.json",
+        "bytes": 830,
+        "sha256": "c2eab73d5083498be643f5ba7ebaebe127f3065a1b5214578700819f936c88cf"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "e0d626eff2e986e882b9e8cacfd65a72c98e99ba2d44c316a2c67f3a59e4aa21"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/command.json",
+        "bytes": 1932,
+        "sha256": "f52faf9ae5a837a90f47aae85e68cc01dd81f535e3bc04a5ec87478dabb17eb3"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--baseline/artifacts.json",
+        "bytes": 2066,
+        "sha256": "445b8f29fff834d0f0ab934365a41b6e6f23f182951b8c784896b264ae177bdd"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/inputs-after.json",
+        "bytes": 858,
+        "sha256": "d2f65a6aaf910792a70a6773a94202cf51e77851a658c361b6abcc9f60659321"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/observer.json",
+        "bytes": 24253,
+        "sha256": "cf4e5f1bd18b33570ed2a8bbfcd24479f2ed77920952243dcaf25d06f3a41525"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/owned-process.json",
+        "bytes": 1555,
+        "sha256": "21cf61aea182d44a5c09e2757041254866f9707f4efadbcff1cad23d007df8b2"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/raw.json",
+        "bytes": 15993,
+        "sha256": "16441402113405195c484c041686697ed9a7b2549da5fa8306d0150c01ca7b23"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/stdout-stderr.log",
+        "bytes": 2813,
+        "sha256": "af5851e322313008d7cd2786e0e251df3b15f53b5a15a4885ac0986128e2edcb"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/inputs-before.json",
+        "bytes": 858,
+        "sha256": "e37d771502c3c5d39bafeb8a91e4478a0b19d6a454fc2c7a21f0b8b25b46f9a3"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "ce96b905119235a7a50a9bc6473cf55e12a149ea1e411762b978b5e0c12a8b00"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/command.json",
+        "bytes": 1930,
+        "sha256": "c00f0f622c3c2290daf3229421fabb9fd9b85c9a9fcdccc22a22f9525ab1a2b9"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/classification.json",
+        "bytes": 7014,
+        "sha256": "6424830018612742f1b066e285fe19c5ac5b61ee55b997ead0bce78bc3833022"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/artifacts.json",
+        "bytes": 2050,
+        "sha256": "6ce71e4fc15c31df2cd601412a99dfe7d81abca48158006ddc2128eac08eb16a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/inputs-after.json",
+        "bytes": 830,
+        "sha256": "50705f8e4634e979a64ecce448a9d4e0bf869fc955fc4456c6330db36f294477"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/observer.json",
+        "bytes": 20517,
+        "sha256": "00732b45383375d83a7090dbd254d03e88e687441536f0643ad621b4cff85680"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/owned-process.json",
+        "bytes": 1557,
+        "sha256": "773dadf79e5cd1611c8c89c678ee60a3cdbebdb4f2331f2a9912a214cc8f7479"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/raw.json",
+        "bytes": 13456,
+        "sha256": "c36f25e1dc0785917442dc35d13bdb6468215a4612007b3e8f8b84cd648d323d"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/stdout-stderr.log",
+        "bytes": 794,
+        "sha256": "fca1f3f56954de9796ed7f867d20806661d8321d213edd9a23006167a43453bb"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/inputs-before.json",
+        "bytes": 830,
+        "sha256": "7cbe0cb43caa51410b677109bf278d44fd8bd7c9daec2847766b01c1d26ca45b"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "cdf3ea4b858906db343e60d3142bf19f581dda8009aa6f3ef6459221dcc129a2"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/command.json",
+        "bytes": 1932,
+        "sha256": "4ff9b7bfc2fa030c39c1aa4b7b3d29c71541bbfff17a412a5b0f96d5799a9ad7"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--restored/artifacts.json",
+        "bytes": 2066,
+        "sha256": "c018101369826ece9db464e7c92fb720f6fe63b62da64ae0e5738f7b78e0a9e7"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C1-likert-origin.json",
+        "bytes": 9043,
+        "sha256": "57a351415d871ce3922a831d23a2bd590db289e89f0648ee536ac7168f8c3571"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/before--P021-C1-likert-origin.json",
+        "bytes": 830,
+        "sha256": "d4f9a41c0c903335e82d85961a65f8620b85232adbb57a4c80520e6e879457bf"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/started--P021-C1-likert-origin.json",
+        "bytes": 1582,
+        "sha256": "8dc69b25b414852372d8f836c72c430a37ff9ae31ae10235c6361c40e41e9569"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/releases/P021-C1-likert-origin.json",
+        "bytes": 2865,
+        "sha256": "65dbddf9976d21be54382b9d8edd9e7e14750e2384c8bf443d1dba127dbba9ad"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/inputs-after.json",
+        "bytes": 830,
+        "sha256": "358420b26b25ef20be7dc47ef6184f346c8337b8bacae539c7c7db1711a47656"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/observer.json",
+        "bytes": 20517,
+        "sha256": "2600d5b1dcdd25f7f602e2fbaedc63cf85d576de858c42198fed1e8ff3155d5a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/owned-process.json",
+        "bytes": 1556,
+        "sha256": "f3985d097eedde3262ea4f681a06bd185fd65d27b2771924a0ea04a9a0590c6e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/raw.json",
+        "bytes": 13473,
+        "sha256": "d5334c4f946d05c8443475e8de7969a3869e470945728d788edd80f251245998"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/stdout-stderr.log",
+        "bytes": 793,
+        "sha256": "b18b558499ed8bd53152fcc7530bec96a59579a1ed3b77db24cb38da0e1fc888"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/inputs-before.json",
+        "bytes": 830,
+        "sha256": "442e7b7bf141bc447709846352cfc8fe00bee560901d9ca19e5184fa3197cdde"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "b1bc5ad575446ced331a12ff9e6f8f467dc6c2afaa833b5bbf924e85a7f68b64"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/command.json",
+        "bytes": 1931,
+        "sha256": "f378b7c300199d09436b6f7b0f7aaa0cd769bb8b85b136a5c208e23b3691ff9d"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--baseline/artifacts.json",
+        "bytes": 2057,
+        "sha256": "860187a4393577320ea1ce883e17417acbfeb93a169444c24488b1868939fcc7"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/inputs-after.json",
+        "bytes": 858,
+        "sha256": "9b5765b79f88f8f8c8c706e26d8faa675906d3f23fe7ce5f9ad81f5b7dddc111"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/observer.json",
+        "bytes": 22391,
+        "sha256": "ab34fc2f841cf8c00795d86693dca093691df226677f026720dceb53d879d892"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/owned-process.json",
+        "bytes": 1554,
+        "sha256": "3674bc1723d26c2022754d66c4e076507e21a967e9de8f8d1585ad6c9a1ad977"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/raw.json",
+        "bytes": 14719,
+        "sha256": "6f8526baa3d30e3626e944bcdfbe14950c37766df78120d2ff759af047e3dba2"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/stdout-stderr.log",
+        "bytes": 1714,
+        "sha256": "0bf44734138613f567d917132ad61e46fb338475289748a8bb870d3286234035"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/inputs-before.json",
+        "bytes": 858,
+        "sha256": "d9bf7407323409ab0ba6eea30b95f0d5362fd5a6dd78f0ecb233c2e1a919e13e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "08b75e5d70eba1c7a3781658403283ba135b33dc5b813009a629b4a7bb8dcae6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/command.json",
+        "bytes": 1929,
+        "sha256": "8e8ecd4b9a6e7cf5ae6628d295da3052a702cb629587118c4f8430d751ebbcd8"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/classification.json",
+        "bytes": 3630,
+        "sha256": "a576f8035cf15973897cd82a204e762872bc0185e5b4da1c014c26545c4ee5f4"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--mutant/artifacts.json",
+        "bytes": 2041,
+        "sha256": "9a84784f9d59122d30c8b43e7fb6458e3ef0d3d5602d8487e26b51e1ad505a33"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/inputs-after.json",
+        "bytes": 830,
+        "sha256": "31f9b3f5f96824e9248d285de301709587a2444a7e0ca49e10f620cab752400f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/observer.json",
+        "bytes": 20517,
+        "sha256": "1dc08e25457ddac9bb260cff9004992d5f3595f9cd5a93cb39163907ae55e8c0"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/owned-process.json",
+        "bytes": 1556,
+        "sha256": "f7a9487e6eee5af59e46d6d30b71e2728827d6a9b04d24d36d4e79a2c5dea2a9"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/raw.json",
+        "bytes": 13468,
+        "sha256": "229184f6fd0ad4b04d53a916c0ba7e28173cbb0ea31285048f02a1e1fc8e35c7"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/stdout-stderr.log",
+        "bytes": 793,
+        "sha256": "12fd847888c733c4e053bd64da30aa9f4539034721b1ee543ae4dca868d59cf8"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/inputs-before.json",
+        "bytes": 830,
+        "sha256": "4e12e4f19f3f09f95adddff18db4c1811ab8f16ec01c1a212606d048c2aa4059"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "920836cb3dc50d2a7f50ef2d839e6c9b2f6ed5e8fd3a845092f22be987fd7e33"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/command.json",
+        "bytes": 1931,
+        "sha256": "c5079e5a9ffcf1628475914f04130ae38aaf32c91111b01837742e38929f721a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/artifacts.json",
+        "bytes": 2057,
+        "sha256": "3aa804074f9186b545394c528aff23ad72f6dbc71e0a77b6462bff9d695b6e78"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C2-L2-threshold.json",
+        "bytes": 5602,
+        "sha256": "9bae5c5f1c09d9f5e4f717f4921bbd6ba9d4d55b41a24777e74b3ccdb854ae98"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/before--P021-C2-L2-threshold.json",
+        "bytes": 830,
+        "sha256": "9e61bce82e8d7a4dd3accc6ff1bae8cda456126b3b3cd749d173eedb73d8bb78"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/started--P021-C2-L2-threshold.json",
+        "bytes": 1580,
+        "sha256": "ee5f33bd13108d5455105b2c951a7e0ec2d9982952b7a759473cbfe21687bd86"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/releases/P021-C2-L2-threshold.json",
+        "bytes": 2894,
+        "sha256": "2ad1f257869c6d8e9bdf2839f7d8e4f1e0a7853dabe734d933fcb21ff4dd4657"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/inputs-after.json",
+        "bytes": 830,
+        "sha256": "71d4c310664fd4e293978fe4a0a8d4a3354462137560c60930a7fd869bf73210"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/observer.json",
+        "bytes": 20517,
+        "sha256": "4a7bb94c46f438499877cf1a494293db11c3e43b9d98844e395638e626a4511f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/owned-process.json",
+        "bytes": 1569,
+        "sha256": "2e10b7ee6ece9995e5c7ef3cbf0eeafb8e3672d2beea1f593e67ec11bd95fa37"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/raw.json",
+        "bytes": 13464,
+        "sha256": "225135ffbe13ab6a95c616c6511e2d0f6b04aa566db987eff11c65d6c6084bc8"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/stdout-stderr.log",
+        "bytes": 806,
+        "sha256": "f5c028f95801b90071c4457287162a71c61bf3ca074dc574dba5d51836ea8d02"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/inputs-before.json",
+        "bytes": 830,
+        "sha256": "15967f10bb112d2f0aab040ec2711cacd805a6438b39e4135d1dae0bab29b4c7"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "b295cac7157b831fc20be0eda8f02779fbcd145df3a87d4d072e2ab50916c08d"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/command.json",
+        "bytes": 1944,
+        "sha256": "ca165741acbc0c14b205d2c74300cd8e90e76a8c2a1715bb2090c4ae20e851a1"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--baseline/artifacts.json",
+        "bytes": 2174,
+        "sha256": "88bc1051b0ca081a0d89aa9f15dc97cc0ab19926ff4f75c389d88ce85bbdb139"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/inputs-after.json",
+        "bytes": 874,
+        "sha256": "34f5ecd5bbe766fe5fc924149f48a82d74a74e65f1be242bc96b0eba8e5a33fa"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/observer.json",
+        "bytes": 26093,
+        "sha256": "65c6909eacae9d74501d4bf083ce5b0cbaa9ae6ee67575f3b9b3affef8752c45"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/owned-process.json",
+        "bytes": 1567,
+        "sha256": "36789acc9c8fb30b1891e8f1b4ca97432d342607dde354a92c4610c1a79c1e8f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/raw.json",
+        "bytes": 17307,
+        "sha256": "059b69606c807f446bd8a08235f99e7ea6dfcaa94e87ec3352a09b6c670530d6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/stdout-stderr.log",
+        "bytes": 3818,
+        "sha256": "425e6d876d5a7b8438bf127f52f9f585678962096cb0e5b7e8c91694fac8b7fb"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/inputs-before.json",
+        "bytes": 874,
+        "sha256": "286b9652486269f79f05fce7b536f7d437a321a87cbbe82a7fda47f35959dd07"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "f31ba2db1649188c7e7128b064ff8e43ce6442940c817c4c7a88b92c211d5692"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/command.json",
+        "bytes": 1942,
+        "sha256": "f238650977f07086fe8bcdfbea7a96c07c539f3824ee0cb7f4d53859c092efa0"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/classification.json",
+        "bytes": 10550,
+        "sha256": "e71ae4b4662b0e4ee75f4c108324245a538533df7b2ebe4495251d54bf638bd6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/artifacts.json",
+        "bytes": 2159,
+        "sha256": "60c24b6b3175fa5dd9c40e9cc8709c5db77e309a23bef9aa9895dee1fc2b409e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/inputs-after.json",
+        "bytes": 830,
+        "sha256": "fbfe5a4c39a6d372d268da22d6cfc5c8d5f19d9c7511eb811cc318625f5c7649"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/observer.json",
+        "bytes": 20517,
+        "sha256": "58768c79ed15c47331e9c0c858b6cf5d45b2663b60d1a9938492d1de3817289e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/owned-process.json",
+        "bytes": 1569,
+        "sha256": "40c81bcc07f069d7b0ded429c2038d2eb5dc913de0617d2ecdd85c5ca9303075"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/raw.json",
+        "bytes": 13483,
+        "sha256": "63eef61af74ab5b956c0bc813260f5ada0c33e9bbc728db027047347d6f0b288"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/stdout-stderr.log",
+        "bytes": 806,
+        "sha256": "703665058ba0b9b6a556257f58cedb5e6f69b40e992a22fde5d509f40ec33e63"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/inputs-before.json",
+        "bytes": 830,
+        "sha256": "098951f9ae0a5a3a431ff789b1b2fc6117351c3b5ffa7924de833646040836b1"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "050f7e51c41904f26f986c1199615faf73774ae6449e128a817bd42e22e0aa35"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/command.json",
+        "bytes": 1944,
+        "sha256": "a487f9487baf7d133e1170737f55a889bf7687b670ac5405a7f167a89b9444d6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--restored/artifacts.json",
+        "bytes": 2174,
+        "sha256": "d8f04d707ec0fd2974d12e53660d2a4700356d38ada44730f2776f29c3aeb32b"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C3-numeric-self-eligible-cap.json",
+        "bytes": 12643,
+        "sha256": "37a9ca7d663048727ebafbc0482ed2877397b89e4670b1960bc9ef4338b866cf"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/before--P021-C3-numeric-self-eligible-cap.json",
+        "bytes": 830,
+        "sha256": "d21045de37c5c6d08d3578af410764c24b157617f1df787e855081577f7261c1"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/started--P021-C3-numeric-self-eligible-cap.json",
+        "bytes": 1606,
+        "sha256": "ce69c23ceccc513bd3df842ed67a30f044fc8555f7cf6a181a251417155f4184"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/releases/P021-C3-numeric-self-eligible-cap.json",
+        "bytes": 2948,
+        "sha256": "14871a8e75a709538273db714a8a30185c1b373088341899a4c8f28e47daf57e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/inputs-after.json",
+        "bytes": 830,
+        "sha256": "7667e9aad15e75c22b88103a53f4192c68c8e2059cfd098b28fef92dbbf0d3a5"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/observer.json",
+        "bytes": 20517,
+        "sha256": "0bac6fdf9288fdf9d26944a08e941384946560225c8e0c596df99010267a7f54"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/owned-process.json",
+        "bytes": 1561,
+        "sha256": "cb3aeb58d26b37ad6e30e19c776eebc6af580c5f90583e6cac3f31b6dbf20b43"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/raw.json",
+        "bytes": 13472,
+        "sha256": "85089bad985d007d8de6a911cacbd6584976c37a016c87bee6fdc2eed65e9733"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/stdout-stderr.log",
+        "bytes": 798,
+        "sha256": "2a2004738fd3cf297825e9be9f81f6aad83bc9bd2970805e2fcbdc70e261f871"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/inputs-before.json",
+        "bytes": 830,
+        "sha256": "b614617f36310379dca07d50910aa06fe0268c8f087070604fb24ed5f916331f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "ce2cdf964c0030aa14593b1ed7355f7682acb0fb927f3bd45925e07e7ff9a0e3"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/command.json",
+        "bytes": 1936,
+        "sha256": "bf0c1f53e90b541ec852cd5cae2aefcc9a7f4bdc0fc2be9545dcc7c81a0b340b"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--baseline/artifacts.json",
+        "bytes": 2102,
+        "sha256": "0ef8c045541653702626bd7924356f8055b37b54fbb7d2bbf872c3c7777b874b"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/inputs-after.json",
+        "bytes": 870,
+        "sha256": "4234a73e47e7987c40354d1faeb1c80e66dc93bdb0269bf48b24c3f53b925e9f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/observer.json",
+        "bytes": 22598,
+        "sha256": "4af9659e0a6e2f1f033fa50b308e09155adc1c7bd925ad1addf21e856905549d"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/owned-process.json",
+        "bytes": 1559,
+        "sha256": "cd31e410f116bc3740536a662e470cbeec423b2fcdbe934c48747589c3bb9925"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/raw.json",
+        "bytes": 14897,
+        "sha256": "825e11b72b6613712a9876bb63ea6a2039d1ae35b31442941978a77ba93c84d5"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/stdout-stderr.log",
+        "bytes": 2004,
+        "sha256": "c2fa46e23ed8b0380a6268f2f555731e241a48d1cfbe7d31d7b5a57287f32627"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/inputs-before.json",
+        "bytes": 870,
+        "sha256": "da23f2f7acaee55a08ae8bdb46df878b0e9684ffe95379a038679334cfb8a046"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "4f79fcde2a33c6641f38edb106a42b6bdd15ccaafc52e7e0bb40fe6b5d116b26"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/command.json",
+        "bytes": 1934,
+        "sha256": "d8f9db6a394fa53997e260083bbca9f94d965ff41f849b06ee1acbd419422323"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/classification.json",
+        "bytes": 4023,
+        "sha256": "f2ba77055f18b7e1b118dcb5bb3b31c679a196f8af4e0c502a05df4ccb0dd4e3"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--mutant/artifacts.json",
+        "bytes": 2086,
+        "sha256": "1bc5bb61764cd6393fdcef7c7c86e3ba19454c8b8064cbbc6766a62dd5eba183"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/inputs-after.json",
+        "bytes": 830,
+        "sha256": "5afd3dd1f831cc96694a3f91de9d65db5e43a66485fb5ffedac5f1bf69f1c48e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/observer.json",
+        "bytes": 20517,
+        "sha256": "c4751725b2fdbde9f5de72df2acf0b1488965e376781edd8843d35c387a84880"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/owned-process.json",
+        "bytes": 1561,
+        "sha256": "4377d90f1d591a8d6a17d9480aa64933e549897feeb558bc7671e32d4626770a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/raw.json",
+        "bytes": 13469,
+        "sha256": "f96ea801cf1797adb78e1ef78aa21231977636b3c793121832e46d9d42a13c79"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/stdout-stderr.log",
+        "bytes": 798,
+        "sha256": "ce85cbf7016e1478facb82dff810532a65df57baf04a9e39cbd7e9bbb14ae775"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/inputs-before.json",
+        "bytes": 830,
+        "sha256": "ff6fea2e303bf2157cf7a9ff568b440ee52d54f6c65b03daf461f5c9219dfbdc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "4c44a140349ce49de619c8051b0d1c30fbd7a80cafa51cd07299483dcf84d7fb"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/command.json",
+        "bytes": 1936,
+        "sha256": "99b4d2130b4626b6f0d8f52ed061603458287ae6ac8d574bfcaa0ad6d3f37ff0"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C4-base-L3-self-tier--restored/artifacts.json",
+        "bytes": 2102,
+        "sha256": "a9015b833ede09a3fe80703ade3ab9bbfd29a7b8047f6b522780545e220a2292"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C4-base-L3-self-tier.json",
+        "bytes": 6004,
+        "sha256": "5d2ff7b0b4fe2ca0f31fc6ab2ac9c0e99c18fc93116b6ff545e3a90a25ece819"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/before--P021-C4-base-L3-self-tier.json",
+        "bytes": 830,
+        "sha256": "df7bc5ec8a6787ae03ec3078cfe15c41d4fa801d6fdc8f38bdeda3721396cb26"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/started--P021-C4-base-L3-self-tier.json",
+        "bytes": 1590,
+        "sha256": "eac03cdaf89b80d4da8fba26e5d61ec401c0f9dd684b9fb3c949c9e13bf238ba"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/releases/P021-C4-base-L3-self-tier.json",
+        "bytes": 2973,
+        "sha256": "f350986877baf1b38020425cca2d5a90414e9d5537f4303e37bc58421fc2ccd7"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/inputs-after.json",
+        "bytes": 830,
+        "sha256": "d8b01c1b542cfe22cea9ed557c7925a2768675a72d982565dbcc5fa5b75308c9"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/observer.json",
+        "bytes": 20517,
+        "sha256": "4727d687970323ab6a6e9e944ee68c9bf1b86f74fed75454cf7756aa9b4b0aee"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/owned-process.json",
+        "bytes": 1566,
+        "sha256": "377108356174a85a172a8b02b0106db8e351ad7b459dcca00fecdec22d0beb98"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/raw.json",
+        "bytes": 13476,
+        "sha256": "a874b7bd62349cf3dce9f5a1d61c174314ae0304b8855fa537c89ec8bdaa13ae"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/stdout-stderr.log",
+        "bytes": 803,
+        "sha256": "bd5fc90885610f8002a8a2f27841c07bc961be69722cee57b5b2baafea4f4fe7"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/inputs-before.json",
+        "bytes": 830,
+        "sha256": "8bb8a25d5093d566b94ce68984646d3e4508e0764d71a4bff4c248b0bf5af4a1"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "f3faabb208b18f7a02605371e472ec6cc1294a1246bb5383ed1c20c0d8a07fe3"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/command.json",
+        "bytes": 1941,
+        "sha256": "7e4cd1ae7048689945c670c8e793c0bda69cfef0cd6d293580946f005d30e613"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--baseline/artifacts.json",
+        "bytes": 2147,
+        "sha256": "e9982ab9dce0ef6366f891ee0100b45c016d7a687fed93b4954cdd5bb251184f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/inputs-after.json",
+        "bytes": 863,
+        "sha256": "4c5174182d307f39e754e27d992398aef6bf227f67eb6a2c52998f7675daad9a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/observer.json",
+        "bytes": 22415,
+        "sha256": "a4019bb8e0d5e08d086099f739a9a8e64f9cb7ac7babea457175d4ac43bf07b6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/owned-process.json",
+        "bytes": 1564,
+        "sha256": "43f4075f022d8e320e94c6cf140fc07597698ab135d93ac7962300c6cd73ece6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/raw.json",
+        "bytes": 14748,
+        "sha256": "f1b8d57ac0314804454bd4c1fc32387c66989ec741e9b55dd256ab61b7086268"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/stdout-stderr.log",
+        "bytes": 2032,
+        "sha256": "555058eaf9e493925b2cc977608c2b5d46e98f4bda2ee129e05a4391643cafd6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/inputs-before.json",
+        "bytes": 863,
+        "sha256": "4f0ff52aff637598d9c9b6d421b3af7cf3a8d15633d8bd1b465c485ebae24274"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "4df79e7c6d91fd618d365452b927ce65e3c8fae86096526cce9aa7c11dbd4cb5"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/command.json",
+        "bytes": 1939,
+        "sha256": "cb61af6b8cdbffe5737548c80966b59357ab5117714537f4d25ac7f5a594af0f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/classification.json",
+        "bytes": 3691,
+        "sha256": "8385777671d7387932c2428cc2b0396dba3200ca788fda680d50665d6733725f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--mutant/artifacts.json",
+        "bytes": 2131,
+        "sha256": "028d1c34211fb5fae5bad9bf55643f7a0c6970abaf8a589ac5744503ef4b6e23"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/inputs-after.json",
+        "bytes": 830,
+        "sha256": "86333f98ca0ff4ccbafc47b7a265bfa5cab105111d94428d2cf059272adb5eed"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/observer.json",
+        "bytes": 20517,
+        "sha256": "38e1b90da2a0a2934becf73afd2c97c0a298e1d0bc5f515a6333f3f863d50a3f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/owned-process.json",
+        "bytes": 1566,
+        "sha256": "b2dbb9f1916528f3be8bf0c370ebe3dc54976ace300e58683e0f6c74aabddaec"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/raw.json",
+        "bytes": 13476,
+        "sha256": "7cd0f166b347bed792f2e1093cbdda75b309acd50a081be8323db18dc830ae7a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/stdout-stderr.log",
+        "bytes": 803,
+        "sha256": "dfa2499a8ee9f46d4cc0cbe7cea0c12bc97def5fe4ed8cabf302adf56c349e00"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/inputs-before.json",
+        "bytes": 830,
+        "sha256": "7412006659bde7a3c5e03c16ba080f7ed3f5e0a07dced310aaee824d6b410e59"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "984fd35aebe01622009af2e4dc65b373f4df753efeda72593d53f2a2d6e2b4c9"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/command.json",
+        "bytes": 1941,
+        "sha256": "5e492847895505055cc4b5fe24377e25c540ede1a58f6768852fdb2d84d13bd5"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C5-default-gate-self-tier--restored/artifacts.json",
+        "bytes": 2147,
+        "sha256": "ad6e03b3fda4c4540b25b4a27f9a909b53111a17745c448af894049449cf4354"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C5-default-gate-self-tier.json",
+        "bytes": 5673,
+        "sha256": "1bd3d7a9669a201a2c716d7f3dec9d24e38729989915007ab3e7fd52d70de532"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/before--P021-C5-default-gate-self-tier.json",
+        "bytes": 830,
+        "sha256": "2beec30b5c7fe468d4deb9a48700dbff176dd54d32ad1db1f7570523b40a06ce"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/started--P021-C5-default-gate-self-tier.json",
+        "bytes": 1600,
+        "sha256": "2fc98f3b0a4d85b075102ec22d7fcf6f539f9ed3ce4eaf2d007cd818afae330e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/releases/P021-C5-default-gate-self-tier.json",
+        "bytes": 3016,
+        "sha256": "f0a52012b0db4e9e1b50e9705e1f66dc42983b2405b080c5293eed5c7389b253"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/inputs-after.json",
+        "bytes": 830,
+        "sha256": "84a78039b182410641066408c83ad7b852780ef777c72697a6ac55e1ead26f56"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/observer.json",
+        "bytes": 20517,
+        "sha256": "42d10c4fdd1783dfe1d23d5eaadc9a3b6f24d5c14de0018bdeb0f49452f8eb41"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/owned-process.json",
+        "bytes": 1567,
+        "sha256": "e8851fe2a2baff8f6f6adbcd1570484934a57af6875e2fdd287e3dc82c534267"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/raw.json",
+        "bytes": 13472,
+        "sha256": "454fd15026ddad270204b0cf72167c4c2d35019a9029107c4203a88d2ffbf112"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/stdout-stderr.log",
+        "bytes": 804,
+        "sha256": "3064d40361a7ee8e26836165ab3979300bd685e92ccd56a439c0984351352657"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/inputs-before.json",
+        "bytes": 830,
+        "sha256": "6cfa9d5eac15217d774bf3b97f1c765524d4fbaf5b662e973f62e1f221e72939"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "2a274895bb743eecc61796c536e66415e2a3072e6e81416868fa2f0a754b6548"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/command.json",
+        "bytes": 1942,
+        "sha256": "e0577189651d200c357446a0d8837bdcbb7353622ff95e5d9580bb79e997a32c"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--baseline/artifacts.json",
+        "bytes": 2156,
+        "sha256": "5b772fdec1c06a241b252089288973bdd901b399b614a132b3db7d6cf3a48bf2"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/inputs-after.json",
+        "bytes": 877,
+        "sha256": "ab0665a6a07a83c0455d271a9cdb69695c683d0a41a8b2526c9d6306174b26c8"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/observer.json",
+        "bytes": 25893,
+        "sha256": "96316d6c08546a8aabd74306a6df6f638c3f241f31c29bfc6019403a74946c4d"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/owned-process.json",
+        "bytes": 1565,
+        "sha256": "a8b05787f4ac002072f2074d6b4af021b9e8fa8683b118221283f4882bf26ca9"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/raw.json",
+        "bytes": 17285,
+        "sha256": "ce66931af9c58d80d721f0f7c65ba226876fe143a3ec62d47855fc2c12d62de9"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/stdout-stderr.log",
+        "bytes": 3161,
+        "sha256": "f877052c79c7dc3f471a4b02ee94213e1d668e8a2c6500977b063dd365b96700"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/inputs-before.json",
+        "bytes": 877,
+        "sha256": "624ceda3861452b8117b3bee9e6055dc749d8bfac726fe14d4d5222f7dfe5529"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "ca7acfc7d1f1333a877df8ac6d58ec8c5dbf1ed2f717edbf59dcb963c44242eb"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/command.json",
+        "bytes": 1940,
+        "sha256": "5dec9355062a935576b1b1580ae9d66073f63bc0708391cd2dbb613e4e6e90fd"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/classification.json",
+        "bytes": 10258,
+        "sha256": "072b3e76dcce1d421c3cf4e1398e0a1f499f1ecd76aae43c8ecd901729d7fd2a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--mutant/artifacts.json",
+        "bytes": 2141,
+        "sha256": "a595d4fffdf772d970dc29c19324a5c66eb5e2b693bf50d3d85b45c08b6e4029"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/inputs-after.json",
+        "bytes": 830,
+        "sha256": "367f12fa041d23e4060e4b9c9e1442908a895d6c8a79d9417f02ad99024ee556"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/observer.json",
+        "bytes": 20517,
+        "sha256": "28eaa99e49c77754a1de29da0eb547378f3ffb8985ad5ae31e9c03379dc47b93"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/owned-process.json",
+        "bytes": 1567,
+        "sha256": "3b09f702052d4946bd835e93a001d492ee897644ec3df51e3938fff72282e60e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/raw.json",
+        "bytes": 13477,
+        "sha256": "abee15eef2e6673e55e2e38b17546ce96c2e7bd99f38826fab0ca7687385d0df"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/stdout-stderr.log",
+        "bytes": 804,
+        "sha256": "93ac516fca51b109ef10e3412f209eb3c5eb7a2d5814fd959d126c5cdd0267d0"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/inputs-before.json",
+        "bytes": 830,
+        "sha256": "22fdec4e6a0434cb019bba616551d9350ac23fdfccb91d0de3621ef584db9e01"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/owned-group-after-exit.json",
+        "bytes": 520,
+        "sha256": "9322a72b601c1a0880f85e2fa1d3c82b3f879f5a478cd8d07ea5ed63bdfb6f5a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/command.json",
+        "bytes": 1942,
+        "sha256": "05be39cac466de60a41933672f0d09af67bf494252f309c12a74ed6e3aeb01e6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/classification.json",
+        "bytes": 229,
+        "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C6-representative-raw-size--restored/artifacts.json",
+        "bytes": 2156,
+        "sha256": "21896ab8ae2d2fd6a9ebc5fa210640c9be52f4ee10f405de4ad81e59a34d7e6d"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/result--P021-C6-representative-raw-size.json",
+        "bytes": 12337,
+        "sha256": "e93c15c1a3a77f7f3003af6b75b9900a5ec1dabecf9421ab9485d06e6369ecb6"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/before--P021-C6-representative-raw-size.json",
+        "bytes": 830,
+        "sha256": "cc05f23960c3266b6534f2d51c72b965ac0b6d72ad8792a1996c047f86a0eb7e"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/started--P021-C6-representative-raw-size.json",
+        "bytes": 1602,
+        "sha256": "276418686554bb0d448ecff3855b74637906cd8a0202898f0c1acef31e3fe08f"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/releases/P021-C6-representative-raw-size.json",
+        "bytes": 3056,
+        "sha256": "efc1a0f6f3b1a2ba8aea707793f8c11ece65ec56c4921a7d0c50adf20c68cc61"
+      }
+    ],
+    "knownLatePatterns": [
+      "Unhandled Errors?",
+      "Unhandled Rejection",
+      "uncaught exception",
+      "Error during teardown",
+      "Tests modified the repository workspace",
+      "Hook timed out",
+      "Error:.*global.?teardown",
+      "ELIFECYCLE",
+      "error during close",
+      "close timed out",
+      "error during global teardown",
+      "Tests closed successfully but something prevents"
+    ],
+    "noActive": true,
+    "noHalted": true
+  },
+  "postControlGlobalVerification": {
+    "sourceFiles": 7945,
+    "distFiles": 4529,
+    "privateActualFiles": 12474,
+    "copyManifestFiles": 12474,
+    "allCurrentSourceDistAndPhysicalFieldsExact": true,
+    "physicalFailures": [],
+    "privateInventoryExact": true,
+    "rootDistInventoryExact": true,
+    "uniquePrivateInodes": 12474,
+    "privateRootInodeIntersection": 0,
+    "links": [
+      {
+        "relativePath": "node_modules",
+        "target": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules",
+        "resolved": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules"
+      }
+    ],
+    "privateGitExists": false,
+    "borrowedNativeExact": true,
+    "borrowedNative": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538645305,
+      "nlink": 1,
+      "mode": 493
+    },
+    "preservationInputsChecked": 32,
+    "preservationInputFailures": [],
+    "ownInputsChecked": 23,
+    "ownInputFailures": [],
+    "recordedPhaseAndFinalNativeFailures": [],
+    "currentNamespace": {
+      "phaseDirs": 18,
+      "releaseFiles": 6,
+      "startedMarkers": 6,
+      "resultFiles": 6,
+      "activeExists": false,
+      "haltedExists": false
+    },
+    "inputManifestPins": [
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/source-manifest.json",
+        "bytes": 948064,
+        "sha256": "33488a499321073557a83b7a4e8446f1c7e4744f0c05fbc6edf27fb26f9c4caf"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/compiled-manifest.json",
+        "bytes": 485185,
+        "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+        "bytes": 3978574,
+        "sha256": "58ef19180c72f3818b797f6e37de6b7700d07604d6be019f3df05211c8547416"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/inputs/preservation.json",
+        "bytes": 8436,
+        "sha256": "c91b8b4d0663f0a69510e5384559abad6305096510b164a8b260dcae21d993a3"
+      }
+    ]
+  },
+  "finalAfterFreezeFullCopyVerification": {
+    "files": 12474,
+    "failed": [],
+    "allReadAfterFrozenFinalPacket": true
+  },
+  "finalPacketVerification": {
+    "failures": [],
+    "indexReferences": 322,
+    "indexUniquePaths": 322,
+    "indexExcluded": [
+      "causal BASE/closure",
+      "causal BASE/home",
+      "causal BASE/tmp",
+      "PARENT/home",
+      "PARENT/store",
+      "live root journal",
+      "this index",
+      "new causal and whole-lane summaries"
+    ],
+    "indexForbiddenReferences": [],
+    "nestedPacketReferenceOccurrences": 166,
+    "nestedPacketUniqueReferencedPaths": 125,
+    "frozenJournalMatchesClosedRootJournal": true,
+    "frozenJournalRows": 15,
+    "frozenJournalExits": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "rootAndCausalCommandRecordsSeparate": true,
+    "wholeAndCausalFormalAcceptanceClosed": [
+      false,
+      false
+    ],
+    "finalPins": [
+      {
+        "path": "/private/tmp/p0-21-bounded-qualification-20261015.json",
+        "bytes": 22661,
+        "sha256": "59f3e11fe15481cbcec48c0d77d4ce6c0ffbd723344a472c965a34368e96f5a2"
+      },
+      {
+        "path": "/private/tmp/p0-21-bounded-qualification-20261015.md",
+        "bytes": 3218,
+        "sha256": "13f47058cf8698a8cf409023061a2b9ce20f20c5e889e224e90e6646f9c2e87a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015.json",
+        "bytes": 214028,
+        "sha256": "dedf4697037ceaf365245141a3422852e5d8f1c6d9d1f12c662d7c8debf1955a"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015.md",
+        "bytes": 3685,
+        "sha256": "15681f6d48f6bc635f385d1a5b83746d315e565af0023f2dc7d89e2ac4e54ac3"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/runtime-artifact-index-v3.json",
+        "bytes": 73776,
+        "sha256": "a46ee93ebf9105bb3f335a60db052a56021e8228367c2a4aa6c96132f22c990e"
+      },
+      {
+        "path": "/private/tmp/p0-21-qualification-20261015/commands-frozen.jsonl",
+        "bytes": 6667,
+        "sha256": "215d1ff940be928d96363cb833c679fd198beab796054ca10076db78fc05ed40"
+      },
+      {
+        "path": "/private/tmp/p0-21-qualification-20261015/final-source-preservation.json",
+        "bytes": 3360,
+        "sha256": "fe710a627ff7dfbaf45dee56a00b57c9a34c2c754c8df66976cdd283298ade24"
+      }
+    ],
+    "freezerPin": {
+      "path": "/private/tmp/p0-21-freeze-qualified-evidence-v2-20261015.py",
+      "bytes": 32622,
+      "sha256": "d9e02e0a26624c4ebbdf9f3786068bbe6392d7f4abc8fd7603f66d99e6b3d19f"
+    },
+    "sourceContext": {
+      "path": "/private/tmp/p0-21-qualification-20261015/exact-source-validation-context.json",
+      "bytes": 3352,
+      "sha256": "79da41374b6d9d69dbaa7b819d9cc2b52804633577eaf1566c93eca9545298fe"
+    },
+    "finalPlanPins": [
+      {
+        "path": "/Users/sid/Downloads/Agent contract.md",
+        "bytes": 25110,
+        "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Issues.md",
+        "bytes": 38227,
+        "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/Workstreams.md",
+        "bytes": 78486,
+        "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/A4 · Forge.md",
+        "bytes": 47286,
+        "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65",
+        "matchesFrozenP025Authority": true
+      },
+      {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+        "matchesFrozenP025Authority": true
+      }
+    ],
+    "finalReservationPin": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "versionHistory": {
+      "v1": "Blocked static preparation; unexecuted.",
+      "v2": "Superseded static preparation; unexecuted.",
+      "v3": "Hash-released actual execution, six controls and 18 completed phase processes."
+    },
+    "quality": {
+      "duplicateFindings": 1269,
+      "deadCodeFindings": 2751,
+      "status": "failed, not rerun or waived in P021"
+    }
+  },
+  "sourceAssertionPeerCrossCheck": {
+    "agent": "/root/native_race_static_review/p021_actual_assertion_map",
+    "scope": "Read-only source/assertion cross-check of original6 tests, recipes and completed raw/observers; no final packet/lifecycle assessment, execution or writes.",
+    "conclusion": "No contradictions; all11 matched source assertion observations and all6 in-memory exact-anchor hashes agree. First-failure masks and C4/C6 limitations agree with main audit."
+  },
+  "findings": [
+    {
+      "id": "E1",
+      "severity": "info",
+      "finding": "Original three corpora and six causal B/M/R controls agree with direct raw/observer/source records; failures are matched AssertionErrors rather than generic nonzero-exit kills."
+    },
+    {
+      "id": "E2",
+      "severity": "info",
+      "finding": "Every causal phase normal0/1 exit has actual retained owned-group ESRCH; no known infrastructure/late diagnostic or survivor. No universal descendant-absence or teardown claim."
+    },
+    {
+      "id": "E3",
+      "severity": "info",
+      "finding": "All current source/dist/physical/native and selected global preservation evidence matches. Borrowed causal dependencies and inherited original wrapper environment are accurately bounded."
+    },
+    {
+      "id": "E4",
+      "severity": "info",
+      "finding": "Final322-reference index,166 nested pins and seven output files agree. Frozen15-row journal exactly equals the root-policy-closed live journal. Both parent home/store and causal private mutable roots are excluded."
+    },
+    {
+      "id": "E5",
+      "severity": "acceptance-gap",
+      "finding": "Strict no-fabrication ok:true/pending0 does not establish literal wording equality:20 lines,10 outside explicit permanentR4 files. No policy/allowlist waiver was made."
+    },
+    {
+      "id": "E6",
+      "severity": "unwaived-quality-debt",
+      "finding": "1269 duplicate and2751 dead-code findings remain prior failed quality results, not fresh P021 runs or waived floors."
+    },
+    {
+      "id": "E7",
+      "severity": "historical-preparation-correction",
+      "finding": "Controllerv1/v2 remain unexecuted/superseded, v3 alone has actual control releases. The metadata-freezer v1 static readiness was premature about parent home/store and a scanner-source packaging sentinel; frozen v2 review explicitly supersedes it. Product evidence was not rerun or reclassified by that metadata preparation correction."
+    }
+  ],
+  "runtimeAndTrustLimits": [
+    "Parent installation/build and retained runtime fingerprint are separate actual root runs. Parent Nodev22.23.3/ABI127/native query1 does not fingerprint every later child or prove every case loaded native.",
+    "Causal phases borrow parent node_modules. The seven-key environment is not an independent install, OS sandbox, network isolation or universal cache/dependency immutability proof.",
+    "Run-end observer precedes global teardown; command exits/full retained streams and owned-group ESRCH supplement it. Detached descendant escape, all-filesystem effects and universal teardown remain unproven.",
+    "Core MCP entitlement/SDK transport are mocked; diagnostic ParsedEvidenceEvents are hand-shaped. CLI14 actually spawns built dist/cli.js with inherited environment and local run JSON. Canned capabilities are fixture data.",
+    "No authenticated stored-row provenance, signed legal truth, paid/full model transport, compliance authority or deployed environment proof follows from these fixtures.",
+    "First-failure masking materially limits mutant claims. C3 does not independently expose every pack; C4 is policy-array sensitivity; C5 masks ATTESTED positive; C6 is representative two-site regression with no observed final6%/80% aggregate."
+  ],
+  "unresolvedScope": [
+    "Literal wording acceptance reconciliation remains open.",
+    "Quality1269duplicates/2751deadcode remain unwaived; reused type/lint/clean-source results retain historical source/command attribution.",
+    "User-skipped P0-29 successor decisions and P0-22 empty-result gaps remain unresolved.",
+    "P0-23 held API/Studio failures, P0-51 issuer/formal failures, P0-24 strict ISO/expert gaps, P0-19/P0-20 proposals and P0-30 held runner/full-batch/installed-pack gaps remain unresolved as recorded.",
+    "Claude work, ownership/reservations, shared CLI/API/Studio/A4 and paused P2-02 remain preserved; no ownership transfer or permission follows.",
+    "Full suite, coverage, Node24, hosted CI, PR/merge, deployment, release, G0 and Done remain unqualified. P0-45 readiness is future read-only planning, not runtime evidence."
+  ],
+  "markdownPin": {
+    "path": "/private/tmp/p0-21-bounded-independent-review-20261015.md",
+    "bytes": 3904,
+    "sha256": "94c0bdddab765bfaa6beeed4f4ef0feea9cae5e72a807f81b192f0b86e7299cf"
+  }
+}

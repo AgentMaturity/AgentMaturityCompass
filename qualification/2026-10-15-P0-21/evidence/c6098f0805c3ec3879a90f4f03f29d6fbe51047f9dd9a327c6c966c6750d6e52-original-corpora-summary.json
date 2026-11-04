@@ -1,0 +1,153 @@
+{
+  "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+  "capturedUtc": "2026-10-15T04:57:28.011766+00:00",
+  "separateOriginalRuns": [
+    {
+      "phase": "original-core",
+      "registered": 37,
+      "passed": 37,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "raw": {
+        "path": "/private/tmp/p0-21-original-core-20261015.json",
+        "bytes": 13531,
+        "sha256": "5956cd0924105ed8af8c535a0d9a9e5700f9bedcc684dc012f983d97393ac9e2"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observers/original-core.json",
+        "bytes": 20673,
+        "sha256": "a184fdece85e47d6d25d4e6730bfa21157598b152a3e15cc8a067ea9df5ceacb"
+      },
+      "combinedStream": {
+        "path": "/private/tmp/p0-21-original-core-20261015.log",
+        "bytes": 756,
+        "sha256": "ca86226e2433acbe6a56afdce4619cdcd7752deca2aa8286eaf52c62790ce15d"
+      },
+      "fileCounts": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+          "registered": 4
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/logisticsIndustryPack.test.ts",
+          "registered": 2
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+          "registered": 7
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+          "registered": 4
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+          "registered": 5
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+          "registered": 15
+        }
+      ],
+      "observerPid": 10289,
+      "recordedInfrastructureOrKnownLateErrors": 0
+    },
+    {
+      "phase": "original-cli",
+      "registered": 14,
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "raw": {
+        "path": "/private/tmp/p0-21-original-cli-20261015.json",
+        "bytes": 5336,
+        "sha256": "11395d84ec62ac0282a2f3c0b027c934b525c461ee006dcdf1bab2a90e36b925"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observers/original-cli.json",
+        "bytes": 7690,
+        "sha256": "8b7547cd2f35a3de1c8918cc234298d4ce6e5599780be0cb39b6992cc27fc2f3"
+      },
+      "combinedStream": {
+        "path": "/private/tmp/p0-21-original-cli-20261015.log",
+        "bytes": 1283,
+        "sha256": "0ff82949f54c37bdb3799f3a4db37f13d03e6d75a681e2d1b35d4bbc88270d41"
+      },
+      "fileCounts": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/industryAdjustCurrentScore.test.ts",
+          "registered": 14
+        }
+      ],
+      "observerPid": 10346,
+      "recordedInfrastructureOrKnownLateErrors": 0
+    },
+    {
+      "phase": "original-consumers",
+      "registered": 48,
+      "passed": 48,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "raw": {
+        "path": "/private/tmp/p0-21-original-consumers-20261015.json",
+        "bytes": 15550,
+        "sha256": "7922b303999bdc675f210fe4613f803fc19cee76b3060f68a7f0874007d8e32d"
+      },
+      "observer": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observers/original-consumers.json",
+        "bytes": 21993,
+        "sha256": "8a147dbc48d51bcbc96fa1e15754e12a4f620fc3c16713bc2937a078eacfff83"
+      },
+      "combinedStream": {
+        "path": "/private/tmp/p0-21-original-consumers-20261015.log",
+        "bytes": 543,
+        "sha256": "c2c535d81692936b3bcf1034871d5f5fadfd0442bec1a29687f23eedee9d6f08"
+      },
+      "fileCounts": [
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domain-assessment.test.ts",
+          "registered": 3
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domain-packs.test.ts",
+          "registered": 8
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/mcpComplianceSafety.test.ts",
+          "registered": 15
+        },
+        {
+          "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreCrossFrameworkMapping.test.ts",
+          "registered": 22
+        }
+      ],
+      "observerPid": 10463,
+      "recordedInfrastructureOrKnownLateErrors": 0
+    }
+  ],
+  "distinctOriginalRegistrationsAcross11Files": 99,
+  "boundary": "Three separate unchanged original invocations:37core,14CLI,48consumers. No single99-case invocation is claimed. Loops/parameter fixtures expand only as measured. Core MCP entitlement/transport are mocked; diagnostic input rows are hand-shaped ParsedEvidenceEvents. CLI14 uses actual built entrypoint with inherited environment and local hand-authored run JSON, not authenticated stored results. Canned MCP capabilities/benchmark counters are fixture data. No full paid transport, signed storage, legal truth or compliance authority claim.",
+  "runtime": {
+    "node": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "modulesABI": "127",
+    "napi": "10",
+    "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+    "sqliteSelected": 1,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538645305,
+      "nlink": 1
+    },
+    "boundary": "Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference."
+  },
+  "priorP025NativeUnchangedAndPhysicalDistinct": true,
+  "compiled4529EqualP025": true,
+  "reporterBoundary": "Private run-end observation plus separately inspected known post-exit diagnostics; no universal child teardown or all-filesystem effects claim."
+}

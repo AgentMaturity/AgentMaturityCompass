@@ -1,0 +1,49 @@
+{
+  "schema": "p125-old-packet-static-audit-seal/1",
+  "actualGitBase": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+  "packetReceipt": {
+    "path": "receipt.json",
+    "repositoryPath": "qualification/2026-10-17-P1-25/receipt.json",
+    "bytes": 66214,
+    "sha256": "c2064956af3bcde63fa631bfb20aa63250e2fd68e94aa055da70ceffc9b10496",
+    "declaredSha256": null,
+    "receiptDeclared": false,
+    "currentGitblob": "8ffdf5e8b8b49703a0c6dd20d59dc8962e3ec85c",
+    "currentGitblobAt": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+    "workingGitblob": "8ffdf5e8b8b49703a0c6dd20d59dc8962e3ec85c",
+    "gitMode": "100644",
+    "sha256MatchesReceipt": null,
+    "workingBytesMatchCurrentGitblob": true
+  },
+  "packetReadme": {
+    "path": "README.md",
+    "repositoryPath": "qualification/2026-10-17-P1-25/README.md",
+    "bytes": 9421,
+    "sha256": "d3b5255d6679c1d00494ade4b4818dbe2c5c97a786879de3ae4f1ca6545e7127",
+    "declaredSha256": "d3b5255d6679c1d00494ade4b4818dbe2c5c97a786879de3ae4f1ca6545e7127",
+    "receiptDeclared": true,
+    "currentGitblob": "7a0c0d4e70db1fa9639b8c0e5f1ffedf404ae6fa",
+    "currentGitblobAt": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7",
+    "workingGitblob": "7a0c0d4e70db1fa9639b8c0e5f1ffedf404ae6fa",
+    "gitMode": "100644",
+    "sha256MatchesReceipt": true,
+    "workingBytesMatchCurrentGitblob": true
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/old-p125-packet-review/README.md",
+      "bytes": 1526,
+      "sha256": "93cbc7b1ca5f1b600d08722e37489c57c37dbdff624eabe05cdbae5c04ae6972"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/old-p125-packet-review/report.json",
+      "bytes": 4196,
+      "sha256": "c58f537740d436307b0142c64ee96aa3773dde983617996badd5bf25efd13b8d"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/old-p125-packet-review/artifact-pins.json",
+      "bytes": 246121,
+      "sha256": "78ff87443adfeb767baa0ea98f4a89f7dbf952bd78d571700b0d3b9d6694893f"
+    }
+  ]
+}

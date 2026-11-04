@@ -1,0 +1,204 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 10346,
+  "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/industryAdjustCurrentScore.test.ts"
+  ],
+  "testCount": 14,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-1039307167",
+      "name": "tests/industryAdjustCurrentScore.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/industryAdjustCurrentScore.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1039307167_0",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_0",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback uses the latest run integrity score when --score is omitted",
+      "fullName": "score industry-adjust current score fallback uses the latest run integrity score when --score is omitted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_1",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback still accepts explicit manual score input",
+      "fullName": "score industry-adjust current score fallback still accepts explicit manual score input",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_2",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback --score is a percentage 0-100: 75 means 75%",
+      "fullName": "score industry-adjust current score fallback --score is a percentage 0-100: 75 means 75%",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_3",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback --score 1.5 is refused instead of being reinterpreted",
+      "fullName": "score industry-adjust current score fallback --score 1.5 is refused instead of being reinterpreted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_4",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback --score 0.75 is refused instead of being reinterpreted",
+      "fullName": "score industry-adjust current score fallback --score 0.75 is refused instead of being reinterpreted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_5",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback --score 101 is refused instead of being reinterpreted",
+      "fullName": "score industry-adjust current score fallback --score 101 is refused instead of being reinterpreted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_6",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback --score -5 is refused instead of being reinterpreted",
+      "fullName": "score industry-adjust current score fallback --score -5 is refused instead of being reinterpreted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_7",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback --score abc is refused instead of being reinterpreted",
+      "fullName": "score industry-adjust current score fallback --score abc is refused instead of being reinterpreted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_8",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback explains how adjusted score differs from raw score",
+      "fullName": "score industry-adjust current score fallback explains how adjusted score differs from raw score",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_9",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback shows per-dimension weighting drilldown on request",
+      "fullName": "score industry-adjust current score fallback shows per-dimension weighting drilldown on request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_10",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback includes per-dimension drilldown in JSON on request",
+      "fullName": "score industry-adjust current score fallback includes per-dimension drilldown in JSON on request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_11",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback exports an industry-adjusted comparison report across scored runs",
+      "fullName": "score industry-adjust current score fallback exports an industry-adjusted comparison report across scored runs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_12",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback includes run comparison rows in JSON history output",
+      "fullName": "score industry-adjust current score fallback includes run comparison rows in JSON history output",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1039307167_0_13",
+      "name": "tests/industryAdjustCurrentScore.test.ts score industry-adjust current score fallback keeps the UX audit aligned with current score auto-read behavior",
+      "fullName": "score industry-adjust current score fallback keeps the UX audit aligned with current score auto-read behavior",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

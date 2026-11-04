@@ -9,6 +9,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, test } from "vitest";
+import YAML from "yaml";
 
 const root = resolve(process.env.AMC_RECONCILE_ROOT ?? join(import.meta.dirname, ".."));
 const scratch: string[] = [];
@@ -33,5 +34,14 @@ describe("test typecheck stays a named release and CI step", () => {
   test.each(["ci.yml", "npm-publish.yml"])("%s runs the test typecheck as a named step", workflow => {
     const text = readFileSync(join(root, ".github", "workflows", workflow), "utf8");
     expect(text).toMatch(/- name: Typecheck tests\n\s+run: npm run typecheck:tests\n/);
+  });
+});
+
+describe("P0-48 CI matrix completion", () => {
+  test("both supported Node jobs retain their results when a sibling fails", () => {
+    const workflow = YAML.parse(readFileSync(join(root, ".github", "workflows", "ci.yml"), "utf8"));
+    const job = workflow.jobs["build-test"];
+    expect(job.strategy).toMatchObject({ "fail-fast": false, matrix: { "node-version": ["22", "24"] } });
+    expect([undefined, false]).toContain(job["continue-on-error"]);
   });
 });

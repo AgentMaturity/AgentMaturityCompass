@@ -1,0 +1,255 @@
+{
+  "key": "P0-41",
+  "source": "33a8e20bf340f2f9c717bb813f95de3b648a4ad4",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T07:06:00.845673+00:00",
+  "branch": "codex/p0-41-current-qualification",
+  "gitStatus": "clean",
+  "trackedSourceFiles": 8574,
+  "trackedSourceManifest": {
+    "path": "/private/tmp/p0-41-qualification-20261015/tracked-source-before.json",
+    "bytes": 1073886,
+    "sha256": "6a87be623c9a996b469a0cee493c308224c6dd338a1e6a8da5f89d9dcc9e80aa"
+  },
+  "sourceManifestPrivateOnly": true,
+  "qualificationOnlyDifferencesFromCodeSource": 835,
+  "directPinsMappedCurrent": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/scripts/program-metrics.mjs",
+      "bytes": 23978,
+      "sha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/gaps.json",
+      "bytes": 16375,
+      "sha256": "bb7eded5387d9b4bb1782b23720042b7c5b26d7fbff119cefc9ceefe7095f006"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/metrics.json",
+      "bytes": 5866,
+      "sha256": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/metrics-manual.json",
+      "bytes": 20,
+      "sha256": "364b37738032a28a72829f4d2192b70bd9353c9ee8dddfc5b70c2785f995d6ac"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/docs/program/status-update-template.md",
+      "bytes": 6702,
+      "sha256": "34686a67909e18f776fb7054e5824a2c9f33689a05c10179b4af78eebb84898e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    }
+  ],
+  "expectedDependencyPinsAfterFreshInstall": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/yaml/package.json",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/node_modules/yaml/package.json",
+        "bytes": 3254,
+        "sha256": "20b8b197cbd10dad245d45e463dfe58e4c8c25a47e24bc4256ad9ab58bf35683"
+      }
+    }
+  ],
+  "externalInputPins": [
+    {
+      "path": "/private/tmp/amc-next-after-p0-11-readonly-routing-20261015.json",
+      "bytes": 19261,
+      "sha256": "304e5211228163818bcda63f8a9583ebf8a19f47db290e04e52ea1abc66b7116"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-11-readonly-routing-20261015.md",
+      "bytes": 5042,
+      "sha256": "e8227e6e11e174ca14994ceb0aee7d89027439c8ca14f87b9e1515ec75a62677"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-41.md",
+      "bytes": 9022,
+      "sha256": "97510873b2cc9229fc94b3a291175bfee227a7e6cf0e8dc496d57846de99ff60"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "bytes": 78486,
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "bytes": 25110,
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+      "bytes": 47286,
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    },
+    {
+      "path": "/private/tmp/p0-45-qualification-20261015/initial-preflight.json",
+      "bytes": 13867,
+      "sha256": "c79bffa5d78f899acacc004aff4fa06e050cece48d7ddf459dab864c305dffb7"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/package.json",
+      "bytes": 6706,
+      "sha256": "7c04bf69824d17a1db64defd3a9a86d538781bf2d6ca2764e3f1143fa5b71166"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/lib/commands/view.js",
+      "bytes": 13106,
+      "sha256": "b1b8b6b5fabcee8d32f94bb1ad735cde2967c1287bb4e6b97782b1240d4883e8"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/pacote/lib/registry.js",
+      "bytes": 14370,
+      "sha256": "f77f415d14cbef4da51bd95b1ecf6ba185819e6912ecad8de575c53f53679b7b"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/npm-registry-fetch/lib/index.js",
+      "bytes": 6573,
+      "sha256": "70be42b89bf61f0fa8e69c7d671bf4baac5e8cda650ef3fddd693b0f285746d1"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/make-fetch-happen/lib/cache/index.js",
+      "bytes": 1792,
+      "sha256": "b9a47e604b9d6ec9211e5129636ba7366c408c074ea1d4b8c859cf221c347071"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/make-fetch-happen/lib/fetch.js",
+      "bytes": 3947,
+      "sha256": "7d57bfd656a6ae2a53738fb3f25365d074d9cb7364794005bc70317ff2bf81e8"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/make-fetch-happen/lib/options.js",
+      "bytes": 1688,
+      "sha256": "b067a3566cf03d9a4cc77478efb88c2b3d8cc4081a311b2ae9ea67a500bf3c0e"
+    },
+    {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/lib/node_modules/npm/node_modules/@npmcli/config/lib/definitions/definitions.js",
+      "bytes": 73793,
+      "sha256": "83b2068320f1a131c96658940e80522ec1f29150b338ce40eccf486e0ee05900"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/.git/worktrees/AgentMaturityCompass28/HEAD",
+      "bytes": 50,
+      "sha256": "1cf8ca92f4a597f3c72500c0addc1d61e53c1550d4d1ec2c6f676e57626d1a8d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/.git/refs/heads/codex/p0-45-current-qualification",
+      "bytes": 41,
+      "sha256": "55bbbad5edbec02494ecd92ac7ce10c3d66245ca8d37eb371dd33b833a8f0b12"
+    }
+  ],
+  "historicalGitIdentity": [
+    {
+      "role": "Historical worktree identity, not portable source",
+      "old": {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/.git",
+        "bytes": 78,
+        "sha256": "6e57b731e5eb4c6528161591fd088f73250813c1a67fc9c1d67083ca80bffc54"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/.git",
+        "bytes": 78,
+        "sha256": "569dd18213bac1a2b658b8f5bfc3357d92828f33f0816dd0f61de0b877dfa03d"
+      }
+    }
+  ],
+  "readiness": {
+    "path": "/private/tmp/p0-41-readonly-readiness-20261015.json",
+    "bytes": 31386,
+    "sha256": "d140b27cb51b6b6f30fb5bdec2a8ca9e8eacdf138c58e563866f5e217031ff83"
+  },
+  "priorP011Handoff": {
+    "path": "/private/tmp/p0-11-canonical-postcommit-handoff-20261015.json",
+    "bytes": 4214,
+    "sha256": "ce5a081d93c59162615ce0dfe0f3ebfe54d6503b616663a1ee918c429d4a81cb"
+  },
+  "currentRouting": {
+    "path": "/private/tmp/amc-next-after-p0-41-readonly-routing-20261015.json",
+    "bytes": 84851,
+    "sha256": "396c2d76d5fac5f61851bf4091123581e7e0b34a5035565e25a8b3f0c665aa14"
+  },
+  "p057ReadOnlyReconciliation": {
+    "path": "/private/tmp/p0-57-readonly-readiness-20261015.json",
+    "bytes": 31873,
+    "sha256": "6cd2c9259ef0bf2cb7859982eda49f8c6c9db3e82f4413218dd138a751cc9b90"
+  },
+  "currentInboxBoundary": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+    "bytes": 879561,
+    "sha256": "6e2ce1c7742ef2fdd953df853dbe11cb2c79955955170ce15ad8dd97f5fbb7ff"
+  },
+  "wrapper": {
+    "path": "/private/tmp/p0-41-run-command-prepared-20261015.py",
+    "bytes": 10488,
+    "sha256": "e1dc7f607d992d38b94ab8b12218de579bc1d58f2adee77a0d788190c345bbbe"
+  },
+  "wrapperReviewState": "Pending independentnamespace-onlyreview beforeexecution",
+  "runtimeFingerprintScript": {
+    "path": "/private/tmp/p0-41-qualification-20261015/runtime-fingerprint.cjs",
+    "bytes": 1147,
+    "sha256": "527d8fd6e36ad48bf3a00aa40e65f7246dd49ad60944dea32735f9bcdc4c8c75"
+  },
+  "originalProgramMetricsTestAbsent": true,
+  "fixtureBoundary": "Root explicitly assigned a NEW private reviewed corpus after P011handoff. No originalP041 tests or pass counts are invented. Existingconfig/guards/deadlines retained. Candidateauthoring outside managedroot; no source/target/measurement changes or --online/externalpost/heldsourceadoption.",
+  "priorityBoundary": "P041 is the next ranked G0Medium candidate. UnrankedhistoricalP057 remains separate readonlyscope/held-fix reconciliation; no numericrank or formaldependencyclosure invented.",
+  "formalAcceptanceClosed": false
+}

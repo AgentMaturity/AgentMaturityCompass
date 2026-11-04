@@ -90,7 +90,7 @@ the `export` line once; without it every signing command refuses with `Vault loc
 
 Measured on 2026-09-14 in the integrating root checkout at commit `d635a5e2` (Darwin
 25.6.0 arm64, Node v25.5.0, `dist/cli.js` built from that source, a fresh temporary
-workspace, stub provider; receipt `AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md`):
+workspace, stub provider; [receipt](https://github.com/AgentMaturity/AgentMaturityCompass/blob/main/AMC_OS/RESEARCH/2026-09-14-fleet-sequential/README.md)):
 `init --minimal` 1.19 s, `amc doctor` before enabling 1.86 s (`runtime-firewall-policy`
 WARN naming the fix), `firewall enable` 0.94 s (revision 1) and 0.80 s when repeated
 ("nothing was written"), the stub turn 0.85 s (1 turn, 2 steps, 1 tool call, 24 events),
@@ -123,6 +123,32 @@ amc session verify --json --expect-monitor <monitor sha256>
 ```
 
 The run summary is a record of the response; verification checks evidence integrity. Neither proves the answer correct or changes an evidence baseline to `READY`. Ctrl-C cancels the active turn; incomplete or failed results remain visible. Existing session continuation is available through `amc agent-loop run --help`.
+
+### TypeScript SDK path (keyless, synthetic)
+
+`amc init --coding` creates a ready, signed workspace in one command: `fs.read`, `fs.write`, `fs.edit` and an
+OS-confined `bash` without network access, a `warn` firewall, signed budgets and config, and you as the ACTIVE OWNER
+in a signed `users.yaml`. It asks for the owner's Studio login (or reads `AMC_BOOTSTRAP_OWNER_USERNAME` and
+`AMC_BOOTSTRAP_OWNER_PASSWORD` in a non-interactive shell) and prints the monitor fingerprint to pin.
+
+```bash
+npm install agent-maturity-compass
+export AMC_VAULT_PASSPHRASE='<a passphrase you keep>'
+npx amc init --coding
+export AMC_EXPECTED_MONITOR_FINGERPRINT=<the fingerprint init printed>
+node quickstart.mjs        # a copy of examples/sdk/quickstart.mjs
+```
+
+The quickstart starts `AMCNativeClient` on the stub provider, makes one governed `fs.write` call (`hello.txt`), then
+`closeAndVerify()` and prints the session id, the verification result and the receipt digest. `amc init` signs the
+default Action Policy, which runs an agent's EXECUTE calls as SIMULATE until it has a trusted diagnostic run at integrity
+0.6 or above, so on a fresh workspace the call is recorded as SIMULATE and `hello.txt` is not written (see
+"Reaching EXECUTE" in `docs/GOVERNOR.md`). An owner can instead sign a lower `requireRunIntegrityAtLeast` for a class
+once a sealed run exists; every decision made under it names the waiver. Every line is labelled
+`[synthetic]`: the stub runs no model, so this is a demonstration of the governed path, never a real-model result.
+For a regulated starting point, `amc init --regulated` adds a `block` firewall, a signed approval preset and a signed,
+not yet active Layer 0 control plan (experimental). See [TypeScript SDK](sdk/TYPESCRIPT_SDK.md) for the API contract,
+the semver policy and both starter profiles.
 
 ---
 
@@ -202,7 +228,7 @@ amc run --question-set lifecycle    # 244 default questions + 20 lifecycle quest
 
 ```bash
 amc quickscore --rapid    # lightweight pulse check, not the full score
-amc badge                 # README badge after a scored run
+amc badge                 # passport badge line from what AMC recorded
 ```
 
 For CI or other non-interactive runs, pass answer levels as JSON instead of relying on a TTY prompt:
@@ -369,7 +395,7 @@ amc adapters run --agent my-agent --adapter generic-cli -- your-agent-command
 
 | Goal | Command |
 |------|---------|
-| Deep diagnostic (244 default questions) | `amc diagnostic run` |
+| Deep diagnostic (244 default questions) | `amc run --score-only` |
 | Lifecycle-expanded diagnostic (264 questions) | `amc run --question-set lifecycle` |
 | EU AI Act compliance check | `amc compliance report --framework EU_AI_ACT` |
 | Red-team your agent | `amc assurance run --all` |

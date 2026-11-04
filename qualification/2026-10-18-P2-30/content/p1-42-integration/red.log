@@ -1,0 +1,143 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/overlay.test.ts (4 tests | 1 failed) 519ms
+     × disposes all 97 pack and 16 deep Technology questions exactly once, including the six restored ids 6ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  16:58:14
+   Duration  1.62s (transform 642ms, setup 100ms, import 779ms, tests 519ms, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/overlay.test.ts > Technology experimental catalog overlay (P2-30) > disposes all 97 pack and 16 deep Technology questions exactly once, including the six restored ids
+AssertionError: expected [ 'TECH-CI-1', 'TECH-CI-10', …(73) ] to deeply equal [ 'TECH-CI-1', 'TECH-CI-10', …(111) ]
+
+- Expected
++ Received
+
+@@ -3,14 +3,11 @@
+    "TECH-CI-10",
+    "TECH-CI-11",
+    "TECH-CI-12",
+    "TECH-CI-13",
+    "TECH-CI-14",
+-   "TECH-CI-15-v2",
+-   "TECH-CI-16",
+-   "TECH-CI-17",
+-   "TECH-CI-18",
++   "TECH-CI-15",
+    "TECH-CI-2",
+    "TECH-CI-3",
+    "TECH-CI-4",
+    "TECH-CI-5",
+    "TECH-CI-6",
+@@ -22,33 +19,25 @@
+    "TECH-INF-11",
+    "TECH-INF-12",
+    "TECH-INF-13",
+    "TECH-INF-14",
+    "TECH-INF-15",
+-   "TECH-INF-16",
+-   "TECH-INF-17",
+-   "TECH-INF-18",
+-   "TECH-INF-19",
+    "TECH-INF-2",
+    "TECH-INF-3",
+    "TECH-INF-4",
+    "TECH-INF-5",
+    "TECH-INF-6",
+    "TECH-INF-7",
+    "TECH-INF-8",
+-   "TECH-INF-9-v2",
++   "TECH-INF-9",
+    "TECH-NE-1",
+    "TECH-NE-10",
+    "TECH-NE-11",
+    "TECH-NE-12",
+    "TECH-NE-13",
+-   "TECH-NE-14-v2",
+-   "TECH-NE-15-v2",
+-   "TECH-NE-16",
+-   "TECH-NE-17",
+-   "TECH-NE-18",
+-   "TECH-NE-19",
++   "TECH-NE-14",
++   "TECH-NE-15",
+    "TECH-NE-2",
+    "TECH-NE-3",
+    "TECH-NE-4",
+    "TECH-NE-5",
+    "TECH-NE-6",
+@@ -60,56 +49,29 @@
+    "TECH-OS-11",
+    "TECH-OS-12",
+    "TECH-OS-13",
+    "TECH-OS-14",
+    "TECH-OS-15",
+-   "TECH-OS-16",
+-   "TECH-OS-17",
+-   "TECH-OS-18",
+-   "TECH-OS-19",
+    "TECH-OS-2",
+-   "TECH-OS-20",
+-   "TECH-OS-21",
+    "TECH-OS-3",
+    "TECH-OS-4",
+    "TECH-OS-5",
+    "TECH-OS-6",
+    "TECH-OS-7",
+    "TECH-OS-8",
+-   "TECH-OS-9-v2",
++   "TECH-OS-9",
+    "TECH-PP-1",
+    "TECH-PP-10",
+    "TECH-PP-11",
+    "TECH-PP-12",
+    "TECH-PP-13",
+    "TECH-PP-14",
+-   "TECH-PP-15-v2",
+-   "TECH-PP-16",
+-   "TECH-PP-17",
+-   "TECH-PP-18",
+-   "TECH-PP-19",
++   "TECH-PP-15",
+    "TECH-PP-2",
+-   "TECH-PP-20",
+    "TECH-PP-3",
+    "TECH-PP-4",
+    "TECH-PP-5",
+    "TECH-PP-6",
+    "TECH-PP-7",
+    "TECH-PP-8",
+    "TECH-PP-9",
+-   "technology-deep-01",
+-   "technology-deep-02",
+-   "technology-deep-03",
+-   "technology-deep-04",
+-   "technology-deep-05",
+-   "technology-deep-06",
+-   "technology-deep-07",
+-   "technology-deep-08",
+-   "technology-deep-09",
+-   "technology-deep-10",
+-   "technology-deep-11",
+-   "technology-deep-12",
+-   "technology-deep-13",
+-   "technology-deep-14",
+-   "technology-deep-15",
+-   "technology-deep-16",
+  ]
+
+ ❯ tests/catalog/stations/technology/overlay.test.ts:55:31
+     53|     expect(new Set(actual).size).toBe(actual.length);
+     54|     expect(new Set(named).size).toBe(named.length);
+     55|     expect([...named].sort()).toEqual([...actual].sort());
+       |                               ^
+     56|     for (const id of restored) expect(packIds, id).toContain(id);
+     57|     for (const row of data.dispositions) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

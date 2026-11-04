@@ -1,0 +1,211 @@
+{
+  "schema": "amc-p139-legacy/2",
+  "label": "unpinned-legacy-catalog",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-pQ7khF",
+  "configuredProtocolVersion": null,
+  "requests": [
+    {
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "server/discover",
+      "id": 0,
+      "hasId": true,
+      "requestedVersion": null,
+      "responseVersion": null,
+      "protocolHeader": "2026-07-28",
+      "originMatches": true,
+      "requestSessionPresent": false,
+      "requestSessionMatches": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseErrorCode": -32601,
+      "responseSessionPresent": false,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "initialize",
+      "id": 1,
+      "hasId": true,
+      "requestedVersion": "2025-11-25",
+      "responseVersion": "2025-11-25",
+      "protocolHeader": null,
+      "originMatches": true,
+      "requestSessionPresent": false,
+      "requestSessionMatches": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseErrorCode": null,
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "notifications/initialized",
+      "id": null,
+      "hasId": false,
+      "requestedVersion": null,
+      "responseVersion": null,
+      "protocolHeader": "2025-11-25",
+      "originMatches": true,
+      "requestSessionPresent": true,
+      "requestSessionMatches": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 202,
+      "responseErrorCode": null,
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "httpMethod": "GET",
+      "path": "/mcp",
+      "rpc": null,
+      "id": null,
+      "hasId": false,
+      "requestedVersion": null,
+      "responseVersion": null,
+      "protocolHeader": "2025-11-25",
+      "originMatches": true,
+      "requestSessionPresent": true,
+      "requestSessionMatches": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 405,
+      "responseErrorCode": null,
+      "responseSessionPresent": false,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "httpMethod": "POST",
+      "path": "/mcp",
+      "rpc": "tools/list",
+      "id": 2,
+      "hasId": true,
+      "requestedVersion": null,
+      "responseVersion": null,
+      "protocolHeader": "2025-11-25",
+      "originMatches": true,
+      "requestSessionPresent": true,
+      "requestSessionMatches": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 200,
+      "responseErrorCode": null,
+      "responseSessionPresent": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "httpMethod": "DELETE",
+      "path": "/mcp",
+      "rpc": null,
+      "id": null,
+      "hasId": false,
+      "requestedVersion": null,
+      "responseVersion": null,
+      "protocolHeader": "2025-11-25",
+      "originMatches": true,
+      "requestSessionPresent": true,
+      "requestSessionMatches": true,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseStatus": 204,
+      "responseErrorCode": null,
+      "responseSessionPresent": false,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "outcome": {
+    "catalog": {
+      "serverId": "legacy_fixture",
+      "protocol": {
+        "negotiatedVersion": "2025-11-25",
+        "mode": "legacy",
+        "serverInfo": {
+          "name": "synthetic-legacy-untrusted",
+          "version": "1"
+        }
+      },
+      "tools": [
+        {
+          "name": "lookup",
+          "description": "Synthetic legacy lookup",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "query"
+            ],
+            "additionalProperties": false
+          },
+          "outputSchema": null,
+          "annotations": null,
+          "execution": null
+        }
+      ],
+      "digest": "2ff1d327e512c12aef67539dd309303ff3ecd69d87de56c0859f8a59c7740753"
+    }
+  },
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "exactEnvironmentRestored": true,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

@@ -114,7 +114,11 @@ function alternativeLogic(): { all: PolicyEvidenceLogic[] } {
 }
 
 function run(levels: Record<string, number>): DiagnosticReport {
+  // A sealed HIGH TRUST run as the governor reads it: the run-integrity condition needs an index (absent reads as no run).
   return {
+    runId: "run_stub",
+    integrityIndex: 0.95,
+    trustLabel: "HIGH TRUST",
     questionScores: Object.entries(levels).map(([questionId, finalLevel]) => ({ questionId, finalLevel })),
   } as DiagnosticReport;
 }
@@ -493,7 +497,7 @@ describe("AMC-1475 bounded nested Action Policy evidence logic", () => {
       actionClass: "DEPLOY",
       configured: false,
       gateCount: 4,
-      mandatoryGates: expect.arrayContaining(["policy-signature", "trust-tier", "sandbox", "execution-ticket", "allow-execute"]),
+      mandatoryGates: expect.arrayContaining(["policy-signature", "run-integrity", "trust-tier", "sandbox", "execution-ticket", "allow-execute"]),
     });
     expect(JSON.stringify(inspected)).not.toContain(root);
 
@@ -670,7 +674,9 @@ describe("AMC-1475 bounded nested Action Policy evidence logic", () => {
       root: join(root, ".amc"),
       name: ACTION_POLICY_WRITER_LOCK,
       operation: () => {
-        expect(() => initActionPolicy(root)).toThrowError(ControlFileLockError);
+        // The locked-vault failure above retained its recovery journal (APPLY_FAILED contract). P2-08's
+        // Action Policy plan checks that journal before taking the writer lock, so init refuses on it first.
+        expect(() => initActionPolicy(root)).toThrowError("Action Policy writer recovery is pending; retry the original exact-confirm apply first.");
         expect(() => applyPolicyPack({ workspace: root, packId: "code-agent.low" }))
           .toThrowError(ControlFileLockError);
         expect(() => applyActionEvidenceLogic({

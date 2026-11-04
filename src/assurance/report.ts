@@ -26,6 +26,19 @@ export function renderAssuranceMarkdown(report: AssuranceReport, sealVerified: b
     })
     .join("\n\n");
 
+  const executedSections = report.packResults.flatMap(pack => pack.scenarioResults.flatMap(row => {
+    if (!row.executed) return [];
+    const packet = row.executed, diagnostics = packet.diagnostics;
+    const rate = diagnostics.fixtureAttemptRate === null ? "not measured" : `${(100 * diagnostics.fixtureAttemptRate).toFixed(2)}%`;
+    const interval = diagnostics.fixtureWilson95 === null ? "not measured" :
+      diagnostics.fixtureWilson95.map(value => `${(100 * value).toFixed(2)}%`).join(" to ");
+    return [`### ${pack.packId}/${row.scenarioId}`,
+      "Native result: not evaluated · Claim: synthetic_example · Production attack success rate: not measured",
+      `Mode: ${packet.attempts === 1 ? "1-attempt smoke" : "25-attempt synthetic fixture"}`,
+      `Local fixture outcome: ${diagnostics.localOutcome}; completed ${diagnostics.completedAttempts}/${packet.attempts}; conclusive ${diagnostics.conclusiveAttempts}/${packet.attempts}`,
+      `Local unauthorized effects: ${diagnostics.result.unauthorizedEffects}; fixture attempt rate: ${rate}; Wilson 95%: ${interval}`, ""];
+  }));
+
   return [
     `# AMC Assurance Report (${report.assuranceRunId})`,
     "",
@@ -45,6 +58,7 @@ export function renderAssuranceMarkdown(report: AssuranceReport, sealVerified: b
     "## Scenario Results",
     scenarioSections,
     "",
+    ...(executedSections.length ? ["## Local fixture diagnostics", "", ...executedSections] : []),
     "## How to read claim kinds",
     "",
     renderClaimLegend("markdown"),

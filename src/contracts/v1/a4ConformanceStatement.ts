@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { claimEnvelopeSchema, claimKindSchema, statusDimensionsSchema } from "../../claims/eligibility/schemas.js";
-import { nonEmpty, sha256HexSchema } from "./common.js";
+import { isoTimeSchema, nonEmpty, sha256HexSchema } from "./common.js";
 import { A4_STAGES } from "./a4Project.js";
 
 const { applicability, evidence, result, enforcement, review } = statusDimensionsSchema.shape;
@@ -19,7 +19,7 @@ export const a4ConformanceStatementV1Schema = z.strictObject({
   stage: z.enum(A4_STAGES),
   revisionDigest: sha256HexSchema,
   planDigest: sha256HexSchema.nullable(),
-  evaluatedAt: z.iso.datetime(),
+  evaluatedAt: isoTimeSchema,
   /** A not_evaluated control always says why. */
   controls: z.array(z.union([
     z.strictObject({ ...controlFields, result: z.literal("not_evaluated"), notEvaluatedReason: nonEmpty }),

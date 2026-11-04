@@ -1,0 +1,14 @@
+{
+  "schema": "p125pc-preservation-readonly-git-successor-author-review/1",
+  "at": "2026-10-17T02:15:23.018108+00:00",
+  "onlyChange": "One global --no-optional-locks argument after git",
+  "reversesToExactV1": true,
+  "allOtherGuardsAndFutureAdmissionContractExact": true,
+  "v1PreservedUnexecuted": true,
+  "fullReadPending": false,
+  "noHelperImportedParsedCompiledOrExecuted": true,
+  "noSourceIndexQaReservationOrPriorArtifactMutation": true,
+  "blockers": [],
+  "fullPreferredSourceTinyAndCompleteC39DeltasRead": true,
+  "inheritedReadonlyIssueDisclosed": true
+}

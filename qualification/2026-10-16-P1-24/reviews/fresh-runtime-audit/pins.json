@@ -1,0 +1,27 @@
+{
+  "schema": "p124-fresh-runtime-audit-pins/1",
+  "files": [
+    {
+      "path": "/private/tmp/p1-24-qualification-20261016/fresh-runtime-audit/review.json",
+      "bytes": 6587,
+      "sha256": "a10aa88fe3b3cae9410e7452ef54cd84bc6e54b92bc9390f6a92b46226faa6bd"
+    },
+    {
+      "path": "/private/tmp/p1-24-qualification-20261016/fresh-runtime-audit/README.md",
+      "bytes": 1833,
+      "sha256": "7a0479b6ac568c4d65d9bc1535f000efd22dfbb03d9fe6195add2b52139c2280"
+    },
+    {
+      "path": "/private/tmp/p1-24-qualification-20261016/fresh-runtime-audit/public-proof.json",
+      "bytes": 15556,
+      "sha256": "edf9cb731a5a56b58119c0d9ab5d7017b825bf31175bfa85c28c086c049a1683"
+    }
+  ],
+  "baselineBinding": {
+    "path": "/private/tmp/p1-24-qualification-20261016/fresh-source-binding.json",
+    "bytes": 16233,
+    "sha256": "55c4855511c5f64907090ca2bf2994c2d17f2ada66e6d3d7615306c1acf3c729"
+  },
+  "allReadsFinished": true,
+  "allWritesFinished": true
+}

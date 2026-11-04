@@ -1,0 +1,11 @@
+{
+  "capturedUtc": "2026-10-15T22:54:32.728780+00:00",
+  "all17IndexBlobsVerified": true,
+  "priorAddIgnoreWarningPreserved": true,
+  "commitExit": 0,
+  "stdout": "[codex/p1-19-qualification 2e136618b] Add independent finance oracle and genuine signed controls\n 17 files changed, 1161 insertions(+), 15 deletions(-)\n create mode 100644 .changeset/finance-independent-oracle.md\n create mode 100644 examples/lighthouse-finance/oracle.mjs\n create mode 100644 examples/lighthouse-finance/oracleEvidence.mjs\n create mode 100644 tests/helpers/financeOracleQualification.ts\n create mode 100644 tests/lighthouse/financeOracle.test.ts\n",
+  "stderr": "",
+  "noForceNoRetryNoVerifyBypass": true,
+  "commit": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+  "status": ""
+}

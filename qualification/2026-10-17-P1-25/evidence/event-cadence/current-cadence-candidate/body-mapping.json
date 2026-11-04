@@ -1,0 +1,104 @@
+{
+  "schema": "p125-next-event-cadence-body-preservation/1",
+  "currentSourceCheckpointPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/source-checkpoint.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-checkpoint.json",
+    "bytes": 530,
+    "sha256": "fc272296ef0059e6f9c3f766a1d4c1dd6ddc9c5a8def9678672bb0317fcc38d5",
+    "dev": 16777231,
+    "inode": 543750215,
+    "nlink": 1
+  },
+  "basePin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.before.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.before.ts.source.txt",
+    "bytes": 34549,
+    "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+    "dev": 16777231,
+    "inode": 543817800,
+    "nlink": 1
+  },
+  "candidatePin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/next-cadence-test-proposal/checkpointWindow.test.ts.source.txt",
+    "bytes": 48568,
+    "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+    "dev": 16777231,
+    "inode": 543817801,
+    "nlink": 1
+  },
+  "entirePriorThreeCaseBlock": {
+    "bytes": 19101,
+    "sha256": "6a443a43673510d71121487ba975f8072aeba9a9336fd383966c0b48cbdfa914",
+    "oldLine": 230,
+    "candidateLine": 259,
+    "byteExact": true
+  },
+  "bodies": [
+    {
+      "kind": "existing-checkpoint-body",
+      "ordinal": 1,
+      "oldLine": 230,
+      "candidateLine": 259,
+      "bytes": 5344,
+      "sha256": "2c88db9a07b39807848ba170a1152f4d19a487caeea3b655128c8b57d0c94714",
+      "byteExact": true
+    },
+    {
+      "kind": "existing-checkpoint-body",
+      "ordinal": 2,
+      "oldLine": 297,
+      "candidateLine": 326,
+      "bytes": 2868,
+      "sha256": "79497fc77e1b25e09da85cc57bfbf6dd9fd705c022bcf6dc5a45dcabc79bad7b",
+      "byteExact": true
+    },
+    {
+      "kind": "existing-checkpoint-body",
+      "ordinal": 3,
+      "oldLine": 334,
+      "candidateLine": 363,
+      "bytes": 10889,
+      "sha256": "7de04091e570a65db166eeca18b7152922e2494702247e75fff7238837351c87",
+      "byteExact": true
+    },
+    {
+      "kind": "unchanged-grant-body",
+      "ordinal": 1,
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+      "oldLine": 8,
+      "bytes": 1250,
+      "sha256": "2893840769a72e5b440a5adec61f53ec4286ab3eb3c8da1f224ad88158f12803",
+      "noSuccessorProposed": true
+    },
+    {
+      "kind": "unchanged-grant-body",
+      "ordinal": 2,
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+      "oldLine": 28,
+      "bytes": 1323,
+      "sha256": "0c624b3c8b2b32f5163649279e31a4037c2edf4f725212db5a7c04dfca7afcdd",
+      "noSuccessorProposed": true
+    }
+  ],
+  "tsaHelperWholeFileUnchangedPin": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+    "bytes": 25255,
+    "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+    "dev": 16777231,
+    "inode": 543658575,
+    "nlink": 1
+  },
+  "grantWholeFileUnchangedPin": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+    "bytes": 2964,
+    "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+    "dev": 16777231,
+    "inode": 543583997,
+    "nlink": 1
+  },
+  "allOldPublicBranchesAndWrapperCodeExactAfterRemovingOnlyDocumentedNewImportsInventoryCaseSetupAndNewCase": true,
+  "trailingSingleNewline": true
+}

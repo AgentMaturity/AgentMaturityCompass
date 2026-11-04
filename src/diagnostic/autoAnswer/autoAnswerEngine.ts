@@ -1,6 +1,8 @@
+import { captureRunHashAuthority, type RunHashPublicationOptions } from "../../ledger/runHashSignature.js";
+import { runReportFailure } from "../../ledger/runReportOutputs.js";
 import { runDiagnostic } from "../runner.js";
 import { resolveAgentId } from "../../fleet/paths.js";
-import { createAgentTransformPlanForApi } from "../../transformation/transformApi.js";
+import { createAgentTransformPlanForApi, createAgentTransformPlanForApiAsync } from "../../transformation/transformApi.js";
 import { deriveAutoAnswerResults } from "./autoAnswerEvidenceQueries.js";
 import type { DiagnosticReport } from "../../types.js";
 
@@ -31,7 +33,9 @@ export async function runAutoAnswer(params: {
   window?: string;
   targetName?: string;
   createPlan?: boolean;
-}): Promise<AutoAnswerOutput> {
+}, options: RunHashPublicationOptions = {}): Promise<AutoAnswerOutput> {
+  params = { ...params }; options = { ...options }; const actor = options.beforePublish; actor?.();
+  const compatibility = Boolean(options.synchronousSeal || process.env.AMC_NO_SIGN === "1"), fixed = captureRunHashAuthority(params.workspace, compatibility), beforePublish = () => { actor?.(); fixed(); };
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const report = await runDiagnostic({
     workspace: params.workspace,
@@ -39,20 +43,19 @@ export async function runAutoAnswer(params: {
     window: params.window ?? "14d",
     targetName: params.targetName ?? "default",
     claimMode: "auto"
-  });
+  }, undefined, { ...options, beforePublish });
   const derived = deriveAutoAnswerResults(report);
   let planId: string | null = null;
   let next3Tasks: string[] = [];
   let created = false;
   if (params.createPlan) {
-    const planned = createAgentTransformPlanForApi({
-      workspace: params.workspace,
-      agentId,
-      to: "targets"
-    });
-    planId = planned.plan.planId;
-    next3Tasks = [...planned.plan.summary.next3Tasks];
-    created = true;
+    let completedPlan: string | null = null;
+    try {
+      const input = { workspace: params.workspace, agentId, to: "targets" as const };
+      beforePublish(); const planned = compatibility ? createAgentTransformPlanForApi(input)
+        : await createAgentTransformPlanForApiAsync(input, { beforePublish });
+      completedPlan = planned.plan.planId; beforePublish(); planId = completedPlan; next3Tasks = [...planned.plan.summary.next3Tasks]; created = true;
+    } catch (cause) { runReportFailure([`diagnostic-run:${report.runId}`, ...(completedPlan === null ? [] : [`transform-plan:${completedPlan}`])], "auto-answer-transform-plan", cause); }
   }
   return {
     agentId,

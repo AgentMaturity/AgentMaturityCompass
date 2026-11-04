@@ -1,6 +1,8 @@
-# Certification
+# Signed certificate bundles (`amc certify`)
 
-AMC certificates (`.amccert`) are signed, portable, and offline-verifiable evidence packages that bind:
+An `.amccert` file is signed evidence of what a run recorded. It is not a certification; no AMC certification exists before the public registry (Gate G3). A valid signature proves integrity, not truth.
+
+A certificate bundle (`.amccert`) is a signed, offline-verifiable evidence package. Verification is portable only against keys the verifier pinned (`--pubkey`, `--expect-monitor`). It binds:
 - diagnostic run outcomes,
 - gate policy thresholds,
 - ledger integrity proofs,
@@ -57,4 +59,5 @@ Revocation files are signed by auditor key and can be verified independently.
 - It does not prove future behavior after issuance.
 - It does not replace runtime monitoring/assurance.
 - It does not prove key isolation unless deployment follows security guidance.
+- It does not prove that the recorded statements are true, and it is not a compliance verdict.
 

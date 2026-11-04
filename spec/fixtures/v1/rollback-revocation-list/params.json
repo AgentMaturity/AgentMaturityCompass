@@ -1,0 +1,9 @@
+{
+  "asOf": "2026-10-01T00:00:00.000Z",
+  "trustRoots": [
+    "7284d995184959356042352b876f5eb02b11b250dc7bdd99f58a584e70a1390c"
+  ],
+  "knownSequences": {
+    "leases:ws-a": 5
+  }
+}

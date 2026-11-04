@@ -1,0 +1,30 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts (121 tests | 1 failed | 120 skipped) 11ms
+     × withholds the CRA drill result when its AIBOM is missing (mutation target) 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > withholds the CRA drill result when its AIBOM is missing (mutation target)
+AssertionError: expected 'pass' to be 'not_evaluated' // Object.is equality
+
+Expected: "not_evaluated"
+Received: "pass"
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:185:106
+    183|     });
+    184|     expect(fixture).toBeDefined();
+    185|     expect(runTechnologyOracle(fixture!.envelope.setup.technologyOracl…
+       |                                                                                                          ^
+    186|   });
+    187| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 120 skipped (121)
+   Start at  10:07:02
+   Duration  4.33s (transform 2.94s, setup 82ms, import 3.98s, tests 11ms, environment 0ms)
+

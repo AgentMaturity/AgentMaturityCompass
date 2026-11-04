@@ -28,7 +28,7 @@ if (process.argv.includes('agent-loop')) {
   const refuse = (frame, code, message, data) => send({jsonrpc:'2.0',id:frame.id,error:{code,message,data}});
   const active = new Map(); let saved = [], releases = 0, sessionCount = 0;
   const capabilities = {loadSession:true, promptCapabilities:{image:mode !== 'no-image',audio:true},
-    _meta:{'dev.agentmaturity.amc':{releaseSession:true,orderedImageInput:'amc-image-input@2',
+    _meta:{'dev.agentmaturity.amc':{releaseSession:true,executionApi:1,orderedImageInput:'amc-image-input@2',
       audioInput:{format:'amc-audio-input@1',encoderId:'gemini-generate-content',
         encoderVersion:mode === 'future-audio' ? 3 : 2,mimeTypes:['audio/wav']}}}};
   if (mode === 'ignore-stop') { process.on('SIGTERM',()=>{}); setInterval(()=>{},1000); }

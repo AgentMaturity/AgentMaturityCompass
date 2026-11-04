@@ -1,0 +1,37 @@
+# fixture PR: src/p152FixtureDuplicate.ts = comment + src/a4/a4Router.ts lines 69-200 (untracked, never committed)
+$ npm run -s check:duplicates
+{"scan":"duplicates","baseline":1254,"current":1254,"new":1,"stale":1,"accepted":0}
+new duplicates finding d3e6e1de5b89f98a8a5736d06ab464749ff914c91bf8d6f1b3991d3f1eb1d07a: a4/a4Router.ts <-> p152FixtureDuplicate.ts (typescript)
+Fix each new finding, or accept one: npm run quality:baseline -- duplicates --accept <id> --reason "<why, 20+ characters>"
+baseline is stale: run `npm run quality:baseline -- duplicates --shrink` (1 recorded findings are gone)
+exit 1
+$ npm run -s check:dead-code
+{"scan":"dead-code","baseline":2787,"current":2788,"new":1,"stale":0,"accepted":0}
+new dead-code finding 82214fceb774a054f35b94aa95614196dcef7c2aa8fda22aa4ca0ac4467938ff: src/p152FixtureDuplicate.ts files {"name":"src/p152FixtureDuplicate.ts"}
+Fix each new finding, or accept one: npm run quality:baseline -- dead-code --accept <id> --reason "<why, 20+ characters>"
+exit 1
+$ npm run -s quality:baseline -- dead-code --accept 82214fceb774a054f35b94aa95614196dcef7c2aa8fda22aa4ca0ac4467938ff --reason short
+source-quality: --reason must be at least 20 characters
+exit 1
+$ npm run -s quality:baseline -- dead-code --accept 82214fceb774a054f35b94aa95614196dcef7c2aa8fda22aa4ca0ac4467938ff --reason fixture PR demo: kept to show the accept path
+{"scan":"dead-code","baseline":2787,"current":2788,"new":0,"stale":0,"accepted":1}
+exit 0
+$ npm run -s check:dead-code
+{"scan":"dead-code","baseline":2787,"current":2788,"new":0,"stale":0,"accepted":1}
+exit 0
+# remove the fixture file: the accepted entry is now stale
+$ npm run -s check:dead-code
+{"scan":"dead-code","baseline":2787,"current":2787,"new":0,"stale":1,"accepted":0}
+baseline is stale: run `npm run quality:baseline -- dead-code --shrink` (1 recorded findings are gone)
+exit 1
+$ npm run -s quality:baseline -- dead-code --shrink
+{"scan":"dead-code","baseline":2787,"current":2787,"new":0,"stale":0,"accepted":0}
+exit 0
+$ npm run -s check:dead-code
+{"scan":"dead-code","baseline":2787,"current":2787,"new":0,"stale":0,"accepted":0}
+exit 0
+$ npm run -s check:duplicates
+{"scan":"duplicates","baseline":1254,"current":1254,"new":0,"stale":0,"accepted":0}
+exit 0
+# baseline after shrink vs committed:
+identical to HEAD

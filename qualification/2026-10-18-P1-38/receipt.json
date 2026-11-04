@@ -1,0 +1,156 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-38",
+  "date": "2026-10-18",
+  "commit": "207c3f9188c32a5a70bfce89baff3cb012db646b",
+  "branch": "rtd/p1-38-pi-ai-providers",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 2503
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 150810
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 38966
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 73433
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 6033
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1612
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 749
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 3456
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2921
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 445
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 892
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 276
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 336
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1270
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 1,
+      "durationMs": 5346
+    },
+    {
+      "cmd": "npm run -s check:third-party-notices",
+      "exit": 0,
+      "durationMs": 276
+    },
+    {
+      "cmd": "npm run -s check:capability-matrix",
+      "exit": 0,
+      "durationMs": 60437
+    },
+    {
+      "cmd": "npm run -s audit:runtime",
+      "exit": 0,
+      "durationMs": 1225
+    },
+    {
+      "cmd": "npm run -s check:packed-install",
+      "exit": 0,
+      "durationMs": 142712
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 8047
+    },
+    {
+      "cmd": "npx vitest run <56 existing test files importing the changed modules> tests/piAi tests/nativeCapabilityContract.test.ts tests/capabilityMatrix.test.ts",
+      "exit": 1,
+      "durationMs": 389000
+    },
+    {
+      "cmd": "npx vitest run tests/cliDelegateFlag.test.ts tests/nativeShellComposition.test.ts tests/nativeValidationOutcomeSurfaces.test.ts",
+      "exit": 0,
+      "durationMs": 78000
+    }
+  ],
+  "tests": {
+    "total": 996,
+    "passed": 992,
+    "failed": 4,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks.json",
+      "sha256": "3228c6880e616ab0ed18b416ed829f51dbf041aff37b9482c0c0672fbf7f3c17"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "c7450db5097ce678bd3040d5f1ff9803e86bd575da1fc25ba79fc31a0e100f4a"
+    },
+    {
+      "path": "capability-claims-native.json",
+      "sha256": "4b90271ac3c663cf99596ae08d23bb0fa27572bdecbaea43b74d34819c4d501c"
+    },
+    {
+      "path": "capability-claims-pi-ai.json",
+      "sha256": "1edcc0a842215f9dc187e014f7cd23cf530bb89cbe2bcd3c1f2172a4e3fc0f75"
+    },
+    {
+      "path": "capability-contract-report.json",
+      "sha256": "306609f851244e161608f400e34554e5937baf5e621249754eba1e170411c153"
+    },
+    {
+      "path": "README.md",
+      "sha256": "03f9cc450de4c74d4797574bcb9ca54111a27670986723479dc30ca3e8a3cf94"
+    }
+  ],
+  "notes": "Commit includes int d03e63daf. pi-ai 1.3.0 is an explicit devDependency and an optional peer; frozen installs are byte-stable. check:dead-code first failed on the pi-ai devDependency (knip cannot see the dynamic import); the finding was accepted with quality:baseline and the rerun exited 0. check:capability-matrix ran the contract tests offline (vitest JSON report in capability-contract-report.json) and matched the committed matrix. tests: focused run of the new tests plus the existing test files importing the changed modules; its 4 failures were load timeouts in three files that then passed alone (65 of 65). Full npm test not run. Mutations: mutations.json. Live providers: not run (needs Sid keys). pi-ai integrity sha512-KaBI8x7q7sPoFUXICNGD9efHzDG+oRNwVvkA9jdIsSQWH1RjFssOlEGsbLtewUPPgCrvmz0l2KTgSLXTyj3acw==."
+}

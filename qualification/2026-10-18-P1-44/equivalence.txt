@@ -1,0 +1,11 @@
+# Tree equivalence of the P1-44 picks (git diff --stat <original> <pick-head> -- <paths the original touched>)
+# picks: c4901407->db1ebc4e9 04dae3c7->dc2498098 5ebc5b69->b94af8eb4 43fdbcf1->9a64fec33 on int 67d0eef0a
+## c4901407 (5 paths)
+ src/mcp/amcMcpServer.ts | 314 ++++++++++++++++++++++++++----------------------
+ 1 file changed, 171 insertions(+), 143 deletions(-)
+## 04dae3c7 (20 paths)
+## 5ebc5b69 (3 paths)
+## 43fdbcf1 (10 paths)
+## O17 hunk in src/mcp/amcMcpServer.ts: original vs pick
+## AMC_OS paths vs int: 0
+## deletions vs int: 0

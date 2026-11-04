@@ -12,21 +12,22 @@ function makeEvent(
 describe("scoreMemoryDepth", () => {
   it("returns empty score for no events", () => {
     const result = scoreMemoryDepth({ events: [] });
-    expect(result.overallScore).toBe(0);
-    expect(result.backendResilience).toBe(0);
+    expect(result.overallScore).toBeNull();
+    expect(result.outcome).toBe("not_evaluated");
+    expect(result.backendResilience).toBeNull();
     expect(result.recommendations.length).toBeGreaterThan(0);
     expect(result.recommendations[0]).toContain("No memory depth events");
   });
 
-  it("scores neutral (0.5) when no relevant events exist for a dimension", () => {
+  it("reports unavailable when no relevant events exist for a dimension", () => {
     // A single unrelated event triggers non-empty path but no dimension-specific events
     const result = scoreMemoryDepth({ events: [makeEvent("session_boundary")] });
-    // backendResilience should be 0.5 (no failures), compressionFidelity 0.5, etc.
-    expect(result.backendResilience).toBe(0.5);
-    expect(result.compressionFidelity).toBe(0.5);
-    expect(result.poisoningResistance).toBe(0.5);
-    expect(result.ttlPolicyCompliance).toBe(0.5);
-    expect(result.capacityManagement).toBe(0.5);
+    // Unobserved dimensions do not contribute synthetic neutral measurements.
+    expect(result.backendResilience).toBeNull();
+    expect(result.compressionFidelity).toBeNull();
+    expect(result.poisoningResistance).toBeNull();
+    expect(result.ttlPolicyCompliance).toBeNull();
+    expect(result.capacityManagement).toBeNull();
   });
 
   it("scores perfect backend resilience — all failures recovered with fallback", () => {
@@ -201,12 +202,12 @@ describe("scoreMemoryDepth", () => {
 
     // Verify weighted sum
     const expectedOverall =
-      result.backendResilience * 0.2 +
-      result.compressionFidelity * 0.2 +
-      result.crossSessionConsistency * 0.2 +
-      result.poisoningResistance * 0.2 +
-      result.ttlPolicyCompliance * 0.1 +
-      result.capacityManagement * 0.1;
+      result.backendResilience! * 0.2 +
+      result.compressionFidelity! * 0.2 +
+      result.crossSessionConsistency! * 0.2 +
+      result.poisoningResistance! * 0.2 +
+      result.ttlPolicyCompliance! * 0.1 +
+      result.capacityManagement! * 0.1;
     expect(result.overallScore).toBeCloseTo(expectedOverall, 2);
   });
 });

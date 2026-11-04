@@ -3,6 +3,7 @@ import { parseWireObject } from "../wire/wireJson.js";
 import {
   acpFailure,
   acpNotification,
+  acpRequest,
   acpResult,
   classifyAcpMessage,
   type AcpErrorObject,
@@ -34,11 +35,13 @@ import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
  * id is recorded when the request is accepted and cleared when it is answered,
  * and a second answer is dropped rather than written.
  *
- * OUTBOUND REQUESTS EXIST BUT ARE UNUSED IN THIS SLICE. The correlation table is
- * here because `session/request_permission` is the obvious next method and
- * retrofitting it would mean restructuring the connection rather than adding a
- * handler. A response to an id nothing is waiting for is IGNORED, never
- * answered: answering a response is how two peers get into a loop.
+ * OUTBOUND REQUESTS (WP40: `_amc/ask_user`). Ids are minted here as `amc-<n>`,
+ * so they never collide with the client's. A response settles the one waiting
+ * request and is dropped from the table, so a second response to the same id
+ * is ignored; a response to an id nothing is waiting for is IGNORED, never
+ * answered: answering a response is how two peers get into a loop. An aborted
+ * request stops waiting and ignores a late answer; an unusable or closed
+ * connection rejects every waiting request.
  */
 
 /** Where the frames go. Injected so the connection owns no transport. */
@@ -70,6 +73,8 @@ export interface AcpConnection {
   ingest(chunk: Buffer): void;
   /** Send a notification to the client. */
   notify(method: string, params: unknown): void;
+  /** Ask the client; resolves with its result, rejects with its error, on abort, or when the stream fails. */
+  request(method: string, params: unknown, signal?: AbortSignal): Promise<unknown>;
   /** Abort the in-flight request with this id, if there is one. */
   abortInbound(id: AcpId): boolean;
   /** Whether a request with this id is still running. */
@@ -83,6 +88,8 @@ export interface AcpConnection {
 export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
   const framer = new NdjsonFramer();
   const inbound = new Map<string, InFlight>();
+  const outbound = new Map<string, { resolve(value: unknown): void; reject(error: Error): void }>();
+  let nextOutbound = 0;
   const log = init.log ?? ((): void => undefined);
   let usable = true;
   let ended = false;
@@ -100,6 +107,7 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
     usable = false;
     for (const entry of inbound.values()) entry.controller.abort();
     inbound.clear();
+    rejectOutbound("the ACP connection became unusable");
     diagnostic(reason);
     try { init.onUnusable?.(reason); } catch { diagnostic("ACP unusable callback failed"); }
   };
@@ -157,6 +165,19 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
       } catch { unusable("ACP inbound dispatch failed; the stream cannot safely continue"); }
     },
 
+    request(method: string, params: unknown, signal?: AbortSignal): Promise<unknown> {
+      return new Promise((resolve, reject) => {
+        if (!usable) { reject(new Error("the ACP connection is unusable")); return; }
+        if (signal?.aborted) { reject(new Error("the request was cancelled")); return; }
+        const id = `amc-${(nextOutbound += 1)}`;
+        const done = (): void => { outbound.delete(key(id)); signal?.removeEventListener("abort", onAbort); };
+        const onAbort = (): void => { done(); reject(new Error("the request was cancelled")); };
+        outbound.set(key(id), { resolve: (value) => { done(); resolve(value); }, reject: (error) => { done(); reject(error); } });
+        signal?.addEventListener("abort", onAbort, { once: true });
+        try { write(acpRequest(id, method, params)); } catch (error) { done(); reject(error instanceof Error ? error : new Error(String(error))); }
+      });
+    },
+
     notify(method: string, params: unknown): void {
       // A caller must retire its cursor as unusable if delivery fails. Silently
       // dropping a notification would convert transport loss into apparent success.
@@ -191,8 +212,13 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
       framer.end();
       for (const entry of inbound.values()) entry.controller.abort();
       inbound.clear();
+      rejectOutbound("the ACP connection closed");
     }
   };
+
+  function rejectOutbound(reason: string): void {
+    for (const pending of [...outbound.values()]) pending.reject(new Error(reason));
+  }
 
   function route(value: Record<string, unknown>): void {
     const message = classifyAcpMessage(value);
@@ -215,9 +241,11 @@ export function createAcpConnection(init: AcpConnectionInit): AcpConnection {
 
       case "response":
       case "response-error": {
-        // Nothing outbound is issued in this slice, so any response is
-        // unsolicited. Ignored, never answered.
-        diagnostic("ignored an unsolicited response");
+        const pending = outbound.get(key(message.id));
+        // Unsolicited, late or repeated: ignored, never answered.
+        if (!pending) { diagnostic("ignored an unsolicited response"); return; }
+        if (message.kind === "response") pending.resolve(message.result);
+        else pending.reject(new Error(`the client answered error ${message.error.code}`));
         return;
       }
 

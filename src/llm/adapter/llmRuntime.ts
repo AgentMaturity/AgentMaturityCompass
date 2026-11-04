@@ -38,7 +38,6 @@
  * row records both the provider's facts and the retry verdict the route's frozen
  * policy reached.
  */
-import { resolve } from "node:path";
 import type { CredentialsService } from "../../credentials/credentialsService.js";
 import { credentialRefName } from "../../credentials/credentialRef.js";
 import type { RecordedCredential } from "../../session/requestOutcomeMeta.js";
@@ -50,12 +49,13 @@ import type { StreamChunk } from "../streamChunk.js";
 import { prepareRequest } from "../request/prepareRequest.js";
 import type { RequestEncoderRegistry } from "../request/requestEncoder.js";
 import type { ToolSchema } from "../request/requestSpec.js";
-import type { AdapterRegistry, PinnedRoute } from "./adapterRegistry.js";
+import { LlmRouteError, type AdapterRegistry, type PinnedRoute, type VirtualRouteSelection } from "./adapterRegistry.js";
 import { classifyResponseFailure } from "./responseFailure.js";
 import { StreamRecorder } from "./streamRecorder.js";
 import type { SettledStream } from "./streamRecorder.js";
 import { fetchTransport, readBodyText } from "./transport.js";
-import type { HttpResponse, HttpTransport } from "./transport.js";
+import { dispatchWithTimeouts } from "./streamTimeouts.js";
+import type { HttpTransport } from "./transport.js";
 import { assertRequestCapabilities, assertRequiredCapabilities, LlmCapabilityError } from "./providerCapabilities.js";
 import { LiveTextPreview, type LiveTextPreviewEvent } from "./liveTextPreview.js";
 import { reserveNativeModelBudget } from "../../budgets/nativeBudgetAdmission.js";
@@ -64,8 +64,8 @@ import { bindProviderToolNames, usesProviderToolNames } from "../request/provide
 import { ProviderToolBinding } from "./providerToolBinding.js";
 import { checkEgress, EgressBlocked } from "../../residency/checkEgress.js";
 import { detectProtectedRequest } from "../../dataflow/detectors.js";
-import { admitProtectedModelRequest, DataFlowRefused } from "../../dataflow/purposePolicy.js";
-import { loadProcessorRegistrySnapshot } from "../../dataflow/processorRegistry.js";
+import { DataFlowRefused } from "../../dataflow/purposePolicy.js";
+import { protectedRequestAdmission } from "../../dataflow/providerAdmission.js";
 
 /** One model call, as a caller describes it. */
 export interface LlmCallSpec {
@@ -81,6 +81,11 @@ export interface LlmCallSpec {
   /** Tools to offer, or null. Committed to the log before the header is written. */
   readonly tools: readonly ToolSchema[] | null;
   readonly signal?: AbortSignal;
+  /**
+   * The route an earlier attempt of the same step pinned, reused instead of re-pinned (D11): a registry replaced or
+   * emptied during a retry backoff does not change the adapter a step sends on. Must name this spec's provider and model.
+   */
+  readonly pinned?: PinnedRoute;
 }
 
 /** How the runtime is wired. */
@@ -172,15 +177,22 @@ export class LlmRuntime {
 
   private readonly transport: HttpTransport;
 
-  private readonly workspace: string;
-
   private readonly now: () => number;
 
   constructor(init: LlmRuntimeInit) {
     this.init = init;
     this.transport = init.transport ?? fetchTransport;
-    this.workspace = resolve(init.session.workspace);
     this.now = init.now ?? Date.now;
+  }
+
+  /** Resolve a route without logging or sending anything. */
+  pin(input: { readonly providerId: string; readonly model: string }): PinnedRoute {
+    return this.init.registry.pin(input);
+  }
+
+  /** Apply an existing router decision explicitly, before a signed request exists. */
+  pinVirtual(selection: VirtualRouteSelection): PinnedRoute {
+    return this.init.registry.pinVirtual(selection);
   }
 
   /** Which providers this runtime can reach right now. */
@@ -203,10 +215,17 @@ export class LlmRuntime {
    * prepared and abandoned is a fact worth having.
    */
   prepare(spec: LlmCallSpec): PreparedCall {
-    const route = this.init.registry.pin({ providerId: spec.providerId, model: spec.model });
+    if (spec.pinned !== undefined && (spec.pinned.providerId !== spec.providerId || spec.pinned.model !== spec.model)) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_UNKNOWN", `the step pinned ${spec.pinned.providerId}/${spec.pinned.model}, not ${spec.providerId}/${spec.model}`);
+    }
+    const route = spec.pinned ?? this.init.registry.pin({ providerId: spec.providerId, model: spec.model });
     assertRequiredCapabilities(route.capabilities, spec.requiredCapabilities);
     if (spec.requiredProtocol !== undefined && route.capabilities?.protocol !== spec.requiredProtocol) {
       throw new LlmCapabilityError("required-protocol", route.capabilities === null ? "unknown" : "unsupported");
+    }
+    // PXA-15: retention is the route's policy, committed in the signed header; a caller cannot choose or override it.
+    if (Object.hasOwn(spec.params, "cacheRetention")) {
+      throw new LlmRouteError("AMC_LLM_ROUTE_INVALID", "cacheRetention is a route setting; it cannot be passed as a request param");
     }
     // Before anything durable: an adapter that cannot carry these params says so
     // now, rather than after a signed header row commits to bytes it will refuse.
@@ -216,6 +235,9 @@ export class LlmRuntime {
     const toolNames = usesProviderToolNames(route.encoderId, route.encoderVersion)
       ? bindProviderToolNames(spec.tools ?? []) : null;
     const prepared = prepareRequest(this.init.session, {
+      modelMetadata: route.modelMetadata,
+      physicalRoute: route.physicalRoute,
+      routingDecision: route.routingDecision,
       model: spec.model,
       providerId: route.providerId,
       // The ENCODER comes from the pinned adapter, never from the caller: an
@@ -223,32 +245,22 @@ export class LlmRuntime {
       // one is how a well-formed request of the wrong shape gets sent.
       encoderId: route.encoderId,
       encoderVersion: route.encoderVersion,
-      params: spec.params,
+      params: route.cacheRetention === undefined ? spec.params : { ...spec.params, cacheRetention: route.cacheRetention },
       systemPromptEventId: spec.systemPromptEventId,
       tools: spec.tools,
       assertRequest: (request) => {
         assertRequestCapabilities(route.capabilities, request);
-        // Opt-in: no .amc/dataflow/processors.yaml (and no .sig) means this workspace has not adopted protected-data admission.
-        if (loadProcessorRegistrySnapshot(this.workspace).state === "missing") return;
-        const detection = detectProtectedRequest(request);
-        if (detection.classes.length === 0) return;
-        const admission = admitProtectedModelRequest(this.workspace, route.providerId, route.baseUrl, detection);
-        const evidence = {
-          classes: [...detection.classes],
-          counts: { ...detection.counts },
-          detectorSetDigest: detection.detectorSetDigest,
-          processorId: admission.processorId
-        };
-        try {
-          this.init.session.recordProjectedEvidence({
-            eventType: "audit",
-            payload: JSON.stringify(evidence),
-            meta: { auditType: "PROTECTED_DATA_DETECTED", ...evidence }
-          });
-        } catch {
-          throw new DataFlowRefused("audit_failed");
+        // P2-02 admission (`protectedRequestAdmission`, opt-in and latched). The workspace is read per use and never
+        // fabricated: a session without one counts as opted in and refuses.
+        const admission = protectedRequestAdmission(this.init.session.workspace, route.providerId, route.baseUrl,
+          issued => detectProtectedRequest(request, issued));
+        if (admission === null) return;
+        if (admission.row !== null) {
+          try { this.init.session.recordProjectedEvidence(admission.row); } catch { throw new DataFlowRefused("audit_failed"); }
         }
-        if (!admission.allowed) throw new DataFlowRefused(admission.reason);
+        if (admission.refusal !== null) throw admission.refusal;
+        // ponytail: admission runs at prepare only; requestRetry streams right after prepare. Add a dispatch recheck if a
+        // caller ever waits between them.
       },
       ...(this.init.encoders !== undefined ? { encoders: this.init.encoders } : {})
     });
@@ -337,88 +349,106 @@ export class LlmRuntime {
       throw settle(recorder.fail({ failure: { message: "request cancelled before budget admission", code: LLM_FAILURE_CODE.ABORTED }, kind: "aborted", httpStatus: null, cause: "aborted_before_dispatch" }));
     }
     try {
-      reserveNativeModelBudget(this.init.session, prepared.headerEventId);
+      reserveNativeModelBudget(this.init.session, prepared.headerEventId, request);
     } catch (error) {
-      // Evidence that fails verification is not exhausted quota: label it so an operator checks the ledger, not the provider.
+      // AMC's own admission refused before dispatch; no provider was contacted, so this is never provider QUOTA (P0-59).
+      // Evidence that fails verification is not a budget decision either: label it so an operator checks the ledger.
       const integrity = error instanceof BudgetEvidenceIntegrityError;
-      throw settle(recorder.fail({ failure: { message: error instanceof Error ? error.message : "native budget admission failed", code: integrity ? "AMC_EVIDENCE_INTEGRITY" : LLM_FAILURE_CODE.QUOTA }, kind: "error", httpStatus: null, cause: integrity ? "budget_evidence_invalid" : "budget_refused" }));
+      throw settle(recorder.fail({ failure: { message: error instanceof Error ? error.message : "native budget admission failed", code: integrity ? "AMC_EVIDENCE_INTEGRITY" : "AMC_NATIVE_BUDGET_REFUSED" }, kind: "error", httpStatus: null, cause: integrity ? "budget_evidence_invalid" : "budget_refused" }));
     }
 
-    let response: HttpResponse;
+    let response: Awaited<ReturnType<typeof dispatchWithTimeouts>> | undefined;
     try {
-      // The same gate covers injected transports and fetch, before either can transmit the pinned bytes.
-      checkEgress({ workspace: this.workspace, channel: "provider", url: request.url });
-      dispatchAttempted = true;
-      response = await this.transport({ ...request, redirect: "error" });
-    } catch (error: unknown) {
-      throw settle(recorder.fail(this.transportFailure(error, spec.signal)));
-    }
-
-    if (response.status < 200 || response.status >= 300) {
-      const bodyText = await readBodyText(response.body);
-      throw settle(
-        recorder.fail({
-          failure: classifyResponseFailure({ adapter: route.adapter, response, bodyText, now: this.now })
-            .failure,
-          kind: "error",
-          httpStatus: response.status,
-          cause: `http_${response.status}`
-        })
-      );
-    }
-
-    // One settlement per dispatch, and the flag is what enforces it across three
-    // exits: a clean finish, a throw, and the consumer walking away mid-stream.
-    let recorded = false;
-    const preview = new LiveTextPreview({ sessionId: this.init.session.sessionId, headerEventId: prepared.headerEventId,
-      secret, notify: this.init.onLiveText });
-    const binding = toolNames === null ? null : new ProviderToolBinding(toolNames);
-    try {
-      for await (const decoded of route.adapter.decode(response)) {
-        const chunk = binding?.bind(decoded) ?? decoded;
-        // Folded and grammar-checked BEFORE the consumer sees it: a chunk that
-        // breaks the contract must not reach a caller who might act on it.
-        recorder.push(chunk);
-        preview.push(chunk);
-        yield chunk;
+      try {
+        // The same gate covers injected transports and fetch, before either can transmit the pinned bytes. checkEgress
+        // resolves the session's workspace itself and refuses a missing one as workspace_scope_required.
+        checkEgress({ workspace: this.init.session.workspace, channel: "provider", url: request.url, providerId: route.providerId });
+        dispatchAttempted = true;
+        response = await dispatchWithTimeouts(this.transport, { ...request, redirect: "error",
+          ...(spec.signal === undefined ? {} : { signal: spec.signal }) }, route.timeouts);
+      } catch (error: unknown) {
+        throw settle(recorder.fail(this.transportFailure(error, spec.signal)));
       }
-      const settled = recorder.complete(response.status);
-      recorded = true;
-      // An in-band terminal error — the adapter decoded a provider error event
-      // into `finish {kind: "error"}` — is a failure and surfaces as one. The
-      // finish chunk has already been yielded, so a consumer that inspects it
-      // sees the same facts the throw carries.
-      if (settled.failure !== null) throw settle(settled);
-      onSettled(settled);
-    } catch (error: unknown) {
-      if (recorded) throw error;
-      recorded = true;
-      const settled = recorder.fail(this.decodeFailure(error, spec.signal));
-      // A protocol violation is OUR bug, not the provider's, and it is rethrown
-      // as itself so `instanceof` still tells the two apart. The row is written
-      // either way.
-      if (isLlmStreamProtocolError(error)) {
-        onSettled(settled);
-        throw error;
-      }
-      throw settle(settled);
-    } finally {
-      preview.finish();
-      if (!recorded) {
-        // The consumer stopped pulling — a `break`, a `return`, an outer throw.
-        // Generators are closed by injecting a return, which no `catch` sees, so
-        // without this the header would sit forever unsettled and the log would
-        // say a request was sent and never answered.
-        recorded = true;
-        onSettled(
+
+      if (response.status < 200 || response.status >= 300) {
+        let bodyText: string;
+        try {
+          bodyText = await readBodyText(response.body);
+          response.assertActive();
+        } catch (error) {
+          throw settle(recorder.fail({ ...this.decodeFailure(error, spec.signal), httpStatus: response.status }));
+        }
+        throw settle(
           recorder.fail({
-            failure: { message: "stream abandoned by the consumer", code: LLM_FAILURE_CODE.ABORTED },
-            kind: "aborted",
+            failure: classifyResponseFailure({ adapter: route.adapter, response, bodyText, now: this.now })
+              .failure,
+            kind: "error",
             httpStatus: response.status,
-            cause: "abandoned"
+            cause: `http_${response.status}`
           })
         );
       }
+
+      // One settlement per dispatch, and the flag is what enforces it across three
+      // exits: a clean finish, a throw, and the consumer walking away mid-stream.
+      let recorded = false;
+      const preview = new LiveTextPreview({ sessionId: this.init.session.sessionId, headerEventId: prepared.headerEventId,
+        secret, notify: this.init.onLiveText });
+      const binding = toolNames === null ? null : new ProviderToolBinding(toolNames);
+      try {
+        for await (const decoded of route.adapter.decode(response)) {
+          // A decoder may salvage already reported usage while unwinding a
+          // failed read. Retain that subtotal, but publish no content after abort.
+          if (decoded.type !== "usage") response.assertActive();
+          const chunk = binding?.bind(decoded) ?? decoded;
+          // Folded and grammar-checked BEFORE the consumer sees it: a chunk that
+          // breaks the contract must not reach a caller who might act on it.
+          recorder.push(chunk);
+          response.assertActive();
+          preview.push(chunk);
+          yield chunk;
+        }
+        response.assertActive();
+        const settled = recorder.complete(response.status);
+        recorded = true;
+        // An in-band terminal error — the adapter decoded a provider error event
+        // into `finish {kind: "error"}` — is a failure and surfaces as one. The
+        // finish chunk has already been yielded, so a consumer that inspects it
+        // sees the same facts the throw carries.
+        if (settled.failure !== null) throw settle(settled);
+        onSettled(settled);
+      } catch (error: unknown) {
+        if (recorded) throw error;
+        recorded = true;
+        const settled = recorder.fail({ ...this.decodeFailure(error, spec.signal), httpStatus: response.status });
+        // A protocol violation is OUR bug, not the provider's, and it is rethrown
+        // as itself so `instanceof` still tells the two apart. The row is written
+        // either way.
+        if (isLlmStreamProtocolError(error)) {
+          onSettled(settled);
+          throw error;
+        }
+        throw settle(settled);
+      } finally {
+        preview.finish();
+        if (!recorded) {
+          // The consumer stopped pulling — a `break`, a `return`, an outer throw.
+          // Generators are closed by injecting a return, which no `catch` sees, so
+          // without this the header would sit forever unsettled and the log would
+          // say a request was sent and never answered.
+          recorded = true;
+          onSettled(
+            recorder.fail({
+              failure: { message: "stream abandoned by the consumer", code: LLM_FAILURE_CODE.ABORTED },
+              kind: "aborted",
+              httpStatus: response.status,
+              cause: "abandoned"
+            })
+          );
+        }
+      }
+    } finally {
+      await response?.close?.();
     }
   }
 

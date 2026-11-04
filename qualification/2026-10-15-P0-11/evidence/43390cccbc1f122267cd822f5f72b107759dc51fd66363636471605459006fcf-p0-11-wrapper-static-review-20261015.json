@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-11",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "capturedUtc": "2026-10-15T06:27:50.174993+00:00",
+  "scope": "Bounded static review of namespace-only prepared original-command wrapper.",
+  "decision": "NO_BLOCKING_STATIC_FINDINGS",
+  "findings": [],
+  "blockingFindings": [],
+  "reviewedWrapper": {
+    "path": "/private/tmp/p0-11-run-command-prepared-20261015.py",
+    "bytes": 10488,
+    "sha256": "b28dec64355192e41615628c8219fe831b83a62f8ee709834844a962301e079a"
+  },
+  "derivedFromWrapper": {
+    "path": "/private/tmp/p0-45-run-command-20261015.py",
+    "bytes": 10488,
+    "sha256": "2e7a5cfc4c9f4d6b80af42060c934f168a889461a07c7fb8fd3bebb6b3cb13fb"
+  },
+  "priorReview": {
+    "path": "/private/tmp/p0-45-wrapper-static-review-20261015.json",
+    "bytes": 5454,
+    "sha256": "b072da3930c8cad75a1578bf0f04292742ce87160ee173d1330e51590e4dccfb"
+  },
+  "reporter": {
+    "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+    "bytes": 2110,
+    "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+  },
+  "diff": {
+    "fullSourceAndDiffRead": true,
+    "changedOnly": [
+      "Docstring P0-45 toP0-11",
+      "BASE path",
+      "ROOT path",
+      "JOURNAL path",
+      "Final diagnostic P045 toP011"
+    ],
+    "functionalChanges": [],
+    "legacyReporterKeyUnchanged": "AMC_P021_RUNTIME_OBSERVER_PATH"
+  },
+  "checks": {
+    "argv": "Original complete argv preserved; observed Node/Vitest/reporter and fresh owned producer path validated.",
+    "exclusiveWrites": "Phase directory/log/command/process/group/snapshot use exclusive creation, reporter retainswx. Vitest producer semantics are not changed; journal remains appendable.",
+    "process": "Popen start_new_session; normal unbounded wait; no outer timeout or terminating signal.",
+    "group": "Owned PGID only, signal0, five-second/50ms polling and positiveESRCH required.",
+    "observer": "Frozen reporter pin; actual PID/cwd; exclusive byte-identical raw snapshot; counts/errors/late/full teardown remain later audit.",
+    "failure": "ACTIVE/HALTED retained on uncertainty; no retry/source restoration/cleanup.",
+    "environment": "Inherited environment with privateHOME, Node22PATH, GIT_NO_LAZY_FETCH and disclosed observed metadata key overrides.",
+    "deadlines": "No original test/helper timeout or command argv rewritten.",
+    "source": "Before/afterHEAD equality only; does not independently prove every file-byte restoration."
+  },
+  "futurePaths": {
+    "base": "/private/tmp/p0-11-qualification-20261015",
+    "root": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+    "journal": "/private/tmp/p0-11-commands-20261015.jsonl"
+  },
+  "limits": [
+    "Static readiness only; assigned root/base/home and later runtime release remain root work.",
+    "Exit0/1 is process metadata, not test acceptance or kill.",
+    "No universal detached-descendant absence, native ABI measurement, OS/network/credential/cache isolation or healthy teardown proof.",
+    "Unbounded normal wait can remain unresolved indefinitely; no automatic kill recovery."
+  ],
+  "performed": {
+    "targetImportedParsedSyntaxCompiledExecuted": false,
+    "productRuntimeTestsBuildInstallFingerprint": false,
+    "laneOrBaseCreation": false,
+    "sourceGitOrProducerWrites": false,
+    "writes": "Only NEW wrapper static review JSON/MD pair."
+  },
+  "runtimeAuthorizationProvided": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "markdown": {
+    "path": "/private/tmp/p0-11-wrapper-static-review-20261015.md",
+    "bytes": 2275,
+    "sha256": "9124f50fd6356f32c5be27cb6d89f416a91bd933e72d8b0613b5f9559e9055a4"
+  }
+}

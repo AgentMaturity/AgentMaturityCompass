@@ -1,0 +1,406 @@
+{
+  "schemaVersion": 1,
+  "kind": "READONLY_ROUTING_UNDER_USER_BOT_WIP_EXCLUSION",
+  "capturedUtc": "2026-10-15T08:27:05.339740+00:00",
+  "source": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+  "productionSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "readRoot": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+  "decision": {
+    "nextCandidate": "P1-01",
+    "scope": "Bounded qualification of existing accepted source only",
+    "rootAlreadySelectedOwnedLane": true,
+    "newHumanPermissionRequiredForThisScope": false,
+    "existingUserAndRootAuthorizationApplies": true,
+    "formalP008P009AcceptanceInferred": false,
+    "wholeP101AcceptanceClosed": false,
+    "sourceImplementationOrTransferAuthorizedByReport": false
+  },
+  "authority": {
+    "planSelectionLines": "169-174",
+    "planReadyLines": "61-69",
+    "issuesDependencyStatusLines": "18-19 and79",
+    "P101Spec": "Dependencies permits the rest if P0-09 trust-list format has not merged; current source already imports both actual upstream schemas.",
+    "newUserSteering": "Parent relayed the latest human instruction: bot PRs are excluded from WIP; continue the next unblocked plan item while preserving Claude/freeze. This supersedes only the older bot-count inference, not source or release holds.",
+    "noBlanketG0ClosurePrecondition": true
+  },
+  "WIP": {
+    "frozenSnapshot": {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015.json",
+      "bytes": 23469,
+      "sha256": "dfa37bfd359c951685d3931d4d5c368f144a51bd614114a0668c821f57ce0432"
+    },
+    "observedAtUtc": "2026-10-15T07:35:10.298993+00:00",
+    "snapshotOpen": 13,
+    "snapshotBot": 13,
+    "snapshotNonBot": 0,
+    "countedFromThatSnapshotUnderNewInstruction": 0,
+    "hostedRefreshByThisAudit": false,
+    "priorConservativeBotHoldSuperseded": true,
+    "noNewPRByAudit": true
+  },
+  "candidate": {
+    "key": "P1-01",
+    "gate": "G1",
+    "priority": "Urgent",
+    "due": "2026-11-20",
+    "epic": "E14",
+    "exportStatus": "In review",
+    "exportBlockedBy": [
+      "P0-08",
+      "P0-09"
+    ],
+    "rankedFirstG1InFrozenRouting": true,
+    "actualSchemaInputsPresent": [
+      "src/claims/eligibility/schemas.ts:claimEnvelopeSchema",
+      "src/trust/trustList.ts:signedTrustListSchema"
+    ],
+    "currentConsumers": "src/contracts/index.ts imports those exact schemas; generator imports built dist/contracts/index.js.",
+    "formalDependencyLimits": "P0-08/P0-09 export Done and usable source inputs support this bounded run; their actual formal acceptance, pin precedence, labels and all downstream security claims remain separate."
+  },
+  "remainingG0": [
+    {
+      "key": "P0-03",
+      "priority": "High",
+      "due": "Oct 16, 2026",
+      "exportStatus": "In progress",
+      "currentReason": "Inventory may remain read-only; cleanup decisions remain human-held. No deletion or worktree cleanup authorized by this routing."
+    },
+    {
+      "key": "P0-14",
+      "priority": "Urgent",
+      "due": "Oct 20, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "D-03=C already answered; Claude-reserved source/deployment scope and tooling/default-passphrase history approvals remain. No topology choice needs re-asking."
+    },
+    {
+      "key": "P0-26",
+      "priority": "High",
+      "due": "Oct 28, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "Thirty keep/drop/defer choices and floor policy remain; do not apply unapproved drops. Scope ownership remains reserved."
+    },
+    {
+      "key": "P0-28",
+      "priority": "High",
+      "due": "Oct 28, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "D-03=C answered; strict P0-22/P0-23 labels and accepted source/CLI transfer remain open. No docs moves or guard weakening."
+    },
+    {
+      "key": "P0-31",
+      "priority": "High",
+      "due": "Oct 29, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "Installed candidate depends on unresolved release chain; normal pack and real Git freeze gates remain mandatory. No --ignore-scripts shortcut or old installed acceptance reuse as current proof."
+    },
+    {
+      "key": "P0-32",
+      "priority": "High",
+      "due": "Oct 30, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "Depends on P0-30/P0-31 full contract; AMC_OS receipt transfer/read access and PR22 confirmation remain. Bounded handoffs are not Done closure."
+    },
+    {
+      "key": "P0-33",
+      "priority": "Urgent",
+      "due": "Oct 24, 2026",
+      "exportStatus": "In progress",
+      "currentReason": "Required quality1269 duplicate/2751 dead findings remain unwaived; P1-52 implementation absent. Written live-health skip until P2-06 preserved."
+    },
+    {
+      "key": "P0-34",
+      "priority": "Urgent",
+      "due": "Oct 28, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "D-03=C,D-06=B,D-20defaults answered; D-12 current release decision/authority not established here. Labels/docs/quality/release dependencies remain."
+    },
+    {
+      "key": "P0-35",
+      "priority": "Urgent",
+      "due": "Oct 28, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "Depends on P0-14; D-03=C is not tooling/network/deployment approval or qualified digest proof."
+    },
+    {
+      "key": "P0-36",
+      "priority": "Urgent",
+      "due": "Oct 27, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "Advisory severity/review and actual P0-37 rotation proof remain; no publication."
+    },
+    {
+      "key": "P0-37",
+      "priority": "Urgent",
+      "due": "Oct 20, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "Source key-lifecycle code is not actual four-key rotation/provider revocation/distrust/datetime proof. P1-08 code-before-rotation instruction remains."
+    },
+    {
+      "key": "P0-38",
+      "priority": "Urgent",
+      "due": "Oct 30, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "Release credentials, publish identity and main protection remain human-held after release-surface readiness."
+    },
+    {
+      "key": "P0-39",
+      "priority": "Urgent",
+      "due": "Nov 1, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "Release chain incomplete; historical P0-56\u201362 add unregistered follow-up debt needing reconciliation. No publish/deprecate/advisory/installer operation authorized."
+    },
+    {
+      "key": "P0-40",
+      "priority": "Urgent",
+      "due": "Nov 3, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "Post-publish clean-machine verification depends on actual P0-39; no clean install proof inferred."
+    },
+    {
+      "key": "P0-53",
+      "priority": "Urgent",
+      "due": "Oct 14, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "D-22defaults already accepted; no blanket CLI/base exception. Accepted A4 source/base and owner coordination remain. Explicitly not a GATE-G0 blocker in export."
+    },
+    {
+      "key": "P0-55",
+      "priority": "Urgent",
+      "due": "Oct 21, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "A4 security follow-ups remain dependency/ownership constrained; old merge label does not close trust/signing/claim gaps. Explicitly not a GATE-G0 blocker in export."
+    },
+    {
+      "key": "P1-52",
+      "priority": "Urgent",
+      "due": "Oct 23, 2026",
+      "exportStatus": "Not started",
+      "currentReason": "D-11=A already answered. Urgent G0 ratchet source/baseline/tests absent; accepted-base/source ownership reconciliation required. Removing1269/2751 debt is outside this spec. No baseline waiver or threshold edit."
+    }
+  ],
+  "remainingG0Meaning": "Inherited held/dependency/decision/source-ownership facts from the frozen after-P041 audit, not new status closure. The new user instruction removes only bot WIP counting; earlier skipped/unresolved lanes stay preserved.",
+  "P057": {
+    "reconciliation": {
+      "path": "/private/tmp/p0-57-held-candidate-readonly-reconciliation-20261015.json",
+      "bytes": 31285,
+      "sha256": "397cbee80d448a01932e98e019f6917dec46eb5ccc8c7b3cb94224beebb15fca"
+    },
+    "reservationLines": "1565-1577,1590-1604",
+    "historicalReleaseMeaning": "Source-only held-line release, not accepted transfer",
+    "acceptedBaseExceptionPresent": false,
+    "heldAddedKey": "P1-65",
+    "acceptedDeclaredCLI": 1236,
+    "heldDeclaredCLI": 1255,
+    "normalGuardRequired": true,
+    "heldWholeFileDependencies": "P1-78 optional deployment/type and callers with absent nativeTaskVerdict/leasePrincipal; no whole closure assumed.",
+    "forbiddenWorkarounds": [
+      "held-parent/self baseline as acceptance",
+      "new exception or baseline rewrite",
+      "planless fail-open loader",
+      "paused P2-02/shared/A4 source takeover"
+    ]
+  },
+  "safeNextActions": [
+    "Fresh owned Node22/pnpm frozen install/build and normal accepted-base freeze.",
+    "Read-only check:schemas; keep actual failures and do not run --write regeneration as a green shortcut.",
+    "Run separately selected unchanged standard/external evidence tests; distinguish their actual scope and later aggregate counts.",
+    "Preserve source/test/config/guard/A4/reservation bytes; scope any future demonstrated fix separately rather than invent a broad approval requirement."
+  ],
+  "staticCoverageAndGaps": {
+    "testsContractsDirectoryAbsent": true,
+    "literalStandardCases": 1,
+    "literalExternalProfileCases": 8,
+    "countsCollected": false,
+    "generatorFixtureLoop": "Current check mode evaluates registered valid/invalid files with current Zod/Ajv; self-consistency is not proof all issue-normative fixtures exist.",
+    "currentVerifierDrift": "src/trust/verifierReport.ts:7 uses not-evaluated; :46 includes trusted.",
+    "legacyReceiptBoundary": "src/contracts/v1/receipt.ts documents non-strict legacy compatibility; do not silently tighten signed legacy bytes.",
+    "historicalFollowups": "pending-checks.md:82-86 records receipt, report spelling/trusted, export hash and Pages-deploy boundaries."
+  },
+  "graphNavigation": {
+    "command": "graphify query 'P1-01 strict public contracts JSON schemas P0-08 P0-09 dependencies' --budget 1000",
+    "cwd": "/Users/sid/AgentMaturityCompass",
+    "exit": 0,
+    "returnedNodes": 474,
+    "displayedNodes": 33,
+    "truncated": true,
+    "graph": {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+      "bytes": 45692207,
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395"
+    },
+    "builtAtCommitAsFrozenNavigationRecords": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "currentAuthority": false,
+    "refreshWatchServer": false
+  },
+  "referencePins": [
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "bytes": 25110,
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "bytes": 78486,
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 \u00b7 Forge.md",
+      "bytes": 47286,
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-01.md",
+      "bytes": 15658,
+      "sha256": "4d9743e9bbbdba999f36ccf45ec7d6e5252ada6267c2bb498da88e19ab43ad57"
+    },
+    {
+      "path": "/private/tmp/p1-01-qualification-20261015/preflight.json",
+      "bytes": 3343,
+      "sha256": "1282da38cd720e31f2e9b2c0054810057cbf8ef278702cd2471c6d798f72e75d"
+    },
+    {
+      "path": "/private/tmp/amc-g1-next-readonly-routing-20261015.json",
+      "bytes": 77917,
+      "sha256": "929d91632ce41446a7e47969d1ee5ae098b185358a0667564940255cf786028d"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-41-readonly-routing-20261015.json",
+      "bytes": 84851,
+      "sha256": "396c2d76d5fac5f61851bf4091123581e7e0b34a5035565e25a8b3f0c665aa14"
+    },
+    {
+      "path": "/private/tmp/p0-57-held-candidate-readonly-reconciliation-20261015.json",
+      "bytes": 31285,
+      "sha256": "397cbee80d448a01932e98e019f6917dec46eb5ccc8c7b3cb94224beebb15fca"
+    },
+    {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015.json",
+      "bytes": 23469,
+      "sha256": "dfa37bfd359c951685d3931d4d5c368f144a51bd614114a0668c821f57ce0432"
+    }
+  ],
+  "directCurrentSourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/contracts/index.ts",
+      "bytes": 8308,
+      "sha256": "5cd1a9079ccf194093965f7f7ba127aca108faa1e0fb795007527287dde9bd1b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/claims/eligibility/schemas.ts",
+      "bytes": 2608,
+      "sha256": "693398d39f327b0053d40d79d0bfa26ad78b829a2b8c978113f78cf93a8c0d96"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/trust/verifierReport.ts",
+      "bytes": 6887,
+      "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/contracts/v1/receipt.ts",
+      "bytes": 2606,
+      "sha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/scripts/gen-spec-schemas.mjs",
+      "bytes": 4307,
+      "sha256": "48ba5eedc013bef2c20a106d61a2948c56163f4779900b84aad196d431303e22"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/standard/standardGenerator.ts",
+      "bytes": 9234,
+      "sha256": "707aace133019e440e9709abedbce925ab5dd35d060556e01040d087bcc60af4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/evidence/exporter.ts",
+      "bytes": 17623,
+      "sha256": "30837bbe636fcae29331041f6cb4f7aa314687034d7f0416f0dde55bed31041a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/spec/ACCEPTANCE_RULES.md",
+      "bytes": 34039,
+      "sha256": "af79570a16abbf50945778dadf2563f1e60ee95e7850f3f5a8e6cff0fad6d794"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/spec/schemas/index.json",
+      "bytes": 8467,
+      "sha256": "ef869ba2c25c14902b537893e3663c30b821516daa39abf60891a1e1df44f339"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/.github/workflows/ci.yml",
+      "bytes": 14134,
+      "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/.github/workflows/pages.yml",
+      "bytes": 1382,
+      "sha256": "460095c4a24f55eb92ae2aba12dc180fab9c592f58bda964624308d0ab406160"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/standardSchemaCaveat.test.ts",
+      "bytes": 2574,
+      "sha256": "5c03f8cbbee2c9a619f7fead8d49c2324709f7f133aa53916b45d19aa1f5a127"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+    }
+  ],
+  "readLimitations": [
+    "No hosted WIP refresh; bot exclusion applied to the frozen all-bot query only.",
+    "An initial guessed plans/execution-log.md and plans/state-ledger.md lookup was absent; authoritative current exported plan and frozen receipts were used.",
+    "A broad private filename inventory hit one unrelated macOS device-log permission denial; selected task authorities remained readable and no dispatch blocker exists."
+  ],
+  "performed": {
+    "readOnlyGraphNavigation": true,
+    "directSourceAndPolicyReads": true,
+    "productImportsTestsCollectionBuildInstall": false,
+    "sourceMutationOrWorktreeCreation": false,
+    "trackerClaudeOrExternalMessages": false,
+    "gitMutation": false,
+    "writes": "Only this new routing pair; the separately assigned wrapper review pair is independently pinned."
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorizationFromReport": false,
+  "markdown": {
+    "path": "/private/tmp/amc-next-unblocked-user-wip-routing-20261015.md",
+    "bytes": 4405,
+    "sha256": "5f2d6b061129bfa1b2c6f703b0f446bc99e82982cde44c200815e0a37e0e0b15"
+  }
+}

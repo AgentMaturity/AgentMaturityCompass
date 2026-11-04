@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+Fail-secure governance and agent protocol security now credit AMC's own source tree only for the modules that enforce a control. On AMC's own tree, fail-secure governance scored 86 before P1-12. P1-12 raised it to 100 by accident: creating `src/policy` (effective-policy receipts) satisfied the "tool call whitelist" criterion, which listed `src/policy` as a witness. The score is still 100, now because the signed ToolHub allowlist (`src/toolhub/toolhubValidators.ts`) is the witness. "Excessive agency controls" now cite scope-limited signed leases (`src/leases/leaseVerifier.ts`) and signed per-agent budget admission (`src/budgets/nativeBudgetAdmission.ts`) instead of `src/policy`, and protocol authorization cites the authorization record (`src/actions/authorize.ts`); both outcomes are unchanged on AMC's tree because `src/enforce` already met them (agent protocol security stays 71). `src/policy` is no longer a witness for any criterion. Outside an AMC checkout nothing changes: `src/` paths never count there.

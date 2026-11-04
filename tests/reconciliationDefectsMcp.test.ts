@@ -9,13 +9,13 @@ import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { initWorkspace } from "../src/workspace.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { agentToolset } from "../src/agent/agentToolset.js";
 import { SessionService } from "../src/session/sessionService.js";
 import { initToolsConfig, loadToolsConfig } from "../src/toolhub/toolhubValidators.js";
 import { discoverNativeMcpCatalog, mountNativeMcpServer, nativeMcpToolName } from "../src/mcp/nativeMcpClient.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // On tools/call the server can announce a catalog change BEFORE its result line.
 const SERVER = String.raw`
@@ -49,7 +49,7 @@ async function mounted(notifyOnCall: boolean) {
   cleanups.push(async () => { rmSync(workspace, { recursive: true, force: true }); });
   const statePath = join(workspace, "state.json"), logPath = join(workspace, "calls.log");
   writeFileSync(statePath, JSON.stringify({ tools: [tool], notifyOnCall })); writeFileSync(logPath, "");
-  initWorkspace({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" });
+  initWorkspaceWithoutActionPolicy({ workspacePath: workspace, agentId: "default", trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
   const name = nativeMcpToolName("fixture", "lookup"), config = loadToolsConfig(workspace);
   initToolsConfig(workspace, { ...config, tools: { ...config.tools, allowedTools: [...config.tools.allowedTools, { name, actionClass: "READ_ONLY" as const }] } });
@@ -82,7 +82,7 @@ describe("AMC-1515 nativeMcpClient.ts:264 — a received result discarded after 
     const fixture = await mounted(true);
     const outcome = await fixture.call();
     expect(fixture.remoteCalls()).toBe(1);
-    expect(outcome.outcome).toBe("ERROR");
+    expect(outcome.outcome).toBe("TOOL_OUTCOME_UNKNOWN");
     expect(String(outcome.content)).toContain("the remote tool executed and its received result was discarded. It was not replayed.");
   });
 });

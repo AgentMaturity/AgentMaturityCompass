@@ -1,3 +1,5 @@
+import { captureBenchArchiveTargets, publishBenchArchive } from "./benchArchivePublication.js";
+export { createBenchArtifactAsync } from "./benchArtifactAsync.js";
 import { collectFiles, cleanupDir } from "../utils/archiveFiles.js";
 import { mkdtempSync, readFileSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -67,7 +69,7 @@ function resolveBenchRoot(dir: string): string {
   return dir;
 }
 
-function normalizeScope(params: {
+export function normalizeBenchScope(params: {
   scope: "workspace" | "node" | "agent";
   id?: string | null;
 }): { scopeType: "WORKSPACE" | "NODE" | "AGENT"; scopeId: string } {
@@ -107,41 +109,7 @@ export interface BenchCreateResult {
   transparencyHash: string;
 }
 
-export function createBenchArtifact(params: {
-  workspace: string;
-  scope: "workspace" | "node" | "agent";
-  id?: string | null;
-  outFile: string;
-  windowDays?: number;
-  named?: boolean;
-  labels?: {
-    industry?: "software" | "fintech" | "health" | "manufacturing" | "other";
-    agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
-    deployment?: "single" | "host" | "k8s" | "compose";
-  };
-}): BenchCreateResult {
-  const signature = verifyBenchPolicySignature(params.workspace);
-  if (!signature.valid) {
-    throw new Error(`bench policy signature invalid: ${signature.reason ?? "unknown"}`);
-  }
-  const policy = loadBenchPolicy(params.workspace);
-  const scope = normalizeScope({
-    scope: params.scope,
-    id: params.id
-  });
-  const collected = collectBenchData({
-    workspace: params.workspace,
-    scopeType: scope.scopeType,
-    scopeId: scope.scopeId,
-    windowDays: Math.max(1, params.windowDays ?? 30),
-    policy,
-    named: params.named,
-    labels: params.labels
-  });
-  const proofs = buildBenchProofs({
-    workspace: params.workspace,
-    includeEventKinds: collected.includedEventKinds
-  });
+export function benchArtifactData(collected: ReturnType<typeof collectBenchData>, proofs: ReturnType<typeof buildBenchProofs>) {
   const calculationManifest = collected.calculationManifest;
   const calculationManifestSha256 = sha256Hex(canonicalize(calculationManifest));
 
@@ -180,6 +148,48 @@ export function createBenchArtifact(params: {
     throw new Error(`bench pii scan failed: ${top.map((row) => `${row.type}:${row.path}`).join(", ")}`);
   }
 
+  return {bench,piiScan,calculationManifest};
+}
+
+export function createBenchArtifact(params: {
+  workspace: string;
+  scope: "workspace" | "node" | "agent";
+  id?: string | null;
+  outFile: string;
+  windowDays?: number;
+  named?: boolean;
+  labels?: {
+    industry?: "software" | "fintech" | "health" | "manufacturing" | "other";
+    agentType?: "code-agent" | "support-agent" | "ops-agent" | "research-agent" | "sales-agent" | "other";
+    deployment?: "single" | "host" | "k8s" | "compose";
+  };
+}): BenchCreateResult {
+  const selectedOut = resolve(params.workspace,params.outFile), before = captureBenchArchiveTargets(selectedOut);
+  const signature = verifyBenchPolicySignature(params.workspace);
+  if (!signature.valid) {
+    throw new Error(`bench policy signature invalid: ${signature.reason ?? "unknown"}`);
+  }
+  const policy = loadBenchPolicy(params.workspace);
+  const scope = normalizeBenchScope({
+    scope: params.scope,
+    id: params.id
+  });
+  const collected = collectBenchData({
+    workspace: params.workspace,
+    scopeType: scope.scopeType,
+    scopeId: scope.scopeId,
+    windowDays: Math.max(1, params.windowDays ?? 30),
+    policy,
+    named: params.named,
+    labels: params.labels
+  });
+  const proofs = buildBenchProofs({
+    workspace: params.workspace,
+    includeEventKinds: collected.includedEventKinds
+  });
+  const {bench: preparedBench, piiScan, calculationManifest} = benchArtifactData(collected,proofs);
+  let bench = preparedBench;
+
   const signed = benchSignatureSchema.parse(signBenchJson(params.workspace, bench));
   const signerPub = valueOrDefault(
     signed.envelope ? Buffer.from(signed.envelope.pubkeyB64, "base64").toString("utf8") : null,
@@ -191,9 +201,10 @@ export function createBenchArtifact(params: {
 
   const buildMeta = benchBuildMetaSchema.parse(collected.buildMeta);
   let finalSignature = signed;
-  const outFile = resolve(params.workspace, params.outFile);
+  const outFile = selectedOut;
   ensureDir(dirname(outFile));
   const tmp = mkdtempSync(join(tmpdir(), "amc-bench-artifact-"));
+  let archiveBytes: Buffer;
   try {
     const root = join(tmp, "amc-bench");
     ensureDir(root);
@@ -233,13 +244,14 @@ export function createBenchArtifact(params: {
     writeFileAtomic(buildPath, `${canonicalize(buildMeta)}\n`, 0o644);
     writeFileAtomic(join(root, "meta", "build.sha256"), `${digestFile(buildPath)}\n`, 0o644);
 
-    tarCreateDeterministic(tmp, outFile);
+    const candidate = join(tmp,".candidate.amcbench");
+    tarCreateDeterministic(tmp,candidate); archiveBytes = readFileSync(candidate);
   } finally {
     cleanupDir(tmp);
   }
 
-  const sha256 = digestFile(outFile);
-  writeFileAtomic(`${outFile}.sha256`, `${sha256}\n`, 0o644);
+  const sha256 = sha256Hex(archiveBytes);
+  publishBenchArchive(params.workspace,before,archiveBytes,()=>{});
   const transparency = appendTransparencyEntry({
     workspace: params.workspace,
     type: "BENCH_CREATED",

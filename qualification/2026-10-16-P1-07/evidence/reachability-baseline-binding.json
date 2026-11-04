@@ -1,0 +1,125 @@
+{
+  "at": "2026-10-16T17:34:08.150840+00:00",
+  "SHead": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "freshQ135SourceCommit": "88e0dbdef8871f119325d289757ad1de38b88a1a",
+  "onlyCommitDelta": "P1-35 qualification metadata160files",
+  "compiledBaselineAuthority": "Q135 unchanged clean-source install/build at source88e0dbdef, actual49449ms. Current source/dist read by check:gates match that checkout.",
+  "rows": [
+    {
+      "relative": "src/diagnostic/levelSemantics.ts",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+    },
+    {
+      "relative": "src/diagnostic/evidenceEmitters.ts",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+    },
+    {
+      "relative": "src/diagnostic/gates.ts",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "relative": "src/diagnostic/questionSets.ts",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/questionSets.ts",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/diagnostic/questionSets.ts",
+      "bytes": 20170,
+      "sha256": "41882ed3b783f64ede11a5f361b68e07bab30b51f5bd81754ed6befd7c75dffa"
+    },
+    {
+      "relative": "src/diagnostic/questionBank.ts",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+    },
+    {
+      "relative": "src/claims/evidenceProvenance.ts",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+    },
+    {
+      "relative": "scripts/check-gate-reachability.mjs",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-gate-reachability.mjs",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/scripts/check-gate-reachability.mjs",
+      "bytes": 9077,
+      "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff"
+    },
+    {
+      "relative": "dist/diagnostic/levelSemantics.js",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/levelSemantics.js",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/dist/diagnostic/levelSemantics.js",
+      "bytes": 11020,
+      "sha256": "614c7b14826adc97a32a96e982abb59dc77217ae5966d2ef484efcc6a29d76ef"
+    },
+    {
+      "relative": "dist/diagnostic/evidenceEmitters.js",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/evidenceEmitters.js",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/dist/diagnostic/evidenceEmitters.js",
+      "bytes": 10877,
+      "sha256": "30734f2d5ece2ad6ae597eb05ef9b36aebd10db3b6364378e774b2f97d6531d1"
+    },
+    {
+      "relative": "dist/diagnostic/gates.js",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/gates.js",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/dist/diagnostic/gates.js",
+      "bytes": 9269,
+      "sha256": "88eaf2578733685a307512a54dea7b0508d37d8c1c8e17cb7372f061e54fff98"
+    },
+    {
+      "relative": "dist/diagnostic/questionSets.js",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/questionSets.js",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/dist/diagnostic/questionSets.js",
+      "bytes": 18549,
+      "sha256": "7a749734d18d8d8921da2eda86481042d075a8f8b9785f00151b8c2c6050a58d"
+    },
+    {
+      "relative": "dist/diagnostic/questionBank.js",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/questionBank.js",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/dist/diagnostic/questionBank.js",
+      "bytes": 304412,
+      "sha256": "2e31419be55be2bed7fdc4369b96040b458eb8227edd344e548fee902c13493f"
+    },
+    {
+      "relative": "dist/claims/evidenceProvenance.js",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/claims/evidenceProvenance.js",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/dist/claims/evidenceProvenance.js",
+      "bytes": 10031,
+      "sha256": "efb5e75b85bb53cea69ee1d3b6dca86f13137dfc8eaf363cd647e55eceb68668"
+    },
+    {
+      "relative": "src/diagnostic/evidenceMaps/index.ts",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec"
+    },
+    {
+      "relative": "dist/diagnostic/evidenceMaps/index.js",
+      "S": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/diagnostic/evidenceMaps/index.js",
+      "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/dist/diagnostic/evidenceMaps/index.js",
+      "bytes": 2392,
+      "sha256": "0390f2409fec897db17a5c52fa74d1d893be84921e30ed4e8bceebc81364d16a"
+    }
+  ],
+  "pinsCount": 15,
+  "baselineGateTable": {
+    "defaultQuestions": 244,
+    "lifecycleQuestions": 264,
+    "L2Maps": 4,
+    "L3L4L5AllNotEvaluable": true,
+    "registeredEmitters": 11,
+    "classifiedLiteralAuditEmissions": 279,
+    "evaluatedRequirements": 9
+  },
+  "fullP107Done": false
+}

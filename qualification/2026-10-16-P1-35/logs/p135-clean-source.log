@@ -1,0 +1,17 @@
+clean-source check of 88e0dbde in /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6
+ok   git clone (committed tree only) (1.9s)
+ok   git checkout pinned commit (0.4s)
+ok   pnpm install --frozen-lockfile (9.2s)
+ok   pnpm run build (29.5s)
+ok   amc doctor (1.8s)
+ok   amc init (isolated workspace) (0.9s)
+ok   keyless native tool turn (0.9s)
+ok   amc session verify --json (0.8s)
+ok   amc agent-loop verify --json (0.8s)
+ok   signed evidence and request reconstruction (1 expected turns)
+ok   process A: leave a completed turn open for resume (0.8s)
+ok   process B: resume and seal the same session (0.8s)
+ok   amc session verify --json (0.8s)
+ok   amc agent-loop verify --json (0.8s)
+ok   signed evidence and request reconstruction (2 expected turns)
+kept: /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6

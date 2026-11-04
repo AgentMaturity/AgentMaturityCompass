@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { claimEnvelopeSchema } from "../../claims/eligibility/schemas.js";
-import { nonEmpty, sha256HexSchema } from "./common.js";
+import { isoTimeSchema, nonEmpty, sha256HexSchema } from "./common.js";
 import { a4SignedDigestSchema } from "./a4Release.js";
 
 /**
@@ -9,7 +9,7 @@ import { a4SignedDigestSchema } from "./a4Release.js";
  * admitted external record whose scope names this KPI and window.
  */
 const observedFields = {
-  window: z.strictObject({ from: z.iso.datetime(), to: z.iso.datetime() }),
+  window: z.strictObject({ from: isoTimeSchema, to: isoTimeSchema }),
   evidenceRefs: z.array(nonEmpty),
   claim: claimEnvelopeSchema
 };
@@ -37,7 +37,7 @@ export const a4ValueClaimV1Schema = z.strictObject({
     status: z.enum(["not_evaluated", "reviewed"]), reviewer: z.string().nullable(), reason: z.string().nullable(), claim: claimEnvelopeSchema
   }),
   objective: z.strictObject({ kind: z.enum(["business", "sustainability", "social"]), statement: nonEmpty, basis: nonEmpty }),
-  createdAt: z.iso.datetime(),
+  createdAt: isoTimeSchema,
   envelope: a4SignedDigestSchema
 });
 export type A4ValueClaimV1 = z.infer<typeof a4ValueClaimV1Schema>;

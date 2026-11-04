@@ -1,0 +1,39 @@
+{
+  "schema": "p125w-inert-fresh-binding-preparation-inputs/1",
+  "at": "2026-10-17T00:10:21.757919+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/bind-fresh.py",
+      "bytes": 4249,
+      "sha256": "b5728229f2780eff8922655a6e99efa48a4655ef08dc885f20841a6da4e7118d"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7651,
+      "sha256": "87d2a39c245dd707529d645416f2e9beb93c6338c34fa868d1f19783e2e131fb"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+      "bytes": 6867,
+      "sha256": "68e48c9fa34740becdd93ff48cbabd548674a4064479a3ed2d2a8836f8292606"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 78069,
+      "sha256": "f84cd7442210621575ebb659e8fb783fc5764dea3222b7aa5bdccefc0473b725"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "bytes": 73883,
+      "sha256": "d5e42ca4121f2cb2b098303d1e79e8645ba02045bd012c466a0b55ec5a0e62ca"
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/branch-adoption.json",
+      "bytes": 302,
+      "sha256": "5126b3618759e581b223a414f51deb08d850d10830e297042280e443b693832d"
+    }
+  ],
+  "actualB38Runtime151TenPriorMetadataRead": true,
+  "noProtectedOrNativeFileBodyRecheckClaimed": true,
+  "futureSourceCheckpointCommandLogFreshRootOrRuntimeResultsNotReadOrAssumed": true
+}

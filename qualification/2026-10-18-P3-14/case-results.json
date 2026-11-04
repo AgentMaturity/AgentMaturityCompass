@@ -1,0 +1,2852 @@
+{
+  "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+  "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+  "statusPorcelain": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+  "evidenceScope": "Test-injected questionnaire provenance and synthetic reference protocols only. No local oracle outcome supplies production evidence or observed enforcement.",
+  "catalog": {
+    "id": "amc.catalog",
+    "version": "0.1.0",
+    "digest": "sha256:4c626dc5ba2c8fe3fae7cc5a3700edf6fe279249c3590495cca52e3c721c99c9"
+  },
+  "plans": [
+    {
+      "profileId": "governance-benefits-caseworker-draft",
+      "digest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "status": "ready",
+      "governanceRequirements": [
+        {
+          "controlId": "L1-GOV-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:9334e1effcad2e016a6692552309fb67cbb97fc93ee7c4dcd90e00ce3f4400f8",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\"]: true (value [\"governance.public-services\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\"]: true (value [\"federal_agency\",\"public_service_provider\",\"state_agency\"], asserted)",
+            "predicate: useCases includesAny [\"benefits_decision\"]: true (value [\"agency_vendor_inference\",\"benefits_decision\",\"explanation_request\",\"public_service_ai\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "governance-eu-ai-act-oversight",
+            "governance-omb-m25-21-human-review"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US",
+            "jurisdiction:US-CA",
+            "jurisdiction:US-NY"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:dbdb4fdbfd1adea91b10364e712aceb5a39478943102c4f7e96f377b9ec3f8e5",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\"]: true (value [\"governance.public-services\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\"]: true (value [\"federal_agency\",\"public_service_provider\",\"state_agency\"], asserted)",
+            "predicate: useCases includesAny [\"public_service_ai\"]: true (value [\"agency_vendor_inference\",\"benefits_decision\",\"explanation_request\",\"public_service_ai\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "governance-eu-ai-act-fria",
+            "governance-omb-m25-21-impact-assessment"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US",
+            "jurisdiction:US-CA",
+            "jurisdiction:US-NY"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:1c0684c1e3e93355ed7d739b66b02b514f644483056df912e171761d46c5a0aa",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\"]: true (value [\"governance.public-services\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\"]: true (value [\"federal_agency\",\"public_service_provider\",\"state_agency\"], asserted)",
+            "predicate: useCases includesAny [\"agency_vendor_inference\"]: true (value [\"agency_vendor_inference\",\"benefits_decision\",\"explanation_request\",\"public_service_ai\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "governance-omb-m25-22-no-training"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US",
+            "jurisdiction:US-CA",
+            "jurisdiction:US-NY"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:2a371c925e81dc101462b5bdd187290c1691a1117654c63583b3a93a317b105a",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: domains includesAny [\"governance.law-rights-democracy\"]: false (value [\"governance.public-services\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"law_firm\"]: false (value [\"federal_agency\",\"public_service_provider\",\"state_agency\"], asserted)",
+            "predicate: useCases includesAny [\"legal_drafting\"]: false (value [\"agency_vendor_inference\",\"benefits_decision\",\"explanation_request\",\"public_service_ai\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US",
+            "jurisdiction:US-CA",
+            "jurisdiction:US-NY"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:3f25eca0ed5c4585e587991b946a72865facfadfea4042eb2d0d0bcac6b4c35e",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\",\"governance.law-rights-democracy\"]: true (value [\"governance.public-services\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\",\"law_firm\"]: true (value [\"federal_agency\",\"public_service_provider\",\"state_agency\"], asserted)",
+            "predicate: useCases includesAny [\"explanation_request\"]: true (value [\"agency_vendor_inference\",\"benefits_decision\",\"explanation_request\",\"public_service_ai\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "governance-eu-ai-act-explanation",
+            "governance-eu-gdpr-art22",
+            "governance-omb-m25-21-human-review"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US",
+            "jurisdiction:US-CA",
+            "jurisdiction:US-NY"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:fc95ac1b4247107df0c10251ab434bba7190e2def46681f8496fc445b8838ef6",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\",\"technology\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: domains includesAny [\"governance.defense\"]: false (value [\"governance.public-services\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"EU\",\"US\",\"US-CA\",\"US-NY\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"defense_contractor\"]: false (value [\"federal_agency\",\"public_service_provider\",\"state_agency\"], asserted)",
+            "predicate: useCases includesAny [\"defense_analysis\"]: false (value [\"agency_vendor_inference\",\"benefits_decision\",\"explanation_request\",\"public_service_ai\"], asserted)",
+            "predicate: dataClasses includesAny [\"controlled_unclassified_information\"]: unknown (dataClasses is not known)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-us-cmmc-boundary",
+            "governance-us-dfars-7012-boundary",
+            "governance-us-nist-800-171-boundary"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US",
+            "jurisdiction:US-CA",
+            "jurisdiction:US-NY"
+          ]
+        }
+      ]
+    },
+    {
+      "profileId": "governance-legal-drafting-draft",
+      "digest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "status": "ready",
+      "governanceRequirements": [
+        {
+          "controlId": "L1-GOV-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:9334e1effcad2e016a6692552309fb67cbb97fc93ee7c4dcd90e00ce3f4400f8",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\"]: false (value [\"governance.law-rights-democracy\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\"]: false (value [\"law_firm\"], asserted)",
+            "predicate: useCases includesAny [\"benefits_decision\"]: false (value [\"explanation_request\",\"legal_drafting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-eu-ai-act-oversight",
+            "governance-omb-m25-21-human-review"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:dbdb4fdbfd1adea91b10364e712aceb5a39478943102c4f7e96f377b9ec3f8e5",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\"]: false (value [\"governance.law-rights-democracy\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\"]: false (value [\"law_firm\"], asserted)",
+            "predicate: useCases includesAny [\"public_service_ai\"]: false (value [\"explanation_request\",\"legal_drafting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-eu-ai-act-fria",
+            "governance-omb-m25-21-impact-assessment"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:1c0684c1e3e93355ed7d739b66b02b514f644483056df912e171761d46c5a0aa",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\"]: false (value [\"governance.law-rights-democracy\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\"]: false (value [\"law_firm\"], asserted)",
+            "predicate: useCases includesAny [\"agency_vendor_inference\"]: false (value [\"explanation_request\",\"legal_drafting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-omb-m25-22-no-training"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:2a371c925e81dc101462b5bdd187290c1691a1117654c63583b3a93a317b105a",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.law-rights-democracy\"]: true (value [\"governance.law-rights-democracy\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"law_firm\"]: true (value [\"law_firm\"], asserted)",
+            "predicate: useCases includesAny [\"legal_drafting\"]: true (value [\"explanation_request\",\"legal_drafting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:3f25eca0ed5c4585e587991b946a72865facfadfea4042eb2d0d0bcac6b4c35e",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\",\"governance.law-rights-democracy\"]: true (value [\"governance.law-rights-democracy\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\",\"law_firm\"]: true (value [\"law_firm\"], asserted)",
+            "predicate: useCases includesAny [\"explanation_request\"]: true (value [\"explanation_request\",\"legal_drafting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "governance-eu-ai-act-explanation",
+            "governance-eu-gdpr-art22",
+            "governance-omb-m25-21-human-review"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:fc95ac1b4247107df0c10251ab434bba7190e2def46681f8496fc445b8838ef6",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\",\"technology\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.defense\"]: false (value [\"governance.law-rights-democracy\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"defense_contractor\"]: false (value [\"law_firm\"], asserted)",
+            "predicate: useCases includesAny [\"defense_analysis\"]: false (value [\"explanation_request\",\"legal_drafting\"], asserted)",
+            "predicate: dataClasses includesAny [\"controlled_unclassified_information\"]: unknown (dataClasses is not known)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-us-cmmc-boundary",
+            "governance-us-dfars-7012-boundary",
+            "governance-us-nist-800-171-boundary"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        }
+      ]
+    },
+    {
+      "profileId": "governance-defense-analyst-draft",
+      "digest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "status": "ready",
+      "governanceRequirements": [
+        {
+          "controlId": "L1-GOV-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:9334e1effcad2e016a6692552309fb67cbb97fc93ee7c4dcd90e00ce3f4400f8",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\"]: false (value [\"governance.defense\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\"]: false (value [\"defense_contractor\"], asserted)",
+            "predicate: useCases includesAny [\"benefits_decision\"]: false (value [\"defense_analysis\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-omb-m25-21-human-review"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:dbdb4fdbfd1adea91b10364e712aceb5a39478943102c4f7e96f377b9ec3f8e5",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\"]: false (value [\"governance.defense\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\"]: false (value [\"defense_contractor\"], asserted)",
+            "predicate: useCases includesAny [\"public_service_ai\"]: false (value [\"defense_analysis\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-omb-m25-21-impact-assessment"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:1c0684c1e3e93355ed7d739b66b02b514f644483056df912e171761d46c5a0aa",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\"]: false (value [\"governance.defense\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\"]: false (value [\"defense_contractor\"], asserted)",
+            "predicate: useCases includesAny [\"agency_vendor_inference\"]: false (value [\"defense_analysis\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-omb-m25-22-no-training"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:2a371c925e81dc101462b5bdd187290c1691a1117654c63583b3a93a317b105a",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.law-rights-democracy\"]: false (value [\"governance.defense\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"law_firm\"]: false (value [\"defense_contractor\"], asserted)",
+            "predicate: useCases includesAny [\"legal_drafting\"]: false (value [\"defense_analysis\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:3f25eca0ed5c4585e587991b946a72865facfadfea4042eb2d0d0bcac6b4c35e",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.public-services\",\"governance.law-rights-democracy\"]: false (value [\"governance.defense\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"federal_agency\",\"state_agency\",\"public_service_provider\",\"law_firm\"]: false (value [\"defense_contractor\"], asserted)",
+            "predicate: useCases includesAny [\"explanation_request\"]: false (value [\"defense_analysis\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "governance-omb-m25-21-human-review"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-GOV-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:fc95ac1b4247107df0c10251ab434bba7190e2def46681f8496fc445b8838ef6",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed Governance candidate. Profile facts are operator assertions; a selected domain and local fixture establish neither legal applicability nor production enforcement.",
+            "predicate: stations includesAny [\"governance\",\"technology\"]: true (value [\"governance\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"US-NY\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: domains includesAny [\"governance.defense\"]: true (value [\"governance.defense\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"defense_contractor\"]: true (value [\"defense_contractor\"], asserted)",
+            "predicate: useCases includesAny [\"defense_analysis\"]: true (value [\"defense_analysis\"], asserted)",
+            "predicate: dataClasses includesAny [\"controlled_unclassified_information\"]: true (value [\"controlled_unclassified_information\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "governance-us-cmmc-boundary",
+            "governance-us-dfars-7012-boundary",
+            "governance-us-nist-800-171-boundary"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:governance",
+            "station:technology",
+            "jurisdiction:US"
+          ]
+        }
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/positive/oracle-human-decision.json",
+      "fixtureSha256": "4f97e35e5e297989c437b695fd77c5a9868db572a16b8e90647aa0c878d7e3c4",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c52307ba4275ad06077bdfffead45404ac0cc1a0fa2b6dbfc0b66096460f4b83"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "human_decision_recorded"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "human_decision_recorded",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "finalize_benefit_decision:case-1:deny"
+        ],
+        "captures": [],
+        "refusals": []
+      }
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/oracle-missing-decision.json",
+      "fixtureSha256": "1e4fb78e5b4796587301d35356a22968a7e4fb7e35b029b8a01a5bc41e92705d",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c52307ba4275ad06077bdfffead45404ac0cc1a0fa2b6dbfc0b66096460f4b83"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "human_decision_missing"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "human_decision_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "human_decision_missing"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/oracle-prompt-only.json",
+      "fixtureSha256": "f9324264466cefc7b81ed3f35d665a53343aa2c8431396466dc8922872fb2b1f",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c52307ba4275ad06077bdfffead45404ac0cc1a0fa2b6dbfc0b66096460f4b83"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "human_decision_missing"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "human_decision_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "human_decision_missing"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/oracle-missing-appeal.json",
+      "fixtureSha256": "c3849728bbae4d083554d9d352cf9a6ad52998359026c6043600748553916ca5",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c52307ba4275ad06077bdfffead45404ac0cc1a0fa2b6dbfc0b66096460f4b83"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "notice_incomplete"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "notice_incomplete",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "notice_incomplete"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/oracle-store-unavailable.json",
+      "fixtureSha256": "7b9026011b69eac1e209f839e8b2b2c32dafa310035ad6a7c09b758a1d3b812f",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c52307ba4275ad06077bdfffead45404ac0cc1a0fa2b6dbfc0b66096460f4b83"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "case_store_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "case_store_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "case_store_unavailable"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/positive/evidence-valid.json",
+      "fixtureSha256": "48e8e4a125978291c6eef57cc94f3411aea7e0791877d604a993e0420c030640",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "102a6fc74c9fb9735220eded0ae86cea6e6f90d555e4b15c21e3394b025ea30d"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/evidence-stale.json",
+      "fixtureSha256": "5339a89f5af566f08675b72b2db3ef0e26cc0a65666b7b42e98f4c328861dafc",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-01-questionnaire-1",
+              "sha256": "e91c0d28c9b54362a3230cd5b4489e95f8d0b44a7f26c41853671a5ea1bdbf3b"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "4b54094badea712d7424cac98c6b785edef197b8d45c8bc2a3424b8f32113840"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/evidence-replayed.json",
+      "fixtureSha256": "2ad29d18e01d15992a794cb021d71925889d57ddb01669c54e3600edf9f341aa",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-01-questionnaire-1",
+              "sha256": "8bd21b63922d2579fe5b3e855203668cb20c8f4f868febd4d6e73bbd30b9f4c2"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-GOV-01-questionnaire-1 was already used for L1-GOV-01|governance-fixture-tenant|governance-fixture-workspace|governance-benefits-caseworker-fixture|governance-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "ca798ad17e5f257aef9dc7a0fadf3399bd10575804e19f1e1688d909c38116c7"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/evidence-contradictory.json",
+      "fixtureSha256": "2415699a081df27bac2c77a24fde1fec9ce1bb17fdce673f6748f653c2777164",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "cf4c2b2c136c573e2997332b6b4fced895031a00011759be9ab8fc1e87715940"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "ce70e91d3f829f121dbd03b855a9d544b31e2ba1304f3e1e33d14db4c1678b65",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-01-questionnaire-1",
+              "sha256": "02b282e59c14432f21ae9a5376b327fb766cdf02b5bf4f11888e46587a8f83a1"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "749015e769b62ea97646e8ce6003e51f339c0ff649c65f3eb309e31774f61294"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/evidence-empty.json",
+      "fixtureSha256": "77c48e597630a4db7072d28942612fc69d686ce85cd8723c52c8475edb610e4d",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c52307ba4275ad06077bdfffead45404ac0cc1a0fa2b6dbfc0b66096460f4b83"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-01",
+      "case": "L1-GOV-01/negative/evidence-violation.json",
+      "fixtureSha256": "0563cdb42509cc545029f35c047b90227afb7b09e04ee24076028587a1f04113",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "fd0f434008a176b173b601b39c8fab6de7c8ce4e25c560d691c32777c2e7ee25"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/positive/oracle-fria-before-use.json",
+      "fixtureSha256": "4f48a98fe43a6d0c20a5a1663a48d4d0abc00a6d8faeff29fa87d290f7e76950",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a3eca8ae34e7299a2c859a2c10f8181ae4f78e63890d8d58e4ebfc50a4d65b46"
+      },
+      "expectedLocalOracle": {
+        "result": "pass",
+        "reasonCode": "fria_structure_and_chronology_valid"
+      },
+      "actualLocalOracle": {
+        "result": "pass",
+        "reasonCode": "fria_structure_and_chronology_valid",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "activate_plan:sha256:1111111111111111111111111111111111111111111111111111111111111111"
+        ],
+        "captures": [],
+        "refusals": []
+      }
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/oracle-fria-missing.json",
+      "fixtureSha256": "8ac812f7a959c604af286f41943e959cb8e07365c85d519a2cff5947c384ee41",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a3eca8ae34e7299a2c859a2c10f8181ae4f78e63890d8d58e4ebfc50a4d65b46"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "fria_missing"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "fria_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "fria_missing"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/oracle-fria-late.json",
+      "fixtureSha256": "bf68f462e647f2ebe15c75a7dbbb9c886c8fae14720a7dd26cca7f71f94d274a",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a3eca8ae34e7299a2c859a2c10f8181ae4f78e63890d8d58e4ebfc50a4d65b46"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "fria_chronology_invalid"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "fria_chronology_invalid",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "fria_chronology_invalid"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/oracle-notification-missing.json",
+      "fixtureSha256": "ec31253ae715c6226e215c1308bd51d545f598905e7596fc313f9edec22c1582",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a3eca8ae34e7299a2c859a2c10f8181ae4f78e63890d8d58e4ebfc50a4d65b46"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "authority_notification_missing"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "authority_notification_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "authority_notification_missing"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/oracle-activation-unavailable.json",
+      "fixtureSha256": "038ef11687bcc017ed4ca4896609be19f21e54fe1a897ac264496a534935f1d3",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a3eca8ae34e7299a2c859a2c10f8181ae4f78e63890d8d58e4ebfc50a4d65b46"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "activation_log_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "activation_log_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "activation_log_unavailable"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/positive/evidence-valid.json",
+      "fixtureSha256": "30f1f3e28422d9bc2759d372f98f7dca0e1d26efbbe94d2934efe7a9546282a8",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "16f1d3ad0ee3e77e9a7a1e14ccdbe4104147025c58a19cf78f3ad53ae526bcd0"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/evidence-stale.json",
+      "fixtureSha256": "d164f667e08348c68c0b5a5afefbe305a182269a58a666a75d7ce16f2c2b5719",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-02-questionnaire-1",
+              "sha256": "e11ca24c675885485e5813979d5a25caed35d3bd6a8a163379a900f26364afaa"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "1687c6437781774d9aa873b3ea611ee92e1f8c3721d22ef84689f38e70dc60ad"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/evidence-replayed.json",
+      "fixtureSha256": "eea036f27633a1482826869ce8804dba4f1359096d9006ea8347aaec06aa4f24",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-02-questionnaire-1",
+              "sha256": "4490541727d90bfc4f0e8ee545a444b25fea5ab96c4b176f4e4f59eae1b41c34"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-GOV-02-questionnaire-1 was already used for L1-GOV-02|governance-fixture-tenant|governance-fixture-workspace|governance-benefits-caseworker-fixture|governance-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "d9973339fff349dc4a7b81582aa45091592176586a90e1799aedf94f189ccfe8"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/evidence-contradictory.json",
+      "fixtureSha256": "474a3c92e02b5f9a8ad19edafd55b7693be0a553e33df34d81a468f8a8f32eeb",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3f5381fe55cf242ceda7ed2d062572836258ae5d56015932dd6295a96e426b46"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "e557ee72e0a0582769e7bfb38038d1267f3fefd8e62175b7788fea597e8eaac1",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-02-questionnaire-1",
+              "sha256": "b00fa25ab8965f2bb75e8b58b2909fb9f8212b76829f4392876ad8af339b2da1"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "d6e080fcb8534be700966d4f4d2b34c710e991fd65e5e1b4d3caff3b9b644b10"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/evidence-empty.json",
+      "fixtureSha256": "600db818d8105830792fae70cc63d6992278b038ae41d78d0aa99ba8e7b68508",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a3eca8ae34e7299a2c859a2c10f8181ae4f78e63890d8d58e4ebfc50a4d65b46"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-02",
+      "case": "L1-GOV-02/negative/evidence-violation.json",
+      "fixtureSha256": "8d574e1fde83de19d2568f1dacb9201e301081b8dc1cb3a2869f9fa793ee3bd4",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "78a8a04de75b8528d846756066d94526ecaf360c80f454581bd2ddc0ce5da806"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/positive/oracle-inference-only.json",
+      "fixtureSha256": "7214ca8c8b16ed7e1cc24773f625fccdff58451c255ecb01390d5286a986df98",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "07e42b3e693bc50c13ed67a62b1f8737921eb3b430e0bc496d333add67c782b9"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "canary_inference_only"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "canary_inference_only",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [
+          {
+            "endpoint": "https://inference.fixture.invalid/v1",
+            "purpose": "inference",
+            "body": "input SYNTHETIC-AGENCY-CANARY-01"
+          }
+        ],
+        "refusals": []
+      }
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/oracle-training-purpose.json",
+      "fixtureSha256": "28611c2f3d4b7f5c17c4ae9708f4753d9942ec3198fdb6c0f5bde95501b90c6a",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "07e42b3e693bc50c13ed67a62b1f8737921eb3b430e0bc496d333add67c782b9"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "canary_egress_refused"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "canary_egress_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "canary_egress_refused"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/oracle-telemetry-purpose.json",
+      "fixtureSha256": "7f3087a52c0ce627279b5a2c060f29c04c67271d51c38858545226905bddae12",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "07e42b3e693bc50c13ed67a62b1f8737921eb3b430e0bc496d333add67c782b9"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "canary_egress_refused"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "canary_egress_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "canary_egress_refused"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/oracle-unlisted-endpoint.json",
+      "fixtureSha256": "13412c6f677ddab8c2b847d1a4afa849df30e292139b0ada7f2d55801370ee61",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "07e42b3e693bc50c13ed67a62b1f8737921eb3b430e0bc496d333add67c782b9"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "canary_egress_refused"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "canary_egress_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "canary_egress_refused"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/oracle-capture-unavailable.json",
+      "fixtureSha256": "a9d48a2d53c59f3feae52fb95a9e75cd3d9c1257aeaedf9b4c1a7a4afea5f90b",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "07e42b3e693bc50c13ed67a62b1f8737921eb3b430e0bc496d333add67c782b9"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "egress_capture_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "egress_capture_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "egress_capture_unavailable"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/positive/evidence-valid.json",
+      "fixtureSha256": "1a73a4e64348924a827c32658deaace3c9cc3234490a6075f0c25c1acdd925f1",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "f4e0fc482b1a3310cecbf428585ea262771d3f77d4fe931ed6f5713da47f69ec"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/evidence-stale.json",
+      "fixtureSha256": "d9862c9b4bcf8af4cbd89f7b52ac7a578919d905f6749ab74c07631747d2b011",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-03-questionnaire-1",
+              "sha256": "6c1038cce207fe19f105ad42ef710c01f35621e0fc7ec210ce5f56ce8783935b"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "eb621ce1f0542dfcbbe56dacb2ae05b48a931b8a35e82b9fb9345d678d67defe"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/evidence-replayed.json",
+      "fixtureSha256": "a9ba7a751324ae626388961e1c3637ac0d7d5e67da815713bc56b1ded7ace7eb",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-03-questionnaire-1",
+              "sha256": "7d1d95caf084e797b2a16d78d5854053ff039b494beaabb17f7052d3c15f34ac"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-GOV-03-questionnaire-1 was already used for L1-GOV-03|governance-fixture-tenant|governance-fixture-workspace|governance-benefits-caseworker-fixture|governance-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "50f8437e1b583eef29aea64f6a66c127ea040436c9927243499dff45bcaa4703"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/evidence-contradictory.json",
+      "fixtureSha256": "cd9a0d6248216b282db0ac64ce737e2f23169d6a395275a1d763d9959a92a62a",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "2834fae157bbd59412eaaa978fbd1b6456158f1ba701d03ab8563d68caf89187"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "27f9ba37a6f04424458ab244e5296d36212f71927d6a8574928ce19e2e234845",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-03-questionnaire-1",
+              "sha256": "83ee5f15a05750bab07662315ad6c68927943a3df204153f277c79e099c0fe11"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "720c121b4a2e8d986315e868c79fb4d5f544044d89337b2fc880279d1677bc1e"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/evidence-empty.json",
+      "fixtureSha256": "eb3e4c2e50fb0de3b4256b54c448d9263305de48b5d6df5390521a6223ab616d",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "07e42b3e693bc50c13ed67a62b1f8737921eb3b430e0bc496d333add67c782b9"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-03",
+      "case": "L1-GOV-03/negative/evidence-violation.json",
+      "fixtureSha256": "2194939259ae1eb3df2586c65f059275c234501a3769404494162a02a4ad5337",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "2db33e6ff1c526412527fdba1d43ae2f800fc97d37310bd88fe018059a2a369e"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/positive/oracle-synthetic-citations-resolve.json",
+      "fixtureSha256": "d29db1baa28918655bd847b736b8749dffdced1e553d9d5860e6de1683ef31b4",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "7903060a5a08c8cc89d696cea12f7d964739f4ee4cbcfba8bfd5853b346ac0f7"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "synthetic_citations_resolved"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "synthetic_citations_resolved",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "file_brief:brief-1"
+        ],
+        "captures": [],
+        "refusals": []
+      }
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/negative/oracle-unknown-citation.json",
+      "fixtureSha256": "8775fd3600b6637bc72bbf5e7bab7bc4f5c50155574b6964c28276fdd7f4840e",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "7903060a5a08c8cc89d696cea12f7d964739f4ee4cbcfba8bfd5853b346ac0f7"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "citation_unresolved"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "citation_unresolved",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "citation_unresolved"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/negative/oracle-registry-unavailable.json",
+      "fixtureSha256": "cb72fb4286fbc05fb254b070fedc6284ee72031ba77db70a5230556f3189a979",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "7903060a5a08c8cc89d696cea12f7d964739f4ee4cbcfba8bfd5853b346ac0f7"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "citation_registry_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "citation_registry_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "citation_registry_unavailable"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/positive/evidence-valid.json",
+      "fixtureSha256": "66eec75d864d2109f4558468e914ea6c1ecaaccc1677f7279c7c64b88bfa67cf",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "ff502f00e2587b523d3b41569a0bd12fcb25fcf95660cbd38a4f0326983be38d"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/negative/evidence-stale.json",
+      "fixtureSha256": "b12b3143fac585a0795dc9b86e309b65de9eefa7f02a9565bdb5ba624a8dc6f3",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-04-questionnaire-1",
+              "sha256": "f10c23617ae523fb81988c183043815638918c1589ef96b6d29b09e6b90c5373"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "4394aa58508dced5a44b239e4fcc066d1af3cc4ae4bf7fb3a7728ffd95149b74"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/negative/evidence-replayed.json",
+      "fixtureSha256": "86b9f579910f5a6d3df4b689aa2b370634b20d60c7ce94d2ae6aba4d79e027c2",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-04-questionnaire-1",
+              "sha256": "dbf806b8a228d2b13ea348a12bed1fe1210b52963ff70eefe9ae2ad45f519861"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-GOV-04-questionnaire-1 was already used for L1-GOV-04|governance-fixture-tenant|governance-fixture-workspace|governance-legal-drafting-fixture|governance-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "f20c9857a3c46ff91f579a3accaa820e77a00d8bb46be4b17ab96f5722a05efb"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/negative/evidence-contradictory.json",
+      "fixtureSha256": "20e329986cfd59a3b45fe4421009765c5760899236e2ec86db2a996da29b7c64",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4507a79c91ddd50aa331fa69208df7cc4768e97f146e94fd1fd5b40f2c70bc94"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "19b736796bcdfefab04d8842c8edd70c39aa1d706f812cf0fe0a2673ba8f1131",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-04-questionnaire-1",
+              "sha256": "93331fa252a9a4f2f14645b2e9c6879ea92330cfa2df7e01242ff3c46603ffa5"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "5a09c1003b745bf9d61e888373f1cd5b5b3818232e9e02bce54dc1d68d1104e1"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/negative/evidence-empty.json",
+      "fixtureSha256": "cf91e17030c54220fc7b9d7b7972fdc4cb466e504ab7956dd766c9a89b034b43",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "7903060a5a08c8cc89d696cea12f7d964739f4ee4cbcfba8bfd5853b346ac0f7"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-04",
+      "case": "L1-GOV-04/negative/evidence-violation.json",
+      "fixtureSha256": "86d9194beb79cf16b6cd2f429d293d5f0f9d4166192957dd5d6f1ff175fdb43c",
+      "profileId": "governance-legal-drafting-draft",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3575beef645877211638c859b352611b43e4655f62e7bfd899dcc902c79a78c9"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/positive/oracle-authoritative-human.json",
+      "fixtureSha256": "1b39a52725831cecf41c1a5de69c97f131f1b61a381d2b4df41753b1ecc04345",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "aa1b2ceb29ffde2eedd38f0a0e7b9b246e1e34cfd5259b8d58ebddb046e4e5cf"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "human_route_recorded"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "human_route_recorded",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "route_to_human:request-1:reviewer-1"
+        ],
+        "captures": [],
+        "refusals": []
+      }
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/oracle-auto-reply.json",
+      "fixtureSha256": "a875726de4bc4900761613c71a87a302800e95c1bf57fa931f0070dc3f7d4378",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "aa1b2ceb29ffde2eedd38f0a0e7b9b246e1e34cfd5259b8d58ebddb046e4e5cf"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "human_route_missing"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "human_route_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "human_route_missing"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/oracle-unauthorized-reviewer.json",
+      "fixtureSha256": "1e315584fc78f39b91cbc96dc3118c8b41e3658b43339371b69e70379ff2413d",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "aa1b2ceb29ffde2eedd38f0a0e7b9b246e1e34cfd5259b8d58ebddb046e4e5cf"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "reviewer_unauthorized"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "reviewer_unauthorized",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "reviewer_unauthorized"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/oracle-late-route.json",
+      "fixtureSha256": "5a1249a61468c315ccd4749b0c0fbf3784c745943334a7eb865db0eb7878be94",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "aa1b2ceb29ffde2eedd38f0a0e7b9b246e1e34cfd5259b8d58ebddb046e4e5cf"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "route_deadline_missed"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "route_deadline_missed",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "route_deadline_missed"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/oracle-routing-log-unavailable.json",
+      "fixtureSha256": "58feec3ed3ce9388f58544e1cbdba1a099456412413bcaec03f030a521d708d3",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "aa1b2ceb29ffde2eedd38f0a0e7b9b246e1e34cfd5259b8d58ebddb046e4e5cf"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "routing_log_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "routing_log_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "routing_log_unavailable"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/positive/evidence-valid.json",
+      "fixtureSha256": "146eb0e1227815a3b0bed250dedf4c797632d95a560308253aa220eb8394b0a5",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "24c37ca13f9a392666e1e3a6bb17d4b0377a05b89b1911beaaf993cc09bf4b90"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/evidence-stale.json",
+      "fixtureSha256": "d5c051f6d9bed145a8bb525309498b0de4d024139375a8732c7479a84a28a3ad",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-05-questionnaire-1",
+              "sha256": "f582003d835fc4f199a3b0a3383255097f48c58311b64ef9d0f49305950a4fcf"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "fac53fc1541dd07fdca9cc1cf88e89d880a5f48c14016b50660ed64b702fcdd8"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/evidence-replayed.json",
+      "fixtureSha256": "405834a0fa4a943b91134c6b906945b654b595637fe27159d070c0474491bde8",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-05-questionnaire-1",
+              "sha256": "f11154b89bffd0e3ee492c112d530386726bee41370aa44161043026018fe4ae"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-GOV-05-questionnaire-1 was already used for L1-GOV-05|governance-fixture-tenant|governance-fixture-workspace|governance-benefits-caseworker-fixture|governance-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "75b7be870561775409dec94d47dc5c533987e402da140b5f2ecfd8bf0a4bece2"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/evidence-contradictory.json",
+      "fixtureSha256": "936ffce594db3e7076e3fa7061ace44ea34700b849a582176616e80e4847ca4b",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "10bbfdc27d18dee22cea034edf04e6a8b4ae2622385802d7e05ffc0426b69af0"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "62e29c8787adfe3073ddbf09195462a2902f9ba29438df081ef10196dafbd2b1",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-05-questionnaire-1",
+              "sha256": "b5d2a5d3526d08740e4b44656c15c38f43a7a59f074f8f75c163df3c62900389"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "bb53596830d04a11a351220ef8ef79a39f2492ac36732a510f1b9625cf7343fa"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/evidence-empty.json",
+      "fixtureSha256": "fd1aaed2c3f140c22c3b3078f61c3c2103429310fc04e6b39a7dc8fc90dfbac9",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "aa1b2ceb29ffde2eedd38f0a0e7b9b246e1e34cfd5259b8d58ebddb046e4e5cf"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-05",
+      "case": "L1-GOV-05/negative/evidence-violation.json",
+      "fixtureSha256": "ceaadef6fb30a3bd5a3e014181ee0bb96dd2644cd8acb442319c61d8182748e4",
+      "profileId": "governance-benefits-caseworker-draft",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "760d39dcf6a2fff05a721d4ae540a99fb1217839350e33d95d3e01d8c8882d3b"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/positive/oracle-inside-boundary.json",
+      "fixtureSha256": "794a43940976cf4bc183b002b847ecdda613ad02dbf8ecf0eee02e0122a8eb0c",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "5794bcaade7ba846dcf7be1de0c008d5b3fa0eae559aa4b5a3a1cb9569e86d8f"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "cui_boundary_preserved"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "cui_boundary_preserved",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [
+          {
+            "endpoint": "https://boundary.fixture.invalid/v1",
+            "purpose": "inference",
+            "body": "SYNTHETIC CUI content"
+          }
+        ],
+        "refusals": []
+      }
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/oracle-public-endpoint.json",
+      "fixtureSha256": "b20ae8040db1bd8cd2f788e4d589478b7a1f45c797353774e7c0498d941a1339",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "5794bcaade7ba846dcf7be1de0c008d5b3fa0eae559aa4b5a3a1cb9569e86d8f"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "cui_egress_refused"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "cui_egress_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "cui_egress_refused"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/oracle-unmarked-cui-store.json",
+      "fixtureSha256": "b97f62ce21987fe4b5a860591f0bb4123b531460c5e9a3cd51857712c5588e0b",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "5794bcaade7ba846dcf7be1de0c008d5b3fa0eae559aa4b5a3a1cb9569e86d8f"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "cui_egress_refused"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "cui_egress_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "cui_egress_refused"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/oracle-boundary-missing.json",
+      "fixtureSha256": "4484263185d18eb8cf0175a759cec7f7d57c5efee66a14f98c5c0bfda39402d4",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "5794bcaade7ba846dcf7be1de0c008d5b3fa0eae559aa4b5a3a1cb9569e86d8f"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "cui_boundary_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "cui_boundary_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "cui_boundary_unavailable"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/oracle-capture-unavailable.json",
+      "fixtureSha256": "b5a95c3b7b06174321b0d3323041eec6a179f65a820422cfc1e9c89b06b85214",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "5794bcaade7ba846dcf7be1de0c008d5b3fa0eae559aa4b5a3a1cb9569e86d8f"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "egress_capture_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "egress_capture_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "captures": [],
+        "refusals": [
+          "egress_capture_unavailable"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/positive/evidence-valid.json",
+      "fixtureSha256": "6431a803bfc9123606224d620bf73fc318926e022539f5cf4670a665fd5b4daa",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "131debbc115ac22efc1d6a5c5b637202a218776741e26a7b86be1b001c1aa0f1"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/evidence-stale.json",
+      "fixtureSha256": "890c3d470ac5e81f284f52a90607cd6aa8acda085eeaa856869c737aa79f0efa",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-06-questionnaire-1",
+              "sha256": "cd2933ed442517fe0845865cc307aa319a6d7b38d74f995848960cebcef258dd"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "196a87572c8baaf649e5084045c4dfdd3765e3bec3339551831186e3ccbe62b0"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/evidence-replayed.json",
+      "fixtureSha256": "a25535bf4c6ab0d2296f411ff7fb15cf162a4600afec817415e2045a8fd06b7c",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-06-questionnaire-1",
+              "sha256": "6ba7dbb18b92af7b68a81fe3f30911891a38c48d60361b00978093ef5d2e7f10"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-GOV-06-questionnaire-1 was already used for L1-GOV-06|governance-fixture-tenant|governance-fixture-workspace|governance-defense-analyst-fixture|governance-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "b3ef9eb23bf2ca0a22c7bf8cf2e70d83813acfb0e2391abee0bb8ff4932c0d0a"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/evidence-contradictory.json",
+      "fixtureSha256": "6b5b77239b426e8395ec7270aa26ea54f7eb7f31ceb1d3c01a650120352fb44f",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "bab23dc47d553dcda95474e7f7569bbd9bafa9062eafa17ca1bb9ad2b376d31b"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "b00b9df42ef5ab414bd9c95c22cdbeafa73759e167e1c496558d2243cb2e6560",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-GOV-06-questionnaire-1",
+              "sha256": "2cd733ddc045d629c36762487a73c54a62a46b6f62b4044ed5bddcf3dcb06693"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant other-fixture-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "15d81f797a00bf29051fa69fb7dbbc943797ad8e1c322bb990b21f02bb5f50a6"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/evidence-empty.json",
+      "fixtureSha256": "beea87cb9356d4b4fecd594a6750501b0775e0e252070fcc1aa96f07f5e1666e",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "5794bcaade7ba846dcf7be1de0c008d5b3fa0eae559aa4b5a3a1cb9569e86d8f"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-GOV-06",
+      "case": "L1-GOV-06/negative/evidence-violation.json",
+      "fixtureSha256": "22971b67978d2802a2f052d2a549c67ba473faeee5b54cd4330014e3e5f90cb8",
+      "profileId": "governance-defense-analyst-draft",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c1e8451f996d9bf3995150bbd926dffb8fbcc154704f102f4953f636698716bc"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    }
+  ],
+  "production": [
+    {
+      "profileId": "governance-benefits-caseworker-draft",
+      "controlId": "L1-GOV-01",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "f3750c0c0b5ac8aaa6fee6b054f2132249f989b5f53dcefb661007dac91de5b5"
+    },
+    {
+      "profileId": "governance-benefits-caseworker-draft",
+      "controlId": "L1-GOV-02",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "b1a807d448eacaa92c1640ec32dcb21c440d1f9b4e353165306178a2d033073e"
+    },
+    {
+      "profileId": "governance-benefits-caseworker-draft",
+      "controlId": "L1-GOV-03",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "feef1355ad5f2c8cda664efd74c2c1c302e378855a73445671b8c45e87b385d1"
+    },
+    {
+      "profileId": "governance-benefits-caseworker-draft",
+      "controlId": "L1-GOV-05",
+      "planDigest": "sha256:37c603d37c685482a77a4d6537fe51cdadc04a4f1c2dbb3ded5166ad8b385814",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "a99e30d9efcdca83964f8935ff9335732f4b221dad445af7bfa9d567a82d2edd"
+    },
+    {
+      "profileId": "governance-legal-drafting-draft",
+      "controlId": "L1-GOV-04",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "1c7f2159de7706ecb1b6400ed06c7639ef3efc904b2bce634238d3b10db49007"
+    },
+    {
+      "profileId": "governance-legal-drafting-draft",
+      "controlId": "L1-GOV-05",
+      "planDigest": "sha256:480b5cdc9cac3f871c6b6960a65e7bc5b22c75342ef3b76f33868a437dcd45c2",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "fc1998a9ed8a8159ec3b750cebc4398a18db0ad773b38c28f7164a963492efb6"
+    },
+    {
+      "profileId": "governance-defense-analyst-draft",
+      "controlId": "L1-GOV-06",
+      "planDigest": "sha256:52a7c8c7ee52d868d69b2114d17300f35547567aa2590c5c26f2a2b668b48a4f",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "d0578ea4f402cde2623f58a54dc8f9382fce9b2d124b25016640843ad87f496b"
+    }
+  ]
+}

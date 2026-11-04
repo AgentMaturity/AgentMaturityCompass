@@ -1,0 +1,37 @@
+{
+  "$schema": "./node_modules/knip/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        "src/index.ts", "src/cli.ts", "api/index.ts",
+        "src/sdk/mobileFetch.ts", "src/sdk/nativeAgentClient.ts",
+        "src/standard/externalEvidenceProfile.ts", "src/importers/piTelemetryCallbacks.ts",
+        "examples/hello-agent/agent.js",
+        "scripts/dev/reachability.mjs", "scripts/standalone-api-smoke.mjs",
+        "scripts/compat-matrix-report.mjs", "scripts/fake-external-signer.mjs",
+        "scripts/installed-crash-recovery-check.mjs", "scripts/studio-native-browser-check.mjs",
+        "scripts/update-native-task-openapi.mjs",
+        "src/console/assets/app.js", "src/console/assets/sw.js",
+        "src/console/assets/benchCompare.js", "src/console/assets/benchPortfolio.js",
+        "src/console/assets/benchRegistry.js", "src/console/assets/benchmarks.js",
+        "src/console/assets/equalizer.js", "src/console/assets/mechanic.js",
+        "src/console/assets/simulator.js", "src/console/assets/upgradeWizard.js",
+        "src/dashboard/templates/app.js", "src/dashboard/templates/api.js",
+        "src/dashboard/templates/components/domains.js", "src/dashboard/templates/components/guardrailsView.js",
+        "src/dashboard/components/radar.js", "src/dashboard/components/heatmap.js",
+        "src/dashboard/components/timeline.js", "src/dashboard/components/questionDetail.js", "src/dashboard/components/eoc.js",
+        "scripts/lib/*.test.mjs",
+        "tests/e2e/playwright.config.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,js}", "api/**/*.ts", "scripts/**/*.{mjs,cjs,js,ts}",
+        "tests/**/*.ts", "examples/**/*.{ts,js}", "integrations/**/*.{ts,js}", "sdk/**/*.{ts,js}"
+      ],
+      "ignoreDependencies": ["@fontsource/inter", "@fontsource/space-mono", "marked"]
+    },
+    "examples/langchain-node": {
+      "entry": ["index.ts"],
+      "project": ["**/*.ts"]
+    }
+  }
+}

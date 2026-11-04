@@ -199,6 +199,16 @@ export function joinContextSections(sections: readonly AssembledContext[]): stri
 }
 
 /**
+ * True for text this module rendered as a runtime-context snapshot. A replay to a client (ACP session/load) or a
+ * demonstration echo uses it to tell harness context from the user's own words.
+ * ponytail: prefix match, since `user/message` carries no source field; a user who types the exact preamble is treated
+ * as context there (the signed row is unchanged). Replace with a spine source field when one exists.
+ */
+export function isContextSnapshot(text: string): boolean {
+  return text.startsWith(`${CONTEXT_SNAPSHOT_PREAMBLE}\n\n`);
+}
+
+/**
  * Render the complete runtime-context snapshot.
  *
  * @param assembly - the assembly to render.

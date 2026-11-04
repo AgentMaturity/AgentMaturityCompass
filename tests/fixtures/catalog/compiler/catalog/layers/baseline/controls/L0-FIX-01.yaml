@@ -1,0 +1,153 @@
+{
+  "id": "L0-FIX-01",
+  "version": "0.1.0",
+  "support": "experimental",
+  "layer": 0,
+  "family": "synthetic-compiler-fixture",
+  "stations": [
+    "education",
+    "environment",
+    "health",
+    "wealth",
+    "technology",
+    "mobility",
+    "governance"
+  ],
+  "title": "Synthetic baseline control",
+  "statement": "The compiler retains this explicitly synthetic planning requirement when its own predicate matches.",
+  "riskRationale": "Exercise planning branches without depending on unreviewed catalog content or claiming real enforcement.",
+  "mandatory": true,
+  "applicability": {
+    "predicate": {
+      "always": true
+    },
+    "reasons": [
+      "Synthetic compiler test data only."
+    ],
+    "exclusions": []
+  },
+  "citations": [
+    {
+      "key": "synthetic-hipaa-scope",
+      "registerId": null,
+      "instrument": "HIPAA Security Rule: synthetic compiler citation-scope fixture",
+      "clause": "45 CFR 164.312(a)(1)",
+      "edition": "Unverified synthetic planning fixture; no legal approval",
+      "jurisdiction": "US",
+      "statusType": "binding-now",
+      "superseded": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "dateNote": "Dates are deliberately unverified fixture data; no legal applicability is asserted.",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-312.xml",
+      "retrieval": {
+        "state": "unverified",
+        "reason": "Synthetic test reference; no retrieval or verification performed."
+      },
+      "appliesWhen": {
+        "all": [
+          {
+            "fact": "jurisdictions",
+            "includesAny": [
+              "US"
+            ]
+          },
+          {
+            "fact": "entityTypes",
+            "includesAny": [
+              "hipaa_covered_entity",
+              "hipaa_business_associate"
+            ]
+          }
+        ]
+      },
+      "legalReview": null,
+      "note": "Only predicate membership is tested. The citation is not evidence of compliance."
+    }
+  ],
+  "binding": {
+    "kind": "enforcement_point",
+    "points": [
+      "tool_pipeline"
+    ],
+    "mechanism": "Synthetic planning binding only; no tool body or enforcement has run.",
+    "parameters": [
+      {
+        "name": "toolPipeline.requirePrincipal",
+        "value": true,
+        "strictness": "true_wins"
+      }
+    ],
+    "manualDuty": null
+  },
+  "tests": [
+    {
+      "id": "L0-FIX-01-T1",
+      "type": "configuration_check",
+      "oracle": {
+        "kind": "signed_config",
+        "observes": "Synthetic catalog fixture shape only; this entry does not execute a runtime oracle."
+      },
+      "fixtures": {
+        "positive": [
+          "L0-FIX-01/positive/valid.json"
+        ],
+        "negative": [
+          "L0-FIX-01/negative/violation.json"
+        ]
+      },
+      "passCriteria": "The compiler schedules this fixture contract without claiming it has executed.",
+      "attempts": 1
+    }
+  ],
+  "evidence": [
+    {
+      "id": "L0-FIX-01-E1",
+      "producer": "amc.ledger",
+      "bindingFields": [
+        "workspaceId",
+        "controlId",
+        "controlVersion",
+        "policyDigest"
+      ],
+      "freshness": {
+        "maxAgeDays": 30
+      },
+      "sampling": {
+        "method": "all",
+        "ratePercent": null,
+        "minItems": 1
+      },
+      "retention": {
+        "mode": "regime_max"
+      },
+      "residency": {
+        "mode": "inherit_deployment"
+      }
+    }
+  ],
+  "invalidatedBy": [
+    "policy_version",
+    "deployment_version"
+  ],
+  "owner": {
+    "role": "fixture_owner"
+  },
+  "clock": null,
+  "levels": [
+    "L1"
+  ],
+  "crosswalk": [],
+  "review": {
+    "status": "pending",
+    "expert": null,
+    "credential": null,
+    "reviewedAt": null,
+    "nextReview": null
+  },
+  "provenance": {
+    "draftedBy": "ai",
+    "draftedAt": "2026-10-16",
+    "approvedBy": null
+  }
+}

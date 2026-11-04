@@ -1,4 +1,5 @@
-import { getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
+import { verifyHexDigestAny } from "../crypto/keys.js";
+import { runHashVerificationKeys } from "../ledger/runHashSignature.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -7,7 +8,7 @@ import { sha256Hex } from "../utils/hash.js";
  *
  * Diagnostic and assurance runs share the same seal discipline: the writer
  * hashes the canonical report with `reportJsonSha256`/`runSealSig` emptied,
- * then signs that hash with the workspace auditor key. Every consumer that
+ * then signs that hash with the artifact-seal purpose key. Every consumer that
  * feeds a report back into scoring must check the seal the same way — G9
  * exists because each reader had been deciding for itself, and most decided
  * not to look.
@@ -17,7 +18,9 @@ import { sha256Hex } from "../utils/hash.js";
  */
 export function sealedRunReportVerifies(
   workspace: string,
-  parsed: Record<string, unknown>
+  parsed: Record<string, unknown>,
+  /** The run-hash verification keys when the caller already read them (it must have read them from `workspace`). */
+  keys?: readonly string[]
 ): boolean {
   const claimedHash = parsed.reportJsonSha256;
   const seal = parsed.runSealSig;
@@ -28,7 +31,7 @@ export function sealedRunReportVerifies(
   );
   if (recomputed !== claimedHash) return false;
   try {
-    return verifyHexDigestAny(claimedHash, seal, getPublicKeyHistory(workspace, "auditor"));
+    return verifyHexDigestAny(claimedHash, seal, [...(keys ?? runHashVerificationKeys(workspace))]);
   } catch {
     return false;
   }

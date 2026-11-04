@@ -32,7 +32,7 @@ describe("community demo kit", () => {
 
   test("public docs and audit expose the community demo kit", () => {
     const readme = read("README.md");
-    const audit = read("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = read("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
 
     expect(readme).toContain("[Community Demo Kit](docs/COMMUNITY_DEMO_KIT.md)");
     expect(audit).toContain("Community demo kit — ✅ Resolved 2026-06-16");

@@ -1,3 +1,4 @@
+import { cliInitiator } from "../approvals/approvalEngine.js";
 /**
  * marketplace/marketplaceCli.ts — CLI functions for `amc pack` marketplace commands.
  *
@@ -132,6 +133,7 @@ export async function packInstallCli(params: {
     try {
       const result = await requestPluginInstall({
         workspace: params.workspace,
+        initiator: cliInitiator(),
         agentId: params.agentId,
         pluginRef: entry.name,
         registryId: entry.registryId
@@ -182,6 +184,7 @@ export async function packUninstallCli(params: {
   try {
     requestPluginRemove({
       workspace: params.workspace,
+      initiator: cliInitiator(),
       agentId: params.agentId,
       pluginId: entry.name
     });

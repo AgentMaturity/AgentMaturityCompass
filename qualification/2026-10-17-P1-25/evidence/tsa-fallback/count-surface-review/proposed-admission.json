@@ -1,0 +1,583 @@
+{
+  "schema": "p125-fallback-private-generated-count-admission/1",
+  "at": "2026-10-16T22:16:25.883642+00:00",
+  "state": "UNEXECUTED_PROPOSAL_ROOT_SOLE_GENERATOR_WRITER",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "headAtObservation": "a0cfbc280f2b11207205541ba89112c125c29895",
+    "branchAtObservation": "codex/p1-25-fallback-qualification",
+    "statusAtObservation": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "exit": 0,
+      "stdout": "?? tests/time/tsaFallback.test.ts\n",
+      "stderr": ""
+    },
+    "indexAtObservation": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "diff",
+        "--cached",
+        "--name-status"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "actualCountRed": {
+    "phase": "p125f-counts-before",
+    "command": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/command.json",
+      "bytes": 1358,
+      "sha256": "b0f134061014699d40730751b1e3c881f779613cb94d0d6b4ccc7b73f73d6163"
+    },
+    "log": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/stdout-stderr.log",
+      "bytes": 1436,
+      "sha256": "e688944294e77493bcfdb36adbb6cbf3e6178b9a6ceed2587bce68213b653d9a"
+    },
+    "ownedGroupRecord": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125f-counts-before/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "5549302a861f149e8ada2b2a5008458dd2aade2846d866bae5b9121560b9c54b"
+    },
+    "exit": 1,
+    "durationMs": 535,
+    "published": 1692,
+    "actual": 1693
+  },
+  "expectedInventory": {
+    "publishedBefore": 1692,
+    "actualFromCountRed": 1693,
+    "additionalFile": "tests/time/tsaFallback.test.ts",
+    "fourBodiesNotFourFiles": true,
+    "generatorExecutedHere": false
+  },
+  "generator": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+    "bytes": 9141,
+    "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+  },
+  "generatorFullSourceRead": true,
+  "candidateDelta": {
+    "paths": [
+      "README.md",
+      "CONTRIBUTING.md",
+      "website/index.html",
+      "website/lite.html",
+      "website/i18n.js",
+      "docs/content/show-hn-draft.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "pathCount": 10,
+    "formattedSpans": 14,
+    "encodedBadgeSpans": 1,
+    "totalNumericSpans": 15,
+    "allCurrentBeforePinsMatchB34ActualAfter": true,
+    "surfaces": [
+      {
+        "relativePath": "README.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+          "bytes": 59828,
+          "sha256": "1cf5097efb8c894746065edb1ef625fc21f616c76060fc4bd2c0011eadbc5826"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "encoded-badge",
+            "line": 17,
+            "byteStart": 1345,
+            "byteEnd": 1352,
+            "before": "1%2C692",
+            "anticipatedAfter": "1%2C693"
+          },
+          {
+            "kind": "marker-testFiles",
+            "line": 918,
+            "byteStart": 58651,
+            "byteEnd": 58656,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 59828,
+          "sha256": "4d39403454d0af139a177a6ec531c33e2aa2023278d874119e00e4f9c2aec60d"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/README.md",
+              "bytes": 62243,
+              "sha256": "0910c215e07741fbb32b4752f1c215f3e1d19a5dee7dfc57bc14bf3420e9159d"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+              "bytes": 59828,
+              "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "49837eb4b3cea2bbf03c46244d370dc80c72c0dec6e78cad7dbc426ef3896c9e"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "marker-testFiles",
+            "line": 54,
+            "byteStart": 1886,
+            "byteEnd": 1891,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 16220,
+          "sha256": "f251e3bd5071672598a90cc71064e41c3143fef495b6ed0c2f74e4860c7a269a"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/CONTRIBUTING.md",
+              "bytes": 19504,
+              "sha256": "7a0a6aab4e90b94bf2442229cda181e52264ea0acb21ce9a9bc965927daf1174"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+              "bytes": 16220,
+              "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "website/index.html",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+          "bytes": 43520,
+          "sha256": "0bf924630aac6ffc3666ed5b899c493c7abbbf16cdbba4ebc1d793893d06ea53"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "website-stat",
+            "line": 90,
+            "byteStart": 5872,
+            "byteEnd": 5877,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 43520,
+          "sha256": "4468804cbaceb41ff376a7e155e434c597996f42026642afb09897d8dbb6e75d"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/index.html",
+              "bytes": 44023,
+              "sha256": "285d6a2105bb73375ecfff6e7f1f97a818f34bc0b304506092666f883e8521e8"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+              "bytes": 43520,
+              "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "website/lite.html",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+          "bytes": 11197,
+          "sha256": "85a23bdc6aa1890627afb0c57562aca3aa2479f0764c0f771d92e03576704db3"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "lite-stat",
+            "line": 74,
+            "byteStart": 4426,
+            "byteEnd": 4431,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 11197,
+          "sha256": "f69082f63720bb53bd9aa313903050321707bc90efc80d3bd3f6166e61dd0ee0"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/lite.html",
+              "bytes": 11197,
+              "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+              "bytes": 11197,
+              "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+          "bytes": 44169,
+          "sha256": "d8385bdeacd02b68add2930d54bc3578fa5d256d0020b5b245462be6eff900c1"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 17,
+            "byteStart": 789,
+            "byteEnd": 794,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 44169,
+          "sha256": "82a6b652ec3942844a2aada509b7256e973093f1617e37da6bd04fadeb847060"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/i18n.js",
+              "bytes": 44169,
+              "sha256": "bef816e6b82f9be94abf597d4787bd4a66e441a2a19a985999fac59c2a783bef"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+              "bytes": 44169,
+              "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "950a26cb53c37c58e98d298878f9219a448cccdc74511e23ba0ebda2e0ab70b5"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 33,
+            "byteStart": 1734,
+            "byteEnd": 1739,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 1951,
+          "sha256": "e1a87d7a073be86e3657d3bdd2b992d5b677a8b9f865e7288f3ac34d0f640884"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/show-hn-draft.md",
+              "bytes": 1951,
+              "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+              "bytes": 1951,
+              "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "45b32dc7ffb39cb808b59f72da39cded0a59c4feeca5bddf0f4c8e5e2e9eea02"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 25,
+            "byteStart": 1341,
+            "byteEnd": 1346,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 49,
+            "byteStart": 2892,
+            "byteEnd": 2897,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 3075,
+          "sha256": "edb78bf0e80c8c052b41c16102c0c087590f2b81f73d235699870995b6360556"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/reddit-launch-drafts.md",
+              "bytes": 3075,
+              "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+              "bytes": 3075,
+              "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "ce8d53e766334530a3d89f0b30a4ed12db3696eec72e900bb956c521321783dd"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 57,
+            "byteStart": 2871,
+            "byteEnd": 2876,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 3880,
+          "sha256": "76cd549bcf137cf62614d52574c9cb0744afd99498e2f4c1be878a92362d5852"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/competitive-landscape.md",
+              "bytes": 3880,
+              "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+              "bytes": 3880,
+              "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "06ae59f494f5fe76df76c5be54a94d11ea7fbbce4cd60cec4d8be4c8330d7551"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 6,
+            "byteStart": 206,
+            "byteEnd": 211,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 2489,
+          "sha256": "80fd75e6bddd9c58f8af50c564d3f0d0eb7315f851284b1490b9c58f1a1eb2e2"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/mirofish-simulation-council.md",
+              "bytes": 2489,
+              "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+              "bytes": 2489,
+              "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "before": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "f980b8c42da97ea010b88408b2114d60330040c75be2753be856083c945f9e01"
+        },
+        "matchesB34ActualAfter": true,
+        "onlyAllowedSpans": [
+          {
+            "kind": "prose-source-inventory",
+            "line": 22,
+            "byteStart": 3964,
+            "byteEnd": 3969,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 415,
+            "byteStart": 42275,
+            "byteEnd": 42280,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 423,
+            "byteStart": 42797,
+            "byteEnd": 42802,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          },
+          {
+            "kind": "prose-source-inventory",
+            "line": 873,
+            "byteStart": 88911,
+            "byteEnd": 88916,
+            "before": "1,692",
+            "anticipatedAfter": "1,693"
+          }
+        ],
+        "anticipatedAfter": {
+          "bytes": 107509,
+          "sha256": "48aaf1ca1121c9e88a9849d3dcefcdb5de865b3ab85f9245d7d1cd81cc25b5a6"
+        },
+        "allOtherAuthoredBytesExactInCandidate": true,
+        "variants": {
+          "Claude": {
+            "pin": {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/whitepaper/AMC_WHITEPAPER_v1.md",
+              "bytes": 108101,
+              "sha256": "0ac4f3ecaf64118437c54c0f40a5982ce1606c3f1a66dda3bcaf41fbe5e8e202"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          },
+          "heldR": {
+            "pin": {
+              "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+              "bytes": 107509,
+              "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25"
+            },
+            "matchesPriorB34Observation": true,
+            "readOnlyNotReplacementInput": true
+          }
+        }
+      }
+    ]
+  },
+  "receiptCopyBoundary": "Only compact proposal, pins and review facts may be selected for a receipt. Large ownership observations and all raw private-originals remain private; do not rename, encode or publish originals elsewhere to evade ignore or authored-byte protections.",
+  "rootAdmissionStillRequired": [
+    "Current hosted/WIP path review excluding verified Dependabot",
+    "Ordinary D15 and freeze checks",
+    "Exact root count-scope admission before unchanged ordinary generator",
+    "Actual generator result diff restricted to these15 spans/10 whole-file anticipated hashes and ordinary count check afterward"
+  ],
+  "noExecutionCredit": true,
+  "allHumanHoldsRetained": true
+}

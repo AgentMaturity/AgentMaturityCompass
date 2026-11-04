@@ -1,0 +1,8 @@
+{
+  "operator": "allow-first-tools-call-reissue",
+  "restoredExact": true,
+  "allFortyOtherInputAndCompiledPinsExact": true,
+  "nativeIdentityExact": true,
+  "sourceSAndHeldRunnerRUnchanged": true,
+  "restoredRerunPending": true
+}

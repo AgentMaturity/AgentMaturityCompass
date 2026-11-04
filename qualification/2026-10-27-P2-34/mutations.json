@@ -1,0 +1,21 @@
+{
+ "key": "P2-34",
+ "red": {
+  "command": "npx vitest run tests/a4/runtimeLifecycle.test.ts (src/ reverted to base 93ccb82b5)",
+  "result": [
+   "Error: Cannot find module '/src/a4/a4RuntimeLifecycle.js' imported from /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-w3-p2-34/tests/a4/runtimeLifecycle.test.ts",
+   " Test Files  1 failed (1)",
+   "      Tests  no tests"
+  ]
+ },
+ "mutations": [
+  "M1 kill incident not named: exit=1 failing=['\u00d7 an active kill holds with its incident id; RESUME is refused until it is released, then an owner resumes 1023ms']",
+  "M2 every change covered: exit=1 failing=['\u00d7 an out-of-envelope change suspends the agent in P2-23 and REOPENs Adapt before the TUNE 1118ms', \"\u00d7 a mandatory invalidated control (P2-23 reassessment) REOPENs Adapt; an agent P2-23 does not govern reads P2-26's rows 1176ms\"]",
+  "M3 floor never blocks: exit=1 failing=['\u00d7 a memory policy kept less than the regime floor is BLOCKED; no floor is READY; an unreadable plan is NOT_EVALUATED 1290ms']",
+  "M4 no digest cross-check: exit=1 failing=[\"\u00d7 embeds P2-23's bound manifest with the digest P2-23 recorded; a tampered state row refuses 1038ms\"]",
+  "M5 activation from any state: exit=1 failing=[\"\u00d7 the deployment approval activates an approved agent, naming the gate's binding digest; other states refuse 763ms\"]",
+  "M6 retire not delegated: exit=1 failing=['\u00d7 RETIRE of a deployed project retires the agent through P2-23 first and names that row 1780ms']",
+  "M8 sync not on governed path: exit=1 failing=['\u00d7 an out-of-envelope change suspends the agent in P2-23 and REOPENs Adapt before the TUNE 1538ms']",
+  "M7 undeployed project moved (re-run after the test gained an Activate-without-release case): exit=1 failing=['\u00d7 a project with no deployed release is not moved']"
+ ]
+}

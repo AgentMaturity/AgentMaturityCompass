@@ -1,15 +1,18 @@
 import { randomUUID } from "node:crypto";
-import { join, dirname, resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { readFileSync, readdirSync } from "node:fs";
 import { z } from "zod";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { verifySignedFileWithAuditor } from "../org/orgSigner.js";
 import { appendTransparencyEntry } from "../transparency/logChain.js";
 import { dispatchIntegrationEvent } from "../integrations/integrationDispatcher.js";
+import { assertOwnerMode } from "../mode/mode.js";
+import { captureTransformRelatedFiles } from "./transformInputs.js";
+import { prepareTransformPairs, publishTransformPairs, finishTransformPublication, type TransformPublicationChecks } from "./transformPublication.js";
 import type { TransformPlan } from "./transformTasks.js";
 
-export const transformAttestationSchema = z.object({
+const transformAttestationSchema = z.object({
   v: z.literal(1),
   attestationId: z.string().min(1),
   scope: z.object({
@@ -83,10 +86,9 @@ export function writeTransformAttestation(params: {
   });
 
   const dir = transformAttestationsDir(params.workspace, params.scope);
-  ensureDir(dir);
   const path = join(dir, `${attestation.attestationId}.json`);
-  writeFileAtomic(path, JSON.stringify(attestation, null, 2), 0o644);
-  const sigPath = signFileWithAuditor(params.workspace, path);
+  publishTransformPairs(params.workspace, "transform attest", [{ path, bytes: Buffer.from(JSON.stringify(attestation, null, 2)) }]);
+  const sigPath = `${path}.sig`;
 
   appendTransparencyEntry({
     workspace: params.workspace,
@@ -120,6 +122,7 @@ export function writeTransformAttestation(params: {
   };
 }
 
+/** The file is read once: its signature is checked over, and the attestation parsed from, the same bytes (WP37 review). */
 export function verifyTransformAttestation(workspace: string, path: string): {
   valid: boolean;
   signatureExists: boolean;
@@ -127,24 +130,29 @@ export function verifyTransformAttestation(workspace: string, path: string): {
   path: string;
   sigPath: string;
   attestation: TransformAttestation | null;
+  fileSha256: string;
 } {
-  const verified = verifySignedFileWithAuditor(workspace, path);
+  let bytes: Buffer | undefined;
+  try { bytes = readFileSync(path); } catch { /* verifySignedFileWithAuditor names the missing file */ }
+  const verified = verifySignedFileWithAuditor(workspace, path, bytes), fileSha256 = bytes ? sha256Hex(bytes) : "";
   let attestation: TransformAttestation | null = null;
-  if (verified.valid) {
+  if (verified.valid && bytes) {
     try {
-      attestation = transformAttestationSchema.parse(JSON.parse(readUtf8(path)) as unknown);
+      attestation = transformAttestationSchema.parse(JSON.parse(bytes.toString("utf8")) as unknown);
     } catch {
       return {
         ...verified,
         valid: false,
         reason: "attestation schema invalid",
-        attestation: null
+        attestation: null,
+        fileSha256
       };
     }
   }
   return {
     ...verified,
-    attestation
+    attestation,
+    fileSha256
   };
 }
 
@@ -172,4 +180,27 @@ export function findLatestAttestationForTask(workspace: string, scope: { type: "
 
 export function attestationPathById(workspace: string, scope: { type: "AGENT"; agentId: string } | { type: "NODE"; nodeId: string }, attestationId: string): string {
   return join(transformAttestationsDir(workspace, scope), `${attestationId}.json`);
+}
+
+export async function writeTransformAttestationAsync(input: Parameters<typeof writeTransformAttestation>[0], checks: TransformPublicationChecks = {}) {
+  const params = structuredClone(input), workspace = params.workspace;
+  assertOwnerMode(workspace, "transform attest"); checks.beforePublish?.();
+  const files = (params.files ?? []).map(file => resolve(workspace, file)), assertRelated = captureTransformRelatedFiles(files);
+  const relatedFiles = files.filter(file => pathExists(file)).map(path => ({ path, sha256: sha256Hex(readFileSync(path)) }));
+  const now = Date.now();
+  const attestation = transformAttestationSchema.parse({ v: 1, attestationId: `att_${now}_${randomUUID().slice(0, 8)}`,
+    scope: params.scope, taskId: params.taskId, createdTs: now, createdByUser: params.createdByUser, role: params.role,
+    statement: params.statement, evidenceLinks: params.evidenceLinks ?? [], hashes: { relatedFiles } });
+  assertRelated();
+  const path = join(transformAttestationsDir(workspace, params.scope), `${attestation.attestationId}.json`), bytes = Buffer.from(JSON.stringify(attestation, null, 2));
+  const prepared = await prepareTransformPairs(workspace, "transform attest", [{ path, bytes }], {
+    beforePublish: checks.beforePublish, assertInputsCurrent() { checks.assertInputsCurrent?.(); assertRelated(); }
+  });
+  prepared.publish();
+  const agentId = params.scope.type === "AGENT" ? params.scope.agentId : `node:${params.scope.nodeId}`;
+  const secondaryWarnings = await finishTransformPublication(prepared, [path, `${path}.sig`], {
+    workspace, type: "TRANSFORM_TASK_ATTESTED", agentId, artifact: { kind: "policy", sha256: sha256Hex(bytes), id: attestation.attestationId }
+  }, [{ workspace, eventName: "TRANSFORM_TASK_ATTESTED", agentId, summary: `Transformation task attested (${params.taskId})`,
+    details: { attestationId: attestation.attestationId, taskId: params.taskId, role: params.role, createdByUser: params.createdByUser, planId: params.plan?.planId ?? null } }]);
+  return { attestation, path, sigPath: `${path}.sig`, secondaryWarnings };
 }

@@ -1,0 +1,922 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1547",
+  "slice": "NEW_TWO_CASE_SIGNED_LEGACY_ROOT_READS",
+  "reviewer": "/root/p0_22_report_audit/p024_packet_meaning",
+  "reviewKind": "Independent actual frozen store-root supplement review",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "findings": [],
+  "conclusion": "The actual two-case supplement establishes bounded legacy read-root sensitivity to the exact original storage-root guard. The initial baseline passes 2/2 and the exact same-case source control measures 2 \u2192 0 \u2192 2, with direct matching-byte observations rather than generic missing-path or permission failures.",
+  "artifactVerification": {
+    "artifactReferences": 2179,
+    "uniquePaths": 2179,
+    "allRecordedBytesAndHashesMatch": true,
+    "frozenCommands": 7,
+    "appendableJournalsNotUsed": true
+  },
+  "actualProof": {
+    "frozenCommands": 7,
+    "actualCaseProcesses": 4,
+    "actualRegisteredCaseNames": [
+      "refuses a parent storage-root override while a strict descendant reads the signed legacy fixture",
+      "refuses a sibling storage-root override while a strict descendant reads the signed legacy fixture"
+    ],
+    "caseObservations": 8,
+    "initialBaselinePasses": 2,
+    "bmrPassed": [
+      2,
+      0,
+      2
+    ],
+    "allCountsNamesAndMatrixAgree": true,
+    "failures": [
+      {
+        "phase": "P30-1547-store-root-mutant",
+        "name": "refuses a parent storage-root override while a strict descendant reads the signed legacy fixture",
+        "kind": "AssertionError",
+        "firstLine": "AssertionError: expected { status: 'ok', detail: null, \u2026(2) } to deeply equal { status: 'tampered', \u2026(3) }",
+        "location": "storeRootQualification.test.ts:166:23",
+        "fullFailureMessageSha256": "04059c0cfb834fd3b16e60422e30d1d3c1aa93b7f35a8c1ea156743a0cd565a7"
+      },
+      {
+        "phase": "P30-1547-store-root-mutant",
+        "name": "refuses a sibling storage-root override while a strict descendant reads the signed legacy fixture",
+        "kind": "AssertionError",
+        "firstLine": "AssertionError: expected { status: 'ok', detail: null, \u2026(2) } to deeply equal { status: 'tampered', \u2026(3) }",
+        "location": "storeRootQualification.test.ts:166:23",
+        "fullFailureMessageSha256": "04059c0cfb834fd3b16e60422e30d1d3c1aa93b7f35a8c1ea156743a0cd565a7"
+      }
+    ],
+    "allSetupPoolCleanupAndPendingChecksClear": true,
+    "all24RetainedSnapshotsComparedWithinCase": true,
+    "allEightWorkersDirectNode22Abi127": true,
+    "privateLaunchAllowlistAnd0700Effects0600": true,
+    "launcherFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "rootReadOnlyHeadCleanReceiptsAgree": true,
+    "phases": [
+      {
+        "phase": "new-two-case-legacy-storage-root-baseline",
+        "counts": {
+          "numTotalTests": 2,
+          "numPassedTests": 2,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/new-two-case-legacy-storage-root-baseline/raw-tests.json",
+          "bytes": 1360,
+          "sha256": "221931b697d809d5df583f63998a3f151743892b26ed6c00ea237c2d7d281cbe"
+        },
+        "sameTwoNames": true,
+        "exit": 0
+      },
+      {
+        "phase": "P30-1547-store-root-baseline",
+        "counts": {
+          "numTotalTests": 2,
+          "numPassedTests": 2,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-baseline/raw-tests.json",
+          "bytes": 1362,
+          "sha256": "5054aed4c5c3e951d94000039f983ccda6be877f624414d52f57e47c20f4ed9f"
+        },
+        "sameTwoNames": true,
+        "exit": 0
+      },
+      {
+        "phase": "P30-1547-store-root-mutant",
+        "counts": {
+          "numTotalTests": 2,
+          "numPassedTests": 0,
+          "numFailedTests": 2,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false
+        },
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-mutant/raw-tests.json",
+          "bytes": 4032,
+          "sha256": "b951c78c17f31fa4f6cbcb161b8da0814dd29db53ee47e860562126b0bfab229"
+        },
+        "sameTwoNames": true,
+        "exit": 1
+      },
+      {
+        "phase": "P30-1547-store-root-restored",
+        "counts": {
+          "numTotalTests": 2,
+          "numPassedTests": 2,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true
+        },
+        "raw": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-restored/raw-tests.json",
+          "bytes": 1363,
+          "sha256": "40c6103606661dd9f396756779760e230c3e91ff6bbf0a049d241828d1ce380f"
+        },
+        "sameTwoNames": true,
+        "exit": 0
+      }
+    ],
+    "observations": [
+      {
+        "phase": "new-two-case-legacy-storage-root-baseline",
+        "case": "parent",
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/new-two-case-legacy-storage-root-baseline/parent.json",
+          "bytes": 22060,
+          "sha256": "82f5c4a6d28da95a89cc71a863fe782108208642d1caf4b4211a7cb78788b934"
+        },
+        "inputBytes": 42,
+        "inputSha256": "29a0c6df69104419a61e8424f77a287df9281b061f1da75ec9335d38c37a39d4",
+        "healthy": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 42,
+          "bytesSha256": "29a0c6df69104419a61e8424f77a287df9281b061f1da75ec9335d38c37a39d4"
+        },
+        "candidate": {
+          "status": "tampered",
+          "detail": "spill root must be a descendant of the workspace",
+          "bytesLength": null,
+          "bytesSha256": null
+        },
+        "signedRowHashAndNodeSignatureBooleans": {
+          "eventHashMatches": true,
+          "nodeSignatureValid": true
+        },
+        "monitorPin": {
+          "pemSha256": "69dd25d44c04990cb3a90014c85e7ab6382e00b459e25c45d5eacb3f4dc10ab1",
+          "spkiSha256": "05f5a9652af794e1657a29334ae8a8b2020ce5ed7debf2b706f0a777e1178ffb"
+        },
+        "recordedMonitorPublicHashMatchesPin": true,
+        "threeSnapshotProjectionsExact": true,
+        "snapshotEntries": 26,
+        "snapshotProjectionSha256": "cba1745bf8e6a593726ca0b49f7716071fff94ad18b94e472482b0785d4e2690",
+        "ownedInputAndBothObjectHashesModesMatch": true,
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "cleanup": {
+          "ledgerAndPoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "new-two-case-legacy-storage-root-baseline",
+        "case": "sibling",
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/new-two-case-legacy-storage-root-baseline/sibling.json",
+          "bytes": 22685,
+          "sha256": "2f6d6adbfffad889a9b28acaccb4c6870747d8aa1bab00f09f4749da2ba91512"
+        },
+        "inputBytes": 43,
+        "inputSha256": "0a1ea68227b248d29b07d29cc050d478a96b94a304b45967344fafea8bd9c8d6",
+        "healthy": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 43,
+          "bytesSha256": "0a1ea68227b248d29b07d29cc050d478a96b94a304b45967344fafea8bd9c8d6"
+        },
+        "candidate": {
+          "status": "tampered",
+          "detail": "spill root must be a descendant of the workspace",
+          "bytesLength": null,
+          "bytesSha256": null
+        },
+        "signedRowHashAndNodeSignatureBooleans": {
+          "eventHashMatches": true,
+          "nodeSignatureValid": true
+        },
+        "monitorPin": {
+          "pemSha256": "56c483bce0f9d6c460fe809b629ba4a7e98f8acdcbe92654ae026bb85e189873",
+          "spkiSha256": "35c4799f7280d9ff8aa6cfd616891434383ebfd163fa174b8e00f975dc48191f"
+        },
+        "recordedMonitorPublicHashMatchesPin": true,
+        "threeSnapshotProjectionsExact": true,
+        "snapshotEntries": 27,
+        "snapshotProjectionSha256": "683fa080611a03a6a8007837be0a4840b2ecf6e4ffb457223993f8f527401280",
+        "ownedInputAndBothObjectHashesModesMatch": true,
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "cleanup": {
+          "ledgerAndPoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1547-store-root-baseline",
+        "case": "parent",
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-baseline/parent.json",
+          "bytes": 21969,
+          "sha256": "f03aa2781c7d8acc5fe0d0173773ddaf6b82c312a8e056af20836fa0a0ffa0d3"
+        },
+        "inputBytes": 42,
+        "inputSha256": "29a0c6df69104419a61e8424f77a287df9281b061f1da75ec9335d38c37a39d4",
+        "healthy": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 42,
+          "bytesSha256": "29a0c6df69104419a61e8424f77a287df9281b061f1da75ec9335d38c37a39d4"
+        },
+        "candidate": {
+          "status": "tampered",
+          "detail": "spill root must be a descendant of the workspace",
+          "bytesLength": null,
+          "bytesSha256": null
+        },
+        "signedRowHashAndNodeSignatureBooleans": {
+          "eventHashMatches": true,
+          "nodeSignatureValid": true
+        },
+        "monitorPin": {
+          "pemSha256": "08d8cd4c513d01deb29ce4f5494f6a20db3c80256d6cb882a218c53c1988979f",
+          "spkiSha256": "00fb12548a13509195fd018c5ab7a01a0d21d1a04e89685f109de17f0e391697"
+        },
+        "recordedMonitorPublicHashMatchesPin": true,
+        "threeSnapshotProjectionsExact": true,
+        "snapshotEntries": 26,
+        "snapshotProjectionSha256": "cc6730e2ba2c549fe418e7c86f492e8764fe05e0029ef705d4e327c2b973bda7",
+        "ownedInputAndBothObjectHashesModesMatch": true,
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "cleanup": {
+          "ledgerAndPoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1547-store-root-baseline",
+        "case": "sibling",
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-baseline/sibling.json",
+          "bytes": 22594,
+          "sha256": "0935aa877afbcce75b19bb69c7dcc0c3e53372e7e535c1b08fea5d58a234ad6f"
+        },
+        "inputBytes": 43,
+        "inputSha256": "0a1ea68227b248d29b07d29cc050d478a96b94a304b45967344fafea8bd9c8d6",
+        "healthy": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 43,
+          "bytesSha256": "0a1ea68227b248d29b07d29cc050d478a96b94a304b45967344fafea8bd9c8d6"
+        },
+        "candidate": {
+          "status": "tampered",
+          "detail": "spill root must be a descendant of the workspace",
+          "bytesLength": null,
+          "bytesSha256": null
+        },
+        "signedRowHashAndNodeSignatureBooleans": {
+          "eventHashMatches": true,
+          "nodeSignatureValid": true
+        },
+        "monitorPin": {
+          "pemSha256": "cf0b7c33ae53877a5381bfab08506c00b6a93a46e6cce2692cb893693df63529",
+          "spkiSha256": "c3e363607b4fdf8ee111a96e26740e32c39fe33e78b5311369d21fbf8fbf9e43"
+        },
+        "recordedMonitorPublicHashMatchesPin": true,
+        "threeSnapshotProjectionsExact": true,
+        "snapshotEntries": 27,
+        "snapshotProjectionSha256": "5999fab7db6408d2e87d57b3b3db31a2bed2ac624324116d09ea2ab6174b3855",
+        "ownedInputAndBothObjectHashesModesMatch": true,
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "cleanup": {
+          "ledgerAndPoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1547-store-root-mutant",
+        "case": "parent",
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-mutant/parent.json",
+          "bytes": 21963,
+          "sha256": "d31cba56ae5df4935a4f3ee281d3fa34f5d717927202182a4a432936d8245aea"
+        },
+        "inputBytes": 42,
+        "inputSha256": "29a0c6df69104419a61e8424f77a287df9281b061f1da75ec9335d38c37a39d4",
+        "healthy": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 42,
+          "bytesSha256": "29a0c6df69104419a61e8424f77a287df9281b061f1da75ec9335d38c37a39d4"
+        },
+        "candidate": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 42,
+          "bytesSha256": "29a0c6df69104419a61e8424f77a287df9281b061f1da75ec9335d38c37a39d4"
+        },
+        "signedRowHashAndNodeSignatureBooleans": {
+          "eventHashMatches": true,
+          "nodeSignatureValid": true
+        },
+        "monitorPin": {
+          "pemSha256": "dc4d7d63641230d14759cd0cb543f313f5b85874d019e29f006e0527735790e2",
+          "spkiSha256": "05a0e327a7662620c57d90ce783131134577d80ecfa78e70b161e20f48d4d925"
+        },
+        "recordedMonitorPublicHashMatchesPin": true,
+        "threeSnapshotProjectionsExact": true,
+        "snapshotEntries": 26,
+        "snapshotProjectionSha256": "31d3c13e6618e7fe9580d125dee796500e95c314c9690c9704a4e492fdcfa093",
+        "ownedInputAndBothObjectHashesModesMatch": true,
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "cleanup": {
+          "ledgerAndPoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1547-store-root-mutant",
+        "case": "sibling",
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-mutant/sibling.json",
+          "bytes": 22588,
+          "sha256": "099aca15cf9073f4a58cc55de6be65990030895997324a0f3d5383651ff14865"
+        },
+        "inputBytes": 43,
+        "inputSha256": "0a1ea68227b248d29b07d29cc050d478a96b94a304b45967344fafea8bd9c8d6",
+        "healthy": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 43,
+          "bytesSha256": "0a1ea68227b248d29b07d29cc050d478a96b94a304b45967344fafea8bd9c8d6"
+        },
+        "candidate": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 43,
+          "bytesSha256": "0a1ea68227b248d29b07d29cc050d478a96b94a304b45967344fafea8bd9c8d6"
+        },
+        "signedRowHashAndNodeSignatureBooleans": {
+          "eventHashMatches": true,
+          "nodeSignatureValid": true
+        },
+        "monitorPin": {
+          "pemSha256": "572bd36b86631eb235c96420f4645d5fe26f61a039c52840a6ff07bc3337b85b",
+          "spkiSha256": "0a0fdf974880d4ec4d6702ae26699a58381482ba94380a595cb628e0cf284ce1"
+        },
+        "recordedMonitorPublicHashMatchesPin": true,
+        "threeSnapshotProjectionsExact": true,
+        "snapshotEntries": 27,
+        "snapshotProjectionSha256": "0823f3ff29166499d16c5476e9e7f5dd12bb5dced4047a35f53c5ca65df9cfaf",
+        "ownedInputAndBothObjectHashesModesMatch": true,
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "cleanup": {
+          "ledgerAndPoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1547-store-root-restored",
+        "case": "parent",
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-restored/parent.json",
+          "bytes": 21969,
+          "sha256": "a69e5bd8b9c52a4827f808490ffca4d6a31cd6c24ea5e4c3f902bcb9a97cdfc8"
+        },
+        "inputBytes": 42,
+        "inputSha256": "29a0c6df69104419a61e8424f77a287df9281b061f1da75ec9335d38c37a39d4",
+        "healthy": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 42,
+          "bytesSha256": "29a0c6df69104419a61e8424f77a287df9281b061f1da75ec9335d38c37a39d4"
+        },
+        "candidate": {
+          "status": "tampered",
+          "detail": "spill root must be a descendant of the workspace",
+          "bytesLength": null,
+          "bytesSha256": null
+        },
+        "signedRowHashAndNodeSignatureBooleans": {
+          "eventHashMatches": true,
+          "nodeSignatureValid": true
+        },
+        "monitorPin": {
+          "pemSha256": "218d53903d2e3d12c0e3af6fa4a731c15a28ec6d41ab980d57195e1b38eeb419",
+          "spkiSha256": "4c35f37f6815cb3064994c021e31ca7ec84bd2601633d1eb103c19e4aad87430"
+        },
+        "recordedMonitorPublicHashMatchesPin": true,
+        "threeSnapshotProjectionsExact": true,
+        "snapshotEntries": 26,
+        "snapshotProjectionSha256": "4cf625c7856be25c4f8f07cd23439657e55462d62bd7b61f464eb89695a3370c",
+        "ownedInputAndBothObjectHashesModesMatch": true,
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "cleanup": {
+          "ledgerAndPoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      },
+      {
+        "phase": "P30-1547-store-root-restored",
+        "case": "sibling",
+        "effect": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effects/P30-1547-store-root-restored/sibling.json",
+          "bytes": 22594,
+          "sha256": "a44fcb1f9cfd1982380cc48c792bd7aa88f65dbda94a17a5cf64ce341c03b7d0"
+        },
+        "inputBytes": 43,
+        "inputSha256": "0a1ea68227b248d29b07d29cc050d478a96b94a304b45967344fafea8bd9c8d6",
+        "healthy": {
+          "status": "ok",
+          "detail": null,
+          "bytesLength": 43,
+          "bytesSha256": "0a1ea68227b248d29b07d29cc050d478a96b94a304b45967344fafea8bd9c8d6"
+        },
+        "candidate": {
+          "status": "tampered",
+          "detail": "spill root must be a descendant of the workspace",
+          "bytesLength": null,
+          "bytesSha256": null
+        },
+        "signedRowHashAndNodeSignatureBooleans": {
+          "eventHashMatches": true,
+          "nodeSignatureValid": true
+        },
+        "monitorPin": {
+          "pemSha256": "73fe909a6ee5e467f4720f6877a4b36b56aaa93fe14189abb887c518ed3a5c4f",
+          "spkiSha256": "0ec10dc407312c1d722b8427b35c5bcf10055eac29d9cb0aba7a2d4edb7e30ec"
+        },
+        "recordedMonitorPublicHashMatchesPin": true,
+        "threeSnapshotProjectionsExact": true,
+        "snapshotEntries": 27,
+        "snapshotProjectionSha256": "a2482b9c1710a56b6ba795a910108cdada33cc0921d38a01f28cc58ed017efd6",
+        "ownedInputAndBothObjectHashesModesMatch": true,
+        "workerRuntime": {
+          "version": "v22.23.3",
+          "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "modulesABI": "127"
+        },
+        "cleanup": {
+          "ledgerAndPoolsClosed": true,
+          "vaultLocked": true,
+          "fixtureExistsAfterRemoval": false,
+          "envRestored": true
+        },
+        "errors": []
+      }
+    ]
+  },
+  "preservationProof": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "newByteExactCaseFile": {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/closure/tests/storeRootQualification.test.ts",
+      "bytes": 10950,
+      "sha256": "fa5fa483e98e41c1c16c6caa23b497a884f71abebde0739fcd934512c7fa6236"
+    },
+    "newCaseAbsentInLiveRoot": true,
+    "completePrivateClosureFiles": 12269,
+    "allRootAndPrivateBytesExact": true,
+    "independentRegularFileInodes": true,
+    "beforeAfterPinGroups": {
+      "protected-pins": 157,
+      "prior-reference-pins": 2094,
+      "author-review-pins": 5,
+      "runtime-input-pins": 2
+    },
+    "priorFinalClosuresDirectlyVerified": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/full-closure-final.json",
+          "bytes": 1399899,
+          "sha256": "dda63cf4e8b307c8297550cb97a0ff4fd6510321c4cd160e0a35317bc723d4d9"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "allExact": true
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "allExact": true
+      }
+    ],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "dependencyLinksVerified": 307,
+    "privateViteDirectories": true,
+    "guard": {
+      "recipe": {
+        "id": "P30-1547-store-root",
+        "sourceTarget": "src/session/spill/spillStore.ts",
+        "sourceSha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af",
+        "sourceFind": "  if (!suffix || suffix === \"..\" || suffix.startsWith(`..${sep}`) || suffix.startsWith(sep)) {",
+        "sourceReplace": "  if (!suffix) {",
+        "sourceOccurrences": 1,
+        "compiledAnchorPinnedOnly": {
+          "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/dist/session/spill/spillStore.js",
+          "relativePath": "dist/session/spill/spillStore.js",
+          "find": "    if (!suffix || suffix === \"..\" || suffix.startsWith(`..${sep}`) || suffix.startsWith(sep)) {",
+          "replace": "    if (!suffix) {",
+          "occurrences": 1,
+          "line": 54,
+          "sha256": "fb64f446d49ca93105ec9ce0a6280d36e6a329689eb748e696583706613dfb24",
+          "recheckedOccurrences": 1,
+          "recheckedLine": 54
+        },
+        "corpus": [
+          "tests/storeRootQualification.test.ts"
+        ],
+        "expectedStaticCases": 2,
+        "historicalExpectationOnly": "killed",
+        "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+        "staticSensitivityAndLimits": {
+          "firstSensitiveControl": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/tests/spillLifecycle.test.ts",
+            "line": 185,
+            "statement": "Held parent/sibling/workspace-itself root table is absent in candidate; no held test copied."
+          },
+          "limits": "Current original15 has root alias/transport tests, but no explicit storage-root parent/sibling negative table. The historic expected-killed classification cannot be inherited. A later newly owned supplement, if assigned and frozen before baseline, may add explicit root negatives without editing the original file; no new test authored here."
+        }
+      },
+      "frozenMutant": {
+        "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/P30-1547-store-root-mutant-source.ts",
+        "bytes": 17455,
+        "sha256": "f50e0a95f00a2eda5a30c1488ffff86f24e31f0d44115a990592f552aeaecd4a"
+      },
+      "oneExactSourceDeltaAndPatch": true,
+      "testAndDistBytesUnchanged": true,
+      "fullRestorationExact": true,
+      "sameOriginalRecoveredRecipeWithNewFixedCorpusOnly": true
+    }
+  },
+  "independentMeaning": {
+    "healthy": "All eight healthy strict-descendant reads return ok, null detail and the expected input SHA and length: parent 42 bytes, sibling 43 bytes.",
+    "candidate": "Both mutant parent/sibling reads return ok with the same exact lengths and SHA as the prepared input and both planted objects. Intact initial/baseline/restored cases instead return tampered with the exact descendant-refusal message and no bytes.",
+    "failures": "Both mutant failures are unchanged candidate-result AssertionErrors at storeRootQualification.test.ts:166:23. The earlier signed-row check at 164 and healthy result at 165 pass. Raw case names/counts match across all four processes, with zero pending/todo, setup, pool, observer or cleanup errors.",
+    "maskedSnapshots": "Final snapshot and cleanup assertions at 168\u2013171 are masked by the candidate-result failure. The source collected both read outcomes, all three snapshots and cleanup before these assertions; independent comparison of retained bytes finds before == afterHealthy == afterCandidate in all eight cases.",
+    "projection": "Each parent record contains 26 named snapshot entries and each sibling record 27. The projection records kind, mode, device, inode, nlink, size and regular-file SHA. The input file and both planted objects have matching content hash/length, mode 0600 and one link. Times are excluded. This is not universal filesystem immutability or concurrency confinement.",
+    "sameCriteria": "Two named registered rows are repeated in four processes, making eight case executions. Fresh workspaces, keys and event IDs are generated per case; no identical physical-artifact claim is made across phases."
+  },
+  "rowAndTrust": {
+    "producer": "The byte-exact fixture uses normal ensureSigningKeys and Ledger startSession/appendEvidenceDetailed/sealSession APIs. The tested reference comes from the actual stored row's meta_json. Legacy input/object files are manually prepared supported plaintext compatibility fixtures.",
+    "hashAndSignature": "All eight retained row observations report true eventHashMatches and nodeSignatureValid, and the corresponding original pre-candidate assertion passed. The retained before snapshot's monitor public-file SHA also matches the recorded monitor PEM pin. The procedure hashes prev_event_hash + product canonicalMetadataForHash(row fields) + payload_sha256 and uses Node Ed25519 verification on decoded event-hash bytes with the captured public PEM.",
+    "readerContract": "readSpilled itself does not authenticate a ledger row. Its documented caller must do that. This fixture supplies a separate row hash/Node signature fact; the observed reader results concern the extracted reference, byte equality and root guard.",
+    "canonicalization": "canonicalMetadataForHash is reused from the product. This is not an independently implemented canonicalizer, whole-ledger chain verifier or independent session-seal validation.",
+    "chronology": "Normal key initialization signs the initial histories before monitor pin capture. The pin is persisted before the TESTED ROW only. The in-case effect file later overwrites its initial record; retained final data and byte-exact code order do not provide an immutable intermediate timeline.",
+    "authorityAndRetention": "The captured key is local fixture authority, not an independent external operator/person/delegation anchor. Public/private signing bytes and the workspace are removed; fingerprints, reference data and observed booleans do not permit complete offline signature replay."
+  },
+  "lifecycleAndScope": {
+    "workspaceAndRoots": "The workspace remains the source of ledger/trust. The healthy root is workspace/retained-objects; the candidates are the owned fixture parent or sibling-objects. No transport root, ledger relocation or invented store-root API is introduced.",
+    "writerBoundary": "The unchanged source closes the actual ledger and process-private SQLite pools before the first snapshot and after each read, then independently attempts normal closure again in finally. There are no writer API calls during the read intervals. All retained errors arrays are empty.",
+    "cleanup": "Every final record reports ledger/pool closure, vault lock, fixture removal and environment restoration. Current read-only filesystem checks confirm all eight fixture roots are absent. These facts do not prove every possible process descriptor was closed or create a cold-child interval.",
+    "configuration": "The new file remains alone under normal config/setup/guards, one worker and dual reporters, with the default 30,000 ms deadline unchanged. Each case directly records Node v22.23.3, its executable and ABI 127; the separate launcher fingerprint agrees.",
+    "effects": "The controller supplies a fresh phase-specific absolute owned effects directory, with separate mode-0600 parent/sibling files outside disposable fixture roots. The final records overwrite their own intermediate states.",
+    "preservation": "All root source and compiled files, the new private case, exact one-file TS mutant body/patch, restoration maps, prior indexed inputs and manifest-listed prior closures remain exact. Dist was not changed or rebuilt. The new private test remains absent from live source."
+  },
+  "originalPacketBoundary": "The original lifecycle15 survivor is preserved as that corpus's earlier observation. This separately staged two-case supplement does not rewrite its raw counts or expectations. The separate recorded correction preserves original bytes while clarifying 170 registered expanded cases and 164 distinct rendered titles.",
+  "operations": {
+    "filesystemJsonHashAnalysisOnly": true,
+    "productImports": 0,
+    "productRuntime": 0,
+    "testsOrReruns": 0,
+    "parserOrSyntaxChecks": 0,
+    "typeChecks": 0,
+    "compilersBuilds": 0,
+    "installs": 0,
+    "network": 0,
+    "gitCommands": 0,
+    "sourceOrPriorInputEdits": 0,
+    "writeOnlyAssignedReviewPair": true
+  },
+  "limits": [
+    "This qualifies these legacy-v1 plaintext root reads and exact guard sensitivity; it does not qualify encrypted spill production/publication, ciphertext transport or decryption.",
+    "No full ledger trust/chain/seal, external identity, complete offline cryptographic replay, universal no-effects/race confinement, whole-cold interval or prior P0-27 mixed-parent SQLITE_CORRUPT repair is established.",
+    "No retention/erasure, CLI/provider, installed package, held transfer, source ownership clearance, permanent source fix, full P0-30/old batch/Node24/full suite/coverage/hosted/G0/release/Done or AMC-1522/P0-32 dependency closure is claimed.",
+    "Eleven prior final file manifests and indexed bytes were checked for preservation; their semantics were not re-audited or aggregated into this result."
+  ],
+  "allReadsFinished": true,
+  "capturedUtc": "2026-10-15T02:08:39.342617+00:00",
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015.json",
+      "bytes": 10348,
+      "sha256": "9ef02732d6e61939bcebeb072aab5ee7d7e64d385878fcfeecbb87f129ca1a56"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015.md",
+      "bytes": 3291,
+      "sha256": "8b6649c184ed5dba96b0cbba7682c50594dc7d2c90c352a409e0b06902d42c8e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/artifact-index.json",
+      "bytes": 523773,
+      "sha256": "409f4bc4cc25b1933939d19f3d9c024ffd3e69f8d670a7109aa0962d6f026814"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 12684,
+      "sha256": "e13183bad3d4e8573c7f0c5c138a18cc3bbebea99ffa35e57f1642280183aeaa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/controller.py",
+      "bytes": 10280,
+      "sha256": "be0aa7ef94631168f45a08f8a4524a8f238d0d6442c112cd5208ad5ac0a4ded7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/prepare.py",
+      "bytes": 8175,
+      "sha256": "5248b26fd236b2de6a8effb4230d9b7648c8ffcad062d0d201bbe517a666d15f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effect-observation-inventory.json",
+      "bytes": 34415,
+      "sha256": "f50add1af05dee17cbbf38d143841f889573c179b8ecc4addd858208ccc9b984"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/setup-prepared.json",
+      "bytes": 5234,
+      "sha256": "156b5a95b456bf9b570636e4ee9573291156c29f7377d66a827cb61a2aaeae1a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/setup-prepared.md",
+      "bytes": 2240,
+      "sha256": "ef0291fc1359af4165845d12f244f2f98e85a67afc9d90bd19e5fa22b6fbd736"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 508567,
+      "sha256": "694a9a485123b3ddb92df2da7c100733b8b83b6eb26145734b4e68d597466ae5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/root-runtime-release.json",
+      "bytes": 1353,
+      "sha256": "b089518e7e8ac2de5a898af3b68c26aee10654eefb628db4a264bacd45b444ae"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/registered-title-count-correction.json",
+      "bytes": 650,
+      "sha256": "ff9acd6fcb77e8efc80e4a21f8a51c1753c6075206972b0df714b106e90bd670"
+    }
+  ],
+  "originalCountCorrectionIndependentlyRechecked": {
+    "registeredCases": 170,
+    "distinctRenderedFileTitles": 164,
+    "originalEdited": false
+  },
+  "currentSourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillStore.ts",
+      "bytes": 17533,
+      "lines": 351,
+      "sha256": "1351dd56270ba66159a5b5fd3747e5969b2d2c874815d63e4861583c0fdc59af"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillTypes.ts",
+      "bytes": 11981,
+      "lines": 264,
+      "sha256": "20f7135239a5bd1ed419194e869b450334bd92a2a04f57fc89a6ea8ca523dd8a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/session/spill/spillEncryption.ts",
+      "bytes": 8324,
+      "lines": 156,
+      "sha256": "fa366ad9e5fc9e5e30ae67953eb8aa1704fcb446114223c08815939185fb953c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "lines": 190,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "lines": 701,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "lines": 1295,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "lines": 71,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/storage/sqlitePool.ts",
+      "bytes": 5804,
+      "lines": 251,
+      "sha256": "021dfe8f275c90273d1821d36431f182bbde538a3417f2375e96013c91867bfc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/src/ops/policy.ts",
+      "bytes": 6472,
+      "lines": 206,
+      "sha256": "cd0cee51e3207c191d74acedbed08579396a5d11c63d5c430b1384d94fe92b44"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/spillLifecycle.test.ts",
+      "bytes": 16924,
+      "lines": 246,
+      "sha256": "4891b925666850485a56e17c21ef80ee260e4262b3e39633e369f7f73b351f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "lines": 33,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "lines": 20,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "lines": 82,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "lines": 36,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "lines": 218,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "lines": 4839,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "lines": 210,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "lines": 32,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    }
+  ]
+}

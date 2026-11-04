@@ -1,0 +1,4 @@
+
+> agent-maturity-compass@1.2.0 typecheck /Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass
+> tsc -p tsconfig.json --noEmit
+

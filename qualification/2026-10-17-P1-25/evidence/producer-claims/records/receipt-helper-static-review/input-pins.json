@@ -1,0 +1,126 @@
+{
+  "schema": "p125pc-independent-inert-receipt-helper-review-input-pins/1",
+  "count": 24,
+  "files": [
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/assemble-extension.py.source.txt",
+      "bytes": 40872,
+      "sha256": "4d825f2a41ae308837c1093c1db4636677b897e906aed3a9a98a6980b914f733"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/v1-to-v2.patch.txt",
+      "bytes": 5696,
+      "sha256": "a41dd2a682b4c6798df793efe7e59ab0288cf9e5aad3eb6c4a5993ac202b56d1"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/c39-to-producer.patch.txt",
+      "bytes": 28544,
+      "sha256": "a3e8e5550fb9b2a1ae3c299d8078b5df001395864c5880f8ae81dc6bf1248ab4"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/input-pins.json",
+      "bytes": 6560,
+      "sha256": "5725a0822462489b4df892a9a14e3d3d1a9e1a93aa7d533be306963b2d2025d1"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/README.md",
+      "bytes": 6434,
+      "sha256": "125b40d0c549b71b29a9e860ef5ab62cfd26dc8912b1255a087340be5e5135f6"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/seal.json",
+      "bytes": 3738,
+      "sha256": "b07c99c51f32703d8cb67bc1c11ada4d051f86935bd1b5a6fac1f86e1ad8ce72"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/assemble-extension.py.base.source.txt",
+      "bytes": 36929,
+      "sha256": "45fa2d76363c9c96da03ab857418049b141f2a18cb9979f18ba242601ea82468"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/actual-inputs.template.json",
+      "bytes": 1728,
+      "sha256": "3e0afaeaa110119c14cb24ab57cac6ef268e32925a29a9a0878e22d7192b55cc"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59"
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/assemble-extension.py",
+      "bytes": 36929,
+      "sha256": "45fa2d76363c9c96da03ab857418049b141f2a18cb9979f18ba242601ea82468"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-selection.json",
+      "bytes": 7899,
+      "sha256": "40618cf6cd152f4a56319124eb44aa967ae939b1dbdb454f2277634c30cf7431"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/source-control.py.source.txt",
+      "bytes": 28698,
+      "sha256": "44f1f8e540f111b8dd3a72202930a1a21fcbbf191096424e38cc6a8443c2d2a5"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/v3/seal.json",
+      "bytes": 4870,
+      "sha256": "f3e9c73239e5671f8f115ed8dd3810a8deeb4aa7dd3d07bf431e6dd5238fb771"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-preparation/controls.json",
+      "bytes": 7181,
+      "sha256": "02db629a3438a38970aabdda2d612a2a216a5d245c2e3b24d6142bea169ede06"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "bytes": 525598,
+      "sha256": "63877e73c81c7888b702d47acf3777279e3002ba26db2a38dfbf0d68e50e51df"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "bytes": 39139,
+      "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "bytes": 877972,
+      "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/seal.json",
+      "bytes": 5057,
+      "sha256": "80d02b94f4c2c40d2311bcd7b086a93fcbcd448d0ec2803af51194a622aa4de0"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v2/author-review.json",
+      "bytes": 6200,
+      "sha256": "91f2a7ff13cc21c8862f368a756b20680ecb9f243de9e451af17fb14f03b0d05"
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/control-helper-static-review/review.json",
+      "bytes": 5302,
+      "sha256": "2097aa093ba9d583f387eb3164ce5140ce72bf79c6d7c8c86f7e5bb94cd995d0"
+    }
+  ]
+}

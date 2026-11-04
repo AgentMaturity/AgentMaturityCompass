@@ -1,0 +1,35 @@
+{
+  "schema": "p125f-current-preservation-snapshot/1",
+  "at": "2026-10-16T22:24:15.376064+00:00",
+  "label": "after-m1",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout",
+  "selectedPathsEachRoot": 72,
+  "compiledPairs": 8,
+  "protectedInputs": 128,
+  "nativePhysicalPins": 8,
+  "allSelectedBytesAndPhysicalPinsExact": true,
+  "heldRHeadStatusIndexExact": true,
+  "target": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/src/time/tsaClient.ts",
+    "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/src/time/tsaClient.ts",
+    "bytes": 10927,
+    "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "dev": 16777231,
+    "inode": 543530786,
+    "nlink": 1
+  },
+  "sourceTarget": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+    "bytes": 10927,
+    "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "dev": 16777231,
+    "inode": 542461053,
+    "nlink": 1
+  },
+  "bothTreesClean": true,
+  "bothIndexesEmpty": true,
+  "boundary": "Actual read-only boundary snapshot only. No continuous isolation, unrecorded earlier check, runtime or future restoration credit."
+}

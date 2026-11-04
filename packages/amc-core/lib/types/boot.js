@@ -15,7 +15,7 @@ import Hmr from "@amc/cordis-plugin-hmr";
 import group from "@amc/cordis-plugin-group";
 import timer from "@amc/cordis-plugin-timer";
 import { watchFibers, describeUnsettled } from "./bootAudit.js";
-import { loadComposition } from "./composition.js";
+import { admitCompositionBytes, loadComposition } from "./composition.js";
 export class BootError extends Error {
     unsettled;
     constructor(message, unsettled = []) {
@@ -33,11 +33,15 @@ export class BootError extends Error {
  */
 export async function boot(options) {
     const auditSettled = options.auditSettled ?? true;
+    const admission = { requireSignature: options.requireSignature ?? false, verifySignature: options.verifySignature };
     const composition = loadComposition({
         workspace: options.workspace,
         configPath: options.configPath,
-        requireSignature: options.requireSignature ?? false
+        ...admission
     });
+    let admitted = composition;
+    /** Admitted by the read wrapper; becomes `admitted` only once the tree it parsed has applied. */
+    let pending = composition;
     const ctx = new Context();
     const audit = watchFibers(ctx);
     let stopWatchingConfig;
@@ -78,6 +82,7 @@ export async function boot(options) {
             }
             await includeService.refresh();
             await ctx.loader.await();
+            admitted = pending;
         };
         /**
          * Captures the mounted Include so reload() can drive it.
@@ -90,7 +95,30 @@ export async function boot(options) {
             constructor(scope, config) {
                 super(scope, config);
                 includeService = this;
+                admitEveryRead(this);
             }
+        }
+        /**
+         * Admits the exact text Include parses, at the initial mount and on every
+         * refresh. Include reads the file itself, so checking the file beforehand
+         * would leave a window between check and mount; wrapping its read closes
+         * it. A rejected read throws before Include applies anything, so a failed
+         * reload leaves the last admitted tree active.
+         */
+        function admitEveryRead(include) {
+            const carrier = include;
+            const read = carrier.read;
+            if (typeof read !== "function") {
+                throw new BootError("composition admission is unavailable: the vendored Include no longer exposes read()");
+            }
+            carrier.read = async (forced) => {
+                const candidate = await read.call(include, forced);
+                if (candidate) {
+                    const { sha256, signature } = admitCompositionBytes(composition.path, composition.relativePath, Buffer.from(candidate.content, "utf8"), admission);
+                    pending = { ...composition, sha256, signature };
+                }
+                return candidate;
+            };
         }
         let createEntry;
         const composed = ctx.inject(["loader"], (scope) => {
@@ -124,6 +152,7 @@ export async function boot(options) {
         // outstanding. It throws the fiber's own failure (or an AggregateError),
         // so a plugin that threw surfaces here rather than as a silent PENDING.
         await ctx.loader.await();
+        admitted = pending;
         if (options.watch) {
             const watchOptions = typeof options.watch === "object" ? options.watch : {};
             let hmrFiber;
@@ -160,7 +189,9 @@ export async function boot(options) {
         }
         return {
             ctx,
-            composition,
+            get composition() {
+                return admitted;
+            },
             unsettled,
             async reload() {
                 await reloadComposition();

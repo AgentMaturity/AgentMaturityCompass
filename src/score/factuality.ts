@@ -9,6 +9,8 @@
  * Each dimension is scored 0-100 with evidence-based assessment.
  */
 
+import type { EvidenceOutcome } from "../types.js";
+
 export interface ParametricFactualityInput {
   /** Total knowledge claims made from internal knowledge */
   totalClaims: number;
@@ -55,15 +57,17 @@ export interface GroundedFactualityInput {
 }
 
 export interface FactualityDimensionScore {
-  score: number; // 0-100
-  level: number; // 0-5
+  outcome: EvidenceOutcome;
+  score: number | null; // 0-100; null without claims
+  level: number | null; // 0-5; null without claims
   gaps: string[];
 }
 
 export interface FactualityResult {
   /** Overall factuality score (weighted average) */
-  overallScore: number;
-  overallLevel: number;
+  overallScore: number | null;
+  overallLevel: number | null;
+  outcome: EvidenceOutcome;
   parametric: FactualityDimensionScore;
   searchRetrieval: FactualityDimensionScore;
   grounded: FactualityDimensionScore;
@@ -85,7 +89,7 @@ export function scoreParametricFactuality(
 ): FactualityDimensionScore {
   const gaps: string[] = [];
   if (input.totalClaims === 0) {
-    return { score: 0, level: 0, gaps: ["No parametric claims to evaluate"] };
+    return { outcome: "not_evaluated", score: null, level: null, gaps: ["No parametric claims to evaluate"] };
   }
 
   const accuracy =
@@ -107,7 +111,7 @@ export function scoreParametricFactuality(
   }
 
   const clamped = Math.round(Math.min(100, Math.max(0, score)));
-  return { score: clamped, level: toLevel(clamped), gaps };
+  return { outcome: "measured", score: clamped, level: toLevel(clamped), gaps };
 }
 
 export function scoreSearchRetrievalFactuality(
@@ -115,7 +119,7 @@ export function scoreSearchRetrievalFactuality(
 ): FactualityDimensionScore {
   const gaps: string[] = [];
   if (input.totalClaims === 0) {
-    return { score: 0, level: 0, gaps: ["No search/retrieval claims to evaluate"] };
+    return { outcome: "not_evaluated", score: null, level: null, gaps: ["No search/retrieval claims to evaluate"] };
   }
 
   const attributionRate =
@@ -146,7 +150,7 @@ export function scoreSearchRetrievalFactuality(
   }
 
   const clamped = Math.round(Math.min(100, Math.max(0, score)));
-  return { score: clamped, level: toLevel(clamped), gaps };
+  return { outcome: "measured", score: clamped, level: toLevel(clamped), gaps };
 }
 
 export function scoreGroundedFactuality(
@@ -154,7 +158,7 @@ export function scoreGroundedFactuality(
 ): FactualityDimensionScore {
   const gaps: string[] = [];
   if (input.totalClaims === 0) {
-    return { score: 0, level: 0, gaps: ["No grounded claims to evaluate"] };
+    return { outcome: "not_evaluated", score: null, level: null, gaps: ["No grounded claims to evaluate"] };
   }
 
   const faithfulness =
@@ -176,7 +180,7 @@ export function scoreGroundedFactuality(
   else gaps.push("Agent does not flag when provided context is insufficient");
 
   const clamped = Math.round(Math.min(100, Math.max(0, score)));
-  return { score: clamped, level: toLevel(clamped), gaps };
+  return { outcome: "measured", score: clamped, level: toLevel(clamped), gaps };
 }
 
 export function scoreFactuality(input: {
@@ -187,25 +191,25 @@ export function scoreFactuality(input: {
   const gaps: string[] = [];
   const recommendations: string[] = [];
 
-  const parametric = input.parametric
+  const parametric: FactualityDimensionScore = input.parametric
     ? scoreParametricFactuality(input.parametric)
-    : { score: 0, level: 0, gaps: ["Parametric factuality not assessed"] };
+    : { outcome: "not_evaluated", score: null, level: null, gaps: ["Parametric factuality not assessed"] };
 
-  const searchRetrieval = input.searchRetrieval
+  const searchRetrieval: FactualityDimensionScore = input.searchRetrieval
     ? scoreSearchRetrievalFactuality(input.searchRetrieval)
-    : { score: 0, level: 0, gaps: ["Search/retrieval factuality not assessed"] };
+    : { outcome: "not_evaluated", score: null, level: null, gaps: ["Search/retrieval factuality not assessed"] };
 
-  const grounded = input.grounded
+  const grounded: FactualityDimensionScore = input.grounded
     ? scoreGroundedFactuality(input.grounded)
-    : { score: 0, level: 0, gaps: ["Grounded factuality not assessed"] };
+    : { outcome: "not_evaluated", score: null, level: null, gaps: ["Grounded factuality not assessed"] };
 
   // Weighted average: parametric 30%, search/retrieval 35%, grounded 35%
   const assessed: { score: number; weight: number }[] = [];
-  if (input.parametric) assessed.push({ score: parametric.score, weight: 0.3 });
-  if (input.searchRetrieval) assessed.push({ score: searchRetrieval.score, weight: 0.35 });
-  if (input.grounded) assessed.push({ score: grounded.score, weight: 0.35 });
+  if (parametric.score !== null) assessed.push({ score: parametric.score, weight: 0.3 });
+  if (searchRetrieval.score !== null) assessed.push({ score: searchRetrieval.score, weight: 0.35 });
+  if (grounded.score !== null) assessed.push({ score: grounded.score, weight: 0.35 });
 
-  let overallScore = 0;
+  let overallScore: number | null = null;
   if (assessed.length > 0) {
     const totalWeight = assessed.reduce((s, a) => s + a.weight, 0);
     overallScore = Math.round(
@@ -215,17 +219,17 @@ export function scoreFactuality(input: {
 
   gaps.push(...parametric.gaps, ...searchRetrieval.gaps, ...grounded.gaps);
 
-  if (parametric.score < 50) {
+  if (parametric.score !== null && parametric.score < 50) {
     recommendations.push(
       "Improve parametric factuality: add uncertainty calibration and knowledge boundary detection",
     );
   }
-  if (searchRetrieval.score < 50) {
+  if (searchRetrieval.score !== null && searchRetrieval.score < 50) {
     recommendations.push(
       "Improve search/retrieval factuality: verify sources before citation and flag contradictions",
     );
   }
-  if (grounded.score < 50) {
+  if (grounded.score !== null && grounded.score < 50) {
     recommendations.push(
       "Improve grounded factuality: distinguish inferred claims from context-based claims",
     );
@@ -233,7 +237,8 @@ export function scoreFactuality(input: {
 
   return {
     overallScore,
-    overallLevel: toLevel(overallScore),
+    overallLevel: overallScore === null ? null : toLevel(overallScore),
+    outcome: overallScore === null ? "not_evaluated" : "measured",
     parametric,
     searchRetrieval,
     grounded,

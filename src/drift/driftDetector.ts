@@ -1,32 +1,34 @@
 import { randomUUID } from "node:crypto";
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { latestAssuranceByPack } from "../assurance/assuranceRunner.js";
+import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
+import { refusedRunsBlocking, scanVerifiedRuns } from "../diagnostic/runReportResolution.js";
+import { scanTrustedRuns } from "../governor/runTrust.js";
 import { openLedger } from "../ledger/ledger.js";
-import type { ActionClass, DiagnosticReport } from "../types.js";
+import type { DiagnosticReport } from "../types.js";
 import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
-import { createFreezeIncident, listIncidents } from "./freezeEngine.js";
-import { dispatchAlert, loadAlertsConfig, verifyAlertsConfigSignature } from "./alerts.js";
+import { createFreezeIncident, createFreezeIncidentForSnapshot, createFreezeIncidentForAuthority, listIncidents, type FreezeIncident } from "./freezeEngine.js";
+import { dispatchAlert, captureVerifiedAlertsConfig, type AlertPayload } from "./alerts.js";
 import { evaluateDriftRules } from "./driftRules.js";
 
-function loadRuns(workspace: string, agentId: string): DiagnosticReport[] {
+/** runId -> ledger-anchored report hash of each trusted run. */
+const trustedHashes = (runs: readonly DiagnosticReport[]) => new Map(runs.map(run => [run.runId, run.reportJsonSha256]));
+
+/**
+ * Trusted runs only (`scanTrustedRuns`): an edited, copied, renamed or unanchored run must neither trigger nor suppress
+ * a signed freeze. Each file must be `<runId>.json` and hash to its run's ledger row. Bytes are kept for the TOCTOU re-check.
+ */
+function loadRunRows(workspace: string, agentId: string, trusted = trustedHashes(scanTrustedRuns(workspace, agentId).runs)): Array<{ path: string; bytes: Buffer; run: DiagnosticReport }> {
   const runsDir = getAgentPaths(workspace, agentId).runsDir;
-  if (!pathExists(runsDir)) {
-    return [];
-  }
-  return readdirSync(runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .map((name) => {
-      try {
-        return JSON.parse(readUtf8(join(runsDir, name))) as DiagnosticReport;
-      } catch {
-        return null;
-      }
-    })
-    .filter((row): row is DiagnosticReport => row !== null)
-    .sort((a, b) => a.ts - b.ts);
+  if (!pathExists(runsDir)) return [];
+  return readdirSync(runsDir).filter(name => name.endsWith(".json")).flatMap(name => {
+    try { const path = join(runsDir, name), bytes = readFileSync(path), run = JSON.parse(bytes.toString("utf8")) as DiagnosticReport | null;
+      return run !== null && name === `${run.runId}.json` && trusted.get(run.runId) === run.reportJsonSha256 && sealedRunReportVerifies(workspace, run as unknown as Record<string, unknown>) ? [{ path, bytes, run }] : []; }
+    catch { return []; }
+  }).sort((a, b) => a.run.ts - b.run.ts);
 }
 
 export interface DriftCheckResult {
@@ -39,170 +41,231 @@ export interface DriftCheckResult {
   incidentId: string | null;
 }
 
-export async function runDriftCheck(params: {
-  workspace: string;
-  agentId?: string;
-  currentRunId?: string;
-}): Promise<DriftCheckResult> {
-  const agentId = resolveAgentId(params.workspace, params.agentId);
-  const runs = loadRuns(params.workspace, agentId);
-  if (runs.length < 2) {
-    return {
-      agentId,
-      triggered: false,
-      ruleId: null,
-      reasons: ["not enough runs for drift comparison"],
-      previousRunId: null,
-      currentRunId: runs[runs.length - 1]?.runId ?? null,
-      incidentId: null
-    };
+/**
+ * Drift that could not be evaluated: the run history it compares is not whole (an unreadable ledger, a thinned, hidden or
+ * unverifiable run). Alerting callers treat it as alertable, never as a clean non-trigger (security review 2026-10-31).
+ */
+export function driftNotEvaluated(result: Pick<DriftCheckResult, "reasons">): boolean {
+  return result.reasons.some((reason) => reason.startsWith("INSUFFICIENT_EVIDENCE"));
+}
+
+/** The owner alert for a drift check that could not be evaluated. */
+export function driftNotEvaluatedAlert(result: DriftCheckResult): AlertPayload {
+  return { type: "AMC_ALERT", ruleId: "drift-not-evaluated", agentId: result.agentId, runId: result.currentRunId ?? "unknown",
+    summary: `Drift not evaluated: ${result.reasons.join(" | ")}`,
+    links: { dashboard: "http://127.0.0.1:4173", report: `.amc/agents/${result.agentId}/reports/${result.currentRunId ?? "latest"}.md` },
+    hashes: { reportSha256: sha256Hex(JSON.stringify(result)), bundleSha256: sha256Hex(`${result.agentId}:${result.currentRunId}`) } };
+}
+
+// A complete repeated baseline is required for inference; shorter histories retain the unconfirmed single-run guard.
+const BASELINE_WINDOW_SIZE = 5;
+
+interface DriftCheckParams { workspace: string; agentId?: string; currentRunId?: string }
+type ReadyDrift = { agentId: string; previous: DiagnosticReport; current: DiagnosticReport; rule: ReturnType<typeof captureVerifiedAlertsConfig>["config"]["alerts"]["rules"][number];
+  evaluated: ReturnType<typeof evaluateDriftRules>; comparisonWindow: NonNullable<FreezeIncident["comparisonWindow"]>; assertInputsCurrent(): void };
+
+function prepareDriftDecision(input: DriftCheckParams): { result: DriftCheckResult } | ReadyDrift {
+  const params = { ...input }, agentId = resolveAgentId(params.workspace, params.agentId), scan = scanTrustedRuns(params.workspace, agentId);
+  const rows = loadRunRows(params.workspace, agentId, trustedHashes(scan.runs)), runs = rows.map(row => row.run);
+  // Another agent's copy is left out and reported, never blocking, so planting one cannot silence a freeze.
+  const unverified = scan.foreign.map(reason => `UNVERIFIED: ${reason}; excluded from drift`);
+  const empty = (reasons: string[], previousRunId: string | null, currentRunId: string | null): { result: DriftCheckResult } => ({ result: {
+    agentId, triggered: false, ruleId: null, reasons: [...reasons, ...unverified], previousRunId, currentRunId, incidentId: null } });
+  // This agent's history is not whole (unreadable ledger, deleted, hidden, renamed, duplicated or unanchored runs): the
+  // pair drift would compare may be stale, so it is never evaluated and never reported as a clean non-trigger.
+  if (scan.untrusted.length > 0) return empty([`INSUFFICIENT_EVIDENCE: ${scan.untrusted.join("; ")}; drift not evaluated`], null, runs.at(-1)?.runId ?? null);
+  if (runs.length < 2) return empty(["not enough runs for drift comparison"], null, runs.at(-1)?.runId ?? null);
+  const select = (values: ReturnType<typeof loadRunRows>) => {
+    const current = (params.currentRunId ? values.find(row => row.run.runId === params.currentRunId) : values.at(-1)) ?? values.at(-1)!;
+    const prior = values.filter(row => row.run.ts < current.run.ts);
+    const baseline = prior.length >= BASELINE_WINDOW_SIZE ? prior.slice(-BASELINE_WINDOW_SIZE) : prior.slice(-1);
+    return { current, previous: prior.at(-1), baseline };
+  };
+  const selected = select(rows);
+  if (!selected.previous) return empty(["not enough previous runs for drift comparison"], null, selected.current.run.runId);
+  const { current, previous } = { current: selected.current.run, previous: selected.previous.run };
+  // A tampered, unreadable or newer unsealed run means the selected pair may be stale: report it, never decide on it (WP37).
+  const blocking = refusedRunsBlocking(scanVerifiedRuns(params.workspace, agentId).refused, current.ts);
+  if (blocking.length > 0) return empty([`INSUFFICIENT_EVIDENCE: unverifiable diagnostic run(s) ${blocking.map(row => row.file).join(", ")}; drift not evaluated`], previous.runId, current.runId);
+  let alerts: ReturnType<typeof captureVerifiedAlertsConfig>;
+  try { alerts = captureVerifiedAlertsConfig(params.workspace); }
+  catch (error) { return empty([`alerts config invalid: ${error instanceof Error ? error.message : "unknown"}`], previous.runId, current.runId); }
+  const assurance = () => latestAssuranceByPack({ workspace: params.workspace, agentId, windowStartTs: current.windowStartTs, windowEndTs: current.windowEndTs });
+  const baseline = selected.baseline.map(row => row.run);
+  let assuranceByPack: ReturnType<typeof assurance>, evaluated: ReturnType<typeof evaluateDriftRules>;
+  // A refused newer assurance report throws INSUFFICIENT_EVIDENCE as well (security sweep 2026-10-31).
+  try { assuranceByPack = assurance(); evaluated = evaluateDriftRules({ config: alerts.config, previousRun: previous, baselineRuns: baseline, currentRun: current, assuranceByPack }); }
+  catch (error) {
+    if (error instanceof Error && error.message.startsWith("INSUFFICIENT_EVIDENCE:")) return empty([error.message], previous.runId, current.runId);
+    throw error;
   }
+  if (!evaluated.triggered || !evaluated.ruleId) return empty(evaluated.reasons, previous.runId, current.runId);
+  const rule = alerts.config.alerts.rules.find(item => item.id === evaluated.ruleId)!;
+  const used = new Set<string>();
+  for (const row of alerts.config.alerts.rules) { for (const id of Object.keys(row.when.assuranceDropBelow)) used.add(id); if (row === rule) break; }
+  const projection = (values: typeof assuranceByPack) => JSON.stringify([...used].map(id => [id, values.get(id)?.score0to100 ?? null]));
+  const assuranceInput = projection(assuranceByPack);
+  return { agentId, current, previous, rule, evaluated, comparisonWindow: {
+    requestedSize: BASELINE_WINDOW_SIZE, runIds: baseline.map(run => run.runId), startTs: baseline[0]!.ts, endTs: baseline.at(-1)!.ts,
+    confirmation: evaluated.confirmation, method: baseline.length === 1 ? "single-run" : "median-bootstrap-95"
+  }, assertInputsCurrent() {
+    alerts.assertCurrent();
+    let now: ReturnType<typeof select>;
+    try { now = select(loadRunRows(params.workspace, agentId)); }
+    catch (cause) { throw new Error("selected drift decision inputs changed while freeze signing was prepared", { cause }); }
+    if (now.current?.path !== selected.current.path || !now.current.bytes.equals(selected.current.bytes)
+      || now.baseline.length !== selected.baseline.length || now.baseline.some((row, index) => row.path !== selected.baseline[index]!.path || !row.bytes.equals(selected.baseline[index]!.bytes))
+      || projection(assurance()) !== assuranceInput) throw new Error("selected drift decision inputs changed while freeze signing was prepared");
+  } };
+}
 
-  const current =
-    (params.currentRunId ? runs.find((run) => run.runId === params.currentRunId) : runs[runs.length - 1]) ?? runs[runs.length - 1]!;
-  const previousCandidates = runs.filter((run) => run.ts < current.ts);
-  const previous = previousCandidates[previousCandidates.length - 1]!;
-  const alertsSig = verifyAlertsConfigSignature(params.workspace);
-  if (!alertsSig.valid) {
-    return {
-      agentId,
-      triggered: false,
-      ruleId: null,
-      reasons: [`alerts config invalid: ${alertsSig.reason ?? "unknown"}`],
-      previousRunId: previous.runId,
-      currentRunId: current.runId,
-      incidentId: null
-    };
+function incidentInput(params: DriftCheckParams, ready: ReadyDrift): Parameters<typeof createFreezeIncident>[0] {
+  return { workspace: params.workspace, agentId: ready.agentId, ruleId: ready.evaluated.ruleId!, previousRunId: ready.previous.runId,
+    currentRunId: ready.current.runId, deltas: ready.evaluated.deltas, comparisonWindow: ready.comparisonWindow,
+    actionClasses: ready.rule.actions.includes("FREEZE_EXECUTE") ? ready.rule.freezeActionClasses ?? ["DEPLOY", "WRITE_HIGH", "SECURITY"] : [],
+    reason: ready.evaluated.reasons.join("; ") };
+}
+
+function regressionAlert(ready: ReadyDrift): AlertPayload {
+  const { agentId, current, rule, evaluated } = ready;
+  return { type: "AMC_ALERT", ruleId: rule.id, agentId, runId: current.runId, summary: `Drift/regression detected: ${evaluated.reasons.join(" | ")}`,
+    links: { dashboard: "http://127.0.0.1:4173", report: `.amc/agents/${agentId}/reports/${current.runId}.md` },
+    hashes: { reportSha256: current.reportJsonSha256, bundleSha256: sha256Hex(`${agentId}:${current.runId}`) } };
+}
+
+/**
+ * AMC_NO_SIGN=1 cannot publish the signed freeze incident, so a detected regression is never read as a clean pass: the
+ * owner is alerted, whatever the rule's actions (the freeze it may ask for cannot be raised), and the check refuses.
+ */
+async function refuseUnsignedRegression(params: DriftCheckParams, ready: ReadyDrift): Promise<void> {
+  if (process.env.AMC_NO_SIGN !== "1") return;
+  let undelivered = "";
+  try { await dispatchAlert(params.workspace, regressionAlert(ready)); }
+  catch (error) { undelivered = `; the owner alert was not delivered: ${error instanceof Error ? error.message : String(error)}`; }
+  throw new Error(`drift regression detected (${ready.evaluated.reasons.join("; ")}), but no-sign mode does not authorize the signed freeze incident; `
+    + `rerun the drift check from a signing session${undelivered}`);
+}
+
+/** Retained incident-signing branch for callback-absent registry consumers. */
+export async function runDriftCheck(input: DriftCheckParams): Promise<DriftCheckResult> {
+  const params = { ...input }, ready = prepareDriftDecision(params); if ("result" in ready) return ready.result;
+  await refuseUnsignedRegression(params, ready);
+  const incident = createFreezeIncidentForSnapshot(incidentInput(params, ready), ready.assertInputsCurrent);
+  return finishDriftCheck(params, ready, incident, false);
+}
+export async function runDriftCheckAsync(input: DriftCheckParams): Promise<DriftCheckResult> {
+  return runDriftCheckForAuthority(input, () => {});
+}
+/** Internal maintained caller handoff. No request-derived actor or signer selector is accepted. */
+export async function runDriftCheckForAuthority(input: DriftCheckParams, beforePublish: () => void): Promise<DriftCheckResult> {
+  const params = { ...input }, ready = prepareDriftDecision(params); if ("result" in ready) return ready.result;
+  await refuseUnsignedRegression(params, ready);
+  const incident = await createFreezeIncidentForAuthority(incidentInput(params, ready), () => { beforePublish(); ready.assertInputsCurrent(); });
+  return finishDriftCheck(params, ready, incident, true);
+}
+
+class DriftPartialError extends Error {
+  readonly code = "DRIFT_PARTIAL";
+  constructor(readonly incidentId: string, readonly incidentPath: string, readonly phase: string, readonly completed: readonly string[], cause: unknown) {
+    super("drift incident was published, but a later required effect did not complete", { cause }); this.name = "DriftPartialError";
   }
-  const alertsConfig = loadAlertsConfig(params.workspace);
-  const assurance = latestAssuranceByPack({
-    workspace: params.workspace,
-    agentId,
-    windowStartTs: current.windowStartTs,
-    windowEndTs: current.windowEndTs
-  });
-  const evaluated = evaluateDriftRules({
-    config: alertsConfig,
-    previousRun: previous,
-    currentRun: current,
-    assuranceByPack: assurance
-  });
+}
+/** Preserve an already published incident when a maintained caller's secondary effect fails. */
+export function driftPostPublicationError(workspace: string, result: Pick<DriftCheckResult, "agentId" | "incidentId">, phase: string, cause: unknown): unknown {
+  return result.incidentId === null ? cause : new DriftPartialError(result.incidentId,
+    join(getAgentPaths(workspace, result.agentId).rootDir, "incidents", `${result.incidentId}.json`), phase, ["incident", "drift-check"], cause);
+}
 
-  if (!evaluated.triggered || !evaluated.ruleId) {
-    return {
-      agentId,
-      triggered: false,
-      ruleId: null,
-      reasons: evaluated.reasons,
-      previousRunId: previous.runId,
-      currentRunId: current.runId,
-      incidentId: null
-    };
-  }
-
-  const rule = alertsConfig.alerts.rules.find((item) => item.id === evaluated.ruleId)!;
-  const freezeClasses: ActionClass[] = rule.freezeActionClasses ?? ["DEPLOY", "WRITE_HIGH", "SECURITY"];
-  const incident = createFreezeIncident({
-    workspace: params.workspace,
-    agentId,
-    ruleId: evaluated.ruleId,
-    previousRunId: previous.runId,
-    currentRunId: current.runId,
-    deltas: evaluated.deltas,
-    actionClasses: rule.actions.includes("FREEZE_EXECUTE") ? freezeClasses : [],
-    reason: evaluated.reasons.join("; ")
-  });
-
-  const ledger = openLedger(params.workspace);
-  const sessionId = `drift-${randomUUID()}`;
+async function finishDriftCheck(params: DriftCheckParams, ready: ReadyDrift, incident: FreezeIncident, checked: boolean): Promise<DriftCheckResult> {
+  const { agentId, current, previous, rule, evaluated } = ready, completed = ["incident"];
+  let phase = "ledger-open";
   try {
-    ledger.startSession({
-      sessionId,
-      runtime: "unknown",
-      binaryPath: "amc-drift-check",
-      binarySha256: sha256Hex("amc-drift-check")
-    });
-    ledger.appendEvidence({
-      sessionId,
-      runtime: "unknown",
-      eventType: "audit",
-      payload: JSON.stringify({
-        auditType: "DRIFT_REGRESSION_DETECTED",
-        severity: "HIGH",
-        agentId,
-        ruleId: evaluated.ruleId,
-        previousRunId: previous.runId,
-        currentRunId: current.runId,
-        incidentId: incident.incidentId,
-        reasons: evaluated.reasons
-      }),
-      payloadExt: "json",
-      inline: true,
-      meta: {
-        auditType: "DRIFT_REGRESSION_DETECTED",
-        severity: "HIGH",
-        agentId,
-        incidentId: incident.incidentId,
-        ruleId: evaluated.ruleId,
-        trustTier: "OBSERVED"
-      }
-    });
-    if (incident.freeze.actionClasses.length > 0) {
+    phase = "ledger-open";
+    const ledger = openLedger(params.workspace); completed.push("ledger-open");
+    const sessionId = `drift-${randomUUID()}`;
+    let failed: unknown;
+    try {
+      phase = "ledger-start";
+      ledger.startSession({
+        sessionId,
+        runtime: "unknown",
+        binaryPath: "amc-drift-check",
+        binarySha256: sha256Hex("amc-drift-check")
+      });
+      completed.push("ledger-start"); phase = "drift-audit";
       ledger.appendEvidence({
         sessionId,
         runtime: "unknown",
         eventType: "audit",
         payload: JSON.stringify({
-          auditType: "EXECUTE_FROZEN_ACTIVE",
+          auditType: "DRIFT_REGRESSION_DETECTED",
           severity: "HIGH",
           agentId,
+          ruleId: evaluated.ruleId,
+          previousRunId: previous.runId,
+          currentRunId: current.runId,
           incidentId: incident.incidentId,
-          actionClasses: incident.freeze.actionClasses
+          reasons: evaluated.reasons
         }),
         payloadExt: "json",
         inline: true,
         meta: {
-          auditType: "EXECUTE_FROZEN_ACTIVE",
+          auditType: "DRIFT_REGRESSION_DETECTED",
           severity: "HIGH",
           agentId,
           incidentId: incident.incidentId,
-          actionClasses: incident.freeze.actionClasses,
+          ruleId: evaluated.ruleId,
           trustTier: "OBSERVED"
         }
       });
-    }
-    ledger.sealSession(sessionId);
-  } finally {
-    ledger.close();
-  }
-
-  if (rule.actions.includes("ALERT_OWNER")) {
-    await dispatchAlert(params.workspace, {
-      type: "AMC_ALERT",
-      ruleId: rule.id,
-      agentId,
-      runId: current.runId,
-      summary: `Drift/regression detected: ${evaluated.reasons.join(" | ")}`,
-      links: {
-        dashboard: "http://127.0.0.1:4173",
-        report: `.amc/agents/${agentId}/reports/${current.runId}.md`
-      },
-      hashes: {
-        reportSha256: current.reportJsonSha256,
-        bundleSha256: sha256Hex(`${agentId}:${current.runId}`)
+      completed.push("drift-audit");
+      if (incident.freeze.actionClasses.length > 0) {
+        phase = "freeze-audit";
+        ledger.appendEvidence({
+          sessionId,
+          runtime: "unknown",
+          eventType: "audit",
+          payload: JSON.stringify({
+            auditType: "EXECUTE_FROZEN_ACTIVE",
+            severity: "HIGH",
+            agentId,
+            incidentId: incident.incidentId,
+            actionClasses: incident.freeze.actionClasses
+          }),
+          payloadExt: "json",
+          inline: true,
+          meta: {
+            auditType: "EXECUTE_FROZEN_ACTIVE",
+            severity: "HIGH",
+            agentId,
+            incidentId: incident.incidentId,
+            actionClasses: incident.freeze.actionClasses,
+            trustTier: "OBSERVED"
+          }
+        });
       }
-    });
-  }
+      if (incident.freeze.actionClasses.length > 0) completed.push("freeze-audit");
+      phase = "ledger-seal"; ledger.sealSession(sessionId); completed.push("ledger-seal");
+    } catch (error) { failed = error; throw error; }
+    finally {
+      if (failed === undefined) phase = "ledger-close";
+      try { ledger.close(); completed.push("ledger-close"); }
+      // oxlint-disable-next-line no-unsafe-finally -- A cleanup failure must surface, with any primary failure, instead of reporting success.
+      catch (error) { if (failed !== undefined) throw new AggregateError([failed, error], "drift ledger close also failed", { cause: failed }); throw error; }
+    }
 
-  return {
-    agentId,
-    triggered: true,
-    ruleId: evaluated.ruleId,
-    reasons: evaluated.reasons,
-    previousRunId: previous.runId,
-    currentRunId: current.runId,
-    incidentId: incident.incidentId
-  };
+    if (rule.actions.includes("ALERT_OWNER")) {
+      phase = "alert";
+      await dispatchAlert(params.workspace, regressionAlert(ready));
+      completed.push("alert");
+    }
+
+    return { agentId, triggered: true, ruleId: evaluated.ruleId, reasons: evaluated.reasons,
+      previousRunId: previous.runId, currentRunId: current.runId, incidentId: incident.incidentId };
+  } catch (error) {
+    if (!checked) throw error;
+    throw new DriftPartialError(incident.incidentId, join(getAgentPaths(params.workspace, agentId).rootDir, "incidents", `${incident.incidentId}.json`), phase, [...completed], error);
+  }
 }
 
 export function lastDriftCheckSummary(workspace: string, agentId?: string): {

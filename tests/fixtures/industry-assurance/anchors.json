@@ -1,0 +1,498 @@
+{
+  "anchors": {
+    "ferpa-99-30": {
+      "citation": "34 CFR 99.30",
+      "title": "FERPA regulations: signed and dated written consent of the parent or eligible student before disclosing personally identifiable information from education records",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title34-vol1/xml/CFR-2024-title34-vol1-sec99-30.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "ferpa-99-31": {
+      "citation": "34 CFR 99.31(a)(1)(i)(B)",
+      "title": "FERPA regulations: an outsourced contractor may be treated as a school official only while under the institution's direct control over use and maintenance of education records",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title34-vol1/xml/CFR-2024-title34-vol1-sec99-31.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "coppa-312-5": {
+      "citation": "16 CFR 312.5(a)(1)",
+      "title": "COPPA Rule: verifiable parental consent before any collection, use, or disclosure of personal information from children",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title16-vol1/xml/CFR-2024-title16-vol1-sec312-5.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Read in the 2024 annual CFR edition; the 2025 amendments (FR Doc. 2025-05904) were not cross-checked against this paragraph."
+    },
+    "coppa-2025-amendments": {
+      "citation": "FR Doc. 2025-05904",
+      "title": "FTC COPPA Rule amendments, 16 CFR Part 312: effective 2025-06-23, general compliance date 2026-04-22; adds biometric identifiers to personal information",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-04-22/html/2025-05904.htm",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-annex3-2": {
+      "citation": "AI Act Annex III point 2",
+      "title": "Regulation (EU) 2024/1689, Annex III point 2: safety components in the management and operation of critical digital infrastructure, road traffic, or water, gas, heating or electricity supply are high-risk",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-annex3-3": {
+      "citation": "AI Act Annex III point 3",
+      "title": "Regulation (EU) 2024/1689, Annex III point 3: education and vocational training, including evaluating learning outcomes and monitoring prohibited behaviour of students during tests, are high-risk",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/annex-3",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-art5-1f": {
+      "citation": "AI Act Art. 5(1)(f)",
+      "title": "Regulation (EU) 2024/1689, Art. 5(1)(f): prohibition on AI systems that infer emotions of a natural person in the workplace and education institutions, except for medical or safety reasons",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-art12-1": {
+      "citation": "AI Act Art. 12(1)",
+      "title": "Regulation (EU) 2024/1689, Art. 12(1): high-risk AI systems shall technically allow automatic recording of events (logs) over the lifetime of the system",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-12",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-art14-4": {
+      "citation": "AI Act Art. 14(4)",
+      "title": "Regulation (EU) 2024/1689, Art. 14(4)(d)-(e): overseers can disregard, override or reverse the output and interrupt the system through a stop button or similar procedure",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-14",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-art27-1": {
+      "citation": "AI Act Art. 27(1)",
+      "title": "Regulation (EU) 2024/1689, Art. 27(1): fundamental rights impact assessment by specified deployers prior to deploying an Art. 6(2) high-risk system, elements (a)-(f)",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-27",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-art50-1": {
+      "citation": "AI Act Art. 50(1)",
+      "title": "Regulation (EU) 2024/1689, Art. 50(1): natural persons are informed that they are interacting with an AI system unless obvious to a reasonably informed person",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-art50-4": {
+      "citation": "AI Act Art. 50(4)",
+      "title": "Regulation (EU) 2024/1689, Art. 50(4): deployers of a system generating deep fake image, audio or video content disclose that it is artificially generated or manipulated",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-50",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-art73": {
+      "citation": "AI Act Art. 73",
+      "title": "Regulation (EU) 2024/1689, Art. 73: serious incident reports not later than 15 days after awareness (para 2), not later than 10 days in the event of death (para 4)",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-73",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aiact-art113": {
+      "citation": "AI Act Art. 113",
+      "title": "Regulation (EU) 2024/1689, Art. 113 as amended by Regulation (EU) 2026/1744: Annex III high-risk obligations from 2027-12-02, Art. 6(1) / Annex I from 2028-08-02",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-113",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Dates read on the Commission AI Act Service Desk consolidated text; the EUR-Lex text of 2026/1744 returned no content to the 2026-10-04 fetch."
+    },
+    "hipaa-164-514-b2": {
+      "citation": "45 CFR 164.514(b)(2)",
+      "title": "HIPAA Privacy Rule: safe-harbor de-identification, removal of identifiers (b)(2)(i)(A)-(R)",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-514.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "hipaa-164-502-b": {
+      "citation": "45 CFR 164.502(b)",
+      "title": "HIPAA Privacy Rule: minimum necessary standard for uses, disclosures and requests of protected health information",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-502.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "hipaa-164-504-e": {
+      "citation": "45 CFR 164.504(e)",
+      "title": "HIPAA Privacy Rule: standard for business associate contracts",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-504.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "hipaa-164-524-b2": {
+      "citation": "45 CFR 164.524(b)(2)",
+      "title": "HIPAA Privacy Rule: act on an individual's request for access no later than 30 days after receipt, one extension of up to 30 days with written notice",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-524.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "hipaa-164-312-b": {
+      "citation": "45 CFR 164.312(b)",
+      "title": "HIPAA Security Rule technical safeguards: audit controls that record and examine activity in systems containing electronic PHI",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-312.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "hipaa-164-312-e": {
+      "citation": "45 CFR 164.312(e)",
+      "title": "HIPAA Security Rule technical safeguards: transmission security for electronic PHI sent over a communications network",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-312.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "hipaa-164-404-b": {
+      "citation": "45 CFR 164.404(b)",
+      "title": "HIPAA Breach Notification Rule: notify individuals without unreasonable delay and no later than 60 calendar days after discovery",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title45-vol2/xml/CFR-2024-title45-vol2-sec164-404.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "sox-302": {
+      "citation": "SOX Sec. 302",
+      "title": "Sarbanes-Oxley Act of 2002, Pub. L. 107-204, Sec. 302 Corporate responsibility for financial reports",
+      "url": "https://www.govinfo.gov/content/pkg/PLAW-107publ204/html/PLAW-107publ204.htm",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Section heading confirmed; the section body was not quoted in the 2026-10-04 read."
+    },
+    "sox-404": {
+      "citation": "SOX Sec. 404",
+      "title": "Sarbanes-Oxley Act of 2002, Pub. L. 107-204, Sec. 404 Management assessment of internal controls",
+      "url": "https://www.govinfo.gov/content/pkg/PLAW-107publ204/html/PLAW-107publ204.htm",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Section heading confirmed; the section body was not quoted in the 2026-10-04 read."
+    },
+    "usc-18-1519": {
+      "citation": "18 U.S.C. 1519",
+      "title": "Destruction, alteration, or falsification of records in Federal investigations and bankruptcy",
+      "url": "https://www.govinfo.gov/content/pkg/USCODE-2023-title18/html/USCODE-2023-title18-partI-chap73-sec1519.htm",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "reg-fd": {
+      "citation": "17 CFR 243.100",
+      "title": "Regulation FD Rule 100: public disclosure when an issuer discloses material nonpublic information to enumerated persons (Release 33-7881, effective 2000-10-23)",
+      "url": "https://www.sec.gov/rules-regulations/2000/08/selective-disclosure-insider-trading",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Read on the SEC adopting-release page; the govinfo CFR section URL returned not-found on 2026-10-04."
+    },
+    "mifid-art25-2": {
+      "citation": "MiFID II Art. 25(2)",
+      "title": "Directive 2014/65/EU, Art. 25(2): for advice or portfolio management, obtain knowledge and experience, financial situation including ability to bear losses, and objectives including risk tolerance",
+      "url": "https://www.esma.europa.eu/publications-and-data/interactive-single-rulebook/mifid-ii/article-25-assessment-suitability-and",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "reg-bi": {
+      "citation": "17 CFR 240.15l-1",
+      "title": "SEC Regulation Best Interest (FR Doc. 2019-12164, effective 2019-09-10): care obligation to understand risks, rewards and costs and have a reasonable basis that a recommendation is in the retail customer's best interest",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2019-07-12/html/2019-12164.htm",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "fda-201-57-c1": {
+      "citation": "21 CFR 201.57(c)(1)",
+      "title": "Prescription drug labeling: boxed warning for serious warnings, headed WARNING, referring to Contraindications or Warnings and Precautions",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title21-vol4/xml/CFR-2024-title21-vol4-sec201-57.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "fda-202-1-e": {
+      "citation": "21 CFR 202.1(e)",
+      "title": "Prescription drug advertisements: no use outside approved labeling ((e)(4)(i)(a)) and fair balance of side effects and contraindications ((e)(5)(ii))",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title21-vol4/xml/CFR-2024-title21-vol4-sec202-1.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "fda-314-80-c1i": {
+      "citation": "21 CFR 314.80(c)(1)(i)",
+      "title": "Postmarketing 15-day alert reports: serious and unexpected adverse drug experiences no later than 15 calendar days from initial receipt",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title21-vol5/xml/CFR-2024-title21-vol5-sec314-80.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "fda-50-20": {
+      "citation": "21 CFR 50.20",
+      "title": "Protection of human subjects: no investigator may involve a human being as a subject without legally effective informed consent",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title21-vol1/xml/CFR-2024-title21-vol1-sec50-20.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "nhtsa-573-6-b": {
+      "citation": "49 CFR 573.6(b)",
+      "title": "Defect and noncompliance information report: submit not more than 5 working days after a defect is determined to be safety related",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title49-vol7/xml/CFR-2024-title49-vol7-sec573-6.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "unr156": {
+      "citation": "UN Regulation No 156",
+      "title": "UN Regulation No 156, software update and software update management system: updates protected against manipulation (7.1.3.1), authenticity and integrity protected (7.2.1.1), user informed before an update (7.2.2.2)",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:42021X0388",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "iso26262": {
+      "citation": "ISO 26262",
+      "title": "ISO 26262, road vehicles functional safety",
+      "url": "https://www.iso.org/standard/68383.html",
+      "status": "unknown",
+      "verified": false,
+      "reason": "iso.org returned HTTP 403 to the 2026-10-04 fetch; edition, status and clause content not confirmed."
+    },
+    "iso21448": {
+      "citation": "ISO 21448",
+      "title": "ISO 21448, road vehicles safety of the intended functionality (SOTIF)",
+      "url": "https://www.iso.org/standard/77490.html",
+      "status": "unknown",
+      "verified": false,
+      "reason": "iso.org returned HTTP 403 to the 2026-10-04 fetch; edition, status and clause content not confirmed."
+    },
+    "nis2-art23-4": {
+      "citation": "NIS2 Art. 23(4)",
+      "title": "Directive (EU) 2022/2555, Art. 23(4): early warning within 24 hours, incident notification within 72 hours, final report not later than one month after the incident notification",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32022L2555",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "gdpr-art33": {
+      "citation": "GDPR Art. 33",
+      "title": "Regulation (EU) 2016/679, Art. 33: notify the supervisory authority of a personal data breach within 72 hours unless unlikely to result in a risk to individuals",
+      "url": "https://www.edpb.europa.eu/sme-data-protection-guide/data-breaches_en",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Read on the EDPB guide, which cites Art. 33; the EUR-Lex HTML fetch of 2026-10-04 stopped at the recitals, so the article text itself was not read."
+    },
+    "gdpr-art35": {
+      "citation": "GDPR Art. 35",
+      "title": "Regulation (EU) 2016/679, Art. 35: data protection impact assessment before processing likely to result in a high risk",
+      "url": "https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/obligations_en",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Read on the European Commission obligations page, which cites Articles 35-36; the article text itself was not read."
+    },
+    "iso27001": {
+      "citation": "ISO/IEC 27001",
+      "title": "ISO/IEC 27001, information security management systems",
+      "url": "https://www.iso.org/standard/27001",
+      "status": "unknown",
+      "verified": false,
+      "reason": "iso.org returned HTTP 403 to the 2026-10-04 fetch; edition and Annex A control numbering not confirmed."
+    },
+    "soc2-tsc": {
+      "citation": "SOC 2 Trust Services Criteria",
+      "title": "AICPA SOC 2 examination of controls relevant to security, availability, processing integrity, confidentiality, or privacy",
+      "url": "https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Confirms the five criteria categories by publication title only; individual criteria (for example CC-series numbers) were not read."
+    },
+    "eo-14148": {
+      "citation": "Executive Order 14148",
+      "title": "Executive Order 14148 (2025-01-20), Initial Rescissions of Harmful Executive Orders and Actions; Sec. 2 item (ggg) revokes Executive Order 14110 of 2023-10-30",
+      "url": "https://www.govinfo.gov/content/pkg/FR-2025-01-28/html/2025-01901.htm",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "cac-genai-art12": {
+      "citation": "China Generative AI Interim Measures Art. 12",
+      "title": "Interim Measures for the Management of Generative AI Services (effective 2023-08-15), Art. 12: label generated images, video and similar content under the deep synthesis provisions",
+      "url": "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "cac-genai-art17": {
+      "citation": "China Generative AI Interim Measures Art. 17",
+      "title": "Interim Measures for the Management of Generative AI Services, Art. 17: services with public-opinion attributes or social-mobilisation capacity undergo security assessment and algorithm filing",
+      "url": "https://www.cac.gov.cn/2023-07/13/c_1690898327029107.htm",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "canada-c27": {
+      "citation": "Canada Bill C-27 (44-1)",
+      "title": "Canada, Bill C-27, Digital Charter Implementation Act 2022, including the Artificial Intelligence and Data Act",
+      "url": "https://www.parl.ca/legisinfo/en/bill/44-1/c-27",
+      "status": "unknown",
+      "verified": false,
+      "reason": "parl.ca returned HTTP 403 to the 2026-10-04 fetch; whether the bill received Royal Assent or lapsed was not confirmed in this run."
+    },
+    "brazil-pl2338": {
+      "citation": "Brazil PL 2338/2023",
+      "title": "Brazil, PL 2338/2023 (artificial intelligence): awaiting the rapporteur's opinion in the Chamber of Deputies special committee",
+      "url": "https://www.camara.leg.br/proposicoesWeb/fichadetramitacao?idProposicao=2487262",
+      "status": "pending",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Status read from the Chamber's bill page; the bill's risk classes were not read."
+    },
+    "nist-ai-rmf": {
+      "citation": "NIST AI 100-1",
+      "title": "NIST AI Risk Management Framework 1.0 (released 2023-01-26): GOVERN, MAP, MEASURE, MANAGE functions",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Voluntary framework; NIST states it is under revision. Subcategory text was not read."
+    },
+    "nist-ai-600-1": {
+      "citation": "NIST AI 600-1",
+      "title": "NIST AI 600-1, Generative Artificial Intelligence Profile (2024-07-26)",
+      "url": "https://www.nist.gov/publications/artificial-intelligence-risk-management-framework-generative-artificial-intelligence",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Publication identity and date confirmed; its risk list was not read from the publication page."
+    },
+    "iso42005": {
+      "citation": "ISO/IEC 42005",
+      "title": "ISO/IEC 42005, AI system impact assessment",
+      "url": "https://www.iso.org/standard/42005",
+      "status": "unknown",
+      "verified": false,
+      "reason": "iso.org returned HTTP 403 to the 2026-10-04 fetch; year, status and clause numbers not confirmed."
+    },
+    "frcp-37e": {
+      "citation": "FRCP 37(e)",
+      "title": "Federal Rules of Civil Procedure, Rule 37(e): failure to preserve electronically stored information",
+      "url": "https://www.govinfo.gov/content/pkg/USCODE-2023-title28/html/USCODE-2023-title28-app-federalru-dup1-rule37.htm",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "aba-rule-1-6": {
+      "citation": "ABA Model Rule 1.6",
+      "title": "ABA Model Rules of Professional Conduct, Rule 1.6 confidentiality of information",
+      "url": "https://www.americanbar.org/groups/professional_responsibility/publications/model_rules_of_professional_conduct/rule_1_6_confidentiality_of_information/",
+      "status": "unknown",
+      "verified": false,
+      "reason": "americanbar.org returned HTTP 403 to the 2026-10-04 fetch; rule text not read. Model Rules bind only as adopted by each jurisdiction."
+    },
+    "aba-rule-5-5": {
+      "citation": "ABA Model Rule 5.5",
+      "title": "ABA Model Rules of Professional Conduct, Rule 5.5 unauthorized practice of law",
+      "url": "https://www.americanbar.org/groups/professional_responsibility/publications/model_rules_of_professional_conduct/model_rules_of_professional_conduct_table_of_contents/",
+      "status": "unknown",
+      "verified": false,
+      "reason": "americanbar.org returned HTTP 403 to the 2026-10-04 fetch; rule text not read. Model Rules bind only as adopted by each jurisdiction."
+    },
+    "iec61508-1": {
+      "citation": "IEC 61508-1:2010",
+      "title": "IEC 61508-1:2010 ed. 2.0, functional safety of E/E/PE safety-related systems, Part 1 general requirements (stability date 2027)",
+      "url": "https://webstore.iec.ch/en/publication/5515",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Publication identity, edition and stability date confirmed on the IEC webstore; clause content is paywalled and was not read."
+    },
+    "osha-1910-119-j": {
+      "citation": "29 CFR 1910.119(j)",
+      "title": "OSHA process safety management of highly hazardous chemicals: mechanical integrity",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title29-vol5/xml/CFR-2024-title29-vol5-sec1910-119.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "osha-1910-119-l": {
+      "citation": "29 CFR 1910.119(l)",
+      "title": "OSHA process safety management: written procedures to manage changes (except replacements in kind) to process chemicals, technology, equipment and procedures",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title29-vol5/xml/CFR-2024-title29-vol5-sec1910-119.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "fcc-24-17": {
+      "citation": "FCC 24-17",
+      "title": "FCC 24-17 Declaratory Ruling, CG Docket 23-362 (adopted 2024-02-02): TCPA restrictions on artificial or prerecorded voice encompass AI technologies that generate human voices",
+      "url": "https://docs.fcc.gov/public/attachments/FCC-24-17A1.txt",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "tcpa-64-1200-a3": {
+      "citation": "47 CFR 64.1200(a)(3)",
+      "title": "TCPA rules: no artificial or prerecorded voice telemarketing calls to residential lines without prior express written consent",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title47-vol3/xml/CFR-2024-title47-vol3-sec64-1200.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "tcpa-64-1200-b1": {
+      "citation": "47 CFR 64.1200(b)(1)",
+      "title": "TCPA rules: an artificial or prerecorded voice message states clearly at the beginning the identity of the entity responsible for the call",
+      "url": "https://www.govinfo.gov/content/pkg/CFR-2024-title47-vol3/xml/CFR-2024-title47-vol3-sec64-1200.xml",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04"
+    },
+    "ntia-sbom": {
+      "citation": "NTIA SBOM Minimum Elements",
+      "title": "NTIA, The Minimum Elements For a Software Bill of Materials (SBOM), 2021-07-12",
+      "url": "https://www.ntia.gov/report/2021/minimum-elements-software-bill-materials-sbom",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Report identity and date confirmed; the enumerated data fields sit in the report PDF, which was not read."
+    },
+    "cra-reporting": {
+      "citation": "Regulation (EU) 2024/2847",
+      "title": "Cyber Resilience Act: manufacturers report actively exploited vulnerabilities, early warning within 24 hours and notification within 72 hours; reporting obligations apply from 2026-09-11",
+      "url": "https://digital-strategy.ec.europa.eu/en/policies/cra-reporting",
+      "status": "in-force",
+      "verified": true,
+      "retrievedAt": "2026-10-04",
+      "note": "Read on the Commission CRA reporting page, which does not name the article; dates read on the Commission CRA policy page."
+    },
+    "cra-annex1-sbom": {
+      "citation": "CRA Annex I Part II(1)",
+      "title": "Cyber Resilience Act, Annex I Part II point (1): identify and document vulnerabilities and components, including by drawing up a software bill of materials",
+      "url": "https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:32024R2847",
+      "status": "unknown",
+      "verified": false,
+      "reason": "The 2026-10-04 EUR-Lex read surfaced SBOM wording without confirming it sits in Annex I Part II; operative annex text not confirmed."
+    }
+  }
+}

@@ -1,0 +1,835 @@
+{
+  "schema": "amc-p125-checkpoint-owned-fixture/1",
+  "caseId": "CHECKPOINT-EVENT-CADENCE",
+  "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "workspace": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG",
+  "privateHome": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/home",
+  "noClockRowGateOrPolicyBypass": true,
+  "trustBoundary": "the signed own trust list and captured monitor pin are controlled fixture authority, not an independent production issuer",
+  "windowBoundary": "default-argument event cadence only; no elapsed-minute, Studio interval, session-seal or certificate qualification",
+  "environment": {
+    "helper": "scripts/clean-source-check.mjs#cleanSourceRuntimeEnvironment",
+    "privateHome": true,
+    "signingEnabled": true,
+    "storageOverrideAbsent": true,
+    "trustOverridesAbsent": true,
+    "loaderOverridesAbsent": true
+  },
+  "nativeBefore": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 542501039,
+    "nlink": 1
+  },
+  "trust": {
+    "mode": "pinned",
+    "signatureVerifiedListCount": 1,
+    "rootKeyId": "9bf2a231539c182b50921d3d5fc9eb3c0f474b9ff4d91cbd37a7633f5da0051e",
+    "monitorFingerprint": "4f2d1ac8b4ed3e74646d022406ca05cb43d75ae32dad7ef38c9902cc2115bf79",
+    "tsaLoaded": true,
+    "signedList": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/home/checkpoint-trust-list.json",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/home/checkpoint-trust-list.json",
+      "bytes": 1993,
+      "sha256": "b8fd7bca1381e009b9756e1a225692a82dc1158cc641fe4ac5016bed2c2238b3",
+      "dev": 16777231,
+      "inode": 543921271,
+      "nlink": 1
+    }
+  },
+  "defaultHome": {
+    "resolved": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/home/.config/amc",
+    "expected": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/home/.config/amc",
+    "overridesAbsent": true,
+    "noOptionsLoaderUsed": true,
+    "mode": "pinned",
+    "signatureVerifiedListCount": 1,
+    "listId": "p125-checkpoint-fixture",
+    "listEqualsOwnSignedList": true,
+    "explicitPinCount": 0,
+    "allowUnpinned": false,
+    "allowUnanchored": false,
+    "rootKeyId": "9bf2a231539c182b50921d3d5fc9eb3c0f474b9ff4d91cbd37a7633f5da0051e",
+    "tsaAnchorIds": [
+      "amc-p125-grant-test-root"
+    ],
+    "trustFiles": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/home/.config/amc/trust/amc-trust-list.json",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/home/.config/amc/trust/amc-trust-list.json",
+        "bytes": 1993,
+        "sha256": "b8fd7bca1381e009b9756e1a225692a82dc1158cc641fe4ac5016bed2c2238b3",
+        "dev": 16777231,
+        "inode": 543921275,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/home/.config/amc/trust/trust-roots.json",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-9vsvV1/home/.config/amc/trust/trust-roots.json",
+        "bytes": 136,
+        "sha256": "aa852fb618cb7496b01f9c286c74dd0f2f035b1048d98e4c0bbb3c4cd93ea25a",
+        "dev": 16777231,
+        "inode": 543921276,
+        "nlink": 1
+      }
+    ]
+  },
+  "initialLedger": {
+    "ok": true,
+    "chain": true,
+    "governance": true,
+    "anchored": true,
+    "errors": 0,
+    "seedEventId": "992dad4f-affb-48be-a30c-213bb969a9b3",
+    "sessionId": "bc14c774-2dd1-4fd0-bbfe-6ae45247c0bc",
+    "eventCount": 1
+  },
+  "eventCadence": {
+    "configured": {
+      "required": false,
+      "tsa": [
+        {
+          "name": "checkpoint-tsa",
+          "url": "http://127.0.0.1:49401/cadence-good",
+          "anchorIds": [
+            "amc-p125-grant-test-root"
+          ],
+          "reqPolicy": "1.2.3.4.1"
+        }
+      ],
+      "checkpoint": {
+        "everyEvents": 2
+      }
+    },
+    "loadedCheckpoint": {
+      "everyEvents": 2,
+      "everyMinutes": 15
+    },
+    "emptyTransparencyAnchors": [],
+    "defaultArgumentsOnly": true,
+    "noClockOrRowEdit": true,
+    "elapsedMinuteOrStudioCredit": false,
+    "configPin": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/amc.config.yaml",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/amc.config.yaml",
+      "bytes": 664,
+      "sha256": "fc12cab54679f3cf727fe42dfd1016434e71093bab9200ac0cba56377b14345d",
+      "dev": 16777231,
+      "inode": 543921277,
+      "nlink": 1
+    },
+    "stages": [
+      {
+        "id": "initial",
+        "result": {
+          "ran": true,
+          "anchors": []
+        },
+        "observedAtMs": 1792201780793,
+        "requestPaths": [
+          "/cadence-good"
+        ],
+        "events": [
+          {
+            "id": "992dad4f-affb-48be-a30c-213bb969a9b3",
+            "eventType": "audit",
+            "ts": 1792201780771,
+            "eventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+            }
+          },
+          {
+            "id": "e73ec8fe-071d-4b57-b131-870679ea07d6",
+            "eventType": "time/checkpoint",
+            "ts": 1792201780790,
+            "eventHash": "5177242e96ae8ec9ebcde665b087997cc94f0860a421bbe93351d67eed5a758e",
+            "meta": {
+              "checkpointSequence": 1,
+              "checkpointSha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1",
+              "tokenSha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf"
+            }
+          }
+        ],
+        "chain": [
+          {
+            "checkpoint": {
+              "type": "amc.ledger-checkpoint",
+              "version": 1,
+              "workspaceId": "default",
+              "sequence": 1,
+              "claimedAt": "2026-10-17T01:49:40.781Z",
+              "ledger": {
+                "headEventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+                "eventCount": 1
+              },
+              "transparency": {
+                "root": "3b1f786b3464bd146a7c5931a30341d92366dc7b412c2d64e9a9219bef5e4255",
+                "leafCount": 1,
+                "algorithm": "rfc9162-sha256"
+              },
+              "previousCheckpointSha256": null
+            },
+            "sha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1"
+          }
+        ],
+        "checkpointPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "bytes": 704,
+            "sha256": "0296854666e2c7a4ffe5671a4177d8c3085791f377d2615022f3c77c3836e49b",
+            "dev": 16777231,
+            "inode": 543921281,
+            "nlink": 1
+          }
+        ],
+        "tokenPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "bytes": 2298,
+            "sha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf",
+            "dev": 16777231,
+            "inode": 543921287,
+            "nlink": 1
+          }
+        ]
+      },
+      {
+        "id": "checkpoint-only",
+        "result": {
+          "ran": false,
+          "anchors": []
+        },
+        "observedAtMs": 1792201780804,
+        "requestPaths": [
+          "/cadence-good"
+        ],
+        "events": [
+          {
+            "id": "992dad4f-affb-48be-a30c-213bb969a9b3",
+            "eventType": "audit",
+            "ts": 1792201780771,
+            "eventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+            }
+          },
+          {
+            "id": "e73ec8fe-071d-4b57-b131-870679ea07d6",
+            "eventType": "time/checkpoint",
+            "ts": 1792201780790,
+            "eventHash": "5177242e96ae8ec9ebcde665b087997cc94f0860a421bbe93351d67eed5a758e",
+            "meta": {
+              "checkpointSequence": 1,
+              "checkpointSha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1",
+              "tokenSha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf"
+            }
+          }
+        ],
+        "chain": [
+          {
+            "checkpoint": {
+              "type": "amc.ledger-checkpoint",
+              "version": 1,
+              "workspaceId": "default",
+              "sequence": 1,
+              "claimedAt": "2026-10-17T01:49:40.781Z",
+              "ledger": {
+                "headEventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+                "eventCount": 1
+              },
+              "transparency": {
+                "root": "3b1f786b3464bd146a7c5931a30341d92366dc7b412c2d64e9a9219bef5e4255",
+                "leafCount": 1,
+                "algorithm": "rfc9162-sha256"
+              },
+              "previousCheckpointSha256": null
+            },
+            "sha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1"
+          }
+        ],
+        "checkpointPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "bytes": 704,
+            "sha256": "0296854666e2c7a4ffe5671a4177d8c3085791f377d2615022f3c77c3836e49b",
+            "dev": 16777231,
+            "inode": 543921281,
+            "nlink": 1
+          }
+        ],
+        "tokenPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "bytes": 2298,
+            "sha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf",
+            "dev": 16777231,
+            "inode": 543921287,
+            "nlink": 1
+          }
+        ]
+      },
+      {
+        "id": "one-new-audit",
+        "result": {
+          "ran": false,
+          "anchors": []
+        },
+        "observedAtMs": 1792201780808,
+        "requestPaths": [
+          "/cadence-good"
+        ],
+        "events": [
+          {
+            "id": "992dad4f-affb-48be-a30c-213bb969a9b3",
+            "eventType": "audit",
+            "ts": 1792201780771,
+            "eventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+            }
+          },
+          {
+            "id": "e73ec8fe-071d-4b57-b131-870679ea07d6",
+            "eventType": "time/checkpoint",
+            "ts": 1792201780790,
+            "eventHash": "5177242e96ae8ec9ebcde665b087997cc94f0860a421bbe93351d67eed5a758e",
+            "meta": {
+              "checkpointSequence": 1,
+              "checkpointSha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1",
+              "tokenSha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf"
+            }
+          },
+          {
+            "id": "b0e508fd-b96e-4144-bae0-499c55137e13",
+            "eventType": "audit",
+            "ts": 1792201780805,
+            "eventHash": "ceb609fc12fb59e4f01e5d215676c7ee26b4b511e2deeaa608e86da360403c20",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+              "fixtureLabel": "cadence-first-audit"
+            }
+          }
+        ],
+        "chain": [
+          {
+            "checkpoint": {
+              "type": "amc.ledger-checkpoint",
+              "version": 1,
+              "workspaceId": "default",
+              "sequence": 1,
+              "claimedAt": "2026-10-17T01:49:40.781Z",
+              "ledger": {
+                "headEventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+                "eventCount": 1
+              },
+              "transparency": {
+                "root": "3b1f786b3464bd146a7c5931a30341d92366dc7b412c2d64e9a9219bef5e4255",
+                "leafCount": 1,
+                "algorithm": "rfc9162-sha256"
+              },
+              "previousCheckpointSha256": null
+            },
+            "sha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1"
+          }
+        ],
+        "checkpointPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "bytes": 704,
+            "sha256": "0296854666e2c7a4ffe5671a4177d8c3085791f377d2615022f3c77c3836e49b",
+            "dev": 16777231,
+            "inode": 543921281,
+            "nlink": 1
+          }
+        ],
+        "tokenPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "bytes": 2298,
+            "sha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf",
+            "dev": 16777231,
+            "inode": 543921287,
+            "nlink": 1
+          }
+        ]
+      },
+      {
+        "id": "two-new-audits",
+        "result": {
+          "ran": true,
+          "anchors": []
+        },
+        "observedAtMs": 1792201780825,
+        "requestPaths": [
+          "/cadence-good",
+          "/cadence-good"
+        ],
+        "events": [
+          {
+            "id": "992dad4f-affb-48be-a30c-213bb969a9b3",
+            "eventType": "audit",
+            "ts": 1792201780771,
+            "eventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+            }
+          },
+          {
+            "id": "e73ec8fe-071d-4b57-b131-870679ea07d6",
+            "eventType": "time/checkpoint",
+            "ts": 1792201780790,
+            "eventHash": "5177242e96ae8ec9ebcde665b087997cc94f0860a421bbe93351d67eed5a758e",
+            "meta": {
+              "checkpointSequence": 1,
+              "checkpointSha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1",
+              "tokenSha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf"
+            }
+          },
+          {
+            "id": "b0e508fd-b96e-4144-bae0-499c55137e13",
+            "eventType": "audit",
+            "ts": 1792201780805,
+            "eventHash": "ceb609fc12fb59e4f01e5d215676c7ee26b4b511e2deeaa608e86da360403c20",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+              "fixtureLabel": "cadence-first-audit"
+            }
+          },
+          {
+            "id": "7838e4af-7631-474a-99c9-0694ea602bd3",
+            "eventType": "audit",
+            "ts": 1792201780809,
+            "eventHash": "c59275ff4219ccd399971f01fc771f28c0e814278c1003615acfc2a95376686f",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+              "fixtureLabel": "cadence-second-audit"
+            }
+          },
+          {
+            "id": "42346148-058e-4471-975f-d5b7af7160b1",
+            "eventType": "time/checkpoint",
+            "ts": 1792201780823,
+            "eventHash": "1ee3c3a56a0820d73caad0bd3e406135e27ff115355e99df46558ff1468ad974",
+            "meta": {
+              "checkpointSequence": 2,
+              "checkpointSha256": "5cb663f2e68180aeea4e5d5fee56bf9767f13fc38020a0000b95cbc25e53bef8",
+              "tokenSha256": "26c04ca9a48304ef5fbaa41ef2d753da7156012a3158bfab46abd461df9e4dd2"
+            }
+          }
+        ],
+        "chain": [
+          {
+            "checkpoint": {
+              "type": "amc.ledger-checkpoint",
+              "version": 1,
+              "workspaceId": "default",
+              "sequence": 1,
+              "claimedAt": "2026-10-17T01:49:40.781Z",
+              "ledger": {
+                "headEventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+                "eventCount": 1
+              },
+              "transparency": {
+                "root": "3b1f786b3464bd146a7c5931a30341d92366dc7b412c2d64e9a9219bef5e4255",
+                "leafCount": 1,
+                "algorithm": "rfc9162-sha256"
+              },
+              "previousCheckpointSha256": null
+            },
+            "sha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1"
+          },
+          {
+            "checkpoint": {
+              "type": "amc.ledger-checkpoint",
+              "version": 1,
+              "workspaceId": "default",
+              "sequence": 2,
+              "claimedAt": "2026-10-17T01:49:40.813Z",
+              "ledger": {
+                "headEventHash": "c59275ff4219ccd399971f01fc771f28c0e814278c1003615acfc2a95376686f",
+                "eventCount": 4
+              },
+              "transparency": {
+                "root": "3b1f786b3464bd146a7c5931a30341d92366dc7b412c2d64e9a9219bef5e4255",
+                "leafCount": 1,
+                "algorithm": "rfc9162-sha256"
+              },
+              "previousCheckpointSha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1"
+            },
+            "sha256": "5cb663f2e68180aeea4e5d5fee56bf9767f13fc38020a0000b95cbc25e53bef8"
+          }
+        ],
+        "checkpointPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "bytes": 704,
+            "sha256": "0296854666e2c7a4ffe5671a4177d8c3085791f377d2615022f3c77c3836e49b",
+            "dev": 16777231,
+            "inode": 543921281,
+            "nlink": 1
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/2.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/2.json",
+            "bytes": 766,
+            "sha256": "9b784b0bde172c7f2d0e1b2aa5ce051b7df15d3cf0d67ab6f0d5b16e20ddfd5b",
+            "dev": 16777231,
+            "inode": 543921291,
+            "nlink": 1
+          }
+        ],
+        "tokenPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "bytes": 2298,
+            "sha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf",
+            "dev": 16777231,
+            "inode": 543921287,
+            "nlink": 1
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/2.tsr",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/2.tsr",
+            "bytes": 2298,
+            "sha256": "26c04ca9a48304ef5fbaa41ef2d753da7156012a3158bfab46abd461df9e4dd2",
+            "dev": 16777231,
+            "inode": 543921297,
+            "nlink": 1
+          }
+        ]
+      },
+      {
+        "id": "reset",
+        "result": {
+          "ran": false,
+          "anchors": []
+        },
+        "observedAtMs": 1792201780834,
+        "requestPaths": [
+          "/cadence-good",
+          "/cadence-good"
+        ],
+        "events": [
+          {
+            "id": "992dad4f-affb-48be-a30c-213bb969a9b3",
+            "eventType": "audit",
+            "ts": 1792201780771,
+            "eventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE"
+            }
+          },
+          {
+            "id": "e73ec8fe-071d-4b57-b131-870679ea07d6",
+            "eventType": "time/checkpoint",
+            "ts": 1792201780790,
+            "eventHash": "5177242e96ae8ec9ebcde665b087997cc94f0860a421bbe93351d67eed5a758e",
+            "meta": {
+              "checkpointSequence": 1,
+              "checkpointSha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1",
+              "tokenSha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf"
+            }
+          },
+          {
+            "id": "b0e508fd-b96e-4144-bae0-499c55137e13",
+            "eventType": "audit",
+            "ts": 1792201780805,
+            "eventHash": "ceb609fc12fb59e4f01e5d215676c7ee26b4b511e2deeaa608e86da360403c20",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+              "fixtureLabel": "cadence-first-audit"
+            }
+          },
+          {
+            "id": "7838e4af-7631-474a-99c9-0694ea602bd3",
+            "eventType": "audit",
+            "ts": 1792201780809,
+            "eventHash": "c59275ff4219ccd399971f01fc771f28c0e814278c1003615acfc2a95376686f",
+            "meta": {
+              "fixtureCase": "CHECKPOINT-EVENT-CADENCE",
+              "fixtureLabel": "cadence-second-audit"
+            }
+          },
+          {
+            "id": "42346148-058e-4471-975f-d5b7af7160b1",
+            "eventType": "time/checkpoint",
+            "ts": 1792201780823,
+            "eventHash": "1ee3c3a56a0820d73caad0bd3e406135e27ff115355e99df46558ff1468ad974",
+            "meta": {
+              "checkpointSequence": 2,
+              "checkpointSha256": "5cb663f2e68180aeea4e5d5fee56bf9767f13fc38020a0000b95cbc25e53bef8",
+              "tokenSha256": "26c04ca9a48304ef5fbaa41ef2d753da7156012a3158bfab46abd461df9e4dd2"
+            }
+          }
+        ],
+        "chain": [
+          {
+            "checkpoint": {
+              "type": "amc.ledger-checkpoint",
+              "version": 1,
+              "workspaceId": "default",
+              "sequence": 1,
+              "claimedAt": "2026-10-17T01:49:40.781Z",
+              "ledger": {
+                "headEventHash": "d2ff45f36763e8acdb47f2e16d58bf74b2177007aa490e602e5bb1bb3c63444f",
+                "eventCount": 1
+              },
+              "transparency": {
+                "root": "3b1f786b3464bd146a7c5931a30341d92366dc7b412c2d64e9a9219bef5e4255",
+                "leafCount": 1,
+                "algorithm": "rfc9162-sha256"
+              },
+              "previousCheckpointSha256": null
+            },
+            "sha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1"
+          },
+          {
+            "checkpoint": {
+              "type": "amc.ledger-checkpoint",
+              "version": 1,
+              "workspaceId": "default",
+              "sequence": 2,
+              "claimedAt": "2026-10-17T01:49:40.813Z",
+              "ledger": {
+                "headEventHash": "c59275ff4219ccd399971f01fc771f28c0e814278c1003615acfc2a95376686f",
+                "eventCount": 4
+              },
+              "transparency": {
+                "root": "3b1f786b3464bd146a7c5931a30341d92366dc7b412c2d64e9a9219bef5e4255",
+                "leafCount": 1,
+                "algorithm": "rfc9162-sha256"
+              },
+              "previousCheckpointSha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1"
+            },
+            "sha256": "5cb663f2e68180aeea4e5d5fee56bf9767f13fc38020a0000b95cbc25e53bef8"
+          }
+        ],
+        "checkpointPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.json",
+            "bytes": 704,
+            "sha256": "0296854666e2c7a4ffe5671a4177d8c3085791f377d2615022f3c77c3836e49b",
+            "dev": 16777231,
+            "inode": 543921281,
+            "nlink": 1
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/2.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/2.json",
+            "bytes": 766,
+            "sha256": "9b784b0bde172c7f2d0e1b2aa5ce051b7df15d3cf0d67ab6f0d5b16e20ddfd5b",
+            "dev": 16777231,
+            "inode": 543921291,
+            "nlink": 1
+          }
+        ],
+        "tokenPins": [
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/1.tsr",
+            "bytes": 2298,
+            "sha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf",
+            "dev": 16777231,
+            "inode": 543921287,
+            "nlink": 1
+          },
+          {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/2.tsr",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/time/checkpoints/2.tsr",
+            "bytes": 2298,
+            "sha256": "26c04ca9a48304ef5fbaa41ef2d753da7156012a3158bfab46abd461df9e4dd2",
+            "dev": 16777231,
+            "inode": 543921297,
+            "nlink": 1
+          }
+        ]
+      }
+    ],
+    "independentGrants": [
+      {
+        "genTime": "2026-10-17T01:49:40.000Z",
+        "accuracyMs": null,
+        "digest": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1",
+        "anchorId": "amc-p125-grant-test-root",
+        "signerCertSha256": "1486f27602681637db17551c6e09fe6ef4bc6b4d4f977770eeb12ecbc4e3681d",
+        "tokenSha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf",
+        "revocationChecked": false
+      },
+      {
+        "genTime": "2026-10-17T01:49:40.000Z",
+        "accuracyMs": null,
+        "digest": "5cb663f2e68180aeea4e5d5fee56bf9767f13fc38020a0000b95cbc25e53bef8",
+        "anchorId": "amc-p125-grant-test-root",
+        "signerCertSha256": "1486f27602681637db17551c6e09fe6ef4bc6b4d4f977770eeb12ecbc4e3681d",
+        "tokenSha256": "26c04ca9a48304ef5fbaa41ef2d753da7156012a3158bfab46abd461df9e4dd2",
+        "revocationChecked": false
+      }
+    ],
+    "firstLedger": {
+      "ok": true,
+      "chain": true,
+      "governance": true,
+      "anchored": true,
+      "errors": 0
+    },
+    "oneEventBeforeTick": {
+      "firstAuditId": "b0e508fd-b96e-4144-bae0-499c55137e13",
+      "afterHeadIds": [
+        "e73ec8fe-071d-4b57-b131-870679ea07d6",
+        "b0e508fd-b96e-4144-bae0-499c55137e13"
+      ],
+      "afterHeadTypes": [
+        "time/checkpoint",
+        "audit"
+      ]
+    },
+    "twoEventsBeforeTick": {
+      "secondAuditId": "7838e4af-7631-474a-99c9-0694ea602bd3",
+      "afterHeadIds": [
+        "e73ec8fe-071d-4b57-b131-870679ea07d6",
+        "b0e508fd-b96e-4144-bae0-499c55137e13",
+        "7838e4af-7631-474a-99c9-0694ea602bd3"
+      ],
+      "afterHeadTypes": [
+        "time/checkpoint",
+        "audit",
+        "audit"
+      ]
+    },
+    "final": {
+      "signaturesValid": true,
+      "oldFilesUnchanged": true,
+      "configUnchanged": true,
+      "checkpointRows": [
+        {
+          "id": "e73ec8fe-071d-4b57-b131-870679ea07d6",
+          "eventHash": "5177242e96ae8ec9ebcde665b087997cc94f0860a421bbe93351d67eed5a758e",
+          "meta": {
+            "checkpointSequence": 1,
+            "checkpointSha256": "eee18a0e68b206c036175ccd9ddcf9745521c2e5b2a6b4a1014b95cd31afe0d1",
+            "tokenSha256": "d6ff0ef1e86e317aef2e2e9b80ea8a50d3c627729304f666055e9573655b75bf"
+          }
+        },
+        {
+          "id": "42346148-058e-4471-975f-d5b7af7160b1",
+          "eventHash": "1ee3c3a56a0820d73caad0bd3e406135e27ff115355e99df46558ff1468ad974",
+          "meta": {
+            "checkpointSequence": 2,
+            "checkpointSha256": "5cb663f2e68180aeea4e5d5fee56bf9767f13fc38020a0000b95cbc25e53bef8",
+            "tokenSha256": "26c04ca9a48304ef5fbaa41ef2d753da7156012a3158bfab46abd461df9e4dd2"
+          }
+        }
+      ],
+      "ledger": {
+        "ok": true,
+        "chain": true,
+        "governance": true,
+        "anchored": true,
+        "errors": 0
+      }
+    }
+  },
+  "ownedGuardCloseInvoked": true,
+  "poolBeforeClose": {
+    "key": "ledger:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG:/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/evidence.sqlite",
+    "dbPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-c4ISPG/.amc/evidence.sqlite",
+    "maxSize": 4,
+    "idle": 1,
+    "active": 0,
+    "pooledConnections": 1,
+    "initialized": true
+  },
+  "poolClosed": true,
+  "vaultLocked": true,
+  "immutableInputCount": 5,
+  "immutableInputsUnchanged": true,
+  "nativeAfter": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 542501039,
+    "nlink": 1
+  },
+  "nativeUnchanged": true,
+  "environmentRestored": true,
+  "ledgerOwners": [
+    {
+      "readonly": false,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": false,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": false,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    },
+    {
+      "readonly": true,
+      "closeAttempted": true,
+      "closed": true
+    }
+  ],
+  "bodyFailed": false,
+  "bodyErrorName": null,
+  "cleanupErrorNames": []
+}

@@ -1,0 +1,5 @@
+The B39 auditor rebind has no concrete static blocker. Both active files equal the reviewed originals with only B39 namespace, p125ec phase/schema and four actual old-window line-location replacements. Both full unified patches were reproduced exactly. The V2 conditional signer equality and all corpus, guard, resource, privacy and partial-failure rules remain unchanged.
+
+All 161 current protected inputs and 11 native binaries match their byte and physical pins. Only the admitted checkpoint test differs from the initial pinset; the other 160 entries remain exact. The preserved three-case block is contiguous and byte exact, shifted by 29 setup/import lines. All six recorded window and cadence witness locations match actual source text.
+
+This is a finite static review. No helper, product, parser, compiler, native binary or network operation was executed, and no source, index, QA or reservation was changed. No source/fresh/control success or whole P1-25/plan completion is claimed. The prior first-head observation limit, held decisions, F37 skip and unchanged quality/freeze checks remain in force. A harmless guessed prior README lookup is retained in the report.

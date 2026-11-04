@@ -1,0 +1,743 @@
+{
+  "schema": "p111-root-actual-receipt-inputs/1",
+  "at": "2026-10-16T19:43:35.080443+00:00",
+  "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+  "environment": {
+    "node": "v22.23.3",
+    "pnpm": "10.33.0",
+    "os": "darwin 25.6.0",
+    "arch": "arm64"
+  },
+  "phases": [
+    "p111-pre-d15",
+    "p111-pre-freeze",
+    "p111-unchanged-compliance",
+    "p111-duplicates-before",
+    "p111-dead-code-before",
+    "p111-node-version",
+    "p111-pnpm-version",
+    "p111-source-combined",
+    "p111-test-types",
+    "p111-counts-before",
+    "p111-counts-d15",
+    "p111-gen-counts",
+    "p111-source-types",
+    "p111-lint",
+    "p111-build",
+    "p111-counts-after",
+    "p111-gates",
+    "p111-threat-model",
+    "p111-architecture",
+    "p111-docs",
+    "p111-freeze",
+    "p111-duplicates-after",
+    "p111-dead-code-after",
+    "p111-fresh-clean-source",
+    "p111-fresh-canonical",
+    "p111-m1",
+    "p111-m1-restored",
+    "p111-m2",
+    "p111-m2-restored",
+    "p111-m3",
+    "p111-m3-restored",
+    "p111-m4",
+    "p111-m4-restored",
+    "p111-q-counts",
+    "p111-q-gates",
+    "p111-q-freeze",
+    "p111-metadata-d15"
+  ],
+  "artifacts": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/branch-adoption.json",
+      "bytes": 479,
+      "sha256": "f1ed7386c399af4406d2f500385143d98f52017246d58fb993b2fbc8654e44c2",
+      "target": "evidence/branch-adoption.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/root-preparation-review.json",
+      "bytes": 3104,
+      "sha256": "06910e16311ee1d6cb1e7f497f5249b7e618083b2424e0c01ce7de2705bafc2c",
+      "target": "evidence/root-preparation-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/protected-inputs.json",
+      "bytes": 22734,
+      "sha256": "a3d71aa9da0787f6ab47993a5e5c12daa87c28f66b5c9f3c3bf04ad39906c3ad",
+      "target": "evidence/protected-inputs.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/held-archive-current-check.json",
+      "bytes": 1365,
+      "sha256": "07c760b4f286c33b16621e479ab9509a8ff641f4a9454f96f24d2b4c4fa0ff54",
+      "target": "evidence/held-archive-current-check.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/hosted-path-admission.json",
+      "bytes": 10729,
+      "sha256": "15501de681e9157dcc3492625123848aaf9adca4ed1fdbb97e1e72ff37cbebb5",
+      "target": "evidence/hosted-path-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/hosted-counts-admission.json",
+      "bytes": 10963,
+      "sha256": "0292fa5c83cc07bc34382eda6439bfdf654e00dd04580068fcb4913905c35726",
+      "target": "evidence/hosted-counts-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/hosted-metadata-admission.json",
+      "bytes": 11048,
+      "sha256": "4734cde96fa334402d8e7d201ee31ca6d108aa74399d760b9ae5ac67adf397fe",
+      "target": "evidence/hosted-metadata-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-path-allocation.json",
+      "bytes": 1126,
+      "sha256": "2be2f1e35425a6260792decb5f262093b209d1c080b9ba66eb504738f7809e48",
+      "target": "evidence/source-path-allocation.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-materialization.json",
+      "bytes": 359,
+      "sha256": "764dc457c2d72bcf18bdbb516292a8eb9db654f0ce79a964321ba29184003a0f",
+      "target": "evidence/test-materialization.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/count-surface-allocation.json",
+      "bytes": 18412,
+      "sha256": "8ccd16260ac57acb5d91164d0348072087bf76659735f31afeef5e1c83016950",
+      "target": "evidence/count-surface-allocation.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/count-surface-actual.json",
+      "bytes": 599,
+      "sha256": "c7c5d299325584d8c25265a08ad3112be1876efbe7f55ffc5ad880d26385bca7",
+      "target": "evidence/count-surface-actual.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-precommit-review.json",
+      "bytes": 1805,
+      "sha256": "92993a6125b98ff1d3288e6cf90ea5de49598b155ba1acfa87d3b9c57df01997",
+      "target": "evidence/source-precommit-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-stage.json",
+      "bytes": 1313,
+      "sha256": "123745082d58db3d0a4d90060588e314aee191b3878c0de969548d3202c357cc",
+      "target": "evidence/source-stage.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-commit.json",
+      "bytes": 525,
+      "sha256": "d1dc3be09c3767b54f005c5944d894b1e3f5900c6e2591a7d7ece4ea26a558b2",
+      "target": "evidence/source-commit.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/fresh-source-binding.json",
+      "bytes": 12542,
+      "sha256": "89e8734b770944694a955933d589815c7cbae8036c7c17d75e57be94b85f3f9f",
+      "target": "evidence/fresh-source-binding.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/controls-admission.json",
+      "bytes": 1193,
+      "sha256": "60bf0e988350bfd6b9e88e0732e657bd2ad844bd6d07186b8f7c7eb05bae265e",
+      "target": "evidence/controls-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/control-chain-summary.json",
+      "bytes": 29533,
+      "sha256": "989e65b9de3f90ef54cc4625ff7abd3cefd5640e271399babf95917f1c5989cc",
+      "target": "evidence/control-chain-summary.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/after-m1-root-physical-check.json",
+      "bytes": 579,
+      "sha256": "cc0f6dc6343aaf95898adb9ddc10cd60a08a5f80df5f4fdc9ab4e35fe5567415",
+      "target": "evidence/after-m1-root-physical-check.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/preservation-after-m2.json",
+      "bytes": 480,
+      "sha256": "e455051d4e9c504c2abda1403f1818b6bf55f7cb36cdeb7ca2734bbeefa7136a",
+      "target": "evidence/preservation-after-m2.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/preservation-after-m3.json",
+      "bytes": 480,
+      "sha256": "ee94460dff6540a28486123f0601043b43087c054a7e25a793b344021e439266",
+      "target": "evidence/preservation-after-m3.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/preservation-final.json",
+      "bytes": 477,
+      "sha256": "87c6c302a5e9502af96f3e2a4578ad62538c66344014b557c175085668b3671d",
+      "target": "evidence/preservation-final.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/whole-issue-gaps.json",
+      "bytes": 2614,
+      "sha256": "3380cde510da30880028ff8525433878ebfd0b1437d32e02d7c757ef845d0877",
+      "target": "evidence/whole-issue-gaps.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/final-notes.json",
+      "bytes": 4038,
+      "sha256": "985364ccb0481e6d73685d92e80fd5aa513c84afb938700e0b42b21ba247a240",
+      "target": "evidence/final-notes.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/audit-observed.py",
+      "bytes": 1563,
+      "sha256": "0dba87ddc237745f890e9ee51ba64a582c76ee3983a42bc0897881249ddf6e6f",
+      "target": "evidence/audit-observed.py",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-control.py",
+      "bytes": 3766,
+      "sha256": "0e236ab0e15df6b0cbde43fab2a5050c531b0d10a9c0e1e315dcc8906adf1eac",
+      "target": "evidence/source-control.py",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/check-preservation.py",
+      "bytes": 2760,
+      "sha256": "93e351f280569fde63620db7fae338ecc1033951f8f4d5c3bd4ddbce706054a5",
+      "target": "evidence/check-preservation.py",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-fresh-canonical-outcome.json",
+      "bytes": 16127,
+      "sha256": "272cec957ed0c817de1a0b68a9e3258506a043051dd88adcb1b9c228898454bc",
+      "target": "evidence/p111-fresh-canonical-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-m1-outcome.json",
+      "bytes": 18753,
+      "sha256": "fae62973ea8eac1a9a9186800292ca0f613d81b5e81b6d49ff275e9992dea177",
+      "target": "evidence/p111-m1-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-m1-restored-outcome.json",
+      "bytes": 16119,
+      "sha256": "7746522b41f240452e08a673befce86d02c9ebc7a53b047448a09111be58d917",
+      "target": "evidence/p111-m1-restored-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-m2-outcome.json",
+      "bytes": 18747,
+      "sha256": "0531b4e494ec8e0764474c6374fa789847d5134a27d62f8eeba91b32e9199563",
+      "target": "evidence/p111-m2-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-m2-restored-outcome.json",
+      "bytes": 16119,
+      "sha256": "ae7536733bf91b6dbea2f10523370cb9bd7497000dc2e378a50ed1666a1dafea",
+      "target": "evidence/p111-m2-restored-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-m3-outcome.json",
+      "bytes": 18353,
+      "sha256": "1238eac5e3794b4be600e8fb9ffcc86c7104c1d5a66194f3610784cd5ece5888",
+      "target": "evidence/p111-m3-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-m3-restored-outcome.json",
+      "bytes": 16119,
+      "sha256": "ecc241baffe1c92d2cb84005ef6c7fbff692cb00747447f198616b9612a648a3",
+      "target": "evidence/p111-m3-restored-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-m4-outcome.json",
+      "bytes": 23724,
+      "sha256": "f130c004bc0f87a2a023b7610a0c99f1426f23d6e7dd4d758b1aee7ce185a5fe",
+      "target": "evidence/p111-m4-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-m4-restored-outcome.json",
+      "bytes": 16119,
+      "sha256": "4541e237f62dc4703a51c1320885891547f6fd4952724156c66b0bcb33b331da",
+      "target": "evidence/p111-m4-restored-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-source-combined-outcome.json",
+      "bytes": 16095,
+      "sha256": "b65711f52075a58b462a35af6e68de1d9a02ccf83b84c8d539d4eab70b498140",
+      "target": "evidence/p111-source-combined-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/p111-unchanged-compliance-outcome.json",
+      "bytes": 11110,
+      "sha256": "1f0e8f25ac804be2337db30c7da721e556f57c2d41b513c1e2b94e06afc7c2b0",
+      "target": "evidence/p111-unchanged-compliance-outcome.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m1-apply.json",
+      "bytes": 684,
+      "sha256": "6bb345ef958c5379aebf17be50f6dbc795d63410001b3f9742293547b727d4e3",
+      "target": "evidence/m1-apply.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m1-restore.json",
+      "bytes": 524,
+      "sha256": "d2285b1be6531cac6e213ddadd5892b994cd95a5cb0d256efddf3cc7ec311ec2",
+      "target": "evidence/m1-restore.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m1-original.ts",
+      "bytes": 6419,
+      "sha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "target": "evidence/m1-original.ts",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m1.patch",
+      "bytes": 1092,
+      "sha256": "b05f883f03b867d8ebea85acaa734fde38a9513e488119f5cb2da3ec455713f4",
+      "target": "evidence/m1.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m2-apply.json",
+      "bytes": 676,
+      "sha256": "70495125668a9b658f62b38100d5f1ac71a54b3536b7c2e8ef0d34e049cfbc2a",
+      "target": "evidence/m2-apply.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m2-restore.json",
+      "bytes": 516,
+      "sha256": "b74caf20fc7e4b28ee20e101da119078f82c1b6ea233e6a189fd5dae76ed5c6f",
+      "target": "evidence/m2-restore.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m2-original.ts",
+      "bytes": 6419,
+      "sha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "target": "evidence/m2-original.ts",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m2.patch",
+      "bytes": 928,
+      "sha256": "3b3e5a398f4c32d2983c3d0d681cfdad6216fdf8e5f7cfb329b2ac703aa97f21",
+      "target": "evidence/m2.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m3-apply.json",
+      "bytes": 692,
+      "sha256": "70b69ce04f82b528ba08445310df5a62c46058c63ea3a3316180babfcefcef27",
+      "target": "evidence/m3-apply.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m3-restore.json",
+      "bytes": 532,
+      "sha256": "bcde42b5f2b2860e504a587e97a96224ba4047eca1b88958d5ab71b5f2098338",
+      "target": "evidence/m3-restore.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m3-original.ts",
+      "bytes": 6419,
+      "sha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "target": "evidence/m3-original.ts",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m3.patch",
+      "bytes": 1006,
+      "sha256": "17fc2f58283f834d330b21761d8ae65a3c5f3f0f876a42a37fecb26fdda6412d",
+      "target": "evidence/m3.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m4-apply.json",
+      "bytes": 673,
+      "sha256": "df4f07b957549b5803b2e15a8275d33fba5b4de77518d57b4fe270274b02030b",
+      "target": "evidence/m4-apply.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m4-restore.json",
+      "bytes": 513,
+      "sha256": "9bd6054915c3efc472cb8e03ab4d41820e9bd8da1ef3c8ac8a11bb8ad505c558",
+      "target": "evidence/m4-restore.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m4-original.ts",
+      "bytes": 6419,
+      "sha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "target": "evidence/m4-original.ts",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/m4.patch",
+      "bytes": 918,
+      "sha256": "866d12374b9b76973911420512cd61f1c9929e28eea57b5be7ff3c0b0f45618b",
+      "target": "evidence/m4.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/README.md",
+      "bytes": 1578,
+      "sha256": "f83eaff83d022f747f7e65a4611103463d088fb9fea7b54dd2f4e9ed59666ffe",
+      "target": "evidence/scope-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/README-v2.md",
+      "bytes": 1589,
+      "sha256": "b909fd5ad98b2be68f46523fd4f8898e2b74541a7fabdc217f78bd339d1be8c7",
+      "target": "evidence/scope-review/README-v2.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/review.json",
+      "bytes": 5096,
+      "sha256": "a74fb8571a1ef4ca8a6a554582dec720f0dbb43518e0658a71cbac39634b7405",
+      "target": "evidence/scope-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/pins.json",
+      "bytes": 2064,
+      "sha256": "3249a71d265c4d532c3ab0627465c12474f52c38457dc67af2ffa6b627da5639",
+      "target": "evidence/scope-review/pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/seal.json",
+      "bytes": 1237,
+      "sha256": "ca06c88ba3695dd3781ecf84315d02a697a4a57af766a7b4eacd5f9d24ed086a",
+      "target": "evidence/scope-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/readme-v2-seal.json",
+      "bytes": 615,
+      "sha256": "b8aa288d295d325efb9198a212bebb7d2f252c83e6b338803d79a93bd5ff5e95",
+      "target": "evidence/scope-review/readme-v2-seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/pending-reservation-entry.md",
+      "bytes": 1615,
+      "sha256": "f14c853219f5a3beb026d5a76433c4df69b3db9f11c1b20f7705908f029faead",
+      "target": "evidence/scope-review/pending-reservation-entry.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/README.md",
+      "bytes": 2701,
+      "sha256": "3b07e3d5d637cdeb63eb3a8b586d8ffc1cc9907b2b3e8912852448fafe57e42c",
+      "target": "evidence/test-design/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/author-review.json",
+      "bytes": 1118,
+      "sha256": "9151e5d9b9422cc66f32316185fa40a249e8e06c5ec933815f5e1c707e616908",
+      "target": "evidence/test-design/author-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/matrix.json",
+      "bytes": 5136,
+      "sha256": "a1151b50c0b48121742f8d066b5fd5024d690b6242cef80d9e0a196a341c8886",
+      "target": "evidence/test-design/matrix.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/input-pins.json",
+      "bytes": 13264,
+      "sha256": "490b23fcf6fee3f7441f20c041cdaf7fef44081dbac7a4932ba8882f1d886f08",
+      "target": "evidence/test-design/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/seal.json",
+      "bytes": 2993,
+      "sha256": "af4aed4f6e0bf5350f5595c9b8cbc7599103e7e19ccc86b8fe2b5457e3d91f96",
+      "target": "evidence/test-design/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/README.md",
+      "bytes": 821,
+      "sha256": "bed3bec5e05e6424cc6e700fb8d1bc14d3af2811d54f6063d5d06e7c0d4cbd34",
+      "target": "evidence/test-design/v2/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/author-review.json",
+      "bytes": 406,
+      "sha256": "c52872928b71b86a7f5b830dd6cf74210fda8fe24585cc124d3b9065cfd30eeb",
+      "target": "evidence/test-design/v2/author-review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/input-pins.json",
+      "bytes": 14638,
+      "sha256": "ef2f5135c82f7c5da3324c27734a3d958e8d969768dad836d2d9df9ee1a3b30e",
+      "target": "evidence/test-design/v2/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/seal.json",
+      "bytes": 3065,
+      "sha256": "865577aaab4792ec15edbbe1adcd7b2ab49cb176d89093b9e9364607d7e4ec68",
+      "target": "evidence/test-design/v2/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/v1-v2.patch",
+      "bytes": 982,
+      "sha256": "6a03306f4b868db47fb1664cf9affe4a5d7e85aa9f4c405c8a8fc7baa341f0cd",
+      "target": "evidence/test-design/v2/v1-v2.patch",
+      "envelope": true
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/README.md",
+      "bytes": 1861,
+      "sha256": "3afa67ea6d28ef035ea2081131ed85608a1bcc3020781378a40a220e0a8a6fea",
+      "target": "evidence/contract-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/review.json",
+      "bytes": 11004,
+      "sha256": "c9ac4e114c8a7d62e02c3b0fbf5d133ad3e2b08db057677395d5d0cb17321c74",
+      "target": "evidence/contract-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/controls.json",
+      "bytes": 5322,
+      "sha256": "059651d3ccf2e21f9142d968a164c48bd9736259f006acb23e4613972a499ca0",
+      "target": "evidence/contract-review/controls.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/input-pins.json",
+      "bytes": 7272,
+      "sha256": "055bb71136b5600c31a160899c21db09837413dd97dee68975005b22c5696336",
+      "target": "evidence/contract-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/seal.json",
+      "bytes": 1148,
+      "sha256": "085ea9c526b1103df40751c87b8192ab5d0e4bc3b22578878e01827c12980131",
+      "target": "evidence/contract-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/candidate-v2/README.md",
+      "bytes": 942,
+      "sha256": "80539c936a1c543b046f129fc37a10f58f40ed3b958bf2e56b0b88d7c7b964c1",
+      "target": "evidence/contract-review/candidate-v2/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/candidate-v2/review.json",
+      "bytes": 6451,
+      "sha256": "15c905b0d661247f9f97a06d3d7425c0ff98154ff71e5936f492dffb8e7f6c23",
+      "target": "evidence/contract-review/candidate-v2/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/candidate-v2/input-pins.json",
+      "bytes": 9825,
+      "sha256": "87afe3dc35cc9cfd2183ce103d072e907cb4d1ddfd0bed13966e9df0f538b713",
+      "target": "evidence/contract-review/candidate-v2/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/contract-review/candidate-v2/seal.json",
+      "bytes": 901,
+      "sha256": "e4b7b5a2fea5b91db939daeb84d7738a648e7ad3cf8b5a54b63fe38de6c12ee2",
+      "target": "evidence/contract-review/candidate-v2/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/README.md",
+      "bytes": 1520,
+      "sha256": "75ef29be612411e9165342c0730e1f719ac1481769eed40d6db9256acecce2da",
+      "target": "evidence/source-run-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/review.json",
+      "bytes": 4435,
+      "sha256": "d19408b5a1fcca47cdad2c1a2f42320b0fce1f9531f940525ef1c966546b80b6",
+      "target": "evidence/source-run-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/pins.json",
+      "bytes": 56249,
+      "sha256": "e825fd4529739938467bbbaa8f8f364739373c000d7cb1dad14ae38cfc139e2d",
+      "target": "evidence/source-run-review/pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-run-review/seal.json",
+      "bytes": 2311,
+      "sha256": "c86f43e70c027bf9257f2157d5c094001dbd8eeff40de4baf379c7222b95f9aa",
+      "target": "evidence/source-run-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/receipt-assembler-static-review/review.json",
+      "bytes": 2395,
+      "sha256": "7bf37241497f7763ba8a96eeb2ca192ea7e999b48400e3fce6f31b2719d30322",
+      "target": "evidence/receipt-assembler-static-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/receipt-assembler-static-review/input-pins.json",
+      "bytes": 794,
+      "sha256": "eada8522d2067ed5ae7740c86e1df46ba19d0d4a052439961733cbad505150fe",
+      "target": "evidence/receipt-assembler-static-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/receipt-assembler-static-review/seal.json",
+      "bytes": 684,
+      "sha256": "83c314db382be2491050cc98e1022153abddcc7cfcb2fe7cf8f8fba548ab10cf",
+      "target": "evidence/receipt-assembler-static-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-control-static-review/README.md",
+      "bytes": 411,
+      "sha256": "225d42676167ce78ea650b1b28e3aed2ca1ec4e7f902c45346b750db8b101a96",
+      "target": "evidence/source-control-static-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-control-static-review/review.json",
+      "bytes": 1750,
+      "sha256": "74ec9c2b29b66ff0110c93ebcba51b45766584aee761d4676f64e0142d47d20f",
+      "target": "evidence/source-control-static-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-control-static-review/input-pins.json",
+      "bytes": 879,
+      "sha256": "4def05be6aabcc7e85c3326c232e8297ddf2aece5affe73ceb58002a42ea7e2c",
+      "target": "evidence/source-control-static-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-control-static-review/seal.json",
+      "bytes": 772,
+      "sha256": "ee0c4c9487561d2e4d5cbf1a2290316a1167359f78ed4e6718d2fef85927dadd",
+      "target": "evidence/source-control-static-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/count-surface-review/proposed-admission.json",
+      "bytes": 25145,
+      "sha256": "c40cc7d19bcc70b21864fd2bee43a11cb96490a3c2c08007fae92627ef79fa37",
+      "target": "evidence/count-surface-review/proposed-admission.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/count-surface-review/seal.json",
+      "bytes": 1066,
+      "sha256": "d03970f70df683f11443b05d1387349f1788e8463f5d508f1138a5c6675fcc78",
+      "target": "evidence/count-surface-review/seal.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/fresh-control-chain-review/README.md",
+      "bytes": 1470,
+      "sha256": "d0a553f639aba61753493ee6a675e4087e766b433f0c1c11490cfe34712791cd",
+      "target": "evidence/fresh-control-chain-review/README.md",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/fresh-control-chain-review/review.json",
+      "bytes": 19234,
+      "sha256": "a305000aefc3a27a583cc41ba56f6965c93b00df76f5c60ad340616684103582",
+      "target": "evidence/fresh-control-chain-review/review.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/fresh-control-chain-review/input-pins.json",
+      "bytes": 93225,
+      "sha256": "2669daec83bbd7d6727c8fbfcd3c6fa0a9af0f10d587d8e16423f321b1cb7769",
+      "target": "evidence/fresh-control-chain-review/input-pins.json",
+      "envelope": false
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/fresh-control-chain-review/seal.json",
+      "bytes": 850,
+      "sha256": "357b37053d8711271739340665b58230172f79bf70a71d4974d3cab13b8a7ec2",
+      "target": "evidence/fresh-control-chain-review/seal.json",
+      "envelope": false
+    }
+  ],
+  "tests": {
+    "total": 88,
+    "passed": 88,
+    "failed": 0,
+    "skipped": 0
+  },
+  "notes": "This receipt closes only the typed evaluator test cohort at source commit a6909ac52ec7db1411696b82c4ef6c9cb61a89d2. It is not full P1-11 completion. Canonical fresh tests pass 88/88 across four files (25 new and 63 unchanged). Four source controls produce 87/1, 87/1, 87/1 and 85/3; each exact restoration passes 88/88. Every run has 29 passing hook entries/values and no unhandled or late errors. Only first failing RED assertions earn direct sensitivity credit; later assertions and the second prefixed replay iteration are masked. The tier control consumes supplied SELF_REPORTED provenance against an ignored OBSERVED attribute, not raw meta.trustTier derivation. Real signatures/receipts/external authorities, signed-plan/public-report positives and origin/main comparisons remain unqualified. Public plan:null, empty-score null versus requested 0, derived NOT_EVALUATED versus the step's UNKNOWN wording, and applicability/violation composition remain recorded gaps. Full suite/coverage, surface acceptance, semantic docs/changeset and merged PR remain open. Global duplicates/dead-code checks each fail before and after with unchanged 1268/2724 findings; no baseline, waiver, guard or deadline was changed. The initial count check genuinely failed after the new file; the unchanged generator changed only 15 numeric spans in 10 files from 1687 to 1688 and the subsequent checks pass. Ordinary source add returned 1 for an ignored docs/internal directory, but all 11 staged blobs were exact, default whitespace check passed and ordinary commit succeeded; no force operation occurred. Commands launch from borrowed R; explicit --root/--dir selects S or owned Q. The inherited source-literal census alone reads R/src. Existing source/work, held provider archive, all human holds and F37 skip remain untouched. The missing shared reservation retains its last-known binding and pending private append. All raw logs and patches use the existing lossless-original/1 base64 representation with original byte/hash verification; producer originals remain retained privately. No PR, push, merge, release or tracker Done.",
+  "readme": "# P1-11 bounded evaluator qualification \u2014 17 October 2026\n\nThe local source checkpoint is `a6909ac52ec7db1411696b82c4ef6c9cb61a89d2` on `codex/p1-11-evidence-qualification`. It adds one new typed evaluator test file and maintains 15 generated numeric spans across ten count surfaces. Existing production code, tests, authored prose, packages and guards are unchanged.\n\nThe fresh canonical cohort passes **88/88** in four files: 25 new evaluator tests and 63 existing compliance tests. The unchanged baseline passes 63/63. Test and production type checks, lint, build, published counts, gate reachability, threat model, architecture, docs drift and freeze checks pass. The clean-source helper separately passes frozen installation, build, doctor, and signed keyless one-turn and cross-process two-turn smoke checks; that helper runs no Vitest.\n\nFour temporary source controls in the owned retained fresh clone produce the following actual results. Each is followed by an exact source restoration and a complete 88/88 run.\n\n| Control | Passing | Failing | First sensitive assertion |\n|---|---:|---:|---|\n| Remove tenant comparison | 87 | 1 | Rejected-ref comparison at line 67, called from 124 |\n| Skip recorded-time freshness refusal | 87 | 1 | Rejected-ref comparison at line 67, called from 147 |\n| Let an attribute override derived tier | 87 | 1 | Admitted-tier comparison at line 266 |\n| Drop replay refusal | 85 | 3 | Ref comparison at 67/168; duplicate admission at 177; foreign-decision ref at 67/183 |\n\nAll nine fresh/control runs retain the same 88 file/title identities, 29 passing hook entries and 29 passing hook values, with no unhandled or late errors. Later assertions in a failing body are masked. Source controls did not mutate compiled JavaScript or native binaries. Eight source/compiled pairs and 57 paths were bound between S and Q; 88 protected inputs and distinct native identities were preserved. Wrapper owned process groups closed naturally with ESRCH observations; this is not universal filesystem or descendant isolation.\n\nThese are already-derived unit inputs. They do not establish real cryptographic provenance, approval signatures, signed/compiled-plan integration or a positive public compliance report. The attribute-tier control is not the specification's raw metadata loader mutation. The process cwd remains borrowed R; the inherited source-literal census reads R/src, while evaluator imports and the remaining selected test modules resolve through the explicit S/Q roots.\n\nWhole P1-11 remains open. `evidence/whole-issue-gaps.json` records public `plan:null`, the empty-score `null` versus requested zero, status spelling and applicability composition, real report/origin comparison, full suite/coverage, surface, docs/changeset and merged-PR gaps. Quality checks remain **RED** before and after: 1,268 duplicate and 2,724 dead-code findings, without waiver or baseline adoption. Numeric count maintenance does not satisfy semantic documentation acceptance.\n\nClaude's source and variants, the missing shared reservation's last-known binding and pending private entry, all held decisions, the ignored D15 provider archive and F37 skip remain intact. Dependabot was excluded only from WIP; every PR's changed paths was checked for overlap. No PR, push, merge, release or tracker Done occurred. After this bounded receipt closes, P1-12 is next by plan priority and dependency depth.\n\nRaw command logs and patches use the existing `amc-qualification-lossless-original/1` JSON envelope. Decode `dataBase64`, then check `original.bytes` and `original.sha256` to recover exact original bytes, including whitespace. The retained private producer originals were not changed. Compact reviews are included; oversized raw ownership observations remain private and are pinned by their sealed review. Post-assembly validation and ordinary Git checks are separate evidence.\n",
+  "privateOversizedOwnershipObservation": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/scope-review/observations.json",
+    "bytes": 1203480,
+    "sha256": "3db70585e96a7ff22c7d1ff8d6176da81c299656fa0eb78c18279e0cc49acd12",
+    "boundary": "Retained privately and pinned by the included sealed compact ownership review; not truncated or falsely presented as a complete committed observation."
+  },
+  "assemblerPin": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/assemble-receipt.py",
+    "bytes": 4107,
+    "sha256": "ae3bd8ffd1c3ba50e6925033490c6d0d18270c3bd39069e4b5ec0343e17d9939"
+  }
+}

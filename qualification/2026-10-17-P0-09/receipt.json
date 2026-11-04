@@ -1,0 +1,160 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-09",
+  "date": "2026-10-17",
+  "commit": "a0f69baec06950ecdc569ac964d6bc8c128b8842",
+  "branch": "codex/p1-28-qualification",
+  "node": "22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "python3 -B -c 'import subprocess,sys\nr=subprocess.run([\"/Users/sid/.local/share/uv/tools/graphifyy/bin/python3\",\"-B\",\"-m\",\"graphify\",\"query\",\"signedArtifactVerificationParity artifactVerifier verifySignedArtifact\",\"--budget\",\"1000\"],cwd=\"/Users/sid/AgentMaturityCompass\")\nsys.exit(r.returncode)'",
+      "exit": 0,
+      "durationMs": 1251
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,sys; r=subprocess.run([\"/opt/homebrew/opt/node@22/bin/node\",\"/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs\",\"--paths\",\"tests/signedArtifactVerificationParity.test.ts\"],cwd=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\"); sys.exit(r.returncode)'",
+      "exit": 0,
+      "durationMs": 238
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-09-qualification-20261017/audit-ownership.py",
+      "exit": 1,
+      "durationMs": 95
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-09-qualification-20261017/audit-ownership.py /private/tmp/p0-09-qualification-20261017/ownership-observations.actual.json",
+      "exit": 0,
+      "durationMs": 19621
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1788
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/signedArtifactVerificationParity.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p009-parity-unchanged-baseline.raw.json",
+      "exit": 1,
+      "durationMs": 9910
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/signedArtifactVerificationParity.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p009-parity-repaired-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 8467
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 41374
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1583
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 543
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 386
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1847
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 2990
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 2974
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 710
+    },
+    {
+      "cmd": "git --no-optional-locks -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass check-ignore --no-index -- tests/signedArtifactVerificationParity.test.ts",
+      "exit": 1,
+      "durationMs": 18
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json\nroot=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\"\nrows={}\nfor key,args in [(\"head\",[\"rev-parse\",\"HEAD\"]),(\"parent\",[\"rev-parse\",\"HEAD^\"]),(\"branch\",[\"branch\",\"--show-current\"]),(\"changed\",[\"diff-tree\",\"--no-commit-id\",\"--name-only\",\"-r\",\"-z\",\"HEAD\"]),(\"tree\",[\"ls-tree\",\"-z\",\"HEAD\",\"--\",\"tests/signedArtifactVerificationParity.test.ts\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"--untracked-files=all\",\"-z\"])]:\n r=subprocess.run([\"git\",\"--no-optional-locks\",\"-C\",root,*args],capture_output=True)\n assert r.returncode==0 and not r.stderr,(key,r.returncode)\n rows[key]=r.stdout.decode(\"utf-8\")\nprint(json.dumps({\"root\":root,\"reads\":rows},indent=2))'",
+      "exit": 0,
+      "durationMs": 199
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass add -- tests/signedArtifactVerificationParity.test.ts",
+      "exit": 0,
+      "durationMs": 32
+    },
+    {
+      "cmd": "python3 -B /private/tmp/p0-09-qualification-20261017/audit-p009-staged-source.py",
+      "exit": 0,
+      "durationMs": 379
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass commit -m 'test: anchor archived verifier parity to its repository'",
+      "exit": 0,
+      "durationMs": 54
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json\nroot=\"/Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass\"\nrows={}\nfor key,args in [(\"head\",[\"rev-parse\",\"HEAD\"]),(\"parent\",[\"rev-parse\",\"HEAD^\"]),(\"branch\",[\"branch\",\"--show-current\"]),(\"changed\",[\"diff-tree\",\"--no-commit-id\",\"--name-only\",\"-r\",\"-z\",\"HEAD\"]),(\"tree\",[\"ls-tree\",\"-z\",\"HEAD\",\"--\",\"tests/signedArtifactVerificationParity.test.ts\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"--untracked-files=all\",\"-z\"])]:\n r=subprocess.run([\"git\",\"--no-optional-locks\",\"-C\",root,*args],capture_output=True)\n assert r.returncode==0 and not r.stderr,(key,r.returncode)\n rows[key]=r.stdout.decode(\"utf-8\")\nprint(json.dumps({\"root\":root,\"reads\":rows},indent=2))'",
+      "exit": 0,
+      "durationMs": 189
+    },
+    {
+      "cmd": "pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:clean-source -- --keep",
+      "exit": 0,
+      "durationMs": 49472
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json\nroot=\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-06RWng/checkout\"\nrows={}\nfor key,args in [(\"head\",[\"rev-parse\",\"HEAD\"]),(\"parent\",[\"rev-parse\",\"HEAD^\"]),(\"branch\",[\"branch\",\"--show-current\"]),(\"changed\",[\"diff-tree\",\"--no-commit-id\",\"--name-only\",\"-r\",\"-z\",\"HEAD\"]),(\"tree\",[\"ls-tree\",\"-z\",\"HEAD\",\"--\",\"tests/signedArtifactVerificationParity.test.ts\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"--untracked-files=all\",\"-z\"])]:\n r=subprocess.run([\"git\",\"--no-optional-locks\",\"-C\",root,*args],capture_output=True)\n assert r.returncode==0 and not r.stderr,(key,r.returncode)\n rows[key]=r.stdout.decode(\"utf-8\")\nprint(json.dumps({\"root\":root,\"reads\":rows},indent=2))'",
+      "exit": 0,
+      "durationMs": 536
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-06RWng/checkout /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-06RWng/checkout/tests/signedArtifactVerificationParity.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p009-parity-fresh-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 8920
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-06RWng/checkout /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-06RWng/checkout/tests/signedArtifactVerificationParity.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p009-parity-admitted-fresh-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 7911
+    },
+    {
+      "cmd": "python3 -B -c 'import subprocess,json\nroot=\"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-06RWng/checkout\"\nrows={}\nfor key,args in [(\"head\",[\"rev-parse\",\"HEAD\"]),(\"parent\",[\"rev-parse\",\"HEAD^\"]),(\"branch\",[\"branch\",\"--show-current\"]),(\"changed\",[\"diff-tree\",\"--no-commit-id\",\"--name-only\",\"-r\",\"-z\",\"HEAD\"]),(\"tree\",[\"ls-tree\",\"-z\",\"HEAD\",\"--\",\"tests/signedArtifactVerificationParity.test.ts\"]),(\"index\",[\"diff\",\"--cached\",\"--name-only\",\"-z\"]),(\"status\",[\"status\",\"--porcelain=v1\",\"--untracked-files=all\",\"-z\"])]:\n r=subprocess.run([\"git\",\"--no-optional-locks\",\"-C\",root,*args],capture_output=True)\n assert r.returncode==0 and not r.stderr,(key,r.returncode)\n rows[key]=r.stdout.decode(\"utf-8\")\nprint(json.dumps({\"root\":root,\"reads\":rows},indent=2))'",
+      "exit": 0,
+      "durationMs": 490
+    }
+  ],
+  "tests": {
+    "total": 61,
+    "passed": 61,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "c666606cfec9bfe8b6599e6cd5c39da503d3b55fe1c3886a389352e9fbe018f3"
+    },
+    {
+      "path": "ordered-case-audit.json",
+      "sha256": "bcb86e4d1d90d2e77608ca9d78c9b0e53ae59f71a6fe4c788cab9af60639fdff"
+    }
+  ],
+  "notes": "Bounded four-literal test-loader repository-path repair only. Source commit a0f69baec06950ecdc569ac964d6bc8c128b8842 is distinct from any future metadata commit. Canonical61 cases: baseline59/2 natural1, repaired61/0 natural0, first fresh61/0 natural0 without finite prelaunch admission or qualification credit, later prospectively admitted fresh61/0 natural0. Four whole raw/observer objects and all ordered joins are retained; repeated observations are not244 unique cases. The first fresh launch followed a failed detached-branch newline assertion before finite pins were created; later130 pins are not backdated. The later admitted clone had already been exercised by that observation. Input boundaries94/94/none/130; all36 source/fresh counterparts byte-equal with distinct identities, 19 old natives preserved and new fresh native distinct. Actual six bounded source checks and retained clean-source check passed; dead-code2710 and duplicates1268 remain natural1, unwaived. The source staging guard verified the sole100644/stage0 blob, full index/status, admission/disk/OID equality and no extra paths before ordinary source commit. H heads refer to R child cwd, not U source commit. All ownership, source/archived verifier/P1-26, trust, schema and runtime guard boundaries are preserved. Initial ownership argv failure and corrected invocation both remain actual records. Explicit-pin versus revoked/compromised-key precedence and all other held decisions remain open. Original full-suite19 failures remain unwaived, with no current total inferred by subtraction. No full repository suite, packed-install/distrust asset, live, CI, release, wholeP009 or plan completion claim. No future metadata validator/staging/commit outcome is included."
+}

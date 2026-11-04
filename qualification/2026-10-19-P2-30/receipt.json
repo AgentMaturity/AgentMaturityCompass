@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-30",
+  "date": "2026-10-19",
+  "commit": "f370260804bbdb21090ae6a7295986aeaed7c6b0",
+  "branch": "codex/p2-30-technology-overlay",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit; local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 175020
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/review-v2-resolved/owner-rule-checks/f370260804bbdb21090ae6a7295986aeaed7c6b0/raw/checks/focused-report.json tests/catalog/stations/technology tests/catalog/citations.test.ts tests/catalog/governance tests/catalog/l0 tests/catalog/admission tests/catalog/compiler/cli.test.ts tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts",
+      "exit": 0,
+      "durationMs": 436081
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 1127
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 2905
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 1316
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 0,
+      "durationMs": 3550
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "b8983e999fbc31ca3db9a9c234bd3618efdb73856b03e36fd199e7dfefa6c1bf"
+    },
+    {
+      "path": "summary.json",
+      "sha256": "81b03ad3b815506904028083499521f9dcc7a28a21611a9f8abcad4b2ee5b0af"
+    }
+  ],
+  "notes": "Resolved review-v2 supplement at exact owner int ccaabe07f. Six current scoped commands pass; focused totals are recorded separately in summary. No full suite in this review round; tests is null and final merged-HEAD full remains Claude's landing obligation. Original receipt, 343 artifacts and blocked supplement are preserved. Prior currency-test shift was forward-reverted; the current test equals owner int. Experimental/unreviewed, promotion none; no primary source read, legal review or production pass. Historical full/failure classifications are explicitly source-pinned and coordinator reports attributed."
+}

@@ -1,0 +1,236 @@
+{
+  "schema": "amc-p207-scim-hardening/1",
+  "label": "active-false-existing-session",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout",
+  "childProcessCreated": false,
+  "observations": [
+    {
+      "kind": "port-probe",
+      "started": true,
+      "closed": true,
+      "listening": false
+    },
+    {
+      "kind": "router",
+      "port": 55315,
+      "started": true,
+      "closed": true
+    },
+    {
+      "kind": "http",
+      "label": "auth-missing-bearer",
+      "path": "/host/scim/v2/ServiceProviderConfig",
+      "method": "GET",
+      "status": 401,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "auth-valid-bearer",
+      "path": "/host/scim/v2/ServiceProviderConfig",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "auth-controls",
+      "unauthenticated": {
+        "status": 401,
+        "contentType": "application/scim+json",
+        "body": {
+          "schemas": [
+            "urn:ietf:params:scim:api:messages:2.0:Error"
+          ],
+          "status": "401",
+          "detail": "missing SCIM bearer token"
+        }
+      },
+      "authenticated": {
+        "status": 200,
+        "contentType": "application/scim+json",
+        "body": {
+          "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
+          ],
+          "patch": {
+            "supported": true
+          },
+          "bulk": {
+            "supported": false,
+            "maxOperations": 0,
+            "maxPayloadSize": 0
+          },
+          "filter": {
+            "supported": true,
+            "maxResults": 200
+          },
+          "changePassword": {
+            "supported": false
+          },
+          "sort": {
+            "supported": false
+          },
+          "etag": {
+            "supported": false
+          },
+          "authenticationSchemes": [
+            {
+              "name": "Bearer Token",
+              "description": "Authorization: Bearer <token>",
+              "type": "oauthbearertoken",
+              "primary": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "http",
+      "label": "create-user-session-user",
+      "path": "/host/scim/v2/Users",
+      "method": "POST",
+      "status": 201,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "create-user",
+      "label": "session-user",
+      "view": {
+        "status": 201,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "id": "b9ca4aa7-a038-49da-9c7e-af8e0cc230b7",
+        "userName": "session-user@example.test",
+        "active": true,
+        "displayName": "Synthetic session-user",
+        "externalId": "ext-session-user"
+      }
+    },
+    {
+      "kind": "http",
+      "label": "existing-session-before",
+      "path": "/host/api/auth/me",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "existing-session-positive",
+      "before": {
+        "directOk": true,
+        "directUserId": "b9ca4aa7-a038-49da-9c7e-af8e0cc230b7",
+        "httpStatus": 200,
+        "httpUserId": "b9ca4aa7-a038-49da-9c7e-af8e0cc230b7"
+      }
+    },
+    {
+      "kind": "http",
+      "label": "active-False",
+      "path": "/host/scim/v2/Users/b9ca4aa7-a038-49da-9c7e-af8e0cc230b7",
+      "method": "PATCH",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "disabled-user-get",
+      "path": "/host/scim/v2/Users/b9ca4aa7-a038-49da-9c7e-af8e0cc230b7",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "existing-session-after",
+      "path": "/host/api/auth/me",
+      "method": "GET",
+      "status": 401,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "deprovisioned-session",
+      "after": {
+        "patched": {
+          "status": 200,
+          "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User"
+          ],
+          "id": "b9ca4aa7-a038-49da-9c7e-af8e0cc230b7",
+          "userName": "session-user@example.test",
+          "active": false,
+          "displayName": "Synthetic session-user",
+          "externalId": "ext-session-user"
+        },
+        "fetched": {
+          "status": 200,
+          "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:User"
+          ],
+          "id": "b9ca4aa7-a038-49da-9c7e-af8e0cc230b7",
+          "userName": "session-user@example.test",
+          "active": false,
+          "displayName": "Synthetic session-user",
+          "externalId": "ext-session-user"
+        },
+        "storedDisabled": true,
+        "direct": {
+          "ok": false,
+          "userId": null,
+          "error": "user disabled"
+        },
+        "httpStatus": 401
+      }
+    }
+  ],
+  "errors": [],
+  "exactEnvironmentRestored": true,
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "signalsSent": false,
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-gQV5z3"
+}

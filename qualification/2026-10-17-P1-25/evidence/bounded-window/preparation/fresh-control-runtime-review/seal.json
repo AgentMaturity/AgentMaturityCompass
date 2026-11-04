@@ -1,0 +1,27 @@
+{
+  "schema": "p125w-independent-runtime-chain-review-seal/1",
+  "at": "2026-10-17T00:30:10.486750+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-control-runtime-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-control-runtime-review/review.json",
+      "bytes": 17143,
+      "sha256": "34db3d1ea446aca16e40ea66d5c98a7f56397c0b315dc315798d17fc4e0ce077",
+      "dev": 16777231,
+      "inode": 543820380,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/fresh-control-runtime-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/fresh-control-runtime-review/input-pins.json",
+      "bytes": 219738,
+      "sha256": "e1b27013b5639e29c494d6d88fb82461dabd0cb95ad377625f0bd1b750708186",
+      "dev": 16777231,
+      "inode": 543820381,
+      "nlink": 1
+    }
+  ],
+  "blockers": [],
+  "completedEvidenceOnly": true,
+  "inputPinCount": 508
+}

@@ -1,0 +1,4 @@
+clean-source check of 3eaa98d0 in /Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30/amc-clean-source-Y7EeDr
+ok   git clone (committed tree only) (10.3s)
+ok   git checkout pinned commit (0.2s)
+ok   pnpm install --frozen-lockfile (16.8s)

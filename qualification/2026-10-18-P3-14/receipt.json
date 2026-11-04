@@ -1,0 +1,315 @@
+{
+  "schemaVersion": 1,
+  "key": "P3-14",
+  "date": "2026-10-18",
+  "commit": "1aedd197c1821d9c4f750073c33e22431ff62137",
+  "branch": "codex/p3-14-governance-overlay",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit; local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 91589
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/focused-report.json tests/catalog/stations/governance tests/catalog/governance tests/catalog/admission tests/catalog/compiler tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/stationTaxonomy.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts",
+      "exit": 1,
+      "durationMs": 65525
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 68944
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 106760
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 6394
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 1,
+      "durationMs": 1915
+    },
+    {
+      "cmd": "node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 1218
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1529
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 1166
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 1,
+      "durationMs": 2163
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 879
+    },
+    {
+      "cmd": "pnpm check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 4273
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 4703
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 1002
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 1656
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 776
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 1000
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 1235
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 2863
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 922
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 3633
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 1404
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 1,
+      "durationMs": 2000
+    },
+    {
+      "cmd": "node scripts/check-catalog-changelog.mjs",
+      "exit": 1,
+      "durationMs": 1295
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 2064
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 10931
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 137597
+    },
+    {
+      "cmd": "pnpm exec tsx /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/probe-governance.ts 21523daa2e879c6cad5782aab3195f093186c1c6",
+      "exit": 0,
+      "durationMs": 5514
+    },
+    {
+      "cmd": "node scripts/check-catalog-changelog.mjs --base-ref int",
+      "exit": 1,
+      "durationMs": 3887
+    },
+    {
+      "cmd": "node scripts/check-catalog-changelog.mjs",
+      "exit": 1,
+      "durationMs": 1792
+    },
+    {
+      "cmd": "npx vitest run tests/catalog/governance/changelogGuard.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/unit-report.json",
+      "exit": 1,
+      "durationMs": 8602
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/initial-green-report.json",
+      "exit": 0,
+      "durationMs": 4754
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/binding-guard-disabled-report.json",
+      "exit": 1,
+      "durationMs": 4294
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/restored-green-report.json",
+      "exit": 0,
+      "durationMs": 4175
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/shared-binding-report.json",
+      "exit": 1,
+      "durationMs": 1038
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/utc-precision-report.json",
+      "exit": 1,
+      "durationMs": 1067
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/nonblank-fields-report.json",
+      "exit": 1,
+      "durationMs": 834
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canonical-endpoint-report.json",
+      "exit": 1,
+      "durationMs": 886
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-human-record-report.json",
+      "exit": 1,
+      "durationMs": 785
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-notice-report.json",
+      "exit": 1,
+      "durationMs": 829
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/activation-signature-report.json",
+      "exit": 1,
+      "durationMs": 815
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-assessor-report.json",
+      "exit": 1,
+      "durationMs": 772
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-authority-report.json",
+      "exit": 1,
+      "durationMs": 783
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-dates-ignored-report.json",
+      "exit": 1,
+      "durationMs": 851
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-observed-report.json",
+      "exit": 1,
+      "durationMs": 794
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-egress-report.json",
+      "exit": 1,
+      "durationMs": 996
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-classification-report.json",
+      "exit": 1,
+      "durationMs": 1052
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-boundary-report.json",
+      "exit": 1,
+      "durationMs": 819
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/unknown-citation-accepted-report.json",
+      "exit": 1,
+      "durationMs": 811
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-human-report.json",
+      "exit": 1,
+      "durationMs": 873
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-identity-report.json",
+      "exit": 1,
+      "durationMs": 897
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-reviewer-report.json",
+      "exit": 1,
+      "durationMs": 875
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-window-report.json",
+      "exit": 1,
+      "durationMs": 893
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/restored-green-report.json",
+      "exit": 0,
+      "durationMs": 841
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "88685e62c6364f9a2004443d39801763a7b90d930ffceb72175addacccdfe055"
+    },
+    {
+      "path": "case-command.json",
+      "sha256": "d7887651a3c00fff57e2e0ebc5c061240776d3b8dcb62b2a471b59b6e962aaba"
+    },
+    {
+      "path": "case-results.json",
+      "sha256": "87e554a2bf8899e246d68670dc679785de1b68a9e70565598f8b32f927a70f6b"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "fef3d0435f4494fea7e50e559fada5355924a4c8a1dac4109c8a2b68d979001c"
+    },
+    {
+      "path": "decision.json",
+      "sha256": "ace8942588320f8c6dd1aaf6243d876d1e4e54c52aa3ae54e0e4bb26ad2f4378"
+    },
+    {
+      "path": "git-state.json",
+      "sha256": "d18f712fc787bf7bed4e7a437e910534f339b9b043fca1224771df00b8f98c24"
+    },
+    {
+      "path": "source-and-mutations.json",
+      "sha256": "3727965f62a6ea9c9e32b22c93f7709e0210cde127eeffeb745365e44a1b3929"
+    }
+  ],
+  "notes": "Direct human option 2 authorizes a draft handoff with dependencies pending. The full suite is NOT_RUN and tests is null. The receipt names product source 1aedd, but all 27 formal rows and the case probe executed at 215 and are historical: 21 passing and four failing required checks; focused totals 430/416/14. Twelve assertions reproduce on int 8b only; that is neither a waiver nor newer-int evidence. Current 1aedd int/main guards both exited 1 with ENTRY_DUPLICATE; unit totals 8/7/1 at line 101 remain pending the landing bump. The current adapter ran 75 passing, then 74 passing plus one targeted mutation failure, then 75 passing after exact restoration. The 19 earlier local mutations intentionally fail their guards at batch source bf0845bc; the lack of per-subprocess whole-repository HEAD sampling is preserved. checks.json maps each command index to its actual execution source and raw artifact. The probe records 70 admissions (64 not evaluated and six conservative failures), 28 synthetic local observations and seven empty production evaluations (not evaluated/enforcement none). They establish no production pass. Updated-int integration, P2-30 dependencies and the merged-HEAD full suite remain pending; merge the posted landing and post ready v2. Current clean source capture is separate from the ten dirty generated outputs during 215 execution. Human, source-review and real-case corpus gaps remain open. Local macOS arm64, not CI. No all-green, approval or promotion claim."
+}

@@ -1,3 +1,4 @@
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { randomUUID } from "node:crypto";
 import {
   createServer,
@@ -24,18 +25,21 @@ import {
 } from "./config.js";
 import { applyUpstreamAuth, missingUpstreamAuthRefs, upstreamCredentials } from "./upstreamAuth.js";
 import type { CredentialsService } from "../credentials/credentialsService.js";
-import { redactBody, redactHeaders } from "./redaction.js";
+import { AGENT_AUTH_HEADER_KEYS, AGENT_AUTH_QUERY_KEYS, redactBody, redactHeaders, redactRequestTarget } from "./redaction.js";
+import { protectedDataOptedIn } from "../dataflow/processorRegistry.js";
+import { admitProviderHttpRequest, dataFlowRefusalBody } from "../dataflow/providerAdmission.js";
 import { relayGatewayResponse } from "./streamPassthrough.js";
 import { monitorPublicKeyFingerprint } from "../receipts/receipt.js";
 import { sha256Hex } from "../utils/hash.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
-import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
+import { readRevokedLeaseIds } from "../leases/leaseStore.js";
 import { extractLeaseCarrier } from "../leases/leaseCarriers.js";
 import { evaluateBudgetStatus } from "../budgets/budgets.js";
 import { CircuitOpenError, TimeoutError, withCircuitBreaker } from "../ops/circuitBreaker.js";
 import { checkUpstreamEgress, pinnedLookup, prepareFieldGuard, requestFieldRefusal, type FieldGuard } from "./requestFieldGuard.js";
 import { checkEgress, EgressBlocked } from "../residency/checkEgress.js";
 import { parseConnectAuthority } from "./connectResidency.js";
+import { killSwitchDenial, killSwitchEgressDenial } from "../runtime/killSwitch.js";
 export interface StartGatewayOptions {
   workspace: string;
   workspaceId?: string;
@@ -361,17 +365,6 @@ function ipAllowedByCidrs(ip: string, cidrs: string[]): boolean {
   return false;
 }
 
-const AGENT_AUTH_HEADER_KEYS = [
-  "x-amc-lease",
-  "authorization",
-  "x-api-key",
-  "x-goog-api-key",
-  "api-key",
-  "x-openai-key",
-  "x-anthropic-api-key"
-] as const;
-const AGENT_AUTH_QUERY_KEYS = ["key", "api_key", "api-key", "access_token", "amc_lease"] as const;
-
 function stripAgentProvidedCredentials(
   headers: Record<string, string>,
   targetUrl: URL,
@@ -433,6 +426,7 @@ function verifyLeaseAndMapError(input: {
   requiredScope: "gateway:llm" | "proxy:connect";
   routePath?: string;
   model?: string | null;
+  upstreamId?: string; egress?: { host: string; config: GatewayConfig };
 }): {
   ok: boolean;
   payload?: {
@@ -440,17 +434,15 @@ function verifyLeaseAndMapError(input: {
     maxTokensPerMinute: number;
     leaseId: string;
     agentId: string;
+    claimKind?: "synthetic_example";
   };
   statusCode: number;
-  auditType:
-    | "LEASE_INVALID_OR_MISSING"
-    | "LEASE_WORKSPACE_MISMATCH_ATTEMPT"
-    | "LEASE_AGENT_MISMATCH"
-    | "LEASE_SCOPE_DENIED"
-    | "LEASE_ROUTE_DENIED"
-    | "LEASE_MODEL_DENIED";
+  auditType: "LEASE_INVALID_OR_MISSING" | "LEASE_WORKSPACE_MISMATCH_ATTEMPT" | "LEASE_AGENT_MISMATCH" | "LEASE_SCOPE_DENIED" | "LEASE_ROUTE_DENIED" | "LEASE_MODEL_DENIED" | "KILL_SWITCH_DENIED";
   message: string;
 } {
+  // P2-26: before any lease work, a kill switch (stop_all, or this provider) refuses the model call with a 403 and an audit row.
+  const killed = input.egress ? killSwitchEgressDenial(input.workspace, input.expectedAgentId, input.egress.host, input.egress.config) : killSwitchDenial(input.workspace, { kind: "model", agentId: input.expectedAgentId, providerId: input.upstreamId ?? null });
+  if (killed !== null) return { ok: false, statusCode: 403, auditType: "KILL_SWITCH_DENIED", message: killed };
   if (!input.leaseToken) {
     return {
       ok: false,
@@ -460,17 +452,17 @@ function verifyLeaseAndMapError(input: {
     };
   }
 
-  const revocationSig = verifyLeaseRevocationsSignature(input.workspace);
-  if (!revocationSig.valid) {
+  const revocations = readRevokedLeaseIds(input.workspace);
+  if (!revocations.ok) {
     return {
       ok: false,
       statusCode: 401,
       auditType: "LEASE_INVALID_OR_MISSING",
-      message: `lease revocation signature invalid: ${revocationSig.reason ?? "unknown"}`
+      message: `lease revocation signature invalid: ${revocations.reason}`
     };
   }
 
-  const revoked = new Set(loadLeaseRevocations(input.workspace).revocations.map((row) => row.leaseId));
+  const revoked = revocations.ids;
   const verification = verifyLeaseToken({
     workspace: input.workspace,
     token: input.leaseToken,
@@ -489,7 +481,8 @@ function verifyLeaseAndMapError(input: {
             maxRequestsPerMinute: verification.payload.maxRequestsPerMinute,
             maxTokensPerMinute: verification.payload.maxTokensPerMinute,
             leaseId: verification.payload.leaseId,
-            agentId: verification.payload.agentId
+            agentId: verification.payload.agentId,
+            ...(verification.payload.claimKind === undefined ? {} : { claimKind: verification.payload.claimKind })
           }
         : undefined,
       statusCode: 200,
@@ -770,7 +763,7 @@ function createProxyServer(params: {
       expectedWorkspaceId: params.workspaceId,
       leaseToken: leaseCarrier.leaseToken ?? undefined,
       expectedAgentId: proxyAgentId ?? "unknown",
-      requiredScope: "proxy:connect"
+      requiredScope: "proxy:connect", egress: { host: targetUrl.hostname, config: params.config }
     });
     if (!proxyAgentId || !leaseVerification.ok) {
       params.appendEvidence({
@@ -958,7 +951,7 @@ function createProxyServer(params: {
       expectedWorkspaceId: params.workspaceId,
       leaseToken: leaseCarrier.leaseToken ?? undefined,
       expectedAgentId: proxyAgentId ?? "unknown",
-      requiredScope: "proxy:connect"
+      requiredScope: "proxy:connect", egress: { host: host ?? "", config: params.config }
     });
 
     if (!authority || !host || !Number.isInteger(port) || port < 1 || port > 65535) {
@@ -1292,7 +1285,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         expectedAgentId: attributedAgentId,
         requiredScope: "gateway:llm",
         routePath: incomingUrl.pathname,
-        model: requestInfo.model ?? null
+        model: requestInfo.model ?? null,
+        upstreamId: route.upstream
       });
       if (!leaseVerification.ok) {
         appendEvidence({
@@ -1397,7 +1391,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         return;
       }
 
-      const budgetStatus = evaluateBudgetStatus(options.workspace, attributedAgentId);
+      const budgetStatus = evaluateBudgetStatus(options.workspace, attributedAgentId, Date.now(), { trust: workspaceSelfTrust(options.workspace) });
       if (!budgetStatus.ok && budgetStatus.reasons.some((reason) => reason.includes("llm "))) {
         appendEvidence({
           eventType: "audit",
@@ -1436,23 +1430,21 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
           : undefined
       );
       if (strippedAuth.hadCredential) {
-        appendEvidence({
-          eventType: "audit",
-          payload: JSON.stringify({
-            auditType: "AGENT_PROVIDED_KEY_IGNORED",
-            severity: "MED",
-            request_id: requestId,
-            agentId: attributedAgentId,
-            strippedHeaders: strippedAuth.strippedHeaders,
-            strippedQueryKeys: strippedAuth.strippedQueryKeys
-          }),
-          meta: {
-            auditType: "AGENT_PROVIDED_KEY_IGNORED",
-            severity: "MED",
-            request_id: requestId,
-            agentId: attributedAgentId
-          }
-        });
+        const ignored = { auditType: "AGENT_PROVIDED_KEY_IGNORED", severity: "MED", request_id: requestId, agentId: attributedAgentId };
+        appendEvidence({ eventType: "audit", meta: ignored,
+          payload: JSON.stringify({ ...ignored, strippedHeaders: strippedAuth.strippedHeaders, strippedQueryKeys: strippedAuth.strippedQueryKeys }) });
+      }
+      // P2-02: llmRuntime's processor/purpose admission over what the provider would receive (target, headers and body, the
+      // agent's credentials stripped), recorded and decided before the upstream credential is applied or any call is made.
+      const providerId = upstreamConfigured.providerId ?? route.upstream;
+      const dataFlow = admitProviderHttpRequest(options.workspace, providerId, upstreamResolved.baseUrl,
+        { target: `${targetUrl.pathname}${targetUrl.search}`, headers: outboundHeaders, body: requestBody });
+      if (dataFlow?.row) appendEvidence({ ...dataFlow.row, meta: { ...dataFlow.row.meta, request_id: requestId } });
+      if (dataFlow?.refusal) {
+        const refused = { ...dataFlow.refusal.evidence(), severity: "HIGH", request_id: requestId, route: route.prefix, upstreamId: route.upstream, agentId: attributedAgentId };
+        appendEvidence({ eventType: "audit", payload: JSON.stringify(refused), meta: refused });
+        res.writeHead(403, { "content-type": "application/json" }).end(dataFlowRefusalBody(dataFlow.refusal));
+        return;
       }
       const authResult = applyUpstreamAuth(targetUrl, outboundHeaders, upstreamResolved.auth, credentials.resolve);
 
@@ -1482,10 +1474,12 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         return;
       }
 
-      const requestHeaderRedaction = redactHeaders(toHeaderObject(req.headers), config.redaction.headerKeysDenylist);
-      const requestBodyRedaction = redactBody(requestBody, req.headers["content-type"], config.redaction);
+      const protectedData = protectedDataOptedIn(options.workspace);
+      const headerRedaction = { textRegexDenylist: config.redaction.textRegexDenylist, protectedData };
+      const requestHeaderRedaction = redactHeaders(toHeaderObject(req.headers), config.redaction.headerKeysDenylist, headerRedaction);
+      const requestBodyRedaction = redactBody(requestBody, req.headers["content-type"], config.redaction, { protectedData });
+      const requestTarget = redactRequestTarget(incomingUrl, protectedData);
       const workOrderId = firstString(req.headers["x-amc-workorder-id"]);
-      const providerId = upstreamConfigured.providerId ?? route.upstream;
       const clientProcess = firstString(req.headers["x-amc-client-process"]);
       const correlationId = firstString(req.headers["x-amc-correlation-id"]);
       const runId = firstString(req.headers["x-amc-run-id"]);
@@ -1502,7 +1496,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         openaiCompatible: route.openaiCompatible,
         hasToolCalls: requestInfo.hasToolCalls === true,
         bodyRedacted: requestBodyRedaction.wasRedacted || requestHeaderRedaction.wasRedacted,
-        redactionReasons: requestBodyRedaction.redactionReasons,
+        redactionReasons: [...new Set([...requestBodyRedaction.redactionReasons, ...requestHeaderRedaction.redactionReasons])],
         originalHashOmitted: requestBodyRedaction.originalHashOmitted,
         agentId: attributedAgentId,
         workOrderId: workOrderId ?? null,
@@ -1511,7 +1505,9 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         run_id: runId ?? null,
         leaseId: leaseVerification.payload?.leaseId ?? null,
         lease_carrier: leaseCarrier.leaseCarrier,
-        trustTier: "OBSERVED",
+        ...(leaseVerification.payload?.claimKind === "synthetic_example"
+          ? { claimKind: "synthetic_example", trustTier: "SELF_REPORTED" }
+          : { trustTier: "OBSERVED" }),
         bodySha256: sha256Hex(requestBodyRedaction.redactedBytes)
       };
       if (requestBodyRedaction.originalPayloadSha256) {
@@ -1528,8 +1524,8 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         payload: JSON.stringify({
           request_id: requestId,
           method,
-          path: incomingUrl.pathname,
-          query: incomingUrl.search,
+          path: requestTarget.path,
+          query: requestTarget.query,
           headers: requestHeaderRedaction.headers,
           body: requestBodyRedaction.redactedBytes.toString("utf8")
         }),
@@ -1561,7 +1557,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
       });
 
       const responseHeaders = normalizeResponseHeaders(upstreamResponse.headers);
-      const responseHeaderRedaction = redactHeaders(responseHeaders, config.redaction.headerKeysDenylist);
+      const responseHeaderRedaction = redactHeaders(responseHeaders, config.redaction.headerKeysDenylist, headerRedaction);
       const streamPassthrough = config.streamPassthrough === true;
       let responseBody: Buffer;
 
@@ -1573,7 +1569,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         responseBody = await readAll(upstreamResponse);
       }
 
-      const responseBodyRedaction = redactBody(responseBody, upstreamResponse.headers["content-type"], config.redaction);
+      const responseBodyRedaction = redactBody(responseBody, upstreamResponse.headers["content-type"], config.redaction, { protectedData });
       const responseInfo = bestEffortJsonInfo(responseBody, incomingUrl.pathname, route.openaiCompatible);
 
       const llmResponseMeta: Record<string, unknown> = {
@@ -1589,7 +1585,7 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         openaiCompatible: route.openaiCompatible,
         hasToolCalls: responseInfo.hasToolCalls === true || requestInfo.hasToolCalls === true,
         bodyRedacted: responseBodyRedaction.wasRedacted || responseHeaderRedaction.wasRedacted,
-        redactionReasons: responseBodyRedaction.redactionReasons,
+        redactionReasons: [...new Set([...responseBodyRedaction.redactionReasons, ...responseHeaderRedaction.redactionReasons])],
         originalHashOmitted: responseBodyRedaction.originalHashOmitted,
         agentId: attributedAgentId,
         workOrderId: workOrderId ?? null,
@@ -1597,7 +1593,9 @@ export async function startGateway(options: StartGatewayOptions): Promise<Gatewa
         correlation_id: correlationId ?? null,
         run_id: runId ?? null,
         leaseId: leaseVerification.payload?.leaseId ?? null,
-        trustTier: "OBSERVED",
+        ...(leaseVerification.payload?.claimKind === "synthetic_example"
+          ? { claimKind: "synthetic_example", trustTier: "SELF_REPORTED" }
+          : { trustTier: "OBSERVED" }),
         bodySha256: sha256Hex(responseBodyRedaction.redactedBytes)
       };
       if (responseBodyRedaction.originalPayloadSha256) {

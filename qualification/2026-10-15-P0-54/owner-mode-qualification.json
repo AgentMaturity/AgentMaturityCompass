@@ -1,0 +1,405 @@
+{
+  "issue": "P0-54",
+  "kind": "Bounded actual mode helper qualification and isolated private-copy causal evidence",
+  "recordedUtc": "2026-10-14T19:40:55.911902+00:00",
+  "repo": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass",
+  "sourceHeadDuringAllRuns": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+  "authoredScope": "ONLY NEW tests/a4OwnerModeQualification.test.ts. No mode/A4/sharedCLI/API/Studio/original-test/archive/freeze/floor source edit.",
+  "test": {
+    "path": "tests/a4OwnerModeQualification.test.ts",
+    "bytes": 7167,
+    "sha256": "f848651383cedbeb17f8bdc2ef9eb6647b47804c6cd21bb18e03bf754d8f4fd8"
+  },
+  "firstTestSourceRetained": {
+    "path": "/private/tmp/p0-54-owner-mode-first-owned-test-20261015.ts",
+    "bytes": 7173,
+    "sha256": "ea7a7343ed944fbe3050234b2715f7559cf4569de5d97f958705c0707fd905ec"
+  },
+  "runtime": "Actual Node22.23.3 with scoped process.execPath/PATH; pnpm10.33.0. No Node24 or default action runtime qualification.",
+  "registeredTestPhases": [
+    {
+      "phase": "first",
+      "rawReport": {
+        "path": "/private/tmp/p0-54-owner-mode-first-20261015.json",
+        "bytes": 21045,
+        "sha256": "d7a1619ce753e544386e7481e1568c2ee23afd6a9b98cb05ab2f0e92429f2c19"
+      },
+      "effects": {
+        "path": "/private/tmp/p0-54-owner-mode-first-20261015/owner-mode-effects.json",
+        "bytes": 150844,
+        "sha256": "1c7ae134abae87f2327edaeab848c3b42c99aa7b364ba5525cd0704f5baf3d75"
+      },
+      "counts": {
+        "success": true,
+        "numTotalTests": 55,
+        "numPassedTests": 55,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "snapshotCalls": 48,
+      "allCapturedBytesAndLinksUnchanged": true,
+      "testSha256": "ea7a7343ed944fbe3050234b2715f7559cf4569de5d97f958705c0707fd905ec"
+    },
+    {
+      "phase": "wording-green",
+      "rawReport": {
+        "path": "/private/tmp/p0-54-owner-mode-wording-green-20261015.json",
+        "bytes": 20768,
+        "sha256": "b583839972c4627912af489522288cde82fa48497034ed9c081184ac18c9c32c"
+      },
+      "effects": {
+        "path": "/private/tmp/p0-54-owner-mode-wording-green-20261015/owner-mode-effects.json",
+        "bytes": 150856,
+        "sha256": "4644ab61cc30e424bffeca2635622854b308cc9fb118076a4df5819b63b188df"
+      },
+      "counts": {
+        "success": true,
+        "numTotalTests": 55,
+        "numPassedTests": 55,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "snapshotCalls": 48,
+      "allCapturedBytesAndLinksUnchanged": true,
+      "testSha256": "f848651383cedbeb17f8bdc2ef9eb6647b47804c6cd21bb18e03bf754d8f4fd8"
+    }
+  ],
+  "privateStandaloneHelperPhases": [
+    {
+      "phase": "baseline",
+      "raw": {
+        "path": "/private/tmp/p0-54-owned-private-mode-VL5gxw/baseline.json",
+        "bytes": 117158,
+        "sha256": "942e70c2f9ad000e2323883e3074314121f70ac638f71088151f96ee0e2dd549"
+      },
+      "counts": {
+        "total": 41,
+        "passed": 41,
+        "failed": 0
+      },
+      "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+      "node": "v22.23.3",
+      "failures": [],
+      "liveBefore": [
+        {
+          "path": "src/mode/mode.ts",
+          "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0"
+        },
+        {
+          "path": "src/utils/fs.ts",
+          "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4"
+        },
+        {
+          "path": "dist/mode/mode.js",
+          "sha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a"
+        },
+        {
+          "path": "dist/utils/fs.js",
+          "sha256": "96241b68640d0835ddffa112aeac9f447cd5761c6bf23441546e5a2e2a76b556"
+        }
+      ],
+      "liveAfter": [
+        {
+          "path": "src/mode/mode.ts",
+          "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0"
+        },
+        {
+          "path": "src/utils/fs.ts",
+          "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4"
+        },
+        {
+          "path": "dist/mode/mode.js",
+          "sha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a"
+        },
+        {
+          "path": "dist/utils/fs.js",
+          "sha256": "96241b68640d0835ddffa112aeac9f447cd5761c6bf23441546e5a2e2a76b556"
+        }
+      ],
+      "mutatedSha256": null,
+      "originalModuleSha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a",
+      "restoredModuleSha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a",
+      "privateModuleRestoredExactly": true,
+      "dependencyUnchanged": true,
+      "allCallSnapshotsUnchanged": true
+    },
+    {
+      "phase": "mutant",
+      "raw": {
+        "path": "/private/tmp/p0-54-owned-private-mode-VL5gxw/mutant.json",
+        "bytes": 117426,
+        "sha256": "02a8555b5748a3b405e9dd885efbad33c90d3ada3ff502e9c0289f6d69a0656c"
+      },
+      "counts": {
+        "total": 41,
+        "passed": 40,
+        "failed": 1
+      },
+      "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+      "node": "v22.23.3",
+      "failures": [
+        {
+          "state": "agent",
+          "path": "a4 approve",
+          "error": null,
+          "expectedError": "Command 'a4 approve' is blocked in agent mode. Switch to owner mode with: amc mode owner"
+        }
+      ],
+      "liveBefore": [
+        {
+          "path": "src/mode/mode.ts",
+          "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0"
+        },
+        {
+          "path": "src/utils/fs.ts",
+          "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4"
+        },
+        {
+          "path": "dist/mode/mode.js",
+          "sha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a"
+        },
+        {
+          "path": "dist/utils/fs.js",
+          "sha256": "96241b68640d0835ddffa112aeac9f447cd5761c6bf23441546e5a2e2a76b556"
+        }
+      ],
+      "liveAfter": [
+        {
+          "path": "src/mode/mode.ts",
+          "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0"
+        },
+        {
+          "path": "src/utils/fs.ts",
+          "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4"
+        },
+        {
+          "path": "dist/mode/mode.js",
+          "sha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a"
+        },
+        {
+          "path": "dist/utils/fs.js",
+          "sha256": "96241b68640d0835ddffa112aeac9f447cd5761c6bf23441546e5a2e2a76b556"
+        }
+      ],
+      "mutatedSha256": "93abfde8b2045965965b2d5f68c7b390a71b3ba39bf6fde4997e45090e54bd67",
+      "originalModuleSha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a",
+      "restoredModuleSha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a",
+      "privateModuleRestoredExactly": true,
+      "dependencyUnchanged": true,
+      "allCallSnapshotsUnchanged": true
+    },
+    {
+      "phase": "restored",
+      "raw": {
+        "path": "/private/tmp/p0-54-owned-private-mode-VL5gxw/restored.json",
+        "bytes": 117158,
+        "sha256": "0224fab04bb278c2b19bede6898c145d78725e1162f1391a14317dfaa87d764d"
+      },
+      "counts": {
+        "total": 41,
+        "passed": 41,
+        "failed": 0
+      },
+      "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b",
+      "node": "v22.23.3",
+      "failures": [],
+      "liveBefore": [
+        {
+          "path": "src/mode/mode.ts",
+          "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0"
+        },
+        {
+          "path": "src/utils/fs.ts",
+          "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4"
+        },
+        {
+          "path": "dist/mode/mode.js",
+          "sha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a"
+        },
+        {
+          "path": "dist/utils/fs.js",
+          "sha256": "96241b68640d0835ddffa112aeac9f447cd5761c6bf23441546e5a2e2a76b556"
+        }
+      ],
+      "liveAfter": [
+        {
+          "path": "src/mode/mode.ts",
+          "sha256": "3385444df603f5c537392c217839cb88d830ecea522ae6cd975b3198a841ecf0"
+        },
+        {
+          "path": "src/utils/fs.ts",
+          "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4"
+        },
+        {
+          "path": "dist/mode/mode.js",
+          "sha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a"
+        },
+        {
+          "path": "dist/utils/fs.js",
+          "sha256": "96241b68640d0835ddffa112aeac9f447cd5761c6bf23441546e5a2e2a76b556"
+        }
+      ],
+      "mutatedSha256": null,
+      "originalModuleSha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a",
+      "restoredModuleSha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a",
+      "privateModuleRestoredExactly": true,
+      "dependencyUnchanged": true,
+      "allCallSnapshotsUnchanged": true
+    }
+  ],
+  "phaseJournal": [
+    {
+      "name": "owner-mode-first",
+      "cmd": "pnpm exec vitest run tests/a4OwnerModeQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-54-owner-mode-first-20261015.json",
+      "exit": 0,
+      "durationMs": 631,
+      "startedUtc": "2026-10-14T19:32:50.240675+00:00",
+      "log": "/private/tmp/p0-54-owner-mode-first-20261015.log",
+      "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+    },
+    {
+      "name": "owner-mode-wording-green",
+      "cmd": "pnpm exec vitest run tests/a4OwnerModeQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-54-owner-mode-wording-green-20261015.json",
+      "exit": 0,
+      "durationMs": 855,
+      "startedUtc": "2026-10-14T19:34:27.525831+00:00",
+      "log": "/private/tmp/p0-54-owner-mode-wording-green-20261015.log",
+      "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+    },
+    {
+      "name": "owner-mode-private-baseline",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-54-private-mode-causal-20261015.mjs baseline",
+      "exit": 0,
+      "durationMs": 94,
+      "startedUtc": "2026-10-14T19:36:01.372387+00:00",
+      "log": "/private/tmp/p0-54-owner-mode-private-baseline-20261015.log",
+      "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+    },
+    {
+      "name": "owner-mode-private-mutant",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-54-private-mode-causal-20261015.mjs mutant",
+      "exit": 1,
+      "durationMs": 89,
+      "startedUtc": "2026-10-14T19:36:07.740174+00:00",
+      "log": "/private/tmp/p0-54-owner-mode-private-mutant-20261015.log",
+      "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+    },
+    {
+      "name": "owner-mode-private-restored",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-54-private-mode-causal-20261015.mjs restored",
+      "exit": 0,
+      "durationMs": 89,
+      "startedUtc": "2026-10-14T19:36:13.133191+00:00",
+      "log": "/private/tmp/p0-54-owner-mode-private-restored-20261015.log",
+      "sourceHead": "bc0666fbb25bc5e53f0cfb6e84d53eb9eb86f01b"
+    }
+  ],
+  "phaseLogs": [
+    {
+      "path": "/private/tmp/p0-54-owner-mode-first-20261015.log",
+      "bytes": 73,
+      "sha256": "aae46fd37b28a01e317790608f679c063833b16e6ebacc4da18e15ad8ff0045e"
+    },
+    {
+      "path": "/private/tmp/p0-54-owner-mode-wording-green-20261015.log",
+      "bytes": 81,
+      "sha256": "2b4902f0fcec9244384c33171f03ee730d55110c54a2d3fe6f756742a6e681ca"
+    },
+    {
+      "path": "/private/tmp/p0-54-owner-mode-private-baseline-20261015.log",
+      "bytes": 184,
+      "sha256": "dbb6ad99c6948f065777ce72a330c6742a5340aff9a2168b18111b59ccf5d44c"
+    },
+    {
+      "path": "/private/tmp/p0-54-owner-mode-private-mutant-20261015.log",
+      "bytes": 180,
+      "sha256": "325d9f02ddad888173e8c860ac418e80867969efdd1563b8b0fd3e1ed4f16b65"
+    },
+    {
+      "path": "/private/tmp/p0-54-owner-mode-private-restored-20261015.log",
+      "bytes": 184,
+      "sha256": "45cc5a28cf72818388ab63e04f32c20015fdaf9fd98c002cadb2f4a1df1675de"
+    }
+  ],
+  "original16Paths": [
+    "a4 approve",
+    "a4 complete",
+    "a4 deny",
+    "a4 deploy record",
+    "a4 deploy verify",
+    "a4 export",
+    "a4 gate-policy",
+    "a4 hold",
+    "a4 members",
+    "a4 release",
+    "a4 reopen",
+    "a4 request-changes",
+    "a4 resume",
+    "a4 retire",
+    "a4 rollback",
+    "a4 tune"
+  ],
+  "acceptedAddition": "a4 acknowledge",
+  "nonblockedHelperStrings": [
+    "a4 guide",
+    "a4 list",
+    "a4 show",
+    "a4 readiness",
+    "a4 verify",
+    "run",
+    "score run"
+  ],
+  "actualContracts": [
+    "Each original path plus acknowledge independently refuses in agent mode with exact error text and permits in owner mode. All48 recorded gate calls preserve byte, inode, permission, timestamp, hardlink and symlink state.",
+    "Actual setMode/getMode persist owner/agent transitions, numeric updatedTs and0644, reread independent valid file rewrites and preserve missing/corrupt/unknown-mode owner fallback.",
+    "Current source inventory retains all17 A4 strings, independent of missing or future command registration."
+  ],
+  "causalProof": {
+    "scope": "Standalone41helper-call checks per private phase, not additional Vitest tests. Copied built mode.js and byte-identical fs.js retain native/relative dependencies. Only the single exact a4 approve entry is removed in the owned private module.",
+    "result": "Baseline41/41 exit0; mutant40/41 exit1 with only agent a4 approve missing-refusal; restored41/41 exit0. Other16agent refusals,17owner allowances and7nonblocked helper controls retain behavior. Every call leaves its workspace snapshots unchanged.",
+    "restoration": "Private module restores byte-exactly in finally. Copied fs.js and four live TS/compiled inputs match before/after every phase. No live guard, test input seam or freeze tool is mutated.",
+    "script": {
+      "path": "/private/tmp/p0-54-private-mode-causal-20261015.mjs",
+      "bytes": 6999,
+      "sha256": "085ca220ea3bbb2ec9e911d8f979e672b921648a37c61375adea3f369621d5b0"
+    },
+    "metadata": {
+      "path": "/private/tmp/p0-54-private-mode-fixture-20261015.json",
+      "bytes": 473,
+      "sha256": "e90753d4b918ea1252bfc49db874ecb5521c65d16f63aec65bee60ea6b2f0125"
+    },
+    "exactPatch": {
+      "path": "/private/tmp/p0-54-private-mode-one-entry-removal-20261015.patch",
+      "bytes": 392,
+      "sha256": "be231b149d77217bd631bc5e4cb06b8d87fdd76850c0f167ebf110ad846af5f0"
+    },
+    "retainedObservedMutantBytes": {
+      "path": "/private/tmp/p0-54-owned-private-mode-VL5gxw/mode-mutant-observed.js",
+      "bytes": 4119,
+      "sha256": "93abfde8b2045965965b2d5f68c7b390a71b3ba39bf6fde4997e45090e54bd67"
+    },
+    "restoredPrivateModule": {
+      "path": "/private/tmp/p0-54-owned-private-mode-VL5gxw/module/mode/mode.js",
+      "bytes": 4141,
+      "sha256": "bcfb6c165e3168e37a2d5a8f1062c477e0ffefc8c10489932efe346cca86ad9a"
+    },
+    "unchangedPrivateHelper": {
+      "path": "/private/tmp/p0-54-owned-private-mode-VL5gxw/module/utils/fs.js",
+      "bytes": 974,
+      "sha256": "96241b68640d0835ddffa112aeac9f447cd5761c6bf23441546e5a2e2a76b556"
+    }
+  },
+  "wordingCorrection": "Initial55/55green overbroadly labelled all seven controls read-only. Only variable/test wording changed to nonblocked; assertion logic and counts stayed identical. Original source/report and corrected55/55 phase are retained. run/score run can write state when executed; these tests never execute the commands.",
+  "observerNotes": "No runtime observer failure occurred. The private missing-gate RED is genuine intended causal evidence. One receipt-generation Python syntax error occurred before any file write; it supplies no product verdict and was corrected without runtime reruns.",
+  "buildCoordination": "Runtime, live hashing and private mutation finished before parent measured-source commit/build. This receipt uses retained private files/known test hashes only, with no live dist/source reads during build.",
+  "limitations": [
+    "String-helper contracts do not establish actor authentication, authorization policy, command registration, routedA4/API/Studio enforcement, OS permissions or actual A4 side effects.",
+    "Missing/corrupt/non-agent state defaults owner in accepted source. This is compatibility evidence, not fail-closed authentication or a security guarantee.",
+    "Nonblocked paths are guard input strings, not executed read-only commands. run and score run can mutate state if executed.",
+    "Private copied modules are never wired into product imports. Live A4 implementation, mode source, original tests, guards, archives, freeze/floors/baselines and budgets remain untouched.",
+    "No whole-suite, coverage, Node24, hostedCI, release/publication or Done claim; prior held debt and paused/reserved A4 work remain separate.",
+    "No vault, actual A4 store, server, CLI, network/provider/model or private key was needed. Owned per-test roots are removed after byte/link records are retained; private copied-module fixture remains."
+  ]
+}

@@ -1,0 +1,118 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-INV-04
+version: "0.1.0"
+support: experimental
+layer: 0
+family: inventory-and-classification
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: EU role and Art. 6(3) record
+statement: >-
+  Where an EU overlay applies, the provider or deployer role and any Art. 6(3) exemption exist as
+  signed artifacts, and without them EU controls are not evaluated.
+riskRationale: >-
+  EU duties differ by role and by whether the Art. 6(3) exemption applies; a flag nobody signed lets
+  an operator pick the lighter set.
+mandatory: true
+applicability:
+  predicate: { fact: jurisdictions, includesAny: [EU] }
+  reasons: [Applies only where the profile's jurisdictions include the EU.]
+  exclusions: []
+citations:
+  - key: eu-ai-act-art-6-3
+    registerId: eu-ai-act
+    instrument: Artificial Intelligence Act, Regulation (EU) 2024/1689
+    clause: Art. 6(3)
+    edition: Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (CELEX 32024R1689, 32026R1744)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2024-08-01"
+    complianceDueDate: "2027-12-02"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32024R1689
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-ai-act records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [EU] }
+    legalReview: null
+    note: >-
+      Strategy: the Art. 6(3) exemption is recorded as a signed artifact. The register lists Art. 6(2) and
+      Annex III only; the legal reviewer confirms the Art. 6(3) paragraph.
+  - key: eu-ai-act-art-6-2
+    registerId: eu-ai-act
+    instrument: Artificial Intelligence Act, Regulation (EU) 2024/1689
+    clause: Art. 6(2) and Annex III
+    edition: Regulation (EU) 2024/1689 as amended by Regulation (EU) 2026/1744 (CELEX 32024R1689, 32026R1744)
+    jurisdiction: EU
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2024-08-01"
+    complianceDueDate: "2027-12-02"
+    dateNote: null
+    url: https://publications.europa.eu/resource/celex/32024R1689
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry eu-ai-act records the source
+        as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen: { fact: jurisdictions, includesAny: [EU] }
+    legalReview: null
+    note: >-
+      Register: Annex III lists the high-risk use areas; Chapter III Sections 1 to 3 apply to Annex III
+      systems from 2027-12-02 (keyDate annexIIIHighRisk).
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    The deployment profile references a signed role record and any signed Art. 6(3) record by digest; EU
+    controls stay not evaluated until both verify.
+  parameters: []
+  manualDuty:
+    duty: >-
+      Sign the EU role record and any Art. 6(3) assessment, and reference them from the deployment
+      profile.
+    ownerRole: senior_manager
+    cadence: at onboarding and on every role change
+    evidenceOfPerformance: >-
+      The signed role and Art. 6(3) records and their digests in the profile.
+tests:
+  - id: L0-INV-04-T1
+    type: document_review
+    oracle: { kind: human_assessor, observes: "The signed role and Art. 6(3) records, read by a named assessor." }
+    fixtures:
+      positive: [L0-INV-04/positive/evidence-valid.json]
+      negative:
+        - L0-INV-04/negative/evidence-contradictory.json
+        - L0-INV-04/negative/evidence-cross-tenant.json
+        - L0-INV-04/negative/evidence-empty.json
+        - L0-INV-04/negative/evidence-replayed.json
+        - L0-INV-04/negative/evidence-stale.json
+        - L0-INV-04/negative/evidence-violation.json
+    passCriteria: Both records exist, verify and state the role and the exemption basis.
+    attempts: 1
+  - id: L0-INV-04-T2
+    type: configuration_check
+    oracle: { kind: signed_config, observes: The record digests the deployment profile references. }
+    fixtures:
+      positive: [L0-INV-04/positive/evidence-valid-t2.json]
+      negative: [L0-INV-04/negative/evidence-violation-t2.json]
+    passCriteria: Each referenced digest matches a verifying signed record.
+    attempts: 1
+evidence:
+  - id: L0-INV-04-E1
+    producer: amc.profile.euRecords
+    bindingFields: [deploymentId, controlId]
+    freshness: { maxAgeDays: 365 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [deployment_version]
+owner: { role: senior_manager }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

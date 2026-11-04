@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/classification.json",
+    "bytes": 10550,
+    "sha256": "e71ae4b4662b0e4ee75f4c108324245a538533df7b2ebe4495251d54bf638bd6"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/command.json",
+    "bytes": 1942,
+    "sha256": "f238650977f07086fe8bcdfbea7a96c07c539f3824ee0cb7f4d53859c092efa0"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/inputs-after.json",
+    "bytes": 874,
+    "sha256": "34f5ecd5bbe766fe5fc924149f48a82d74a74e65f1be242bc96b0eba8e5a33fa"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/inputs-before.json",
+    "bytes": 874,
+    "sha256": "286b9652486269f79f05fce7b536f7d437a321a87cbbe82a7fda47f35959dd07"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/observer.json",
+    "bytes": 26093,
+    "sha256": "65c6909eacae9d74501d4bf083ce5b0cbaa9ae6ee67575f3b9b3affef8752c45"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "f31ba2db1649188c7e7128b064ff8e43ce6442940c817c4c7a88b92c211d5692"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/owned-process.json",
+    "bytes": 1567,
+    "sha256": "36789acc9c8fb30b1891e8f1b4ca97432d342607dde354a92c4610c1a79c1e8f"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/raw.json",
+    "bytes": 17307,
+    "sha256": "059b69606c807f446bd8a08235f99e7ea6dfcaa94e87ec3352a09b6c670530d6"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C3-numeric-self-eligible-cap--mutant/stdout-stderr.log",
+    "bytes": 3818,
+    "sha256": "425e6d876d5a7b8438bf127f52f9f585678962096cb0e5b7e8c91694fac8b7fb"
+  }
+]

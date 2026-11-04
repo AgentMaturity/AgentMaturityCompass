@@ -1,0 +1,22 @@
+{
+  "capturedUtc": "2026-10-14T21:35:02.599Z",
+  "root": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source",
+  "node": "v24.21.0",
+  "executable": "/opt/homebrew/Cellar/node@24/24.21.0_2/bin/node",
+  "modulesAbi": "137",
+  "packageVersion": "12.11.1",
+  "packagePath": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source/node_modules/better-sqlite3/package.json",
+  "native": {
+    "path": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "realpath": "/private/tmp/p0-27-runtime-compatibility-20261015/node24-source/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "sha256": "c6fac315df023cf5efec45a3511e6515c6b0f7461a4a284b1b7a79c7ef8febe7",
+    "device": 16777231,
+    "inode": 537203733,
+    "links": 1,
+    "bytes": 1931952
+  },
+  "smoke": {
+    "witness": 1
+  },
+  "limits": "Genuine native SQLite ABI smoke only, no application/agent/model or cross-runtime behavior acceptance. Fresh isolated dependency stores; no source edit or shared ABI rebuild."
+}

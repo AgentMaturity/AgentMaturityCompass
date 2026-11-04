@@ -1,0 +1,65 @@
+{
+  "key": "P0-21",
+  "capturedUtc": "2026-10-15T05:08:31.333628+00:00",
+  "scope": "Root read-only preparation review; no controller/product execution or mutant write. V1 retained, not approved for runtime.",
+  "v1Controller": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+    "bytes": 18783,
+    "sha256": "df22405c146c82099182f19e4f3aa8b9200103ed2b518cdf8842c430776158c8"
+  },
+  "v1Setup": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/setup.json",
+    "bytes": 6837,
+    "sha256": "d7511c53ff825e7897b89af9327e91ee17301c4b6831ab2a7310789bbca4e246"
+  },
+  "v1Index": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/setup-index.json",
+    "bytes": 3131,
+    "sha256": "cc36bfc5492d94d192cd7fe85a71d8efe22d916c19b94f1753e8c4809fc38129"
+  },
+  "rootReadInstalledCloseImplementation": {
+    "file": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js",
+      "bytes": 498779,
+      "sha256": "a236001d048380e2c67d05423fc9ea3f26b07ee019ba8d6e622082f29d49102e"
+    },
+    "lines": "13995-14055",
+    "version": "4.1.11"
+  },
+  "blockingFinding": {
+    "priority": 1,
+    "problem": "V1 rejects selected infrastructure banners but omits actual error during close, close timed out and Tests closed successfully but something prevents banners. Vitest can log rejected close promises or force process.exit with the current0/1 code after reporter output. Green raw or expected assertion failures plus outer exit and owned-group ESRCH therefore do not exclude these known close faults.",
+    "requirement": "Final controller must reject actual known close diagnostics and preserve ACTIVE/HALTED with no restoration or new runtime."
+  },
+  "additionalCorrections": [
+    {
+      "kind": "scheduling consistency",
+      "change": "Add maxWorkers1/no-file-parallelism to match parent original37 run."
+    },
+    {
+      "kind": "robustness, not unsafe acceptance",
+      "change": "Retain all signal-zero process-group probes for bounded5s/50ms and require a positive ESRCH proof before restoration. One-shot v1 was already fail-closed."
+    },
+    {
+      "kind": "retained-state truth",
+      "change": "Rename catch-handler restorationAttempted:false to automaticRestorationOnException:false because earlier normal restoration may already have occurred before a later failure."
+    },
+    {
+      "kind": "diagnostic coverage",
+      "change": "Explicitly include error during global teardown."
+    }
+  ],
+  "v3CodeRead": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+    "bytes": 19822,
+    "sha256": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68"
+  },
+  "v3ExecutionStatus": "Unexecuted; combined independent code and sealed setup/index review still required before root release.",
+  "priorStreamsAudit": {
+    "path": "/private/tmp/p0-21-qualification-20261015/known-late-close-retrospective-audit.json",
+    "bytes": 2039,
+    "sha256": "ce67e789c62a686baef1a2ecd8f102eb0cc098a779068fbe2ca0c83c84a27ea1"
+  },
+  "oldInputsEdited": false,
+  "formalAcceptanceClosed": false
+}

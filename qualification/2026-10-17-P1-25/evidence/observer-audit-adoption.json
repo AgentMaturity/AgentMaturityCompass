@@ -1,0 +1,7 @@
+{
+  "source": "/private/tmp/p1-07-gate-qualification-20261016/audit-observed-run.py",
+  "sourceSha256": "09ca539e09290657954dc7cbd07016057fa0b9837faf9b943799956a36af0c42",
+  "target": "/private/tmp/p1-25-time-qualification-20261016/audit-observed-run.py",
+  "targetSha256": "c82abc7644b2f7cb70ae6f9d8e54dc72b685c677adb11405a6bfe718b97fbc39",
+  "review": "Full original read; only schema label and private outcome directory changed. File/title/occurrence/state joins, original logs and observers remain unchanged. No test execution or source modifications."
+}

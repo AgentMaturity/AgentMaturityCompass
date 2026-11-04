@@ -1,0 +1,61 @@
+{
+  "state": "NOT_STARTED_FOR_Q4",
+  "sourceCommit": "d8381b6daccc1ef3a9c011f8b953c323babe34d5",
+  "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020",
+  "branch": "codex/p2-27-publication-final",
+  "qualificationPrefix": "qualification/2026-10-20-P2-27-publication/",
+  "boundHelper": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/capture-publication-full-suite-bound-v1.py",
+    "sha256": "8ce1e255abc7b2c9264478151a0f5e1b61498c8366e486b68196df5dbc95e9bc",
+    "bytes": 15089
+  },
+  "bindingReview": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/bound-full-helper-binding-review-v1.json",
+    "sha256": "ad995b22b7936adb6784e1d600750029cbae254db3ad357438df76ed5fa84227",
+    "bytes": 11666
+  },
+  "commandShape": "npx vitest run --maxWorkers=2 --reporter=verbose --reporter=json --outputFile=<owned full-suite/Q4/report.json>",
+  "requirements": [
+    "Actual Q4 is the clean single-parent metadata-only child of H4.",
+    "Before and after: exact HEAD, int, branch, Node, pnpm, owned TMPDIR, tracked status and source hashes.",
+    "Use an exclusive new output directory and owned process group; never overwrite earlier captures.",
+    "Preserve native JSON, raw log, exit code, failed assertions, genuine collection errors and skips.",
+    "Root checks native arithmetic, exact file roster and exit/success coherence; missing or malformed output never qualifies.",
+    "Classify each failure separately against actual clean int and candidate evidence. No future failure is preclassified.",
+    "Do not edit, rebuild, stage or commit in the candidate while its full run executes.",
+    "Write completed full evidence outside Q4, bound to Q4, so the measured final commit remains unchanged."
+  ],
+  "inheritedCaptureCaveats": "Some launch, snapshot and malformed nested JSON exceptions can escape before result.json. Preserve all available artifacts and record an invalid capture explicitly.",
+  "priorQ2": {
+    "nativeResult": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/full-suite/4c06e443b83d87c5f117bee8c413649dc4000f61/result.json",
+      "sha256": "6d4444cc7f3a84a1d54f02122efef7bc4f9e6ddd282ba180ee60b3ce25423389",
+      "bytes": 5200
+    },
+    "status": "completed_failed_not_qualification_for_H3_or_Q3",
+    "ownedFailures": 7,
+    "exactBaselineDocsFailures": 1,
+    "fullOnlyTsaFailuresPassingAloneOnBothLines": 8
+  },
+  "nativeTotals": null,
+  "automaticQualificationOrLanding": false,
+  "actualQ4Result": null,
+  "priorQ3": {
+    "status": "completed_failed_not_qualification_for_H4_or_Q4",
+    "result": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/full-suite/c6ab4e8fe0421365e11202eb9e0312d74c8c9c0c/result.json",
+      "sha256": "1a98a8d847351f5b9d13b007ae72ad49a14b32125757d628923cab866cc0e7be",
+      "bytes": 5285
+    },
+    "rootAudit": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/q3-completed-native-root-audit-v1.json",
+      "sha256": "76f546b1d177956bd1a89f4c906ee3764e14cff66e51c7023225f3ed8cf567c0",
+      "bytes": 10989
+    },
+    "classification": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/q3-completed-full-forward-fixes-required-root-v1.json",
+      "sha256": "4babe62b038eab7ffbd28af65eeadb6ef4b6efbe513c87d67bacdeb621625051",
+      "bytes": 4564
+    }
+  }
+}

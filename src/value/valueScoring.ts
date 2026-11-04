@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import type { ValueContract } from "./valueContracts.js";
 import type { ValuePolicy } from "./valuePolicySchema.js";
 import type { ValueEvent } from "./valueEventSchema.js";
@@ -8,11 +9,8 @@ export interface ValueKpiScore {
   baselineValue: number | null;
   currentValue: number | null;
   delta: number | null;
-  trustKindSummary: {
-    observed: number;
-    attested: number;
-    selfReported: number;
-  };
+  /** Shares of the KPI's events by trust kind; null with no events (not measured). */
+  trustKindSummary: TrustKindShares;
   evidenceRefsCount: number;
 }
 
@@ -44,10 +42,7 @@ function clamp100(value: number): number {
 }
 
 function average(values: number[]): number | null {
-  if (values.length === 0) {
-    return null;
-  }
-  return Number((values.reduce((sum, value) => sum + value, 0) / values.length).toFixed(6));
+  return values.length === 0 ? null : Number(mean(values).toFixed(6));
 }
 
 function normalizeScore(params: {
@@ -70,17 +65,16 @@ function normalizeScore(params: {
   return clamp100(((params.value - params.maxBad) / denom) * 100);
 }
 
-function trustSummary(events: ValueEvent[]): {
-  observed: number;
-  attested: number;
-  selfReported: number;
-} {
+export interface TrustKindShares {
+  observed: number | null;
+  attested: number | null;
+  selfReported: number | null;
+}
+
+/** Event shares by trust kind; with no events nothing was measured, so every share is null, never 0. */
+export function trustKindShares(events: Array<{ source: { trustKind: "OBSERVED" | "ATTESTED" | "SELF_REPORTED" } }>): TrustKindShares {
   if (events.length === 0) {
-    return {
-      observed: 0,
-      attested: 0,
-      selfReported: 0
-    };
+    return { observed: null, attested: null, selfReported: null };
   }
   const observed = events.filter((event) => event.source.trustKind === "OBSERVED").length;
   const attested = events.filter((event) => event.source.trustKind === "ATTESTED").length;
@@ -113,7 +107,7 @@ export function scoreValueDimensions(params: {
     const baseline = params.baselineEvents.filter((event) => event.kpiId === kpi.kpiId);
     const currentValue = average(current.map((event) => event.value));
     const baselineValue = average(baseline.map((event) => event.value));
-    const summary = trustSummary(current);
+    const summary = trustKindShares(current);
     const normalizedScore =
       currentValue === null
         ? null
@@ -146,7 +140,7 @@ export function scoreValueDimensions(params: {
       continue;
     }
 
-    const pureSelfReported = summary.observed === 0 && summary.attested === 0 && summary.selfReported > 0;
+    const pureSelfReported = summary.observed === 0 && summary.attested === 0 && (summary.selfReported ?? 0) > 0;
     for (const dim of ["emotional", "functional", "economic", "brand", "lifetime"] as const) {
       const weight = kpi.valueDimensionImpacts[dim];
       if (weight <= 0) {
@@ -193,10 +187,11 @@ export function scoreValueDimensions(params: {
         )
       : null;
 
-  const observedShare = clamp01(
-    kpis.length === 0 ? 0 : kpis.reduce((sum, row) => sum + row.trustKindSummary.observed, 0) / Math.max(1, kpis.length)
-  );
-  if (observedShare < params.policy.valuePolicy.evidenceGates.minObservedShareForStrongClaims) {
+  // Only KPIs with events measured an observed share; one with no events is not a measured 0.
+  const measuredShares = kpis.flatMap((row) => row.trustKindSummary.observed === null ? [] : [row.trustKindSummary.observed]);
+  if (measuredShares.length === 0) {
+    notes.push("observed_share_not_measured");
+  } else if (clamp01(mean(measuredShares)) < params.policy.valuePolicy.evidenceGates.minObservedShareForStrongClaims) {
     notes.push("observed_share_low_for_strong_claims");
   }
 

@@ -1,0 +1,53 @@
+{
+  "schema": "p107-private-static-admission-seal/1",
+  "allReadsFinished": true,
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/review.json",
+      "bytes": 24844,
+      "sha256": "058071197907ec1e2b4897d3ee748764ce7e16e7394e2eaad59050a31be62b51"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/README.md",
+      "bytes": 2734,
+      "sha256": "3cdccfe4e278e8e94b106309a5441282ae9de9918e42c37afb3045ce0f6c83ff"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/pins.json",
+      "bytes": 14980,
+      "sha256": "201c551315884f3d3df6dec95ece0651cfbedbf2a41b8ac151bb2f2586eefae4"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/ownership-facts.json",
+      "bytes": 148634,
+      "sha256": "e6dea5ea0da45d5d74ac86d118bb29ca823a839981668db306dba806446224ba"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/src-types.ts.preserved-variant.diff",
+      "bytes": 1129,
+      "sha256": "a69b89e3ac2716de39ac1b477acea6c6514100e0a9ca7d46d8d309192093ab50"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/src-claims-evidenceProvenance.ts.preserved-variant.diff",
+      "bytes": 1031,
+      "sha256": "c4e2bc966a15f87ff99cf966b2aa2250cd6a89d62d5e9bd2e39b0bd8ee2d39b4"
+    }
+  ],
+  "fullCapture": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/observations.json",
+    "bytes": 1410359,
+    "sha256": "f56ba25b9921d373c4d70e2c6a4977bde1eb2650e37a249a86ee301b486aca05",
+    "readScope": "complete JSON metadata analysis; no product execution"
+  },
+  "semanticEquivalentCompactCapture": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/observations.compact.json",
+    "bytes": 1052084,
+    "sha256": "b8fa145ce84f356ef67e0ecfe270c4431da9795de0d0352d6aefeff9d1a305a2",
+    "readScope": "same complete observations with JSON whitespace removed; preserved alongside original"
+  },
+  "inputPinCount": 41,
+  "runtimeExecuted": false,
+  "checkoutIndexQAWrites": false,
+  "wholeIssueDone": false
+}

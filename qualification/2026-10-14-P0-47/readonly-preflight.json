@@ -1,0 +1,1907 @@
+{
+  "schemaVersion": 1,
+  "kind": "readonly-queue-preflight",
+  "issue": "P0-47",
+  "preparedOn": "2026-10-14",
+  "status": "NOT_QUALIFIED_NO_CHECKS_EXECUTED",
+  "scope": {
+    "readOnlyRepository": true,
+    "noBuilds": true,
+    "noTests": true,
+    "noSourceEdits": true,
+    "noPR": true,
+    "noPublication": true,
+    "outputs": [
+      "/private/tmp/p0-47-readonly-preflight-20261014.json",
+      "/private/tmp/p0-47-readonly-preflight-20261014.md"
+    ]
+  },
+  "authority": {
+    "pullRequest": {
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/38",
+      "title": "[P0-47] Snapshot frozen files on edit so restoration parity proofs stop blocking plan work (D-15)",
+      "mergeCommit": "a54e4ec84f6f4350909ec2294b59fec176ec9172",
+      "headCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "mergedAt": "2026-10-06T14:56:03Z",
+      "body": "Proposed plan issue **P0-47**: implements Sid's decision **D-15 (\"snapshot on edit\", 2026-10-05)** from the [AMC Ready-to-Deploy Implementation Plan](https://claude.ai/code/artifact/153157e0-0d2f-4374-934b-5f6f360a46e1). **Stacked on #34** (P0-01): its base branch is `rtd/p0-01-contract-receipts-freeze` because P0-01 edits four of the same parity tests.\n\n> **Merge note:** merge #34 with **\"Create a merge commit\"**, not squash, then this PR. The snapshot entry records `baseCommit` `51f425bf` (#34's head), and `tests/planEditsManifest.test.ts` requires it to stay an ancestor of `HEAD`. After a squash, rerun `scripts/snapshot-plan-edit.mjs` with the new base (see `unused-code/plan-edits/README.md`).\n\n## Why\n\nThe root patch landed on `main` (786d8abb) added restoration parity tests. They compare live files byte for byte with archives under `unused-code/`, which freezes about 190 files: `src/types.ts`, `src/index.ts`, `src/sdk/nativeAgentClient.ts`, `src/workspace.ts`, built `dist/*.d.ts` and the text of other tests. That blocks P0-06 (shell gate) and P0-08 (claim service), which must edit those files.\n\n## What changes\n\n- **`tests/helpers/landedSource.ts`.** `landedBytes`/`landedText` return the archived pre-edit bytes for a path registered in `unused-code/plan-edits/manifest.json`, after verifying their sha256, and otherwise return the live file.\n- **19 parity test files** route every *live freeze-comparison* read through the helper. Archive reads and behaviour reads are unchanged: the tests still import and run live code, and there is no `node:fs` mock. The other 10 files have no live freeze read.\n- **`scripts/snapshot-plan-edit.mjs --issue <KEY> --base <rev> <path>...`** archives `git cat-file blob <rev>:<path>` and upserts the sorted manifest. For a source file it also archives the pinned `dist/` outputs from disk, but only while they still equal their pins.\n  - It refuses: a duplicate path, a bad key, a path that is not a file at `<rev>`, an already-rebuilt `dist/` output, and `package.json`, which P0-01 pins by entries.\n- **`tests/planEditsManifest.test.ts`** checks:\n  - Schema, sort order and uniqueness, and that each archive's sha256 matches.\n  - Each archive equals `<baseCommit>:<path>`, and the base is an ancestor of `HEAD`. This is skipped only in a shallow clone that lacks the base.\n  - Helper units, and script behaviour in temp git repositories.\n- **Meta-freeze.** This PR edits `tests/privateModuleHelperVisibility.test.ts`, whose text `workspacePathRedactionParity` freezes. Its pre-edit bytes are therefore registered under `P0-47`, which is the one manifest entry.\n- `unused-code/plan-edits/README.md` documents how to use it. The patch changeset is worded \"contributor tooling only, no runtime change\".\n\n## Acceptance checklist\n\n- [x] The parity tests pass as before. 7,098 parity tests at the base and 7,098 + 10 new after. With an *empty* manifest only one assertion fails: the meta-freeze of the test file this PR edits, which its own committed entry covers.\n- [x] Integration proof for `src/types.ts`, `src/index.ts`, `src/sdk/nativeAgentClient.ts` and `src/workspace.ts`. Each got a probe that changes declarations (`export const p47Probe = 1;`), followed by a `dist/` rebuild. Each probe failed the parity suite (3, 3, 3 and 2 failures) and passed after `snapshot-plan-edit.mjs --issue P0-99`. All probes were reverted.\n- [x] Manifest and helper tests pass. Mutation checks:\n  - `landedBytes` always reading the live file fails the integration proof plus 5 helper and script tests.\n  - Skipping the sha256 check fails \"throws when an archive no longer matches its manifest sha256\".\n- [x] No archive read was rerouted and no `node:fs` mock was added.\n- [x] Full suite, typecheck, typecheck:tests and lint pass (local run below); changeset added.\n\n**Full local run of every CI step at `975d3723`:**\n- 1,525 test files, 21,457/21,457 tests passed under coverage; per-file floors pass.\n- clean-source, packed-install and e2e smoke pass.\n- `release:gate` 17/19. Only `source-duplicates` and `source-dead-code` fail, as on `main` (D-11).\n- `git status` was empty after the run.\n\nKnip first reported 3 new findings (exported constants used only inside their own modules). The last commit makes them module-private, which brings Knip back to 2,339, the base count. Duplicates are unchanged at 1,253. Focused tests, typecheck:tests and lint were rerun after that commit.\n\n## Review\n\nThree lenses raised 8 findings and refuters checked each one. Seven were confirmed and fixed with regression tests:\n\n- **(high)** Built `dist/*.d.ts` pins in `metricParameterContractParity` and `workspacePathRedactionParity` would still block P0-06 and P0-08 once CI rebuilt `dist/`. Pinned build outputs are now snapshotted too.\n- A squash-rewritten `baseCommit` now fails clearly instead of being skipped.\n- The script ran nothing when invoked through a symlink, and it accepted a directory as a path.\n- The script and validator now refuse `package.json`.\n\n## Limits\n\nD-15 only frees *freeze comparisons*. Behaviour checks still run live code, so an edit that really changes the behaviour of a module those tests execute still fails them. That is intended, and P0-06 and P0-08 handle it per issue.\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n"
+    },
+    "recoveredAcceptance": [
+      "Preserve all existing parity assertions; compare the same full original source/declaration/archive bytes.",
+      "Four real declaration-changing source probes: src/types.ts, src/index.ts, src/sdk/nativeAgentClient.ts, src/workspace.ts; each adds export const p47Probe = 1; and rebuilds dist. Each must fail without its snapshot and pass after snapshot registration, then be reverted in an owned fixture.",
+      "Manifest schema/sort/uniqueness/archive SHA/base ancestry checks, helper units, and actual script behavior must pass.",
+      "An actual helper mutation that always reads live files must fail integration and helper/script tests; an actual SHA-guard removal must fail the tampered-archive test.",
+      "Archive reads and behavior reads remain unchanged; behavior executes live code; no node:fs mock.",
+      "Full suite, typecheck, typecheck:tests and lint pass. Retain changeset; do not weaken any global or per-file coverage floor."
+    ],
+    "packageRefusalSupersededBy": [
+      "80abdaf02",
+      "742330c5"
+    ],
+    "decisionSource": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/decisions.md",
+      "sha256": "f4a23e966d0f949dd0d418a0896b0797aeedacafbd21dd9d1242d32467c04c00",
+      "lines": [
+        5,
+        49
+      ]
+    }
+  },
+  "currentInventory": {
+    "manifestRows": 55,
+    "issueCount": 29,
+    "probeRegistrations": [
+      {
+        "path": "dist/index.d.ts",
+        "issue": "P0-08",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-08/dist/index.d.ts.landed",
+        "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
+      },
+      {
+        "path": "dist/sdk/nativeAgentClient.d.ts",
+        "issue": "P0-06",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-06/dist/sdk/nativeAgentClient.d.ts.landed",
+        "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+      },
+      {
+        "path": "src/index.ts",
+        "issue": "P0-08",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-08/src/index.ts.landed",
+        "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
+      },
+      {
+        "path": "src/sdk/nativeAgentClient.ts",
+        "issue": "P0-06",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-06/src/sdk/nativeAgentClient.ts.landed",
+        "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
+      },
+      {
+        "path": "src/types.ts",
+        "issue": "P0-44",
+        "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+        "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
+        "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
+      },
+      {
+        "path": "src/workspace.ts",
+        "issue": "P1-25",
+        "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+        "archivePath": "unused-code/plan-edits/P1-25/src/workspace.ts.landed",
+        "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661"
+      }
+    ],
+    "p0_47Registrations": [
+      {
+        "path": "tests/privateModuleHelperVisibility.test.ts",
+        "issue": "P0-47",
+        "baseCommit": "51f425bf33ae5ce35b4328b33d17be26af44dad2",
+        "archivePath": "unused-code/plan-edits/P0-47/tests/privateModuleHelperVisibility.test.ts.landed",
+        "sha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5"
+      }
+    ],
+    "packageRegistration": [
+      {
+        "path": "package.json",
+        "issue": "P0-09",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-09/package.json.landed",
+        "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc"
+      }
+    ],
+    "compiledPins": {
+      "dist/index.d.ts": [
+        {
+          "restoration": "unused-code/2026-10-02-main/metric-private-parameter-contracts/restoration.json",
+          "file": "dist/index.d.ts",
+          "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
+        },
+        {
+          "restoration": "unused-code/2026-10-02-main/workspace-path-redaction/restoration.json",
+          "source": "src/index.ts",
+          "file": "dist/index.d.ts",
+          "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47"
+        }
+      ],
+      "dist/sdk/nativeAgentClient.d.ts": [
+        {
+          "restoration": "unused-code/2026-10-02-main/metric-private-parameter-contracts/restoration.json",
+          "file": "dist/sdk/nativeAgentClient.d.ts",
+          "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+        },
+        {
+          "restoration": "unused-code/2026-10-02-main/workspace-path-redaction/restoration.json",
+          "source": "src/sdk/nativeAgentClient.ts",
+          "file": "dist/sdk/nativeAgentClient.d.ts",
+          "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a"
+        }
+      ]
+    },
+    "distPresence": {
+      "dist/types.d.ts": true,
+      "dist/types.js": true,
+      "dist/index.d.ts": true,
+      "dist/index.js": true,
+      "dist/sdk/nativeAgentClient.d.ts": true,
+      "dist/sdk/nativeAgentClient.js": true,
+      "dist/workspace.d.ts": true,
+      "dist/workspace.js": true
+    },
+    "scripts": {
+      "build": "tsc -p tsconfig.json && npm run copy-assets && node scripts/bundle-kernel.mjs && npm run api:build",
+      "build:pages": "node scripts/build-pages-site.mjs",
+      "docs:api": "typedoc --options typedoc.json",
+      "build:sea": "node scripts/build-sea.mjs",
+      "brand:render": "node scripts/render-brand-assets.mjs",
+      "package:desktop": "node scripts/package-desktop-installers.mjs",
+      "package:desktop:verify": "node scripts/verify-desktop-installers.mjs",
+      "release:prepare-assets": "node scripts/prepare-public-release-assets.mjs",
+      "release:verify-version": "node scripts/verify-release-version.mjs",
+      "copy-assets": "node scripts/copy-build-assets.mjs",
+      "dev": "tsx src/cli.ts",
+      "api:start": "tsx api/index.ts",
+      "api:build": "node scripts/build-standalone-api.mjs",
+      "api:start:production": "node dist/standalone-api.js",
+      "lint": "oxlint --type-aware --deny-warnings -c .oxlintrc.json src && node scripts/lint-contract.mjs && node scripts/check-no-fabrication.mjs",
+      "typecheck": "tsc -p tsconfig.json --noEmit",
+      "typecheck:tests": "tsc -p tsconfig.tests.json --noEmit",
+      "pretest": "npm run build",
+      "test": "vitest run",
+      "test:e2e": "node scripts/run-e2e.mjs",
+      "accessibility:release-evidence": "node scripts/write-accessibility-release-evidence.mjs --report tmp/accessibility-playwright.json --out docs/runbooks/accessibility-release-evidence-latest.md",
+      "test:watch": "vitest",
+      "changeset": "changeset",
+      "version-packages": "changeset version",
+      "release": "changeset publish",
+      "release:gate": "node scripts/release-gate.mjs",
+      "release:prepack-check": "node scripts/prepack-release-check.mjs",
+      "qa:install-personas": "node scripts/install-persona-qa.mjs",
+      "qa:dogfood-8-agents": "node scripts/amc-dogfood-8-agents.mjs",
+      "research:amc-landscape": "node scripts/research-amc-landscape.mjs",
+      "research:amc-landscape:verify": "node scripts/verify-amc-landscape.mjs",
+      "audit:runtime": "pnpm audit --prod --audit-level moderate",
+      "check:incident-readiness": "node scripts/incident-readiness-check.mjs",
+      "check:architecture-boundaries": "node scripts/architecture-boundaries-check.mjs",
+      "check:docs-drift": "node scripts/docs-drift-check.mjs",
+      "check:policy-fixtures": "node scripts/run-policy-fixtures-ci.mjs",
+      "clean": "node scripts/clean-dist.mjs",
+      "prebuild": "npm run clean",
+      "prepack": "npm run release:gate -- --json --out tmp/release-gate/prepack.json && npm run release:prepack-check",
+      "postinstall": "node scripts/postinstall.js || true",
+      "gen-counts": "node scripts/gen-counts.mjs --write",
+      "check:counts": "node scripts/gen-counts.mjs --check",
+      "check:freeze": "node scripts/check-freeze.mjs",
+      "check:no-fabrication": "node scripts/check-no-fabrication.mjs",
+      "check:threat-model": "node scripts/check-threat-model.mjs",
+      "check:qualification": "node scripts/check-qualification-receipts.mjs",
+      "check:regulatory-currency": "node scripts/check-regulatory-currency.mjs",
+      "check:citations": "node scripts/check-citations.mjs",
+      "trust-list": "node scripts/trust-list.mjs",
+      "check:compliance-freshness": "node scripts/compliance-artifact-freshness.mjs",
+      "check:evidence-paths": "node scripts/evidence-path-check.mjs",
+      "gen:api-ref": "node scripts/gen-api-ref.cjs",
+      "check:api-ref": "node scripts/gen-api-ref.cjs --check",
+      "gen:schemas": "node scripts/gen-spec-schemas.mjs --write",
+      "check:schemas": "node scripts/gen-spec-schemas.mjs --check",
+      "check:question-bank-export": "node scripts/gen-question-bank-export.mjs --check",
+      "check:gates": "node scripts/check-gate-reachability.mjs",
+      "test:coverage": "vitest run --coverage",
+      "gen:changelog-page": "node scripts/gen-changelog-page.mjs",
+      "check:changelog-page": "node scripts/gen-changelog-page.mjs --check",
+      "vendor:rescope": "node scripts/vendor/rescope-vendor.mjs --apply",
+      "check:vendor-links": "node scripts/vendor/verify-vendored-links.mjs",
+      "check:vendor-rescope": "node scripts/vendor/rescope-vendor.mjs --check",
+      "gen:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs",
+      "check:third-party-notices": "node scripts/vendor/gen-third-party-notices.mjs --check",
+      "build:vendor": "tsc -b vendor/cordis vendor/loader vendor/include vendor/group vendor/timer vendor/hmr vendor/logger-console vendor/schemastery",
+      "graph:update": "graphify update .",
+      "check:clean-source": "node scripts/clean-source-check.mjs",
+      "bundle:kernel": "node scripts/bundle-kernel.mjs",
+      "check:packed-install": "node scripts/packed-install-check.mjs",
+      "qualify:platform": "node scripts/qualify-platform.mjs",
+      "check:package": "node scripts/package-lint.mjs",
+      "check:duplicates": "node scripts/source-quality.mjs duplicates",
+      "check:dead-code": "node scripts/source-quality.mjs dead-code",
+      "check:coverage": "node scripts/per-file-coverage.mjs"
+    }
+  },
+  "qualificationInterpretation": {
+    "existingSnapshots": "All four probe source paths are already registered on accepted main. Their historical archives and existing issue owners must remain intact. A direct P0-99 re-registration correctly refuses, and current-main probe source changes already read snapshots for freeze comparisons.",
+    "reproduction": "Replay the original red-before/pass-after mechanism in disposable detached worktrees at b552b69cd220d7d73b63a58685f77bb2bbb26c8f, where only the original P0-47 meta-freeze is registered. Use exact current snapshot script/helper bytes as the tooling under qualification; leave historical parity assertions, source, manifests and archives unchanged except the explicitly owned probe and added snapshot rows.",
+    "proofSeparation": "A historical fixture replay is integration evidence for current tooling against the unregistered frozen baseline. It is not a full-suite pass on current main. Current-main helper/manifest/parity/full-suite checks and current guard mutations must be separately recorded.",
+    "behavior": "Real behavior changes may still fail parity after snapshot registration; a snapshot must never suppress those behavior failures.",
+    "packageJson": "Keep approved package.json snapshot support and its current P0-09 archive. Do not restore the PR body's obsolete refusal."
+  },
+  "missingAuthoritativeDetails": [
+    "No dedicated specs/P0-47.md exists in the recovered specs inventory; merged PR #38 plus D-15 decisions are the recovered authority.",
+    "PR #38 names four probes, their one-line edit and historical failure counts (3,3,3,2), but no committed executable real-probe runner or retained per-probe raw logs/JSON receipts were found. These historical counts are not fresh evidence.",
+    "The linked Claude artifact has not been read directly; the locally recovered D-15 text records option A and references PR #38.",
+    "There is no approved instruction to delete/reassign existing snapshots on current main. Current-main red-before reproduction cannot be claimed by silently removing registered downstream archives."
+  ],
+  "commands": [
+    {
+      "phase": "Current-main baseline, in a fresh owned checkout at acceptedMain; run Node 22 and Node 24 in separate owned checkouts",
+      "executed": false,
+      "shell": "bash",
+      "command": "set -euo pipefail\nexport PATH=\"/opt/homebrew/opt/node@22/bin:$PATH\"\nexport GIT_NO_LAZY_FETCH=1\ntest \"$(git rev-parse HEAD)\" = 5ea5e866a42acd5c8228a712e9b8c1d9f18c745c\npnpm install --frozen-lockfile\nmkdir -p tmp/p0-47\nnpm run build > tmp/p0-47/build.log 2>&1\nnpx --no-install vitest run tests/planEditsManifest.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-47/helper-manifest.json > tmp/p0-47/helper-manifest.log 2>&1\nnpx --no-install vitest run $(git grep -l 'unused-code/' -- tests | rg '\\.test\\.ts$') --reporter=default --reporter=json --outputFile.json=tmp/p0-47/parity.json > tmp/p0-47/parity.log 2>&1\nnpm run typecheck > tmp/p0-47/typecheck.log 2>&1\nnpm run typecheck:tests > tmp/p0-47/typecheck-tests.log 2>&1\nnpm run lint > tmp/p0-47/lint.log 2>&1\nnpm run check:freeze > tmp/p0-47/freeze.log 2>&1\nnpm run check:clean-source > tmp/p0-47/clean-source.log 2>&1\nnpm run test:coverage -- --exclude 'tests/performance/**' --coverage.reportOnFailure --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/p0-47/full-tests.json > tmp/p0-47/full-tests.log 2>&1\nnpx --no-install vitest run tests/performance --no-file-parallelism --reporter=default --reporter=json --outputFile.json=tmp/p0-47/performance.json > tmp/p0-47/performance.log 2>&1\nnpm run check:coverage > tmp/p0-47/per-file-coverage.log 2>&1\ngit status --porcelain=v1 --untracked-files=all > tmp/p0-47/after-tests.txt\ntest ! -s tmp/p0-47/after-tests.txt\n",
+      "note": "For Node 24 use /opt/homebrew/opt/node@24/bin in a separate owned checkout with a fresh frozen install. Every check must retain its actual exit code. Do not describe full test success from passed case counts alone: JSON success must be true, failures/pending/todo must be zero, and global and per-file coverage must pass."
+    },
+    {
+      "phase": "Four real source/declaration probes on the historical unregistered baseline, with current approved tooling",
+      "executed": false,
+      "shell": "bash",
+      "command": "set -euo pipefail\nexport PATH=\"/opt/homebrew/opt/node@22/bin:$PATH\"\nexport GIT_NO_LAZY_FETCH=1\np47_repo=/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass\np47_main=5ea5e866a42acd5c8228a712e9b8c1d9f18c745c\np47_base=b552b69cd220d7d73b63a58685f77bb2bbb26c8f\np47_runroot=$(mktemp -d /private/tmp/amc-p0-47-probes-20261014.XXXXXX)\nfor p47_source in src/types.ts src/index.ts src/sdk/nativeAgentClient.ts src/workspace.ts; do\n  p47_slug=$(printf '%s' \"$p47_source\" | tr '/.' '--')\n  p47_fixture=\"$p47_runroot/$p47_slug\"\n  git -C \"$p47_repo\" worktree add --detach \"$p47_fixture\" \"$p47_base\"\n  for p47_tool in scripts/snapshot-plan-edit.mjs tests/helpers/landedSource.ts tests/planEditsManifest.test.ts; do\n    git -C \"$p47_repo\" show \"$p47_main:$p47_tool\" > \"$p47_fixture/$p47_tool\"\n  done\n  (\n    cd \"$p47_fixture\"\n    pnpm install --frozen-lockfile\n    mkdir -p tmp/p0-47\n    npm run build > tmp/p0-47/base-build.log 2>&1\n    npx --no-install vitest run $(git grep -l 'unused-code/' -- tests | rg '\\.test\\.ts$') --reporter=default --reporter=json --outputFile.json=tmp/p0-47/baseline.json > tmp/p0-47/baseline.log 2>&1\n    printf '\\nexport const p47Probe = 1;\\n' >> \"$p47_source\"\n    npm run build > tmp/p0-47/red-build.log 2>&1\n    set +e\n    npx --no-install vitest run $(git grep -l 'unused-code/' -- tests | rg '\\.test\\.ts$') --reporter=default --reporter=json --outputFile.json=tmp/p0-47/red.json > tmp/p0-47/red.log 2>&1\n    p47_red=$?\n    set -e\n    test \"$p47_red\" -ne 0\n    printf '%s\\n' \"$p47_red\" > tmp/p0-47/red.exit\n    # Only this disposable fixture's one probe source is restored. No main archive or manifest is touched.\n    git restore --source \"$p47_base\" -- \"$p47_source\"\n    npm run build > tmp/p0-47/restored-base-build.log 2>&1\n    node scripts/snapshot-plan-edit.mjs --issue P0-99 --base \"$p47_base\" \"$p47_source\" > tmp/p0-47/snapshot.log 2>&1\n    printf '\\nexport const p47Probe = 1;\\n' >> \"$p47_source\"\n    npm run build > tmp/p0-47/green-build.log 2>&1\n    npx --no-install vitest run $(git grep -l 'unused-code/' -- tests | rg '\\.test\\.ts$') --reporter=default --reporter=json --outputFile.json=tmp/p0-47/green.json > tmp/p0-47/green.log 2>&1\n    git restore --source \"$p47_base\" -- \"$p47_source\"\n    npm run build > tmp/p0-47/final-base-build.log 2>&1\n  )\ndone\nprintf '%s\\n' \"$p47_runroot\"\n",
+      "note": "The current script/helper/test copies are measured tooling overlay, not a current-main suite claim. Retain all four fixtures and receipts for review. Confirm each red report fails the source/declaration freeze assertions relevant to that probe and each green report is success=true with zero failed/pending/todo. Historical expected failures were 3,3,3,2; report fresh outcomes exactly. No existing registration is removed or rewritten."
+    },
+    {
+      "phase": "Actual live-read helper mutation, current-main owned checkout only",
+      "executed": false,
+      "shell": "bash",
+      "command": "set -euo pipefail\nexport PATH=\"/opt/homebrew/opt/node@22/bin:$PATH\"\np47_helper=tests/helpers/landedSource.ts\np47_backup=$(mktemp /private/tmp/amc-p0-47-landedSource.XXXXXX)\ncp \"$p47_helper\" \"$p47_backup\"\ntrap 'cp \"$p47_backup\" \"$p47_helper\"' EXIT\npython3 - <<'MUTATION'\nfrom pathlib import Path\np=Path('tests/helpers/landedSource.ts')\ns=p.read_text()\nneedle='if (!edit) return readFileSync(resolve(root, key));'\nassert s.count(needle)==1\np.write_text(s.replace(needle,'if (true) return readFileSync(resolve(root, key));'))\nMUTATION\nset +e\nnpx --no-install vitest run tests/planEditsManifest.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-47/live-read-helper-mutant.json > tmp/p0-47/live-read-helper-mutant.log 2>&1\np47_helper_red=$?\nnpx --no-install vitest run $(git grep -l 'unused-code/' -- tests | rg '\\.test\\.ts$') --reporter=default --reporter=json --outputFile.json=tmp/p0-47/live-read-parity-mutant.json > tmp/p0-47/live-read-parity-mutant.log 2>&1\np47_parity_red=$?\nset -e\ncp \"$p47_backup\" \"$p47_helper\"\ncmp \"$p47_backup\" \"$p47_helper\"\ntest \"$p47_helper_red\" -ne 0\ntest \"$p47_parity_red\" -ne 0\ntrap - EXIT\n",
+      "note": "Inspect actual archive-vs-live failures, not process exit alone. No fs mock is involved. Repeat current-main passing checks after byte restoration."
+    },
+    {
+      "phase": "Actual omitted-SHA helper mutation, current-main owned checkout only",
+      "executed": false,
+      "shell": "bash",
+      "command": "set -euo pipefail\nexport PATH=\"/opt/homebrew/opt/node@22/bin:$PATH\"\np47_helper=tests/helpers/landedSource.ts\np47_backup=$(mktemp /private/tmp/amc-p0-47-landedSource.XXXXXX)\ncp \"$p47_helper\" \"$p47_backup\"\ntrap 'cp \"$p47_backup\" \"$p47_helper\"' EXIT\npython3 - <<'MUTATION'\nfrom pathlib import Path\np=Path('tests/helpers/landedSource.ts')\ns=p.read_text()\nneedle='    if (sha256(bytes) !== edit.sha256) throw new Error(\"Plan-edit snapshot changed: \" + edit.archivePath);\\n'\nassert s.count(needle)==1\np.write_text(s.replace(needle,'    // Qualification mutant: archive hash guard omitted.\\n'))\nMUTATION\nset +e\nnpx --no-install vitest run tests/planEditsManifest.test.ts --testNamePattern 'throws when an archive no longer matches its manifest sha256' --reporter=default --reporter=json --outputFile.json=tmp/p0-47/omitted-sha-mutant.json > tmp/p0-47/omitted-sha-mutant.log 2>&1\np47_sha_red=$?\nset -e\ncp \"$p47_backup\" \"$p47_helper\"\ncmp \"$p47_backup\" \"$p47_helper\"\ntest \"$p47_sha_red\" -ne 0\ntrap - EXIT\n",
+      "note": "The selected tampered-archive assertion must fail because no error is thrown. Restore exact helper bytes, rerun helper/manifest positive checks, and verify all recorded source/archive hashes. No manifest entry is deleted or reassigned."
+    }
+  ],
+  "observations": {
+    "graph": "No graphify-out/graph.json exists in the inspected owned checkout. Source and pinned Git objects were inspected directly.",
+    "freshResults": "None. This is preflight only."
+  },
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "readRoot": "/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass",
+  "sourceHashes": [
+    {
+      "path": ".changeset/plan-edit-snapshots.md",
+      "gitBlob": "7596c6fec7997dc5c964838b88588e92de2ea487",
+      "sha256": "aa4aac40f6c8cfc9bb83c4d4641d1eb4484a23e0097798c53d5c12158764ca56",
+      "bytes": 412,
+      "worktreeSha256": "aa4aac40f6c8cfc9bb83c4d4641d1eb4484a23e0097798c53d5c12158764ca56",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "gitBlob": "faf724e45b4ff26e8a931924cd9efce23e01d9e0",
+      "sha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "bytes": 14111,
+      "worktreeSha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "package.json",
+      "gitBlob": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "bytes": 8631,
+      "worktreeSha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "gitBlob": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "bytes": 155432,
+      "worktreeSha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "scripts/snapshot-plan-edit.mjs",
+      "gitBlob": "faaab384dc50a76235046ee869e68975f272bf2c",
+      "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+      "bytes": 7012,
+      "worktreeSha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "src/index.ts",
+      "gitBlob": "b5ab43deb0c57e4795f01f240423b30a160d31c4",
+      "sha256": "7a0b8f1731643900d1da3b2bf6415828bf3c91c25f1ffcfbb37dc1102b156929",
+      "bytes": 74550,
+      "worktreeSha256": "7a0b8f1731643900d1da3b2bf6415828bf3c91c25f1ffcfbb37dc1102b156929",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "src/sdk/nativeAgentClient.ts",
+      "gitBlob": "8b7bd35959bb0ba56ae783eea2dd4e91f7a6ffcc",
+      "sha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+      "bytes": 47921,
+      "worktreeSha256": "3b7248c6b7afdb7e0f11af78e54914b75145a7d9dcb36e706a628d5fa825a5f5",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "src/types.ts",
+      "gitBlob": "5bb674dea7570b3e8a68a160f91562a6eb78edae",
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "bytes": 124482,
+      "worktreeSha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "src/workspace.ts",
+      "gitBlob": "32e5e9c85c077fe84f2f4fb8d65b742208740d76",
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "bytes": 27587,
+      "worktreeSha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/apiRouterResponseParity.test.ts",
+      "gitBlob": "6a5a720354304d085b6ffa49e3ce300ddd787e1c",
+      "sha256": "17a06cd5a85a6f82fc54c82a09a7ca1e5ef992341438f1352ca37ce7f106317c",
+      "bytes": 18946,
+      "worktreeSha256": "17a06cd5a85a6f82fc54c82a09a7ca1e5ef992341438f1352ca37ce7f106317c",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/archiveFilesParity.test.ts",
+      "gitBlob": "b4cdc0e4b542ba478d5dc6dc19b287a43628fcbe",
+      "sha256": "ad554970e1f70923313ac5a05484b8988a8c0639ef542ef08203182ae710a2c9",
+      "bytes": 18496,
+      "worktreeSha256": "ad554970e1f70923313ac5a05484b8988a8c0639ef542ef08203182ae710a2c9",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/assuranceScenarioContextParity.test.ts",
+      "gitBlob": "270c207b2c69f85bff20b984b145d346d90d5aa5",
+      "sha256": "0c2220eb87d67d239523f5cb4db805c3cb9c49cce586c02fc95757fbbc8535da",
+      "bytes": 15244,
+      "worktreeSha256": "0c2220eb87d67d239523f5cb4db805c3cb9c49cce586c02fc95757fbbc8535da",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/auditEvidenceAccountingParity.test.ts",
+      "gitBlob": "19b97f165a9a434f224c10b3e15b33fb9ab7af83",
+      "sha256": "19e73c8492efa38f8d0cb2eca129937b2023d26051940ed531e7a9002eac3abd",
+      "bytes": 23263,
+      "worktreeSha256": "19e73c8492efa38f8d0cb2eca129937b2023d26051940ed531e7a9002eac3abd",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/controlHttpResponsesParity.test.ts",
+      "gitBlob": "0284d31db0b4f5353c04b98b51e77c7560209088",
+      "sha256": "eb78cebc58ba83070d181e81826218ab1154ffc0807bd185d5123d6afd9978a6",
+      "bytes": 19014,
+      "worktreeSha256": "eb78cebc58ba83070d181e81826218ab1154ffc0807bd185d5123d6afd9978a6",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/diagnosticResponseScoringParity.test.ts",
+      "gitBlob": "70524b66f82965906ef59c3e894aacf6158f087e",
+      "sha256": "09c6da4e448b05ec5d972d4afff6f4e9d67a46d037a5aa50956f1325923f59a9",
+      "bytes": 11867,
+      "worktreeSha256": "09c6da4e448b05ec5d972d4afff6f4e9d67a46d037a5aa50956f1325923f59a9",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/explainabilityContractParity.test.ts",
+      "gitBlob": "3d340e6b64b117e1f8e99de9b9d58f63a6c8dd80",
+      "sha256": "770ef3525f1dbbf4d4a387ce6057660f19972b946fe12418bbbbc6bd554642b6",
+      "bytes": 13262,
+      "worktreeSha256": "770ef3525f1dbbf4d4a387ce6057660f19972b946fe12418bbbbc6bd554642b6",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/helpers/landedSource.ts",
+      "gitBlob": "4af907a9228f72a997edcb919038bada64dcc226",
+      "sha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+      "bytes": 3498,
+      "worktreeSha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/helpers/packageEntries.ts",
+      "gitBlob": "370c39d382c1c850f635a2562a78896093bc59ae",
+      "sha256": "1bcada34e53fb15466bc7da1cee95114ed074763085e1866f259d96939c0cedf",
+      "bytes": 1880,
+      "worktreeSha256": "1bcada34e53fb15466bc7da1cee95114ed074763085e1866f259d96939c0cedf",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/liveDriftEvidenceFieldsParity.test.ts",
+      "gitBlob": "cd9b712220d657b4d2312acf0fb4bb0baef64fc9",
+      "sha256": "b7be0456731e606b3b541e4678ba6ab9e864ab42c05143e700347057080673f2",
+      "bytes": 14180,
+      "worktreeSha256": "b7be0456731e606b3b541e4678ba6ab9e864ab42c05143e700347057080673f2",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/liveDriftProofStatsParity.test.ts",
+      "gitBlob": "9ff07fb0d7a9ba44240ebb796ad7092c43906ecf",
+      "sha256": "bf0b8ed6baa42418e1d1d0004e83b9dae92ebfcd0a61a607a9bd533eb78137be",
+      "bytes": 10341,
+      "worktreeSha256": "bf0b8ed6baa42418e1d1d0004e83b9dae92ebfcd0a61a607a9bd533eb78137be",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/metricCoverageSummaryParity.test.ts",
+      "gitBlob": "c577beae1640a19e570b69d30028898dcfd3c947",
+      "sha256": "760f3cf90d8083027c3e23ce5a8ee785df7086d14d562cebdf6f6e4d954c6e06",
+      "bytes": 15678,
+      "worktreeSha256": "760f3cf90d8083027c3e23ce5a8ee785df7086d14d562cebdf6f6e4d954c6e06",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/metricParameterContractParity.test.ts",
+      "gitBlob": "5f722014a45b88c8f9d4d3550ec8039a2523ee1f",
+      "sha256": "ee6d067eea61d70709be898efff83537ff226ed8edff2cd53a84b15f303e9370",
+      "bytes": 11244,
+      "worktreeSha256": "ee6d067eea61d70709be898efff83537ff226ed8edff2cd53a84b15f303e9370",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/metricRowPublicContract.test.ts",
+      "gitBlob": "da4c525dfb52b7c60b0a2b849429b64585df495a",
+      "sha256": "d9ce68af8dc229679d72d1142be26d0cf68a25d7fa854e0d0ee46c67a2c68ce7",
+      "bytes": 8774,
+      "worktreeSha256": "d9ce68af8dc229679d72d1142be26d0cf68a25d7fa854e0d0ee46c67a2c68ce7",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/mobileFetchSdk.test.ts",
+      "gitBlob": "8af09def2c5c0d66d8f3272e66f874a977729ea8",
+      "sha256": "2412d3386d7fc09123b73c2f1a34f00508c926d9c12203fefae81f3c1cada12d",
+      "bytes": 8067,
+      "worktreeSha256": "2412d3386d7fc09123b73c2f1a34f00508c926d9c12203fefae81f3c1cada12d",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/nativeSecondSharingRestoration.test.ts",
+      "gitBlob": "3c1867f172f6a17fc86875eae1d0f241361d70d1",
+      "sha256": "1160171a6e4deba51b816a04e820abc7f948d197f79c4e1839eabde8dff42dc1",
+      "bytes": 3103,
+      "worktreeSha256": "1160171a6e4deba51b816a04e820abc7f948d197f79c4e1839eabde8dff42dc1",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/pdfRenderingParity.test.ts",
+      "gitBlob": "7f8f91642181dc9c18b31effeedde5441c6ac1ef",
+      "sha256": "b789c9191916f8d7ddc981d9c3a6e4f155a37a62b7f69351e4855dd7663c55e3",
+      "bytes": 12600,
+      "worktreeSha256": "b789c9191916f8d7ddc981d9c3a6e4f155a37a62b7f69351e4855dd7663c55e3",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/planEditsManifest.test.ts",
+      "gitBlob": "23c590cc501d882fb307c051da4f432210c2c6f3",
+      "sha256": "e04d2f1d073440fac52ca990965fcae2772fbf9a6ade236cfe9dbbdf8c488d63",
+      "bytes": 15119,
+      "worktreeSha256": "e04d2f1d073440fac52ca990965fcae2772fbf9a6ade236cfe9dbbdf8c488d63",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/privateModuleHelperVisibility.test.ts",
+      "gitBlob": "5f808150653986dc88f68e441a643916342f72e3",
+      "sha256": "682c8c0317ddf4327746fa9f8801cc43574b6016c21b4f4cd79329b0c0eb15a3",
+      "bytes": 6272,
+      "worktreeSha256": "682c8c0317ddf4327746fa9f8801cc43574b6016c21b4f4cd79329b0c0eb15a3",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/privateStoreLocatorVisibility.test.ts",
+      "gitBlob": "c552264360a8db22bafada59ba8402f2bb7a692e",
+      "sha256": "ec8f85b6aa1a9b80fb69fc63216b88f086845097f3c13e7541135a03028b073f",
+      "bytes": 6984,
+      "worktreeSha256": "ec8f85b6aa1a9b80fb69fc63216b88f086845097f3c13e7541135a03028b073f",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/providerDriftDescriptorParity.test.ts",
+      "gitBlob": "de0fddc562e74f3df88c7040b1d007d8d3a033b8",
+      "sha256": "14f45f14e4a57ba90792a91ddca41aed0f426fc88358becf8eed4573fde54bf6",
+      "bytes": 14970,
+      "worktreeSha256": "14f45f14e4a57ba90792a91ddca41aed0f426fc88358becf8eed4573fde54bf6",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/providerDriftRowContractsParity.test.ts",
+      "gitBlob": "8c6279fa02aa544894c9ca4465c06f185ad25293",
+      "sha256": "a33259774bbd429e20976a959f1689069738ac0a5b4f9ce3dce97d8319103382",
+      "bytes": 14060,
+      "worktreeSha256": "a33259774bbd429e20976a959f1689069738ac0a5b4f9ce3dce97d8319103382",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/signedArtifactVerificationParity.test.ts",
+      "gitBlob": "ebad614b52bd84397b8f1e593ffa0157a24640c5",
+      "sha256": "9641e98d4ad30fde10108a2c1283a693ccb23f79b066590af0085b233733835d",
+      "bytes": 25581,
+      "worktreeSha256": "9641e98d4ad30fde10108a2c1283a693ccb23f79b066590af0085b233733835d",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/studioRouteRoleContextParity.test.ts",
+      "gitBlob": "7a8ec260da37eb6588ee7f8b6dd5f89e299c2ba8",
+      "sha256": "14a842b3872cab223d6587c344a409a22d41f3405aeb4d11ed5a7d42c8539eca",
+      "bytes": 10838,
+      "worktreeSha256": "14a842b3872cab223d6587c344a409a22d41f3405aeb4d11ed5a7d42c8539eca",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/studioVaultSigningContextParity.test.ts",
+      "gitBlob": "66c9a4d93ef5a4c54dc884df5858b4e6374924a6",
+      "sha256": "31efea65532fcdfa6272c0bbe2160c019596c72e1506194233c58b74faf772ec",
+      "bytes": 10257,
+      "worktreeSha256": "31efea65532fcdfa6272c0bbe2160c019596c72e1506194233c58b74faf772ec",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/watchReceiptSharingRestoration.test.ts",
+      "gitBlob": "a3ac29f0f60fe010d237dbb4d12af17f2052430c",
+      "sha256": "59a9869b6bb7f1082e89b944178f0fef6085d3f1a99148f33f20336eb54b6869",
+      "bytes": 2895,
+      "worktreeSha256": "59a9869b6bb7f1082e89b944178f0fef6085d3f1a99148f33f20336eb54b6869",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/watchReceiptValidationParity.test.ts",
+      "gitBlob": "ce7425e4932fff1a909454c79f59fd7d87c77080",
+      "sha256": "c36039caa34fc0cf0c1a71e0ae991d0bd5fc7e572a46cef3453ba6edd0c81819",
+      "bytes": 14524,
+      "worktreeSha256": "c36039caa34fc0cf0c1a71e0ae991d0bd5fc7e572a46cef3453ba6edd0c81819",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tests/workspacePathRedactionParity.test.ts",
+      "gitBlob": "5be669563dda153b8022693172210d6c4833844a",
+      "sha256": "bb360e5ac73f0e4162c4c0cb4e65f1b8157d1fa8be77b750e6f57ab063aaf62d",
+      "bytes": 15794,
+      "worktreeSha256": "bb360e5ac73f0e4162c4c0cb4e65f1b8157d1fa8be77b750e6f57ab063aaf62d",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tsconfig.json",
+      "gitBlob": "049a148beabbfee79e7f9ee07e3c9c269491a710",
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+      "bytes": 504,
+      "worktreeSha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "tsconfig.tests.json",
+      "gitBlob": "2b4748cc9da05ebe4dbecb38ecaa893590dbd041",
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "bytes": 300,
+      "worktreeSha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/2026-10-02-main/metric-private-parameter-contracts/restoration.json",
+      "gitBlob": "1223c23fdf31a7c3f826c32bf162e1e2c7d9e1ff",
+      "sha256": "14427bf62a577b1a46ffaabd1addee53a269fd8e1945745326f91583851ed660",
+      "bytes": 310945,
+      "worktreeSha256": "14427bf62a577b1a46ffaabd1addee53a269fd8e1945745326f91583851ed660",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/2026-10-02-main/workspace-path-redaction/restoration.json",
+      "gitBlob": "1e39ace694b1992a446c660cbc73b8f5f3f7d0d8",
+      "sha256": "a6c28a2b4237ddccb214989220a15d52a73902b563a9bc4ad9e3e1f0f1a5c518",
+      "bytes": 17762,
+      "worktreeSha256": "a6c28a2b4237ddccb214989220a15d52a73902b563a9bc4ad9e3e1f0f1a5c518",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-06/dist/sdk/nativeAgentClient.d.ts.landed",
+      "gitBlob": "c81e0fa37cae55dee87885a914c82b486310fc5a",
+      "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a",
+      "bytes": 10226,
+      "worktreeSha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-06/src/sdk/nativeAgentClient.ts.landed",
+      "gitBlob": "d5a3250f84edfb219f528b0a23bcac135f07dfce",
+      "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+      "bytes": 47656,
+      "worktreeSha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-08/dist/index.d.ts.landed",
+      "gitBlob": "f2994f7359827059f1cef2babccb9234c08cf5ee",
+      "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47",
+      "bytes": 64919,
+      "worktreeSha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-08/src/index.ts.landed",
+      "gitBlob": "a98e1c2aa0519e35207e1c7f0cfc3a149b9eabd4",
+      "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+      "bytes": 74295,
+      "worktreeSha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/package.json.landed",
+      "gitBlob": "6c779f7e1d134fa34c68a6e190e1e4e6db3c7458",
+      "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+      "bytes": 7886,
+      "worktreeSha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/api/benchmarkRouter.ts.landed",
+      "gitBlob": "5a92d8244cb7c99d9e6f57ee4f91b1135fec2470",
+      "sha256": "b446b1359c3df995fff5ac76a4e07231f87b52dd41327a3adddb7531c505a3cd",
+      "bytes": 10854,
+      "worktreeSha256": "b446b1359c3df995fff5ac76a4e07231f87b52dd41327a3adddb7531c505a3cd",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/assurance/assuranceStore.ts.landed",
+      "gitBlob": "829a7b72ab3a3bb5413a6860aa367fa3fcba6199",
+      "sha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0",
+      "bytes": 2219,
+      "worktreeSha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/bench/benchRegistryClient.ts.landed",
+      "gitBlob": "c5412795956ac917f75829146a0cc5ee22557b6d",
+      "sha256": "de5c0f24cddfd5dd7976ff63398b8a8890657a1479beae96b980622823eb880f",
+      "bytes": 8223,
+      "worktreeSha256": "de5c0f24cddfd5dd7976ff63398b8a8890657a1479beae96b980622823eb880f",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/bench/benchRegistryStore.ts.landed",
+      "gitBlob": "10c6032cfca0dcc95793000492a66d5d656c29f4",
+      "sha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c",
+      "bytes": 5514,
+      "worktreeSha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/ci/gate.ts.landed",
+      "gitBlob": "0e1116be125f281a26ca0d4e7a1687ec5207022e",
+      "sha256": "b441577305fc5464ab38f634ce767a45369f013a8e1b379f8d218efcd9bc0ba2",
+      "bytes": 30555,
+      "worktreeSha256": "b441577305fc5464ab38f634ce767a45369f013a8e1b379f8d218efcd9bc0ba2",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/passport/passportCli.ts.landed",
+      "gitBlob": "9062608f0d8ff774f8c92463330b80a2fd60384e",
+      "sha256": "5bef8b0d8b505d2d36a15adf34aaa4432025e48737472f38dceac54fec4aedc8",
+      "bytes": 8899,
+      "worktreeSha256": "5bef8b0d8b505d2d36a15adf34aaa4432025e48737472f38dceac54fec4aedc8",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/plugins/pluginPackage.ts.landed",
+      "gitBlob": "946bfde9dafd34b378e4cf89c007847c97f8ea28",
+      "sha256": "566a7701f5bb006a5139c77c5ebc336c9659ef72be0c050362c814f046847c6e",
+      "bytes": 12026,
+      "worktreeSha256": "566a7701f5bb006a5139c77c5ebc336c9659ef72be0c050362c814f046847c6e",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/plugins/pluginRegistryClient.ts.landed",
+      "gitBlob": "fa2f94d2a233d82927cdced91896d6cd79f8306f",
+      "sha256": "44236debfef1053173c2f5427e185141b566395b75608804fa8a08eb43c6724f",
+      "bytes": 10473,
+      "worktreeSha256": "44236debfef1053173c2f5427e185141b566395b75608804fa8a08eb43c6724f",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/prompt/promptPackVerifier.ts.landed",
+      "gitBlob": "d5af16b42a8db1a3e347e8377e04043651f67c9f",
+      "sha256": "0956285bdaf07793ecd40b5c70d9a47c3b2b9aa4762c65dfeeeb4df2abe254ad",
+      "bytes": 3629,
+      "worktreeSha256": "0956285bdaf07793ecd40b5c70d9a47c3b2b9aa4762c65dfeeeb4df2abe254ad",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/src/studio/studioServer.ts.landed",
+      "gitBlob": "2de75b9130ac1d49a35d05bc8b05f3181eaa46a6",
+      "sha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815",
+      "bytes": 320369,
+      "worktreeSha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-10/src/governor/emergencyOverride.ts.landed",
+      "gitBlob": "ce93d9959a98f4ddda785fc88dfa521f497ef5dc",
+      "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e",
+      "bytes": 9994,
+      "worktreeSha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-15/src/assurance/assuranceCertificates.ts.landed",
+      "gitBlob": "5acdf2d927d079f11f3ed21d09206525ed34afe3",
+      "sha256": "c2c01bc5494307f1ce94363c50369126d7098e3e00b071cfd3810288ef907008",
+      "bytes": 10976,
+      "worktreeSha256": "c2c01bc5494307f1ce94363c50369126d7098e3e00b071cfd3810288ef907008",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-15/src/assurance/assurancePolicyStore.ts.landed",
+      "gitBlob": "5ce248e463a3eee75319ed69b0dc8f2a19d3ed76",
+      "sha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228",
+      "bytes": 10262,
+      "worktreeSha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-15/src/demo/prospectDemo.ts.landed",
+      "gitBlob": "d0f333dc021a5056641720b314f34202ef070ace",
+      "sha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63",
+      "bytes": 11630,
+      "worktreeSha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-15/src/passport/passportCollector.ts.landed",
+      "gitBlob": "567840b29b76b7e25e7a8c2713c87eab80e2264c",
+      "sha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd",
+      "bytes": 21961,
+      "worktreeSha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-17/src/compliance/complianceEngine.ts.landed",
+      "gitBlob": "cddbb569942feb9cba276de54c3d6f90e777f6e8",
+      "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8",
+      "bytes": 15209,
+      "worktreeSha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-18/src/diagnostic/runner.ts.landed",
+      "gitBlob": "c405f621783067a17bd9172d70f4228dedd5f189",
+      "sha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5",
+      "bytes": 96293,
+      "worktreeSha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-18/src/ledger/ledger.ts.landed",
+      "gitBlob": "63d24af50f83f39dcc0012d2fb3bfb66643e622f",
+      "sha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d",
+      "bytes": 43230,
+      "worktreeSha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-19/src/assurance/validators.ts.landed",
+      "gitBlob": "6f648ca2ed1c0b9619c7102ef26690413ee64a57",
+      "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293",
+      "bytes": 12074,
+      "worktreeSha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-22/src/executive/brief.ts.landed",
+      "gitBlob": "be95580ae86c901a58fc998cdf65c541bdb2636f",
+      "sha256": "7cd20318c92def5052ec57cb8d0e28d3aec62c0a1eb54d1a1a9304faeebe647a",
+      "bytes": 12754,
+      "worktreeSha256": "7cd20318c92def5052ec57cb8d0e28d3aec62c0a1eb54d1a1a9304faeebe647a",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-23/src/api/index.ts.landed",
+      "gitBlob": "1319e17c19b81b42456e5dc86062723ce40f5ef7",
+      "sha256": "c717805caea163897ea26f5a22555cdf52d37442b42c5faa351e42adc9c2043b",
+      "bytes": 18240,
+      "worktreeSha256": "c717805caea163897ea26f5a22555cdf52d37442b42c5faa351e42adc9c2043b",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-23/tests/apiRouterResponseParity.test.ts.landed",
+      "gitBlob": "cfe606efc4de5b870f5a1ffb1b0a7330ec9377a8",
+      "sha256": "cc00ec46b8f325a35b7d216c9fdff449087729212d83c86f15f27a1798d9081a",
+      "bytes": 18316,
+      "worktreeSha256": "cc00ec46b8f325a35b7d216c9fdff449087729212d83c86f15f27a1798d9081a",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-23/tests/studioRouteRoleContextParity.test.ts.landed",
+      "gitBlob": "16e99f7e91a0fd424ffb331f9a51eba161853c80",
+      "sha256": "0cfcfb81e9424e3e18c0db20e77ae68a41c37f4cc185e88ad00222262f3947b1",
+      "bytes": 10648,
+      "worktreeSha256": "0cfcfb81e9424e3e18c0db20e77ae68a41c37f4cc185e88ad00222262f3947b1",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-27/src/evidence/exporter.ts.landed",
+      "gitBlob": "868a335af740d13c63e361d1dbfaff7f1c7e25d2",
+      "sha256": "e5633b1d0a5cae6c4c73a306768b51a5b8e9e65111a3354d9daae5daa0726a57",
+      "bytes": 15160,
+      "worktreeSha256": "e5633b1d0a5cae6c4c73a306768b51a5b8e9e65111a3354d9daae5daa0726a57",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-27/src/lifecycle/signedControlJournal.ts.landed",
+      "gitBlob": "ee508502d8ece59db05b7c6cd58b4168323a7162",
+      "sha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17",
+      "bytes": 28762,
+      "worktreeSha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-44/src/types.ts.landed",
+      "gitBlob": "885f314c3fe07633ee7c4749cea5502c7809c0ce",
+      "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "bytes": 122721,
+      "worktreeSha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-45/src/trust/trustConfig.ts.landed",
+      "gitBlob": "2251db81259c06e7c4f4676198ecd160d2321b2d",
+      "sha256": "d7ea83f8f45ab725b8dc2fb026da48d058b62670941fb9f622b79e3c7e7c39d9",
+      "bytes": 14201,
+      "worktreeSha256": "d7ea83f8f45ab725b8dc2fb026da48d058b62670941fb9f622b79e3c7e7c39d9",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-47/tests/privateModuleHelperVisibility.test.ts.landed",
+      "gitBlob": "a85e1d59785e4df13ced09b665b9047b338db419",
+      "sha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5",
+      "bytes": 6252,
+      "worktreeSha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+      "gitBlob": "dcc0e0dac48087deae560f7122686b04a44daef2",
+      "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "bytes": 155411,
+      "worktreeSha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-51/src/api/exportRouter.ts.landed",
+      "gitBlob": "26ca236a85cfe0189a8aabc7141cb3ef3eeb62bd",
+      "sha256": "53ffcd66d4bcdf8b220fee32982667be4b55dc84f59f22d4b4b4b24abc082cfc",
+      "bytes": 6998,
+      "worktreeSha256": "53ffcd66d4bcdf8b220fee32982667be4b55dc84f59f22d4b4b4b24abc082cfc",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-51/src/bom/bomVerifier.ts.landed",
+      "gitBlob": "15310a91be3d1c4021596aae79435df7dc1fd055",
+      "sha256": "27d61e6ed5061d32aba8023586450fd549dd90fdd981cdccac389cb4629061c5",
+      "bytes": 4247,
+      "worktreeSha256": "27d61e6ed5061d32aba8023586450fd549dd90fdd981cdccac389cb4629061c5",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-51/src/domains/industryPackEntitlement.ts.landed",
+      "gitBlob": "b550dc3f2e756b14cc0e82b3f6ddeb402b5f1cc6",
+      "sha256": "37e6ae0bc7dadb519826a2e7f3181643843383da7458c68b5cd0e565e214b294",
+      "bytes": 18468,
+      "worktreeSha256": "37e6ae0bc7dadb519826a2e7f3181643843383da7458c68b5cd0e565e214b294",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-51/src/notary/notaryAttestation.ts.landed",
+      "gitBlob": "eef7e973d01c82cf66d8865fc012316b058e4270",
+      "sha256": "fe408e7383b4fd9fe46d30b0018cc387b6241ef16817ec6876e6e2ba9606c404",
+      "bytes": 5748,
+      "worktreeSha256": "fe408e7383b4fd9fe46d30b0018cc387b6241ef16817ec6876e6e2ba9606c404",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-52/src/federation/federationStore.ts.landed",
+      "gitBlob": "54c0108b719916930b82ff05e699a845b6420369",
+      "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7",
+      "bytes": 6456,
+      "worktreeSha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-55/src/api/scoreRouter.ts.landed",
+      "gitBlob": "46534aaeaf394fc6ee9781e0754792816d37017f",
+      "sha256": "7773a77fc1ceeb9916ab09d62a99324d33cd33c5517b5a2d4fdbe003a2b61951",
+      "bytes": 38874,
+      "worktreeSha256": "7773a77fc1ceeb9916ab09d62a99324d33cd33c5517b5a2d4fdbe003a2b61951",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-02/src/studio/studioState.ts.landed",
+      "gitBlob": "2e2c1f3e0e73ef05b604ae6ac3de9ab029896219",
+      "sha256": "3b2571d70377251e35752b9473ce7bbdc1f806441345e2f1be0f080c271cc33b",
+      "bytes": 12402,
+      "worktreeSha256": "3b2571d70377251e35752b9473ce7bbdc1f806441345e2f1be0f080c271cc33b",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-05/src/toolhub/toolhubValidators.ts.landed",
+      "gitBlob": "29427092c1ad80ba1c667240143438f9091de013",
+      "sha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176",
+      "bytes": 14727,
+      "worktreeSha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-07/src/diagnostic/l5DeltaReport.ts.landed",
+      "gitBlob": "ccac101579e329c365dbd080557ee7908f69302d",
+      "sha256": "5b5271ab17ae7bb2efb84e95cbe2d492217d826dec69f2a2516b470997033836",
+      "bytes": 9677,
+      "worktreeSha256": "5b5271ab17ae7bb2efb84e95cbe2d492217d826dec69f2a2516b470997033836",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-07/src/diagnostic/questionScoreExplainability.ts.landed",
+      "gitBlob": "a1eb5ff7dbb05bc1d7de9c4ffd5405abfe7e2922",
+      "sha256": "70c067e6bbef4441cd8c571b60a37c5bd76d82f1fa0d58c14db40b096f92e374",
+      "bytes": 166812,
+      "worktreeSha256": "70c067e6bbef4441cd8c571b60a37c5bd76d82f1fa0d58c14db40b096f92e374",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-07/src/diagnostic/spineEvidenceProjection.ts.landed",
+      "gitBlob": "29a57ef19a86e13d48249d149cff616986aa0649",
+      "sha256": "42372ce26d36438fb22879dacd6abdd1b432e86324366cabe83fee69be632e1a",
+      "bytes": 12799,
+      "worktreeSha256": "42372ce26d36438fb22879dacd6abdd1b432e86324366cabe83fee69be632e1a",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-15/src/ops/policy.ts.landed",
+      "gitBlob": "b854801b697fc30de615eecca811e2df852bda93",
+      "sha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da",
+      "bytes": 6458,
+      "worktreeSha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-24/src/gateway/config.ts.landed",
+      "gitBlob": "873e8937f591c9b966a57ab2ff3b57c5bb1f99ec",
+      "sha256": "e61c26fd23c2d5df879575052022e709f74a09b78b8ed9be1d1d3f40b2fd52cc",
+      "bytes": 17608,
+      "worktreeSha256": "e61c26fd23c2d5df879575052022e709f74a09b78b8ed9be1d1d3f40b2fd52cc",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-24/src/importers/dshSessionImport.ts.landed",
+      "gitBlob": "5586daa32b7ce773179189a2dc40ef2ba42db7ee",
+      "sha256": "c5fd2a3203db0848bb9b745a27d13d6533fb8581fde99be8f7d529ce085956b4",
+      "bytes": 14792,
+      "worktreeSha256": "c5fd2a3203db0848bb9b745a27d13d6533fb8581fde99be8f7d529ce085956b4",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-25/src/workspace.ts.landed",
+      "gitBlob": "595a8b30cf06608d61e66e85c107007c3a5b4fba",
+      "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+      "bytes": 27328,
+      "worktreeSha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-43/src/agent/nativeToolCapabilities.ts.landed",
+      "gitBlob": "e8076d55ca015d66f4cecc04a0aec97014108247",
+      "sha256": "d0a8f4c55a8f01db62a0c1c31807bf28ad8c553b98f71ce66817cacf71bed4f0",
+      "bytes": 2962,
+      "worktreeSha256": "d0a8f4c55a8f01db62a0c1c31807bf28ad8c553b98f71ce66817cacf71bed4f0",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-56/src/auth/authApi.ts.landed",
+      "gitBlob": "18f5b8df5ca6ee5490ff020fdf1dcfcfa71eebc4",
+      "sha256": "964fd2bda09ef5e4dcbd373a8168cf4a4412c0b332eff2b5d51ab7d359be78df",
+      "bytes": 14449,
+      "worktreeSha256": "964fd2bda09ef5e4dcbd373a8168cf4a4412c0b332eff2b5d51ab7d359be78df",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-59/src/enforce/resourceManifest.ts.landed",
+      "gitBlob": "c71d6e61bdb734fd90ba07a90faf04569942568a",
+      "sha256": "770d74c94b33014b6d5401232043f214dc8c8478bd98252c2dda8150e4059849",
+      "bytes": 73672,
+      "worktreeSha256": "770d74c94b33014b6d5401232043f214dc8c8478bd98252c2dda8150e4059849",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P1-67/src/leases/leaseStore.ts.landed",
+      "gitBlob": "7be6bd6fa729fb083d26fcd66b288fc79ba00398",
+      "sha256": "416a6c5d9e1fb905a0cc0e6f0485c77bce2001c660ab056ab31d7413351cb61c",
+      "bytes": 6101,
+      "worktreeSha256": "416a6c5d9e1fb905a0cc0e6f0485c77bce2001c660ab056ab31d7413351cb61c",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P2-01/src/bridge/bridgeServer.ts.landed",
+      "gitBlob": "3492b7fbf51a7139ab3037b600b25a5c53737129",
+      "sha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f",
+      "bytes": 46055,
+      "worktreeSha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/P2-01/src/drift/alerts.ts.landed",
+      "gitBlob": "44eec8f09e63be9ec17fbfb9de2a586a55495253",
+      "sha256": "de42434762596133deac32622fe725aaf6d7a30bc986d9782c71e7ab2430991a",
+      "bytes": 7752,
+      "worktreeSha256": "de42434762596133deac32622fe725aaf6d7a30bc986d9782c71e7ab2430991a",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/README.md",
+      "gitBlob": "6c2a7b4cfc71ff249981147637ae0b95c7029cae",
+      "sha256": "713815b36d9b347a701f0275e041987d049c434760313f8a55da096809e63d91",
+      "bytes": 3324,
+      "worktreeSha256": "713815b36d9b347a701f0275e041987d049c434760313f8a55da096809e63d91",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "gitBlob": "d84e3abecfc8c41b8d9a1e4674102b2bf7dc1a66",
+      "sha256": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+      "bytes": 17539,
+      "worktreeSha256": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+      "worktreeEqualsMain": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "gitBlob": "e72e9654a9d602319c28febb5893da12eb5438b8",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "bytes": 1324,
+      "worktreeSha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "worktreeEqualsMain": true
+    }
+  ],
+  "parityTests": [
+    "tests/apiRouterResponseParity.test.ts",
+    "tests/archiveFilesParity.test.ts",
+    "tests/assuranceScenarioContextParity.test.ts",
+    "tests/auditEvidenceAccountingParity.test.ts",
+    "tests/controlHttpResponsesParity.test.ts",
+    "tests/diagnosticResponseScoringParity.test.ts",
+    "tests/explainabilityContractParity.test.ts",
+    "tests/liveDriftEvidenceFieldsParity.test.ts",
+    "tests/liveDriftProofStatsParity.test.ts",
+    "tests/metricCoverageSummaryParity.test.ts",
+    "tests/metricParameterContractParity.test.ts",
+    "tests/metricRowPublicContract.test.ts",
+    "tests/mobileFetchSdk.test.ts",
+    "tests/nativeSecondSharingRestoration.test.ts",
+    "tests/pdfRenderingParity.test.ts",
+    "tests/planEditsManifest.test.ts",
+    "tests/privateModuleHelperVisibility.test.ts",
+    "tests/privateStoreLocatorVisibility.test.ts",
+    "tests/providerDriftDescriptorParity.test.ts",
+    "tests/providerDriftRowContractsParity.test.ts",
+    "tests/signedArtifactVerificationParity.test.ts",
+    "tests/studioRouteRoleContextParity.test.ts",
+    "tests/studioVaultSigningContextParity.test.ts",
+    "tests/watchReceiptSharingRestoration.test.ts",
+    "tests/watchReceiptValidationParity.test.ts",
+    "tests/workspacePathRedactionParity.test.ts"
+  ],
+  "initialRoutedParityTests": [
+    "tests/apiRouterResponseParity.test.ts",
+    "tests/archiveFilesParity.test.ts",
+    "tests/assuranceScenarioContextParity.test.ts",
+    "tests/auditEvidenceAccountingParity.test.ts",
+    "tests/controlHttpResponsesParity.test.ts",
+    "tests/diagnosticResponseScoringParity.test.ts",
+    "tests/explainabilityContractParity.test.ts",
+    "tests/liveDriftProofStatsParity.test.ts",
+    "tests/metricParameterContractParity.test.ts",
+    "tests/metricRowPublicContract.test.ts",
+    "tests/mobileFetchSdk.test.ts",
+    "tests/nativeSecondSharingRestoration.test.ts",
+    "tests/pdfRenderingParity.test.ts",
+    "tests/privateModuleHelperVisibility.test.ts",
+    "tests/privateStoreLocatorVisibility.test.ts",
+    "tests/studioRouteRoleContextParity.test.ts",
+    "tests/studioVaultSigningContextParity.test.ts",
+    "tests/watchReceiptSharingRestoration.test.ts",
+    "tests/workspacePathRedactionParity.test.ts"
+  ],
+  "revisions": [
+    {
+      "reference": "a54e4ec84",
+      "resolved": "a54e4ec84f6f4350909ec2294b59fec176ec9172",
+      "ancestorOfMain": true,
+      "ancestryExit": 0
+    },
+    {
+      "reference": "b552b69cd",
+      "resolved": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "ancestorOfMain": true,
+      "ancestryExit": 0
+    },
+    {
+      "reference": "51f425bf",
+      "resolved": "51f425bf33ae5ce35b4328b33d17be26af44dad2",
+      "ancestorOfMain": true,
+      "ancestryExit": 0
+    },
+    {
+      "reference": "80abdaf02",
+      "resolved": "80abdaf02da615fbe6797b593270d363d7a36163",
+      "ancestorOfMain": true,
+      "ancestryExit": 0
+    },
+    {
+      "reference": "742330c5",
+      "resolved": "742330c5c03c57e8beb2cf517eaf8dbcc54796dc",
+      "ancestorOfMain": true,
+      "ancestryExit": 0
+    }
+  ],
+  "archiveStaticObservations": [
+    {
+      "path": "dist/index.d.ts",
+      "issue": "P0-08",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-08/dist/index.d.ts.landed",
+      "sha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47",
+      "actualArchiveSha256": "9aa3559ae0aa5ab9e73bd3f5f335e46bd2b249541dcfc326be2ac71ee8528b47",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": null
+    },
+    {
+      "path": "dist/sdk/nativeAgentClient.d.ts",
+      "issue": "P0-06",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-06/dist/sdk/nativeAgentClient.d.ts.landed",
+      "sha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a",
+      "actualArchiveSha256": "8652b7c9ffded332a5e277ce4511f3a8a0e06f0599d49677d73298a4e2b1bc8a",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": null
+    },
+    {
+      "path": "package.json",
+      "issue": "P0-09",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-09/package.json.landed",
+      "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+      "actualArchiveSha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "issue": "P0-49",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+      "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "actualArchiveSha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/agent/nativeToolCapabilities.ts",
+      "issue": "P1-43",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-43/src/agent/nativeToolCapabilities.ts.landed",
+      "sha256": "d0a8f4c55a8f01db62a0c1c31807bf28ad8c553b98f71ce66817cacf71bed4f0",
+      "actualArchiveSha256": "d0a8f4c55a8f01db62a0c1c31807bf28ad8c553b98f71ce66817cacf71bed4f0",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/api/benchmarkRouter.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/api/benchmarkRouter.ts.landed",
+      "sha256": "b446b1359c3df995fff5ac76a4e07231f87b52dd41327a3adddb7531c505a3cd",
+      "actualArchiveSha256": "b446b1359c3df995fff5ac76a4e07231f87b52dd41327a3adddb7531c505a3cd",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/api/exportRouter.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/api/exportRouter.ts.landed",
+      "sha256": "53ffcd66d4bcdf8b220fee32982667be4b55dc84f59f22d4b4b4b24abc082cfc",
+      "actualArchiveSha256": "53ffcd66d4bcdf8b220fee32982667be4b55dc84f59f22d4b4b4b24abc082cfc",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/api/index.ts",
+      "issue": "P0-23",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-23/src/api/index.ts.landed",
+      "sha256": "c717805caea163897ea26f5a22555cdf52d37442b42c5faa351e42adc9c2043b",
+      "actualArchiveSha256": "c717805caea163897ea26f5a22555cdf52d37442b42c5faa351e42adc9c2043b",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/api/scoreRouter.ts",
+      "issue": "P0-55",
+      "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
+      "archivePath": "unused-code/plan-edits/P0-55/src/api/scoreRouter.ts.landed",
+      "sha256": "7773a77fc1ceeb9916ab09d62a99324d33cd33c5517b5a2d4fdbe003a2b61951",
+      "actualArchiveSha256": "7773a77fc1ceeb9916ab09d62a99324d33cd33c5517b5a2d4fdbe003a2b61951",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/assurance/assuranceCertificates.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/assurance/assuranceCertificates.ts.landed",
+      "sha256": "c2c01bc5494307f1ce94363c50369126d7098e3e00b071cfd3810288ef907008",
+      "actualArchiveSha256": "c2c01bc5494307f1ce94363c50369126d7098e3e00b071cfd3810288ef907008",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/assurance/assurancePolicyStore.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/assurance/assurancePolicyStore.ts.landed",
+      "sha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228",
+      "actualArchiveSha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/assurance/assuranceStore.ts.landed",
+      "sha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0",
+      "actualArchiveSha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "issue": "P0-19",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-19/src/assurance/validators.ts.landed",
+      "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293",
+      "actualArchiveSha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/auth/authApi.ts",
+      "issue": "P1-56",
+      "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
+      "archivePath": "unused-code/plan-edits/P1-56/src/auth/authApi.ts.landed",
+      "sha256": "964fd2bda09ef5e4dcbd373a8168cf4a4412c0b332eff2b5d51ab7d359be78df",
+      "actualArchiveSha256": "964fd2bda09ef5e4dcbd373a8168cf4a4412c0b332eff2b5d51ab7d359be78df",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/bench/benchRegistryClient.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/bench/benchRegistryClient.ts.landed",
+      "sha256": "de5c0f24cddfd5dd7976ff63398b8a8890657a1479beae96b980622823eb880f",
+      "actualArchiveSha256": "de5c0f24cddfd5dd7976ff63398b8a8890657a1479beae96b980622823eb880f",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/bench/benchRegistryStore.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/bench/benchRegistryStore.ts.landed",
+      "sha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c",
+      "actualArchiveSha256": "404dd08ae477aa2ba6ff866170e69d853b4dc998e2a7e5a8327b187869d0401c",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/bom/bomVerifier.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/bom/bomVerifier.ts.landed",
+      "sha256": "27d61e6ed5061d32aba8023586450fd549dd90fdd981cdccac389cb4629061c5",
+      "actualArchiveSha256": "27d61e6ed5061d32aba8023586450fd549dd90fdd981cdccac389cb4629061c5",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/bridge/bridgeServer.ts",
+      "issue": "P2-01",
+      "baseCommit": "f60406454b94e213290587911e6b8066c4126869",
+      "archivePath": "unused-code/plan-edits/P2-01/src/bridge/bridgeServer.ts.landed",
+      "sha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f",
+      "actualArchiveSha256": "4899b523f54632cb489f5b9c09b092c18515c065ff3d0486aebe12cda20e4d2f",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/ci/gate.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/ci/gate.ts.landed",
+      "sha256": "b441577305fc5464ab38f634ce767a45369f013a8e1b379f8d218efcd9bc0ba2",
+      "actualArchiveSha256": "b441577305fc5464ab38f634ce767a45369f013a8e1b379f8d218efcd9bc0ba2",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "issue": "P0-17",
+      "baseCommit": "6b899a60c7ba3b605fed78e9257901e84b93c871",
+      "archivePath": "unused-code/plan-edits/P0-17/src/compliance/complianceEngine.ts.landed",
+      "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8",
+      "actualArchiveSha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/demo/prospectDemo.ts",
+      "issue": "P0-15",
+      "baseCommit": "b396249ad8d9ffc9b0b47db2c56464ca86183a4b",
+      "archivePath": "unused-code/plan-edits/P0-15/src/demo/prospectDemo.ts.landed",
+      "sha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63",
+      "actualArchiveSha256": "af482db8700e0d6067c4084248cd97b11e3c82359da2be4d3a9d49c8cc064e63",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/diagnostic/l5DeltaReport.ts",
+      "issue": "P1-07",
+      "baseCommit": "8e46e0f725c9ec38c865f181776e0a0488960203",
+      "archivePath": "unused-code/plan-edits/P1-07/src/diagnostic/l5DeltaReport.ts.landed",
+      "sha256": "5b5271ab17ae7bb2efb84e95cbe2d492217d826dec69f2a2516b470997033836",
+      "actualArchiveSha256": "5b5271ab17ae7bb2efb84e95cbe2d492217d826dec69f2a2516b470997033836",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/diagnostic/questionScoreExplainability.ts",
+      "issue": "P1-07",
+      "baseCommit": "8e46e0f725c9ec38c865f181776e0a0488960203",
+      "archivePath": "unused-code/plan-edits/P1-07/src/diagnostic/questionScoreExplainability.ts.landed",
+      "sha256": "70c067e6bbef4441cd8c571b60a37c5bd76d82f1fa0d58c14db40b096f92e374",
+      "actualArchiveSha256": "70c067e6bbef4441cd8c571b60a37c5bd76d82f1fa0d58c14db40b096f92e374",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/diagnostic/runner.ts",
+      "issue": "P0-18",
+      "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",
+      "archivePath": "unused-code/plan-edits/P0-18/src/diagnostic/runner.ts.landed",
+      "sha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5",
+      "actualArchiveSha256": "378115c82d4365c7163beb689355dd8eee5c2f75d04354c92f67a2510932b1d5",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/diagnostic/spineEvidenceProjection.ts",
+      "issue": "P1-07",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-07/src/diagnostic/spineEvidenceProjection.ts.landed",
+      "sha256": "42372ce26d36438fb22879dacd6abdd1b432e86324366cabe83fee69be632e1a",
+      "actualArchiveSha256": "42372ce26d36438fb22879dacd6abdd1b432e86324366cabe83fee69be632e1a",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/domains/industryPackEntitlement.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/domains/industryPackEntitlement.ts.landed",
+      "sha256": "37e6ae0bc7dadb519826a2e7f3181643843383da7458c68b5cd0e565e214b294",
+      "actualArchiveSha256": "37e6ae0bc7dadb519826a2e7f3181643843383da7458c68b5cd0e565e214b294",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/drift/alerts.ts",
+      "issue": "P2-01",
+      "baseCommit": "29118e02e5ae3c1ea46d2df04a7dc4838134a852",
+      "archivePath": "unused-code/plan-edits/P2-01/src/drift/alerts.ts.landed",
+      "sha256": "de42434762596133deac32622fe725aaf6d7a30bc986d9782c71e7ab2430991a",
+      "actualArchiveSha256": "de42434762596133deac32622fe725aaf6d7a30bc986d9782c71e7ab2430991a",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/enforce/resourceManifest.ts",
+      "issue": "P1-59",
+      "baseCommit": "ebfa106dc45a853fc15f36e8d5312b499fc01806",
+      "archivePath": "unused-code/plan-edits/P1-59/src/enforce/resourceManifest.ts.landed",
+      "sha256": "770d74c94b33014b6d5401232043f214dc8c8478bd98252c2dda8150e4059849",
+      "actualArchiveSha256": "770d74c94b33014b6d5401232043f214dc8c8478bd98252c2dda8150e4059849",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/evidence/exporter.ts",
+      "issue": "P0-27",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-27/src/evidence/exporter.ts.landed",
+      "sha256": "e5633b1d0a5cae6c4c73a306768b51a5b8e9e65111a3354d9daae5daa0726a57",
+      "actualArchiveSha256": "e5633b1d0a5cae6c4c73a306768b51a5b8e9e65111a3354d9daae5daa0726a57",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/executive/brief.ts",
+      "issue": "P0-22",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-22/src/executive/brief.ts.landed",
+      "sha256": "7cd20318c92def5052ec57cb8d0e28d3aec62c0a1eb54d1a1a9304faeebe647a",
+      "actualArchiveSha256": "7cd20318c92def5052ec57cb8d0e28d3aec62c0a1eb54d1a1a9304faeebe647a",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/federation/federationStore.ts",
+      "issue": "P0-52",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-52/src/federation/federationStore.ts.landed",
+      "sha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7",
+      "actualArchiveSha256": "7f8cd201e6850e2d14c9b176f1a258dd5c4fb0c4c2f4992f1a68287faca004b7",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/gateway/config.ts",
+      "issue": "P1-24",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-24/src/gateway/config.ts.landed",
+      "sha256": "e61c26fd23c2d5df879575052022e709f74a09b78b8ed9be1d1d3f40b2fd52cc",
+      "actualArchiveSha256": "e61c26fd23c2d5df879575052022e709f74a09b78b8ed9be1d1d3f40b2fd52cc",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/governor/emergencyOverride.ts",
+      "issue": "P0-10",
+      "baseCommit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
+      "archivePath": "unused-code/plan-edits/P0-10/src/governor/emergencyOverride.ts.landed",
+      "sha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e",
+      "actualArchiveSha256": "13ef944ee66ad891c4e13642de6bdcb563a81e023ae762961464da8b8971f44e",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/importers/dshSessionImport.ts",
+      "issue": "P1-24",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-24/src/importers/dshSessionImport.ts.landed",
+      "sha256": "c5fd2a3203db0848bb9b745a27d13d6533fb8581fde99be8f7d529ce085956b4",
+      "actualArchiveSha256": "c5fd2a3203db0848bb9b745a27d13d6533fb8581fde99be8f7d529ce085956b4",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/index.ts",
+      "issue": "P0-08",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-08/src/index.ts.landed",
+      "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+      "actualArchiveSha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/leases/leaseStore.ts",
+      "issue": "P1-67",
+      "baseCommit": "2a592a00f0e3c6452f19e9a3902b569c111eb4c1",
+      "archivePath": "unused-code/plan-edits/P1-67/src/leases/leaseStore.ts.landed",
+      "sha256": "416a6c5d9e1fb905a0cc0e6f0485c77bce2001c660ab056ab31d7413351cb61c",
+      "actualArchiveSha256": "416a6c5d9e1fb905a0cc0e6f0485c77bce2001c660ab056ab31d7413351cb61c",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/ledger/ledger.ts",
+      "issue": "P0-18",
+      "baseCommit": "1f3a2f6681389011120fdb8251f95eb5d4527d58",
+      "archivePath": "unused-code/plan-edits/P0-18/src/ledger/ledger.ts.landed",
+      "sha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d",
+      "actualArchiveSha256": "11d19e1e3c5ea69b889ae36f5a59ad2352eacd93616c31404012be431642bd6d",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "issue": "P0-27",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-27/src/lifecycle/signedControlJournal.ts.landed",
+      "sha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17",
+      "actualArchiveSha256": "4eef636358fb607e4ada186a19aee5e187b9c8e9022c5d04b77467c5b46bbe17",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/notary/notaryAttestation.ts",
+      "issue": "P0-51",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-51/src/notary/notaryAttestation.ts.landed",
+      "sha256": "fe408e7383b4fd9fe46d30b0018cc387b6241ef16817ec6876e6e2ba9606c404",
+      "actualArchiveSha256": "fe408e7383b4fd9fe46d30b0018cc387b6241ef16817ec6876e6e2ba9606c404",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/ops/policy.ts",
+      "issue": "P1-15",
+      "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
+      "archivePath": "unused-code/plan-edits/P1-15/src/ops/policy.ts.landed",
+      "sha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da",
+      "actualArchiveSha256": "c017b7a3680d0544ab1e71ed9b665dab283f09100be3a5d722e201cc9a0549da",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/passport/passportCli.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/passport/passportCli.ts.landed",
+      "sha256": "5bef8b0d8b505d2d36a15adf34aaa4432025e48737472f38dceac54fec4aedc8",
+      "actualArchiveSha256": "5bef8b0d8b505d2d36a15adf34aaa4432025e48737472f38dceac54fec4aedc8",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/passport/passportCollector.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/passport/passportCollector.ts.landed",
+      "sha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd",
+      "actualArchiveSha256": "ddfbd29e5a0a69aa06be7648a4fcc44e3a474c6f6be8d5f7fd3f7756709d39bd",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/plugins/pluginPackage.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/plugins/pluginPackage.ts.landed",
+      "sha256": "566a7701f5bb006a5139c77c5ebc336c9659ef72be0c050362c814f046847c6e",
+      "actualArchiveSha256": "566a7701f5bb006a5139c77c5ebc336c9659ef72be0c050362c814f046847c6e",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/plugins/pluginRegistryClient.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/plugins/pluginRegistryClient.ts.landed",
+      "sha256": "44236debfef1053173c2f5427e185141b566395b75608804fa8a08eb43c6724f",
+      "actualArchiveSha256": "44236debfef1053173c2f5427e185141b566395b75608804fa8a08eb43c6724f",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/prompt/promptPackVerifier.ts",
+      "issue": "P0-09",
+      "baseCommit": "0b818f4f866dbd25226d5690cdf3f2e8f6837101",
+      "archivePath": "unused-code/plan-edits/P0-09/src/prompt/promptPackVerifier.ts.landed",
+      "sha256": "0956285bdaf07793ecd40b5c70d9a47c3b2b9aa4762c65dfeeeb4df2abe254ad",
+      "actualArchiveSha256": "0956285bdaf07793ecd40b5c70d9a47c3b2b9aa4762c65dfeeeb4df2abe254ad",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/sdk/nativeAgentClient.ts",
+      "issue": "P0-06",
+      "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+      "archivePath": "unused-code/plan-edits/P0-06/src/sdk/nativeAgentClient.ts.landed",
+      "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+      "actualArchiveSha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/studio/studioServer.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/studio/studioServer.ts.landed",
+      "sha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815",
+      "actualArchiveSha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/studio/studioState.ts",
+      "issue": "P1-02",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-02/src/studio/studioState.ts.landed",
+      "sha256": "3b2571d70377251e35752b9473ce7bbdc1f806441345e2f1be0f080c271cc33b",
+      "actualArchiveSha256": "3b2571d70377251e35752b9473ce7bbdc1f806441345e2f1be0f080c271cc33b",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/toolhub/toolhubValidators.ts",
+      "issue": "P1-05",
+      "baseCommit": "cd04963e99c096e7114734304524be6dae3470e8",
+      "archivePath": "unused-code/plan-edits/P1-05/src/toolhub/toolhubValidators.ts.landed",
+      "sha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176",
+      "actualArchiveSha256": "3f3d55b71ab48147ea436d7b9b165ac75cbe8e7f2a40b6f95af40d7f5dfeb176",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/trust/trustConfig.ts",
+      "issue": "P0-45",
+      "baseCommit": "2a5d632588f5c198785aedf229a801ad0178938d",
+      "archivePath": "unused-code/plan-edits/P0-45/src/trust/trustConfig.ts.landed",
+      "sha256": "d7ea83f8f45ab725b8dc2fb026da48d058b62670941fb9f622b79e3c7e7c39d9",
+      "actualArchiveSha256": "d7ea83f8f45ab725b8dc2fb026da48d058b62670941fb9f622b79e3c7e7c39d9",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/types.ts",
+      "issue": "P0-44",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
+      "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "actualArchiveSha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "src/workspace.ts",
+      "issue": "P1-25",
+      "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+      "archivePath": "unused-code/plan-edits/P1-25/src/workspace.ts.landed",
+      "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+      "actualArchiveSha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "tests/apiRouterResponseParity.test.ts",
+      "issue": "P0-23",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-23/tests/apiRouterResponseParity.test.ts.landed",
+      "sha256": "cc00ec46b8f325a35b7d216c9fdff449087729212d83c86f15f27a1798d9081a",
+      "actualArchiveSha256": "cc00ec46b8f325a35b7d216c9fdff449087729212d83c86f15f27a1798d9081a",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "tests/privateModuleHelperVisibility.test.ts",
+      "issue": "P0-47",
+      "baseCommit": "51f425bf33ae5ce35b4328b33d17be26af44dad2",
+      "archivePath": "unused-code/plan-edits/P0-47/tests/privateModuleHelperVisibility.test.ts.landed",
+      "sha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5",
+      "actualArchiveSha256": "100d9d4cac5105f958d03deb6b460a2598b1a9feee386e1302575c047581e2c5",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    },
+    {
+      "path": "tests/studioRouteRoleContextParity.test.ts",
+      "issue": "P0-23",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-23/tests/studioRouteRoleContextParity.test.ts.landed",
+      "sha256": "0cfcfb81e9424e3e18c0db20e77ae68a41c37f4cc185e88ad00222262f3947b1",
+      "actualArchiveSha256": "0cfcfb81e9424e3e18c0db20e77ae68a41c37f4cc185e88ad00222262f3947b1",
+      "hashMatches": true,
+      "ancestorOfMain": true,
+      "equalsBaseBlob": true
+    }
+  ],
+  "laterPackageSnapshotCommits": [
+    {
+      "commit": "80abdaf02",
+      "files": [
+        {
+          "path": "scripts/snapshot-plan-edit.mjs",
+          "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+          "gitBlob": "faaab384dc50a76235046ee869e68975f272bf2c"
+        },
+        {
+          "path": "tests/helpers/landedSource.ts",
+          "sha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+          "gitBlob": "4af907a9228f72a997edcb919038bada64dcc226"
+        },
+        {
+          "path": "unused-code/plan-edits/README.md",
+          "sha256": "713815b36d9b347a701f0275e041987d049c434760313f8a55da096809e63d91",
+          "gitBlob": "6c2a7b4cfc71ff249981147637ae0b95c7029cae"
+        }
+      ]
+    },
+    {
+      "commit": "742330c5",
+      "files": [
+        {
+          "path": "tests/planEditsManifest.test.ts",
+          "sha256": "e04d2f1d073440fac52ca990965fcae2772fbf9a6ade236cfe9dbbdf8c488d63",
+          "gitBlob": "23c590cc501d882fb307c051da4f432210c2c6f3"
+        }
+      ]
+    }
+  ],
+  "observedBuildOutputs": [
+    {
+      "path": "dist/types.d.ts",
+      "exists": true,
+      "sha256": "5428bbf2854755008f92d41efc827715d40000bd8a09756d9bb800882ef08975"
+    },
+    {
+      "path": "dist/types.js",
+      "exists": true,
+      "sha256": "8e609bb71c20b858c77f0e9f90bb1319db8477b13f9f965f1a1e18524bf50881"
+    },
+    {
+      "path": "dist/index.d.ts",
+      "exists": true,
+      "sha256": "fe148f4acd4fc207e11f3d0e6120ece11e6a232a3ab07f84bc1f9381678c9565"
+    },
+    {
+      "path": "dist/index.js",
+      "exists": true,
+      "sha256": "970dbf7bf675f0a66d13401a9ddad2c80bd07989a0fe5b608f145b27e39193c4"
+    },
+    {
+      "path": "dist/sdk/nativeAgentClient.d.ts",
+      "exists": true,
+      "sha256": "c54cbb2812ce82825ba5ddd3fe71f98ed096d8b9b2f4a963cb62ecc9806c50c9"
+    },
+    {
+      "path": "dist/sdk/nativeAgentClient.js",
+      "exists": true,
+      "sha256": "6dead15ddabfc163b56c687d311cda2ffbdc4af6870d78e14b9e85a760ed93d1"
+    },
+    {
+      "path": "dist/workspace.d.ts",
+      "exists": true,
+      "sha256": "7b6e8e2079a50c0d19d16e40ea013f09cb9ca69200c9e374701f6f40b9113a4a"
+    },
+    {
+      "path": "dist/workspace.js",
+      "exists": true,
+      "sha256": "5b50d81f0ba2619bc7a6b5651f0e6179d542d7febbbfa513a30e218ea2215c06"
+    }
+  ],
+  "packageEntryConsumers": [
+    "tests/explainabilityContractParity.test.ts",
+    "tests/privateModuleHelperVisibility.test.ts",
+    "tests/privateStoreLocatorVisibility.test.ts",
+    "tests/workspacePathRedactionParity.test.ts"
+  ],
+  "probeDetails": [
+    {
+      "source": "src/types.ts",
+      "edit": "\nexport const p47Probe = 1;\n",
+      "historicalFailures": 3,
+      "existingRegistration": {
+        "path": "src/types.ts",
+        "issue": "P0-44",
+        "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+        "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
+        "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645"
+      },
+      "ownBuiltOutputs": [
+        "dist/types.d.ts",
+        "dist/types.js"
+      ]
+    },
+    {
+      "source": "src/index.ts",
+      "edit": "\nexport const p47Probe = 1;\n",
+      "historicalFailures": 3,
+      "existingRegistration": {
+        "path": "src/index.ts",
+        "issue": "P0-08",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-08/src/index.ts.landed",
+        "sha256": "9c33ae512e09e0526550c34a94c49001d997901a17136307650403f9c9414242"
+      },
+      "ownBuiltOutputs": [
+        "dist/index.d.ts",
+        "dist/index.js"
+      ]
+    },
+    {
+      "source": "src/sdk/nativeAgentClient.ts",
+      "edit": "\nexport const p47Probe = 1;\n",
+      "historicalFailures": 3,
+      "existingRegistration": {
+        "path": "src/sdk/nativeAgentClient.ts",
+        "issue": "P0-06",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-06/src/sdk/nativeAgentClient.ts.landed",
+        "sha256": "824475754824d4e4f4625b8545c30532418319583668401233c8383766edcf10"
+      },
+      "ownBuiltOutputs": [
+        "dist/sdk/nativeAgentClient.d.ts",
+        "dist/sdk/nativeAgentClient.js"
+      ]
+    },
+    {
+      "source": "src/workspace.ts",
+      "edit": "\nexport const p47Probe = 1;\n",
+      "historicalFailures": 2,
+      "existingRegistration": {
+        "path": "src/workspace.ts",
+        "issue": "P1-25",
+        "baseCommit": "e263c5718df833f7e35d63012a9999faa949f607",
+        "archivePath": "unused-code/plan-edits/P1-25/src/workspace.ts.landed",
+        "sha256": "3357bbc8d9bf0c0b4d0a4a4768fb5206baac2dac7d97e4415c534824e8ff2661"
+      },
+      "ownBuiltOutputs": [
+        "dist/workspace.d.ts",
+        "dist/workspace.js"
+      ]
+    }
+  ]
+}

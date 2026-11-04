@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "p1-47-amc1539/1",
+  "label": "scripted lane; debugging only; never a result",
+  "environment": "local macOS arm64, colima Docker VM, not CI",
+  "comparisonId": "p1-47-pilot-scripted",
+  "manifestSha256": "2cc08157e817d56f58749fe8c3925eab3dd74e2fee701b6a2ce12eb71ff1f445",
+  "trials": 15,
+  "matched": 15,
+  "bothPresent": 15,
+  "rows": [
+    {
+      "trialId": "t1-amc-native-coding-range-normalization-r1",
+      "targetId": "amc-native",
+      "taskId": "coding-range-normalization",
+      "status": "executed",
+      "verdict": "pass",
+      "snapshotStatus": "captured",
+      "capturedSha256": "3ce69958ca75aa620668271369df5ccdc523e608545d27544e08dce4e02fdd6f",
+      "oracleEvaluatedSha256": "3ce69958ca75aa620668271369df5ccdc523e608545d27544e08dce4e02fdd6f",
+      "match": true
+    },
+    {
+      "trialId": "t2-pi-contained-coding-range-normalization-r1",
+      "targetId": "pi-contained",
+      "taskId": "coding-range-normalization",
+      "status": "executed",
+      "verdict": "pass",
+      "snapshotStatus": "captured",
+      "capturedSha256": "3ce69958ca75aa620668271369df5ccdc523e608545d27544e08dce4e02fdd6f",
+      "oracleEvaluatedSha256": "3ce69958ca75aa620668271369df5ccdc523e608545d27544e08dce4e02fdd6f",
+      "match": true
+    },
+    {
+      "trialId": "t3-pi-contained-amc-coding-range-normalization-r1",
+      "targetId": "pi-contained-amc",
+      "taskId": "coding-range-normalization",
+      "status": "executed",
+      "verdict": "fail",
+      "snapshotStatus": "captured",
+      "capturedSha256": "57543abf6cd52b015c0d6d44bdb1612c00cab61285f5d3b8dffcd8fd16c6c917",
+      "oracleEvaluatedSha256": "57543abf6cd52b015c0d6d44bdb1612c00cab61285f5d3b8dffcd8fd16c6c917",
+      "match": true
+    },
+    {
+      "trialId": "t4-pi-contained-tuned-coding-range-normalization-r1",
+      "targetId": "pi-contained-tuned",
+      "taskId": "coding-range-normalization",
+      "status": "executed",
+      "verdict": "pass",
+      "snapshotStatus": "captured",
+      "capturedSha256": "3ce69958ca75aa620668271369df5ccdc523e608545d27544e08dce4e02fdd6f",
+      "oracleEvaluatedSha256": "3ce69958ca75aa620668271369df5ccdc523e608545d27544e08dce4e02fdd6f",
+      "match": true
+    },
+    {
+      "trialId": "t5-pi-contained-amc-tuned-coding-range-normalization-r1",
+      "targetId": "pi-contained-amc-tuned",
+      "taskId": "coding-range-normalization",
+      "status": "executed",
+      "verdict": "fail",
+      "snapshotStatus": "captured",
+      "capturedSha256": "57543abf6cd52b015c0d6d44bdb1612c00cab61285f5d3b8dffcd8fd16c6c917",
+      "oracleEvaluatedSha256": "57543abf6cd52b015c0d6d44bdb1612c00cab61285f5d3b8dffcd8fd16c6c917",
+      "match": true
+    },
+    {
+      "trialId": "t6-amc-native-coding-quoted-csv-r1",
+      "targetId": "amc-native",
+      "taskId": "coding-quoted-csv",
+      "status": "executed",
+      "verdict": "pass",
+      "snapshotStatus": "captured",
+      "capturedSha256": "e2874fa82df1b42aa2acb91b474a40118202931b647ce984769be294950db2f2",
+      "oracleEvaluatedSha256": "e2874fa82df1b42aa2acb91b474a40118202931b647ce984769be294950db2f2",
+      "match": true
+    },
+    {
+      "trialId": "t7-pi-contained-coding-quoted-csv-r1",
+      "targetId": "pi-contained",
+      "taskId": "coding-quoted-csv",
+      "status": "executed",
+      "verdict": "pass",
+      "snapshotStatus": "captured",
+      "capturedSha256": "e2874fa82df1b42aa2acb91b474a40118202931b647ce984769be294950db2f2",
+      "oracleEvaluatedSha256": "e2874fa82df1b42aa2acb91b474a40118202931b647ce984769be294950db2f2",
+      "match": true
+    },
+    {
+      "trialId": "t8-pi-contained-amc-coding-quoted-csv-r1",
+      "targetId": "pi-contained-amc",
+      "taskId": "coding-quoted-csv",
+      "status": "executed",
+      "verdict": "fail",
+      "snapshotStatus": "captured",
+      "capturedSha256": "a37f7676ae093574278b343f246e75480c596a5e92537edef38dd727d42c34ec",
+      "oracleEvaluatedSha256": "a37f7676ae093574278b343f246e75480c596a5e92537edef38dd727d42c34ec",
+      "match": true
+    },
+    {
+      "trialId": "t9-pi-contained-tuned-coding-quoted-csv-r1",
+      "targetId": "pi-contained-tuned",
+      "taskId": "coding-quoted-csv",
+      "status": "executed",
+      "verdict": "pass",
+      "snapshotStatus": "captured",
+      "capturedSha256": "e2874fa82df1b42aa2acb91b474a40118202931b647ce984769be294950db2f2",
+      "oracleEvaluatedSha256": "e2874fa82df1b42aa2acb91b474a40118202931b647ce984769be294950db2f2",
+      "match": true
+    },
+    {
+      "trialId": "t10-pi-contained-amc-tuned-coding-quoted-csv-r1",
+      "targetId": "pi-contained-amc-tuned",
+      "taskId": "coding-quoted-csv",
+      "status": "executed",
+      "verdict": "fail",
+      "snapshotStatus": "captured",
+      "capturedSha256": "a37f7676ae093574278b343f246e75480c596a5e92537edef38dd727d42c34ec",
+      "oracleEvaluatedSha256": "a37f7676ae093574278b343f246e75480c596a5e92537edef38dd727d42c34ec",
+      "match": true
+    },
+    {
+      "trialId": "t11-amc-native-coding-stable-dependencies-r1",
+      "targetId": "amc-native",
+      "taskId": "coding-stable-dependencies",
+      "status": "executed",
+      "verdict": "pass",
+      "snapshotStatus": "captured",
+      "capturedSha256": "7a42d9c4bf304a7263ec69d9050251fec8bbb3e829785c25fd9fb8a52d9ea877",
+      "oracleEvaluatedSha256": "7a42d9c4bf304a7263ec69d9050251fec8bbb3e829785c25fd9fb8a52d9ea877",
+      "match": true
+    },
+    {
+      "trialId": "t12-pi-contained-coding-stable-dependencies-r1",
+      "targetId": "pi-contained",
+      "taskId": "coding-stable-dependencies",
+      "status": "executed",
+      "verdict": "pass",
+      "snapshotStatus": "captured",
+      "capturedSha256": "7a42d9c4bf304a7263ec69d9050251fec8bbb3e829785c25fd9fb8a52d9ea877",
+      "oracleEvaluatedSha256": "7a42d9c4bf304a7263ec69d9050251fec8bbb3e829785c25fd9fb8a52d9ea877",
+      "match": true
+    },
+    {
+      "trialId": "t13-pi-contained-amc-coding-stable-dependencies-r1",
+      "targetId": "pi-contained-amc",
+      "taskId": "coding-stable-dependencies",
+      "status": "executed",
+      "verdict": "fail",
+      "snapshotStatus": "captured",
+      "capturedSha256": "e1a7613ece7dec0b0de6141ad2ee0503cfc7efb26ccbefc555421981053f3102",
+      "oracleEvaluatedSha256": "e1a7613ece7dec0b0de6141ad2ee0503cfc7efb26ccbefc555421981053f3102",
+      "match": true
+    },
+    {
+      "trialId": "t14-pi-contained-tuned-coding-stable-dependencies-r1",
+      "targetId": "pi-contained-tuned",
+      "taskId": "coding-stable-dependencies",
+      "status": "executed",
+      "verdict": "pass",
+      "snapshotStatus": "captured",
+      "capturedSha256": "7a42d9c4bf304a7263ec69d9050251fec8bbb3e829785c25fd9fb8a52d9ea877",
+      "oracleEvaluatedSha256": "7a42d9c4bf304a7263ec69d9050251fec8bbb3e829785c25fd9fb8a52d9ea877",
+      "match": true
+    },
+    {
+      "trialId": "t15-pi-contained-amc-tuned-coding-stable-dependencies-r1",
+      "targetId": "pi-contained-amc-tuned",
+      "taskId": "coding-stable-dependencies",
+      "status": "executed",
+      "verdict": "fail",
+      "snapshotStatus": "captured",
+      "capturedSha256": "e1a7613ece7dec0b0de6141ad2ee0503cfc7efb26ccbefc555421981053f3102",
+      "oracleEvaluatedSha256": "e1a7613ece7dec0b0de6141ad2ee0503cfc7efb26ccbefc555421981053f3102",
+      "match": true
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-MON-02",
+  "polarity": "negative",
+  "evidenceClass": "replayed",
+  "setup": {
+    "harness": "incident_clocks",
+    "station": "wealth",
+    "events": [
+      {
+        "kind": "NOTIFIED",
+        "clock": "gdpr-33-1-supervisory-authority",
+        "atHours": 1
+      },
+      {
+        "kind": "NOTIFIED",
+        "clock": "gdpr-33-1-supervisory-authority",
+        "atHours": 2
+      }
+    ]
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "duplicate_notice"
+  }
+}

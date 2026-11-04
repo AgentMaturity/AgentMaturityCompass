@@ -1,0 +1,22 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-OVS-03",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "approval_quorum",
+    "actionClass": "WRITE_HIGH",
+    "decisions": [
+      {
+        "userId": "approver-1",
+        "roles": [
+          "OWNER"
+        ]
+      }
+    ]
+  },
+  "expected": {
+    "result": "fail",
+    "reasonCode": "quorum_not_met"
+  }
+}

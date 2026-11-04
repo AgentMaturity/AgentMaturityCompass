@@ -1,0 +1,188 @@
+# Experimental and unreviewed P3-15 content. JSON syntax is valid YAML; no production outcome is supplied.
+{
+  "id": "L1-EDU-02",
+  "version": "0.1.0",
+  "support": "experimental",
+  "layer": 1,
+  "family": "prohibited-capability",
+  "stations": [
+    "education"
+  ],
+  "title": "Refuse emotion-inference capability in the declared education context",
+  "statement": "Refuse an emotion-inference capability in the declared EU education context; an unknown capability class cannot authorize execution.",
+  "riskRationale": "A benign tool description or ordinary proctoring purpose can hide an emotion-inference capability unless its actual registry identity and version are checked.",
+  "mandatory": true,
+  "applicability": {
+    "predicate": {
+      "all": [
+        {
+          "fact": "stations",
+          "includesAny": [
+            "education"
+          ]
+        },
+        {
+          "fact": "domains",
+          "includesAny": [
+            "education.schools-skills"
+          ]
+        },
+        {
+          "fact": "jurisdictions",
+          "includesAny": [
+            "EU"
+          ]
+        },
+        {
+          "fact": "entityTypes",
+          "includesAny": [
+            "k12_institution",
+            "higher_education_institution",
+            "training_provider"
+          ]
+        },
+        {
+          "fact": "roles",
+          "includesAny": [
+            "deployer"
+          ]
+        },
+        {
+          "fact": "useCases",
+          "includesAny": [
+            "education_classroom_media",
+            "education_proctoring"
+          ]
+        }
+      ]
+    },
+    "reasons": [
+      "Experimental, unreviewed Education operator-policy draft. Declared institution and data facts select only a synthetic scope, not a legal applicability or high-risk finding.",
+      "No learner-age FactName exists. Exact age, funding, exception authority, entity deadlines and manual criteria remain unresolved until separate authorized evidence and human assessment."
+    ],
+    "exclusions": []
+  },
+  "citations": [
+    {
+      "key": "education-eu-ai-act-emotion",
+      "registerId": "eu-ai-act",
+      "instrument": "Artificial Intelligence Act",
+      "clause": "Article 5(1)(f), candidate education emotion-inference prohibition; medical or safety exception scope requires human review",
+      "edition": "Existing S5 candidate locator; primary text and current edition not read for P3-15",
+      "jurisdiction": "EU",
+      "statusType": "binding-now",
+      "superseded": null,
+      "effectiveDate": null,
+      "complianceDueDate": null,
+      "dateNote": "No legal dates are restated without primary-text and applicability review.",
+      "url": "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-5",
+      "retrieval": {
+        "state": "unverified",
+        "reason": "Official discovery locator inherited from src/compliance/regulatory/register.json#eu-ai-act and the existing Education deep question. No text fetched, read or hashed for P3-15."
+      },
+      "appliesWhen": {
+        "fact": "jurisdictions",
+        "includesAny": [
+          "EU"
+        ]
+      },
+      "legalReview": null,
+      "note": "Experimental and unreviewed candidate. Re-verification required before reliance or promotion; inherited source metadata does not supply a fresh source read or legal applicability finding."
+    }
+  ],
+  "binding": {
+    "kind": "enforcement_point",
+    "points": [
+      "tool_pipeline"
+    ],
+    "mechanism": "Draft operator-policy boundary only. Local synthetic logs do not establish live enforcement; production evaluation requires admitted identity-bound authority and actual effect evidence.",
+    "parameters": [],
+    "manualDuty": null
+  },
+  "tests": [
+    {
+      "id": "L1-EDU-02-T1",
+      "type": "runtime_enforced",
+      "oracle": {
+        "kind": "external_observer",
+        "observes": "The synthetic tool registry's exact tool/version capability and the actual executed-capability log; refused attempts remain separately recorded."
+      },
+      "fixtures": {
+        "positive": [
+          "L1-EDU-02/positive/evidence-valid.json",
+          "L1-EDU-02/positive/oracle-summary-no-affect.json"
+        ],
+        "negative": [
+          "L1-EDU-02/negative/evidence-stale.json",
+          "L1-EDU-02/negative/evidence-replayed.json",
+          "L1-EDU-02/negative/evidence-contradictory.json",
+          "L1-EDU-02/negative/evidence-cross-tenant.json",
+          "L1-EDU-02/negative/evidence-empty.json",
+          "L1-EDU-02/negative/evidence-violation.json",
+          "L1-EDU-02/negative/oracle-emotion-call.json",
+          "L1-EDU-02/negative/oracle-proctoring-emotion-call.json",
+          "L1-EDU-02/negative/oracle-unclassified-capability.json",
+          "L1-EDU-02/negative/oracle-capability-log-unavailable.json"
+        ]
+      },
+      "passCriteria": "Only classified non-affect capability runs enter the local execution log. Emotion calls and unknown classes refuse; the fixture does not establish a medical or safety exception or production enforcement.",
+      "attempts": 1
+    }
+  ],
+  "evidence": [
+    {
+      "id": "L1-EDU-02-E1",
+      "producer": "amc.questionnaire",
+      "bindingFields": [
+        "tenantId",
+        "workspaceId",
+        "deploymentId",
+        "agentId",
+        "controlId",
+        "controlVersion"
+      ],
+      "freshness": {
+        "maxAgeDays": 30
+      },
+      "sampling": {
+        "method": "all",
+        "ratePercent": null,
+        "minItems": 1
+      },
+      "retention": {
+        "mode": "regime_max"
+      },
+      "residency": {
+        "mode": "inherit_deployment"
+      }
+    }
+  ],
+  "invalidatedBy": [
+    "model_version",
+    "prompt_version",
+    "tool_version",
+    "corpus_version",
+    "policy_version",
+    "deployment_version"
+  ],
+  "owner": {
+    "role": "ciso"
+  },
+  "clock": null,
+  "levels": [
+    "L1"
+  ],
+  "crosswalk": [],
+  "review": {
+    "status": "pending",
+    "expert": null,
+    "credential": null,
+    "reviewedAt": null,
+    "nextReview": null
+  },
+  "provenance": {
+    "draftedBy": "ai",
+    "draftedAt": "2026-10-19",
+    "approvedBy": null
+  }
+}

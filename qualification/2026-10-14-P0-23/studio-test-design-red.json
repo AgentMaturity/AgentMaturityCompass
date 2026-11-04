@@ -1,0 +1,1133 @@
+{
+  "issue": "P0-23",
+  "status": "bounded actual Studio HTTP RED; no production repair or acceptance",
+  "generatedUtc": "2026-10-14T17:21:46.243459+00:00",
+  "head": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "worktree": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass",
+  "ownedNewTest": {
+    "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts",
+    "sha256": "d43f02d76f6727a6fb4d437d1452d0657079acadd0fe1fbc988c9bb3b630955d",
+    "bytes": 18131
+  },
+  "apiTestUnchanged": {
+    "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/apiClaimLabels.test.ts",
+    "sha256": "0b3ce0a7a268fc6564d53bcc11f6acbe946cc22e49b97250b798396e7e9ccdd1",
+    "bytes": 15391,
+    "equalsFinalApiSliceSha256": true
+  },
+  "runtime": {
+    "node": "v22.23.3",
+    "executable": {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+      "bytes": 67024
+    },
+    "sdkVersion": "1.32.1"
+  },
+  "sourceInputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/studio/studioServer.ts",
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+      "bytes": 323521,
+      "gitHeadBlob": "5655e5793632ff9674ef377c0f66583a0734b8cc",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/studio/studioClaimOutput.ts",
+      "sha256": "c29e8ca0cc2e7fbe6ff6748c385def883fcb92dcc7962d53881f1beb13d53ac7",
+      "bytes": 2969,
+      "gitHeadBlob": "b54294fb1e35ba8dc7accbbd533eaea82d05a446",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/index.ts",
+      "sha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+      "bytes": 19070,
+      "gitHeadBlob": "4ab8c976b28dc1941188c4d0f80a0592f029db2e",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/accessPolicy.ts",
+      "sha256": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+      "bytes": 8057,
+      "gitHeadBlob": "4bde7602a982982e270b71f903e7ad38cc2d18b2",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/resultRouteRegistry.ts",
+      "sha256": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+      "bytes": 13528,
+      "gitHeadBlob": "50316b894c5124249ff60d762c70ccaff28a7f16",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+      "sha256": "c7b666c37c3b7348164002ccb2ad21a85c16d60e92d50ec6a417436ef279c497",
+      "bytes": 8482,
+      "gitHeadBlob": "6093414342c245b1128ce13b659f7c1fd0de6e93",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/adapters/results.ts",
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "bytes": 9797,
+      "gitHeadBlob": "f9993b2dd4980debcc721da495fb4a3b502c8b50",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/render.ts",
+      "sha256": "274b20ebbef6a2a3746ef88ceea552a2717a94e61b264698e6a4afd48791b1da",
+      "bytes": 7029,
+      "gitHeadBlob": "359560c9aa5d63bddc8e9d03a66ca4aec6ff7edb",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/diagnostic/reportSeal.ts",
+      "sha256": "890711c710ce278edef9081355417474cdfe7ae281c562d1d277a64e48d80c4f",
+      "bytes": 1471,
+      "gitHeadBlob": "96eebf423f7de2a4ca715b4be0d847087df30dfd",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/diagnostic/evidenceReadiness.ts",
+      "sha256": "b213abd2246373799e87cb12631f75502ebbff430869898020ad16c3b8182624",
+      "bytes": 6072,
+      "gitHeadBlob": "024acb8abd0b118223438a4bb5f37316fa60d69d",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/diagnostic/runReportResolution.ts",
+      "sha256": "892b489a786d45e238c71615db3000cb48f922013d9cefbe26d9e41208f3d39f",
+      "bytes": 4495,
+      "gitHeadBlob": "a1212248cad5dbc002c5ab6d420aee854411626a",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/domains/industryPackEntitlement.ts",
+      "sha256": "095572a719fe570a2c3207aa51c32470140b861655ba803846c4b61564e9f5f0",
+      "bytes": 21813,
+      "gitHeadBlob": "a0de3390ba61e5dc51906aec476da8a6edd308b4",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/domains/industryPacks.ts",
+      "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7",
+      "bytes": 621751,
+      "gitHeadBlob": "524c2a5107e1f6cc0ef0d093b9d3498959babc13",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "bytes": 43792,
+      "gitHeadBlob": "aa1d539a15001c827e98af9453cc96c876300fe5",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "bytes": 9168,
+      "gitHeadBlob": "cffeb21a2cd47897d7f623048bfa6cfb11606c2d",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/workspace.ts",
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "bytes": 27587,
+      "gitHeadBlob": "32e5e9c85c077fe84f2f4fb8d65b742208740d76",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/methodology/publicMethodology.ts",
+      "sha256": "a86de215883618469ed69872823a8ad194b52290145427b3f66592c05b1df97a",
+      "bytes": 930822,
+      "gitHeadBlob": "59b9a2f42869e06deeeeeae6ccc31dce95062be0",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "bytes": 1324,
+      "gitHeadBlob": "e72e9654a9d602319c28febb5893da12eb5438b8",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "bytes": 8631,
+      "gitHeadBlob": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+      "equalsHeadBytes": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "bytes": 155432,
+      "gitHeadBlob": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+      "equalsHeadBytes": true
+    }
+  ],
+  "phases": [
+    {
+      "phase": "red",
+      "report": {
+        "path": "/private/tmp/p0-23-studio-claim-labels-red-20261014.json",
+        "sha256": "ff98d780ce414a2c4d3bbde06b7c20f97df37d7621b0a297d3c0ca768cfc48f0",
+        "bytes": 8666
+      },
+      "log": {
+        "path": "/private/tmp/p0-23-studio-claim-labels-red-20261014.log",
+        "sha256": "14402cdb1308bedde0d5f0b43d2903b41080189cd851284c0a61391c90db7813",
+        "bytes": 5360
+      },
+      "command": {
+        "name": "studio-claim-labels-red",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/studioClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-studio-claim-labels-red-20261014.json",
+        "exit": 1,
+        "durationMs": 6758,
+        "startedUtc": "2026-10-14T17:17:16.002160+00:00",
+        "log": "/private/tmp/p0-23-studio-claim-labels-red-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      },
+      "counts": {
+        "success": false,
+        "numTotalTests": 14,
+        "numPassedTests": 11,
+        "numFailedTests": 3,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "cases": [
+        {
+          "title": "a sealed legacy run retains the canonical legacy claim after Studio report decoration",
+          "status": "failed",
+          "durationMs": 263.85308299999997
+        },
+        {
+          "title": "a current sealed run with stored readiness retains its observed claim",
+          "status": "passed",
+          "durationMs": 198.62529199999972
+        },
+        {
+          "title": "adding display readiness does not invalidate a current report's valid stored seal",
+          "status": "failed",
+          "durationMs": 187.46983399999954
+        },
+        {
+          "title": "an unsealed current report cannot promote its own observed metadata",
+          "status": "passed",
+          "durationMs": 175.0765420000007
+        },
+        {
+          "title": "a tampered current report cannot inherit its prior valid seal",
+          "status": "passed",
+          "durationMs": 190.20233299999927
+        },
+        {
+          "title": "refuses report access with admin credential null",
+          "status": "passed",
+          "durationMs": 168.00645900000018
+        },
+        {
+          "title": "refuses report access with admin credential invalid-owned-studio-token",
+          "status": "passed",
+          "durationMs": 167.6752919999999
+        },
+        {
+          "title": "a missing stored run returns 404 without a fabricated result claim",
+          "status": "failed",
+          "durationMs": 160.0152079999998
+        },
+        {
+          "title": "an unknown authenticated Studio route keeps its 404 error contract",
+          "status": "passed",
+          "durationMs": 162.1765830000004
+        },
+        {
+          "title": "paid catalog access changes content availability without changing any pack claim or truth-rule note",
+          "status": "passed",
+          "durationMs": 172.07716700000037
+        },
+        {
+          "title": "a genuine signed entitlement still refuses inherited pack ID __proto__",
+          "status": "passed",
+          "durationMs": 160.22762500000044
+        },
+        {
+          "title": "a genuine signed entitlement still refuses inherited pack ID constructor",
+          "status": "passed",
+          "durationMs": 158.56433300000026
+        },
+        {
+          "title": "a genuine signed entitlement still refuses inherited pack ID toString",
+          "status": "passed",
+          "durationMs": 163.07029200000034
+        },
+        {
+          "title": "a genuine signed entitlement still refuses inherited pack ID hasOwnProperty",
+          "status": "passed",
+          "durationMs": 162.86962500000027
+        }
+      ],
+      "testSource": {
+        "path": "/private/tmp/p0-23-studio-claim-labels-first-red-source-20261014.ts",
+        "sha256": "31d8499aacd87dae22540ae521c0659714d2f224e8cadd56bd15a12a140a2602",
+        "bytes": 17361
+      }
+    },
+    {
+      "phase": "final-red",
+      "report": {
+        "path": "/private/tmp/p0-23-studio-claim-labels-final-red-20261014.json",
+        "sha256": "b5ffcfe006ad0a90545581f00ec4d37ff8016a4e6b9cc7843ccc163813e27ae8",
+        "bytes": 10031
+      },
+      "log": {
+        "path": "/private/tmp/p0-23-studio-claim-labels-final-red-20261014.log",
+        "sha256": "4e1fa31cfc0732fc2abcc8e1e60eec5b4e8a8b927e10f5cd2212a5dff9884709",
+        "bytes": 6908
+      },
+      "command": {
+        "name": "studio-claim-labels-final-red",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/studioClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-studio-claim-labels-final-red-20261014.json",
+        "exit": 1,
+        "durationMs": 6933,
+        "startedUtc": "2026-10-14T17:18:31.353147+00:00",
+        "log": "/private/tmp/p0-23-studio-claim-labels-final-red-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      },
+      "counts": {
+        "success": false,
+        "numTotalTests": 15,
+        "numPassedTests": 11,
+        "numFailedTests": 4,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "numFailedTestSuites": 2
+      },
+      "cases": [
+        {
+          "title": "a sealed legacy run retains the canonical legacy claim after Studio report decoration",
+          "status": "failed",
+          "durationMs": 273.017167
+        },
+        {
+          "title": "a current sealed run with stored readiness retains its observed claim",
+          "status": "passed",
+          "durationMs": 191.10391700000037
+        },
+        {
+          "title": "a legacy version cannot become observed even when its stored readiness also verifies",
+          "status": "failed",
+          "durationMs": 189.90879200000018
+        },
+        {
+          "title": "adding display readiness does not invalidate a current report's valid stored seal",
+          "status": "failed",
+          "durationMs": 182.47362500000054
+        },
+        {
+          "title": "an unsealed current report cannot promote its own observed metadata",
+          "status": "passed",
+          "durationMs": 178.69770900000003
+        },
+        {
+          "title": "a tampered current report cannot inherit its prior valid seal",
+          "status": "passed",
+          "durationMs": 186.17666699999972
+        },
+        {
+          "title": "refuses report access with admin credential null",
+          "status": "passed",
+          "durationMs": 177.76829199999975
+        },
+        {
+          "title": "refuses report access with admin credential invalid-owned-studio-token",
+          "status": "passed",
+          "durationMs": 175.4668329999995
+        },
+        {
+          "title": "a missing stored run returns 404 without a fabricated result claim",
+          "status": "failed",
+          "durationMs": 164.98183299999982
+        },
+        {
+          "title": "an unknown authenticated Studio route keeps its 404 error contract",
+          "status": "passed",
+          "durationMs": 158.8809999999994
+        },
+        {
+          "title": "paid catalog access changes content availability without changing any pack claim or truth-rule note",
+          "status": "passed",
+          "durationMs": 174.5848330000008
+        },
+        {
+          "title": "a genuine signed entitlement still refuses inherited pack ID __proto__",
+          "status": "passed",
+          "durationMs": 163.62625000000025
+        },
+        {
+          "title": "a genuine signed entitlement still refuses inherited pack ID constructor",
+          "status": "passed",
+          "durationMs": 159.57108399999925
+        },
+        {
+          "title": "a genuine signed entitlement still refuses inherited pack ID toString",
+          "status": "passed",
+          "durationMs": 161.64595800000006
+        },
+        {
+          "title": "a genuine signed entitlement still refuses inherited pack ID hasOwnProperty",
+          "status": "passed",
+          "durationMs": 159.85916700000053
+        }
+      ],
+      "testSource": {
+        "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/studioClaimLabels.test.ts",
+        "sha256": "d43f02d76f6727a6fb4d437d1452d0657079acadd0fe1fbc988c9bb3b630955d",
+        "bytes": 18131
+      }
+    }
+  ],
+  "rawAssets": [
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-auth-control-stored.json",
+      "sha256": "dd68507bf35e770874aba8676f547fadfa44943c45d7f62a3a4568a551565855",
+      "bytes": 897307
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-auth-invalid.json",
+      "sha256": "ec1679227e3a97f600ce8821e64d1b5522545439c85a006e31043f08646b6a72",
+      "bytes": 259
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-auth-missing.json",
+      "sha256": "ec1679227e3a97f600ce8821e64d1b5522545439c85a006e31043f08646b6a72",
+      "bytes": 259
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-catalog-paid.json",
+      "sha256": "2a744443294ef431f3960de1ae92f2414af4bb6d758eb30f35c76d914e64e5fe",
+      "bytes": 123061
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-catalog-unpaid.json",
+      "sha256": "d55b8c2acc9e8b24bd7f532fdac741290f28b669566d1b6bb84ae0509be1ff31",
+      "bytes": 69512
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-current-no-readiness-stored.json",
+      "sha256": "01ae87e6288c10776231fbf10d0390a12d1e46d55d4446ca02cafaf84f66f7ad",
+      "bytes": 896661
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-current-no-readiness.json",
+      "sha256": "82c37fbc3f7044325fec6094176f4bda195e5f83556ce809d7bd554c480d650d",
+      "bytes": 1756433
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-current-sealed-stored.json",
+      "sha256": "91f557e25b877ce9411bfbafb0f5e3aa194d0464e3b1309174160ec610395407",
+      "bytes": 897309
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-current-sealed.json",
+      "sha256": "cdf39ac65ddcbce3389875a5ca0e85faab79a602e9d0c71fd05deea36e496d9d",
+      "bytes": 1756243
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-current-tampered-stored.json",
+      "sha256": "0ee334d10f91bf6f0c141776f64c4f40a2839bb477a650a84718660fd0e728b5",
+      "bytes": 897311
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-current-tampered.json",
+      "sha256": "2299f8faf3425864ef7a4fddfe1154959746983428bf28bb095b748d299c1746",
+      "bytes": 1756421
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-current-unsealed-stored.json",
+      "sha256": "f5cf1155aa94eb00f786f0044669058fc9b7a4bb403c3f5b27d2d0a56d416c9a",
+      "bytes": 897160
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-current-unsealed.json",
+      "sha256": "80453a3a12364865732c4d3836b9199dbffc48494b57813a93bd761611ebaee4",
+      "bytes": 1756117
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-legacy-1-1-1-stored.json",
+      "sha256": "118c1dc1f95d5b4ab38401b36f28c743fcebd74cdee30964fc4262add125ccb5",
+      "bytes": 896653
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-legacy-1-1-1.json",
+      "sha256": "8beef317f49bbcddd00271982b2fef4b840b373f4a827ff834b06c1064dd3c4b",
+      "bytes": 1756409
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-missing-run.json",
+      "sha256": "842a8d7338bc9f7025dcafb9d7cf91113c691ef631575dabc02f85352c9c4485",
+      "bytes": 251
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-pack-inherited-__proto__.json",
+      "sha256": "65768781ffec0ba66a22684dbdde8b976f2cb611d9163e90aedce16aeaf98a34",
+      "bytes": 249
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-pack-inherited-constructor.json",
+      "sha256": "6aa565ffc4cd61f35eb3262259f6e13dd75ef9f5da633abe2857e2715d880551",
+      "bytes": 251
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-pack-inherited-hasOwnProperty.json",
+      "sha256": "479b88f19b7ed8dca819db3016e38a38ff341315b9c7ca30135e851963009f5a",
+      "bytes": 254
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-pack-inherited-toString.json",
+      "sha256": "97d0eebef8242f2dc9ed012bf914a6f487be70814d4aacfa6333d26a3ac228f5",
+      "bytes": 248
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-pack-paid.json",
+      "sha256": "7d54fcb4d1ab6e5a8dc29b78f8c9b13e0f6586487e7368fe00b4bf2f586ed8c0",
+      "bytes": 40034
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-pack-unpaid-refusal.json",
+      "sha256": "8d7a6786d5f3950ac6571c3081948729b436a27e7970101e693deb333b50edfd",
+      "bytes": 1780
+    },
+    {
+      "phase": "red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-red-20261014/studio-unknown-route.json",
+      "sha256": "ff777c1b4609a7811ec5e5ffd78e892696b07f968531f3672f7e09849144541e",
+      "bytes": 222
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-control-stored.json",
+      "sha256": "e224d7cd705137261b6ad8f62dde437990fb20bc93e59dbff62aad4129f80a85",
+      "bytes": 897307
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-invalid.json",
+      "sha256": "ec1679227e3a97f600ce8821e64d1b5522545439c85a006e31043f08646b6a72",
+      "bytes": 259
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-missing.json",
+      "sha256": "ec1679227e3a97f600ce8821e64d1b5522545439c85a006e31043f08646b6a72",
+      "bytes": 259
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-catalog-paid.json",
+      "sha256": "2a744443294ef431f3960de1ae92f2414af4bb6d758eb30f35c76d914e64e5fe",
+      "bytes": 123061
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-catalog-unpaid.json",
+      "sha256": "d55b8c2acc9e8b24bd7f532fdac741290f28b669566d1b6bb84ae0509be1ff31",
+      "bytes": 69512
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-no-readiness-stored.json",
+      "sha256": "65dde20d639b105d62545eeffa8a884f37269d947bf024f6ed4e4e8dee44e66c",
+      "bytes": 896661
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-no-readiness.json",
+      "sha256": "9eb39e5141ce16cdc12085a63fe70a2919ce4a5340de1fbf19a2336b6ec71169",
+      "bytes": 1756433
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-sealed-stored.json",
+      "sha256": "7e2225a1c035996339d546241314b1b24c74018abab5feec2023a823f522b1cd",
+      "bytes": 897309
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-sealed.json",
+      "sha256": "21606bc64ea9339f4db3a19187defd16a084f8c66c656bf515dfc6601c813081",
+      "bytes": 1756243
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-tampered-stored.json",
+      "sha256": "4c655bfc26388d614e6516569e60954647903661068cc227ad428cc8bac271f0",
+      "bytes": 897311
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-tampered.json",
+      "sha256": "37960a2b13255707513e35530453b8d50f10eaa8607cc56cc5bb43409cc3ec53",
+      "bytes": 1756421
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-unsealed-stored.json",
+      "sha256": "7e013f80733a055b33af4d3ff101667a1fa1411a83123ecd996110aaa858db52",
+      "bytes": 897160
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-unsealed.json",
+      "sha256": "f92109f7cdd8245b5ddab2b3f627491ad567914a9a904786dab457b686f97b72",
+      "bytes": 1756117
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-1-1-1-stored.json",
+      "sha256": "6d9c8b541719db383157a13b7dfe08e38870d86f591ec8930b1125c81ae4d84b",
+      "bytes": 896653
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-1-1-1.json",
+      "sha256": "1ae8d431e05bcafb0c5fcb090ec1fa900c0862b984170de472d816bcb2e54dc5",
+      "bytes": 1756409
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-with-readiness-stored.json",
+      "sha256": "ed7af9f29cc787cc36a00184f0f09fa655d21ae42b5fe57fce6d8597b0dcb044",
+      "bytes": 897316
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-with-readiness.json",
+      "sha256": "c8cd0172997aa547cc23c878d03ddc564b72b48983d250a0eccc0df0a0265bbb",
+      "bytes": 1756264
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-missing-run.json",
+      "sha256": "842a8d7338bc9f7025dcafb9d7cf91113c691ef631575dabc02f85352c9c4485",
+      "bytes": 251
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-__proto__.json",
+      "sha256": "65768781ffec0ba66a22684dbdde8b976f2cb611d9163e90aedce16aeaf98a34",
+      "bytes": 249
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-constructor.json",
+      "sha256": "6aa565ffc4cd61f35eb3262259f6e13dd75ef9f5da633abe2857e2715d880551",
+      "bytes": 251
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-hasOwnProperty.json",
+      "sha256": "479b88f19b7ed8dca819db3016e38a38ff341315b9c7ca30135e851963009f5a",
+      "bytes": 254
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-toString.json",
+      "sha256": "97d0eebef8242f2dc9ed012bf914a6f487be70814d4aacfa6333d26a3ac228f5",
+      "bytes": 248
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-paid.json",
+      "sha256": "7d54fcb4d1ab6e5a8dc29b78f8c9b13e0f6586487e7368fe00b4bf2f586ed8c0",
+      "bytes": 40034
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-unpaid-refusal.json",
+      "sha256": "8d7a6786d5f3950ac6571c3081948729b436a27e7970101e693deb333b50edfd",
+      "bytes": 1780
+    },
+    {
+      "phase": "final-red",
+      "path": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-unknown-route.json",
+      "sha256": "ff777c1b4609a7811ec5e5ffd78e892696b07f968531f3672f7e09849144541e",
+      "bytes": 222
+    }
+  ],
+  "storedFixtures": [
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-control-stored.json",
+      "runId": "studio-auth-control",
+      "version": "1.2.0",
+      "storedReadiness": true,
+      "sealVerified": true,
+      "hasRealAuditorPublicKeyHistory": true
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-no-readiness-stored.json",
+      "runId": "studio-current-no-readiness",
+      "version": "1.2.0",
+      "storedReadiness": false,
+      "sealVerified": true,
+      "hasRealAuditorPublicKeyHistory": true
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-sealed-stored.json",
+      "runId": "studio-current-sealed",
+      "version": "1.2.0",
+      "storedReadiness": true,
+      "sealVerified": true,
+      "hasRealAuditorPublicKeyHistory": true
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-tampered-stored.json",
+      "runId": "studio-current-tampered",
+      "version": "1.2.0",
+      "storedReadiness": true,
+      "sealVerified": true,
+      "hasRealAuditorPublicKeyHistory": true
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-unsealed-stored.json",
+      "runId": "studio-current-unsealed",
+      "version": "1.2.0",
+      "storedReadiness": true,
+      "sealVerified": false,
+      "hasRealAuditorPublicKeyHistory": true
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-1-1-1-stored.json",
+      "runId": "studio-legacy-1-1-1",
+      "version": "1.1.1",
+      "storedReadiness": false,
+      "sealVerified": true,
+      "hasRealAuditorPublicKeyHistory": true
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-with-readiness-stored.json",
+      "runId": "studio-legacy-with-readiness",
+      "version": "1.1.1",
+      "storedReadiness": true,
+      "sealVerified": true,
+      "hasRealAuditorPublicKeyHistory": true
+    }
+  ],
+  "actualResponses": [
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-invalid.json",
+      "method": "GET",
+      "path": "/runs/studio-auth-control/report",
+      "authenticated": false,
+      "status": 401,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": "missing or invalid token",
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-auth-missing.json",
+      "method": "GET",
+      "path": "/runs/studio-auth-control/report",
+      "authenticated": false,
+      "status": 401,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": "missing or invalid token",
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-catalog-paid.json",
+      "method": "GET",
+      "path": "/industry-packs/list",
+      "authenticated": true,
+      "status": 200,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": null,
+      "packCount": 41,
+      "entitlementActive": true,
+      "entitlementNote": "Payment unlocks access to pack content; it never changes a result, a trust tier or a verification outcome."
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-catalog-unpaid.json",
+      "method": "GET",
+      "path": "/industry-packs/list",
+      "authenticated": true,
+      "status": 200,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": null,
+      "packCount": 41,
+      "entitlementActive": false,
+      "entitlementNote": "Payment unlocks access to pack content; it never changes a result, a trust tier or a verification outcome."
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-no-readiness.json",
+      "method": "GET",
+      "path": "/runs/studio-current-no-readiness/report",
+      "authenticated": true,
+      "status": 200,
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "incomplete",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported \u00b7 Result: not evaluated (this result is not yet bound to claim-eligible evidence) \u00b7 Evidence: incomplete \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+      "error": null,
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-sealed.json",
+      "method": "GET",
+      "path": "/runs/studio-current-sealed/report",
+      "authenticated": true,
+      "status": 200,
+      "claimKind": "observed",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "sufficient",
+        "result": "pass",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Observed \u00b7 Result: pass \u00b7 Evidence: sufficient \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+      "error": null,
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-tampered.json",
+      "method": "GET",
+      "path": "/runs/studio-current-tampered/report",
+      "authenticated": true,
+      "status": 200,
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "incomplete",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported \u00b7 Result: not evaluated (this result is not yet bound to claim-eligible evidence) \u00b7 Evidence: incomplete \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+      "error": null,
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-current-unsealed.json",
+      "method": "GET",
+      "path": "/runs/studio-current-unsealed/report",
+      "authenticated": true,
+      "status": 200,
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "incomplete",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported \u00b7 Result: not evaluated (this result is not yet bound to claim-eligible evidence) \u00b7 Evidence: incomplete \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+      "error": null,
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-1-1-1.json",
+      "method": "GET",
+      "path": "/runs/studio-legacy-1-1-1/report",
+      "authenticated": true,
+      "status": 200,
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "incomplete",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported \u00b7 Result: not evaluated (this result is not yet bound to claim-eligible evidence) \u00b7 Evidence: incomplete \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+      "error": null,
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-legacy-with-readiness.json",
+      "method": "GET",
+      "path": "/runs/studio-legacy-with-readiness/report",
+      "authenticated": true,
+      "status": 200,
+      "claimKind": "observed",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "sufficient",
+        "result": "pass",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Observed \u00b7 Result: pass \u00b7 Evidence: sufficient \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+      "error": null,
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-missing-run.json",
+      "method": "GET",
+      "path": "/runs/studio-missing-run/report",
+      "authenticated": true,
+      "status": 500,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": "internal server error",
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-__proto__.json",
+      "method": "GET",
+      "path": "/industry-packs/__proto__",
+      "authenticated": true,
+      "status": 404,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": "industry pack not found",
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-constructor.json",
+      "method": "GET",
+      "path": "/industry-packs/constructor",
+      "authenticated": true,
+      "status": 404,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": "industry pack not found",
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-hasOwnProperty.json",
+      "method": "GET",
+      "path": "/industry-packs/hasOwnProperty",
+      "authenticated": true,
+      "status": 404,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": "industry pack not found",
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-inherited-toString.json",
+      "method": "GET",
+      "path": "/industry-packs/toString",
+      "authenticated": true,
+      "status": 404,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": "industry pack not found",
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-paid.json",
+      "method": "GET",
+      "path": "/industry-packs/farm-to-fork",
+      "authenticated": true,
+      "status": 200,
+      "claimKind": "self_reported",
+      "statusDimensions": {
+        "applicability": {
+          "state": "applicable"
+        },
+        "evidence": "incomplete",
+        "result": "not_evaluated",
+        "enforcement": {
+          "state": "none"
+        },
+        "review": "pending"
+      },
+      "claimLabel": "Claim: Self-reported \u00b7 Result: not evaluated (this result is not yet bound to claim-eligible evidence) \u00b7 Evidence: incomplete \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable",
+      "error": null,
+      "packCount": 0,
+      "entitlementActive": true,
+      "entitlementNote": "Payment unlocks access to pack content; it never changes a result, a trust tier or a verification outcome."
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-pack-unpaid-refusal.json",
+      "method": "GET",
+      "path": "/industry-packs/farm-to-fork",
+      "authenticated": true,
+      "status": 402,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": "industry_packs_locked",
+      "packCount": 0,
+      "entitlementActive": false,
+      "entitlementNote": "Payment unlocks access to pack content; it never changes a result, a trust tier or a verification outcome."
+    },
+    {
+      "artifact": "/private/tmp/p0-23-studio-claim-responses-final-red-20261014/studio-unknown-route.json",
+      "method": "GET",
+      "path": "/p0-23-unknown-owned-route",
+      "authenticated": true,
+      "status": 404,
+      "claimKind": null,
+      "statusDimensions": null,
+      "claimLabel": null,
+      "error": "not found",
+      "packCount": 0,
+      "entitlementActive": null,
+      "entitlementNote": null
+    }
+  ],
+  "confirmedFailures": [
+    {
+      "case": "legacy without stored readiness",
+      "actual": "HTTP200 self_reported/not_evaluated, but canonical legacy wording is lost",
+      "required": "Canonical envelopeForStoredRun legacy fields and label",
+      "cause": "Studio spreads the valid stored report and adds evidenceReadiness before the shared result adapter rechecks the signature over the decorated body. The new property changes the canonical hash and reaches unbound fallback."
+    },
+    {
+      "case": "legacy with stored readiness",
+      "actual": "HTTP200 observed/pass",
+      "required": "Legacy self_reported/not_evaluated canonical fields and label",
+      "cause": "The presealed readiness decoration remains identical, so verification succeeds; shared resultEnvelope then invokes raw envelopeForDiagnosticReport without the version-sensitive stored-run downgrade. This separately reproduces the actual API version bypass through Studio HTTP."
+    },
+    {
+      "case": "current valid seal without stored readiness",
+      "actual": "HTTP200 self_reported/not_evaluated",
+      "required": "Current observed/pass canonical fields from the genuinely verified stored report",
+      "cause": "The same display-only readiness property invalidates the hash used by the shared adapter; a current report already storing readiness passes the normal observed/pass control."
+    },
+    {
+      "case": "missing stored report",
+      "actual": "HTTP500 with exact body {\"error\":\"internal server error\"}",
+      "required": "HTTP404 without result or claim fields",
+      "cause": "loadRunReport throws ENOENT for the missing owned run file and the Studio catch treats it as a generic server failure. Authentication correctly precedes report reads."
+    }
+  ],
+  "passingControls": [
+    "Normal current sealed report with readiness stored before signing remains observed/pass.",
+    "Current unsealed and genuinely tampered reports remain self_reported/not_evaluated; returned report contents and derived readiness are preserved.",
+    "Missing and invalid admin credentials both return401 with exact missing-or-invalid-token error and no result/claim fields.",
+    "Unknown authenticated Studio route returns404 with exact not-found error and no result/claim fields.",
+    "Unpaid and genuinely Ed25519-licensed catalogs contain the same41 exact pack IDs and identical canonical claims for every pack; only content locked flags and entitlement change. Both preserve the exact payment truth-rule note.",
+    "Unpaid real pack content returns402; locally licensed real content returns200 with self_reported/not_evaluated claim and unchanged truth-rule note.",
+    "__proto__,constructor,toString,hasOwnProperty all reach licensed own-key lookup and return404 industry-pack-not-found, without result/claim fields."
+  ],
+  "readOnlyRepairRecommendations": [
+    {
+      "paths": [
+        "src/api/resultRouteRegistry.ts",
+        "src/studio/studioClaimOutput.ts",
+        "src/studio/studioServer.ts"
+      ],
+      "recommendation": "Under reconciled shared ownership, apply the version-sensitive canonical envelopeForStoredRun to the original stored report after actual signature verification, and carry that claim through display-only Studio readiness decoration. Do not reclassify decorated bytes as a tampered stored file, guess away signed metadata, accept unverified source fields, or upgrade unsealed/tampered inputs. Keep the typed current/readiness, missing-auth and payment controls unchanged."
+    },
+    {
+      "path": "src/studio/studioServer.ts",
+      "recommendation": "If the parent accepts repairing the requested missing-run404 contract, map only the missing-file ENOENT from the stored-run read to404. Preserve authentication, real malformed/other read failures and existing error disclosure boundaries; do not blanket-catch all report faults as404. Otherwise retain this explicit unresolved RED."
+    }
+  ],
+  "scopeLimits": [
+    "Only the new tests/studioClaimLabels.test.ts was edited for this task. tests/apiClaimLabels.test.ts is byte-identical to the finished API slice.",
+    "Every HTTP request uses the fresh owned server origin at127.0.0.1 and an ephemeral port. The real dispatcher/router/report loader/seal and label helpers were not mocked.",
+    "Fixtures are typed test control inputs, not observed agent maturity measurements. Signed originals and real auditor public key histories are retained privately.",
+    "The local license is genuinely signed with a fresh Ed25519 key and admitted by the existing entitlement verifier; no ACTIVE flag, live checkout, remote activation or authentication bypass was used.",
+    "No A4 handler or preview gate was enabled, and no provider/network call outside the owned loopback server was made.",
+    "Servers close before own temporary workspaces are removed. All close/lock/removal errors are collected and thrown; neither run reported a cleanup failure. Private raw phase/source/response evidence remains retained.",
+    "P0-22 two empty-array failures remain unresolved and unchanged.",
+    "No production edit, install, build, all30-route qualification, browser/page proof, full suite, coverage, source acceptance, hosted CI or release claim follows from these15 tests."
+  ],
+  "gitStatusAtReceipt": [
+    " M docs/CLAIM_KINDS.md",
+    " M src/mcp/mcpClaimOutput.ts",
+    "?? .changeset/p0-23-mcp-stored-run-claims.md",
+    "?? tests/apiClaimLabels.test.ts",
+    "?? tests/claimBadge.test.ts",
+    "?? tests/industryPackCli.test.ts",
+    "?? tests/mcpClaimLabels.test.ts",
+    "?? tests/studioClaimLabels.test.ts"
+  ]
+}

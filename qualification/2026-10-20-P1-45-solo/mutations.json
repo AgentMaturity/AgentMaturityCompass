@@ -1,0 +1,1046 @@
+{
+ "item": "P1-45",
+ "state": "SCOPED15_GUARD_MATRIX_MEASURED_NOT_FULL_OR_LEGAL_REVIEW",
+ "summary": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/summary.json",
+  "sha256": "d6486438ce48e7b50c6e17e50c4121a4604f636bf4af4b3cebda6db7d89ff346",
+  "bytes": 9212
+ },
+ "independentAudit": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/independent-current-15-mutation-proof-audit-290b9-v2.json",
+  "sha256": "d248dc9696c47cff7db12dab6dd4b8d7b4115386d0fc81d2fdd4fa4ef3db3a8a",
+  "bytes": 40813
+ },
+ "sourceHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+ "restoredHead": "e848550aa3d44a5d7c87a6c18181abd0ccdcf05f",
+ "int": "8132127925426c41fb3c25402f1615ca23019f11",
+ "initialTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+ "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+ "currentProductBridge": {
+  "reviewSnapshot": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+  "exactTreeRestoredAt": "e848550aa3d44a5d7c87a6c18181abd0ccdcf05f",
+  "treeProof": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/summary.json",
+   "sha256": "d6486438ce48e7b50c6e17e50c4121a4604f636bf4af4b3cebda6db7d89ff346",
+   "bytes": 9212
+  },
+  "currentPreparatoryProductHead": "87c99c9a2b559c71344d4356eb5841e1bbb3860f",
+  "baselineMetadataOnlySuccessorProof": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/independent-native-data-duplicate-fingerprint-refresh-audit-87c99-v1.json",
+   "sha256": "ec5174577dbcda59fb0023d0fc997957593ac9469e806065b0b71306fb414c3b",
+   "bytes": 18146
+  },
+  "successorOnlyChangedPath": "scripts/quality/source-quality-baseline.json",
+  "sourceOrTestBuffersChanged": false,
+  "source14ImmutableIndex": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/mutation-input-source-290b9-v1/index.json",
+   "sha256": "d6d825987bea8c340689af77cfc2b0027df9219acdcb0d4d99b1e1b4f1ef1165",
+   "bytes": 4973
+  },
+  "wholeTreeEqualityBetweenGAndH": false,
+  "freshReadOrLegalReviewAtSuccessor": false
+ },
+ "actualRows": 15,
+ "intendedAssertionKills": 15,
+ "actualNativeAssertionErrorOccurrences": 29,
+ "initial": {
+  "sourceHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+  "scope": "Initial same eight guard files at S. Not additional distinct test coverage.",
+  "result": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/290b9ba4cd49d7a8009343f294971eaa474af5e7/matrix-guards-v1-initial-green/result.json",
+   "sha256": "0ea52773c3f9b08439a1f13be7e94c314189aa6eeefc0c83c8e73b19300aab05",
+   "bytes": 23601
+  },
+  "argv": [
+   "npx",
+   "--no-install",
+   "vitest",
+   "run",
+   "tests/builtInMappingsDataOnly.test.ts",
+   "tests/compliance/coverageScorer.test.ts",
+   "tests/compliance/descopedIso42005.test.ts",
+   "tests/compliance/familyReviewSurfaces.test.ts",
+   "tests/crosswalkNoAutoPass.test.ts",
+   "tests/crosswalkRelations.test.ts",
+   "tests/frameworkBreadth.test.ts",
+   "tests/mappingSources.test.ts",
+   "--maxWorkers=1",
+   "--reporter=dot",
+   "--reporter=json",
+   "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/290b9ba4cd49d7a8009343f294971eaa474af5e7/matrix-guards-v1-initial-green/report.json"
+  ],
+  "rawLog": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/290b9ba4cd49d7a8009343f294971eaa474af5e7/matrix-guards-v1-initial-green/raw.log",
+   "sha256": "44dd51c30f5aee74b3031b2c47e0b1e103a99c657447141f6c4cf1f1a9cc315d",
+   "bytes": 1942
+  },
+  "nativeReport": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/290b9ba4cd49d7a8009343f294971eaa474af5e7/matrix-guards-v1-initial-green/report.json",
+   "sha256": "b81733ca0e3cf3cd9d259ad0553fa75a9de9f2704c51a5c6bf2ae15a529d43d9",
+   "bytes": 34616
+  },
+  "nativeAudit": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/290b9ba4cd49d7a8009343f294971eaa474af5e7/matrix-guards-v1-initial-green/native-audit.json",
+   "sha256": "dde0e924876f1255633aad9db9c94c853f96aa112a03a52be80223f4a4ac1b18",
+   "bytes": 3775
+  },
+  "tests": {
+   "total": 100,
+   "passed": 100,
+   "failed": 0,
+   "skipped": 0
+  }
+ },
+ "restored": {
+  "sourceHead": "e848550aa3d44a5d7c87a6c18181abd0ccdcf05f",
+  "scope": "Eight unfiltered guard files at G after exact restoration. Not full or run on H.",
+  "result": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e848550aa3d44a5d7c87a6c18181abd0ccdcf05f/matrix-guards-v1-restored-green/result.json",
+   "sha256": "a83d36b34533a62faaa45f55cc708be068d85614e6be440a93929f65737ea7a4",
+   "bytes": 23606
+  },
+  "argv": [
+   "npx",
+   "--no-install",
+   "vitest",
+   "run",
+   "tests/builtInMappingsDataOnly.test.ts",
+   "tests/compliance/coverageScorer.test.ts",
+   "tests/compliance/descopedIso42005.test.ts",
+   "tests/compliance/familyReviewSurfaces.test.ts",
+   "tests/crosswalkNoAutoPass.test.ts",
+   "tests/crosswalkRelations.test.ts",
+   "tests/frameworkBreadth.test.ts",
+   "tests/mappingSources.test.ts",
+   "--maxWorkers=1",
+   "--reporter=dot",
+   "--reporter=json",
+   "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e848550aa3d44a5d7c87a6c18181abd0ccdcf05f/matrix-guards-v1-restored-green/report.json"
+  ],
+  "rawLog": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e848550aa3d44a5d7c87a6c18181abd0ccdcf05f/matrix-guards-v1-restored-green/raw.log",
+   "sha256": "c42b727e6703914a61ad055f316e2747045b0da66d0d25b5086623f8157f021a",
+   "bytes": 1943
+  },
+  "nativeReport": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e848550aa3d44a5d7c87a6c18181abd0ccdcf05f/matrix-guards-v1-restored-green/report.json",
+   "sha256": "286e451059c4d8c0f9837383504413df396bb59adfb1620469a52db4351ad080",
+   "bytes": 34609
+  },
+  "nativeAudit": {
+   "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e848550aa3d44a5d7c87a6c18181abd0ccdcf05f/matrix-guards-v1-restored-green/native-audit.json",
+   "sha256": "dde0e924876f1255633aad9db9c94c853f96aa112a03a52be80223f4a4ac1b18",
+   "bytes": 3775
+  },
+  "tests": {
+   "total": 100,
+   "passed": 100,
+   "failed": 0,
+   "skipped": 0
+  }
+ },
+ "testFiles": {
+  "tests/builtInMappingsDataOnly.test.ts": 3,
+  "tests/crosswalkNoAutoPass.test.ts": 3,
+  "tests/crosswalkRelations.test.ts": 14,
+  "tests/frameworkBreadth.test.ts": 47,
+  "tests/mappingSources.test.ts": 15,
+  "tests/compliance/coverageScorer.test.ts": 9,
+  "tests/compliance/descopedIso42005.test.ts": 3,
+  "tests/compliance/familyReviewSurfaces.test.ts": 6
+ },
+ "source14ImmutableIndex": {
+  "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/mutation-input-source-290b9-v1/index.json",
+  "sha256": "d6d825987bea8c340689af77cfc2b0027df9219acdcb0d4d99b1e1b4f1ef1165",
+  "bytes": 4973
+ },
+ "rows": [
+  {
+   "id": "P145-M01-engine-crosslink-pass-copy",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r01-row.json",
+    "sha256": "6af2a1827a1b6b4cfba1898abc38410541e710331bcd6b82fe7c1529fde5c396",
+    "bytes": 7272
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/complianceEngine.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "mutantHead": "96bca41bc5c3188869a3209ad36279d1b5354f33",
+   "restoredHead": "17f073ac0ed051575c4260a5c79d8046ade7ed66",
+   "originalSha256": "42b76cfa5ff85724e815b0a8b3e6e1567559c08937e06e286b5f7075ec2b8ff9",
+   "mutatedSha256": "6ef8215d46e2042d1a21cea20dde16f6955b30766beafb03db8fa5064c56c1c1",
+   "restoredSha256": "42b76cfa5ff85724e815b0a8b3e6e1567559c08937e06e286b5f7075ec2b8ff9",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/96bca41bc5c3188869a3209ad36279d1b5354f33/matrix-guards-v1-r01-test/result.json",
+    "sha256": "1fdcc22bcbcc051b82e1a9c34b0f79e0e914940f7f2379a84b3c4a1e3fe02a33",
+    "bytes": 23267
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/crosswalkNoAutoPass.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/96bca41bc5c3188869a3209ad36279d1b5354f33/matrix-guards-v1-r01-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/96bca41bc5c3188869a3209ad36279d1b5354f33/matrix-guards-v1-r01-test/raw.log",
+    "sha256": "4ecf8d557498d5154e13972db22a9e17792babcef30da5463bd0cf1acff0e7b5",
+    "bytes": 13299
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/96bca41bc5c3188869a3209ad36279d1b5354f33/matrix-guards-v1-r01-test/report.json",
+    "sha256": "afaae789a241979be2bbb87b661cab97a8f7c5b6a82bd0494e1bb7b4ae2ff322",
+    "bytes": 4597
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/96bca41bc5c3188869a3209ad36279d1b5354f33/matrix-guards-v1-r01-test/native-audit.json",
+    "sha256": "8b66ebde4d260475863e212a7ff2f5bc6bcf28143dbaa2de2071758a0dca22d7",
+    "bytes": 5359
+   },
+   "actualNativeAssertionErrorOccurrences": 2,
+   "nativeFailedFullNames": [
+    "no auto-pass across crosswalk links evidence bound to DORA controls only leaves every NIS2 result as it is without the binding: not evaluated",
+    "no auto-pass across crosswalk links passing EU AI Act categories never change a linked framework's status, result, evidence or coverage"
+   ],
+   "recordedIntendedNames": [
+    "no auto-pass across crosswalk links evidence bound to DORA controls only leaves every NIS2 result as it is without the binding: not evaluated",
+    "no auto-pass across crosswalk links passing EU AI Act categories never change a linked framework's status, result, evidence or coverage"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M02-selfreported-SAT-credit",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r02-row.json",
+    "sha256": "bc116e68c49a03f23d44ac37ac09e53b4df5e9c89041e47954bce36e6e04b8c0",
+    "bytes": 6863
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/coverageScorer.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "17f073ac0ed051575c4260a5c79d8046ade7ed66",
+   "mutantHead": "b6decef98af86dc31e0527f640d07928dd218807",
+   "restoredHead": "063b6d6fd0a0d22b1b16f5f9e16210bc57a3fff3",
+   "originalSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "mutatedSha256": "e2c0d9725cced1f8c01696bf0b7f5c30be04b6bef4da7e3a3ecb7b7bf8a04de1",
+   "restoredSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/b6decef98af86dc31e0527f640d07928dd218807/matrix-guards-v1-r02-test/result.json",
+    "sha256": "1b7303de6a2884bed9f83f154c091be2f772ae5080082498ce16c9006346bbbe",
+    "bytes": 23272
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/coverageScorer.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/b6decef98af86dc31e0527f640d07928dd218807/matrix-guards-v1-r02-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/b6decef98af86dc31e0527f640d07928dd218807/matrix-guards-v1-r02-test/raw.log",
+    "sha256": "c19594f234f66e32f3d1b764db7c397347914cc203c02fa6429e896bcc5f222e",
+    "bytes": 1618
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/b6decef98af86dc31e0527f640d07928dd218807/matrix-guards-v1-r02-test/report.json",
+    "sha256": "045070201493438c054bf550f03e9727a4fb195edf726f10180e642985f995ad",
+    "bytes": 5523
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/b6decef98af86dc31e0527f640d07928dd218807/matrix-guards-v1-r02-test/native-audit.json",
+    "sha256": "ad46388f9c2b14eb67c137172f73718f2d7f55c5150546f71a84840df412e6e7",
+    "bytes": 3541
+   },
+   "actualNativeAssertionErrorOccurrences": 1,
+   "nativeFailedFullNames": [
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a self-reported SATISFIED row is displayed but earns no evaluated coverage"
+   ],
+   "recordedIntendedNames": [
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a self-reported SATISFIED row is displayed but earns no evaluated coverage"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M03-selfreported-PARTIAL-evaluated",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r03-row.json",
+    "sha256": "4a46003768f5132b995cd28c4deefe11cb442c7d8682ee447050f9ba564dc8a1",
+    "bytes": 6868
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/coverageScorer.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "063b6d6fd0a0d22b1b16f5f9e16210bc57a3fff3",
+   "mutantHead": "9f5c4ce0a03820a6683671b1fa34c0aa4ae699f7",
+   "restoredHead": "d05b8065de7e5138c6f3f972091d5c0695c1322f",
+   "originalSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "mutatedSha256": "3e8dc2255ccb1199ec18a8d5522b45b666cb1dc91d9a473eef188e8dd36c473d",
+   "restoredSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9f5c4ce0a03820a6683671b1fa34c0aa4ae699f7/matrix-guards-v1-r03-test/result.json",
+    "sha256": "d1736ef0929d55a94b8873a7c5611ceafb492bfe827b80d6e4200921d6f7fe2b",
+    "bytes": 23272
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/coverageScorer.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9f5c4ce0a03820a6683671b1fa34c0aa4ae699f7/matrix-guards-v1-r03-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9f5c4ce0a03820a6683671b1fa34c0aa4ae699f7/matrix-guards-v1-r03-test/raw.log",
+    "sha256": "ad4447dbc0ec7406d535320dc9a9572e166ebecc45ef6a7efcc77f3cae2cfc09",
+    "bytes": 1691
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9f5c4ce0a03820a6683671b1fa34c0aa4ae699f7/matrix-guards-v1-r03-test/report.json",
+    "sha256": "2768ad58a64201387e417226a601c0009a3d3b1e45386b4dab6967f80fa3607d",
+    "bytes": 5524
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9f5c4ce0a03820a6683671b1fa34c0aa4ae699f7/matrix-guards-v1-r03-test/native-audit.json",
+    "sha256": "a32e7032e9dd0b1d5847d61df2f2f2e5abedd644ed5618b8198f7196e49ae908",
+    "bytes": 3541
+   },
+   "actualNativeAssertionErrorOccurrences": 1,
+   "nativeFailedFullNames": [
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a self-reported PARTIAL is not an evaluation: the score stays null, not 0"
+   ],
+   "recordedIntendedNames": [
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a self-reported PARTIAL is not an evaluation: the score stays null, not 0"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M04-UNKNOWN-quarter-credit",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r04-row.json",
+    "sha256": "ed594583f74a96dd0f3b75f32916bbafeaa62497dc2c212515e1c26f2b184f57",
+    "bytes": 7232
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/coverageScorer.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "d05b8065de7e5138c6f3f972091d5c0695c1322f",
+   "mutantHead": "9797086640e52d415e08fe46fdda6a649f6a1d1c",
+   "restoredHead": "eca2bded259336883632fe4494724e3050b54bfe",
+   "originalSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "mutatedSha256": "93412bc9ecb5ec5ec4d209949ed30be99b9e99bb0be3081b516ef703c9250116",
+   "restoredSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9797086640e52d415e08fe46fdda6a649f6a1d1c/matrix-guards-v1-r04-test/result.json",
+    "sha256": "ac4a5da51867062e2e6db51534d4b46e2fcd9f303b2387520be3c1b93d97f0e3",
+    "bytes": 23272
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/coverageScorer.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9797086640e52d415e08fe46fdda6a649f6a1d1c/matrix-guards-v1-r04-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9797086640e52d415e08fe46fdda6a649f6a1d1c/matrix-guards-v1-r04-test/raw.log",
+    "sha256": "1ae75a0aca65b0933d3e77f493ab801968926c6fdc3abece25e086ff3237ee13",
+    "bytes": 2232
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9797086640e52d415e08fe46fdda6a649f6a1d1c/matrix-guards-v1-r04-test/report.json",
+    "sha256": "0c1ed4c5425694eb27dc415e64a391fbec96726763994b5918fad0a5f0ede44f",
+    "bytes": 6774
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/9797086640e52d415e08fe46fdda6a649f6a1d1c/matrix-guards-v1-r04-test/native-audit.json",
+    "sha256": "1370cdb3e62d8eefd6924af19e9c7878be4d247a695ef8f20275774c2aed0b08",
+    "bytes": 5263
+   },
+   "actualNativeAssertionErrorOccurrences": 2,
+   "nativeFailedFullNames": [
+    "coverageScore (P0-17) only a pass earns credit; NOT_EVALUATED, UNKNOWN and legacy PARTIAL earn 0 and stay in the denominator",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) UNKNOWN earns 0 (it earned 0.25 before S6) and is not an evaluation"
+   ],
+   "recordedIntendedNames": [
+    "coverageScore (P0-17) only a pass earns credit; NOT_EVALUATED, UNKNOWN and legacy PARTIAL earn 0 and stay in the denominator",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) UNKNOWN earns 0 (it earned 0.25 before S6) and is not an evaluation"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M05-blank-ID-refusal",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r05-row.json",
+    "sha256": "c0ec06f79e21059f92f30ce47532357580e420de8967df6e4c8c0cef5cdef87d",
+    "bytes": 7630
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/coverageScorer.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "eca2bded259336883632fe4494724e3050b54bfe",
+   "mutantHead": "69a8b8046b6be6130f8d6505fbe41cc32a177722",
+   "restoredHead": "996171b19e37428b3908504a6604423c6ce46e0e",
+   "originalSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "mutatedSha256": "57a889d5121cbb60fd4a94bdb8a5117c797f3bae15493609fd1a02fa9d756c45",
+   "restoredSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/69a8b8046b6be6130f8d6505fbe41cc32a177722/matrix-guards-v1-r05-test/result.json",
+    "sha256": "b2de9c66857c7360d670408716b5a7f2dc2d6baf6e59a62371512e52a808ea3e",
+    "bytes": 23272
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/coverageScorer.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/69a8b8046b6be6130f8d6505fbe41cc32a177722/matrix-guards-v1-r05-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/69a8b8046b6be6130f8d6505fbe41cc32a177722/matrix-guards-v1-r05-test/raw.log",
+    "sha256": "8aacea1704434d8e61549221ea9462f55ad4d8e8f047a3018336c7efed7d5ffd",
+    "bytes": 1597
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/69a8b8046b6be6130f8d6505fbe41cc32a177722/matrix-guards-v1-r05-test/report.json",
+    "sha256": "70318ab34eb5ee93454168d007d53e5331bce0adf5f547496ccdf2d6dfb76259",
+    "bytes": 8391
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/69a8b8046b6be6130f8d6505fbe41cc32a177722/matrix-guards-v1-r05-test/native-audit.json",
+    "sha256": "74ca8d04e807aab0ba60f6c25d27546a270e4941ab8175574c2c1d51dd3bb349",
+    "bytes": 7367
+   },
+   "actualNativeAssertionErrorOccurrences": 3,
+   "nativeFailedFullNames": [
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a row whose control id is \"\" throws instead of being scored",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a row whose control id is \"   \" throws instead of being scored",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a row whose control id is \"\\t\" throws instead of being scored"
+   ],
+   "recordedIntendedNames": [
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a row whose control id is \"   \" throws instead of being scored",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a row whose control id is \"\" throws instead of being scored",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a row whose control id is \"\\t\" throws instead of being scored"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M06-empty-NULL-to-zero",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r06-row.json",
+    "sha256": "25a8ad8301808aec997339b5ef478aa28c983f6e35f2c988674f836906e3f9d0",
+    "bytes": 8302
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/coverageScorer.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "996171b19e37428b3908504a6604423c6ce46e0e",
+   "mutantHead": "09f40e52cbb78fea0c5dbe2eb7d80cc7d0e3d881",
+   "restoredHead": "fe842c70cd719364929932bb2ffddf0e50368edb",
+   "originalSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "mutatedSha256": "e7fbeec493cf6d150cee01c89d07a06b2148a49588f28d5a320e9db29d68d0c6",
+   "restoredSha256": "c72513b376c006ee5adba662279aee39a1451fae36b577b1ed2fb93ea60424bb",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/09f40e52cbb78fea0c5dbe2eb7d80cc7d0e3d881/matrix-guards-v1-r06-test/result.json",
+    "sha256": "6458cf630bbb4f47b26cd2cea1e973343944537a105a8f90329328037f8e7360",
+    "bytes": 23274
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/coverageScorer.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/09f40e52cbb78fea0c5dbe2eb7d80cc7d0e3d881/matrix-guards-v1-r06-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/09f40e52cbb78fea0c5dbe2eb7d80cc7d0e3d881/matrix-guards-v1-r06-test/raw.log",
+    "sha256": "b69d72c18e5b1969e406ef2ef337660299f287ff3add101f756e150a56b25fd5",
+    "bytes": 5018
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/09f40e52cbb78fea0c5dbe2eb7d80cc7d0e3d881/matrix-guards-v1-r06-test/report.json",
+    "sha256": "9b0532e466ec804c8f2d1cfe4544658df7436fa247344dd642e791f2b63923af",
+    "bytes": 10804
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/09f40e52cbb78fea0c5dbe2eb7d80cc7d0e3d881/matrix-guards-v1-r06-test/native-audit.json",
+    "sha256": "0adf093e9e629bf250755c080004d785f459affdff1574c71beca0d8b0653df3",
+    "bytes": 10686
+   },
+   "actualNativeAssertionErrorOccurrences": 5,
+   "nativeFailedFullNames": [
+    "coverageScore (P0-17) score is null when nothing was evaluated",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) zero rows: not evaluated, never a score of 0",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) UNKNOWN earns 0 (it earned 0.25 before S6) and is not an evaluation",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a self-reported SATISFIED row is displayed but earns no evaluated coverage",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a self-reported PARTIAL is not an evaluation: the score stays null, not 0"
+   ],
+   "recordedIntendedNames": [
+    "coverageScore (P0-17) score is null when nothing was evaluated",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) UNKNOWN earns 0 (it earned 0.25 before S6) and is not an evaluation",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a self-reported PARTIAL is not an evaluation: the score stays null, not 0",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) a self-reported SATISFIED row is displayed but earns no evaluated coverage",
+    "coverageScore on top of P0-17 (P1-45, S6 rules ratified 2026-10-04) zero rows: not evaluated, never a score of 0"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M07-equivalent-without-signoff",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r07-row.json",
+    "sha256": "144344512fbab9265ef51a92aedf4a74f45d6f53e86660b36d46a21431f61e5d",
+    "bytes": 7019
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/mappingSchema.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "fe842c70cd719364929932bb2ffddf0e50368edb",
+   "mutantHead": "a904ad93aead8bbbc11d32d68a69f8078232820c",
+   "restoredHead": "bd58cd4d9ed6fb95acb13eafb86b5e715dd2c870",
+   "originalSha256": "11461728a635ed8d6d932f86053065923cf37409c07583890cfd806bec36cf5f",
+   "mutatedSha256": "c62fdea31e90f4d3cd8956766c66e257785993023f15c159fee38f99d5b43f2f",
+   "restoredSha256": "11461728a635ed8d6d932f86053065923cf37409c07583890cfd806bec36cf5f",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/a904ad93aead8bbbc11d32d68a69f8078232820c/matrix-guards-v1-r07-test/result.json",
+    "sha256": "ecfd1193e860fdfbba7d85309f00c1196e704dd58ce78662b0f7d995c2ae0bba",
+    "bytes": 23265
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/crosswalkRelations.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/a904ad93aead8bbbc11d32d68a69f8078232820c/matrix-guards-v1-r07-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/a904ad93aead8bbbc11d32d68a69f8078232820c/matrix-guards-v1-r07-test/raw.log",
+    "sha256": "496f548239e1e6694d37ac02f8398b5c06fc267ac09262f9cbc9bf76c79545b6",
+    "bytes": 2038
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/a904ad93aead8bbbc11d32d68a69f8078232820c/matrix-guards-v1-r07-test/report.json",
+    "sha256": "02ffda67ef5b49099d9933000034d375ccc37932d1fef1cead9be9f50fdcc5bf",
+    "bytes": 7203
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/a904ad93aead8bbbc11d32d68a69f8078232820c/matrix-guards-v1-r07-test/native-audit.json",
+    "sha256": "63e399f94fc557dcdab8af5b8f8b30d942a358a8415dbe81ccc38ca3f27ab7b7",
+    "bytes": 5130
+   },
+   "actualNativeAssertionErrorOccurrences": 2,
+   "nativeFailedFullNames": [
+    "crosswalkLinkSchema equivalent without a sign-off id fails; with one it parses",
+    "crosswalkLinkSchema a control fails its schema when one of its links does"
+   ],
+   "recordedIntendedNames": [
+    "crosswalkLinkSchema a control fails its schema when one of its links does",
+    "crosswalkLinkSchema equivalent without a sign-off id fails; with one it parses"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M08-receipt-unlisted-source",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r08-row.json",
+    "sha256": "17fdde4b9b3b9b80ed37d994a6896bc0133e8a8b9d9dba5adfb1e8fca5a285ea",
+    "bytes": 6803
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/controlCrosswalk.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "bd58cd4d9ed6fb95acb13eafb86b5e715dd2c870",
+   "mutantHead": "50ec027671de8b5258cc3078ea7276cae1a1ceb1",
+   "restoredHead": "28aa43ecac88758372e574edfb9367dd478e12ff",
+   "originalSha256": "a9458afc64e583df9f7e895e0130452ae536d711bb42ae38aaf4fb26953c1504",
+   "mutatedSha256": "9ff5161451e800dd0c103391353675c7085c748d2c35dd1c91266aff104f3276",
+   "restoredSha256": "a9458afc64e583df9f7e895e0130452ae536d711bb42ae38aaf4fb26953c1504",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/50ec027671de8b5258cc3078ea7276cae1a1ceb1/matrix-guards-v1-r08-test/result.json",
+    "sha256": "352b1037b02ab80f8733403f5eed7e4b92a878124c37b4e169db44c2fac2817f",
+    "bytes": 23264
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/frameworkBreadth.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/50ec027671de8b5258cc3078ea7276cae1a1ceb1/matrix-guards-v1-r08-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/50ec027671de8b5258cc3078ea7276cae1a1ceb1/matrix-guards-v1-r08-test/raw.log",
+    "sha256": "17ae3dc645ac1ff67ee954d88d5edf068b4f8a97cadfb417c097a58960489932",
+    "bytes": 1356
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/50ec027671de8b5258cc3078ea7276cae1a1ceb1/matrix-guards-v1-r08-test/report.json",
+    "sha256": "45abb984418e06c2378411e945f9a0c7dd80daebf252d7ee6e06b1dfb87b7c70",
+    "bytes": 16915
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/50ec027671de8b5258cc3078ea7276cae1a1ceb1/matrix-guards-v1-r08-test/native-audit.json",
+    "sha256": "3cadefd55c7b20125fbcb077e26e406edd318c47f9e1236064c1f2a5b309667a",
+    "bytes": 3440
+   },
+   "actualNativeAssertionErrorOccurrences": 1,
+   "nativeFailedFullNames": [
+    "control crosswalk over sourced mappings fails closed when a row's own source is not among the receipt citations"
+   ],
+   "recordedIntendedNames": [
+    "control crosswalk over sourced mappings fails closed when a row's own source is not among the receipt citations"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M09-nondata-60-line-function",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r09-row.json",
+    "sha256": "0cfac03ff5717beffdd0f19facf2cb6af60eb9532725b6bbf07c61d3d0045728",
+    "bytes": 6769
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/builtInMappings.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "28aa43ecac88758372e574edfb9367dd478e12ff",
+   "mutantHead": "5b93865518e7686309a2f01a7d48d9a6c22eeb47",
+   "restoredHead": "721f71cf91e73e8b763cbe9cd0a1f183cbec4791",
+   "originalSha256": "7035ad29dd23f81570be5b9da2ee6492dd60c69f78580e19110712d2c17c1eab",
+   "mutatedSha256": "3f0e5cbbec003960ec22e466cc4b04f5b378310a9908238d26bd0d6e39bce249",
+   "restoredSha256": "7035ad29dd23f81570be5b9da2ee6492dd60c69f78580e19110712d2c17c1eab",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/5b93865518e7686309a2f01a7d48d9a6c22eeb47/matrix-guards-v1-r09-test/result.json",
+    "sha256": "8f2cd0307bdc5ad37dc001b90a35031c7e85824ce67415d42d33dc4d8e6e8d2f",
+    "bytes": 23270
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/builtInMappingsDataOnly.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/5b93865518e7686309a2f01a7d48d9a6c22eeb47/matrix-guards-v1-r09-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/5b93865518e7686309a2f01a7d48d9a6c22eeb47/matrix-guards-v1-r09-test/raw.log",
+    "sha256": "c500989b7181761738c877d4c510a8efb9c8814b068e8d0e2e723b264bb21dba",
+    "bytes": 1141
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/5b93865518e7686309a2f01a7d48d9a6c22eeb47/matrix-guards-v1-r09-test/report.json",
+    "sha256": "9a3e95758bfb8e7ef54a06b22ddce723555b6bc77f7c60e81505980e42e4a7ad",
+    "bytes": 2970
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/5b93865518e7686309a2f01a7d48d9a6c22eeb47/matrix-guards-v1-r09-test/native-audit.json",
+    "sha256": "1d174142f8152178d7f5f6d548922048fcd190e0b5ee2a67ffe63183bb9e6d0f",
+    "bytes": 3426
+   },
+   "actualNativeAssertionErrorOccurrences": 1,
+   "nativeFailedFullNames": [
+    "builtInMappings.ts stays a data registry only the two data helpers exist, each a single return"
+   ],
+   "recordedIntendedNames": [
+    "builtInMappings.ts stays a data registry only the two data helpers exist, each a single return"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M10-mixed-emitted-unemitted-audit",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r10-row.json",
+    "sha256": "0eac6f32d6222088935a3cfefc1d4a8eabdb14469b695a5c48224998d48f9a77",
+    "bytes": 6798
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/builtInMappings.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "721f71cf91e73e8b763cbe9cd0a1f183cbec4791",
+   "mutantHead": "e8980d7db13f55301d76f24dbaaedc1314ea0b6e",
+   "restoredHead": "29cfe89cd971dfcfd172b8aa64fcb056a0741164",
+   "originalSha256": "7035ad29dd23f81570be5b9da2ee6492dd60c69f78580e19110712d2c17c1eab",
+   "mutatedSha256": "da26463bba5018bc5ed163dd546b274e148b157bb11d7b7076757c4ddfb1d8d6",
+   "restoredSha256": "7035ad29dd23f81570be5b9da2ee6492dd60c69f78580e19110712d2c17c1eab",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e8980d7db13f55301d76f24dbaaedc1314ea0b6e/matrix-guards-v1-r10-test/result.json",
+    "sha256": "74358b1691845fa54dd697a0809ce46bc10825d520a26f81fec16cd97f575ee0",
+    "bytes": 23261
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/mappingSources.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e8980d7db13f55301d76f24dbaaedc1314ea0b6e/matrix-guards-v1-r10-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e8980d7db13f55301d76f24dbaaedc1314ea0b6e/matrix-guards-v1-r10-test/raw.log",
+    "sha256": "e5ca336184922726f8a3a2643f26f76f6bb5032678775a1f988804323e0c001f",
+    "bytes": 2531
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e8980d7db13f55301d76f24dbaaedc1314ea0b6e/matrix-guards-v1-r10-test/report.json",
+    "sha256": "64133beb44a8c9168f33d417f7884081a7d0482fe9a10797d6ead8f3e5ce4d5c",
+    "bytes": 6688
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/e8980d7db13f55301d76f24dbaaedc1314ea0b6e/matrix-guards-v1-r10-test/native-audit.json",
+    "sha256": "97c1152fb0788cf8dbe767b9f1e037573fb7ecd57a02343676bed52a7e395d83",
+    "bytes": 3413
+   },
+   "actualNativeAssertionErrorOccurrences": 1,
+   "nativeFailedFullNames": [
+    "built-in compliance mappings every audit type a no-audit requirement names is one that AMC source can emit"
+   ],
+   "recordedIntendedNames": [
+    "built-in compliance mappings every audit type a no-audit requirement names is one that AMC source can emit"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M11-familyReview-approved-promotion",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r11-row.json",
+    "sha256": "39619d1952e3185b11cb66976929fd7930408a3026e17381c6263db2436f57b2",
+    "bytes": 7127
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/frameworks.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "29cfe89cd971dfcfd172b8aa64fcb056a0741164",
+   "mutantHead": "7e6ca54178e9335abbbd46fb6a20878353f4604c",
+   "restoredHead": "7ad35a841bedf9e52bd5534f180987e2045e2657",
+   "originalSha256": "f99ae1601f173f86c7c47bb715099e3a7a5c72df010d6692feb78141650822b1",
+   "mutatedSha256": "4d5f934822b3e761a43402fa8d3e3a1e954f05c4d375bb09e09cc2e1ba6eaf28",
+   "restoredSha256": "f99ae1601f173f86c7c47bb715099e3a7a5c72df010d6692feb78141650822b1",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/7e6ca54178e9335abbbd46fb6a20878353f4604c/matrix-guards-v1-r11-test/result.json",
+    "sha256": "34b112ef7220d80a7bc12647e02964f323a38dd38ed54b19466eb8f4b0ac8c79",
+    "bytes": 23278
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/familyReviewSurfaces.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/7e6ca54178e9335abbbd46fb6a20878353f4604c/matrix-guards-v1-r11-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/7e6ca54178e9335abbbd46fb6a20878353f4604c/matrix-guards-v1-r11-test/raw.log",
+    "sha256": "ffdeeca95a3844ca4855cc2377a1372cf368e1ed15e3f60063d12ac5ab568322",
+    "bytes": 6433
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/7e6ca54178e9335abbbd46fb6a20878353f4604c/matrix-guards-v1-r11-test/report.json",
+    "sha256": "1215c3f678ed21e9c1fa9f02ce028c35496aa1710ad182b4141cbe13bfd6fb0d",
+    "bytes": 5557
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/7e6ca54178e9335abbbd46fb6a20878353f4604c/matrix-guards-v1-r11-test/native-audit.json",
+    "sha256": "dc129081709f2861802bc7bd9faaa855749e78ba73a6026e28a5b90a1439585a",
+    "bytes": 5490
+   },
+   "actualNativeAssertionErrorOccurrences": 2,
+   "nativeFailedFullNames": [
+    "familyReview on every compliance surface report JSON carries the family's review status and flags",
+    "familyReview on every compliance surface the coverage matrix carries it per framework, in JSON and Markdown"
+   ],
+   "recordedIntendedNames": [
+    "familyReview on every compliance surface report JSON carries the family's review status and flags",
+    "familyReview on every compliance surface the coverage matrix carries it per framework, in JSON and Markdown"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M12-ignore-descoped-decision",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r12-row.json",
+    "sha256": "dcdae93cd5c7d20d0961aabfe1f3d96c12a27afbfb3054420d11240e85efaf21",
+    "bytes": 7678
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/complianceEngine.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "7ad35a841bedf9e52bd5534f180987e2045e2657",
+   "mutantHead": "86f38d12a329f36434c7f644cffaa0665fe97e41",
+   "restoredHead": "47518cbf0b42c782e3313c28470158948d223977",
+   "originalSha256": "42b76cfa5ff85724e815b0a8b3e6e1567559c08937e06e286b5f7075ec2b8ff9",
+   "mutatedSha256": "b6ea80c78afc75cf7e9f8d4e4a12f1db9b3ae04ab31067817e7427181aad166f",
+   "restoredSha256": "42b76cfa5ff85724e815b0a8b3e6e1567559c08937e06e286b5f7075ec2b8ff9",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/86f38d12a329f36434c7f644cffaa0665fe97e41/matrix-guards-v1-r12-test/result.json",
+    "sha256": "12765f2b06909019ce44213559cbde28b58c58d5602344bd8928a77c554a7cd8",
+    "bytes": 23274
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/descopedIso42005.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/86f38d12a329f36434c7f644cffaa0665fe97e41/matrix-guards-v1-r12-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/86f38d12a329f36434c7f644cffaa0665fe97e41/matrix-guards-v1-r12-test/raw.log",
+    "sha256": "bc7da2d58472097c797c79cbf7304aeadfd90af50325111ff3ffeadcd0a1ed22",
+    "bytes": 3716
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/86f38d12a329f36434c7f644cffaa0665fe97e41/matrix-guards-v1-r12-test/report.json",
+    "sha256": "bfe4333e708de72a7d249f3ae00f90223c4de100117bd54e8e232c004dbf89b7",
+    "bytes": 5996
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/86f38d12a329f36434c7f644cffaa0665fe97e41/matrix-guards-v1-r12-test/native-audit.json",
+    "sha256": "21eaf6c5edd79abb3d0fbb6e8d80ff8a68dbcb86c2335d07ccccf638a139ee88",
+    "bytes": 7147
+   },
+   "actualNativeAssertionErrorOccurrences": 3,
+   "nativeFailedFullNames": [
+    "ISO/IEC 42005 descope in the compliance report synthetic custom IDs retain unavailable ISO42005 category fallback and remain unevaluated",
+    "ISO/IEC 42005 descope in the compliance report stable iso42005 mapping IDs stay descoped under signed display-category renames",
+    "ISO/IEC 42005 descope in the compliance report the three iso42005 categories are listed, never evaluated and never counted, even with passing evidence"
+   ],
+   "recordedIntendedNames": [
+    "ISO/IEC 42005 descope in the compliance report stable iso42005 mapping IDs stay descoped under signed display-category renames",
+    "ISO/IEC 42005 descope in the compliance report synthetic custom IDs retain unavailable ISO42005 category fallback and remain unevaluated",
+    "ISO/IEC 42005 descope in the compliance report the three iso42005 categories are listed, never evaluated and never counted, even with passing evidence"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M13-count-descoped-rows",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r13-row.json",
+    "sha256": "759a049a96c0ae3d70bef5ee88bc63d1523f548c067c63d5abbed94020639ba7",
+    "bytes": 7673
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/complianceEngine.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "47518cbf0b42c782e3313c28470158948d223977",
+   "mutantHead": "26da81c4d7697b8f04250bc3ce943624b78147f8",
+   "restoredHead": "355de568969a3196a590e762b5d3f23835c49969",
+   "originalSha256": "42b76cfa5ff85724e815b0a8b3e6e1567559c08937e06e286b5f7075ec2b8ff9",
+   "mutatedSha256": "6b9949528d1a090e7ac046b2c04f68c421c650964a21019bbf71242c246e3579",
+   "restoredSha256": "42b76cfa5ff85724e815b0a8b3e6e1567559c08937e06e286b5f7075ec2b8ff9",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/26da81c4d7697b8f04250bc3ce943624b78147f8/matrix-guards-v1-r13-test/result.json",
+    "sha256": "4fe6862f2b635a1dc2b8c24635e5823d8433a31607dec847bd9ab3c4c3e8191b",
+    "bytes": 23274
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/descopedIso42005.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/26da81c4d7697b8f04250bc3ce943624b78147f8/matrix-guards-v1-r13-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/26da81c4d7697b8f04250bc3ce943624b78147f8/matrix-guards-v1-r13-test/raw.log",
+    "sha256": "a18e15c6bcbaa699dbda58bf10be8ac122283879baf0643ca1fe6ece7393509a",
+    "bytes": 3114
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/26da81c4d7697b8f04250bc3ce943624b78147f8/matrix-guards-v1-r13-test/report.json",
+    "sha256": "16993bf855fc107f14e7179a3cf410559cbe56634faff812b982a3b4d9070c07",
+    "bytes": 5843
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/26da81c4d7697b8f04250bc3ce943624b78147f8/matrix-guards-v1-r13-test/native-audit.json",
+    "sha256": "651d53c9555c3ead6a1f29ec856d0e3ece63f6bf13dccbbdc0369aa86f9ae46a",
+    "bytes": 6994
+   },
+   "actualNativeAssertionErrorOccurrences": 3,
+   "nativeFailedFullNames": [
+    "ISO/IEC 42005 descope in the compliance report synthetic custom IDs retain unavailable ISO42005 category fallback and remain unevaluated",
+    "ISO/IEC 42005 descope in the compliance report stable iso42005 mapping IDs stay descoped under signed display-category renames",
+    "ISO/IEC 42005 descope in the compliance report the three iso42005 categories are listed, never evaluated and never counted, even with passing evidence"
+   ],
+   "recordedIntendedNames": [
+    "ISO/IEC 42005 descope in the compliance report stable iso42005 mapping IDs stay descoped under signed display-category renames",
+    "ISO/IEC 42005 descope in the compliance report synthetic custom IDs retain unavailable ISO42005 category fallback and remain unevaluated",
+    "ISO/IEC 42005 descope in the compliance report the three iso42005 categories are listed, never evaluated and never counted, even with passing evidence"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M14-bypass-stable-ID-descope",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r14-row.json",
+    "sha256": "cf76ee95cd8d528c5abdc3d3c83b5435eec5a7098b04642033bd9b7a7995d258",
+    "bytes": 6828
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/frameworks.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "355de568969a3196a590e762b5d3f23835c49969",
+   "mutantHead": "f1037f2e0d98696fcefd3f76920de55aaa9cc27f",
+   "restoredHead": "882af400ee3a49eb8e89bc20b9aa910a791bad56",
+   "originalSha256": "f99ae1601f173f86c7c47bb715099e3a7a5c72df010d6692feb78141650822b1",
+   "mutatedSha256": "d031072feeeaa8a63258d822eb393956e488e924c17f3821ef8cd3bf95aa5ed2",
+   "restoredSha256": "f99ae1601f173f86c7c47bb715099e3a7a5c72df010d6692feb78141650822b1",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/f1037f2e0d98696fcefd3f76920de55aaa9cc27f/matrix-guards-v1-r14-test/result.json",
+    "sha256": "2b3c98896beee2779bedb5ba9ccbac489c5d05b4fcc0abf11869b43f583558ba",
+    "bytes": 23274
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/descopedIso42005.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/f1037f2e0d98696fcefd3f76920de55aaa9cc27f/matrix-guards-v1-r14-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/f1037f2e0d98696fcefd3f76920de55aaa9cc27f/matrix-guards-v1-r14-test/raw.log",
+    "sha256": "3696df609b935bdee0e52d1626cd490df3fa9e1499dd567b41bc53ccbb25642a",
+    "bytes": 1577
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/f1037f2e0d98696fcefd3f76920de55aaa9cc27f/matrix-guards-v1-r14-test/report.json",
+    "sha256": "f8166fad55d51b954924bbd48f5fc270dcd06d16bb0aa54490adebbb508747f9",
+    "bytes": 3291
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/f1037f2e0d98696fcefd3f76920de55aaa9cc27f/matrix-guards-v1-r14-test/native-audit.json",
+    "sha256": "b4c1e1fae241185e5ce8e48c03673877ca450700078957b9781c0391a4b468b2",
+    "bytes": 3516
+   },
+   "actualNativeAssertionErrorOccurrences": 1,
+   "nativeFailedFullNames": [
+    "ISO/IEC 42005 descope in the compliance report stable iso42005 mapping IDs stay descoped under signed display-category renames"
+   ],
+   "recordedIntendedNames": [
+    "ISO/IEC 42005 descope in the compliance report stable iso42005 mapping IDs stay descoped under signed display-category renames"
+   ],
+   "exactRestore": true
+  },
+  {
+   "id": "P145-M15-bypass-category-fallback",
+   "row": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/guard-mutations/290b9ba4cd49d7a8009343f294971eaa474af5e7/guards-v1/r15-row.json",
+    "sha256": "49cf746a2e4e2690b07858a0521cee16a0cb51646249667e3c2e0e4f55253101",
+    "bytes": 6848
+   },
+   "outcome": "KILLED_INTENDED_ASSERTIONS",
+   "file": "src/compliance/frameworks.ts",
+   "baseHead": "290b9ba4cd49d7a8009343f294971eaa474af5e7",
+   "beforeHead": "882af400ee3a49eb8e89bc20b9aa910a791bad56",
+   "mutantHead": "0e1fa0b0446f031a9711e72acba4d84978b5b402",
+   "restoredHead": "e848550aa3d44a5d7c87a6c18181abd0ccdcf05f",
+   "originalSha256": "f99ae1601f173f86c7c47bb715099e3a7a5c72df010d6692feb78141650822b1",
+   "mutatedSha256": "f4478bfb83d3673ed969c94c4ee373856ca86b5fa61935519e52df1aff1e3e3c",
+   "restoredSha256": "f99ae1601f173f86c7c47bb715099e3a7a5c72df010d6692feb78141650822b1",
+   "restoredTree": "ebd847318e1f4e78acac080b16f608e1a3adb331",
+   "captureResult": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/0e1fa0b0446f031a9711e72acba4d84978b5b402/matrix-guards-v1-r15-test/result.json",
+    "sha256": "827a8682388c79f5f75331f828cea1c4d3ae375fa19d6d9872eb15366040c595",
+    "bytes": 23274
+   },
+   "argv": [
+    "npx",
+    "--no-install",
+    "vitest",
+    "run",
+    "tests/compliance/descopedIso42005.test.ts",
+    "--maxWorkers=1",
+    "--reporter=dot",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/0e1fa0b0446f031a9711e72acba4d84978b5b402/matrix-guards-v1-r15-test/report.json"
+   ],
+   "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/0e1fa0b0446f031a9711e72acba4d84978b5b402/matrix-guards-v1-r15-test/raw.log",
+    "sha256": "1f4d738c237962e687fd4d470dd8d9dde71573d08a4e855b14f346f18139302c",
+    "bytes": 1576
+   },
+   "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/0e1fa0b0446f031a9711e72acba4d84978b5b402/matrix-guards-v1-r15-test/report.json",
+    "sha256": "647612f471a4982a786d911208f52713ed58a7003423cf2c542cb6eeed31f702",
+    "bytes": 3276
+   },
+   "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p1-45/solo-20261020/commands/0e1fa0b0446f031a9711e72acba4d84978b5b402/matrix-guards-v1-r15-test/native-audit.json",
+    "sha256": "76931960f87565cffd303385266deb2b37c42ae1aa897f82b3e964ec3154e69d",
+    "bytes": 3525
+   },
+   "actualNativeAssertionErrorOccurrences": 1,
+   "nativeFailedFullNames": [
+    "ISO/IEC 42005 descope in the compliance report synthetic custom IDs retain unavailable ISO42005 category fallback and remain unevaluated"
+   ],
+   "recordedIntendedNames": [
+    "ISO/IEC 42005 descope in the compliance report synthetic custom IDs retain unavailable ISO42005 category fallback and remain unevaluated"
+   ],
+   "exactRestore": true
+  }
+ ],
+ "expertSignOff": null,
+ "legalApproval": false,
+ "fullSuiteClaim": false,
+ "scope": "All15 deliberate mutants caused intended AssertionError failures, not setup/import/runtime faults, with exact restoration. 29 means failure occurrences across15 runs, not unique tests. Initial/restored100 and broader228 overlap. External proofs preserve30 normal mutation/restore commits and full raw/native evidence."
+}

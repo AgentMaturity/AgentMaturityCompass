@@ -1,0 +1,424 @@
+{
+  "schemaVersion": 1,
+  "audit": "P0-48 independent final readiness \u2014 read-only",
+  "timestampUtc": "2026-10-14T14:24:34.233902+00:00",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "primaryPR40": {
+    "baseRefName": "main",
+    "body": "Proposed plan issue **P0-48** (Gate G0, Urgent): make `build-test` finish on GitHub runners. It feeds P0-33 (\"CI green on main\"). Part of the [AMC Ready-to-Deploy Implementation Plan](https://claude.ai/code/artifact/153157e0-0d2f-4374-934b-5f6f360a46e1). Base: `main` @ `786d8abb`.\n\n## Problem\n\nEvery `build-test` run from 2026-09-16 to 2026-10-05 was **cancelled at its job timeout, with no log uploaded**. That covers `main` and PRs #34, #36 and #37. The last green run was 2026-07-15. Runs ignored their own step timeouts, so the runner agent itself had stalled; no test reported a failure.\n\n## Root cause\n\n`tests/foreignSubagentRunner.test.ts`, test \"a truncated answer is not an answer\":\n- Its fake agent prints 5 MiB with **no newline** (`head -c 5242880 /dev/zero | tr '\\0' 'x'`).\n- `spawnGovernedChild` tees child output to the parent's stdout.\n- The resulting single 5,242,903-byte line in the Actions log stalls the runner.\n\nBisected on GitHub in probe #39 (now closed):\n\n| Round | Run | Result |\n| --- | --- | --- |\n| 1 | [37363461747](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37363461747) | Coverage or plain, default or 2 workers: all 4 died |\n| 2 | [37371774017](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37371774017) | In a 12 GB container the runner still died; 87 GB disk and 13 GB RAM free |\n| 3 | [37381278303](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37381278303) | 8 shards: only shard 8 hung |\n| 4 | [37385666873](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37385666873) | Shard 8 in 8 parts: only part 4 hung |\n| 5 | [37389641298](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37389641298) | 24 single-file jobs: only this file hung |\n| 6 | [37392711874](https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37392711874) | Original test, output to a file: runner survived. Patched test printing normally: passed in 1.5 min |\n\n## Fix\n\n1. In that one test, swallow the tee with `vi.spyOn(process.stdout, \"write\")`. The assertion is about what the runner records, not what it prints. Product behaviour is unchanged.\n2. In `ci.yml` \"Full suite and coverage thresholds\" and `npm-publish.yml` \"Test\", pipe the runner-log copy through `cut -c1-4096`. The full output still goes to the log artifact through `tee`. Both steps use `shell: bash` (`-eo pipefail`), so the test exit status still fails the step. No future giant line can stall a runner.\n\nChangeset: patch, \"contributor tooling only, no runtime change\".\n\n## Proof\n\n- **Regression evidence:** the probe rounds above. Locally, the original file writes one 5,242,903-byte line; with the fix its whole output is 420 bytes, and all 12 tests pass.\n- **Mutation:** removing the spy brings the 5 MiB line back (round 6 shows what that does on GitHub).\n- **Full local run of every CI step at `cde922e0`:**\n  - 1,522 test files, 21,409/21,409 tests passed under coverage; per-file floors pass.\n  - `release:gate` 17/19: only the D-11 source checks fail, as on `main`.\n  - Related and parity tests: 34 files, 7,263 tests pass.\n- **Acceptance:** this PR's own `build-test` jobs on GitHub must finish, for the first time since 2026-09-16.\n\n## Follow-up (not in this PR)\n\nProduct question: the monitor tees a foreign child's output straight to the operator's stdout with no line or size bound. A real delegate that prints a huge single line would do the same thing to a user's CI runner when AMC runs inside GitHub Actions (for example through `amc-action`).\n\n\ud83e\udd16 Generated with [Claude Code](https://claude.com/claude-code)\n",
+    "files": [
+      {
+        "path": ".changeset/ci-runner-log-line.md",
+        "additions": 5,
+        "deletions": 0,
+        "changeType": "ADDED"
+      },
+      {
+        "path": ".github/workflows/ci.yml",
+        "additions": 5,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": ".github/workflows/npm-publish.yml",
+        "additions": 5,
+        "deletions": 1,
+        "changeType": "MODIFIED"
+      },
+      {
+        "path": "tests/foreignSubagentRunner.test.ts",
+        "additions": 13,
+        "deletions": 2,
+        "changeType": "MODIFIED"
+      }
+    ],
+    "headRefName": "rtd/p0-48-ci-runner-log-line",
+    "mergeCommit": {
+      "oid": "63081f958d2372b300038176680fe01af4889efa"
+    },
+    "mergedAt": "2026-10-06T14:56:03Z",
+    "state": "MERGED",
+    "title": "[P0-48] Stop a 5 MiB test log line from killing GitHub runners; cut runner-log lines in CI",
+    "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/40"
+  },
+  "prior_preflight": {
+    "path": "/private/tmp/p0-48-readonly-preflight-20261014.json",
+    "sha256": "a5a0084ede0dcc48a86ca2199d4524ef2d667147984cd736d0970972cadfc4f3"
+  },
+  "exact_acceptance": {
+    "quoted": "this PR's own `build-test` jobs on GitHub must finish, for the first time since 2026-09-16.",
+    "interpretation": "There are two configured Node matrix jobs. A cancelled job with a cancelled full-suite step does not supply its completed test result. The historical PR40 matrix remains unqualified; a current pinned candidate can establish current completion but cannot retroactively change the PR40 run. The criterion does not state that every test/coverage metric must pass; P0-33 separately owns CI green on main.",
+    "scope": "One test-only stdout spy, two Actions runner-console clipping pipelines, full diagnostic artifacts and producer failures preserved. Product foreign-child raw stdout policy is expressly out of PR40."
+  },
+  "matrix_findings": {
+    "source_range": ".github/workflows/ci.yml:35-42",
+    "node_matrix": [
+      "22",
+      "24"
+    ],
+    "runner": "ubuntu-latest",
+    "timeout_minutes": 90,
+    "fail_fast_setting": "omitted, therefore GitHub default true",
+    "official_semantics_url": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idstrategyfail-fast",
+    "official_semantics": "Default true cancels in-progress/queued matrix jobs after a matrix failure. false retains the failing job result while letting siblings finish.",
+    "actual_runs": [
+      {
+        "runId": 38132701944,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944",
+        "jobs": [
+          {
+            "id": 114450140435,
+            "name": "build-test (22)",
+            "status": "completed",
+            "conclusion": "failure",
+            "started_at": "2026-10-11T10:39:05Z",
+            "completed_at": "2026-10-11T11:10:55Z",
+            "steps": [
+              {
+                "name": "Full suite and coverage thresholds",
+                "status": "completed",
+                "conclusion": "failure",
+                "number": 26,
+                "started_at": "2026-10-11T10:41:43Z",
+                "completed_at": "2026-10-11T11:10:50Z"
+              },
+              {
+                "name": "Upload coverage diagnostics",
+                "status": "completed",
+                "conclusion": "success",
+                "number": 30,
+                "started_at": "2026-10-11T11:10:50Z",
+                "completed_at": "2026-10-11T11:10:53Z"
+              }
+            ]
+          },
+          {
+            "id": 114450140505,
+            "name": "build-test (24)",
+            "status": "completed",
+            "conclusion": "cancelled",
+            "started_at": "2026-10-11T10:39:04Z",
+            "completed_at": "2026-10-11T11:11:12Z",
+            "steps": [
+              {
+                "name": "Full suite and coverage thresholds",
+                "status": "completed",
+                "conclusion": "cancelled",
+                "number": 26,
+                "started_at": "2026-10-11T10:42:35Z",
+                "completed_at": "2026-10-11T11:11:08Z"
+              },
+              {
+                "name": "Upload coverage diagnostics",
+                "status": "completed",
+                "conclusion": "success",
+                "number": 30,
+                "started_at": "2026-10-11T11:11:08Z",
+                "completed_at": "2026-10-11T11:11:09Z"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "runId": 37395019475,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37395019475",
+        "jobs": [
+          {
+            "id": 112048810885,
+            "name": "build-test (22)",
+            "status": "completed",
+            "conclusion": "cancelled",
+            "started_at": "2026-10-06T00:38:01Z",
+            "completed_at": "2026-10-06T01:03:31Z",
+            "steps": [
+              {
+                "name": "Full suite and coverage thresholds",
+                "status": "completed",
+                "conclusion": "cancelled",
+                "number": 18,
+                "started_at": "2026-10-06T00:41:17Z",
+                "completed_at": "2026-10-06T01:03:28Z"
+              },
+              {
+                "name": "Upload coverage diagnostics",
+                "status": "completed",
+                "conclusion": "success",
+                "number": 20,
+                "started_at": "2026-10-06T01:03:28Z",
+                "completed_at": "2026-10-06T01:03:29Z"
+              }
+            ]
+          },
+          {
+            "id": 112048810954,
+            "name": "build-test (24)",
+            "status": "completed",
+            "conclusion": "failure",
+            "started_at": "2026-10-06T00:38:00Z",
+            "completed_at": "2026-10-06T01:03:15Z",
+            "steps": [
+              {
+                "name": "Full suite and coverage thresholds",
+                "status": "completed",
+                "conclusion": "failure",
+                "number": 18,
+                "started_at": "2026-10-06T00:39:58Z",
+                "completed_at": "2026-10-06T01:03:11Z"
+              },
+              {
+                "name": "Upload coverage diagnostics",
+                "status": "completed",
+                "conclusion": "success",
+                "number": 20,
+                "started_at": "2026-10-06T01:03:11Z",
+                "completed_at": "2026-10-06T01:03:13Z"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "latest_main_ci": {
+      "id": 38132701944,
+      "head_sha": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-10-11T10:39:02Z",
+      "html_url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/38132701944"
+    },
+    "causal_limit": "Node22 failure followed within17 seconds by Node24 cancellation agrees with default fail-fast; the Node24 log says The operation was canceled, not the causal matrix name. Exact cancellation cause is inferred from documented semantics and observed timing, not an explicit log assertion.",
+    "minimal_supported_proposal": "diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml\n--- a/.github/workflows/ci.yml\n+++ b/.github/workflows/ci.yml\n@@ -36,6 +36,7 @@ jobs:\n     runs-on: ubuntu-latest\n     timeout-minutes: 90\n     strategy:\n+      fail-fast: false\n       matrix:\n         node-version: [\"22\", \"24\"]\n     steps:\n",
+    "unchanged_boundaries": [
+      "matrix22/24",
+      "ubuntu-latest",
+      "job/step timeouts",
+      "producer exit status and required full-suite step",
+      "global/per-file coverage policy",
+      "current freeze checks/base authority",
+      "source-quality policy owned by P0-33",
+      "npm-publish triggers/release jobs",
+      "product stdout/recording/refusal limits"
+    ]
+  },
+  "current_pipeline_contracts": {
+    "CI": {
+      "path": ".github/workflows/ci.yml:151-161",
+      "command": "npm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096",
+      "shell": "bash",
+      "diagnostics": "always upload tmp/ci-coverage and coverage/coverage-summary.json"
+    },
+    "publish": {
+      "path": ".github/workflows/npm-publish.yml:63-85",
+      "command": "npm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096",
+      "shell": "bash",
+      "diagnostics": "always upload tmp/ci-tests/"
+    },
+    "integrity": "tee precedes cut, so the full artifact is retained. Explicit shell bash supplies -e -o pipefail and propagates producer failure. Do not remove stderr2>&1, swap tee/cut, ignore exit status, clip artifacts or add continue-on-error."
+  },
+  "existing_tests": [
+    {
+      "source": "tests/reconciliationDefectsReleaseGate.test.ts:33",
+      "scope": "Accepted-main checks both ci.yml/npm-publish named test typecheck steps through AMC_RECONCILE_ROOT; it is an existing small workflow-contract file. It currently has no matrix/pipeline contract."
+    },
+    {
+      "source": "tests/amc1479PolicyFixturesCi.test.ts:466",
+      "scope": "Accepted-main current workflow references/build ordering; different policy-fixture scope."
+    },
+    {
+      "source": "tests/architectureBoundaries.test.ts:60",
+      "scope": "Accepted-main current workflow architecture step presence; no pipeline/matrix checks."
+    },
+    {
+      "source": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tests/ciWorkflowContract.test.ts",
+      "scope": "Existing held P0-33 YAML/commandStep/required-step contract with mutations; absent on accepted main and requires P0-33 release/Playwright/source-quality changes. Reuse narrow patterns only, not the whole file."
+    },
+    {
+      "source": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tests/sourceQualityRatchet.test.ts:345",
+      "scope": "Existing P0-33 actual Bash run-block execution with PATH npm shim and failure propagation. Absent on accepted main; reusable pattern for a bounded P0-48 pipeline proof."
+    }
+  ],
+  "current_actual_5MiB_case": {
+    "source_file_sha256": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+    "full_run_source": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+    "runtime": "Node22.23.3",
+    "report": "/private/tmp/p0-47-full-correctness-20261014.json",
+    "report_sha256": "3d659821bae47f08a2fe5a09c281d04e79eeb45ce8eb36afaba13d028a64c30a",
+    "suite_assertions": 12,
+    "passed": 12,
+    "failed": 0,
+    "truncation_case": {
+      "ancestorTitles": [
+        "a truncated answer is not an answer"
+      ],
+      "fullName": "a truncated answer is not an answer refuses rather than reporting the part that fit",
+      "status": "passed",
+      "title": "refuses rather than reporting the part that fit",
+      "duration": 1852.925207999997,
+      "failureMessages": [],
+      "meta": {},
+      "tags": []
+    },
+    "limits": "Actual fake producer emits5MiB, monitor recording cap4MiB and incomplete-output refusal are preserved. Spy changes only the parent stdout sink and restores in finally. The12 passing cases do not constitute a whole-suite or Node24 pass."
+  },
+  "historical_giant_line_proof": [
+    {
+      "runId": 37392711874,
+      "jobId": 112041325128,
+      "fetchExit": 0,
+      "logSha256": "190b6e7cd627ad9a6c9cd2c3f063f1e0da44db382ec0aecab8e19113769c0387",
+      "lineCount": 368,
+      "longestGitHubLogLineChars": 444,
+      "selectedEvidence": [
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:01.5420700Z ^[[36;1m  git show origin/main:tests/foreignSubagentRunner.test.ts > tests/foreignSubagentRunner.test.ts^[[0m",
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:01.5421370Z ^[[36;1m  npx vitest run tests/foreignSubagentRunner.test.ts > /tmp/out.txt 2>&1; rc=$?^[[0m",
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:01.5423536Z ^[[36;1m  npx vitest run tests/foreignSubagentRunner.test.ts --reporter=verbose^[[0m",
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:30.7159591Z exit=0 bytes=5244733 longest=5242903",
+        "probe (original-redirected)\tUNKNOWN STEP\t2026-10-06T00:13:30.7255871Z ##[error]Process completed with exit code 1."
+      ],
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37392711874/job/112041325128"
+    },
+    {
+      "runId": 37392711874,
+      "jobId": 112041325529,
+      "fetchExit": 0,
+      "logSha256": "1c09eb55a8b50c5740704b2208f49583d041adcfe8b5860f64892e823c0063d0",
+      "lineCount": 394,
+      "longestGitHubLogLineChars": 441,
+      "selectedEvidence": [
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:12:59.2684513Z ^[[36;1m  git show origin/main:tests/foreignSubagentRunner.test.ts > tests/foreignSubagentRunner.test.ts^[[0m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:12:59.2685183Z ^[[36;1m  npx vitest run tests/foreignSubagentRunner.test.ts > /tmp/out.txt 2>&1; rc=$?^[[0m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:12:59.2687568Z ^[[36;1m  npx vitest run tests/foreignSubagentRunner.test.ts --reporter=verbose^[[0m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:04.6778976Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child answers through the same seam^[[2m > ^[[22mreturns the child's own words, folded from its recorded output^[[33m 528^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:05.0566770Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child answers through the same seam^[[2m > ^[[22mpasses the goal to the foreign command^[[33m 390^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:05.4254142Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child answers through the same seam^[[2m > ^[[22mrefuses when the child exits non-zero, rather than returning partial words^[[33m 379^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:05.6938856Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child answers through the same seam^[[2m > ^[[22mrefuses a child that said nothing^[[33m 370^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:06.0405765Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child is governed or it does not run^[[2m > ^[[22mrefuses to spawn without a lease^[[32m 261^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:15.4102065Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child is governed or it does not run^[[2m > ^[[22mkeeps the child's lease out of the recorded output^[[33m 354^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:17.4116905Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child does not hang its parent^[[2m > ^[[22mrefuses on the deadline, and says it was the deadline^[[33m 10870^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:27.1759160Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma truncated answer is not an answer^[[2m > ^[[22mrefuses rather than reporting the part that fit^[[33m 854^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:27.4880771Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child stops when its parent gives up^[[2m > ^[[22mkills the process on the signal rather than running to completion^[[33m 9414^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:27.8803245Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child cannot be continued^[[2m > ^[[22mrefuses a continuable request instead of pretending^[[33m 302^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:28.2675900Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child is governed by the same chokepoint as an in-process one^[[2m > ^[[22mruns through spawnSubagent with a signed packet and an announced session^[[33m 408^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:28.2784030Z  ^[[32m\u2713^[[39m tests/foreignSubagentRunner.test.ts^[[2m > ^[[22ma foreign child is governed by the same chokepoint as an in-process one^[[2m > ^[[22msettles a crashed foreign child as failed, not as a silent success^[[33m 377^[[2mms^[[22m^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:28.2826431Z ^[[2m Test Files ^[[22m ^[[1m^[[32m1 passed^[[39m^[[22m^[[90m (1)^[[39m",
+        "probe (patched-printing)\tUNKNOWN STEP\t2026-10-06T00:13:28.2827696Z ^[[2m      Tests ^[[22m ^[[1m^[[32m12 passed^[[39m^[[22m^[[90m (12)^[[39m"
+      ],
+      "url": "https://github.com/AgentMaturity/AgentMaturityCompass/actions/runs/37392711874/job/112041325529"
+    }
+  ],
+  "recommended_later_qualification": [
+    {
+      "step": "Existing file/runtime reuse",
+      "detail": "Reuse the exact existing Node22 full-run12-case result above. Obtain equivalent exact-source Node24 result if none exists; do not run a second whole suite merely to repeat this test."
+    },
+    {
+      "step": "Narrow current workflow contract",
+      "detail": "Prefer extending the existing accepted reconciliationDefectsReleaseGate workflow checks with YAML-selected build-test strategy.fail-fast === false and matrix22/24, preserving job failure semantics; reuse P0-33 parsing/shim patterns only where needed. There is no dedicated existing clipping/matrix test to claim as passing."
+    },
+    {
+      "step": "Exact Bash pipeline proof",
+      "detail": "In a temporary directory, execute each actual YAML Test/Full suite run block with a controlled npm producer shim printing5MiB of ASCII on one line plus stderr. Use bash --noprofile --norc -e -o pipefail, redirect console output to another file, measure max line rather than printing it. For producer exit0 and17 require full tee bytes preserved, console longest line4096 and correct shell status0/17. Keep clipping only the console copy."
+    },
+    {
+      "step": "Spy mutation, if needed for new current evidence",
+      "detail": "Remove only the existing single-case stdout spy in an owned isolated fixture or checkout, redirect all output to disk, run only the truncated-answer case, measure the giant line and restore exact original test bytes. Never change the5MiB input,4MiB product cap, timeout or result/refusal assertions."
+    },
+    {
+      "step": "Hosted completion acceptance",
+      "detail": "Both current Node22/24 build-test full-suite steps must reach recorded results without sibling fail-fast cancellation or runner hang; upload diagnostics. Actual test/coverage failures must remain failures and P0-33 debt. No hosted run was triggered by this audit."
+    }
+  ],
+  "source_identity": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "currentMainWorkingBytesEqualBase": true,
+      "d15Registered": false
+    },
+    {
+      "path": ".github/workflows/npm-publish.yml",
+      "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "3c4bb58c740409850865514f3d07fe60efb115f471aa5aa2f307f28344e2f5f1",
+      "currentMainWorkingBytesEqualBase": true,
+      "d15Registered": false
+    },
+    {
+      "path": "tests/foreignSubagentRunner.test.ts",
+      "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+      "currentMainWorkingBytesEqualBase": true,
+      "d15Registered": false
+    },
+    {
+      "path": "tests/reconciliationDefectsReleaseGate.test.ts",
+      "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "sha256": "3c2eb86cdb3ec4bd101ec1ed8ba9b16d49c9e4606bf3c462baddad7906f98179",
+      "currentMainWorkingBytesEqualBase": true,
+      "d15Registered": false
+    }
+  ],
+  "D15": {
+    "decision_source": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+    "recorded_option": "Snapshot on edit before first change for files a restoration test freezes; behavior checks keep using live code.",
+    "current_registered_rows": [],
+    "all_archive_manifest_search": "No exact named path found in unused-code JSON archive metadata for the four bounded paths.",
+    "readonly_needs_snapshot_helper": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/needs-snapshot.mjs",
+      "sha256": "3bfbe4c68e4860ad6f344433eae4f39e864462798f75ff2c58d8cef488bae1b3",
+      "args": [
+        "--paths",
+        ".github/workflows/ci.yml",
+        ".github/workflows/npm-publish.yml",
+        "tests/foreignSubagentRunner.test.ts",
+        "tests/reconciliationDefectsReleaseGate.test.ts",
+        "--at",
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+      ],
+      "result": "none"
+    },
+    "conclusion": "At accepted5ea none of these bounded paths requires a missing D15 registration by the existing comprehensive helper. Do not invent snapshots or blanket-register un-frozen paths; if a changed route later reveals an actual frozen path, preserve before bytes and register under P0-48 first. Never alter old archive bytes or redirect live behavior reads."
+  },
+  "ownership_reservations": {
+    "source": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "line_count": 1616,
+    "last_appended_scope": "2026-10-12 P2-02 slice2; preserved/paused unrelated scopes remain owned",
+    "explicit_ci_or_publish_or_P048_reservations_found": false,
+    "session_metadata": [
+      {
+        "path": "/Users/sid/.claude/sessions/2692.json",
+        "pid": 2692,
+        "sessionId": "7fccbbfa-7f5d-4ff0-b679-dcef42f87812",
+        "cwd": "/Users/sid/AgentMaturityCompass/.claude/worktrees/loving-germain-ac9c7f",
+        "status": "idle",
+        "name": "Fix Enforce manifest digest mismatch on typed graphs",
+        "updatedAt": 1791778135460,
+        "statusUpdatedAt": 1791778135460
+      },
+      {
+        "path": "/Users/sid/.claude/sessions/17524.json",
+        "pid": 17524,
+        "sessionId": "442cd919-61e6-4923-8fc9-c2ffc9937ca1",
+        "cwd": "/Users/sid/AgentMaturityCompass",
+        "status": "idle",
+        "name": "Work trees consolidation",
+        "updatedAt": 1791777873972,
+        "statusUpdatedAt": 1791777873972
+      }
+    ],
+    "limits": "These dated reservations and idle session metadata do not grant general clearance. This review authorizes no implementation. Any later active P0-48 work must stay in its own isolated accepted-main branch; preserve all held Claude/P0-33 work and do not edit another session checkout. The legacy reconciliation test comment names historical other-session ownership; do not silently merge/rewrite that held workflow work."
+  },
+  "graph_navigation": {
+    "command": "graphify query 'foreignSubagentRunner workflow CI build-test runner stdout truncation' --budget700",
+    "result": "Existing36459-node graph returns foreignSubagentRunner/source flow navigation; truncated1128-node neighborhood. Current workflow authority was verified from immutable accepted source and GitHub, not this stale graph.",
+    "limits": "No graph rebuild, watcher or server used."
+  },
+  "not_done": [
+    "No pipeline byte/exit proof or new test was run by this audit.",
+    "No fail-fast change was applied; it is a proposal.",
+    "No hosted rerun, push, PR, publication, deployment, build, tracker edit or paused-scope resumption occurred.",
+    "Source-only pipeline inspection and historical PR recovery do not satisfy current two-job hosted acceptance."
+  ]
+}

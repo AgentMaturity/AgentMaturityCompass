@@ -1,0 +1,471 @@
+{
+  "baseSourceHead": "cab126572f32a531822c148166fbcc6336779fac",
+  "summary": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/summary.json",
+    "sha256": "1909a4ea3559aefb8605536cd98a3fc9156f5452ec240a3b8ec9b4b18d59d781",
+    "bytes": 78566
+  },
+  "actualInitialOwnPassed": 23,
+  "actualAttempted": 34,
+  "actualKilled": 34,
+  "actualRestoredOwnPassed": 23,
+  "normalRetainedCommits": 68,
+  "gitActions": 136,
+  "finalRestoredHead": "fe5b6821c87510200cf6b8fba9be8ef2e3b36b43",
+  "finalRestoredTreeEqualsBase": true,
+  "mutations": [
+    {
+      "id": "actual-host-entry-refusal",
+      "actualMutantHead": "f08bfd0581f39ff20ac9c55b7fbb71bbda1c77ca",
+      "actualRestoredHead": "6a3a639fec0c44e2a4d0525d8f2555965f36bf8b",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-01-actual-host-entry-refusal.json",
+        "sha256": "f85f968b2a450898849f9466d5202879ea4b6812824a08b0ac4b24c4317a85ac",
+        "bytes": 4465
+      }
+    },
+    {
+      "id": "request-strict-shape",
+      "actualMutantHead": "f302c39c4d693ca11b0a93967f8eca5c5be3e810",
+      "actualRestoredHead": "05c9e60624ef545da224d8348c688505747511d2",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-02-request-strict-shape.json",
+        "sha256": "07d13e430db75c4f4215565f343f4dd9a7f2f2464d65ed9f56867f339c752057",
+        "bytes": 4376
+      }
+    },
+    {
+      "id": "request-argv-shape-family",
+      "actualMutantHead": "79fcb83944c5addf6997cb864fbc811909ae4ab4",
+      "actualRestoredHead": "eb3f322024b131693a5711c9f2f8a1272a51aaaa",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-03-request-argv-shape-family.json",
+        "sha256": "87b4b3042b42e43f1c07fc22f123560307f850d498c591bc243e65ef318efded",
+        "bytes": 4390
+      }
+    },
+    {
+      "id": "argument-nul-refusal",
+      "actualMutantHead": "00f9fabd23ebee158d2409deb1d5b58b71803533",
+      "actualRestoredHead": "7b74001252bf795faf9ce2cdb07f71e70701d4d0",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-04-argument-nul-refusal.json",
+        "sha256": "5744fbeebe6c1d17735dcfcd773b2f71d782c79c9bca64bc8d8c21de43c3c56b",
+        "bytes": 4360
+      }
+    },
+    {
+      "id": "request-nonempty-cwd",
+      "actualMutantHead": "9bbba0739de672ee0453401cf640cbb3c1287941",
+      "actualRestoredHead": "dd148a09cdf0b0b819e58bf2d4383054220a5f13",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-05-request-nonempty-cwd.json",
+        "sha256": "7998f8f4b70affb37570e7e4a2a92d0582458a619adaa696b49dc335dbbe0393",
+        "bytes": 4365
+      }
+    },
+    {
+      "id": "digest-shape-family",
+      "actualMutantHead": "9f33315fe0c596bc415ad418094078b0b4d1923d",
+      "actualRestoredHead": "9ea178274e5a36b19a909fa2aa8d98a6d5e290fc",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-06-digest-shape-family.json",
+        "sha256": "b94d96e2917b08cb6ee2f891d135c84db9f232d54735200ef56f394d206b4adb",
+        "bytes": 4373
+      }
+    },
+    {
+      "id": "api-object-availability",
+      "actualMutantHead": "af29a99c7ba4049e86b097dc49854fc5689e2fe1",
+      "actualRestoredHead": "692a6597c34933de81ab358797008104ab13d409",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-07-api-object-availability.json",
+        "sha256": "25950c5a29b41be3965a299f1ced386db8397455991a6c71fcc00659845c0d4b",
+        "bytes": 4372
+      }
+    },
+    {
+      "id": "api-method-shape",
+      "actualMutantHead": "c895fa63aef455ef443828d84e6fcf154a27950d",
+      "actualRestoredHead": "e0ae213f9785a965a326cd7f241644f809d327e5",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-08-api-method-shape.json",
+        "sha256": "7c1434197ef007c53b6f2e704e512c17f5d8b0279f4b63395c17e6973a64d441",
+        "bytes": 4336
+      }
+    },
+    {
+      "id": "api-prerequisite-verdict",
+      "actualMutantHead": "3281af6929f2024031761feeab6dd8bd88a67d3b",
+      "actualRestoredHead": "8dffe2c28d16e6edfef5b591e2293deaaef0fc44",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-09-api-prerequisite-verdict.json",
+        "sha256": "9c8fa66ee9177f822dce76a1c6f62e8b8bbff6853b57147c8e79a2cf4a2d59e6",
+        "bytes": 4404
+      }
+    },
+    {
+      "id": "api-prerequisite-exception",
+      "actualMutantHead": "e9111959da6ef7f551fe34cb7ee10df76f8a8916",
+      "actualRestoredHead": "6428dd73f0aaca5fe5f49bf3d5542735cafa2bd1",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-10-api-prerequisite-exception.json",
+        "sha256": "440c7f02884e030a483249452bb348dd7b00c0948a98e801f96bc436d48d193b",
+        "bytes": 4409
+      }
+    },
+    {
+      "id": "request-outer-freeze",
+      "actualMutantHead": "c28c2bad2b080a61d6fccaf11f808a01e2b70bdf",
+      "actualRestoredHead": "57f41622429c6ebeb54fb0914a8826d2fde7dea6",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-11-request-outer-freeze.json",
+        "sha256": "b137400ada69c0238a27420e1dfbf117e2acf86e2f232c8be21130268a54eb0a",
+        "bytes": 4427
+      }
+    },
+    {
+      "id": "request-argv-freeze",
+      "actualMutantHead": "f3363b2f765c05aaa10bcce5ef82f86c022953de",
+      "actualRestoredHead": "e3097fb4d3b4880c5bcdc4602af8995bf47818a5",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-12-request-argv-freeze.json",
+        "sha256": "154f2f739628d36941c9a0547d407ec0000e1fd467a749847a2490d3690f09fd",
+        "bytes": 4420
+      }
+    },
+    {
+      "id": "request-owned-copy",
+      "actualMutantHead": "0649e63c23c97b7102bb01eb279efdea467e45c5",
+      "actualRestoredHead": "b4dd8d7a4bf356521043950f3a98df3243907d88",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-13-request-owned-copy.json",
+        "sha256": "cb8f5a70bfde020abad27c0ef464f86e0e5c1d1a4227aa721408f470d3bd5d17",
+        "bytes": 4454
+      }
+    },
+    {
+      "id": "fresh-invocation-nonce",
+      "actualMutantHead": "00d40e7b47208dc8ab232dabdfb21c1722686250",
+      "actualRestoredHead": "87183a323b72ad589e6751c2fc4e090f31ee62c7",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-14-fresh-invocation-nonce.json",
+        "sha256": "5e178ec2b11cc137436423f608505c43ac2a757dcd22ece944a966ed6c134165",
+        "bytes": 4457
+      }
+    },
+    {
+      "id": "transport-child-numeric-contract",
+      "actualMutantHead": "71671c44d43aeb74c0c0702c75e2d234837759bf",
+      "actualRestoredHead": "8f167e8405260638ebf1ea81062476aee371be0e",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-15-transport-child-numeric-contract.json",
+        "sha256": "9fa942640722ebb633b7c663402b60c752dd6fa57b022e0b54b848b06bfdfa7c",
+        "bytes": 4514
+      }
+    },
+    {
+      "id": "exit-numeric-contract",
+      "actualMutantHead": "33b17282aff3d46715e0fc3228e87fddc43ca3d1",
+      "actualRestoredHead": "3ac76ea00437f349b0194df5255d7430ea6c80a8",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-16-exit-numeric-contract.json",
+        "sha256": "07eeed8dc4cf4e0d1b4fd92a6370b195cd3e97b60649a7239aad62e6f92ec22f",
+        "bytes": 4439
+      }
+    },
+    {
+      "id": "mandatory-missing-launcher-status",
+      "actualMutantHead": "a748e19d92539a939f8f756074e2fb85894073db",
+      "actualRestoredHead": "a036cb47c6548e93ee6d19f7d9fc72c2e13c82f7",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-17-mandatory-missing-launcher-status.json",
+        "sha256": "e54bea03827fe046d87928a2a60a27d984762e3f556858d708a7c231b7bc2666",
+        "bytes": 4867
+      }
+    },
+    {
+      "id": "empty-launcher-status",
+      "actualMutantHead": "f7c63ff10712b3c8c23da10cc6e200828da575fb",
+      "actualRestoredHead": "d2b305fb4baf47bf7e95efde1a87c82d1132396a",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-18-empty-launcher-status.json",
+        "sha256": "534423a7f944d1188083b37ed21660c35999ab837035f41b7e4b5a8663ac149f",
+        "bytes": 4379
+      }
+    },
+    {
+      "id": "status-byte-cap-family",
+      "actualMutantHead": "0c54e7ee0aa8b196da2d4c017019eb8dfe0a45aa",
+      "actualRestoredHead": "f2b152ca81e22149c08419771970dc7a22969bfb",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-19-status-byte-cap-family.json",
+        "sha256": "d5cd251addf49260bf4a8f1202611b746bb7cda2ce9531cb21255157d1d55817",
+        "bytes": 4581
+      }
+    },
+    {
+      "id": "utf8-refusal-result",
+      "actualMutantHead": "d009fc2122c7c00b67d75a37058f929faaca27d8",
+      "actualRestoredHead": "ade7329a54cc68df44962e3bc26061b17a02a771",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-20-utf8-refusal-result.json",
+        "sha256": "dbf3e8a080b24ab3132711408b4b2552fdc64e5a7457a2661026011358952158",
+        "bytes": 4375
+      }
+    },
+    {
+      "id": "malformed-json-promotion",
+      "actualMutantHead": "0501157545a848c5bb60b05f73c995f07b4b3d25",
+      "actualRestoredHead": "bdc96257f4f407e866683c9d7964e16baa098a23",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-21-malformed-json-promotion.json",
+        "sha256": "2edcac689b73fbd2b041763530f44318e03c618be017af9a82e2c093c4e4281f",
+        "bytes": 4396
+      }
+    },
+    {
+      "id": "status-strict-fields",
+      "actualMutantHead": "656ede163fcf96a59cbb807d57ba23669f0b79b9",
+      "actualRestoredHead": "5ac6cd57a373de1f17de509491d75805c44da8c1",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-22-status-strict-fields.json",
+        "sha256": "b3d0ccd9eed5a259a72441c39bd990e45a933dd1826d4e267ee3cab8cf98553e",
+        "bytes": 4393
+      }
+    },
+    {
+      "id": "status-version",
+      "actualMutantHead": "6cf9832801ec164d80d08f90a24b479220a9a37a",
+      "actualRestoredHead": "cd502b7a9edbe3fcca6228fd86e14982eb43b056",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-23-status-version.json",
+        "sha256": "dae9d5c17daa7d38c806341a3cfc736a78d9c4bd26a888b13d5f53f142153d09",
+        "bytes": 4335
+      }
+    },
+    {
+      "id": "status-child-binding",
+      "actualMutantHead": "bbafa28c3b89d1e5c2fade671f8c4c9928cc7a65",
+      "actualRestoredHead": "e60c6ae49f38cd9d69b54613204210fa1cdaaceb",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-24-status-child-binding.json",
+        "sha256": "cdb06bcf1d5b12237b76eec8815cfb10dbd36e04b64518f8aa09f8f7cf3397fc",
+        "bytes": 4391
+      }
+    },
+    {
+      "id": "status-policy-binding",
+      "actualMutantHead": "c6fe11ccac2c7cd72ee4627c23d7f93a7099e876",
+      "actualRestoredHead": "dab19e56e7076915b4d08c430100ccde0c6f2841",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-25-status-policy-binding.json",
+        "sha256": "6d3778bc01826402024167a61fb7344739bbd874949a542f995f44846ed48aaf",
+        "bytes": 4348
+      }
+    },
+    {
+      "id": "status-invocation-binding",
+      "actualMutantHead": "529eafd3e3188e31c1ec451c142503f0dec1af1e",
+      "actualRestoredHead": "554a973f9f52858fdb3e7f86675f6735d4a47665",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-26-status-invocation-binding.json",
+        "sha256": "d898ea87514f18f1fe3fe7bb27e1857b7c4d0ad717a6a8741e3f298a6d051920",
+        "bytes": 4575
+      }
+    },
+    {
+      "id": "status-exit-binding",
+      "actualMutantHead": "c33abe172f2b20f63fe162f645ea071d54a04d33",
+      "actualRestoredHead": "e5bc7c5e448ad827c67ca8655c3eb39431944d5b",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-27-status-exit-binding.json",
+        "sha256": "ebf3b7d56b078c3630147a7b6ec6ffd52383e3c5a17e10a660916dfa410a687f",
+        "bytes": 4398
+      }
+    },
+    {
+      "id": "run-exception-refusal",
+      "actualMutantHead": "cc49c59b7b4ec5175823513d66f51feace73b311",
+      "actualRestoredHead": "d58c2c1634f3119c3abb64f63e45f92cf8d0010e",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-28-run-exception-refusal.json",
+        "sha256": "7f321619754d798b119ea2288d5df8bc681da5b5d5becaed080b312bbe470603",
+        "bytes": 4424
+      }
+    },
+    {
+      "id": "cleanup-call-required",
+      "actualMutantHead": "ca61537eadb96fff058c77d89c54622d1cefaa5d",
+      "actualRestoredHead": "f066ab9e5deb9cc8b712241fdc307c7d62b4f27a",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-29-cleanup-call-required.json",
+        "sha256": "d65865a64ac3aca340f6395db1e9085c44bd24affee8728db2a4775d7fdd8c34",
+        "bytes": 4615
+      }
+    },
+    {
+      "id": "cleanup-failure-propagated",
+      "actualMutantHead": "df1ae87e2f74e0c28491f439acb946c56e4d7d61",
+      "actualRestoredHead": "84459f5db8cdf710e6617fe72ed68d4b28836306",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-30-cleanup-failure-propagated.json",
+        "sha256": "15014ed0abbed0ba6589635d0900cc398762e99c2c3099739c9216e537320791",
+        "bytes": 4463
+      }
+    },
+    {
+      "id": "never-confined",
+      "actualMutantHead": "6c4a874b1f64626a25671883431c26ca015147a5",
+      "actualRestoredHead": "432cf8802bc5ea0d6358300ae13d34c957b1aa97",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-31-never-confined.json",
+        "sha256": "072d9f3e08e0739baec32713b09de5634b7dd33b5a582a3c0456156541214949",
+        "bytes": 4346
+      }
+    },
+    {
+      "id": "never-tree-proven",
+      "actualMutantHead": "3bc787cc5a33abc302f6d7ee49ff1cf0f27c7938",
+      "actualRestoredHead": "a0199f3752e805588471b959ce2826c90ee5dbe8",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-32-never-tree-proven.json",
+        "sha256": "e53c14a742b2e017ba3f0d6d85966f146f3a3a84a3872d35d961a519477139d2",
+        "bytes": 4369
+      }
+    },
+    {
+      "id": "never-native-exit",
+      "actualMutantHead": "00d1f421b63b3b282193151a59cdd915212573aa",
+      "actualRestoredHead": "b3921a82b3f7030078d0aced26fa530835419a32",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-33-never-native-exit.json",
+        "sha256": "edf723a8615c695af9a8ef99d923a2d9d2f4b655e5222c03d1d49812dad3d033",
+        "bytes": 4376
+      }
+    },
+    {
+      "id": "always-unmeasured",
+      "actualMutantHead": "e8ed642ff7438b1941e967b370d35cd8e8cd7b77",
+      "actualRestoredHead": "fe5b6821c87510200cf6b8fba9be8ef2e3b36b43",
+      "killed": true,
+      "intendedAssertionFailure": true,
+      "exactByteRestore": true,
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/cab126572f32a531822c148166fbcc6336779fac/clean-commit-v1/mutation-34-always-unmeasured.json",
+        "sha256": "d27beb280f94c796a156c118b9e25e8780686ee3db5347a22d9c9ef469f5af8f",
+        "bytes": 4386
+      }
+    }
+  ],
+  "plan": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/mutation-plan-root-reviewed-cab126-v1.json",
+    "sha256": "61ddbfedb79d990352fc4cccace5148074558dff602f920352c8764d119d28e0",
+    "bytes": 61976
+  },
+  "limits": [
+    "One guard-family mutation does not prove each sibling primitive min/max/enum independently. Current request cases target empty argv, NUL argument, empty cwd, digest and unknown field; individual untested standard-library bounds are not claimed separately.",
+    "The status cap mutant weakens the two overlapping caps together; neither independent cap or intrinsic copying is falsely counted killed.",
+    "UTF8 and numeric shape cases have independent later parse/equality defenses. Their stated result/diagnostic promotions do not claim unauthorized effects or removal-only bypasses.",
+    "Method snapshots, status-buffer copying and every typed-array intrinsic are reviewed structure, not independently killed subpredicates. Do not expand the measured kill claim beyond each stated counterexample."
+  ]
+}

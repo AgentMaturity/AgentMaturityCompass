@@ -6,13 +6,24 @@ import { ACP_MAX_SESSION_ROWS, ACP_MAX_TURN_UPDATE_BYTES } from "./acpCommittedU
 import { ACP_ERROR, AcpFailure } from "./acpErrors.js";
 import { acpSupportsImageInput, type AcpPromptBlock, type AcpPromptRoute } from "./acpPromptInput.js";
 import { ACP_NATIVE_AUDIO_CONTRACT, acpSupportsAudioInput } from "./acpAudioInput.js";
+import { validClientRequestId } from "../session/loopEventMeta.js";
+import { EXECUTION_API_VERSION } from "../execution/executionContract.js";
+import { NATIVE_MCP_STATUS_FORMAT } from "../mcp/nativeMcpStatus.js";
 
 /** Shared wire contract for SDKs. None of these declarations is a cold-verifier verdict. */
 export const ACP_RUNTIME_META_KEY = "dev.agentmaturity.amc";
 export const ACP_RUNTIME_FORMAT = "amc-acp-runtime@1";
 export const ACP_MAX_UPDATE_PARAMS_BYTES = 900_000;
-/** Where a spawning composer (Studio native tasks, P1-67) hands `amc acp` the lease it minted for that process. */
-export const NATIVE_TASK_LEASE_ENV = "AMC_NATIVE_TASK_LEASE";
+/**
+ * A spawning composer (Studio native tasks, P1-67) hands `amc acp` the lease it minted for that process over an inherited
+ * pipe on fd NATIVE_TASK_LEASE_FD, and names that fd in this variable; the token itself never enters the environment.
+ */
+export const NATIVE_TASK_LEASE_FD_ENV = "AMC_NATIVE_TASK_LEASE_FD";
+export const NATIVE_TASK_LEASE_FD = 3;
+/** The Studio principal a native task belongs to (P1-78), recorded as the initiator of the approvals its runtime raises. */
+export const NATIVE_TASK_INITIATOR_ENV = "AMC_NATIVE_TASK_INITIATOR";
+/** The system prompt Studio composed for a native task's agent (P2-37, src/studio/nativeTaskContext.ts); read and unset at startup. */
+export const NATIVE_TASK_SYSTEM_PROMPT_ENV = "AMC_NATIVE_TASK_SYSTEM_PROMPT";
 export const ACP_RUNTIME_LIMITS = Object.freeze({
   inputFrameBytes: MAX_WIRE_LINE_BYTES,
   updateParamsBytes: ACP_MAX_UPDATE_PARAMS_BYTES,
@@ -29,8 +40,13 @@ export interface AcpForkSessionParams {
   readonly workspace: string;
   readonly agentId: string;
   readonly signal: AbortSignal;
+  /** The child's own lease (P1-79), minted before the factory runs; compose the child with it (`AgentSessionInit.leaseToken`). */
+  readonly leaseToken?: string;
 }
 export type AcpForkSessionFactory = (params: AcpForkSessionParams) => AgentSession | Promise<AgentSession>;
+/** `_amc/session/fork` (P2-13): the CLI's --fork-from. The child's signed open row names the verified parent's final row;
+ * it starts with no inherited model context, so it is never advertised as the standard context-inheriting `session/fork`. */
+const ACP_LINEAGE_FORK = "verified-parent-reference";
 
 export function nativeAcpCapabilities(options: {
   readonly route?: AcpPromptRoute;
@@ -38,6 +54,7 @@ export function nativeAcpCapabilities(options: {
   readonly audioInput?: boolean;
   readonly loadSession: boolean;
   readonly forkSession: boolean;
+  readonly lineageFork?: boolean;
   readonly nativeExecution?: { readonly tools: "none" | "workspace"; readonly signedApprovalGate: boolean;
     readonly reviewedMcpConfigured: boolean; readonly taskValidation?: boolean };
 }) {
@@ -49,13 +66,20 @@ export function nativeAcpCapabilities(options: {
     promptCapabilities: Object.freeze({ image, audio, embeddedContext: false }),
     _meta: Object.freeze({ [ACP_RUNTIME_META_KEY]: Object.freeze({
       ...(options.nativeExecution ?? {}),
+      // The execution contract version each SDK pins (P2-13). Phases ride on prompt results of native compositions only.
+      executionApi: EXECUTION_API_VERSION,
       runtimeFormat: ACP_RUNTIME_FORMAT,
       committedUpdates: "live-completed-blocks" as const,
+      committedTurn: "amc-committed-turn-v1" as const,
+      currentPlanUpdates: "amc-current-plan-v1" as const,
+      sessionEventPage: "amc-session-event-page-v1" as const,
+      ...(options.nativeExecution ? { clientRequestIds: true, withdrawSubmission: true, mcpStatus: NATIVE_MCP_STATUS_FORMAT } : {}),
       verification: "not-verified" as const,
       cancellation: "prompt-scoped" as const,
       limits: ACP_RUNTIME_LIMITS,
       ...(options.loadSession ? { releaseSession: true } : {}),
       ...(options.forkSession ? { forkContext: "authenticated-parent-history" as const } : {}),
+      ...(options.lineageFork ? { lineageFork: ACP_LINEAGE_FORK } : {}),
       ...(image && options.orderedImageInput === true ? { orderedImageInput: NATIVE_ORDERED_INPUT_FORMAT } : {}),
       ...(audio ? { audioInput: ACP_NATIVE_AUDIO_CONTRACT } : {})
     }) })
@@ -70,14 +94,24 @@ export function acpPromptInputFormat(meta: unknown): typeof NATIVE_ORDERED_INPUT
   if (!isRecord(meta)) throw new AcpFailure(ACP_ERROR.invalidParams, "ACP prompt metadata must be an object or null.");
   if (!Object.hasOwn(meta, ACP_RUNTIME_META_KEY)) return undefined;
   const extension = meta[ACP_RUNTIME_META_KEY];
-  if (!isRecord(extension) || Object.keys(extension).some(key => key !== "inputFormat")) {
+  if (!isRecord(extension) || Object.keys(extension).some(key => key !== "inputFormat" && key !== "clientRequestId")) {
     throw new AcpFailure(ACP_ERROR.invalidParams, "Malformed or unsupported native prompt extension; no downgrade was used.");
+  }
+  if (Object.hasOwn(extension, "clientRequestId") && !validClientRequestId(extension.clientRequestId)) {
+    throw new AcpFailure(ACP_ERROR.invalidParams, "clientRequestId must be 1 through 128 visible ASCII characters.");
   }
   if (!Object.hasOwn(extension, "inputFormat")) return undefined;
   if (extension.inputFormat !== NATIVE_ORDERED_INPUT_FORMAT && extension.inputFormat !== NATIVE_AUDIO_INPUT_FORMAT) {
     throw new AcpFailure(ACP_ERROR.invalidParams, "Unsupported native ordered input format; no downgrade was used.");
   }
   return extension.inputFormat;
+}
+
+/** Uses the same strict extension admission as ordered input; unknown metadata stays opaque. */
+export function acpPromptClientRequestId(meta: unknown): string | undefined {
+  acpPromptInputFormat(meta);
+  if (!isRecord(meta) || !isRecord(meta[ACP_RUNTIME_META_KEY])) return undefined;
+  return (meta[ACP_RUNTIME_META_KEY] as { clientRequestId?: string }).clientRequestId;
 }
 
 /** The vendored schema permits extra properties. Native codecs cannot silently lose

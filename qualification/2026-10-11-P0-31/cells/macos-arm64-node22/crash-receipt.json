@@ -1,0 +1,313 @@
+{
+  "schemaVersion": "amc-installed-crash-recovery/v1",
+  "ok": true,
+  "startedAt": "2026-10-11T07:30:44.565Z",
+  "runId": "89906acf-ca3d-4aef-8531-a7307db250bd",
+  "sourceCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "sourceFiles": {
+    "scripts/installed-crash-recovery-check.mjs": "777c26d2c68ad15f85f6df4815ffe549fca4d8d8d6a9fb726b4aa09bf26fbf7f",
+    "scripts/lib/installedCrashMcpServer.mjs": "1ce79eba9a6db019b6054e909453ba055d43c72e23e652036f1f582e677e611c",
+    "scripts/lib/ownedProcessCommand.mjs": "cad3be3fdb81c13b74b6650a8fa719677d97333ac447a9d76538e855364ea560"
+  },
+  "artifactSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "expectedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "runtime": {
+    "node": "v22.22.0",
+    "executable": "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+    "nodeSha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+    "npmSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "checks": [
+    {
+      "name": "real-approved-effect-before-ack-and-authenticated-writer-kill",
+      "ok": true,
+      "sessionId": "000ebb28-c616-4c7f-ac7a-2382614d817f",
+      "approvalId": "apprreq_dff2c73ee91545af9a2fe45768ef426f",
+      "toolName": "mcp_crashfixture_3b74c681a9b88de1",
+      "callId": "stub-call-1",
+      "killedPid": 28480,
+      "effects": 1,
+      "toolResultsBeforeKill": 0,
+      "originalPrefixSha256": "c08875d80300af87838152bb02aed37ba27fabcffd968fe70268f888d374c7dd",
+      "effectSha256": "88bff8f5acf5521f157afbe5847ca8bc758ad406903fa402ca28c8ab380fa963",
+      "pendingWriteLow": 1
+    },
+    {
+      "name": "resume-preserves-original-prefix-uncertain-outcome-and-reservation",
+      "ok": true,
+      "unknownToolOutcomes": 1,
+      "automaticModelCalls": 0,
+      "effectCount": 1
+    },
+    {
+      "name": "new-explicit-turn-without-side-effect-replay-and-cold-verification",
+      "ok": true,
+      "finalModelCalls": 2,
+      "finalToolCalls": 1,
+      "effectCount": 1,
+      "pendingWriteLow": 1,
+      "payloads": "verified",
+      "historySha256": "1f65a3e6809ee94885487b3b34b655023270d8490f799df2ae86eabf60582c71"
+    }
+  ],
+  "commands": [
+    {
+      "label": "00-install",
+      "args": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+        "install",
+        "--no-audit",
+        "--no-fund",
+        "--loglevel=error",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-rc/rc.tgz"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 27996
+    },
+    {
+      "label": "01-bootstrap",
+      "args": [
+        "bootstrap"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28317
+    },
+    {
+      "label": "02-initialize",
+      "args": [
+        "--agent",
+        "default",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28318
+    },
+    {
+      "label": "03-firewall",
+      "args": [
+        "firewall",
+        "enable",
+        "--mode",
+        "block",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28319
+    },
+    {
+      "label": "04-budget-sign",
+      "args": [
+        "budgets",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28323
+    },
+    {
+      "label": "05-owner-login",
+      "args": [
+        "approvals",
+        "login",
+        "--username",
+        "crash-owner",
+        "--token-file",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/crash/private/approval-token",
+        "--password-stdin",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28325
+    },
+    {
+      "label": "06-mcp-catalog",
+      "args": [
+        "agent-loop",
+        "mcp-catalog",
+        "--config",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/crash/private/mcp.json",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28386
+    },
+    {
+      "label": "07-tools-sign",
+      "args": [
+        "tools",
+        "sign",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28479
+    },
+    {
+      "label": "08-pending-1",
+      "args": [
+        "approvals",
+        "list",
+        "--agent",
+        "default",
+        "--status",
+        "pending",
+        "--json"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28507
+    },
+    {
+      "label": "09-review",
+      "args": [
+        "approvals",
+        "show",
+        "--agent",
+        "default",
+        "apprreq_dff2c73ee91545af9a2fe45768ef426f"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28600
+    },
+    {
+      "label": "10-approve",
+      "args": [
+        "approvals",
+        "approve",
+        "--agent",
+        "default",
+        "apprreq_dff2c73ee91545af9a2fe45768ef426f",
+        "--mode",
+        "execute",
+        "--reason",
+        "Explicit local crash-recovery acceptance",
+        "--username",
+        "crash-owner",
+        "--user-id",
+        "7a2da4ae-1061-46d8-8624-3eca471dd61a",
+        "--roles",
+        "OWNER",
+        "--session-token-file",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/crash/private/approval-token",
+        "--expect-request-digest",
+        "892e701756104157f91924749e96f9159479c2e0e46802b40d8cf3785313ee43"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28602
+    },
+    {
+      "label": "11-budget-before-resume",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28606
+    },
+    {
+      "label": "12-budget-after-resume",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28614
+    },
+    {
+      "label": "13-cold-native-verification",
+      "args": [
+        "agent-loop",
+        "verify",
+        "000ebb28-c616-4c7f-ac7a-2382614d817f",
+        "--json",
+        "--expect-monitor",
+        "e328450466904b24040200e9a95ec57b348f6cb0349d21ae4d49f72fbb761137"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28616
+    },
+    {
+      "label": "14-cold-ledger-verification",
+      "args": [
+        "session",
+        "verify",
+        "--json",
+        "--expect-monitor",
+        "e328450466904b24040200e9a95ec57b348f6cb0349d21ae4d49f72fbb761137"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28759
+    },
+    {
+      "label": "15-final-budget",
+      "args": [
+        "budgets",
+        "status",
+        "--agent",
+        "default"
+      ],
+      "code": 0,
+      "signal": null,
+      "closed": true,
+      "processGroupId": 28789
+    }
+  ],
+  "limits": [
+    "Explicit deterministic stub provider and operator-trusted local stdio MCP tool; no live model or OS sandbox claim.",
+    "Monitor pin is captured locally before execution; it proves workspace-key consistency, not independent trust anchoring.",
+    "Artifact/source build correspondence is supplied by the release receipt; this runner independently pins artifact, installed CLI, and committed orchestration bytes.",
+    "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts."
+  ],
+  "installed": {
+    "publicNativeExport": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/crash/consumer/node_modules/agent-maturity-compass/dist/sdk/nativeAgentClient.js",
+    "publicNativeExportSha256": "6dead15ddabfc163b56c687d311cda2ffbdc4af6870d78e14b9e85a760ed93d1",
+    "cliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165"
+  },
+  "preExecutionMonitorSha256": "e328450466904b24040200e9a95ec57b348f6cb0349d21ae4d49f72fbb761137",
+  "closedProcesses": {
+    "writerPids": [
+      28608
+    ],
+    "helperPids": [
+      28478,
+      28481,
+      28613
+    ],
+    "allObservedGone": true
+  },
+  "endedAt": "2026-10-11T07:31:13.514Z"
+}

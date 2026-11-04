@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "preparedOnly": true,
+  "artifactCount": 11,
+  "artifacts": [
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/README.md",
+      "bytes": 1169,
+      "sha256": "19516251a394c1ace632a238fe577ebea663a0e95cf3f8d6b86f93b86fa66c8f"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/copy-stage.json",
+      "bytes": 248,
+      "sha256": "5b83753abf6db66e9da41b53701ae94d185ffa2623d03c6658cb64f70ea19a76"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/driver/controller.py",
+      "bytes": 28317,
+      "sha256": "5c1981f23721d88c490c80f2e6c1f2324898f3f7acee719c8ece8c8c1f90e878"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/case-identities.json",
+      "bytes": 2209,
+      "sha256": "94c9ff968471bc6cc3be324e7241df7d23a8677673e34627b021563c20e9c8dc"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/compiled-manifest.json",
+      "bytes": 485185,
+      "sha256": "9874a6e302600c23fd3e39c9873f657287e56d6be69a4e02d3c9116c15d4be48"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/physical-copy-manifest.json",
+      "bytes": 5036200,
+      "sha256": "75ee14d53d89d3552fa8a48d6a6c57102cf782fed90e1483c61be58551813bb8"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/preservation.json",
+      "bytes": 50800,
+      "sha256": "0264617d15daa39ea7c52dfa01d4a391f1ceb33bfc608a877170722b8bc68d35"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/inputs/source-manifest.json",
+      "bytes": 1031176,
+      "sha256": "757fc432259404ed8b4db216b0627e07ac60159aea801dd9dc3b6c129048871e"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/proposal.json",
+      "bytes": 2735,
+      "sha256": "74b34ab3fd8943b6d573ef8277cb6f187a43efe05edd04e7909129fac86db9e9"
+    },
+    {
+      "path": "/private/tmp/p0-11-causal-qualification-20261015/setup.json",
+      "bytes": 6138,
+      "sha256": "782e8f05272eccad954f372f2ce686b9f408b962cce70aae17811fb7506853ec"
+    }
+  ],
+  "closureCount": 12891,
+  "sourceCount": 8362,
+  "compiledCount": 4529,
+  "allPhysicalCopyBytesExact": true,
+  "nativeIdentityExact": true,
+  "futureBoundary": "No runtime/release. Excludes self/latersummarytoavoidcycles; physicalmanifestprivateonlyunsplit."
+}

@@ -1,0 +1,1177 @@
+{
+  "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "requiredNames": [
+    "build",
+    "typecheck",
+    "typecheck-tests",
+    "lint",
+    "check-counts",
+    "check-docs-drift",
+    "check-freeze",
+    "check-citations",
+    "check-architecture-boundaries",
+    "check-threat-model",
+    "check-api-ref",
+    "check-schemas",
+    "check-gates",
+    "check-qualification",
+    "check-catalog-currency",
+    "check-catalog-changelog",
+    "check-catalog-admission",
+    "check-industry-guides",
+    "check-regulatory-calendar",
+    "check-clean-source",
+    "check-duplicates",
+    "check-dead-code",
+    "release-notes-check"
+  ],
+  "ordinaryRows": [
+    {
+      "label": "build",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/01-build/command.json",
+        "sha256": "1c28ccac5dcdb44c1c7f556e4a90fa342994a900b6da01bfbdf1c4a2017c7633",
+        "bytes": 2779
+      },
+      "projection": {
+        "cmd": "npm run -s build",
+        "exit": 0,
+        "durationMs": 46085
+      }
+    },
+    {
+      "label": "typecheck",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/02-typecheck/command.json",
+        "sha256": "0aa8a8a379d1c52659f6454c6e3b867934628c89c3b613cd597952ab6c7c98df",
+        "bytes": 2785
+      },
+      "projection": {
+        "cmd": "npm run -s typecheck",
+        "exit": 0,
+        "durationMs": 28363
+      }
+    },
+    {
+      "label": "typecheck-tests",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/03-typecheck-tests/command.json",
+        "sha256": "9b8eb25fc17a21d319f4884a8ed3177b0c996270492e5f551c6f699e9989aeec",
+        "bytes": 2797
+      },
+      "projection": {
+        "cmd": "npm run -s typecheck:tests",
+        "exit": 0,
+        "durationMs": 41631
+      }
+    },
+    {
+      "label": "lint",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/04-lint/command.json",
+        "sha256": "8dda2c817c40f196e8323ec78d6d64875b3849816be5ec55897310cde1304d0a",
+        "bytes": 2776
+      },
+      "projection": {
+        "cmd": "npm run -s lint",
+        "exit": 0,
+        "durationMs": 4540
+      }
+    },
+    {
+      "label": "check-counts",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/05-check-counts/command.json",
+        "sha256": "dddef52c59ecb38eb57f4c4d5ff7d619f37b82f558ad23ebea943e1504863ef7",
+        "bytes": 2790
+      },
+      "projection": {
+        "cmd": "npm run -s check:counts",
+        "exit": 0,
+        "durationMs": 739
+      }
+    },
+    {
+      "label": "check-docs-drift",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/06-check-docs-drift/command.json",
+        "sha256": "316875ef8fc739639ea62c97bb0ac298cfc03db73bbb90000999a52a87147ba0",
+        "bytes": 2799
+      },
+      "projection": {
+        "cmd": "npm run -s check:docs-drift",
+        "exit": 0,
+        "durationMs": 440
+      }
+    },
+    {
+      "label": "check-freeze",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/07-check-freeze/command.json",
+        "sha256": "ff1d9bae6dfcdd40d3c0483cb6986614cb066fee68ce2c1484e3051979c11318",
+        "bytes": 2868
+      },
+      "projection": {
+        "cmd": "npm run -s check:freeze -- --base-ref dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "exit": 0,
+        "durationMs": 1696
+      }
+    },
+    {
+      "label": "check-citations",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/08-check-citations/command.json",
+        "sha256": "400cc55fdfe20638d5df4186c8aea4ab39be47c4a7ccee26e57970686bd5e231",
+        "bytes": 2797
+      },
+      "projection": {
+        "cmd": "npm run -s check:citations",
+        "exit": 0,
+        "durationMs": 331
+      }
+    },
+    {
+      "label": "check-architecture-boundaries",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/09-check-architecture-boundaries/command.json",
+        "sha256": "d2d8e0534b97f4d27d4cf00a62f7864b7733d9ff9d60eb6d361869e89108c5fb",
+        "bytes": 2829
+      },
+      "projection": {
+        "cmd": "npm run -s check:architecture-boundaries",
+        "exit": 0,
+        "durationMs": 1713
+      }
+    },
+    {
+      "label": "check-threat-model",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/10-check-threat-model/command.json",
+        "sha256": "2b5d0d857c607a4a0249f4d1bc7dced73bd56fa214a5550696c8df65382215c3",
+        "bytes": 2803
+      },
+      "projection": {
+        "cmd": "npm run -s check:threat-model",
+        "exit": 0,
+        "durationMs": 213
+      }
+    },
+    {
+      "label": "check-api-ref",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/11-check-api-ref/command.json",
+        "sha256": "941a8e3c796d2f13d92851e28bd2477910db8f2ccac1f7e6c569d13a269ed3f5",
+        "bytes": 2792
+      },
+      "projection": {
+        "cmd": "npm run -s check:api-ref",
+        "exit": 0,
+        "durationMs": 182
+      }
+    },
+    {
+      "label": "check-schemas",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/12-check-schemas/command.json",
+        "sha256": "c0899cbb6d18ca353ef76ce43745b150d8104cdc18942c8551e7b2ab8610c97b",
+        "bytes": 2792
+      },
+      "projection": {
+        "cmd": "npm run -s check:schemas",
+        "exit": 0,
+        "durationMs": 577
+      }
+    },
+    {
+      "label": "check-gates",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/13-check-gates/command.json",
+        "sha256": "17d396e11d00b50fcbc7a6d9bbb2e1598d91cb3821aec57e2364e47914535add",
+        "bytes": 2789
+      },
+      "projection": {
+        "cmd": "npm run -s check:gates",
+        "exit": 0,
+        "durationMs": 280
+      }
+    },
+    {
+      "label": "check-qualification",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/14-check-qualification/command.json",
+        "sha256": "ed9b2ba9b6b486c926741549a49ec8c9d7f8c8c8fb23136837fa9b74ad13e5fa",
+        "bytes": 2805
+      },
+      "projection": {
+        "cmd": "npm run -s check:qualification",
+        "exit": 0,
+        "durationMs": 1522
+      }
+    },
+    {
+      "label": "check-catalog-currency",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/15-check-catalog-currency/command.json",
+        "sha256": "9de801f8818e9e50079671d4339a7e9fd115cbebd70797405a39b80ff1f8619d",
+        "bytes": 2811
+      },
+      "projection": {
+        "cmd": "npm run -s check:catalog-currency",
+        "exit": 0,
+        "durationMs": 379
+      }
+    },
+    {
+      "label": "check-catalog-changelog",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/16-check-catalog-changelog/command.json",
+        "sha256": "eb86cf93d7e949748c9ea708a39500fa9045e1f2aec0e75d592a122f25d6124b",
+        "bytes": 2889
+      },
+      "projection": {
+        "cmd": "npm run -s check:catalog-changelog -- --base-ref dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "exit": 0,
+        "durationMs": 780
+      }
+    },
+    {
+      "label": "check-catalog-admission",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/17-check-catalog-admission/command.json",
+        "sha256": "b0da2e6f40571b50bcf2ac482acc05d5cb90c5c5356d36c481b9b8df09ca12fb",
+        "bytes": 2815
+      },
+      "projection": {
+        "cmd": "npm run -s check:catalog-admission",
+        "exit": 0,
+        "durationMs": 1378
+      }
+    },
+    {
+      "label": "check-industry-guides",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/18-check-industry-guides/command.json",
+        "sha256": "ac07b5a39bc2de181a309d789f27415e2c2a57ae5c36b19bd500a57446748104",
+        "bytes": 2809
+      },
+      "projection": {
+        "cmd": "npm run -s check:industry-guides",
+        "exit": 0,
+        "durationMs": 805
+      }
+    },
+    {
+      "label": "check-regulatory-calendar",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/19-check-regulatory-calendar/command.json",
+        "sha256": "9832acad0a3cdaf20b23613d2523e04c8ccbfde3f5fc05a3358a64e2f647e773",
+        "bytes": 2817
+      },
+      "projection": {
+        "cmd": "npm run -s check:regulatory-calendar",
+        "exit": 0,
+        "durationMs": 236
+      }
+    },
+    {
+      "label": "check-clean-source",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/20-check-clean-source/command.json",
+        "sha256": "3809e0fb6622d8e60b8e4996879b94082e975513b03144eaad7017605b31faae",
+        "bytes": 2805
+      },
+      "projection": {
+        "cmd": "npm run -s check:clean-source",
+        "exit": 0,
+        "durationMs": 57752
+      }
+    },
+    {
+      "label": "check-duplicates",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/21-check-duplicates/command.json",
+        "sha256": "6df9e1be50d43bafbe8293b4cc70e2050c413658dfe66e13f5c045f108e4fd38",
+        "bytes": 2799
+      },
+      "projection": {
+        "cmd": "npm run -s check:duplicates",
+        "exit": 0,
+        "durationMs": 738
+      }
+    },
+    {
+      "label": "check-dead-code",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/22-check-dead-code/command.json",
+        "sha256": "fe077d64277c056b846ae973fb4e32206bd508416b02578131110325a2cf9df3",
+        "bytes": 2798
+      },
+      "projection": {
+        "cmd": "npm run -s check:dead-code",
+        "exit": 0,
+        "durationMs": 3325
+      }
+    },
+    {
+      "label": "release-notes-check",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/23-release-notes-check/command.json",
+        "sha256": "dc439d697c3d0d81522b02a27ba487c4b4697001ae958c176c98dc4b5a1ff71d",
+        "bytes": 2822
+      },
+      "projection": {
+        "cmd": "npm run -s release:notes -- --check",
+        "exit": 0,
+        "durationMs": 191
+      }
+    }
+  ],
+  "focusedCommand": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/focused-final-source/command.json",
+    "sha256": "160bee5d80da4cc7f6996449aee09ff3c5672d18e28c2eb3e3f626a64805b68e",
+    "bytes": 2050
+  },
+  "focusedReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/focused-final-source-report.json",
+    "sha256": "10ad94ceec9918b7ea85d50518c650cb950dd246af04ee327a8eb704e3c039e3",
+    "bytes": 191198
+  },
+  "ownCommand": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/own-final-source-green/command.json",
+    "sha256": "454c82f59cc9d9232ddb4a2f1a02e5b34dbd7b0c4b31a16750ddffbe2baf4197",
+    "bytes": 1645
+  },
+  "ownReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/own-final-source-green-report.json",
+    "sha256": "6e1cc6fc7d0509cfee10aefe5ec708654626860cfd68dc4ee7a301deef365124",
+    "bytes": 77916
+  },
+  "supportingCommands": [
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/own-final-source-green/command.json",
+        "sha256": "454c82f59cc9d9232ddb4a2f1a02e5b34dbd7b0c4b31a16750ddffbe2baf4197",
+        "bytes": 1645
+      },
+      "projection": {
+        "cmd": "npx --no-install vitest run --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/own-final-source-green-report.json tests/catalog/stations/governance",
+        "exit": 0,
+        "durationMs": 3112
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/01-build/command.json",
+        "sha256": "1c28ccac5dcdb44c1c7f556e4a90fa342994a900b6da01bfbdf1c4a2017c7633",
+        "bytes": 2779
+      },
+      "projection": {
+        "cmd": "npm run -s build",
+        "exit": 0,
+        "durationMs": 46085
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/02-typecheck/command.json",
+        "sha256": "0aa8a8a379d1c52659f6454c6e3b867934628c89c3b613cd597952ab6c7c98df",
+        "bytes": 2785
+      },
+      "projection": {
+        "cmd": "npm run -s typecheck",
+        "exit": 0,
+        "durationMs": 28363
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/03-typecheck-tests/command.json",
+        "sha256": "9b8eb25fc17a21d319f4884a8ed3177b0c996270492e5f551c6f699e9989aeec",
+        "bytes": 2797
+      },
+      "projection": {
+        "cmd": "npm run -s typecheck:tests",
+        "exit": 0,
+        "durationMs": 41631
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/04-lint/command.json",
+        "sha256": "8dda2c817c40f196e8323ec78d6d64875b3849816be5ec55897310cde1304d0a",
+        "bytes": 2776
+      },
+      "projection": {
+        "cmd": "npm run -s lint",
+        "exit": 0,
+        "durationMs": 4540
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/05-check-counts/command.json",
+        "sha256": "dddef52c59ecb38eb57f4c4d5ff7d619f37b82f558ad23ebea943e1504863ef7",
+        "bytes": 2790
+      },
+      "projection": {
+        "cmd": "npm run -s check:counts",
+        "exit": 0,
+        "durationMs": 739
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/06-check-docs-drift/command.json",
+        "sha256": "316875ef8fc739639ea62c97bb0ac298cfc03db73bbb90000999a52a87147ba0",
+        "bytes": 2799
+      },
+      "projection": {
+        "cmd": "npm run -s check:docs-drift",
+        "exit": 0,
+        "durationMs": 440
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/07-check-freeze/command.json",
+        "sha256": "ff1d9bae6dfcdd40d3c0483cb6986614cb066fee68ce2c1484e3051979c11318",
+        "bytes": 2868
+      },
+      "projection": {
+        "cmd": "npm run -s check:freeze -- --base-ref dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "exit": 0,
+        "durationMs": 1696
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/08-check-citations/command.json",
+        "sha256": "400cc55fdfe20638d5df4186c8aea4ab39be47c4a7ccee26e57970686bd5e231",
+        "bytes": 2797
+      },
+      "projection": {
+        "cmd": "npm run -s check:citations",
+        "exit": 0,
+        "durationMs": 331
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/09-check-architecture-boundaries/command.json",
+        "sha256": "d2d8e0534b97f4d27d4cf00a62f7864b7733d9ff9d60eb6d361869e89108c5fb",
+        "bytes": 2829
+      },
+      "projection": {
+        "cmd": "npm run -s check:architecture-boundaries",
+        "exit": 0,
+        "durationMs": 1713
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/10-check-threat-model/command.json",
+        "sha256": "2b5d0d857c607a4a0249f4d1bc7dced73bd56fa214a5550696c8df65382215c3",
+        "bytes": 2803
+      },
+      "projection": {
+        "cmd": "npm run -s check:threat-model",
+        "exit": 0,
+        "durationMs": 213
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/11-check-api-ref/command.json",
+        "sha256": "941a8e3c796d2f13d92851e28bd2477910db8f2ccac1f7e6c569d13a269ed3f5",
+        "bytes": 2792
+      },
+      "projection": {
+        "cmd": "npm run -s check:api-ref",
+        "exit": 0,
+        "durationMs": 182
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/12-check-schemas/command.json",
+        "sha256": "c0899cbb6d18ca353ef76ce43745b150d8104cdc18942c8551e7b2ab8610c97b",
+        "bytes": 2792
+      },
+      "projection": {
+        "cmd": "npm run -s check:schemas",
+        "exit": 0,
+        "durationMs": 577
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/13-check-gates/command.json",
+        "sha256": "17d396e11d00b50fcbc7a6d9bbb2e1598d91cb3821aec57e2364e47914535add",
+        "bytes": 2789
+      },
+      "projection": {
+        "cmd": "npm run -s check:gates",
+        "exit": 0,
+        "durationMs": 280
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/14-check-qualification/command.json",
+        "sha256": "ed9b2ba9b6b486c926741549a49ec8c9d7f8c8c8fb23136837fa9b74ad13e5fa",
+        "bytes": 2805
+      },
+      "projection": {
+        "cmd": "npm run -s check:qualification",
+        "exit": 0,
+        "durationMs": 1522
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/15-check-catalog-currency/command.json",
+        "sha256": "9de801f8818e9e50079671d4339a7e9fd115cbebd70797405a39b80ff1f8619d",
+        "bytes": 2811
+      },
+      "projection": {
+        "cmd": "npm run -s check:catalog-currency",
+        "exit": 0,
+        "durationMs": 379
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/16-check-catalog-changelog/command.json",
+        "sha256": "eb86cf93d7e949748c9ea708a39500fa9045e1f2aec0e75d592a122f25d6124b",
+        "bytes": 2889
+      },
+      "projection": {
+        "cmd": "npm run -s check:catalog-changelog -- --base-ref dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+        "exit": 0,
+        "durationMs": 780
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/17-check-catalog-admission/command.json",
+        "sha256": "b0da2e6f40571b50bcf2ac482acc05d5cb90c5c5356d36c481b9b8df09ca12fb",
+        "bytes": 2815
+      },
+      "projection": {
+        "cmd": "npm run -s check:catalog-admission",
+        "exit": 0,
+        "durationMs": 1378
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/18-check-industry-guides/command.json",
+        "sha256": "ac07b5a39bc2de181a309d789f27415e2c2a57ae5c36b19bd500a57446748104",
+        "bytes": 2809
+      },
+      "projection": {
+        "cmd": "npm run -s check:industry-guides",
+        "exit": 0,
+        "durationMs": 805
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/19-check-regulatory-calendar/command.json",
+        "sha256": "9832acad0a3cdaf20b23613d2523e04c8ccbfde3f5fc05a3358a64e2f647e773",
+        "bytes": 2817
+      },
+      "projection": {
+        "cmd": "npm run -s check:regulatory-calendar",
+        "exit": 0,
+        "durationMs": 236
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/20-check-clean-source/command.json",
+        "sha256": "3809e0fb6622d8e60b8e4996879b94082e975513b03144eaad7017605b31faae",
+        "bytes": 2805
+      },
+      "projection": {
+        "cmd": "npm run -s check:clean-source",
+        "exit": 0,
+        "durationMs": 57752
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/21-check-duplicates/command.json",
+        "sha256": "6df9e1be50d43bafbe8293b4cc70e2050c413658dfe66e13f5c045f108e4fd38",
+        "bytes": 2799
+      },
+      "projection": {
+        "cmd": "npm run -s check:duplicates",
+        "exit": 0,
+        "durationMs": 738
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/22-check-dead-code/command.json",
+        "sha256": "fe077d64277c056b846ae973fb4e32206bd508416b02578131110325a2cf9df3",
+        "bytes": 2798
+      },
+      "projection": {
+        "cmd": "npm run -s check:dead-code",
+        "exit": 0,
+        "durationMs": 3325
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/solo-20261019/check-20261019T083813-73a88bee/23-release-notes-check/command.json",
+        "sha256": "dc439d697c3d0d81522b02a27ba487c4b4697001ae958c176c98dc4b5a1ff71d",
+        "bytes": 2822
+      },
+      "projection": {
+        "cmd": "npm run -s release:notes -- --check",
+        "exit": 0,
+        "durationMs": 191
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": null,
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/focused-final-source/command.json",
+        "sha256": "160bee5d80da4cc7f6996449aee09ff3c5672d18e28c2eb3e3f626a64805b68e",
+        "bytes": 2050
+      },
+      "projection": {
+        "cmd": "npx --no-install vitest run --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/focused-final-source-report.json tests/catalog/stations/governance tests/catalog/governance tests/catalog/admission tests/catalog/compiler tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/stationTaxonomy.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts",
+        "exit": 0,
+        "durationMs": 35127
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/result.json",
+        "sha256": "ee2060f397c0e7965ab80465e3595918aa3cde86d8f59a158654729133b28229",
+        "bytes": 16934
+      },
+      "projection": {
+        "cmd": "npx --no-install vitest run --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/report.json",
+        "exit": 1,
+        "durationMs": 3398547
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/command.json",
+        "sha256": "cb91a9f7950b77f7c9a29b3c5d4a725f12801a8d5a8ce12524b738c3d4bd9f17",
+        "bytes": 19444
+      },
+      "projection": {
+        "cmd": "npx --no-install vitest run tests/apiRouterResponseParity.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/report.json",
+        "exit": 1,
+        "durationMs": 8241
+      },
+      "sourceHead": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/command.json",
+        "sha256": "a574f94069daaae4d378c3d8a80cb2183c83c90236bc1259f0f09810e6a3ed1b",
+        "bytes": 19430
+      },
+      "projection": {
+        "cmd": "npx --no-install vitest run tests/publicDocsGraph.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/report.json",
+        "exit": 1,
+        "durationMs": 1212
+      },
+      "sourceHead": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/command.json",
+        "sha256": "6b30fb23c23c2215130cfdaa759a4bc48bd872f40c5b28958a3c0698895ccd8a",
+        "bytes": 19439
+      },
+      "projection": {
+        "cmd": "npx --no-install vitest run tests/time/checkpointWindow.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+        "exit": 1,
+        "durationMs": 3795
+      },
+      "sourceHead": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/command.json",
+        "sha256": "855d0e3e2411dc64e42689823a85ce259163d51d7b079c1e45363846c8d6c641",
+        "bytes": 19418
+      },
+      "projection": {
+        "cmd": "npx --no-install vitest run tests/time/tsaGrant.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/report.json",
+        "exit": 1,
+        "durationMs": 2415
+      },
+      "sourceHead": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/initial-green/command.json",
+        "sha256": "649fc3c0c3ecbf1f58fc373ff6360a2981311d84572f0448f31e007facc95180",
+        "bytes": 3607
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts tests/catalog/stations/governance/fixtures.test.ts tests/catalog/stations/governance/overlay.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/initial-green/report.json",
+        "exit": 0,
+        "durationMs": 3640
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/restored-green/command.json",
+        "sha256": "516477948e4dabbef952e96a7211492ff26cd312cc7e00f6f22156575a64312e",
+        "bytes": 3610
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts tests/catalog/stations/governance/fixtures.test.ts tests/catalog/stations/governance/overlay.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/restored-green/report.json",
+        "exit": 0,
+        "durationMs": 2456
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/01-shared-binding/command.json",
+        "sha256": "84cb73ef89be8c6702bb4ab59eaefa59bca61b52010a6f63bad6b3005e003557",
+        "bytes": 9450
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ compares\\ every\\ subject/control/version/plan\\ binding\\ field|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ an\\ actual\\ same\\-case\\ authorized\\ decision,\\ not\\ the\\ prompt\\ or\\ agent\\ recommendation|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ captures\\ actual\\ seeded\\ body\\ bytes\\ only\\ for\\ contracted\\ inference,\\ atomically|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ uses\\ only\\ the\\ ten\\ explicitly\\ synthetic\\ registered\\ IDs\\ and\\ blocks\\ unknown\\ filing|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ classifies\\ CUI\\ from\\ the\\ source\\ store\\ despite\\ no\\ marking;\\ binds\\ document\\ and\\ boundary\\ before\\ capture)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/01-shared-binding/report.json",
+        "exit": 1,
+        "durationMs": 461
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/02-utc-precision/command.json",
+        "sha256": "a700b0e3058e2920bcf78d6b5475bc678922048b3517b1e7c22ab46356ab4e36",
+        "bytes": 5276
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ lossy/impossible\\ UTC\\ time\\ 2026\\-10\\-18T12:00:00\\.0001Z|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/02-utc-precision/report.json",
+        "exit": 1,
+        "durationMs": 467
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/03-nonblank-fields/command.json",
+        "sha256": "0c3b935d458d4d9cdcbbb425b1a4861f5b92058027b56832ec579fc94689d9f0",
+        "bytes": 4302
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/03-nonblank-fields/report.json",
+        "exit": 1,
+        "durationMs": 503
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/04-canonical-endpoint/command.json",
+        "sha256": "dd5aa62427b791cc4551513bc18aea017c2f48518625fc838f9c4266545a4954",
+        "bytes": 8841
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ http://inference\\.fixture\\.invalid/v1|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ https://u:p@inference\\.fixture\\.invalid/v1|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ https://inference\\.fixture\\.invalid/v1\\?training=1|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ https://inference\\.fixture\\.invalid/a/\\.\\./v1|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ https://inference\\.fixture\\.invalid/v1\\#x)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/04-canonical-endpoint/report.json",
+        "exit": 1,
+        "durationMs": 484
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/05-case-human-record/command.json",
+        "sha256": "1e2ee0315e84b582d2159418f1faf7f72c2b3bab6c1ce1d1694caa400ede47f4",
+        "bytes": 5280
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ an\\ actual\\ same\\-case\\ authorized\\ decision,\\ not\\ the\\ prompt\\ or\\ agent\\ recommendation|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ binds\\ the\\ disclosure\\ and\\ appeal\\ notice;\\ refuses\\ a\\ future\\ human\\ decision)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/05-case-human-record/report.json",
+        "exit": 1,
+        "durationMs": 480
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/06-case-notice/command.json",
+        "sha256": "9f5eb022794ca3ed201816840398d041e8bac2955b2cbd88cefab8eae7880467",
+        "bytes": 5137
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ binds\\ the\\ disclosure\\ and\\ appeal\\ notice;\\ refuses\\ a\\ future\\ human\\ decision|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 1/negative/oracle\\-missing\\-appeal\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/06-case-notice/report.json",
+        "exit": 1,
+        "durationMs": 479
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/07-activation-signature/command.json",
+        "sha256": "f29abab5bc796eea8581d9ef27639098033c1e60f87a9f624373a6ac5f56ca1b",
+        "bytes": 4254
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ verifies\\ activation\\ bytes\\ against\\ the\\ independently\\ pinned\\ fixture\\ authority)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/07-activation-signature/report.json",
+        "exit": 1,
+        "durationMs": 484
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/08-fria-assessor/command.json",
+        "sha256": "c135965e17ae0d200e02c272356f599b97700cf65251dcdc9f1878ba80ac464c",
+        "bytes": 4311
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/08-fria-assessor/report.json",
+        "exit": 1,
+        "durationMs": 481
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/09-fria-authority/command.json",
+        "sha256": "d4cc957190feac6ffc9a84e48d392af77bbd57cd7294695655188d3fad270ea2",
+        "bytes": 4314
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/09-fria-authority/report.json",
+        "exit": 1,
+        "durationMs": 469
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/10-fria-dates-ignored/command.json",
+        "sha256": "29b2c799cdebde2d833eba250fcb0880e7196d80bfd809a601f4d5e192e5e224",
+        "bytes": 5239
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 2/negative/oracle\\-fria\\-late\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/10-fria-dates-ignored/report.json",
+        "exit": 1,
+        "durationMs": 489
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/11-canary-observed/command.json",
+        "sha256": "a19f8c1b376efbc4ae9be8ad0f4405fdf117db6d045bffc1744239cc74638e69",
+        "bytes": 4240
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ captures\\ actual\\ seeded\\ body\\ bytes\\ only\\ for\\ contracted\\ inference,\\ atomically)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/11-canary-observed/report.json",
+        "exit": 1,
+        "durationMs": 489
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/12-canary-egress/command.json",
+        "sha256": "c73179a0cd739537d7597bf29d17053a7c75808dcffd66f085ce7eef47eb433b",
+        "bytes": 8019
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ captures\\ actual\\ seeded\\ body\\ bytes\\ only\\ for\\ contracted\\ inference,\\ atomically|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ refuses\\ endpoint\\ ambiguity\\ https://inference\\.fixture\\.invalid\\.evil/v1|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 3/negative/oracle\\-telemetry\\-purpose\\.json|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 3/negative/oracle\\-training\\-purpose\\.json|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 3/negative/oracle\\-unlisted\\-endpoint\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/12-canary-egress/report.json",
+        "exit": 1,
+        "durationMs": 477
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/13-cui-classification/command.json",
+        "sha256": "3537449f479721a540c418db0a246ee45db28bee04777ede0aeba9d50401e6cd",
+        "bytes": 4306
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ classifies\\ CUI\\ from\\ the\\ source\\ store\\ despite\\ no\\ marking;\\ binds\\ document\\ and\\ boundary\\ before\\ capture)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/13-cui-classification/report.json",
+        "exit": 1,
+        "durationMs": 476
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/14-cui-boundary/command.json",
+        "sha256": "0401b11236db4e3ebc82658eda9f7fab80d077b0aeca0938f2ae820227164305",
+        "bytes": 6148
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ classifies\\ CUI\\ from\\ the\\ source\\ store\\ despite\\ no\\ marking;\\ binds\\ document\\ and\\ boundary\\ before\\ capture|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 6/negative/oracle\\-public\\-endpoint\\.json|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 6/negative/oracle\\-unmarked\\-cui\\-store\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/14-cui-boundary/report.json",
+        "exit": 1,
+        "durationMs": 482
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/15-unknown-citation-accepted/command.json",
+        "sha256": "4f080f0c8f16db501ca87af40133f4fe44390d70028644e4dce7d0df8a4a54ff",
+        "bytes": 5218
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ uses\\ only\\ the\\ ten\\ explicitly\\ synthetic\\ registered\\ IDs\\ and\\ blocks\\ unknown\\ filing|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 4/negative/oracle\\-unknown\\-citation\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/15-unknown-citation-accepted/report.json",
+        "exit": 1,
+        "durationMs": 475
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/16-explanation-human/command.json",
+        "sha256": "4a024e4527d88bfd2e22079f0c61e3ebe5ae07cd53cd2d24e184979ed5740c03",
+        "bytes": 4145
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 5/negative/oracle\\-auto\\-reply\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/16-explanation-human/report.json",
+        "exit": 1,
+        "durationMs": 481
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/17-explanation-identity/command.json",
+        "sha256": "082e5c771181b0c3207c3e5a289aa03d53d3ef217a9beb66cda100f8192b60ab",
+        "bytes": 4313
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ a\\ same\\-request\\ human\\ route\\ by\\ an\\ authorized\\ reviewer\\ within\\ the\\ inclusive\\ synthetic\\ window)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/17-explanation-identity/report.json",
+        "exit": 1,
+        "durationMs": 467
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/18-explanation-reviewer/command.json",
+        "sha256": "966dee24503ab53320dadcdf0774b3a4bb8a9cbec74379da8b287cdd1b94c18e",
+        "bytes": 4177
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 5/negative/oracle\\-unauthorized\\-reviewer\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/18-explanation-reviewer/report.json",
+        "exit": 1,
+        "durationMs": 485
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/19-explanation-window/command.json",
+        "sha256": "d48e3f42c2e04b21ad66546b6d368b2ec38eca10616597474b631df31456ebeb",
+        "bytes": 5224
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ a\\ same\\-request\\ human\\ route\\ by\\ an\\ authorized\\ reviewer\\ within\\ the\\ inclusive\\ synthetic\\ window|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 5/negative/oracle\\-late\\-route\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/19-explanation-window/report.json",
+        "exit": 1,
+        "durationMs": 477
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/20-adapter-subject-binding/command.json",
+        "sha256": "ad9f939d5bfefa92e730350e8372b5bdcee124f40d86b79f54e544f53d31325a",
+        "bytes": 4135
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ actual\\ compiled\\ policy\\ \\(P3\\-14\\)\\ refuses\\ a\\ fixture\\ subject\\ outside\\ the\\ actual\\ compiled\\ deployment)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/20-adapter-subject-binding/report.json",
+        "exit": 1,
+        "durationMs": 1918
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/21-expected-control-context/command.json",
+        "sha256": "43b3b15094a9b400747d6f6403fc52a2ae932be6fcb8cfe3ada871458d4a82e6",
+        "bytes": 8942
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ caseworker:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ fria:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ canary:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ citation:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ explanation:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ cui:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/21-expected-control-context/report.json",
+        "exit": 1,
+        "durationMs": 491
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/22-adapter-not-applicable-requirement/command.json",
+        "sha256": "456f94b55d7e4421a5fe202a15ac61f1f1cbf145500c97feeb0e9a7221ac9c4c",
+        "bytes": 4174
+      },
+      "projection": {
+        "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ actual\\ compiled\\ policy\\ \\(P3\\-14\\)\\ refuses\\ a\\ nonselected\\ requirement\\ with\\ a\\ matching\\ compiled\\ subject)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/22-adapter-not-applicable-requirement/report.json",
+        "exit": 1,
+        "durationMs": 1915
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    },
+    {
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/case-probe-final-source/command.json",
+        "sha256": "2d2300b76c8624e8f8362699918091d76e3cc3d9bef58116e8fc93c5b13c83d4",
+        "bytes": 1550
+      },
+      "projection": {
+        "cmd": "npx --no-install tsx /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/probe-governance-386a9.ts 386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+        "exit": 0,
+        "durationMs": 2009
+      },
+      "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "role": "ACTUAL_SUPPORTING_COMMAND"
+    }
+  ]
+}

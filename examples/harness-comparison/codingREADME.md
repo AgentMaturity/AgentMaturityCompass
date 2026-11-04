@@ -37,6 +37,13 @@ Create a reviewed JSON configuration with these fields:
   "maxRequests": 12,
   "contextWindow": 8192,
   "temperature": 0,
+  "containment": {
+    "cli": "/opt/homebrew/bin/docker",
+    "host": "unix:///Users/REPLACE/.colima/REPLACE/docker.sock",
+    "image": "sha256:REPLACE_WITH_THE_LOCAL_node:22-bookworm-slim_IMAGE_ID",
+    "hostGateway": "192.168.5.2",
+    "mountableRoot": "/Users/REPLACE"
+  },
   "targets": [
     {
       "id": "amc",
@@ -71,6 +78,16 @@ Create a reviewed JSON configuration with these fields:
   ]
 }
 ```
+
+`containment` names the container runtime the oracle and the Pi binding use: an
+absolute Docker CLI, its `unix:///` socket, a `node:22` image pinned by ID or
+digest, the address at which containers reach the host, and the directory the
+runtime can bind-mount (run `amc bench harness-compare` with `TMPDIR` under it).
+The oracle evaluates the model-written solution only in that container (no
+network, read-only root, no capabilities, the nobody user, no mounts). Pi runs
+only in a container whose only network peer is a relay to the trial's gateway.
+Without a reachable runtime both refuse, and the trial reads "not measured:
+containment unavailable"; neither runs on the host.
 
 Values above are placeholders, not source or model attestations. Do not put API
 keys, account tokens, private prompts or secrets in this public configuration.
@@ -115,10 +132,11 @@ from a local-inference study.
 Native system prompts and tool schemas differ and remain part of each target.
 AMC signs repository-only read/write/search grants; Pi and DSH retain their own
 native permission semantics, recorded in adapter receipts. These are not equal
-OS confinement boundaries. The runner and import-free bounded oracle VM are
-intended for trusted repair fixtures, not hostile programs. Direct network calls,
-host access and arbitrary detached processes are not machine-wide sandboxed by
-this example. Do not turn this small corpus into an adversarial safety claim.
+OS confinement boundaries. Pi runs in its container (the container runtime's
+isolation, not an AMC claim); AMC and DSH run on the host. The oracle's vm layer
+is defense in depth inside its container, not the boundary. DSH's direct
+network calls, host access and detached processes are not sandboxed by this
+example. Do not turn this small corpus into an adversarial safety claim.
 
 Published results must keep observed coding outcomes, usage qualification,
 governance evidence, human usability and wider platform qualification separate.

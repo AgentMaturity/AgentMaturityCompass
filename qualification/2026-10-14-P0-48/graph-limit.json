@@ -1,0 +1,9 @@
+{
+  "navigationOnly": true,
+  "graphSource": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+  "graphBuilt": "2026-09-08",
+  "installedGraphify": "0.9.74",
+  "refreshPin": "0.9.56",
+  "scope": "CI_WORKFLOW_PATH and foreignSubagentRunner.ts vocabulary query; current source and YAML were independently verified",
+  "limitations": "Stale graph does not qualify current CI behavior; no refresh, watcher or server"
+}

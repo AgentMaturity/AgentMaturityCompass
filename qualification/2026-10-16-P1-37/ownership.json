@@ -1,0 +1,2608 @@
+{
+  "initialRootPreflight": {
+    "capturedUtc": "2026-10-16T10:27:12.386814+00:00",
+    "sourceHead": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+    "registries": [
+      {
+        "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "sha256": "f39a1f1f9b00c126026e68887f5eaddc5e06438f981c3b232828d86aed6a9281"
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+        "sha256": "9298f65e3aa1c45c78d511a40c07a1cc588c4db38606fc36b80b90a7405c6960"
+      }
+    ],
+    "worktrees": 163,
+    "ownershipRows": [
+      {
+        "root": "/Users/sid/.codex/worktrees/a4-bottom-up/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/finance-fixture/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/global-regulatory-guidance/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/low-priority-jurisdictions/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/oidc-hardening/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-49-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/.codex/worktrees/toolhub-journal/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/amc-1545-stop-operator",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/amc-1545-stop-runtime",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/amc-1546-agent-auth-tests",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-lifecycle",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-mutation-prep",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-session-tests",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-storage",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/amc-cancellation-candidate-prep",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/amc-stop-auth-mutation-prep",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/cos-closure-map",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/cos-human-first-use",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/cos-installed-spill",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/cos-observer-guide",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/cos-spill-boundaries",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/cos-spill-commands",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/cos-study-capture",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/domain-proof-lane",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0635",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0636",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0637",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0638",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0639",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0640",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0641",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0642",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0643",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0644",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0645",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0646",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0647",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0648",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0649",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0650",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0651",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0652",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0653",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0654",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0655",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0656",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0657",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0658",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0659",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0660",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0661",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0662",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0663",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0664",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0665",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0666",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0667",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/gap-0668",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/interesting-haslett-d9efa9",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/combine1",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-14",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-26",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-28",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-28f",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-30",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-30f",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31b",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31c",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-32",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-34",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-35",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-36",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-36f",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-56",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-06",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-08",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-14",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-18",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-22",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-23",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-27",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-40",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-41",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-48",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-52",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-78",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p2-01t",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/state-of-art-20260713",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/sweet-merkle-71246c",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/vigilant-merkle-2d8549",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_0b845f07-2cd-4",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-17",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-18",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-19",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-20",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-1",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-10",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-2",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-20",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-3",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-4",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-5",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-6",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-7",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-8",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-9",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-15",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-16",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-5",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-6",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_870dd21b-f1e-5",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_870dd21b-f1e-6",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-1",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-10",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-2",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-3",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-4",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-5",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-6",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-7",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-8",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-9",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-1",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-2",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-3",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-4",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-1",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-2",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-3",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-4",
+        "absent": true
+      },
+      {
+        "root": "/Users/sid/AgentMaturityCompass/.claude/worktrees/loving-germain-ac9c7f",
+        "absent": true
+      },
+      {
+        "path": "src/agent/compaction/promptPressure.ts",
+        "sourcePins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/compaction/promptPressure.ts",
+            "bytes": 3326,
+            "sha256": "8a6af01c5fe75ce4f252ad2d5be88a6f33f740165d8772c820a9052fc1d3b605"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass/src/agent/compaction/promptPressure.ts",
+            "bytes": 3326,
+            "sha256": "8a6af01c5fe75ce4f252ad2d5be88a6f33f740165d8772c820a9052fc1d3b605"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/agent/compaction/promptPressure.ts",
+            "bytes": 3326,
+            "sha256": "8a6af01c5fe75ce4f252ad2d5be88a6f33f740165d8772c820a9052fc1d3b605"
+          }
+        ]
+      },
+      {
+        "path": "src/agent/compaction/autoCompact.ts",
+        "sourcePins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/compaction/autoCompact.ts",
+            "bytes": 15090,
+            "sha256": "18c7389dd676b3fea419b1f326f75c5bcf586886eddf8edb87a87f9ee35c70bb"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass/src/agent/compaction/autoCompact.ts",
+            "bytes": 15090,
+            "sha256": "18c7389dd676b3fea419b1f326f75c5bcf586886eddf8edb87a87f9ee35c70bb"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/agent/compaction/autoCompact.ts",
+            "bytes": 15090,
+            "sha256": "18c7389dd676b3fea419b1f326f75c5bcf586886eddf8edb87a87f9ee35c70bb"
+          }
+        ]
+      },
+      {
+        "path": "src/agent/compaction/summaryPrompt.ts",
+        "sourcePins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/compaction/summaryPrompt.ts",
+            "bytes": 2312,
+            "sha256": "3f8efa1f61951a26893d63c3fa4dd0cb866749fec94c12fff271188765362d0d"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass/src/agent/compaction/summaryPrompt.ts",
+            "bytes": 2312,
+            "sha256": "3f8efa1f61951a26893d63c3fa4dd0cb866749fec94c12fff271188765362d0d"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/agent/compaction/summaryPrompt.ts",
+            "bytes": 2312,
+            "sha256": "3f8efa1f61951a26893d63c3fa4dd0cb866749fec94c12fff271188765362d0d"
+          }
+        ]
+      },
+      {
+        "path": "src/session/surfaceCompactionValidation.ts",
+        "sourcePins": [
+          {
+            "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/surfaceCompactionValidation.ts",
+            "bytes": 11644,
+            "sha256": "447f32b89135f0485f931a64c19c9492f59d2d732ab119fc6d4f55a2fa24a883"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass/src/session/surfaceCompactionValidation.ts",
+            "bytes": 11644,
+            "sha256": "447f32b89135f0485f931a64c19c9492f59d2d732ab119fc6d4f55a2fa24a883"
+          },
+          {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/session/surfaceCompactionValidation.ts",
+            "bytes": 11644,
+            "sha256": "447f32b89135f0485f931a64c19c9492f59d2d732ab119fc6d4f55a2fa24a883"
+          }
+        ]
+      }
+    ],
+    "reservation": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "sourcePins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/compaction/promptPressure.ts",
+        "bytes": 3326,
+        "sha256": "8a6af01c5fe75ce4f252ad2d5be88a6f33f740165d8772c820a9052fc1d3b605"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/compaction/autoCompact.ts",
+        "bytes": 15090,
+        "sha256": "18c7389dd676b3fea419b1f326f75c5bcf586886eddf8edb87a87f9ee35c70bb"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/compaction/summaryPrompt.ts",
+        "bytes": 2312,
+        "sha256": "3f8efa1f61951a26893d63c3fa4dd0cb866749fec94c12fff271188765362d0d"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/surfaceCompactionValidation.ts",
+        "bytes": 11644,
+        "sha256": "447f32b89135f0485f931a64c19c9492f59d2d732ab119fc6d4f55a2fa24a883"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/agentDriver.ts",
+        "bytes": 26416,
+        "sha256": "6feef547719a4eb9f58c863517643c5f3236a422f9fe2419edab8fec06b320db"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/loopTypes.ts",
+        "bytes": 12761,
+        "sha256": "9ddef9301d6d162f96db4008a542abb350e4d77a966748153ed637c44bce70a4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/sessionService.ts",
+        "bytes": 36194,
+        "sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/surfaceCompaction.ts",
+        "bytes": 12527,
+        "sha256": "53ac23c1d5485e1fb15d551acb4fcea765f0e9cd76f17682e8ed71da6620ff02"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/session/surfaceProjection.ts",
+        "bytes": 10043,
+        "sha256": "f1e18326b343ecb3f3ae9b63928d1ce5fb1f348c29b4a9f141983b72a2106956"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/stepRunner.ts",
+        "bytes": 8399,
+        "sha256": "49faf852d7927fa4020d4df9d3ad5b8cec214d312d86510cd2a0bb7f1015ac45"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/agent/requestRetry.ts",
+        "bytes": 12746,
+        "sha256": "15721e3ffd552925e87fc6b0cf01a1aa309dbf0bcca925196eb777da7b7f4fd7"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/surfaceCompaction.test.ts",
+        "bytes": 8961,
+        "sha256": "81440b4f3a587de870a2a4301abb0fc4e49eec8d4d5a13bee2ea264f8f0a2393"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/surfaceHistoryCompaction.test.ts",
+        "bytes": 17065,
+        "sha256": "655ea7fc64c19c7afda75cd46accba3bc0ed3821d984cca638ae8fdf2bd1888a"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+        "bytes": 636550,
+        "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+        "bytes": 5010,
+        "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/package.json",
+        "bytes": 8631,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-lock.yaml",
+        "bytes": 155432,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+      }
+    ],
+    "wip": {
+      "open": 13,
+      "excludedDependabot": 13,
+      "counted": 0,
+      "prs": [
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 33,
+          "title": "deps: bump the dev-dependencies group across 1 directory with 3 updates",
+          "updatedAt": "2026-07-10T20:35:08Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 28,
+          "title": "deps: bump better-sqlite3 from 12.8.0 to 12.11.1",
+          "updatedAt": "2026-06-22T06:27:11Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 27,
+          "title": "deps: bump semver from 7.7.4 to 7.8.5",
+          "updatedAt": "2026-06-22T06:25:16Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 21,
+          "title": "deps: bump commander from 14.0.3 to 15.0.0",
+          "updatedAt": "2026-07-09T20:50:37Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 20,
+          "title": "deps: bump inquirer from 13.3.2 to 14.0.2",
+          "updatedAt": "2026-07-09T20:50:36Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 19,
+          "title": "deps: bump yaml from 2.8.3 to 2.9.0",
+          "updatedAt": "2026-06-26T16:05:36Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 17,
+          "title": "deps: bump zod from 4.3.6 to 4.4.3",
+          "updatedAt": "2026-06-26T16:05:35Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 8,
+          "title": "ci: bump actions/setup-node from 4 to 6",
+          "updatedAt": "2026-05-22T07:31:27Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 7,
+          "title": "ci: bump azure/setup-helm from 4 to 5",
+          "updatedAt": "2026-05-22T07:31:26Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 6,
+          "title": "ci: bump docker/setup-buildx-action from 3 to 4",
+          "updatedAt": "2026-05-22T07:31:25Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 5,
+          "title": "ci: bump actions/deploy-pages from 4 to 5",
+          "updatedAt": "2026-05-22T07:31:24Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 4,
+          "title": "ci: bump actions/upload-artifact from 4 to 7",
+          "updatedAt": "2026-05-22T07:31:23Z"
+        },
+        {
+          "author": {
+            "is_bot": true,
+            "login": "app/dependabot"
+          },
+          "isDraft": false,
+          "number": 3,
+          "title": "deps: bump @modelcontextprotocol/sdk from 1.27.1 to 1.29.0",
+          "updatedAt": "2026-05-22T07:31:22Z"
+        }
+      ]
+    },
+    "hosted": [
+      {
+        "number": 33,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": "package-lock.json"
+            },
+            {
+              "path": "package.json"
+            }
+          ]
+        }
+      },
+      {
+        "number": 28,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": "package-lock.json"
+            },
+            {
+              "path": "package.json"
+            }
+          ]
+        }
+      },
+      {
+        "number": 27,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": "package-lock.json"
+            },
+            {
+              "path": "package.json"
+            }
+          ]
+        }
+      },
+      {
+        "number": 21,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": "package-lock.json"
+            },
+            {
+              "path": "package.json"
+            }
+          ]
+        }
+      },
+      {
+        "number": 20,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": "package-lock.json"
+            },
+            {
+              "path": "package.json"
+            }
+          ]
+        }
+      },
+      {
+        "number": 19,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": "package-lock.json"
+            },
+            {
+              "path": "package.json"
+            }
+          ]
+        }
+      },
+      {
+        "number": 17,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": "package-lock.json"
+            },
+            {
+              "path": "package.json"
+            }
+          ]
+        }
+      },
+      {
+        "number": 8,
+        "files": {
+          "totalCount": 6,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": ".github/workflows/amc-score.yml"
+            },
+            {
+              "path": ".github/workflows/ci.yml"
+            },
+            {
+              "path": ".github/workflows/docker-build.yml"
+            },
+            {
+              "path": ".github/workflows/nightly-compatibility-matrix.yml"
+            },
+            {
+              "path": ".github/workflows/npm-publish.yml"
+            },
+            {
+              "path": ".github/workflows/release.yml"
+            }
+          ]
+        }
+      },
+      {
+        "number": 7,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": ".github/workflows/ci.yml"
+            },
+            {
+              "path": ".github/workflows/docker-build.yml"
+            }
+          ]
+        }
+      },
+      {
+        "number": 6,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": ".github/workflows/docker-runner.yml"
+            },
+            {
+              "path": ".github/workflows/release.yml"
+            }
+          ]
+        }
+      },
+      {
+        "number": 5,
+        "files": {
+          "totalCount": 1,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": ".github/workflows/pages.yml"
+            }
+          ]
+        }
+      },
+      {
+        "number": 4,
+        "files": {
+          "totalCount": 3,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": ".github/workflows/ci.yml"
+            },
+            {
+              "path": ".github/workflows/docker-build.yml"
+            },
+            {
+              "path": ".github/workflows/nightly-compatibility-matrix.yml"
+            }
+          ]
+        }
+      },
+      {
+        "number": 3,
+        "files": {
+          "totalCount": 2,
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "path": "package-lock.json"
+            },
+            {
+              "path": "package.json"
+            }
+          ]
+        }
+      }
+    ],
+    "overlap": [],
+    "conditionalAllocation": "/private/tmp/amc-next-after-p124-20261016/p137-conditional-root-allocation.json",
+    "scope": "New tests/autoCompaction.test.ts only. Preserve all production source. Existing two suites first; no formal issue advancement.",
+    "D15Pending": true,
+    "formalDone": false
+  },
+  "narrowInitialWriteAdmission": {
+    "capturedUtc": "2026-10-16T10:27:37.065036+00:00",
+    "sourceHead": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+    "admittedPath": "tests/autoCompaction.test.ts",
+    "materializationConditional": "Root reads and accepts a sealed private proposal first.",
+    "d15": {
+      "phase": "p137-first-scope-d15",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/autoCompaction.test.ts",
+      "exit": 0,
+      "durationMs": 198,
+      "startedUtc": "2026-10-16T10:27:22.697996+00:00",
+      "endedUtc": "2026-10-16T10:27:22.909695+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-scope-d15/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 35373,
+        "ownedPgid": 35373,
+        "observedPgidAfterLaunch": 35373,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+          "--paths",
+          "tests/autoCompaction.test.ts"
+        ],
+        "startedUtc": "2026-10-16T10:27:22.697996+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "ownership": "163 exact target absences; four merged implementation modules match across R, primary and independent Claude clone; all source ownership remains reserved.",
+    "integratorAllocation": "/private/tmp/amc-next-after-p124-20261016/p137-conditional-root-allocation.json",
+    "previousSerialCheckpoint": "P1-24 bounded source and qualification commits complete; formal acceptance gaps preserved.",
+    "productionEditsAdmitted": false,
+    "sharedHelperEditsAdmitted": false,
+    "freezeOrQualityWaiver": false,
+    "formalDone": false
+  },
+  "countOverlayAdmission": {
+    "at": "2026-10-16T10:55:19.317481+00:00",
+    "paths": [
+      "README.md",
+      "CONTRIBUTING.md",
+      "website/index.html",
+      "website/lite.html",
+      "website/i18n.js",
+      "docs/content/show-hn-draft.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "d15": "p137-count-scope-d15 exit0, none",
+    "admittedChange": "Generated factual test-file count only: 1,675 to1,676 /1675to1676 /encoded1%2C675to1%2C676. Root will verify exact literal-only diff and no other changed tracked paths.",
+    "freezeAndCoverageBaselinesChangeAllowed": false,
+    "inventedPassingTestCountAllowed": false,
+    "originalsPreserved": true
+  },
+  "extraRegistryObservation": {
+    "schema": "amc-p137-extra-registry-observation/1",
+    "capturedUtc": "2026-10-16T11:02:25.963296+00:00",
+    "inventoryInput": {
+      "path": "/private/tmp/amc-next-after-p137-20261016/p207-readonly-preflight/worktree-registry-and-test-presence.json",
+      "bytes": 194963,
+      "sha256": "5996783583cc46a02095e5f431b5e3075e35b2a0fbe12bbccd841f707b19664b"
+    },
+    "qualificationFolderChecks": [
+      {
+        "path": "/Users/sid/.codex/worktrees/a4-bottom-up/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/finance-fixture/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/global-regulatory-guidance/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/low-priority-jurisdictions/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/oidc-hardening/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-46-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-47-historical-probes/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-49-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-50-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-52-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-54-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/toolhub-journal/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p0-29-gap-reconciliation/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p1-34-catalog-currency/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-18-oscal-v1/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p3-12-source-reconciliation/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/amc-1545-stop-operator/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/amc-1545-stop-runtime/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/amc-1546-agent-auth-tests/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-lifecycle/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-mutation-prep/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-session-tests/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/amc-1547-spill-storage/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/amc-cancellation-candidate-prep/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/amc-stop-auth-mutation-prep/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/cos-closure-map/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/cos-human-first-use/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/cos-installed-spill/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/cos-observer-guide/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/cos-spill-boundaries/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/cos-spill-commands/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/cos-study-capture/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/domain-proof-lane/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0635/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0636/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0637/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0638/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0639/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0640/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0641/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0642/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0643/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0644/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0645/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0646/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0647/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0648/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0649/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0650/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0651/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0652/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0653/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0654/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0655/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0656/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0657/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0658/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0659/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0660/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0661/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0662/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0663/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0664/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0665/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0666/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0667/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/gap-0668/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/hermes-knowledge-refresh-20260713/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/hermes-state-of-art-20260713/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/interesting-haslett-d9efa9/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/combine1/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-14/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-26/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-28/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-28f/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-30/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-30f/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31b/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-31c/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-32/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-34/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-35/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-36/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-36f/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p0-56/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-06/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-08/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-14/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-18/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-22/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-23/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-27/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-40/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-41/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-48/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-52/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-78/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p2-01t/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/state-of-art-20260713/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/sweet-merkle-71246c/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/vigilant-merkle-2d8549/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_0b845f07-2cd-4/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-17/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-18/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-19/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_3cbab9c8-0f5-20/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-1/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-10/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-2/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-20/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-3/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-4/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-5/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-6/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-7/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-8/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_5210e2f4-3ea-9/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-15/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-16/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-5/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_75d332bf-2ec-6/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_870dd21b-f1e-5/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_870dd21b-f1e-6/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-1/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-10/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-2/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-3/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-4/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-5/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-6/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-7/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-8/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_b05b1ca6-169-9/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-1/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-2/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-3/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_bea95acb-47c-4/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-1/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-2/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-3/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/wf_fc54d4b0-c89-4/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass/.claude/worktrees/loving-germain-ac9c7f/qualification/2026-10-16-P1-37",
+        "state": "absent",
+        "errno": 2
+      }
+    ],
+    "qualificationFoldersAll169Absent": true,
+    "extraXirpAutoCompactionTestChecks": [
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10/tests/autoCompaction.test.ts",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p0-29-gap-reconciliation/tests/autoCompaction.test.ts",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p1-34-catalog-currency/tests/autoCompaction.test.ts",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch/tests/autoCompaction.test.ts",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-18-oscal-v1/tests/autoCompaction.test.ts",
+        "state": "absent",
+        "errno": 2
+      },
+      {
+        "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p3-12-source-reconciliation/tests/autoCompaction.test.ts",
+        "state": "absent",
+        "errno": 2
+      }
+    ],
+    "extraSixAutoCompactionTestsAllAbsent": true,
+    "limits": [
+      "Read-only lstat observations at the recorded instant.",
+      "No ownership release or allocation inferred.",
+      "Original P1-37 newtest preflight covered the prior 163 registrations; this observation adds the six Xirp roots only.",
+      "No R changes, runtime, D15 check or hosted overlap refresh."
+    ]
+  },
+  "receiptAdmission": {
+    "at": "2026-10-16T11:04:05.820921+00:00",
+    "admittedNewFolder": "qualification/2026-10-16-P1-37",
+    "sourceCommit": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+    "independentInventory": {
+      "path": "/private/tmp/amc-next-after-p137-20261016/p207-readonly-preflight/p137-extra-registry-observation.json",
+      "bytes": 29773,
+      "sha256": "637d06c90f7c2f0066db80f2d31edff6148eb830e843806cbc620ea3c681f02e"
+    },
+    "exactFolderAbsences": 169,
+    "priorNewTestInventory": 163,
+    "additionalHistoricalXirpNewTestAbsences": 6,
+    "D15": "p137-receipt-scope-d15 exit0 none",
+    "hostedAll13All30PathsRead": true,
+    "touchConflictsIncludingDependabot": [],
+    "countedWipExcludingOnlyVerifiedDependabot": 0,
+    "scope": "Only bounded qualification artifacts; no source/helper/CLI/guard/baseline/held-decision edits. Formal acceptance stays open.",
+    "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "ordinaryValidatorRequired": true
+  },
+  "hostedRefresh": {
+    "at": "2026-10-16T10:57:33.320682+00:00",
+    "response": {
+      "data": {
+        "repository": {
+          "pullRequests": {
+            "totalCount": 13,
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "number": 3,
+                "title": "deps: bump @modelcontextprotocol/sdk from 1.27.1 to 1.29.0",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:22Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 4,
+                "title": "ci: bump actions/upload-artifact from 4 to 7",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:23Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 3,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/ci.yml"
+                    },
+                    {
+                      "path": ".github/workflows/docker-build.yml"
+                    },
+                    {
+                      "path": ".github/workflows/nightly-compatibility-matrix.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 5,
+                "title": "ci: bump actions/deploy-pages from 4 to 5",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:24Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 1,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/pages.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 6,
+                "title": "ci: bump docker/setup-buildx-action from 3 to 4",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:25Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/docker-runner.yml"
+                    },
+                    {
+                      "path": ".github/workflows/release.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 7,
+                "title": "ci: bump azure/setup-helm from 4 to 5",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:26Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/ci.yml"
+                    },
+                    {
+                      "path": ".github/workflows/docker-build.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 8,
+                "title": "ci: bump actions/setup-node from 4 to 6",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:27Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 6,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/amc-score.yml"
+                    },
+                    {
+                      "path": ".github/workflows/ci.yml"
+                    },
+                    {
+                      "path": ".github/workflows/docker-build.yml"
+                    },
+                    {
+                      "path": ".github/workflows/nightly-compatibility-matrix.yml"
+                    },
+                    {
+                      "path": ".github/workflows/npm-publish.yml"
+                    },
+                    {
+                      "path": ".github/workflows/release.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 17,
+                "title": "deps: bump zod from 4.3.6 to 4.4.3",
+                "isDraft": false,
+                "updatedAt": "2026-06-26T16:05:35Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 19,
+                "title": "deps: bump yaml from 2.8.3 to 2.9.0",
+                "isDraft": false,
+                "updatedAt": "2026-06-26T16:05:36Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 20,
+                "title": "deps: bump inquirer from 13.3.2 to 14.0.2",
+                "isDraft": false,
+                "updatedAt": "2026-07-09T20:50:36Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 21,
+                "title": "deps: bump commander from 14.0.3 to 15.0.0",
+                "isDraft": false,
+                "updatedAt": "2026-07-09T20:50:37Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 27,
+                "title": "deps: bump semver from 7.7.4 to 7.8.5",
+                "isDraft": false,
+                "updatedAt": "2026-06-22T06:25:16Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 28,
+                "title": "deps: bump better-sqlite3 from 12.8.0 to 12.11.1",
+                "isDraft": false,
+                "updatedAt": "2026-06-22T06:27:11Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 33,
+                "title": "deps: bump the dev-dependencies group across 1 directory with 3 updates",
+                "isDraft": false,
+                "updatedAt": "2026-07-10T20:35:08Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "openCount": 13,
+    "excludedDependabotOnly": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      17,
+      19,
+      20,
+      21,
+      27,
+      28,
+      33
+    ],
+    "countedWip": [],
+    "allFilePagesRead": true,
+    "totalChangedPaths": 30,
+    "prospectiveExactScope": [
+      "CONTRIBUTING.md",
+      "README.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/content/show-hn-draft.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "qualification/2026-10-16-P1-37",
+      "tests/autoCompaction.test.ts",
+      "website/i18n.js",
+      "website/index.html",
+      "website/lite.html",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "touchConflictsIncludingBots": [],
+    "exclusionOnlyAffectsWip": true
+  },
+  "boundary": "Absence and clean source are observations, not release of Claude ownership. New test-only allocation preserves all production reservations. Dependabot excluded from WIP only; hosted touch checks include bots."
+}

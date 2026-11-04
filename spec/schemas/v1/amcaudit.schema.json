@@ -796,33 +796,21 @@
             "assuranceCadence": {
               "properties": {
                 "configuredHours": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "lastRunTs": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "nextRunTs": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "status": {
@@ -840,33 +828,21 @@
             "benchCadence": {
               "properties": {
                 "configuredDays": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "lastRunTs": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "nextRunTs": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "status": {
@@ -884,33 +860,21 @@
             "diagnosticCadence": {
               "properties": {
                 "configuredHours": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "lastRunTs": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "nextRunTs": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "status": {
@@ -928,33 +892,21 @@
             "forecastCadence": {
               "properties": {
                 "configuredHours": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "lastRunTs": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "nextRunTs": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "status": {
@@ -1090,63 +1042,76 @@
     "trust": {
       "properties": {
         "correlationRatio": {
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "evidenceCoverage": {
-          "properties": {
-            "attestedShare": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
+          "anyOf": [
+            {
+              "properties": {
+                "attestedShare": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "observedShare": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                "selfReportedShare": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "observedShare",
+                "attestedShare",
+                "selfReportedShare"
+              ],
+              "type": "object"
             },
-            "observedShare": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
-            },
-            "selfReportedShare": {
-              "maximum": 1,
-              "minimum": 0,
-              "type": "number"
+            {
+              "type": "null"
             }
-          },
-          "required": [
-            "observedShare",
-            "attestedShare",
-            "selfReportedShare"
-          ],
-          "type": "object"
+          ]
         },
         "integrityIndex": {
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "notary": {
           "properties": {
             "attestationAgeMinutes": {
-              "anyOf": [
-                {
-                  "type": "number"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "number",
+                "null"
               ]
             },
             "enabled": {
               "type": "boolean"
             },
             "fingerprint": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "null"
               ]
             }
           },

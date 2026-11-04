@@ -1,5 +1,6 @@
 import { join } from "node:path";
 import { z } from "zod";
+import { refineControlMapping, providerSchema } from "../bridge/hookProviders.js";
 import {
   loadAdaptersConfig,
   verifyAdaptersConfigSignature,
@@ -95,7 +96,7 @@ const hookRequestMetaSchema = receiptMetaSchema.extend({
   sourceProtocol: z.literal("aep"),
   sourceEventType: z.literal("action.requested"),
   actionId: z.string().min(1),
-  provider: z.enum(["claude-code", "gemini-cli"]),
+  provider: providerSchema,
   rawPayloadStored: z.literal(false),
 }).passthrough();
 
@@ -109,7 +110,7 @@ const hookDecisionMetaV1Schema = receiptMetaSchema.extend({
 
 const hookDecisionMetaV2Schema = receiptMetaSchema.extend({
   controlSchemaVersion: z.literal(2),
-  provider: z.enum(["claude-code", "gemini-cli"]),
+  provider: providerSchema,
   actionId: z.string().min(1),
   requestedDecision: z.enum(["allow", "deny", "ask", "steer"]),
   decision: z.enum(["allow", "deny", "ask"]),
@@ -117,28 +118,7 @@ const hookDecisionMetaV2Schema = receiptMetaSchema.extend({
   providerMapping: z.enum(["native", "corrective_deny", "fail_closed_deny"]),
   capabilityLossy: z.boolean(),
   rawPayloadStored: z.literal(false),
-}).passthrough().superRefine((value, ctx) => {
-  const native = value.providerMapping === "native"
-    && value.requestedDecision !== "steer"
-    && value.requestedDecision === value.decision
-    && value.effectiveOutcome === value.decision
-    && !value.capabilityLossy;
-  const corrective = value.providerMapping === "corrective_deny"
-    && value.provider === "claude-code"
-    && value.requestedDecision === "steer"
-    && value.decision === "deny"
-    && value.effectiveOutcome === "steer"
-    && !value.capabilityLossy;
-  const fallback = value.providerMapping === "fail_closed_deny"
-    && value.provider === "gemini-cli"
-    && (value.requestedDecision === "ask" || value.requestedDecision === "steer")
-    && value.decision === "deny"
-    && value.effectiveOutcome === "deny"
-    && value.capabilityLossy;
-  if (!native && !corrective && !fallback) {
-    ctx.addIssue({ code: "custom", path: ["providerMapping"], message: "provider outcome mapping is inconsistent" });
-  }
-});
+}).passthrough().superRefine(refineControlMapping);
 
 const hookDecisionMetaSchema = z.union([hookDecisionMetaV2Schema, hookDecisionMetaV1Schema]);
 
@@ -152,13 +132,13 @@ const hookRequestCandidateSchema = candidateMetaSchema.extend({
   sourceProtocol: z.literal("aep"),
   sourceEventType: z.literal("action.requested"),
   actionId: z.string().min(1),
-  provider: z.enum(["claude-code", "gemini-cli"]),
+  provider: providerSchema,
   rawPayloadStored: z.literal(false),
 }).passthrough();
 
 const hookDecisionCandidateSchema = candidateMetaSchema.extend({
   controlSchemaVersion: z.union([z.literal(1), z.literal(2)]),
-  provider: z.enum(["claude-code", "gemini-cli"]),
+  provider: providerSchema,
   actionId: z.string().min(1),
   decision: z.enum(["allow", "deny", "ask"]),
   rawPayloadStored: z.literal(false),
@@ -309,7 +289,7 @@ function connectionReadiness(workspace: string, agentId: string): {
     }
   }
 
-  for (const provider of ["claude-code", "gemini-cli"] as HookProvider[]) {
+  for (const provider of ["claude-code", "gemini-cli", "pi"] as HookProvider[]) {
     const status = getHookIntegrationStatus({ workspace, provider });
     if (status.state === "not-installed" || !hookArtifactsExist(status)) continue;
     if (status.state !== "installed") {
@@ -366,7 +346,7 @@ function nextAction(agentId: string, completed: number, ready: boolean): Onboard
   }
   return {
     label: "Run one controlled action",
-    command: `amc connect hooks install --provider <claude-code|gemini-cli> --agent ${agentId} --mode control`,
+    command: `amc connect hooks install --provider <claude-code|gemini-cli|pi> --agent ${agentId} --mode control`,
   };
 }
 

@@ -1,0 +1,35 @@
+[
+  {
+    "name": "build",
+    "cmd": "npm run -s build",
+    "exit": 0,
+    "durationMs": 58657,
+    "head": "b37f2630b74084282abccb777f41f275813e4103",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/build.log",
+    "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+    "rawLogBytes": 375,
+    "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/build.log"
+  },
+  {
+    "name": "focused",
+    "cmd": "npx vitest run --maxWorkers=2 tests/catalog/stations/technology tests/catalog/governance tests/catalog/l0 tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts",
+    "exit": 0,
+    "durationMs": 149379,
+    "head": "b37f2630b74084282abccb777f41f275813e4103",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/focused.log",
+    "rawLogSha256": "cb460d67c96793e9afaf33e389fbe91c154c2f3910dc1cb1f41b5f044c16a972",
+    "rawLogBytes": 255,
+    "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/focused.log"
+  },
+  {
+    "name": "typecheck",
+    "cmd": "npm run -s typecheck",
+    "exit": 0,
+    "durationMs": 59375,
+    "head": "b37f2630b74084282abccb777f41f275813e4103",
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-p1-10f-b37f2630/typecheck.log",
+    "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rawLogBytes": 0,
+    "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/typecheck.log"
+  }
+]

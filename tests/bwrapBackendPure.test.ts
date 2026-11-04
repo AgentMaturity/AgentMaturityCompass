@@ -2,7 +2,7 @@
 // backend. These run on any host; they do not launch Bubblewrap or load the
 // filter into a kernel, so they are not Linux confinement qualification.
 import { describe, expect, test } from "vitest";
-import { bwrapCommandExit, linuxSocketDenyFilter } from "../src/sandbox/bwrapBackend.js";
+import { bwrapCommandExit, linuxSocketDenyFilter, unconsumedFds } from "../src/sandbox/bwrapBackend.js";
 
 const KILL = 0x80000000, EPERM = 0x00050001, ALLOW = 0x7fff0000;
 const AUDIT_X64 = 0xc000003e, AUDIT_ARM64 = 0xc00000b7, AUDIT_I386 = 0x40000003;
@@ -74,5 +74,18 @@ describe("bwrapCommandExit", () => {
 
   test.each(["[1]", "7", "null", "\"text\"", "{not json"])("row %s is refused", row => {
     expect(bwrapCommandExit(status({ "child-pid": 12 }, row, { "exit-code": 0 }))).toBeNull();
+  });
+});
+
+describe("unconsumedFds: the confined command inherits no launcher descriptor", () => {
+  const head = ["/usr/bin/bwrap", "--json-status-fd", "3", "--seccomp", "4"];
+  test("a plan whose every fd is taken by a consuming option leaks nothing", () => {
+    expect(unconsumedFds([...head, "--ro-bind-fd", "5", "/usr", "--bind-fd", "6", "/ws/a", "--", "/bin/sh"], 4)).toEqual([]);
+  });
+  test("a /proc/self/fd path bind leaves its fd open in the child", () => {
+    expect(unconsumedFds([...head, "--ro-bind", "/proc/self/fd/5", "/ws", "--", "/bin/sh"], 3)).toEqual([5]);
+  });
+  test("an fd number after -- is the command's argument, not a consumed fd", () => {
+    expect(unconsumedFds([...head, "--", "/bin/echo", "--ro-bind-fd", "5"], 3)).toEqual([5]);
   });
 });

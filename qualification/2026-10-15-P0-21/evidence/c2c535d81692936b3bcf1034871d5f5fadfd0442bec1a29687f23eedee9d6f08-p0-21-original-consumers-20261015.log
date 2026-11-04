@@ -1,0 +1,14 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass
+
+ ✓ tests/mcpComplianceSafety.test.ts (15 tests) 9ms
+ ✓ tests/scoreCrossFrameworkMapping.test.ts (22 tests) 7ms
+ ✓ tests/domain-packs.test.ts (8 tests) 5ms
+ ✓ tests/domain-assessment.test.ts (3 tests) 12ms
+
+ Test Files  4 passed (4)
+      Tests  48 passed (48)
+   Start at  10:26:06
+   Duration  2.90s (transform 1.82s, setup 53ms, import 2.44s, tests 33ms, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-original-consumers-20261015.json

@@ -7,7 +7,7 @@
  * Issue: AMC-48 — BUILD: LLM-as-Judge Metrics (Extended Set)
  */
 
-import { LLMJudgeEngine } from './llmJudgeEngine.js';
+import { LLMJudgeEngine, scoredJudgeResults } from './llmJudgeEngine.js';
 export { JudgeContext, JudgeResult } from './llmJudgeEngine.js';
 import type { JudgeContext, JudgeResult } from './llmJudgeEngine.js';
 
@@ -329,10 +329,13 @@ export class ExtendedLLMJudgeEngine extends LLMJudgeEngine {
 
 export interface MetricSummary {
   category: string;
-  averageScore: number;
-  minScore: number;
-  maxScore: number;
+  /** Over scored results only; null when every result in the category was invalid. */
+  averageScore: number | null;
+  minScore: number | null;
+  maxScore: number | null;
   metricCount: number;
+  /** Results whose judge output was invalid and so carry no score. */
+  invalidCount: number;
   results: JudgeResult[];
 }
 
@@ -346,13 +349,14 @@ export function aggregateMetricsByCategory(results: JudgeResult[]): MetricSummar
     
     if (categoryResults.length === 0) continue;
 
-    const scores = categoryResults.map(r => r.score);
+    const scores = scoredJudgeResults(categoryResults).map(r => r.score);
     const summary: MetricSummary = {
       category,
-      averageScore: scores.reduce((a, b) => a + b, 0) / scores.length,
-      minScore: Math.min(...scores),
-      maxScore: Math.max(...scores),
+      averageScore: scores.length === 0 ? null : scores.reduce((a, b) => a + b, 0) / scores.length,
+      minScore: scores.length === 0 ? null : Math.min(...scores),
+      maxScore: scores.length === 0 ? null : Math.max(...scores),
       metricCount: categoryResults.length,
+      invalidCount: categoryResults.length - scores.length,
       results: categoryResults
     };
 
@@ -362,7 +366,9 @@ export function aggregateMetricsByCategory(results: JudgeResult[]): MetricSummar
   return summaries;
 }
 
-export function calculateOverallScore(results: JudgeResult[]): number {
-  if (results.length === 0) return 0;
-  return results.reduce((sum, result) => sum + result.score, 0) / results.length;
+/** Mean over scored results; null when nothing was scored (no results, or all invalid), never a stand-in zero. */
+export function calculateOverallScore(results: JudgeResult[]): number | null {
+  const scored = scoredJudgeResults(results);
+  if (scored.length === 0) return null;
+  return scored.reduce((sum, result) => sum + result.score, 0) / scored.length;
 }

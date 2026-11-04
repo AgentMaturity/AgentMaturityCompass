@@ -1,0 +1,492 @@
+{
+  "item": "P2-08",
+  "productH": "f6e80b150c57d53b746fcb34238bc7e6dd95f9da",
+  "baseInt": "2914b043abc56ff84ea81796fcc4faa4e1ccf4b2",
+  "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-08-publication-20261020",
+  "branch": "codex/p2-08-publication-final",
+  "literalStatusBeforeAndAfter": "",
+  "sourceUnchanged": true,
+  "required23": {
+    "summary": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/summary.json",
+      "sha256": "561f43f9f115f735eceb21335c64d68cae206fd4867b55cbc546ed172b3416a7",
+      "bytes": 184208
+    },
+    "allExitZero": true,
+    "count": 23,
+    "rows": [
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "build"
+        ],
+        "exitCode": 0,
+        "durationMs": 31341,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/00-build.log",
+          "sha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+          "bytes": 375
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "typecheck"
+        ],
+        "exitCode": 0,
+        "durationMs": 26445,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/01-typecheck.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "typecheck:tests"
+        ],
+        "exitCode": 0,
+        "durationMs": 40481,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/02-typecheck-tests.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "lint"
+        ],
+        "exitCode": 0,
+        "durationMs": 3002,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/03-lint.log",
+          "sha256": "b7096a28a4ef9fc9c2b3964e45ba643cee6913af3b85795f8e22294d36c7ec33",
+          "bytes": 200
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:counts"
+        ],
+        "exitCode": 0,
+        "durationMs": 721,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/04-check-counts.log",
+          "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+          "bytes": 81
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:docs-drift"
+        ],
+        "exitCode": 0,
+        "durationMs": 367,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/05-check-docs-drift.log",
+          "sha256": "9883fbd8b1cc62eeb984e98399d6aac676f46407887696016afb940a08f02cd1",
+          "bytes": 121
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:freeze",
+          "--",
+          "--base-ref",
+          "int"
+        ],
+        "exitCode": 0,
+        "durationMs": 1632,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/06-int.log",
+          "sha256": "8d42bbd1e67429a82770b9dd948515eb5be4475b8081e388fc71793c1423081a",
+          "bytes": 116
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:citations"
+        ],
+        "exitCode": 0,
+        "durationMs": 455,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/07-check-citations.log",
+          "sha256": "81f675216150883385813ad7802c2768d1c1f0f6b7f1c24356bddc993fef8fdb",
+          "bytes": 373
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:architecture-boundaries"
+        ],
+        "exitCode": 0,
+        "durationMs": 1659,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/08-check-architecture-boundaries.log",
+          "sha256": "98ae3eccdc1f97307e10bd0cfd82d46d1c3688c522a33a1185efaf3279b814e3",
+          "bytes": 103685
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:threat-model"
+        ],
+        "exitCode": 0,
+        "durationMs": 197,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/09-check-threat-model.log",
+          "sha256": "f90f862e445c974b501980fd492fdbab3b80ddfb8f0f0e4b888fbb61d240463c",
+          "bytes": 134
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:api-ref"
+        ],
+        "exitCode": 0,
+        "durationMs": 166,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/10-check-api-ref.log",
+          "sha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+          "bytes": 42
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:schemas"
+        ],
+        "exitCode": 0,
+        "durationMs": 562,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/11-check-schemas.log",
+          "sha256": "7e8480a16d9658750e5ae578fa1ef0b25789a098d283a740b59ae28f16dd4365",
+          "bytes": 65
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:gates"
+        ],
+        "exitCode": 0,
+        "durationMs": 285,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/12-check-gates.log",
+          "sha256": "faa08f454f67bacd69d6b9df6483af36bfc20e1bd992ed51e371b37080f80971",
+          "bytes": 659
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:qualification"
+        ],
+        "exitCode": 0,
+        "durationMs": 1076,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/13-check-qualification.log",
+          "sha256": "cdb58c2700d345ac5bf654c957582c2ab4875244a73f5dc3b4e1578360ccb889",
+          "bytes": 66
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:catalog-currency"
+        ],
+        "exitCode": 0,
+        "durationMs": 400,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/14-check-catalog-currency.log",
+          "sha256": "c998646f1719e95c33b9197899711c71c2d4cd765786b6b61728f01d12634b0f",
+          "bytes": 161
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:catalog-changelog",
+          "--",
+          "--base-ref",
+          "int"
+        ],
+        "exitCode": 0,
+        "durationMs": 863,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/15-int.log",
+          "sha256": "fdc3a6a93f7c37fb5ddcba407ebac1934617acfbd6c0ee41eb5ff8ea5b8a880c",
+          "bytes": 146
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:catalog-admission"
+        ],
+        "exitCode": 0,
+        "durationMs": 2476,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/16-check-catalog-admission.log",
+          "sha256": "a612de0dcf4681752241fae00c422737031e53599f2f214c3f1e31e6b5ecf7b9",
+          "bytes": 8372
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:industry-guides"
+        ],
+        "exitCode": 0,
+        "durationMs": 382,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/17-check-industry-guides.log",
+          "sha256": "fe7769497169b293a18815397791f4f5320699fac4a414665e0aff857ae3dd95",
+          "bytes": 137
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:regulatory-calendar"
+        ],
+        "exitCode": 0,
+        "durationMs": 203,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/18-check-regulatory-calendar.log",
+          "sha256": "f59a1f720450af8a2c2868cbe94c8cac3e08e8e309027f4494efe1c3072472d1",
+          "bytes": 150
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:clean-source"
+        ],
+        "exitCode": 0,
+        "durationMs": 58909,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/19-check-clean-source.log",
+          "sha256": "ef26db5acca6341653634ecf527b93afbd2381a866aab9a7460a68476de33ce6",
+          "bytes": 803
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:duplicates"
+        ],
+        "exitCode": 0,
+        "durationMs": 608,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/20-check-duplicates.log",
+          "sha256": "c2d66a74e627394267159797814a19d0c4d4e2f0d56cdb3a9c8be321f19e242d",
+          "bytes": 85
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:dead-code"
+        ],
+        "exitCode": 0,
+        "durationMs": 3190,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/21-check-dead-code.log",
+          "sha256": "da055cae1129abafc1678f6b111188a027f1d717eddcf8068f0d7c3f13ca6503",
+          "bytes": 84
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "release:notes",
+          "--",
+          "--check"
+        ],
+        "exitCode": 0,
+        "durationMs": 179,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-required23-v8/22---check.log",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      }
+    ]
+  },
+  "itemExtras": {
+    "summary": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-extras-v5/summary.json",
+      "sha256": "a83ddfc0c1ca6fba12e32118e55f9c44787d7649c3e9436ea96a453b3b766cf1",
+      "bytes": 175153
+    },
+    "allExitZero": true,
+    "count": 3,
+    "rows": [
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "audit:runtime"
+        ],
+        "exitCode": 0,
+        "durationMs": 743,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-extras-v5/00-audit-runtime.log",
+          "sha256": "15950a68a7ed99c59779717acefdceb3f69cfd31bde67d2c954f2a3cea4d7955",
+          "bytes": 31
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:third-party-notices"
+        ],
+        "exitCode": 0,
+        "durationMs": 162,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-extras-v5/01-check-third-party-notices.log",
+          "sha256": "2c07f358b97ffd4d746cf8aeb10d25e8396fbc3d764aaa64a03975ced114e6cf",
+          "bytes": 55
+        }
+      },
+      {
+        "command": [
+          "npm",
+          "run",
+          "-s",
+          "check:packed-install"
+        ],
+        "exitCode": 0,
+        "durationMs": 66285,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-extras-v5/02-check-packed-install.log",
+          "sha256": "bc2fa2083be26c18b3ff32f974d94c01661e982d54d91a8f1c3f9883cc8b1203",
+          "bytes": 1529
+        }
+      }
+    ]
+  },
+  "localSoftwareToken": {
+    "summary": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-softhsm-v4/summary.json",
+      "sha256": "48f97e8971ba2fb7cc4887eebfc5a8f44daa6e5d89694e8e229f9555ed75ff27",
+      "bytes": 174637
+    },
+    "allExitZero": true,
+    "count": 1,
+    "rows": [
+      {
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/keys/pkcs11Softhsm.test.ts",
+          "--maxWorkers=1",
+          "--reporter=verbose",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-softhsm-v4/vitest.json"
+        ],
+        "exitCode": 0,
+        "durationMs": 665,
+        "log": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-softhsm-v4/00---outputFile--Users-sid-AgentMaturityCompass-worktrees-codex-7f-evidence-p2-08-solo-20261020-publication-hono-final-softhsm-v4-vitest-json.log",
+          "sha256": "459d13265951216bda5c1e83a8866bb4b14175af542d0943b3b41701e369c03a",
+          "bytes": 867
+        }
+      }
+    ],
+    "report": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/publication-hono-final-softhsm-v4/vitest.json",
+      "sha256": "7b71a4c3d1e23cd88ed73bc33e3a4f10ff8e1ecbb0625dd3fcea292e1b443673",
+      "bytes": 1753
+    },
+    "actualTests": {
+      "numTotalTests": 3,
+      "numPassedTests": 3,
+      "numFailedTests": 0,
+      "numPendingTests": 0
+    },
+    "nativeUnhandledCounterPresent": false,
+    "nativeUnhandledErrors": null,
+    "scope": "Local macOS software token, not actual HSM or hosted CI."
+  },
+  "full": {
+    "state": "PENDING_ON_METADATA_ONLY_CHILD_Q",
+    "Q": null,
+    "tests": null,
+    "exitCode": null,
+    "coverageAudit": "PENDING actual complete native report against all948 required whole files and87 owned whole test files",
+    "passClaim": false
+  },
+  "focusedPartials": {
+    "state": "INCOMPLETE_NO_FINAL_TOTALS_OR_COVERAGE_CREDIT",
+    "v3Stop": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/compatibility-focused-v3-owned-stop-complete-v1.json",
+      "sha256": "15a5f1ad68e80a0601741875f2eb376ad1147eb703f6c37da19978b13ac9658f",
+      "bytes": 1315
+    },
+    "earlierV2AlsoIncomplete": true
+  },
+  "scope": "Local macOS arm64, not CI. Literal command results; no final full/acceptance inference."
+}

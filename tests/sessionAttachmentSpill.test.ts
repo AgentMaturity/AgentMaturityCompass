@@ -35,6 +35,10 @@ import { lockVault } from "../src/vault/vault.js";
 import { sha256Hex } from "../src/utils/hash.js";
 import type { EvidenceEvent } from "../src/types.js";
 import { wavBytes } from "./fixtures/nativeSignedAudio.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
+import { redactingSessionFor } from "../src/dataflow/redactingSession.js";
+import { RedactionRefused } from "../src/dataflow/tokenizer.js";
+import { paddedPng } from "./helpers/paddedPng.js";
 
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jZ1sAAAAASUVORK5CYII=", "base64");
 const PASSPHRASE = "disposable-attachment-spill-fixture-passphrase";
@@ -47,13 +51,8 @@ afterEach(async () => {
   vi.unstubAllEnvs();
 });
 
-/** A PNG header followed by a deterministic non-repeating body: passes the media sniff, sized exactly as asked. */
-function png(bytes: number): Buffer {
-  const out = Buffer.alloc(bytes);
-  for (let i = 0; i < bytes; i++) out[i] = (i * 7919 + (i >> 8)) & 0xff;
-  PNG.copy(out);
-  return out;
-}
+/** A well-formed PNG padded inside its container with a deterministic non-repeating body, sized exactly as asked. */
+function png(bytes: number): Buffer { return paddedPng(PNG, bytes, i => i * 7919 + (i >> 8)); }
 type Admission = (input: SessionStoreAppendInput, commit: () => SessionStoreAppendResult) => SessionStoreAppendResult;
 function opened(options: { provision?: boolean; admission?: Admission } = {}) {
   vi.stubEnv("AMC_VAULT_PASSPHRASE", PASSPHRASE);
@@ -366,5 +365,22 @@ describe("user attachments above the per-event cap are retained through the sign
     expect((refusal as SpilledInputRetentionError).stage).toBe("commit");
     expect(objectFiles(spillRoot(root))).toEqual([]);
     expect(h.writer.readEvents()).toHaveLength(before);
+  });
+
+  test("P2-02: an image above the cap in a PHI-run-purpose workspace with no BAA is refused before any row or spill", () => {
+    const h = opened();
+    initProcessorRegistry(h.root, { schemaVersion: "amc.dataflow-processors/v1", experimental: true,
+      processors: [{ processorId: "proc-care", legalName: "Fixture Care Processor",
+        contracts: [{ kind: "DPA", reference: "DPA-CARE-1", effective: "2026-01-01", expires: null, dataClasses: ["phi", "pii"] }] }],
+      purposes: [{ purposeId: "care", allowedDataClasses: ["phi", "pii"], allowedTools: ["model.request"], allowedProcessors: ["proc-care"] }],
+      bindings: [], runPurpose: "care" });
+    const before = h.writer.readEvents().length;
+    let refusal: unknown;
+    try { redactingSessionFor(h.writer).recordUserAttachment({ filename: "chart.png", content: png(h.cap + 1), mimeType: "image/png", kind: "image" }); }
+    catch (error) { refusal = error; }
+    expect(refusal).toBeInstanceOf(RedactionRefused);
+    expect((refusal as RedactionRefused).reason).toBe("attachment_not_redactable");
+    expect(h.writer.readEvents()).toHaveLength(before);
+    expect(objectFiles(spillRoot(h.root))).toEqual([]);
   });
 });

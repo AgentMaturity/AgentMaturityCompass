@@ -36,18 +36,14 @@ export function computeEconomicSignificance(params: {
     };
   }
 
-  const benefitScore = (() => {
-    const scores = [params.valueScore, params.economicValue].filter((value): value is number => typeof value === "number");
-    if (scores.length === 0) {
-      return 0;
-    }
-    return scores.reduce((sum, value) => sum + value, 0) / scores.length;
-  })();
+  const benefits = [params.valueScore, params.economicValue].filter((value): value is number => typeof value === "number");
+  // No measured benefit: the score is not evaluated, never one built on a 0 benefit.
+  const benefitScore = benefits.length === 0 ? null : benefits.reduce((sum, value) => sum + value, 0) / benefits.length;
   const normalizedCost = params.costScore ?? 50;
   const riskQuality = params.assuranceScore ?? 50;
   const weights = params.policy.valuePolicy.formulas.economicSignificance;
 
-  const score = clamp(
+  const score = benefitScore === null ? null : clamp(
     benefitScore * weights.benefitWeight + normalizedCost * weights.costWeight + riskQuality * weights.riskWeight,
     0,
     100
@@ -55,7 +51,7 @@ export function computeEconomicSignificance(params: {
 
   const penalties = params.policy.valuePolicy.formulas.riskIndices.economicSignificanceRisk;
   let risk = penalties.base;
-  const reasons: string[] = [];
+  const reasons: string[] = benefitScore === null ? ["VALUE_NOT_MEASURED"] : [];
   if (params.noValueEventsLast30d) {
     risk += penalties.penaltyIfNoValueEventsLast30d;
     reasons.push("NO_VALUE_EVENTS_30D");
@@ -70,7 +66,7 @@ export function computeEconomicSignificance(params: {
   }
 
   return {
-    score: Number(score.toFixed(6)),
+    score: score === null ? null : Number(score.toFixed(6)),
     risk: Number(clamp(risk, 0, 100).toFixed(6)),
     reasons
   };

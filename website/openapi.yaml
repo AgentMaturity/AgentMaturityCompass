@@ -1326,8 +1326,8 @@ components:
         hasAlternatives: { type: boolean }
         mandatoryGates:
           type: array
-          minItems: 9
-          maxItems: 9
+          minItems: 10
+          maxItems: 10
           items: { type: string }
         baseline: { $ref: '#/components/schemas/ActionEvidencePolicyHash' }
 
@@ -1351,8 +1351,8 @@ components:
           items: { $ref: '#/components/schemas/ActionEvidenceGate' }
         mandatoryGates:
           type: array
-          minItems: 9
-          maxItems: 9
+          minItems: 10
+          maxItems: 10
           items: { type: string }
         baseline: { $ref: '#/components/schemas/ActionEvidencePolicyHash' }
         candidate: { $ref: '#/components/schemas/ActionEvidencePolicyHash' }
@@ -2121,6 +2121,18 @@ components:
         receiptIds:
           type: array
           items: { type: string }
+        authorizationMismatch:
+          type: boolean
+          nullable: true
+          description: Claude Code control only. Whether the input the tool ran with differs from the input AMC authorized (observed, not prevented); null without a bound outcome.
+        observationConflict:
+          type: boolean
+          description: Claude Code control only. An outcome for this call was unmatched, conflicting or unverifiable.
+        observationNotRecorded:
+          type: string
+          nullable: true
+          enum: [rate-limited]
+          description: Claude Code control only. An observation of this call was refused by the intake cap and listed in a signed summary row; the call is not fully evidenced.
         rawProviderPayloadStored:
           type: boolean
           enum: [false]
@@ -2594,6 +2606,86 @@ components:
           type: integer
           minimum: 1
           maximum: 32
+    NativeTaskFork:
+      type: object
+      additionalProperties: false
+      required:
+        - clientRequestId
+        - expectedRevision
+      properties:
+        clientRequestId:
+          type: string
+          format: uuid
+        expectedRevision:
+          type: integer
+          minimum: 1
+          maximum: 32
+      description: A new owner-scoped request ID for the child task, and the parent's current revision. The child
+        keeps the parent's pinned provider, model, tools digest, checks and limits, with its own lease; it starts
+        with no inherited model context. A parent that does not verify is refused with code NATIVE_FORK_<reason>.
+    ExecutionStatus:
+      type: object
+      additionalProperties: false
+      required:
+        - sessionId
+        - receiptStates
+        - recheckFailures
+        - phases
+      properties:
+        sessionId:
+          type: string
+        receiptStates:
+          type: array
+          items:
+            type: string
+        recheckFailures:
+          type: array
+          items:
+            type: string
+        phases:
+          type: object
+          additionalProperties: false
+          required:
+            - admission
+            - model-completion
+            - side-effect-completion
+            - evidence-verification
+          properties:
+            admission:
+              type: string
+              enum:
+                - pending
+                - succeeded
+                - failed
+                - refused
+                - unknown
+            model-completion:
+              type: string
+              enum:
+                - pending
+                - succeeded
+                - failed
+                - refused
+                - unknown
+            side-effect-completion:
+              type: string
+              enum:
+                - pending
+                - succeeded
+                - failed
+                - refused
+                - unknown
+            evidence-verification:
+              type: string
+              enum:
+                - pending
+                - succeeded
+                - failed
+                - refused
+                - unknown
+      description: "The four execution phases (P2-13, docs/sdk/EXECUTION_API.md). Each has one source and none
+        implies another: a finished turn whose evidence nobody verified reads model-completion succeeded,
+        evidence-verification pending."
     NativeTask:
       type: object
       additionalProperties: false
@@ -2620,6 +2712,7 @@ components:
         - turnEndReason
         - error
         - verification
+        - verificationScope
         - approvals
         - approvalError
         - nextCursor
@@ -2629,6 +2722,8 @@ components:
         - resumeBlockedReason
         - history
         - recovery
+        - execution
+        - delegation
       properties:
         taskId:
           type: string
@@ -2687,6 +2782,15 @@ components:
           maxItems: 8
           items:
             $ref: "#/components/schemas/NativeTaskValidationOutput"
+        plans:
+          type: array
+          maxItems: 2
+          items:
+            $ref: "#/components/schemas/NativeTaskPlan"
+        usage:
+          type: object
+          description: Bounded NativeRunUsage recorded-session aggregates with issueCount, without per-request reports
+            or issue arrays. Missing usage stays unavailable; it is never filled from configured limits.
         maxSteps:
           type: integer
           minimum: 0
@@ -2725,9 +2829,18 @@ components:
             - not-verified
             - workspace-key-consistency
             - externally-anchored
+            - anchored-prefix
             - failed
-          description: Evidence integrity result, separate from task success. Other open ledger writers can prevent a
-            complete verification.
+          description: "Evidence integrity result, separate from task success. anchored-prefix: anchored to the
+            operator's monitor pin over a verified prefix (verificationScope names the unfinalized sessions); it
+            is not a complete verification."
+        verificationScope:
+          oneOf:
+            - $ref: "#/components/schemas/NativeTaskVerificationScope"
+            - type: object
+              nullable: true
+              enum:
+                - null
         approvals:
           type: array
           items:
@@ -2758,6 +2871,93 @@ components:
               nullable: true
               enum:
                 - null
+        execution:
+          oneOf:
+            - $ref: "#/components/schemas/ExecutionStatus"
+            - type: object
+              nullable: true
+              enum:
+                - null
+        delegation:
+          oneOf:
+            - $ref: "#/components/schemas/DelegationChain"
+            - type: object
+              nullable: true
+              enum:
+                - null
+    DelegationChain:
+      type: object
+      additionalProperties: false
+      required:
+        - chainDigest
+        - status
+        - reason
+        - links
+      properties:
+        chainDigest:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        status:
+          type: string
+          enum:
+            - verified
+            - refused
+            - unavailable
+        reason:
+          type: string
+          nullable: true
+        links:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - linkId
+              - depth
+              - principal
+              - delegate
+              - scopes
+              - notAfter
+            properties:
+              linkId:
+                type: string
+              depth:
+                type: integer
+                minimum: 0
+              principal:
+                type: string
+              delegate:
+                type: string
+              scopes:
+                type: array
+                items:
+                  type: string
+              notAfter:
+                type: integer
+                minimum: 0
+      description: The signed delegation chain the task runtime's v2 lease binds (P2-25, docs/AGENT_IDENTITY.md),
+        from the human or declared service that authorized it to the runtime, re-verified on every read.
+        Experimental.
+    NativeTaskVerificationScope:
+      type: object
+      additionalProperties: false
+      required:
+        - scope
+        - unfinalizedSessions
+      properties:
+        scope:
+          type: string
+          enum:
+            - complete-ledger
+            - verified-prefix
+        unfinalizedSessions:
+          type: array
+          items:
+            type: string
+      description: "What an anchored verdict covers. verified-prefix (verification anchored-prefix): the task's
+        session closed and sealed, every recorded row and every sealed session verified, while the listed unended,
+        unsealed legacy sessions (a running gateway's) were named instead of failed; nothing is claimed about how
+        they end."
     NativeTaskRecovery:
       type: object
       additionalProperties: false
@@ -2801,6 +3001,7 @@ components:
           enum:
             - sqlite
             - jsonl
+            - postgres
             - null
           nullable: true
         headEventHash:
@@ -3008,6 +3209,117 @@ components:
       description: Text from the exact authenticated check-result payload after its complete bytes match
         payloadSha256. The display is redacted and capped at 16 KiB; payloadSha256 describes the original bytes,
         not transformed display text. Reads over 2 MiB are withheld.
+    NativeTaskPlan:
+      type: object
+      additionalProperties: false
+      required:
+        - kind
+        - revision
+        - recordSha256
+        - text
+        - evidence
+        - scope
+      properties:
+        kind:
+          type: string
+          enum:
+            - todo
+            - plan
+        revision:
+          type: integer
+          minimum: 1
+        recordSha256:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        text:
+          type: string
+        evidence:
+          type: string
+          enum:
+            - committed
+        scope:
+          type: string
+          enum:
+            - current-record
+      description: Latest authenticated list state for the current turn, separate from durable transcript replay and
+        approval authority. Model-written text must be HTML-escaped.
+    NativeTaskPage:
+      type: object
+      additionalProperties: false
+      required:
+        - format
+        - sessionId
+        - agentId
+        - committed
+        - backend
+        - headEventHash
+        - headSeq
+        - storeHeadEventHash
+        - firstSeq
+        - nextSeq
+        - nextCursor
+        - resumeCursor
+        - sealed
+        - verification
+        - state
+      properties:
+        format:
+          type: string
+          enum:
+            - amc-session-event-page-v1
+        sessionId:
+          type: string
+        agentId:
+          type: string
+          minLength: 1
+          maxLength: 128
+          pattern: ^[a-z0-9][a-z0-9_-]*$
+        committed:
+          type: boolean
+          enum:
+            - true
+        backend:
+          type: string
+          enum:
+            - sqlite
+            - jsonl
+            - postgres
+        headEventHash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        headSeq:
+          type: integer
+          minimum: 0
+        storeHeadEventHash:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        firstSeq:
+          type: integer
+          minimum: 0
+        nextSeq:
+          type: integer
+          minimum: 0
+        nextCursor:
+          type: string
+          minLength: 1
+          maxLength: 2048
+          nullable: true
+        resumeCursor:
+          type: string
+          minLength: 1
+          maxLength: 2048
+        sealed:
+          type: boolean
+        verification:
+          type: object
+        state:
+          type: object
+      description: Shared verified-session snapshot metadata. Sequences are zero-based raw session rows, including
+        rows without visible updates. nextSeq is exclusive. nextCursor null means this snapshot is exhausted. The
+        complete success response, including current task state and page, is bounded to 2 MiB; oversized state
+        refuses with 409 instead of truncating fields. The same-store page state carries validation, recorded
+        usage, approvals, ending and unknown tool outcomes. Verification reads the complete selected store before
+        slicing; it does not grant payload access or a writer.
     NativeTaskEvent:
       type: object
       additionalProperties: false
@@ -3020,6 +3332,8 @@ components:
         cursor:
           type: integer
           minimum: 0
+          description: Raw source sequence in page mode; legacy projected-update position otherwise. Read page.nextSeq
+            to advance over source rows without visible updates.
         kind:
           type: string
           enum:
@@ -3450,10 +3764,13 @@ components:
               $ref: "#/components/schemas/NativeTask"
             events:
               type: array
+              maxItems: 512
               items:
                 $ref: "#/components/schemas/NativeTaskEvent"
             truncated:
               type: boolean
+            page:
+              $ref: "#/components/schemas/NativeTaskPage"
     # END GENERATED NATIVE TASK SCHEMAS
 
     # BEGIN GENERATED A4 SCHEMAS
@@ -3747,6 +4064,12 @@ components:
           type: string
           pattern: ^[A-Za-z0-9_-]{8,128}$
           description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+        via:
+          type: string
+          enum:
+            - studio
+            - mcp
+          description: The surface the sender states (self-reported); default studio.
     A4Presence:
       type: object
       additionalProperties: false
@@ -4194,6 +4517,176 @@ components:
         expectedRequestDigestSha256:
           type: string
           pattern: ^[a-f0-9]{64}$
+    A4Deployment:
+      type: object
+      additionalProperties: false
+      required:
+        - kind
+        - environment
+        - target
+        - packageDigest
+        - imageDigest
+        - overlayDigest
+        - restartedAt
+        - helmRevision
+        - leaseIds
+        - destinationRef
+        - operatorStated
+        - expectedHeadSeq
+        - clientRequestId
+      properties:
+        kind:
+          type: string
+          enum:
+            - deploy
+            - rollback
+        environment:
+          type: string
+          enum:
+            - staging
+            - production
+        target:
+          type: string
+          enum:
+            - compose
+            - helm
+        packageDigest:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+          nullable: true
+        imageDigest:
+          type: string
+          pattern: ^sha256:[0-9a-f]{64}$
+          nullable: true
+        overlayDigest:
+          type: string
+          pattern: ^[a-f0-9]{64}$
+        restartedAt:
+          type: string
+          format: date-time
+          description: Operator-stated; recorded as a claim beside the server time.
+        helmRevision:
+          type: integer
+          minimum: 1
+          description: The helm history revision for a Helm target; null for Compose.
+          nullable: true
+        leaseIds:
+          type: array
+          maxItems: 4
+          items:
+            type: string
+            pattern: ^lease_[0-9a-f]{32}$
+        destinationRef:
+          type: string
+          description: host[:port]; never a URL or credentials.
+        operatorStated:
+          type: object
+          additionalProperties: false
+          required:
+            - status
+          properties:
+            status:
+              type: string
+              enum:
+                - succeeded
+                - failed
+                - partial
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+    A4Verify:
+      type: object
+      additionalProperties: false
+      required:
+        - environment
+        - expectedHeadSeq
+        - clientRequestId
+      properties:
+        environment:
+          type: string
+          enum:
+            - staging
+            - production
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+    A4RollbackPreview:
+      type: object
+      additionalProperties: false
+      required:
+        - environment
+        - expectedHeadSeq
+        - clientRequestId
+      properties:
+        environment:
+          type: string
+          enum:
+            - staging
+            - production
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+    A4Transparency:
+      type: object
+      additionalProperties: false
+      required:
+        - expectedHeadSeq
+        - clientRequestId
+      properties:
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
+    A4Rollback:
+      type: object
+      additionalProperties: false
+      required:
+        - environment
+        - reason
+        - toReleaseId
+        - confirmManifestId
+        - expectedHeadSeq
+        - clientRequestId
+      properties:
+        environment:
+          type: string
+          enum:
+            - staging
+            - production
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        toReleaseId:
+          type: string
+          pattern: ^a4r_[0-9a-f]{32}$
+          nullable: true
+        confirmManifestId:
+          type: string
+          pattern: ^enforce-resources-[0-9a-f]{16}$
+          nullable: true
+        expectedHeadSeq:
+          type: integer
+          minimum: 0
+        clientRequestId:
+          type: string
+          pattern: ^[A-Za-z0-9_-]{8,128}$
+          description: Owner-scoped idempotency key; a retry with the same key and body answers the recorded result.
     # END GENERATED A4 SCHEMAS
 
 tags:
@@ -9024,6 +9517,10 @@ paths:
       responses:
         '201':
           description: Confirmation completed with safe proof
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClaimResult'
         '200':
           description: Confirmation blocked by policy or scope gate
           content:
@@ -10530,8 +11027,28 @@ paths:
             type: integer
             minimum: 0
             maximum: 999999999999999
-          description: Exclusive event cursor. Retention may truncate earlier updates; this is not a complete evidence
-            verification.
+          description: Legacy exclusive projected-update cursor. Do not combine with pageCursor or limit. Retention may
+            truncate this legacy view.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 256
+            default: 64
+          description: Negotiate verified native history pages on this route. Bounds delivered source rows, not total
+            verification work.
+        - name: pageCursor
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 2048
+          description: Opaque verified-store position bound to session, agent and authenticated owner. nextCursor
+            continues the fixed snapshot; resumeCursor follows after delivered rows. Omit for the first page.
+            Cursor forgery, a chain gap or tampering fails the whole page. No control or tool is replayed.
       responses:
         "200":
           description: Current owned task state; no-store.
@@ -10646,6 +11163,121 @@ paths:
           application/json:
             schema:
               $ref: "#/components/schemas/NativeTaskTurn"
+      responses:
+        "202":
+          description: Admission recorded; inspect the task for its actual outcome.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskResponse"
+        "400":
+          description: Invalid request, unknown or repeated query fields, or bounds exceeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "401":
+          description: A verified human session or bootstrap admin token is required.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "403":
+          description: Identity, role, origin, CSRF, demo or read-only policy refused the operation.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "404":
+          description: Unknown task or task belongs to another owner/agent.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "409":
+          description: Revision, request ID, signed scope or task state conflict. Refresh; do not automatically replay.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "413":
+          description: Request body exceeds the server's JSON limit.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "429":
+          description: Active task or retained task capacity reached.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "500":
+          description: Task status is uncertain. Inspect recorded state before another submission.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+        "503":
+          description: Native task service is unavailable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NativeTaskError"
+  /v1/native-tasks/{taskId}/fork:
+    post:
+      summary: "Fork this task's session into a new owned task: a child whose signed open row names the verified
+        parent (P2-13)"
+      tags:
+        - Studio
+        - Native Tasks
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^[a-f0-9]{64}$
+        - name: agentId
+          in: query
+          required: false
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 128
+            pattern: ^[a-z0-9][a-z0-9_-]*$
+          description: Selected agent; defaults to the workspace selection. A task remains pinned to its original owner
+            and agent.
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native task/approval mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain from options or /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+            Admin-token clients may omit it.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NativeTaskFork"
       responses:
         "202":
           description: Admission recorded; inspect the task for its actual outcome.
@@ -10823,7 +11455,8 @@ paths:
                 $ref: "#/components/schemas/NativeTaskError"
   /v1/native-tasks/{taskId}/release:
     post:
-      summary: Release the native writer while keeping an eligible session resumable
+      summary: "Dispose: release the native writer, keeping an eligible session resumable, then stop the runtime
+        process"
       tags:
         - Studio
         - Native Tasks
@@ -11165,8 +11798,8 @@ paths:
                 $ref: "#/components/schemas/NativeTaskError"
   /v1/native-tasks/{taskId}/archive:
     post:
-      summary: Archive an owned closed task after authenticating its sealed history; retain evidence and request
-        identities
+      summary: "Studio-only housekeeping, not an execution verb: archive an owned closed task after authenticating
+        its sealed history; retain evidence and request identities"
       tags:
         - Studio
         - Native Tasks
@@ -11324,8 +11957,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11386,8 +12020,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11448,8 +12083,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11536,8 +12172,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11606,8 +12243,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11687,8 +12325,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11768,8 +12407,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11836,8 +12476,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11918,8 +12559,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -11992,8 +12634,84 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/revisions/{revisionNo}/resolved:
+    get:
+      summary: One revision with its derived parts resolved and checked (amc.a4-revision-resolved/v1)
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: revisionNo
+          in: path
+          required: true
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        "200":
+          description: Current A4 state; no-store.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Response"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12067,8 +12785,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12135,8 +12854,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12203,8 +12923,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12296,8 +13017,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12370,8 +13092,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12463,8 +13186,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12557,8 +13281,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12632,8 +13357,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12726,8 +13452,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12746,7 +13473,11 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/value:
     get:
-      summary: "Value view: not evaluated until Activate's producer (P1-62)"
+      summary: "The current release's value claims (amc.a4-value-claim/v1, one per value-contract KPI, recorded once
+        per Activate Review) in four lanes never merged: recommended, implemented, observed (re-resolved now;
+        null while a ref dangles) and independently reviewed (not_evaluated without an admitted record naming
+        the KPI); the members' other objectives, the ROI worksheet (not evaluated) and the hypotheses predicted
+        vs observed vs verdict. Reads only: never runs the value report or appends a value event"
       tags:
         - Studio
         - A4 Forge
@@ -12796,8 +13527,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12816,7 +13548,9 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/monitor:
     get:
-      summary: "Monitor view: not evaluated until Activate's producer (P1-62)"
+      summary: "The current release's newest monitor record (Activate Review; lane implementation, self_reported):
+        one claim envelope per source, every field { value, source, trustTier, window }, a missing source
+        source_unavailable with value null; read only while its signed file resolves"
       tags:
         - Studio
         - A4 Forge
@@ -12866,8 +13600,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -12952,8 +13687,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13022,8 +13758,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13116,8 +13853,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13136,7 +13874,9 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/acknowledge:
     post:
-      summary: Owner acknowledgement of a WAITING item (stays WAITING, OWNER_ACKNOWLEDGED, 90 days)
+      summary: Owner acknowledgement of a WAITING item (stays WAITING, OWNER_ACKNOWLEDGED, 90 days); 409
+        A4_NOT_ACKNOWLEDGEABLE for one that would not count (Activate's regulatory_sources_status and
+        deployment.amc_check before Review, the check before it names a receipt)
       tags:
         - Studio
         - A4 Forge
@@ -13210,8 +13950,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13322,8 +14063,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13422,8 +14164,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13443,8 +14186,14 @@ paths:
   /v1/a4/projects/{projectId}/stages/{stage}/complete:
     post:
       summary: "Consume the stage's approved gate once (adapt and activate: owner); an effect gate opened on it, or
-        an effect that runs on the gate's own quorum (Aspire completion: a4.aspire.apply_contracts), runs its
-        effect and the response names the attempt"
+        an effect that runs on the gate's own quorum (Aspire completion: a4.aspire.apply_contracts; Activate
+        completion: a4.activate.production_lease), runs its effect and the response names the attempt (409
+        SOD_VIOLATION when the caller is an approver the production lease's gate quorum counted); an inline
+        effect (the release, the production lease) runs before the response, which carries its lease token once
+        (a replay answers token: null, TOKEN_ALREADY_DELIVERED once the attempt finished, or the attempt's
+        failure code) or its failure code. Each lease names the caller when they are an active users.yaml user;
+        under a plan whose identity-binding requires a principal (L0-IDN-01) any other caller, a
+        workspace-router session included, is refused 409 PRINCIPAL_UNRESOLVED before the gate is consumed"
       tags:
         - Studio
         - A4 Forge
@@ -13528,8 +14277,887 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases:
+    get:
+      summary: This project's release records (amc.a4-release/v1 summaries) with the leases' live status
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+      responses:
+        "200":
+          description: Current A4 state; no-store.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Response"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+    post:
+      summary: "Release (owner): consume the release approval (Activate's direction gate) and run the opened
+        a4.activate.release effect inline: a signed package from content-addressed inputs and the staging lease
+        (WRITE_LOW at most, the staging routes, 24 h, naming the caller when they are an active users.yaml
+        user), whose token this response carries once; a replay answers token: null, TOKEN_ALREADY_DELIVERED
+        once the attempt finished, or the attempt's failure code. Under a plan whose identity-binding requires a
+        principal (L0-IDN-01) a caller who is not an active local users.yaml user, a workspace-router session
+        included, is refused 409 PRINCIPAL_UNRESOLVED before the release approval or its engine grant is
+        consumed"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Complete"
+      responses:
+        "200":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}:
+    get:
+      summary: "One release record (amc.a4-release/v1): its A4_RECORD envelope checked now, the leases' live status,
+        the package's file list (when the manifest still hashes to the package digest), the eight-surface table
+        with a reason for each surface not evaluated, the prepared deployment plan (its steps only while its
+        signature verifies now and the verified package manifest lists its digest; plan null with the reason
+        otherwise) and update policy with their signatures checked now, the receipts in two columns (recorded by
+        the operator; checked by AMC), the rollbacks, rollbackTargetRolledBack (the record's rollback target was
+        rolled back since, so the plan's rollback steps are superseded by the rollback preview), the lifecycle
+        bridge outcomes and the production bridge rows as they stand now"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+      responses:
+        "200":
+          description: Current A4 state; no-store.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Response"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/deployments:
+    get:
+      summary: "The release's deploy and rollback receipts in two columns: recordedStatus as the operator stated it,
+        amcCheckStatus from AMC's newest check of that receipt; never merged"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+      responses:
+        "200":
+          description: Current A4 state; no-store.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Response"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+    post:
+      summary: "Record the operator's deployment receipt (owner, owner mode; amc.a4-deployment-receipt/v1, signed
+        a4-deployment-receipt, self_reported). Refused DEPLOYMENT_NOT_SAME_HOST unless this Studio runs under
+        the target (v1 same-host restart, D-18; P2-40), PACKAGE_DIGEST_MISMATCH, LEASE_NOT_OF_RELEASE,
+        TARGET_MISMATCH, DESTINATION_MISMATCH (a deploy row naming another destination than the release was
+        packaged for), RELEASE_ROLLED_BACK (a deploy row for a release rolled back or whose rollback started),
+        ROLLBACK_TARGET_ROLLED_BACK for a production deploy row (the release's recorded rollback target was
+        rolled back: such a release never reaches production), ROLLBACK_TARGET_ROLLBACK_PENDING for one while a
+        production rollback of that target has started and is not recorded (finish it first: a release built
+        then names the same target), and for a rollback row (its rollback found in any cycle; its leaseIds name
+        only leases the release rolled back to minted, in any cycle) ROLLBACK_ENVIRONMENT_MISMATCH (not the
+        rollback's environment), ROLLBACK_ROW_RECORDED (a succeeded row of it exists) or, for a production row,
+        ROLLBACK_TARGET_ROLLED_BACK (the release rolled back to was itself rolled back) or ROLLBACK_SUPERSEDED
+        (a succeeded production deploy or rollback row followed it, or the rolled-back release is not the one
+        production ran). A rollback row is recordable on a held or frozen project. No lease is issued and no
+        runtime run is created; a succeeded production deploy, or a succeeded production rollback row, moves
+        deployedReleaseId"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Deployment"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/verify:
+    post:
+      summary: "AMC's own check of the newest receipt's destinationRef (owner, owner mode, token-less):
+        resolveAndCheck with a pinned connection, TLS to the system CA set, no redirects, 5 s, 256 KiB.
+        reachable at best in v1 (image, package and plan-head checks not_evaluated until P2-40); failed on
+        DESTINATION_MISMATCH (the receipt's destination is not the one the release was packaged for),
+        READYZ_FAILED, REDIRECT_REFUSED or TLS_REFUSED; 409 VERIFY_EGRESS_REFUSED for a non-public destination,
+        with nothing recorded. recordedStatus is never touched"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Verify"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/transparency:
+    post:
+      summary: "Append the release package's transparency entry (owner, owner mode) when the release effect could
+        not: idempotent (an entry of this exact release and package digest is reused, never appended twice), 409
+        EFFECT_RUNNING while the release effect runs, 409 TRANSPARENCY_NOT_APPENDED with the reason, 423
+        A4_VAULT_LOCKED. Readiness item package.transparency is BLOCKED, and the deployment approval cannot be
+        requested, until the entry exists. Answers { releaseId, entryId, reason }"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Transparency"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Response"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/rollback/preview:
+    post:
+      summary: "Preview a rollback (owner, owner mode) and open its effect gate a4.activate.rollback: a DEPLOY
+        engine request binding the preview, decided separately under A4's separation of duties. Only the release
+        running in the chosen environment rolls back (production: the newest one with a succeeded production
+        deploy not rolled back; staging: this cycle's release; 409 ROLLBACK_RELEASE_NOT_RUNNING otherwise). The
+        target is the release record's rollback block: the release running in production when this one was
+        built; when that target was itself rolled back since, the preview names none (no Enforce restore;
+        Compose's one prepared command is the base file, which re-pins no release, and Helm gets none, since a
+        Helm rollback re-pins whatever release its chosen revision deployed; the leases are revoked, and the
+        freeze raised for a high or critical risk tier) and its restore note says so; a production preview never
+        names none, since such a release never deploys to production. In production the leases include the
+        production lease of every release built on this one, in any cycle,, which can then never deploy"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4RollbackPreview"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/releases/{releaseId}/rollback:
+    post:
+      summary: "Roll back (owner, owner mode) with the exact release and Enforce manifest the preview bound,
+        journaled as an effect (refused before anything while the vault's artifact-seal or revocation-list key
+        cannot sign: 423 A4_VAULT_LOCKED, 409 A4_KEY_REVOKED for a revoked one; EFFECT_STARTED first, pinned to
+        expectedHeadSeq and refused again with ROLLBACK_RELEASE_NOT_RUNNING or ROLLBACK_TARGET_ROLLED_BACK on
+        the rows it reads; 409 EFFECT_RUNNING while another attempt or the deployment approval's
+        production-lease effect runs): the grant consumed (a re-run uses the grant its own execution consumed,
+        never for an approver its quorum counted: 409 SOD_VIOLATION; GRANT_ALREADY_USED when another execution
+        consumed it), a freeze first for a high or critical risk tier, the Enforce restore, every lease of the
+        release revoked (read again at execution, and the lease journal once more before it settles; in
+        production also the production lease of every release, in any cycle, whose rollback target this release
+        is), the prepared commands, a signed a4-rollback-receipt, then ROLLBACK with EFFECT_FINISHED; a failed
+        step is EFFECT_FAILED with its code and a replay answers the attempt's outcome; the lifecycle is never
+        moved backwards and deployedReleaseId moves when the operator records a production rollback row"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: releaseId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4r_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Rollback"
+      responses:
+        "201":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13627,8 +15255,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13727,8 +15356,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13829,8 +15459,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13925,8 +15556,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -13946,7 +15578,9 @@ paths:
   /v1/a4/projects/{projectId}/stages/assemble/connect:
     post:
       summary: "External path, after Build (owner, owner mode): connect instructions with a lease whose token is in
-        this response once and never stored; the record keeps the leaseId (a replay answers token: null)"
+        this response once and never stored; the record keeps the leaseId (a replay answers token: null). The
+        lease names the caller when they are an active users.yaml user; under a plan whose identity-binding
+        requires a principal any other caller is 409 PRINCIPAL_UNRESOLVED and nothing is minted"
       tags:
         - Studio
         - A4 Forge
@@ -14020,8 +15654,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14116,8 +15751,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14214,8 +15850,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14315,8 +15952,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14416,8 +16054,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14516,8 +16155,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14536,7 +16176,12 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/gates/{gateId}/deny:
     post:
-      summary: Deny a gate (bound to its request digest and seq; separation of duties refused at write)
+      summary: Deny a gate (bound to its request digest and seq; separation of duties refused at write). A DENY of
+        an unconsumed Activate completion gate revokes its release's staging lease (423 A4_VAULT_LOCKED while
+        the vault is locked and 409 A4_KEY_REVOKED while its revocation-list key is revoked, before the DENY is
+        recorded; 409 LEASE_REVOKE_FAILED naming the lease ids when it fails after the DENY is recorded, which
+        stands, 423 A4_VAULT_LOCKED naming them when the vault locked meanwhile, and the same request retries
+        it)
       tags:
         - Studio
         - A4 Forge
@@ -14616,8 +16261,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14725,8 +16371,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14745,7 +16392,10 @@ paths:
                 $ref: "#/components/schemas/A4Error"
   /v1/a4/projects/{projectId}/stages/{stage}/effects/{effectId}/retry:
     post:
-      summary: Retry a failed effect under the liveness rule (owner)
+      summary: Retry a failed effect under the liveness rule (owner; 409 SOD_VIOLATION for an approver its consumed
+        grant or gate quorum counted; at Activate, under a plan whose identity-binding requires a principal, 409
+        PRINCIPAL_UNRESOLVED for a caller who is not an active local users.yaml user, before a new attempt
+        starts or the grant is consumed)
       tags:
         - Studio
         - A4 Forge
@@ -14834,8 +16484,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -14938,8 +16589,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15042,8 +16694,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15146,8 +16799,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15250,8 +16904,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15354,8 +17009,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15375,8 +17031,10 @@ paths:
   /v1/a4/projects/{projectId}/stages/{stage}/build:
     post:
       summary: "Build (step built): the stage's producer (aspire, assemble and adapt: owner, owner mode; assemble's
-        native build session starts after the step is recorded and the response names it), or a self_reported
-        human-authored implementation ref while it has none"
+        native build session starts after the step is recorded and the response names it; a workspace-tools
+        session whose lease would name no active users.yaml user under a plan that requires a principal is 409
+        PRINCIPAL_UNRESOLVED before anything is written), or a self_reported human-authored implementation ref
+        while it has none"
       tags:
         - Studio
         - A4 Forge
@@ -15460,8 +17118,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15565,8 +17224,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15659,8 +17319,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15753,8 +17414,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15847,8 +17509,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -15941,8 +17604,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16035,8 +17699,106 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
         "409":
-          description: A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_NOT_READY naming the items,
-            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure.
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "423":
+          description: "A4_VAULT_LOCKED: unlock the vault to record this."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "500":
+          description: The outcome is uncertain; reload the project before retrying.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+  /v1/a4/projects/{projectId}/private/erase:
+    post:
+      summary: "Erase the project's private text (owner, owner mode): destroys the project key through the P2-01
+        deletion gate (409 DELETION_DENIED under a hold) and records ERASED; effective only once older backups,
+        WORM segments and mirrors are rotated out"
+      tags:
+        - Studio
+        - A4 Forge
+      security:
+        - amcAdminToken: []
+        - amcSessionCookie: []
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: ^a4p_[0-9a-f]{32}$
+        - name: x-amc-native-intent
+          in: header
+          required: true
+          schema:
+            type: string
+            enum:
+              - task-workspace-v1
+          description: Explicit native mutation intent.
+        - name: x-amc-native-csrf
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required with a human session cookie; obtain nativeCsrfToken from GET /auth/me. Never use in a URL.
+        - name: Origin
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Required for cookie mutations; must match a configured browser origin and the request Host.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/A4Reason"
+      responses:
+        "200":
+          description: Recorded transition (or the recorded result of a retried request ID).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4MutationResponse"
+        "400":
+          description: Invalid body or query, an identity or trust field in the body, SOD_VIOLATION or
+            HYPOTHESIS_SOURCE_MISMATCH.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "401":
+          description: No authenticated Studio session (A4 routes are served only through native Studio admission).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "403":
+          description: DEMO_REFUSED, ADMIN_TOKEN_REFUSED (the admin token reads only), NATIVE_READ_ONLY, role class or
+            project membership refused.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "404":
+          description: A4_PREVIEW_DISABLED without AMC_A4_PREVIEW=1, or an unknown project, gate or route.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/A4Error"
+        "409":
+          description: "A4_STALE_HEAD (with head and diff), A4_GATE_STALE, A4_ON_HOLD or A4_NOT_READY naming the items,
+            RESOURCE_DRIFTED, REQUEST_CONFLICT or an integrity failure (A4_INTEGRITY_FAILED with detail {status:
+            BLOCKED, reasonCodes: [A4_INTEGRITY_FAILED]} and no row named; GET …/verify reports the problems)."
           content:
             application/json:
               schema:
@@ -16054,3 +17816,733 @@ paths:
               schema:
                 $ref: "#/components/schemas/A4Error"
   # END GENERATED A4 PATHS
+  # BEGIN GENERATED RESULT ROUTE PATHS
+  /v1/score/evidence-drilldown/{runId}/{questionId}:
+    get:
+      summary: GET /api/v1/score/evidence-drilldown/:runId/:questionId
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: questionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/industry/adjust:
+    post:
+      summary: POST /api/v1/score/industry/adjust
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/industry/models:
+    get:
+      summary: GET /api/v1/score/industry/models
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/industry/model/{industryId}:
+    get:
+      summary: GET /api/v1/score/industry/model/:industryId
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: industryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/lane/safety-research:
+    post:
+      summary: POST /api/v1/score/lane/safety-research
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/judge-calibration:
+    post:
+      summary: POST /api/v1/score/judge-calibration
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/live-drift:
+    post:
+      summary: POST /api/v1/score/live-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/provider-drift:
+    post:
+      summary: POST /api/v1/score/provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/promptfoo-provider-drift:
+    post:
+      summary: POST /api/v1/score/promptfoo-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/inspect-provider-drift:
+    post:
+      summary: POST /api/v1/score/inspect-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/tensorzero-provider-drift:
+    post:
+      summary: POST /api/v1/score/tensorzero-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/helm-provider-drift:
+    post:
+      summary: POST /api/v1/score/helm-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/patronus-provider-drift:
+    post:
+      summary: POST /api/v1/score/patronus-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/trust/verify-claim:
+    post:
+      summary: POST /api/v1/score/trust/verify-claim
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/trust/transitive:
+    post:
+      summary: POST /api/v1/score/trust/transitive
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/trust/decay:
+    post:
+      summary: POST /api/v1/score/trust/decay
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/score/trust/inherited:
+    post:
+      summary: POST /api/v1/score/trust/inherited
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/passport/trust-token/verify:
+    post:
+      summary: POST /api/v1/passport/trust-token/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/passport/trust-token/translate:
+    post:
+      summary: POST /api/v1/passport/trust-token/translate
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/badge/export:
+    post:
+      summary: POST /api/v1/badge/export
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bundle/verify:
+    post:
+      summary: POST /api/v1/bundle/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bundle/inspect:
+    post:
+      summary: POST /api/v1/bundle/inspect
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bundle/diff:
+    post:
+      summary: POST /api/v1/bundle/diff
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bundle/export:
+    post:
+      summary: POST /api/v1/bundle/export
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/bom/verify:
+    post:
+      summary: POST /api/v1/bom/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/enforce/formal/certificate:
+    post:
+      summary: POST /api/v1/enforce/formal/certificate
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/enforce/formal/verify:
+    post:
+      summary: POST /api/v1/enforce/formal/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance:
+    post:
+      summary: POST /api/v1/assurance
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+    get:
+      summary: GET /api/v1/assurance
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      runs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            claim:
+                              $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/{runId}:
+    get:
+      summary: GET /api/v1/assurance/:runId
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: runId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/history:
+    get:
+      summary: GET /api/v1/assurance/history
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      runs:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            claim:
+                              $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/verify:
+    post:
+      summary: POST /api/v1/assurance/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/workspace/verify:
+    get:
+      summary: GET /api/v1/assurance/workspace/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/lab/{packName}:
+    post:
+      summary: POST /api/v1/assurance/lab/:packName
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: packName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/cert:
+    post:
+      summary: POST /api/v1/assurance/cert
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/cert/latest:
+    get:
+      summary: GET /api/v1/assurance/cert/latest
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/assurance/cert/verify:
+    post:
+      summary: POST /api/v1/assurance/cert/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/verify:
+    post:
+      summary: POST /api/v1/benchmarks/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/promptfoo-provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/promptfoo-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/inspect-provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/inspect-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/tensorzero-provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/tensorzero-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/benchmarks/helm-provider-drift:
+    post:
+      summary: POST /api/v1/benchmarks/helm-provider-drift
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/red-team/run:
+    post:
+      summary: POST /api/v1/shield/red-team/run
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/trust-pipeline/run:
+    post:
+      summary: POST /api/v1/shield/trust-pipeline/run
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/replay-corpus/verify:
+    post:
+      summary: POST /api/v1/shield/replay-corpus/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/live-drift/verify:
+    post:
+      summary: POST /api/v1/shield/live-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/judge-calibration/verify:
+    post:
+      summary: POST /api/v1/shield/judge-calibration/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/promptfoo-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/promptfoo-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/inspect-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/inspect-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/tensorzero-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/tensorzero-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/helm-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/helm-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/shield/patronus-provider-drift/verify:
+    post:
+      summary: POST /api/v1/shield/patronus-provider-drift/verify
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/compliance/regulatory/check:
+    post:
+      summary: POST /api/v1/compliance/regulatory/check
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  /v1/incidents/{id}/clocks:
+    get:
+      summary: GET /api/v1/incidents/:id/clocks
+      description: Claim-labelled result route. Its request and full response schemas are not documented yet; the
+        claim fields are.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The result with its claim fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClaimResult"
+  # END GENERATED RESULT ROUTE PATHS

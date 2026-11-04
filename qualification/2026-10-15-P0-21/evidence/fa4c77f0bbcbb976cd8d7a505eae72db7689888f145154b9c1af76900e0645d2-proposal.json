@@ -1,0 +1,198 @@
+{
+  "schemaVersion": 1,
+  "recipes": [
+    {
+      "id": "P021-C1-likert-origin",
+      "title": "Shift validated Likert conversion from (x-1)/4 to x/5",
+      "file": "src/score/units.ts",
+      "anchors": [
+        {
+          "find": "return percent(((x - 1) / 4) * 100);",
+          "replace": "return percent((x / 5) * 100);"
+        }
+      ],
+      "baselineSha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df",
+      "assertionPointers": [
+        {
+          "file": "tests/scoreUnits.test.ts",
+          "case": "conversions are explicit",
+          "line": 34,
+          "assertions": [
+            "likertToPercent(likert(5)) === 100",
+            "likertToPercent(likert(1)) === 0",
+            "likertToPercent(likert(3)) === 50"
+          ],
+          "reachability": "Calls the exact production converter directly; the first maximum assertion is predicted unchanged, then the answer1 assertion sees20 rather than0. Later assertions in that case can be masked by its first failure."
+        },
+        {
+          "file": "tests/domainAssessmentUnits.test.ts",
+          "case": "valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent",
+          "line": 34,
+          "reachability": "Actual assessDomain loops through answerFor and the shared converter. The domainScore50 assertion observes the changed middle answer without modifying source fixtures."
+        }
+      ],
+      "meaning": "A true conversion-value regression using still-valid finite percentages. No historical normalizeScore loop or clamping logic is reintroduced.",
+      "limits": "The maximum5 still yields100, so all-5 scoring alone is insufficient. Do not call this malformed-input admission or the old raw6 regression; it is the explicit conversion-origin control.",
+      "proposedMutantSha256": "e4fb73bd8410125725a5b298fbab9773e074c6f32e1c9e911c91faf66b8dbe0d"
+    },
+    {
+      "id": "P021-C2-L2-threshold",
+      "title": "Move the one L2 boundary from30 to35",
+      "file": "src/score/units.ts",
+      "anchors": [
+        {
+          "find": "if (p >= 30) return level(2);",
+          "replace": "if (p >= 35) return level(2);"
+        }
+      ],
+      "baselineSha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df",
+      "assertionPointers": [
+        {
+          "file": "tests/scoreUnits.test.ts",
+          "case": "percentToLevel is the one level table: L2 starts at 30",
+          "line": 42,
+          "reachability": "Original literal table contains29.9\u21921 and30\u21922. The30 assertion directly reaches this branch and is predicted to fail; the later55/75/90 cases must not be counted as reached after that first failure."
+        }
+      ],
+      "meaning": "Direct sensitivity of the already accepted30 boundary. It does not choose a new methodology or claim every consumer independently retested every edge.",
+      "limits": "All-5 results and the existing domain composite56 are above35; those positive controls can stay green. Keep current table/comment/docs intact outside the one private branch.",
+      "proposedMutantSha256": "f9d6017207c3e4c8f883180540892e6696457db2421e5256edf7d875ee632487"
+    },
+    {
+      "id": "P021-C3-numeric-self-eligible-cap",
+      "title": "Bypass only the numeric self-answer eligible-level cap",
+      "file": "src/claims/eligibility/evaluate.ts",
+      "anchors": [
+        {
+          "find": "    if (level !== null && level > 1) reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n    level = capAtOne(level);",
+          "replace": "    if (level !== null && level > 1) reasons.push(\"SELF_REPORTED_LEVEL_CAP\");\n    level = input.proposed.level;"
+        }
+      ],
+      "baselineSha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0",
+      "assertionPointers": [
+        {
+          "file": "tests/noCertificationFromSelfAssessment.test.ts",
+          "case": "all-5 answers on every registered pack are a complete self-assessment, not a certification",
+          "line": 70,
+          "assertionLine": 78,
+          "reachability": "scoreIndustryPack\u2192selfAssessPack\u2192packSelfAssessmentEnvelope\u2192envelopeForSelfAssessment\u2192evaluateClaimEligibility(method numeric_self_answer). Actual eligibleLevel is checked\u22641 for each registered pack."
+        },
+        {
+          "file": "tests/noCertificationFromSelfAssessment.test.ts",
+          "case": "the pack audit reports a self-reported overall with no certified field",
+          "line": 95,
+          "assertionLine": 101,
+          "reachability": "Current /3 audit calls the same self-assessment path and independently checks overall.eligibleLevel\u22641."
+        },
+        {
+          "file": "tests/logisticsIndustryPack.test.ts",
+          "case": "scores concrete logistics controls and surfaces low-level compliance gaps",
+          "line": 29,
+          "assertionLine": 54,
+          "reachability": "The actual answered logistics result must have eligibleLevel exactly1 while keeping its raw level5 and percentage100."
+        },
+        {
+          "file": "tests/claims/claimEligibility.test.ts",
+          "case": "numeric self-answers all 5, regulated / numeric self-answers, not regulated, proposed L3",
+          "line": 64,
+          "status": "Optional existing direct helper corpus, not required to add or run for this proposal.",
+          "reachability": "Existing table rows and weak-method loop directly require eligibleLevel1; they are not new tests."
+        }
+      ],
+      "meaning": "A proposed actual eligible-level leak is visible in existing pure producer outputs. The numeric branch kind, incomplete evidence, regulated blockPass and weak-method cap remain untouched.",
+      "limits": "The shared capAtOne call occurs twice, so bare global replacement is forbidden. The two-line numeric reason context above is exact-once. This does not make a regulated result pass: other status/applicability guards still block positive results. Preserve null as null, raw percentage/level, /3 signatures and all other status fields.",
+      "proposedMutantSha256": "2ab6f7120d00f5d618cd77a4565a3a6f9bbbe55a437072232d8d41e2aa0a24a3"
+    },
+    {
+      "id": "P021-C4-base-L3-self-tier",
+      "title": "Let only base L3 fall through to the self-reported tier list",
+      "file": "src/diagnostic/questionBank.ts",
+      "anchors": [
+        {
+          "find": ": level >= 2 // P0-21: self-reported evidence caps at L1",
+          "replace": ": level >= 2 && level !== 3 // P0-21: self-reported evidence caps at L1"
+        }
+      ],
+      "baselineSha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a",
+      "assertionPointers": [
+        {
+          "file": "tests/selfReportedLevelCap.test.ts",
+          "case": "no base gate at L2 or above accepts SELF_REPORTED",
+          "line": 64,
+          "assertionLine": 67,
+          "reachability": "Iterates actual registered questionBank gates includingL3 and rejects a SELF_REPORTED policy entry. It is independent of whether evaluateLevels admits any rows for that gate."
+        }
+      ],
+      "meaning": "Exact current policy-guard sensitivity corresponding to the historical L3 self-report regression. Original L2/L4+ tier policies remain unchanged.",
+      "limits": "AMC-5.29 has l2 tool-call-allowed/tool-call-denied and an empty l3 map. Its SELF_REPORTED-shaped runtime rows are rejected by emitterAdmits, imported rows have onlyL1 uses, and absent maps make higher levels not evaluated. Therefore current behavioral cap cases may stay green even while the policy assertion fails. Do not claim self-reported rows actually reachedL3, do not change emitter/maps/provenance to force it, and retain the current OBSERVEDL2 assertion.",
+      "proposedMutantSha256": "ada378cfbe2e0cf483b71c6426b2842a1900e871164c98aaf745b1d0aefdce23"
+    },
+    {
+      "id": "P021-C5-default-gate-self-tier",
+      "title": "Admit self-reported rows when a gate names no tiers",
+      "file": "src/diagnostic/gates.ts",
+      "anchors": [
+        {
+          "find": ": [\"OBSERVED\", \"ATTESTED\"]; // self-reported evidence never meets a gate that names no tiers",
+          "replace": ": [\"OBSERVED\", \"ATTESTED\", \"SELF_REPORTED\"]; // self-reported evidence never meets a gate that names no tiers"
+        }
+      ],
+      "baselineSha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+      "assertionPointers": [
+        {
+          "file": "tests/selfReportedLevelCap.test.ts",
+          "case": "a gate that lists no tiers defaults to OBSERVED and ATTESTED",
+          "line": 72,
+          "assertionLine": 77,
+          "reachability": "The original direct evaluateGate fixture setsL2, requires stdout with minima1 and no mustInclude fields. Existing SELF_REPORTED ParsedEvidenceEvents contain matching stdout; baseline refusal is false. Adding the tier directly changes that evaluated helper boundary. The later ATTESTED positive is a separate original assertion and may be masked by the first failure."
+        }
+      ],
+      "meaning": "Actual evaluateGate tier-filter refusal sensitivity on its existing typed input contract. This is not a full diagnostic provenance or signed-ledger integration.",
+      "limits": "The test passes already parsed hand-shaped rows to evaluateGate. Do not describe them as authenticated stored records or use this result to bypass parseEvidenceEventWith/readerTrustFor. No map or emitter change is needed or allowed.",
+      "proposedMutantSha256": "cdd692d54b24b7ac47726e7b578809ea01b097bf355b3ca3d1a3015a3159521c"
+    },
+    {
+      "id": "P021-C6-representative-raw-size",
+      "title": "Representative two-site raw-size historical regression",
+      "file": "src/domains/domainAssessmentEngine.ts",
+      "anchors": [
+        {
+          "find": "return likert(domainQuestionScores[question.id] ?? 1);",
+          "replace": "return (domainQuestionScores[question.id] ?? 1) as Likert1to5;"
+        },
+        {
+          "find": "const score = likertToPercent(answerFor(question, domainQuestionScores));",
+          "replace": "const raw = answerFor(question, domainQuestionScores);\n    const score = raw <= 5 ? (raw / 5) * 100 : raw;"
+        }
+      ],
+      "baselineSha256": "191a628a588bdcf40fcf9897df53d06946164ffbfd227df5e6aaebb58fa10c57",
+      "assertionPointers": [
+        {
+          "file": "tests/domainAssessmentUnits.test.ts",
+          "case": "a raw 6 in domainQuestionScores throws instead of scoring 6%"
+        },
+        {
+          "file": "tests/domainAssessmentUnits.test.ts",
+          "case": "a percentage passed as a Likert answer throws"
+        },
+        {
+          "file": "tests/domainAssessmentUnits.test.ts",
+          "case": "valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent"
+        }
+      ],
+      "meaning": "Representative historical size interpretation, not exact restoration of the old file. answerFor no longer validates; weighted scoring interpretsraw6 as6percent andraw80 as80percent; the later compliance-gap path reuses answerFor without revalidation. Other unit constructors stay untouched.",
+      "limits": "Two exact-once anchors in one TS file. Predictions only; preserve actual outcomes. No loop, historical schema, positive-map or production change.",
+      "proposedMutantSha256": "2f10cdaae2d42b94aa9b350151f2075d81f0d10daa0de851a1a9f921918f79c3"
+    }
+  ],
+  "corpus": [
+    "tests/scoreUnits.test.ts",
+    "tests/domainAssessmentUnits.test.ts",
+    "tests/noCertificationFromSelfAssessment.test.ts",
+    "tests/selfReportedLevelCap.test.ts",
+    "tests/logisticsIndustryPack.test.ts",
+    "tests/transparencyReport.test.ts"
+  ],
+  "staticExpectedCases": 37,
+  "noMutantWritten": true
+}

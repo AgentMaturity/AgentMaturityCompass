@@ -1,3 +1,4 @@
+import { runHashHttpOptions } from "./runHashPublication.js";
 /**
  * scoreRouter.ts — Score/diagnostic API routes.
  * Full parity with: amc score *, amc diagnostic *
@@ -76,9 +77,8 @@ const createClaimBodySchema = z.object({
   agentId: nonEmptyStringSchema,
   publicKeyHash: nonEmptyStringSchema,
   issuingWorkspace: nonEmptyStringSchema,
-  sharedSecret: optionalNonEmptyStringSchema,
-  amcScore: z.number().optional(),
-  amcLevel: optionalNonEmptyStringSchema,
+  audience: nonEmptyStringSchema, // P1-08: a claim is bound to the agent or workspace it is for
+  sharedSecret: optionalNonEmptyStringSchema, // the claim's amcScore and amcLevel come from the agent's trusted run, never the body
   amcPassportId: optionalNonEmptyStringSchema,
   ttlHours: z.number().positive().optional(),
 });
@@ -109,6 +109,7 @@ const safetyResearchBodySchema = z.object({
 });
 
 function scoreRouteError(res: ServerResponse, error: unknown, fallback: string, status = 500): void {
+  if (res.headersSent) return;
   if (isRequestBodyError(error)) {
     apiError(res, error.statusCode, error.message);
     return;
@@ -122,6 +123,7 @@ export async function handleScoreRoute(
   req: IncomingMessage,
   res: ServerResponse,
   workspace = process.cwd(),
+  revalidateAuthority?: () => boolean,
 ): Promise<boolean> {
 
   // GET /api/v1/score/status
@@ -327,7 +329,7 @@ export async function handleScoreRoute(
         runtimeForHarness: body.runtimeForHarness as import('../types.js').RuntimeName | undefined,
         questionSetVersion: body.questionSetVersion,
         applyIndustryPackWeights: body.applyIndustryPackWeights === true,
-      });
+      }, undefined, runHashHttpOptions(res, revalidateAuthority));
       queueScoreComputationMetric({
         agentId,
         runId: result.runId,
@@ -484,7 +486,7 @@ export async function handleScoreRoute(
       const body = await bodyJsonSchema(req, agentWindowBodySchema);
       const agentId = body.agentId ?? 'default';
       const { runDiagnostic } = await import('../diagnostic/runner.js');
-      const result = await runDiagnostic({ workspace, agentId, window: body.window ?? '30d' });
+      const result = await runDiagnostic({ workspace, agentId, window: body.window ?? '30d' }, undefined, runHashHttpOptions(res, revalidateAuthority));
       const score = result.layerScores?.reduce((s: number, l: { avgFinalLevel: number }) => s + l.avgFinalLevel, 0) ?? 0;
       const max = (result.layerScores?.length ?? 0) * 5;
       queueScoreComputationMetric({
@@ -512,7 +514,7 @@ export async function handleScoreRoute(
       const agentId = body.agentId ?? 'default';
       // Adversarial runs a special diagnostic pass — run diagnostic with adversarial window
       const { runDiagnostic } = await import('../diagnostic/runner.js');
-      const result = await runDiagnostic({ workspace, agentId, window: '7d', claimMode: 'auto' });
+      const result = await runDiagnostic({ workspace, agentId, window: '7d', claimMode: 'auto' }, undefined, runHashHttpOptions(res, revalidateAuthority));
       apiSuccess(res, { agentId, adversarialResult: result, inflationAttempts: result.inflationAttempts ?? [], unsupportedClaims: result.unsupportedClaimCount ?? 0 });
     } catch (err) {
       scoreRouteError(res, err, 'Adversarial test failed');
@@ -766,26 +768,21 @@ export async function handleScoreRoute(
     return true;
   }
 
-  // POST /api/v1/score/trust/create-claim — create a new agent identity claim
+  // POST /api/v1/score/trust/create-claim — an agent identity claim stating the agent's latest trusted score. A request
+  // never chooses that score, and never signs with the server's AMC_TRUST_SECRET (security review 2026-10-31).
   if (pathname === '/api/v1/score/trust/create-claim' && method === 'POST') {
     try {
       const body = await bodyJsonSchema(req, createClaimBodySchema);
-      const { createAgentClaim } = await import('../score/crossAgentTrust.js');
-      const secret = body.sharedSecret ?? process.env['AMC_TRUST_SECRET']; // P0-55: no well-known default secret
-      if (!secret) { apiError(res, 400, 'sharedSecret is required when the server sets no AMC_TRUST_SECRET'); return true; }
-      const result = createAgentClaim(
-        body.agentId,
-        body.publicKeyHash,
-        body.issuingWorkspace,
-        secret,
-        {
-          amcScore: body.amcScore,
-          amcLevel: body.amcLevel,
-          amcPassportId: body.amcPassportId,
-          ttlHours: body.ttlHours,
-        },
-      );
-      apiSuccess(res, result, 201);
+      if (!body.sharedSecret) { apiError(res, 400, 'sharedSecret is required: a request never signs with the server AMC_TRUST_SECRET'); return true; }
+      const [{ createAgentClaim }, { latestTrustedRun }, { assertNotExample }, { overallScore }, { scoreToLevel, toDisplayScore }] = await Promise.all([
+        import('../score/crossAgentTrust.js'), import('../governor/runTrust.js'), import('../claims/eligibility/exampleMode.js'),
+        import('../diagnostic/levelSemantics.js'), import('../score/scoringScale.js')]);
+      const { run, refusal } = latestTrustedRun(workspace, body.agentId);
+      if (!run) { apiError(res, 409, `NO_TRUSTED_RUN: agent ${body.agentId} has no trusted diagnostic run to state a score from${refusal ? ` (${refusal})` : ''}`); return true; }
+      assertNotExample(run, 'signed into an agent claim');
+      const internal = overallScore(run.layerScores) / 5; // levels 0-5 to the claim's 0-1 internal scale
+      apiSuccess(res, createAgentClaim(body.agentId, body.publicKeyHash, body.issuingWorkspace, body.sharedSecret, { audience: body.audience,
+        amcScore: toDisplayScore(internal), amcLevel: scoreToLevel(internal), amcPassportId: body.amcPassportId, ttlHours: body.ttlHours }), 201);
     } catch (err) {
       scoreRouteError(res, err, 'create-claim failed');
     }

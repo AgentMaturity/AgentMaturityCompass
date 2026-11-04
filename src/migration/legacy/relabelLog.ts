@@ -101,11 +101,3 @@ export function chainRecords(head: string, firstSeq: number,
   }
   return { lines, head };
 }
-
-/** Appends lines; the only write the log ever sees. */
-export function appendRelabelLines(workspace: string, lines: readonly string[]): void {
-  if (lines.length === 0) return;
-  const path = join(workspace, RELABEL_LOG);
-  mkdirSync(dirname(path), { recursive: true });
-  appendFileSync(path, `${lines.join("\n")}\n`);
-}

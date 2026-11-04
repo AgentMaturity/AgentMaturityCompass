@@ -1,0 +1,561 @@
+{
+  "kind": "P0-23 actual SDK MCP contract receipt; bounded source candidate, not whole issue qualification",
+  "atUtc": "2026-10-14T17:13:03.067544+00:00",
+  "worktree": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-23-current-qualification",
+  "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "childScope": [
+    "tests/mcpClaimLabels.test.ts"
+  ],
+  "file": {
+    "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/mcpClaimLabels.test.ts",
+    "sha256": "7b650560d33a25b793eba987063d269c40ba2a56987ff2d58fc16ba150e4d07e",
+    "lines": 368,
+    "newTestCases": 23,
+    "snapshotsAdded": 0
+  },
+  "parentProductionPatch": {
+    "path": "src/mcp/mcpClaimOutput.ts",
+    "sha256": "5585b461f2abe8e240cb5547e422e81e1eb758bb887119f22250bdc4aaf644ac",
+    "description": "The parent replaced domain evidence lookup in agentRunClaim with existing resolveRunReport, actual seal verification and envelopeForStoredRun. This child did not change production."
+  },
+  "execution": {
+    "node": "22.23.3",
+    "sdk": "1.32.1",
+    "runtime": "Every phase used the explicit /opt/homebrew/opt/node@22/bin/node and the journal wrapper prepended Node 22 to PATH.",
+    "journal": "/private/tmp/p0-23-commands-20261014.jsonl",
+    "phaseRecords": [
+      {
+        "phase": "mcp-sdk-first-red",
+        "journal": {
+          "name": "mcp-sdk-first-red",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-first-red-20261014.actual.json",
+          "exit": 1,
+          "durationMs": 4959,
+          "startedUtc": "2026-10-14T17:00:55.251929+00:00",
+          "log": "/private/tmp/p0-23-mcp-sdk-first-red-20261014.log",
+          "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+        },
+        "actualJson": "/private/tmp/p0-23-mcp-sdk-first-red-20261014.actual.json",
+        "actualSha256": "ef57c89df47f2ad24e89c8235740786f2e0a985e77c1f68693f2f072b98d83e3",
+        "logSha256": "332f8381a5c77a15a3c13eafa285c1f0c7fb4b13351950ad05ebc52471944280",
+        "tests": 2,
+        "passed": 1,
+        "failed": 1,
+        "pending": 0,
+        "todo": 0,
+        "cases": [
+          {
+            "name": "AMC MCP claim labels through the SDK discovers the exact 11 default tools with A4 preview disabled",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected { claimKind: 'observed', \u2026(2) } to match object { claimKind: 'self_reported', \u2026(2) }\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/mcpClaimLabels.test.ts:144:24\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": "mcp-sdk-red-diff",
+        "journal": {
+          "name": "mcp-sdk-red-diff",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-red-diff-20261014.actual.json",
+          "exit": 0,
+          "durationMs": 4094,
+          "startedUtc": "2026-10-14T17:01:44.930772+00:00",
+          "log": "/private/tmp/p0-23-mcp-sdk-red-diff-20261014.log",
+          "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+        },
+        "actualJson": "/private/tmp/p0-23-mcp-sdk-red-diff-20261014.actual.json",
+        "actualSha256": "2beafdc9383e587f55b72ff8d3fede921cfc8e86dbfd40c23eb992a9f825b543",
+        "logSha256": "529f27d20ae5c328e232cfad7dab378d611bd8e647f418cfd860a29802dbf263",
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "cases": [
+          {
+            "name": "AMC MCP claim labels through the SDK discovers the exact 11 default tools with A4 preview disabled",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ]
+      },
+      {
+        "phase": "mcp-sdk-two-case-green",
+        "journal": {
+          "name": "mcp-sdk-two-case-green",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-two-case-green-20261014.actual.json",
+          "exit": 0,
+          "durationMs": 3743,
+          "startedUtc": "2026-10-14T17:02:20.554029+00:00",
+          "log": "/private/tmp/p0-23-mcp-sdk-two-case-green-20261014.log",
+          "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+        },
+        "actualJson": "/private/tmp/p0-23-mcp-sdk-two-case-green-20261014.actual.json",
+        "actualSha256": "810a2a2ef7664f7efb6d412ffd31c5996067afd86c966bb5a36d68d9dfa1dcb5",
+        "logSha256": "33d1df7d5a0df9cba1a4433250c932af93bd7d2616a67937c6d8aa859552b649",
+        "tests": 2,
+        "passed": 2,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "cases": [
+          {
+            "name": "AMC MCP claim labels through the SDK discovers the exact 11 default tools with A4 preview disabled",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ]
+      },
+      {
+        "phase": "mcp-sdk-expanded-first",
+        "journal": {
+          "name": "mcp-sdk-expanded-first",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-expanded-first-20261014.actual.json",
+          "exit": 1,
+          "durationMs": 7284,
+          "startedUtc": "2026-10-14T17:07:46.873391+00:00",
+          "log": "/private/tmp/p0-23-mcp-sdk-expanded-first-20261014.log",
+          "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+        },
+        "actualJson": "/private/tmp/p0-23-mcp-sdk-expanded-first-20261014.actual.json",
+        "actualSha256": "8d10d9f5c34321dc78860228561e146cf0e4b27d1ebf03d40f3e6fff1e9c5f7b",
+        "logSha256": "b0e6239e2cc295f0030cbfefb5f7c044fe43650f3de3f8cfd7b126b933daaa34",
+        "tests": 23,
+        "passed": 21,
+        "failed": 2,
+        "pending": 0,
+        "todo": 0,
+        "cases": [
+          {
+            "name": "AMC MCP claim labels through the SDK discovers the exact 11 default tools with A4 preview disabled",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_list_agents returns actual canonical claim fields",
+            "status": "failed",
+            "failureMessages": [
+              "AssertionError: expected [] to have a length of 1 but got +0\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1389:20)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/mcpClaimLabels.test.ts:270:22\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+            ]
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_quickscore returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_get_guide returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_check_compliance returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_transparency_report returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_score_sector_pack returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_score_agent returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_list_evidence returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_query_diagnostic returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_get_recommendations returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a current transparency run with checked seal true preserves its own claim",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a current transparency run with checked seal false preserves its own claim",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK paid fixture refuses inherited pack ID __proto__",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK paid fixture refuses inherited pack ID constructor",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK paid fixture refuses inherited pack ID toString",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK paid fixture refuses inherited pack ID hasOwnProperty",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK an unpaid pack request remains an access refusal without an invented result",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_list_evidence keeps an empty workspace result not evaluated",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_query_diagnostic keeps an empty workspace result not evaluated",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a missing agent response is an error, not successful claim coverage",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK the incident-clock extension returns a regulated not-evaluated claim separately",
+            "status": "failed",
+            "failureMessages": [
+              "TypeError: Cannot read properties of undefined (reading 'some')\n    at verifyHexDigestAny (/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/crypto/keys.ts:170:21)\n    at verifyIncidentSignature (/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/incidents/incidentStore.ts:547:10)\n    at incidentFixture (/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/mcpClaimLabels.test.ts:200:12)\n    at /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/mcpClaimLabels.test.ts:346:24\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": "mcp-sdk-expanded-fixture-corrected",
+        "journal": {
+          "name": "mcp-sdk-expanded-fixture-corrected",
+          "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-expanded-fixture-corrected-20261014.actual.json",
+          "exit": 0,
+          "durationMs": 7578,
+          "startedUtc": "2026-10-14T17:09:50.362711+00:00",
+          "log": "/private/tmp/p0-23-mcp-sdk-expanded-fixture-corrected-20261014.log",
+          "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+        },
+        "actualJson": "/private/tmp/p0-23-mcp-sdk-expanded-fixture-corrected-20261014.actual.json",
+        "actualSha256": "1378c34960f1d04350080c43a77151de681f2cf912866767ade9d3cadfb73829",
+        "logSha256": "a91954efc318532ab495c7bfe9830eec4618a67185a223eed2f5215ee6a85315",
+        "tests": 23,
+        "passed": 23,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "cases": [
+          {
+            "name": "AMC MCP claim labels through the SDK discovers the exact 11 default tools with A4 preview disabled",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_list_agents returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_quickscore returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_get_guide returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_check_compliance returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_transparency_report returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_score_sector_pack returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_score_agent returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_list_evidence returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_query_diagnostic returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_get_recommendations returns actual canonical claim fields",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a current transparency run with checked seal true preserves its own claim",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a current transparency run with checked seal false preserves its own claim",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK paid fixture refuses inherited pack ID __proto__",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK paid fixture refuses inherited pack ID constructor",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK paid fixture refuses inherited pack ID toString",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK paid fixture refuses inherited pack ID hasOwnProperty",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK an unpaid pack request remains an access refusal without an invented result",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_list_evidence keeps an empty workspace result not evaluated",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK amc_query_diagnostic keeps an empty workspace result not evaluated",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK a missing agent response is an error, not successful claim coverage",
+            "status": "passed",
+            "failureMessages": []
+          },
+          {
+            "name": "AMC MCP claim labels through the SDK the incident-clock extension returns a regulated not-evaluated claim separately",
+            "status": "passed",
+            "failureMessages": []
+          }
+        ]
+      }
+    ],
+    "noListeningServers": true,
+    "noExternalRequests": true,
+    "noModelCalls": true,
+    "noGlobalCwdChange": true,
+    "noProducerOrHandlerMocks": true,
+    "noDependencyOrDocumentationChanges": true
+  },
+  "realRed": {
+    "phase": "mcp-sdk-first-red",
+    "tests": 2,
+    "passed": 1,
+    "failed": 1,
+    "pending": 0,
+    "todo": 0,
+    "failure": "Actual structuredContent claimKind was observed while the parseable transparency JSON payload was self_reported and labelled Legacy (1.x), self-reported. The actual test-key seal verified, successful JSON payload assertions and schema/trailer checks passed before parity failed.",
+    "meaning": "This was a real mismatch through SDK Client and InMemoryTransport, not a helper-only claim or fake seal."
+  },
+  "phasePrecision": [
+    "The phase named mcp-sdk-red-diff ran after the parent patch arrived before module import and actually passed 2/2. It is retained as an actual GREEN despite its diagnostic phase name; it is not represented as a second RED.",
+    "The explicit mcp-sdk-two-case-green ran the unchanged two-case test before expansion and passed 2/2, with zero pending/todo.",
+    "The first expanded phase ran 23 cases: 21 passed and two fixture preconditions failed. initWorkspace left a legacy root-scoped default absent from listAgents enumeration; the incident signature precondition incorrectly omitted verifyIncidentSignature\u2019s workspace argument. Both raw failures remain saved.",
+    "Fixture correction used an explicitly initialized and scaffolded fleet agent and the correct three-argument signature verifier. Assertions were preserved. The final expanded phase passed 23/23, with zero failed, pending or todo cases."
+  ],
+  "acceptanceMapping": [
+    {
+      "cases": 1,
+      "contract": "Actual SDK discovery",
+      "evidence": "Exact ten original names plus accepted amc_incident_clocks; A4 preview unset and no A4 tools exposed."
+    },
+    {
+      "cases": 1,
+      "contract": "Sealed 1.1.1 transparency parity",
+      "evidence": "The original JSON payload remains legacy self_reported/not_evaluated and agrees with the actual wrapper dimensions, kind, text line and structuredContent."
+    },
+    {
+      "cases": 10,
+      "contract": "Every original tool actually succeeds with canonical text and structured fields",
+      "evidence": "Allowed kind and all five dimensions parse. The second text block equals the actual structured claimLabel plus docs pointer. No Certified wording. Current sealed report tools remain observed/pass; aggregates and regulated questionnaire/compliance claims remain self_reported/not_evaluated."
+    },
+    {
+      "cases": 2,
+      "contract": "Current sealed and unsealed controls",
+      "evidence": "Checked 1.2.0 seal gives observed/pass; unsealed current VALID-declared bytes give self_reported/not_evaluated with untrusted evidence. Both JSON payload and wrapper agree and are not labelled legacy."
+    },
+    {
+      "cases": 4,
+      "contract": "Paid inherited-name refusal",
+      "evidence": "A locally signed Ed25519 fixture license is actually admitted before __proto__, constructor, toString and hasOwnProperty reach lookup. All actual SDK calls return isError with Unknown sector pack and no structured successful result."
+    },
+    {
+      "cases": 1,
+      "contract": "Unpaid access refusal",
+      "evidence": "The actual entitlement state is inactive. All-5 real pack input is refused without an invented successful claim. No unsigned ACTIVE flag, fake legacy key, network checkout or gate removal."
+    },
+    {
+      "cases": 2,
+      "contract": "Empty evidence and missing diagnostic run",
+      "evidence": "Actual successful responses remain self_reported/not_evaluated. Empty evidence events remain an empty array; no invented rows. This does not decide the unresolved raw-array contract from P0-22."
+    },
+    {
+      "cases": 1,
+      "contract": "Missing agent error boundary",
+      "evidence": "Actual amc_quickscore error is explicitly asserted as no successful result coverage, with no structured claim fabricated."
+    },
+    {
+      "cases": 1,
+      "contract": "Accepted incident-clock extension, separately from original ten",
+      "evidence": "A real monitor-key signed manual fixture incident verifies. The actual tool returns regulated self_reported/not_evaluated with unresolved applicability, explicit non-filing/non-applicability notes and no invented notice events."
+    }
+  ],
+  "perResultAssertions": [
+    "amc_list_agents returns the registered fixture agent\u2019s observed/pass claim and schema-valid dimensions separately from the aggregate self-reported not-evaluated claim.",
+    "amc_list_evidence includes a manual fixture event as self_reported and an explicitly synthetic fixture event as synthetic_example, with corresponding text row labels. Neither event claims observed agent behavior.",
+    "amc_score_sector_pack uses all existing clinical-trials questions with all-5 answers, preserves self_reported/not_evaluated and unresolved regulated applicability, and prints self-reported; not a certification.",
+    "amc_query_diagnostic resolves the actual fixture run inserted in the owned ledger, rather than merely exercising its no-run shortcut."
+  ],
+  "fixturesAndCleanup": [
+    "Workspace initialization, fleet buildAgentConfig/scaffoldAgent, diagnostic methodology, canonical hashing, auditor sealing and seal verification are production functions.",
+    "Stored report levels and coverage are explicitly controlled test records; observed classification here is a reader contract, not evidence of live agent or provider behavior.",
+    "Local Ed25519 license issuance and signature verification use existing entitlement functions. The handler sees that admitted entitlement; licensing is not mocked or bypassed.",
+    "Fixture incidents follow the existing incidentsStore typed/hash/signature pattern with empty applicability/notice claims.",
+    "Client and server in-memory transports close; only newly created fixture vaults and roots are locked/removed. Environment changes use vi.stubEnv and are restored. The real rate-limiter reset provides isolation without changing production rate limiting."
+  ],
+  "protectedInputChecks": [
+    {
+      "path": "src/domains/domainEvidence.ts",
+      "sha256": "964e0eccddeced986aa6e6f68358cb6e30ecf1b6901edc7761a11566d90c545a",
+      "equalBase": true
+    },
+    {
+      "path": "src/mcp/amcMcpServer.ts",
+      "sha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+      "equalBase": true
+    },
+    {
+      "path": "src/mcp/a4Tools.ts",
+      "sha256": "4614662d0246743ea1949aa9fcb93f88b6f9268fb5bdafe2f4747148d953ebca",
+      "equalBase": true
+    },
+    {
+      "path": "src/api/resultRouteRegistry.ts",
+      "sha256": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+      "equalBase": true
+    },
+    {
+      "path": "src/studio/studioServer.ts",
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+      "equalBase": true
+    },
+    {
+      "path": "src/studio/openapi.ts",
+      "sha256": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+      "equalBase": true
+    },
+    {
+      "path": "src/console/assets/components/claimBadge.js",
+      "sha256": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+      "equalBase": true
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "equalBase": true
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "equalBase": true
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "equalBase": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "equalBase": true
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "equalBase": true
+    }
+  ],
+  "patch": {
+    "path": "/private/tmp/p0-23-mcp-sdk-contracts-20261014.patch",
+    "sha256": "44c76a9d2168adc181c8648a41a133ffb434b5866f8641483acd05db21da7968"
+  },
+  "limits": [
+    "Final focused run covers 23 unique MCP cases only, not the entire source suite or whole P0-23 acceptance.",
+    "No current API or Studio output qualification, page screenshots, OpenAPI regeneration, mutation run, freeze check, global build/typecheck/lint or Node 24 execution was performed by this child.",
+    "No A4 preview handler was invoked and no held A4/privacy/P2-02 scope resumed.",
+    "No independently_reviewed production transcript was fabricated. Actual controlled event output includes synthetic labeling, but does not invent a positive independently reviewed result.",
+    "The root retains production review, commit, overall checks, ownership reconciliation and closing receipt responsibilities. P0-22 failures and the user-directed empty JSON contract remain preserved."
+  ]
+}

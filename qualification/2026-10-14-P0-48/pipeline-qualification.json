@@ -1,0 +1,316 @@
+{
+  "schemaVersion": 1,
+  "qualification": "P0-48 exact local workflow logging pipelines",
+  "sourceHead": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "sourceCheckout": "/Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass",
+  "startedUtc": "2026-10-14T14:35:53.969548+00:00",
+  "finishedUtc": "2026-10-14T14:35:55.173526+00:00",
+  "status": "passed",
+  "parser": {
+    "node": "v24.21.0",
+    "execPath": "/opt/homebrew/opt/node@24/bin/node",
+    "yamlVersion": "2.9.0",
+    "yamlModule": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/yaml"
+  },
+  "environment": {
+    "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+    "bash": "GNU bash, version 3.2.57(1)-release (arm64-apple-darwin25)",
+    "cut": "/usr/bin/cut, macOS local runner; ASCII lengths only"
+  },
+  "expected": {
+    "stdoutBytes": 5242880,
+    "stdoutNewlines": 0,
+    "stderr": "p0-48 pipeline stderr diagnostic\\n",
+    "fullBytes": 5242913,
+    "sha256": "c2ec3673e08dafae206033c2cf4ebe7af22b41b83c9984501d86b7e0bc7a3930"
+  },
+  "workflowsBefore": [
+    {
+      "id": "ci",
+      "file": ".github/workflows/ci.yml",
+      "job": "build-test",
+      "name": "Full suite and coverage thresholds",
+      "artifact": "tmp/ci-coverage/tests.log",
+      "run": "mkdir -p tmp/ci-coverage\nnpm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096\n",
+      "shell": "bash",
+      "workflowSha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6"
+    },
+    {
+      "id": "publish",
+      "file": ".github/workflows/npm-publish.yml",
+      "job": "test-build",
+      "name": "Test",
+      "artifact": "tmp/ci-tests/tests.log",
+      "run": "mkdir -p tmp/ci-tests\nnpm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096\n",
+      "shell": "bash",
+      "workflowSha256": "3c4bb58c740409850865514f3d07fe60efb115f471aa5aa2f307f28344e2f5f1"
+    }
+  ],
+  "workflowsAfter": [
+    {
+      "id": "ci",
+      "file": ".github/workflows/ci.yml",
+      "job": "build-test",
+      "name": "Full suite and coverage thresholds",
+      "artifact": "tmp/ci-coverage/tests.log",
+      "run": "mkdir -p tmp/ci-coverage\nnpm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096\n",
+      "shell": "bash",
+      "workflowSha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6"
+    },
+    {
+      "id": "publish",
+      "file": ".github/workflows/npm-publish.yml",
+      "job": "test-build",
+      "name": "Test",
+      "artifact": "tmp/ci-tests/tests.log",
+      "run": "mkdir -p tmp/ci-tests\nnpm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096\n",
+      "shell": "bash",
+      "workflowSha256": "3c4bb58c740409850865514f3d07fe60efb115f471aa5aa2f307f28344e2f5f1"
+    }
+  ],
+  "runBlocksAndShellByteIdenticalBeforeAfter": true,
+  "cases": [
+    {
+      "workflow": "ci",
+      "step": "Full suite and coverage thresholds",
+      "fixture": "/private/tmp/p0-48-pipeline-ci-exit0-r0djzas4",
+      "startedUtc": "2026-10-14T14:35:53.989019+00:00",
+      "finishedUtc": "2026-10-14T14:35:54.642875+00:00",
+      "producerExit": 0,
+      "shellExit": 0,
+      "exactRunBlock": "mkdir -p tmp/ci-coverage\nnpm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096\n",
+      "runBlockSha256": "2750ed6df3ed949e0d5693ce0445c110fcff681411b15073ede797b1ec6fa180",
+      "shellArgv": [
+        "/bin/bash",
+        "--noprofile",
+        "--norc",
+        "-e",
+        "-o",
+        "pipefail",
+        "-c",
+        "mkdir -p tmp/ci-coverage\nnpm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096\n"
+      ],
+      "npmArgv": [
+        "run",
+        "test:coverage",
+        "--",
+        "--exclude",
+        "tests/performance/**",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=hanging-process",
+        "--outputFile.json=tmp/ci-coverage/tests.json"
+      ],
+      "rawFiles": {
+        "fullArtifact": "/private/tmp/p0-48-pipeline-ci-exit0-r0djzas4/tmp/ci-coverage/tests.log",
+        "console": "/private/tmp/p0-48-pipeline-ci-exit0-r0djzas4/console.log",
+        "expected": "/private/tmp/p0-48-pipeline-ci-exit0-r0djzas4/expected-full.bin",
+        "shim": "/private/tmp/p0-48-pipeline-ci-exit0-r0djzas4/bin/npm",
+        "runBlock": "/private/tmp/p0-48-pipeline-ci-exit0-r0djzas4/run-block.sh",
+        "producerArgv": "/private/tmp/p0-48-pipeline-ci-exit0-r0djzas4/producer-argv.json"
+      },
+      "fullArtifact": {
+        "bytes": 5242913,
+        "sha256": "c2ec3673e08dafae206033c2cf4ebe7af22b41b83c9984501d86b7e0bc7a3930",
+        "longestLineBytes": 5242912
+      },
+      "console": {
+        "bytes": 4097,
+        "sha256": "5d05023e33a88151e829770ac45c53a2acd6f5bd111cbb101b8d649d7f9c2906",
+        "longestLineBytes": 4096
+      },
+      "checks": {
+        "shell_exit_preserved": true,
+        "full_artifact_exact_bytes": true,
+        "full_artifact_exact_sha256": true,
+        "full_artifact_stderr_preserved": true,
+        "console_longest_line_4096": true,
+        "console_exact_clipped_copy": true,
+        "npm_shim_was_the_executed_producer": true
+      },
+      "passed": true
+    },
+    {
+      "workflow": "ci",
+      "step": "Full suite and coverage thresholds",
+      "fixture": "/private/tmp/p0-48-pipeline-ci-exit17-ya_dfztu",
+      "startedUtc": "2026-10-14T14:35:53.989064+00:00",
+      "finishedUtc": "2026-10-14T14:35:55.110100+00:00",
+      "producerExit": 17,
+      "shellExit": 17,
+      "exactRunBlock": "mkdir -p tmp/ci-coverage\nnpm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096\n",
+      "runBlockSha256": "2750ed6df3ed949e0d5693ce0445c110fcff681411b15073ede797b1ec6fa180",
+      "shellArgv": [
+        "/bin/bash",
+        "--noprofile",
+        "--norc",
+        "-e",
+        "-o",
+        "pipefail",
+        "-c",
+        "mkdir -p tmp/ci-coverage\nnpm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096\n"
+      ],
+      "npmArgv": [
+        "run",
+        "test:coverage",
+        "--",
+        "--exclude",
+        "tests/performance/**",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=hanging-process",
+        "--outputFile.json=tmp/ci-coverage/tests.json"
+      ],
+      "rawFiles": {
+        "fullArtifact": "/private/tmp/p0-48-pipeline-ci-exit17-ya_dfztu/tmp/ci-coverage/tests.log",
+        "console": "/private/tmp/p0-48-pipeline-ci-exit17-ya_dfztu/console.log",
+        "expected": "/private/tmp/p0-48-pipeline-ci-exit17-ya_dfztu/expected-full.bin",
+        "shim": "/private/tmp/p0-48-pipeline-ci-exit17-ya_dfztu/bin/npm",
+        "runBlock": "/private/tmp/p0-48-pipeline-ci-exit17-ya_dfztu/run-block.sh",
+        "producerArgv": "/private/tmp/p0-48-pipeline-ci-exit17-ya_dfztu/producer-argv.json"
+      },
+      "fullArtifact": {
+        "bytes": 5242913,
+        "sha256": "c2ec3673e08dafae206033c2cf4ebe7af22b41b83c9984501d86b7e0bc7a3930",
+        "longestLineBytes": 5242912
+      },
+      "console": {
+        "bytes": 4097,
+        "sha256": "5d05023e33a88151e829770ac45c53a2acd6f5bd111cbb101b8d649d7f9c2906",
+        "longestLineBytes": 4096
+      },
+      "checks": {
+        "shell_exit_preserved": true,
+        "full_artifact_exact_bytes": true,
+        "full_artifact_exact_sha256": true,
+        "full_artifact_stderr_preserved": true,
+        "console_longest_line_4096": true,
+        "console_exact_clipped_copy": true,
+        "npm_shim_was_the_executed_producer": true
+      },
+      "passed": true
+    },
+    {
+      "workflow": "publish",
+      "step": "Test",
+      "fixture": "/private/tmp/p0-48-pipeline-publish-exit0-aw9uc5sb",
+      "startedUtc": "2026-10-14T14:35:53.988912+00:00",
+      "finishedUtc": "2026-10-14T14:35:54.753498+00:00",
+      "producerExit": 0,
+      "shellExit": 0,
+      "exactRunBlock": "mkdir -p tmp/ci-tests\nnpm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096\n",
+      "runBlockSha256": "b70b384327eedd13ccdc30b802149066a93860b1fdfa81d573e44a19c0a29495",
+      "shellArgv": [
+        "/bin/bash",
+        "--noprofile",
+        "--norc",
+        "-e",
+        "-o",
+        "pipefail",
+        "-c",
+        "mkdir -p tmp/ci-tests\nnpm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096\n"
+      ],
+      "npmArgv": [
+        "test",
+        "--",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=hanging-process",
+        "--outputFile.json=tmp/ci-tests/tests.json"
+      ],
+      "rawFiles": {
+        "fullArtifact": "/private/tmp/p0-48-pipeline-publish-exit0-aw9uc5sb/tmp/ci-tests/tests.log",
+        "console": "/private/tmp/p0-48-pipeline-publish-exit0-aw9uc5sb/console.log",
+        "expected": "/private/tmp/p0-48-pipeline-publish-exit0-aw9uc5sb/expected-full.bin",
+        "shim": "/private/tmp/p0-48-pipeline-publish-exit0-aw9uc5sb/bin/npm",
+        "runBlock": "/private/tmp/p0-48-pipeline-publish-exit0-aw9uc5sb/run-block.sh",
+        "producerArgv": "/private/tmp/p0-48-pipeline-publish-exit0-aw9uc5sb/producer-argv.json"
+      },
+      "fullArtifact": {
+        "bytes": 5242913,
+        "sha256": "c2ec3673e08dafae206033c2cf4ebe7af22b41b83c9984501d86b7e0bc7a3930",
+        "longestLineBytes": 5242912
+      },
+      "console": {
+        "bytes": 4097,
+        "sha256": "5d05023e33a88151e829770ac45c53a2acd6f5bd111cbb101b8d649d7f9c2906",
+        "longestLineBytes": 4096
+      },
+      "checks": {
+        "shell_exit_preserved": true,
+        "full_artifact_exact_bytes": true,
+        "full_artifact_exact_sha256": true,
+        "full_artifact_stderr_preserved": true,
+        "console_longest_line_4096": true,
+        "console_exact_clipped_copy": true,
+        "npm_shim_was_the_executed_producer": true
+      },
+      "passed": true
+    },
+    {
+      "workflow": "publish",
+      "step": "Test",
+      "fixture": "/private/tmp/p0-48-pipeline-publish-exit17-ytn5wtfx",
+      "startedUtc": "2026-10-14T14:35:53.988977+00:00",
+      "finishedUtc": "2026-10-14T14:35:55.002605+00:00",
+      "producerExit": 17,
+      "shellExit": 17,
+      "exactRunBlock": "mkdir -p tmp/ci-tests\nnpm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096\n",
+      "runBlockSha256": "b70b384327eedd13ccdc30b802149066a93860b1fdfa81d573e44a19c0a29495",
+      "shellArgv": [
+        "/bin/bash",
+        "--noprofile",
+        "--norc",
+        "-e",
+        "-o",
+        "pipefail",
+        "-c",
+        "mkdir -p tmp/ci-tests\nnpm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096\n"
+      ],
+      "npmArgv": [
+        "test",
+        "--",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=hanging-process",
+        "--outputFile.json=tmp/ci-tests/tests.json"
+      ],
+      "rawFiles": {
+        "fullArtifact": "/private/tmp/p0-48-pipeline-publish-exit17-ytn5wtfx/tmp/ci-tests/tests.log",
+        "console": "/private/tmp/p0-48-pipeline-publish-exit17-ytn5wtfx/console.log",
+        "expected": "/private/tmp/p0-48-pipeline-publish-exit17-ytn5wtfx/expected-full.bin",
+        "shim": "/private/tmp/p0-48-pipeline-publish-exit17-ytn5wtfx/bin/npm",
+        "runBlock": "/private/tmp/p0-48-pipeline-publish-exit17-ytn5wtfx/run-block.sh",
+        "producerArgv": "/private/tmp/p0-48-pipeline-publish-exit17-ytn5wtfx/producer-argv.json"
+      },
+      "fullArtifact": {
+        "bytes": 5242913,
+        "sha256": "c2ec3673e08dafae206033c2cf4ebe7af22b41b83c9984501d86b7e0bc7a3930",
+        "longestLineBytes": 5242912
+      },
+      "console": {
+        "bytes": 4097,
+        "sha256": "5d05023e33a88151e829770ac45c53a2acd6f5bd111cbb101b8d649d7f9c2906",
+        "longestLineBytes": 4096
+      },
+      "checks": {
+        "shell_exit_preserved": true,
+        "full_artifact_exact_bytes": true,
+        "full_artifact_exact_sha256": true,
+        "full_artifact_stderr_preserved": true,
+        "console_longest_line_4096": true,
+        "console_exact_clipped_copy": true,
+        "npm_shim_was_the_executed_producer": true
+      },
+      "passed": true
+    }
+  ],
+  "rawRetention": "All complete raw artifacts, console copies, expected bytes, producer receipts and shims remain in uniquely named own /private/tmp/p0-48-pipeline-* fixture directories. No cleanup or source modification performed.",
+  "limits": [
+    "This is exact Bash pipeline qualification with a controlled npm shim, not execution of real npm/Vitest tests.",
+    "Root checkout and install were not modified; installed Node24/YAML were read only from an existing fixture.",
+    "The result proves local full tee retention, ASCII console clipping and producer exit propagation for both current run blocks.",
+    "It qualifies no GitHub matrix completion, hosted runner, release, npm publication, full suite, coverage floor or runtime stdout policy.",
+    "No actual npm-publish trigger, source edit, build or cross-session action occurred."
+  ]
+}

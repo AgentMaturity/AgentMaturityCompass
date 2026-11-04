@@ -1,10 +1,11 @@
+import type { ExecutedRunScope, ExecutedScenarioRunReport } from "./assurance/executed/reportTypes.js";
 // "amc" is a session AMC ran natively through its own agent loop (SessionService)
-// — as opposed to "claude"/"gemini"/"openclaw", which mean AMC observed an
-// external agent of that kind, or "gateway"/"sandbox", the observation mechanism.
-// A native session labelled anything else would misreport how its evidence was
-// produced, which is exactly the provenance the trust plane exists to keep
-// honest.
-export type RuntimeName = "amc" | "claude" | "gemini" | "openclaw" | "unknown" | "mock" | "any" | "gateway" | "sandbox";
+// — as opposed to "claude"/"gemini"/"openclaw"/"pi", which mean AMC observed or
+// controlled an external agent of that kind, or "gateway"/"sandbox", the
+// observation mechanism. A native session labelled anything else would misreport
+// how its evidence was produced, which is exactly the provenance the trust plane
+// exists to keep honest.
+export type RuntimeName = "amc" | "claude" | "gemini" | "openclaw" | "pi" | "unknown" | "mock" | "any" | "gateway" | "sandbox";
 
 export type EvidenceEventType =
   | "stdin"
@@ -62,6 +63,12 @@ export type EvidenceEventType =
   | "session/resume"
   | "session/release"
   | "session/recovered"
+  // Writer fencing and resume rules (P2-12): an idle live writer's lease proof,
+  // the format change a version-2 writer records on a version-1 owner's session,
+  // and how resume settled one interrupted tool call.
+  | "session/heartbeat"
+  | "session/migration"
+  | "tool/reconciled"
   // The agent loop's own control rows (plan P3.2). Namespaced `loop/`, NOT
   // `agent/`: `agent_process_started` and friends above already mean "AMC
   // OBSERVED an external agent", and reusing that prefix would blur the
@@ -920,6 +927,13 @@ export interface QuestionScoreAgentTrialStatisticalLensRef {
   repairHint: string;
   rowHash: string;
 }
+
+/**
+ * Whether a result rests on a measurement (WP37), lifted from a4 readiness's NOT_EVALUATED / source_unavailable
+ * vocabulary: measured; not_evaluated (the input was empty, so there is nothing to score); source_unavailable (the
+ * input could not be read). Anything but "measured" must never be presented as a pass, 100% or healthy.
+ */
+export type EvidenceOutcome = "measured" | "not_evaluated" | "source_unavailable";
 
 export type QuestionScoreCodeQuestLanguage =
   | "python"
@@ -3098,13 +3112,15 @@ interface MetricValidationSharedFields {
   subtleMemoryJudgeAgreement0to1: number | null;
   subtleMemoryValidationPassRate0to1: number | null;
   subtleMemoryReportArtifactHashes: string[];
-  confidenceInterval: MetricValidationConfidenceInterval;
+  /** Null when the metric has no samples (not evaluated). */
+  confidenceInterval: MetricValidationConfidenceInterval | null;
   evidenceRefs: string[];
   warnings: string[];
 }
 
 export interface MetricValidationRow extends MetricValidationSharedFields {
-  constructValidity: number;
+  /** Null when the metric has no question scores (not evaluated). */
+  constructValidity: number | null;
   interRaterAgreement: number | null;
   testRetestStability: number | null;
   status: "pass" | "attention" | "fail";
@@ -3265,7 +3281,8 @@ export interface DiagnosticReport {
   inflationAttempts: { questionId: string; claimed: number; supported: number }[];
   unsupportedClaimCount: number;
   contradictionCount: number;
-  correlationRatio: number;
+  /** Null when no trace in the window carried a receipt (not measured); sealed reports written before this hold a number. */
+  correlationRatio: number | null;
   invalidReceiptsCount: number;
   correlationWarnings: string[];
   evidenceCoverage: number;
@@ -3287,7 +3304,7 @@ export interface DiagnosticReport {
   dualityCompliance?: {
     executeWithValidTicket: number;
     executeAttempted: number;
-    ratio: number;
+    ratio: number | null;
   };
   toolHubUsage?: {
     toolActionCount: number;
@@ -3393,6 +3410,10 @@ export interface AMCConfig {
   time?: unknown;
   /** P1-26 public anchoring, kept as written; src/transparency/anchors/anchor.ts parses it strictly. */
   transparency?: unknown;
+  /** P2-08 key providers, kept as written; src/keys/keysConfig.ts parses it strictly. */
+  keys?: unknown;
+  /** P2-22 operator workflow (inbox window, opt-in review timing), kept as written; src/operator/operatorSources.ts parses it. */
+  operator?: unknown;
 }
 
 export interface GatePolicy {
@@ -3410,10 +3431,15 @@ export interface GatePolicy {
     experimentId: string;
     minUpliftSuccessRate: number;
     minUpliftValuePoints: number;
+    denyIfRegression?: boolean;
+    candidateConfigDigest?: string;
+    minPairedCases?: number;
   };
 }
 
 export interface AssuranceScenarioResult {
+  /** Authenticated synthetic fixture diagnostics; never a regulated assurance pass. */
+  executed?: ExecutedScenarioRunReport;
   scenarioId: string;
   title: string;
   category: string;
@@ -3450,6 +3476,8 @@ export interface AssuranceScenarioResult {
 export type AssuranceGradingMethod = "keyword" | "token-claim" | "structured" | "executed";
 
 export interface AssurancePackResult {
+  /** Fixed reason when an entire pack could not be executed. */
+  notEvaluatedReason?: string;
   packId: string;
   title: string;
   scenarioCount: number;
@@ -3465,6 +3493,8 @@ export interface AssurancePackResult {
 }
 
 export interface AssuranceReport {
+  /** Native policy/profile subject used for synthetic fixture captures. */
+  executedScope?: ExecutedRunScope;
   assuranceRunId: string;
   agentId: string;
   /**
@@ -3602,14 +3632,69 @@ export interface CasebookRunCaseResult {
   title: string;
   baselineSuccess: boolean;
   candidateSuccess: boolean;
-  baselineValuePoints: number;
-  candidateValuePoints: number;
-  baselineCost: number;
-  candidateCost: number;
+  baselineValuePoints: number | null;
+  candidateValuePoints: number | null;
+  baselineSuccessPoints?: number | null;
+  candidateSuccessPoints?: number | null;
+  /** Measured tokens (not currency); null when the case's usage is not attributable or incomplete. */
+  baselineCost: number | null;
+  candidateCost: number | null;
   reasons: string[];
+  /** v2: per-side case status; a case is paired only when both sides are `passed` or `failed`. */
+  baselineStatus?: "passed" | "failed" | "unavailable";
+  candidateStatus?: "passed" | "failed" | "unavailable";
+  candidateReasons?: string[];
+  paired?: boolean;
+  baselineExecution?: { trialId: string; configDigest: string; caseSha256: string; eventIds: string[] } | null;
+  candidateExecution?: { trialId: string; configDigest: string; caseSha256: string; eventIds: string[] } | null;
+}
+
+/** One side of a v2 experiment: whose evidence, which closed range, and which bound trial (null: legacy window). */
+interface ExperimentSideIdentity {
+  agentId: string;
+  startedTs: number;
+  endedTs: number;
+  trialId: string | null;
+  configDigest: string | null;
+}
+
+export interface ExperimentExecution {
+  method: "native-trials/1";
+  /** Holdout partition of the casebook's cases; only its validation (held-out) split is executed and judged. */
+  partitionDigest: string;
+  evaluatedSplit: "validation";
+  caseIds: string[];
+  /** The executor runs each case's task; the judge (casebook validators) alone holds the rubric and expected evidence. */
+  executor: { identity: string };
+  judge: { identity: string };
+  limits: { maxExecutions: number; trialTimeoutMs: number; concurrency: number };
+  executions: Array<{ side: "baseline" | "candidate"; trialId: string; caseId: string; outcome: "completed" | "unavailable"; reason: string | null; durationMs: number;
+    resources?: import("./experiments/trialReceipts.js").TrialResourceReceipt;
+    roleCosts?: import("./experiments/experimentResourceUsage.js").ExperimentRoleCostSummary }>;
 }
 
 export interface ExperimentReport {
+  /** 2 for evidence-bound reports; absent on legacy reports, which stay readable but never promotion-eligible. */
+  schemaVersion?: 2;
+  methodVersion?: string;
+  /** sha256 over the signed casebook index and case files the report was computed from. */
+  casebookSha256?: string;
+  /** Advisory lint of agent-facing case prompts (e.g. measurement language); recorded, never a refusal. */
+  inputWarnings?: string[];
+  candidateConfigDigest?: string | null;
+  baseline?: ExperimentSideIdentity;
+  candidate?: ExperimentSideIdentity;
+  /** "paired-cases": rates and statistics use only cases determinate on both sides. */
+  pairing?: "paired-cases";
+  /** candidateUnavailable: paired cases the candidate left unavailable, scored as its failures (absent on older reports). */
+  counts?: { cases: number; pairedCases: number; excludedCases: number; candidateUnavailable?: number; baselineSuccesses: number; candidateSuccesses: number };
+  costUnit?: "tokens";
+  /** Absolute case-value points on a 0..100 scale; success rates remain fractions. */
+  valueUnit?: "points";
+  /** Recorded at execution time and covered by the report seal. Absent on legacy reports. */
+  warnings?: string[];
+  /** Present when AMC executed the trials itself (GAP-WP04): the held-out cases run, both role identities and each execution. */
+  execution?: ExperimentExecution;
   experimentId: string;
   agentId: string;
   ts: number;
@@ -3625,10 +3710,16 @@ export interface ExperimentReport {
   baselineValuePointsAvg: number;
   candidateValuePointsAvg: number;
   upliftValuePoints: number;
-  baselineCostPerSuccess: number;
-  candidateCostPerSuccess: number;
-  confidenceInterval95: [number, number];
-  effectSize: number;
+  /** Tokens per successful case; null when there is no success or cost evidence is incomplete. */
+  baselineCostPerSuccess: number | null;
+  candidateCostPerSuccess: number | null;
+  /** Paired bootstrap interval of the value-point difference; null when the sample is insufficient. */
+  confidenceInterval95: [number, number] | null;
+  confidenceStatus?: "estimated" | "insufficient";
+  /** v2: raw mean difference of value points (candidate - baseline). */
+  meanDifference?: number;
+  /** v2: standardized paired effect (Cohen's d_z), null when undefined. Legacy reports stored the raw difference here. */
+  effectSize: number | null;
   reportJsonSha256: string;
   reportSealSig: string;
 }

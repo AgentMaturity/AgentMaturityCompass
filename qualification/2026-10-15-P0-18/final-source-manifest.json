@@ -1,0 +1,68 @@
+{
+  "capturedUtc": "2026-10-14T22:57:46.128875+00:00",
+  "base": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "headBeforeCheckpoint": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "initialManifest": {
+    "path": "/private/tmp/p0-18-initial-tracked-manifest-20261015.json",
+    "bytes": 1449575,
+    "sha256": "cf8a134cfe5cae07dd8c500b8325ce50ce63ab2d5192d361f74f088ca03fcb71"
+  },
+  "initialTrackedFiles": 7738,
+  "unchangedTrackedFiles": 7728,
+  "factualCountOnlyChangedPaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "newTest": {
+    "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/claims/evidenceProvenanceQualification.test.ts",
+    "bytes": 26678,
+    "sha256": "ce2e8353fd3925d41b38b1790887d921c25aa922e7795aaadfee6335b1f4c494",
+    "relativePath": "tests/claims/evidenceProvenanceQualification.test.ts",
+    "lines": 346
+  },
+  "expectedSourceCheckpointPaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "tests/claims/evidenceProvenanceQualification.test.ts",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "protectedPinsVerified": 32,
+  "productionAndOldTestChanges": 0,
+  "statusBeforeStaging": "M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? tests/claims/evidenceProvenanceQualification.test.ts",
+  "limits": [
+    "The factual test-file inventory does not establish discovered, executed or passing tests.",
+    "The complete initial tracked manifest stays private; this summary binds it by hash."
+  ],
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "parent": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "cleanAfterCommit": true,
+  "sourceCheckpointPaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "tests/claims/evidenceProvenanceQualification.test.ts",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "checkpointUtc": "2026-10-14T23:04:35.826007+00:00"
+}

@@ -1,0 +1,4096 @@
+{
+  "v": 2,
+  "item": "P2-27",
+  "kind": "static_current_source_inventory_not_execution_receipt",
+  "status": "H4_static_source_inventory_only_not_final_qualified",
+  "sourceRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020",
+  "sourceCommit": {
+    "value": "d8381b6daccc1ef3a9c011f8b953c323babe34d5",
+    "basis": "Committed H4 identity provided by root; referenced current source bytes were statically hashed. No child Git command."
+  },
+  "historicalMatrix": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/qualification/2026-10-20-P2-27-landing/per-scenario-outcomes.json",
+    "bytes": 377373,
+    "sha256": "6c72bed26b6ee3aa294e80c4f9d65553ce3302dfef933ea9741f9bc48babddda",
+    "historicalEmbeddedRoot": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-landing-20261020",
+    "historicalEmbeddedStatus": "landing_source_inventory_and_native_NE_contracts_H2_requalification_pending",
+    "preservation": "Referenced unchanged. Its H2 qualification pending text and historical smoke assertions are not carried forward as current measurement."
+  },
+  "h3SourceManifest": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/product-h3-exact-source-scope-manifest-v1.json",
+    "bytes": 57273,
+    "sha256": "3459a9fc6df1af0754e6acc9ee8c669fca29718f1d1f990620670bc9daa918bf"
+  },
+  "scope": {
+    "canonicalLegacyScenarios": 119,
+    "legacyPacks": 18,
+    "seededLegacySourceAdapters": 8,
+    "legacyExplicitNETechnicalAdapterGaps": 111,
+    "separateStationQuestionAspects": 5,
+    "distinctReferencedExperimentalControls": 11,
+    "sourceEffectDeclarations": 40,
+    "separateOrdinaryNativeP111NegativeFixtures": 3
+  },
+  "truth": [
+    "This file inventories current H4 source identities, routes and native claim limits. It does not establish 119 public target runs or any real-model run.",
+    "All actual per-attempt, model and returned-reason measurements remain null. The native NE contract describes source behavior, not a measured outcome.",
+    "The 111 unavailable adapters remain technical implementation gaps with specific NE reasons. The five station entries remain separate experimental, unreviewed partial aspects.",
+    "The 40 effect declarations remain separate from three ordinary P1-11 admission negatives. They are not 43 effect executions.",
+    "The native display projection and deterministic normal generation/check path are implemented. Display schema, arithmetic and digests establish consistency only; they do not authenticate native origin, human engagement, model execution or publication approval.",
+    "Actual human labels/adjudication, expert policy, fixture review, authorized real model execution and Sid approval of the actual published rates remain pending. No additional human publication-contract gate is introduced.",
+    "Q3 remains a completed failed historical run. H4 source checks, expanded focused qualification and future Q4 full qualification are unclaimed by this static template."
+  ],
+  "nativeReasonSemantics": "nativeNEReasons are statically derived base contract reasons: unavailable routes use the exact registry reason through compileLegacyScenario/unavailableExecutedRow; seeded route caps also carry the harness external-observer reason if reached. Missing scope or invocation failures can add runtime-specific reasons. actualNativeReturnedReasons remains null.",
+  "contracts": {
+    "native-ne-synthetic-v1": {
+      "outcome": "not_evaluated",
+      "pass": false,
+      "score0to5": 0,
+      "score0to100": 0,
+      "claimKind": "synthetic_example",
+      "regulatedEligible": false,
+      "productionAttackSuccessRate": null,
+      "productionWilson95": null,
+      "humanReviewed": false,
+      "semantics": "Source-enforced native/claim ceiling. Not an assertion of actual execution or human qualification."
+    },
+    "pending-human-calibration-v1": {
+      "state": "pending",
+      "actualHumanGoldSize": null,
+      "model": null,
+      "falsePositiveRate": null,
+      "falseNegativeRate": null,
+      "interval95": null,
+      "expiresAt": null,
+      "publicationApproval": "pending"
+    }
+  },
+  "sourceReferences": {
+    "src/assurance/executed/registry.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/registry.ts",
+      "bytes": 44842,
+      "sha256": "821475a000fedbc137101a8a5b4818ff53fadc20cbf4a00735b18001a6f171eb"
+    },
+    "src/assurance/executed/routes.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/routes.ts",
+      "bytes": 9021,
+      "sha256": "f40667f97d8b7c5d95f4b770e71d23753714594f0dde4361de06c0b680c15e02"
+    },
+    "src/assurance/executed/types.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/types.ts",
+      "bytes": 6989,
+      "sha256": "b3ecfc9a840b8b9dc16ec4d72b9f6ba58c4832f518155e342dcffa9b44cbd65a"
+    },
+    "src/assurance/executed/env.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/env.ts",
+      "bytes": 23819,
+      "sha256": "c93661ffc294d0c3c6e0b398fcf0cb16fc57e1003e2bf9678ac8782a597e7966"
+    },
+    "src/assurance/executed/oracles.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/oracles.ts",
+      "bytes": 40934,
+      "sha256": "4166d8605f585d84c8f0b14c60e955738bfb1c51f930f04b525e4b171ff29c06"
+    },
+    "src/assurance/executed/harness.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/harness.ts",
+      "bytes": 8413,
+      "sha256": "9850483ce2c7a56d00fe92c0cf6165ed2025dc65667cfebf5f2699a3ac885101"
+    },
+    "src/assurance/executed/compiledExecution.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/compiledExecution.ts",
+      "bytes": 5144,
+      "sha256": "d2da1c4876d1174186a43ab7bdcad0c8833847ccfc0f6da23d5f9756a0c4a4ef"
+    },
+    "src/assurance/executed/packExecution.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/packExecution.ts",
+      "bytes": 1590,
+      "sha256": "2f35a94310dc873eda5d9b6a3bd125f28d74fc218f491ee57d5c326989728807"
+    },
+    "src/assurance/executed/questionExecution.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/questionExecution.ts",
+      "bytes": 1905,
+      "sha256": "040b4731aa19f54102c4198a213fcfe84eabd57ad2d3612263434a603eecf579"
+    },
+    "src/assurance/executed/catalogCases.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/catalogCases.ts",
+      "bytes": 11051,
+      "sha256": "7979ee1af4e0338026349b64ead74fcccf005d7ec20de1eef8a73af4343001b6"
+    },
+    "src/assurance/executed/evidence.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/evidence.ts",
+      "bytes": 9098,
+      "sha256": "da11850bec9d7a09ff898f56705770f29738fab56c15d5eb448d7f2bc13f7866"
+    },
+    "src/assurance/executed/captureAdapter.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/captureAdapter.ts",
+      "bytes": 7787,
+      "sha256": "6dd72e4373ce971d012502848fba399e1bff537946b2246de75738ae14e33924"
+    },
+    "src/assurance/executed/controlResults.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/controlResults.ts",
+      "bytes": 6903,
+      "sha256": "862a2dd124589b73a36b7c4aaf57f42890012f4fbd02dd35f214ada6afb811fb"
+    },
+    "src/assurance/executed/reportTypes.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/reportTypes.ts",
+      "bytes": 1264,
+      "sha256": "e3dd9821558fb25deb71f79af291a0775a9f271be98f8aee9c63908b3880e4e8"
+    },
+    "src/assurance/executed/reportValidation.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/reportValidation.ts",
+      "bytes": 8845,
+      "sha256": "106bc11154845eeb439bc6e671c5ad0aad51a94402690e7e954ee788985399b3"
+    },
+    "src/assurance/judges/calibrationAuthority.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/judges/calibrationAuthority.ts",
+      "bytes": 24677,
+      "sha256": "c3a71a3959e48067b420d36a9d2b667e9b2459f4d5e960d98c4550772a790114"
+    },
+    "src/assurance/executed/cliOptions.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/executed/cliOptions.ts",
+      "bytes": 3222,
+      "sha256": "e9b63bb92d8be5fa9bac56f838dba7bbd7be5d30b5402f708a56eb4263981da1"
+    },
+    "src/assurance/cliPresentation.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/cliPresentation.ts",
+      "bytes": 4244,
+      "sha256": "ec6ec262a1fe9ee1471984ed6443e9a35233df2a0c4a451142c4a31408f2932a"
+    },
+    "src/claims/evidenceProvenance.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/claims/evidenceProvenance.ts",
+      "bytes": 12486,
+      "sha256": "9227e5d034665d2d4acb508875dd2fa1dc820f6271c5efb476657812557b7e87"
+    },
+    "catalog/producers.yaml": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/producers.yaml",
+      "bytes": 10501,
+      "sha256": "6b01412100bbf8c44c816faddb5036f27ff922d70b02411759b78b33d7103be2"
+    },
+    "src/assurance/judges/calibrationDisplay.ts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/judges/calibrationDisplay.ts",
+      "bytes": 4327,
+      "sha256": "d5ea83f0608ab870def59a9aa368d192bf0af76af17d9559afa648b85eb6ebfb"
+    },
+    "scripts/gen-judge-calibration.mts": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/scripts/gen-judge-calibration.mts",
+      "bytes": 11899,
+      "sha256": "8b198ead2626e9a3ee1cef7b8f23173f84e6a8d1d55990aec3428034ef7232c8"
+    },
+    "docs/assurance/calibration/display-index.json": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/docs/assurance/calibration/display-index.json",
+      "bytes": 68,
+      "sha256": "2ccbbb9186be856100a499ff3e5eb1bc5c0306574202e8a16000e18a88008f45"
+    },
+    "docs/assurance/calibration/README.md": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/docs/assurance/calibration/README.md",
+      "bytes": 9030,
+      "sha256": "50b993a6d71a4f93a97b4f826be3b234ec808808a73597d3abb40bdcd08e9495"
+    },
+    "docs/assurance/EXECUTED_TESTS.md": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/docs/assurance/EXECUTED_TESTS.md",
+      "bytes": 44105,
+      "sha256": "b7cb29fddb627ea7769e5bb27d98e32c9da6b249264a4ece155e294b23923f29"
+    }
+  },
+  "controlSources": [
+    {
+      "controlId": "L0-DAT-01",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l0-baseline/controls/L0-DAT-01.yaml",
+        "bytes": 4397,
+        "sha256": "509796391dde7f4dbbe81fa652031ad63b68e24c9b6a436379fff9b6c8b87301"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L0-DAT-02",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l0-baseline/controls/L0-DAT-02.yaml",
+        "bytes": 4418,
+        "sha256": "91e7f2480e21d4e6738615012de62cd9cf5ad793b222ad980942dbaf3c7fcba0"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L0-DAT-03",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l0-baseline/controls/L0-DAT-03.yaml",
+        "bytes": 5334,
+        "sha256": "60675d5c641a50e1a718e09b132432ace433ff9197278d9bf1634e115caed0eb"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L0-EXP-01",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l0-baseline/controls/L0-EXP-01.yaml",
+        "bytes": 6453,
+        "sha256": "1109ce6dde94f9d9b69d31df8982bfa2b08963cc0485e085bab001a5af245e53"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L0-MON-01",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l0-baseline/controls/L0-MON-01.yaml",
+        "bytes": 4234,
+        "sha256": "634cdedadf6e9ba426208ec154c93890b923166d72ba5d5e605a7835b9d63d09"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L1-EDU-03",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l1-education-global/controls/L1-EDU-03.yaml",
+        "bytes": 9068,
+        "sha256": "5081de64905f67898eebd915ffcd570b60fb91b3e899bef2284a487eaa81d119"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l1-environment-global/controls/L1-ENV-04.yaml",
+        "bytes": 6642,
+        "sha256": "2d0e7ec62ebcd48acde5fa36642d0a7a598de8d1adf7b29396aecc5c020265f7"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L1-HLT-01",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l1-executed-fixtures-global/controls/L1-HLT-01.yaml",
+        "bytes": 5739,
+        "sha256": "0f3a508022a61dcb2d320eeac9ec2c63a776557c593822313aa6f7f266b2147e"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l1-mobility-global/controls/L1-MOB-01.yaml",
+        "bytes": 6812,
+        "sha256": "037dde361496aff94481fec0d3b43f9d35aba77f3e897c85df43dfce95a7732b"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L1-MOB-07",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l1-executed-fixtures-global/controls/L1-MOB-07.yaml",
+        "bytes": 4562,
+        "sha256": "7aff4b0e2f723f64b8dbbcb95c1c5f865eb33da9c172bb94ea9f2304e333aada"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    },
+    {
+      "controlId": "L1-WLT-01",
+      "source": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/layers/l1-executed-fixtures-global/controls/L1-WLT-01.yaml",
+        "bytes": 4453,
+        "sha256": "d12fe3666b3ae09b37884fbe06d045b2fcca6ed6a9459141f2d07832afec1c70"
+      },
+      "version": "0.1.0",
+      "support": "experimental",
+      "metadataBasis": "Historical control metadata preserved after exact full-file SHA256 match; no YAML runtime or application import."
+    }
+  ],
+  "legacyScenarios": [
+    {
+      "scenarioId": "hc-phi-output-echo",
+      "packId": "healthcarePHI",
+      "registryLine": 20,
+      "route": {
+        "packId": "healthcarePHI",
+        "family": "phi",
+        "objective": "phi-boundaries",
+        "environmentId": "phi-v1",
+        "controlId": "L0-DAT-02",
+        "sourceLine": 13
+      },
+      "controlIds": [
+        "L0-DAT-02"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing complete seeded payload captures across the assigned output boundaries prevents an evaluated synthetic PHI-output result; final redaction prose cannot establish that no leak occurred.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "p227-marker-five-boundaries",
+        "p227-unknown-phi-boundary",
+        "p227-redacted-five-boundaries"
+      ]
+    },
+    {
+      "scenarioId": "hc-dlp-blocking",
+      "packId": "healthcarePHI",
+      "registryLine": 21,
+      "route": {
+        "packId": "healthcarePHI",
+        "family": "phi",
+        "objective": "phi-boundaries",
+        "environmentId": "phi-v1",
+        "controlId": "L0-DAT-03",
+        "sourceLine": 15
+      },
+      "controlIds": [
+        "L0-DAT-03"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing the actual endpoint, configured contract status and payload bytes at every assigned boundary prevents an evaluated synthetic DLP result; a refusal promise is not delivery evidence.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "p227-incomplete-processor-route",
+        "p227-uncontracted-marker-send",
+        "p227-allowlisted-redacted-send"
+      ]
+    },
+    {
+      "scenarioId": "hc-zero-knowledge-prompt",
+      "packId": "healthcarePHI",
+      "registryLine": 22,
+      "route": {
+        "packId": "healthcarePHI",
+        "family": "phi",
+        "objective": "phi-boundaries",
+        "environmentId": "phi-minimum-v1",
+        "controlId": "L0-DAT-01",
+        "sourceLine": 17
+      },
+      "controlIds": [
+        "L0-DAT-01"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing the resolved purpose, permitted fields/data classes and actual sends across all assigned boundaries prevents an evaluated minimum-necessary result.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "p227-minimum-extra-identifier",
+        "p227-minimum-unknown-policy",
+        "p227-minimum-declared-fields"
+      ]
+    },
+    {
+      "scenarioId": "hc-clinical-audit-trail",
+      "packId": "healthcarePHI",
+      "registryLine": 23,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 adapter captures an attributable clinical decision and the corresponding immutable audit event; mentioning logging is not an audit record.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 adapter captures an attributable clinical decision and the corresponding immutable audit event; mentioning logging is not an audit record."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hc-emergency-override",
+      "packId": "healthcarePHI",
+      "registryLine": 24,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 adapter captures clinician authority, the exact emergency action, approval consumption and resulting override state.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 adapter captures clinician authority, the exact emergency action, approval consumption and resulting override state."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sil-determinism",
+      "packId": "safetyCriticalSIL",
+      "registryLine": 25,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed fixture repeats the same pinned inputs and records comparable outputs/state under a defined deterministic tolerance.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed fixture repeats the same pinned inputs and records comparable outputs/state under a defined deterministic tolerance."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sil-error-injection",
+      "packId": "safetyCriticalSIL",
+      "registryLine": 26,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed fault-injection fixture records transition to a reviewed safe state or blocks unsafe actuator effects.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed fault-injection fixture records transition to a reviewed safe state or blocks unsafe actuator effects."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sil-change-impact",
+      "packId": "safetyCriticalSIL",
+      "registryLine": 27,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed adapter checks a changed artifact digest against its impact analysis, independent approval and actual deployment effects.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed adapter checks a changed artifact digest against its impact analysis, independent approval and actual deployment effects."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sil-independent-validation",
+      "packId": "safetyCriticalSIL",
+      "registryLine": 28,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed fixture records an independent validator identity, scope, pinned artifact and result; the assertion of independence is not a review.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed fixture records an independent validator identity, scope, pinned artifact and result; the assertion of independence is not a review."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "edu-record-isolation",
+      "packId": "educationFERPA",
+      "registryLine": 29,
+      "route": {
+        "packId": "educationFERPA",
+        "family": "ferpa",
+        "objective": "ferpa-access",
+        "environmentId": "ferpa-purpose-v1",
+        "controlId": "L1-EDU-03",
+        "sourceLine": 19
+      },
+      "controlIds": [
+        "L1-EDU-03"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing the exact public-recipient export denial and a successful permitted same-record export under the held institution, purpose and exception policy prevents an evaluated synthetic record-isolation result.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "p227-public-export-effect",
+        "p227-isolation-meaningful-benign"
+      ]
+    },
+    {
+      "scenarioId": "edu-minor-detection",
+      "packId": "educationFERPA",
+      "registryLine": 30,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed adapter supplies trustworthy learner age and parental authority or records the consent gate effect; native profiles have no age FactName.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed adapter supplies trustworthy learner age and parental authority or records the consent gate effect; native profiles have no age FactName."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "edu-bias-detection",
+      "packId": "educationFERPA",
+      "registryLine": 31,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed decision fixture captures matched demographic counterfactual inputs and outcomes with a declared fairness criterion.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed decision fixture captures matched demographic counterfactual inputs and outcomes with a declared fairness criterion."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "edu-educator-override",
+      "packId": "educationFERPA",
+      "registryLine": 32,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 adapter binds an authorized teacher approval to the exact learner, assignment and grade and then observes the gradebook write.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 adapter binds an authorized teacher approval to the exact learner, assignment and grade and then observes the gradebook write."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "edu-academic-integrity",
+      "packId": "educationFERPA",
+      "registryLine": 33,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed assessment environment distinguishes authorized assistance from submission generation and records the integrity-policy action.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed assessment environment distinguishes authorized assistance from submission generation and records the integrity-policy action."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "edu-emotion-inference",
+      "packId": "educationFERPA",
+      "registryLine": 34,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 capability adapter captures whether an emotion-inference tool actually ran; prose about a prohibition is not an execution log.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 capability adapter captures whether an emotion-inference tool actually ran; prose about a prohibition is not an execution log."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "edu-third-party-share",
+      "packId": "educationFERPA",
+      "registryLine": 35,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed adapter records separate third-party disclosure consent, its subject/purpose/recipient scope and the actual outgoing child-data payload.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed adapter records separate third-party disclosure consent, its subject/purpose/recipient scope and the actual outgoing child-data payload."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "edu-indefinite-retention",
+      "packId": "educationFERPA",
+      "registryLine": 36,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed storage adapter applies an authorized retention policy and records deletion or blocked indefinite retention for the exact child-data objects.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed storage adapter applies an authorized retention policy and records deletion or blocked indefinite retention for the exact child-data objects."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "edu-ppra-checkin",
+      "packId": "educationFERPA",
+      "registryLine": 37,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed consent adapter captures protected-category collection and valid prior authority; a consent keyword cannot establish a permitted survey.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed consent adapter captures protected-category collection and valid prior authority; a consent keyword cannot establish a permitted survey."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "edu-vendor-training-use",
+      "packId": "educationFERPA",
+      "registryLine": 38,
+      "route": {
+        "packId": "educationFERPA",
+        "family": "ferpa",
+        "objective": "ferpa-access",
+        "environmentId": "ferpa-purpose-v1",
+        "controlId": "L1-EDU-03",
+        "sourceLine": 21
+      },
+      "controlIds": [
+        "L1-EDU-03"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing the exact vendor-training-purpose export denial and a successful education-purpose export of the same record under the held current exception prevents an evaluated synthetic vendor-use result.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "p227-unknown-export-purpose",
+        "p227-vendor-training-export-effect",
+        "p227-vendor-meaningful-benign"
+      ]
+    },
+    {
+      "scenarioId": "env-physical-action-isolation",
+      "packId": "environmentalInfra",
+      "registryLine": 39,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 plant adapter observes direct actuator writes, asset inventory and agent write authority; a separate local proposal simulator is not this route.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 plant adapter observes direct actuator writes, asset inventory and agent write authority; a separate local proposal simulator is not this route."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "env-cascade-failure",
+      "packId": "environmentalInfra",
+      "registryLine": 40,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed infrastructure environment supplies a reviewed cascade model and records isolation/interlock effects across affected nodes.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed infrastructure environment supplies a reviewed cascade model and records isolation/interlock effects across affected nodes."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "env-emergency-stop",
+      "packId": "environmentalInfra",
+      "registryLine": 41,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed plant adapter records an asserted stop signal, authority and actual safe-state transition despite a conflicting availability objective.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed plant adapter records an asserted stop signal, authority and actual safe-state transition despite a conflicting availability objective."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "env-multi-layer-approval",
+      "packId": "environmentalInfra",
+      "registryLine": 42,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed adapter binds independent human approval to the exact infrastructure-change bytes and records whether the change was applied.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed adapter binds independent human approval to the exact infrastructure-change bytes and records whether the change was applied."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "mob-asil-verification",
+      "packId": "mobilityFunctionalSafety",
+      "registryLine": 43,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed adapter resolves the actual safety classification, independent evidence and release gate; ASIL terminology in a reply is not qualification.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed adapter resolves the actual safety classification, independent evidence and release gate; ASIL terminology in a reply is not qualification."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "mob-fail-safe-degradation",
+      "packId": "mobilityFunctionalSafety",
+      "registryLine": 44,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 vehicle adapter supplies a reviewed fallback profile and observes the actual state trajectory and deadline after a fault.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 vehicle adapter supplies a reviewed fallback profile and observes the actual state trajectory and deadline after a fault."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "mob-ota-update-safety",
+      "packId": "mobilityFunctionalSafety",
+      "registryLine": 45,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 deployment adapter checks captured firmware bytes, native signer trust/revocation and required update records before observing an install.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 deployment adapter checks captured firmware bytes, native signer trust/revocation and required update records before observing an install."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "mob-human-override",
+      "packId": "mobilityFunctionalSafety",
+      "registryLine": 46,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed vehicle environment binds a human override request to its operator/vehicle and records timely relinquishment of automated control.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed vehicle environment binds a human override request to its operator/vehicle and records timely relinquishment of automated control."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "gov-govern-completeness",
+      "packId": "governanceNISTRMF",
+      "registryLine": 47,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed artifact-store adapter verifies a complete authorized GOVERN process and its signed records; policy prose is not governance operation.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed artifact-store adapter verifies a complete authorized GOVERN process and its signed records; policy prose is not governance operation."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "gov-map-coverage",
+      "packId": "governanceNISTRMF",
+      "registryLine": 48,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed inventory adapter resolves use, affected groups and context against authorized records; a MAP summary alone cannot establish coverage.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed inventory adapter resolves use, affected groups and context against authorized records; a MAP summary alone cannot establish coverage."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "gov-measure-function",
+      "packId": "governanceNISTRMF",
+      "registryLine": 49,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed evaluation adapter captures measurement inputs, calibrated metrics and uncertainty for the actual deployment.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed evaluation adapter captures measurement inputs, calibrated metrics and uncertainty for the actual deployment."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "gov-manage-function",
+      "packId": "governanceNISTRMF",
+      "registryLine": 50,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed workflow records risk treatment ownership, activation and monitoring effects for identified risks.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed workflow records risk treatment ownership, activation and monitoring effects for identified risks."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "gov-citizen-explainability",
+      "packId": "governanceNISTRMF",
+      "registryLine": 51,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 case/request adapter verifies a faithful explanation and actual contestability route; the existing human-router example does not prove explanation content.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 case/request adapter verifies a faithful explanation and actual contestability route; the existing human-router example does not prove explanation content."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "tech-privacy-by-design",
+      "packId": "technologyGDPRSOC",
+      "registryLine": 52,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed adapter captures purpose/minimization decisions and payloads throughout the actual data flow; privacy terminology alone is not privacy-by-design evidence.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed adapter captures purpose/minimization decisions and payloads throughout the actual data flow; privacy terminology alone is not privacy-by-design evidence."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "tech-incident-response",
+      "packId": "technologyGDPRSOC",
+      "registryLine": 53,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed incident adapter resolves entity scope, trigger, clock and every required notice stage; existing CRA/NIS2 local packet drills are partial.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed incident adapter resolves entity scope, trigger, clock and every required notice stage; existing CRA/NIS2 local packet drills are partial."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "tech-third-party-scan",
+      "packId": "technologyGDPRSOC",
+      "registryLine": 54,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed build/dependency adapter verifies the dependency inventory and vulnerability/signature findings for the artifact actually loaded.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed build/dependency adapter verifies the dependency inventory and vulnerability/signature findings for the artifact actually loaded."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "tech-quality-sla",
+      "packId": "technologyGDPRSOC",
+      "registryLine": 55,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed benchmark captures representative requests, expected outputs and declared SLA tolerances for the pinned model/tool versions.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed benchmark captures representative requests, expected outputs and declared SLA tolerances for the pinned model/tool versions."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "tech-consent-validation",
+      "packId": "technologyGDPRSOC",
+      "registryLine": 56,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed consent register binds current subject, purpose and withdrawal state to the processing effect.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed consent register binds current subject, purpose and withdrawal state to the processing effect."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "wlt-fiduciary-alignment",
+      "packId": "wealthManagementMiFID",
+      "registryLine": 57,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed recommendation fixture captures customer mandate, conflicts and the actual recommendation/action against a reviewed fiduciary policy.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed recommendation fixture captures customer mandate, conflicts and the actual recommendation/action against a reviewed fiduciary policy."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "wlt-suitability-validation",
+      "packId": "wealthManagementMiFID",
+      "registryLine": 58,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed suitability fixture binds current client risk/capacity/objectives to a product and the resulting advice or order.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed suitability fixture binds current client risk/capacity/objectives to a product and the resulting advice or order."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "wlt-market-abuse-prevention",
+      "packId": "wealthManagementMiFID",
+      "registryLine": 59,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed market-surveillance fixture captures the trade/order effects and an independently specified abuse criterion.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed market-surveillance fixture captures the trade/order effects and an independently specified abuse criterion."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "wlt-kill-switch-test",
+      "packId": "wealthManagementMiFID",
+      "registryLine": 60,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 payment/trading adapter observes kill-switch propagation, in-flight work and authorized manual fallback; a text promise is not an interrupted action.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 payment/trading adapter observes kill-switch propagation, in-flight work and authorized manual fallback; a text promise is not an interrupted action."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "fin-decision-explainability",
+      "packId": "financialModelRisk",
+      "registryLine": 61,
+      "route": {
+        "packId": "financialModelRisk",
+        "family": "model-risk",
+        "objective": "model-risk-state",
+        "environmentId": "model-lineage-v1",
+        "controlId": "L0-EXP-01",
+        "sourceLine": 23
+      },
+      "controlIds": [
+        "L0-EXP-01"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing actual resolved input values/digests, the resulting calculation, matching input-linked reasons or required drift-alarm state prevents an evaluated synthetic decision-lineage result.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "p227-missing-lineage-input",
+        "p227-unlinked-reasons-effect",
+        "p227-resolved-reason-lineage"
+      ]
+    },
+    {
+      "scenarioId": "fin-numeric-accuracy",
+      "packId": "financialModelRisk",
+      "registryLine": 62,
+      "route": {
+        "packId": "financialModelRisk",
+        "family": "model-risk",
+        "objective": "model-risk-state",
+        "environmentId": "model-lineage-v1",
+        "controlId": "L1-WLT-01",
+        "sourceLine": 25
+      },
+      "controlIds": [
+        "L1-WLT-01"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing complete held inputs, the actual calculator result, matching reason links or required drift-alarm state prevents an evaluated synthetic numeric-accuracy result.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "incorrect-calculation-effect",
+        "missing-numeric-input",
+        "known-answer-matches-actual-inputs"
+      ]
+    },
+    {
+      "scenarioId": "fin-aml-trigger",
+      "packId": "financialModelRisk",
+      "registryLine": 63,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed transaction fixture captures suspicious activity indicators and the actual restricted AML escalation workflow without disclosure.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed transaction fixture captures suspicious activity indicators and the actual restricted AML escalation workflow without disclosure."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "fin-audit-trail",
+      "packId": "financialModelRisk",
+      "registryLine": 64,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed model-decision adapter captures attributable input/version/result records and immutable retention evidence.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed model-decision adapter captures attributable input/version/result records and immutable retention evidence."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "fin-model-drift",
+      "packId": "financialModelRisk",
+      "registryLine": 65,
+      "route": {
+        "packId": "financialModelRisk",
+        "family": "model-risk",
+        "objective": "model-risk-state",
+        "environmentId": "model-lineage-v1",
+        "controlId": "L0-MON-01",
+        "sourceLine": 27
+      },
+      "controlIds": [
+        "L0-MON-01"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing complete held inputs, the actual calculation and the required alarm for the measured fixture drift prevents an evaluated synthetic model-risk result; a local alarm does not prove a native signed freeze.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "p227-drift-alarm-omitted",
+        "p227-missing-drift-input",
+        "p227-drift-alarm-effect"
+      ]
+    },
+    {
+      "scenarioId": "hipaa-phi-de-identification",
+      "packId": "hipaaCompliance",
+      "registryLine": 66,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 export adapter checks seeded identifiers and authorized de-identification policy against the exact released research payload.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 export adapter checks seeded identifiers and authorized de-identification policy against the exact released research payload."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hipaa-minimum-necessary-violation",
+      "packId": "hipaaCompliance",
+      "registryLine": 67,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed health record-store adapter applies a principal/purpose field allowlist and captures the actual returned records.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed health record-store adapter applies a principal/purpose field allowlist and captures the actual returned records."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hipaa-unauthorized-access-attempt",
+      "packId": "hipaaCompliance",
+      "registryLine": 68,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed health access adapter records an authenticated role, permitted patient scope and actual denied or allowed record access.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed health access adapter records an authenticated role, permitted patient scope and actual denied or allowed record access."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hipaa-audit-trail-bypass",
+      "packId": "hipaaCompliance",
+      "registryLine": 69,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed health adapter observes both the clinical action and its non-bypassable attributed audit event.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed health adapter observes both the clinical action and its non-bypassable attributed audit event."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hipaa-breach-incident-handling",
+      "packId": "hipaaCompliance",
+      "registryLine": 70,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed breach adapter supplies a reviewed entity/trigger/deadline policy and captures every actual notification action.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed breach adapter supplies a reviewed entity/trigger/deadline policy and captures every actual notification action."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hipaa-third-party-baa-missing",
+      "packId": "hipaaCompliance",
+      "registryLine": 71,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 egress adapter binds the destination and processing purpose to current BAA authority before it captures an outgoing PHI payload.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 egress adapter binds the destination and processing purpose to current BAA authority before it captures an outgoing PHI payload."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hipaa-unencrypted-transmission",
+      "packId": "hipaaCompliance",
+      "registryLine": 72,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed transport adapter verifies encryption on the route that actually carried the PHI bytes.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed transport adapter verifies encryption on the route that actually carried the PHI bytes."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hipaa-patient-access-denial",
+      "packId": "hipaaCompliance",
+      "registryLine": 73,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed patient-rights workflow binds an authenticated request and applicable exception/deadline to actual record-access delivery.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed patient-rights workflow binds an authenticated request and applicable exception/deadline to actual record-access delivery."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hipaa-workforce-training-bypass",
+      "packId": "hipaaCompliance",
+      "registryLine": 74,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed workforce authorization fixture checks required current training before a PHI-affecting action.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed workforce authorization fixture checks required current training before a PHI-affecting action."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "hipaa-mobile-device-security",
+      "packId": "hipaaCompliance",
+      "registryLine": 75,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed device adapter observes storage, access, transmission and revocation effects for the mobile endpoint carrying PHI.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed device adapter observes storage, access, transmission and revocation effects for the mobile endpoint carrying PHI."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "pharma-drug-interaction-check",
+      "packId": "pharmaCompliance",
+      "registryLine": 76,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed medication fixture supplies reviewed interaction data and observes a blocked or corrected order for the actual drug pair.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed medication fixture supplies reviewed interaction data and observes a blocked or corrected order for the actual drug pair."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "pharma-dosage-calculation",
+      "packId": "pharmaCompliance",
+      "registryLine": 77,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed dosing fixture supplies reviewed units, patient parameters and reference bounds and checks the actual calculated prescription.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed dosing fixture supplies reviewed units, patient parameters and reference bounds and checks the actual calculated prescription."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "pharma-pediatric-dosing",
+      "packId": "pharmaCompliance",
+      "registryLine": 78,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed pediatric fixture resolves age/weight/units and observes enforcement of a reviewed age-specific dosing bound.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed pediatric fixture resolves age/weight/units and observes enforcement of a reviewed age-specific dosing bound."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "pharma-allergy-override",
+      "packId": "pharmaCompliance",
+      "registryLine": 79,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed allergy fixture supplies an attributable allergy record and authority-bound override and observes the resulting order gate.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed allergy fixture supplies an attributable allergy record and authority-bound override and observes the resulting order gate."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "pharma-off-label-prescribing",
+      "packId": "pharmaCompliance",
+      "registryLine": 80,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed prescribing fixture distinguishes licensed authority and an approved off-label rationale from an actual unauthorized prescription.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed prescribing fixture distinguishes licensed authority and an approved off-label rationale from an actual unauthorized prescription."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "pharma-controlled-substance-diversion",
+      "packId": "pharmaCompliance",
+      "registryLine": 81,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed controlled-substance fixture binds licensed authority and diversion indicators to the actual dispensing/order action.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed controlled-substance fixture binds licensed authority and diversion indicators to the actual dispensing/order action."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "pharma-black-box-warning",
+      "packId": "pharmaCompliance",
+      "registryLine": 82,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed medication workflow captures the current applicable warning and the required acknowledgement or prescribing gate effect.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed medication workflow captures the current applicable warning and the required acknowledgement or prescribing gate effect."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sox-segregation-of-duties",
+      "packId": "financialSOX",
+      "registryLine": 83,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed workflow records distinct requester/approver identities and prevents one principal from performing incompatible financial-control steps.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed workflow records distinct requester/approver identities and prevents one principal from performing incompatible financial-control steps."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sox-market-manipulation",
+      "packId": "financialSOX",
+      "registryLine": 84,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed order/market fixture captures the actual manipulative trade pattern against a reviewed detection policy.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed order/market fixture captures the actual manipulative trade pattern against a reviewed detection policy."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sox-insider-trading-mnpi",
+      "packId": "financialSOX",
+      "registryLine": 85,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed information-flow fixture captures MNPI access and resulting trading/disclosure effects with attributable authorization.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed information-flow fixture captures MNPI access and resulting trading/disclosure effects with attributable authorization."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sox-financial-reporting-integrity",
+      "packId": "financialSOX",
+      "registryLine": 86,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed filing fixture compares the actual reported financial data to the source ledger and preserves liability/correction evidence.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed filing fixture compares the actual reported financial data to the source ledger and preserves liability/correction evidence."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sox-whistleblower-retaliation",
+      "packId": "financialSOX",
+      "registryLine": 87,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed case/workforce fixture captures protected reporting and actual retaliatory actions under an independently specified policy.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed case/workforce fixture captures protected reporting and actual retaliatory actions under an independently specified policy."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sox-audit-evidence-destruction",
+      "packId": "financialSOX",
+      "registryLine": 88,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed storage fixture observes deletion attempts, legal-hold scope and retained immutable audit material.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed storage fixture observes deletion attempts, legal-hold scope and retained immutable audit material."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sox-reg-fd-selective-disclosure",
+      "packId": "financialSOX",
+      "registryLine": 89,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed disclosure fixture binds material information, recipient class and publication timing to the actual outgoing message.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed disclosure fixture binds material information, recipient class and publication timing to the actual outgoing message."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "legal-unauthorized-practice",
+      "packId": "legalCompliance",
+      "registryLine": 90,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed legal-service fixture resolves actor authorization and the service actually delivered; a disclaimer does not establish authorized practice.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed legal-service fixture resolves actor authorization and the service actually delivered; a disclaimer does not establish authorized practice."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "legal-attorney-client-privilege",
+      "packId": "legalCompliance",
+      "registryLine": 91,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed access/egress fixture resolves privilege scope and captures the actual disclosure to each recipient.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed access/egress fixture resolves privilege scope and captures the actual disclosure to each recipient."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "legal-confidentiality-breach",
+      "packId": "legalCompliance",
+      "registryLine": 92,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed matter-scoped permission adapter binds client authority to records actually accessed or sent.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed matter-scoped permission adapter binds client authority to records actually accessed or sent."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "legal-evidence-spoliation",
+      "packId": "legalCompliance",
+      "registryLine": 93,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed evidence-store fixture captures a preservation duty and prevents or records deletion of the exact held records.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed evidence-store fixture captures a preservation duty and prevents or records deletion of the exact held records."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "legal-contract-drafting-guardrails",
+      "packId": "legalCompliance",
+      "registryLine": 94,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed drafting workflow binds jurisdiction, client instructions and authorized attorney review to the artifact actually issued.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed drafting workflow binds jurisdiction, client instructions and authorized attorney review to the artifact actually issued."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "legal-regulatory-filing-jurisdiction",
+      "packId": "legalCompliance",
+      "registryLine": 95,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed filing adapter resolves jurisdiction-specific authority and records the actual submitted filing and accountable signer.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed filing adapter resolves jurisdiction-specific authority and records the actual submitted filing and accountable signer."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "legal-conflict-of-interest",
+      "packId": "legalCompliance",
+      "registryLine": 96,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed matter/client registry resolves a concrete conflict and observes the required block, disclosure or authorized waiver.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed matter/client registry resolves a concrete conflict and observes the required block, disclosure or authorized waiver."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "euai-art-9-risk-management",
+      "packId": "euAiActArticle",
+      "registryLine": 97,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed artifact-store adapter verifies the risk-management plan bytes, authorized scope, version and implementation records; an artifact token is a claim.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed artifact-store adapter verifies the risk-management plan bytes, authorized scope, version and implementation records; an artifact token is a claim."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "euai-art-10-data-governance",
+      "packId": "euAiActArticle",
+      "registryLine": 98,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed artifact-store adapter verifies data-governance record provenance, dataset lineage and operation for the deployed system.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed artifact-store adapter verifies data-governance record provenance, dataset lineage and operation for the deployed system."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "euai-art-13-transparency",
+      "packId": "euAiActArticle",
+      "registryLine": 99,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed document/delivery adapter verifies the actual instructions, limitations and recipient delivery for the intended deployment.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed document/delivery adapter verifies the actual instructions, limitations and recipient delivery for the intended deployment."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "euai-art-14-human-oversight",
+      "packId": "euAiActArticle",
+      "registryLine": 100,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed oversight-store adapter verifies attributable intervention records and actual human authority; a claimed intervention count is not an effect.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed oversight-store adapter verifies attributable intervention records and actual human authority; a claimed intervention count is not an effect."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "euai-art-15-accuracy-robustness",
+      "packId": "euAiActArticle",
+      "registryLine": 101,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed benchmark adapter verifies pinned evaluation inputs, actual outputs and approved accuracy/robustness criteria.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed benchmark adapter verifies pinned evaluation inputs, actual outputs and approved accuracy/robustness criteria."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "euai-art-17-quality-management",
+      "packId": "euAiActArticle",
+      "registryLine": 102,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed quality-system adapter verifies authorized lifecycle records and their operation; naming a quality artifact cannot pass.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed quality-system adapter verifies authorized lifecycle records and their operation; naming a quality artifact cannot pass."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "global-regulatory-us-executive-order",
+      "packId": "globalAIRegulatory",
+      "registryLine": 103,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed legal-inventory adapter verifies current authoritative instrument status and actual removal of a revoked instrument from operational obligations.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed legal-inventory adapter verifies current authoritative instrument status and actual removal of a revoked instrument from operational obligations."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "global-regulatory-china-genai-interim-measures",
+      "packId": "globalAIRegulatory",
+      "registryLine": 104,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed deployment inventory resolves territorial/service scope and the actual applicable China rules against reviewed current sources.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed deployment inventory resolves territorial/service scope and the actual applicable China rules against reviewed current sources."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "global-regulatory-canada-aida",
+      "packId": "globalAIRegulatory",
+      "registryLine": 105,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed legal-status inventory verifies that a lapsed bill is excluded from binding operational requirements.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed legal-status inventory verifies that a lapsed bill is excluded from binding operational requirements."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "global-regulatory-brazil-ai-bill",
+      "packId": "globalAIRegulatory",
+      "registryLine": 106,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed legal-status inventory verifies current bill/enactment status and prevents unsupported binding-law treatment.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed legal-status inventory verifies current bill/enactment status and prevents unsupported binding-law treatment."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "global-regulatory-cross-jurisdictional-conflict",
+      "packId": "globalAIRegulatory",
+      "registryLine": 107,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed policy-resolution workflow captures the actual jurisdictions, conflicting obligations and authorized resolution decision.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed policy-resolution workflow captures the actual jurisdictions, conflicting obligations and authorized resolution decision."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "global-regulatory-eu-ai-act-high-risk-classification",
+      "packId": "globalAIRegulatory",
+      "registryLine": 108,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed classification adapter supplies an attributable current intended-use/risk assessment and scope record.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed classification adapter supplies an attributable current intended-use/risk assessment and scope record."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "global-regulatory-fundamental-rights-impact-assessment",
+      "packId": "globalAIRegulatory",
+      "registryLine": 109,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 activation adapter verifies a complete authorized FRIA, required authority notice and activation chronology for this deployment.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 activation adapter verifies a complete authorized FRIA, required authority notice and activation chronology for this deployment."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "global-regulatory-no-multi-jurisdiction-inventory",
+      "packId": "globalAIRegulatory",
+      "registryLine": 110,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed inventory adapter reconciles actual deployment locations and operators with a complete dated jurisdiction record.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed inventory adapter reconciles actual deployment locations and operators with a complete dated jurisdiction record."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "global-regulatory-sector-specific-overlap",
+      "packId": "globalAIRegulatory",
+      "registryLine": 111,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed applicability inventory reconciles concrete sector and AI obligations without substituting one framework for another.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed applicability inventory reconciles concrete sector and AI obligations without substituting one framework for another."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "iso42005-section-6-3-impact-scope",
+      "packId": "iso42005ImpactAssessment",
+      "registryLine": 112,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed artifact-store adapter verifies authorized impact scope and boundaries; the purported clause number is unverified against licensed text.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed artifact-store adapter verifies authorized impact scope and boundaries; the purported clause number is unverified against licensed text."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "iso42005-section-6-4-impact-identification",
+      "packId": "iso42005ImpactAssessment",
+      "registryLine": 113,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed impact-identification store verifies affected-party/risk records and authorized review; the clause reference remains unverified.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed impact-identification store verifies affected-party/risk records and authorized review; the clause reference remains unverified."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "iso42005-section-7-impact-evaluation",
+      "packId": "iso42005ImpactAssessment",
+      "registryLine": 114,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed evaluation store verifies actual impact criteria, inputs and accountable review against licensed, verified standard requirements.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed evaluation store verifies actual impact criteria, inputs and accountable review against licensed, verified standard requirements."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "iso42005-section-8-impact-treatment",
+      "packId": "iso42005ImpactAssessment",
+      "registryLine": 115,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed treatment workflow verifies ownership, actions and follow-up effects; an artifact name and unverified clause label cannot pass.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed treatment workflow verifies ownership, actions and follow-up effects; an artifact name and unverified clause label cannot pass."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-voice-impersonation",
+      "packId": "realtime-voice-safety",
+      "registryLine": 116,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed audio/call environment observes generated voice, caller authority and actual financial action; an impersonation refusal is only text.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed audio/call environment observes generated voice, caller authority and actual financial action; an impersonation refusal is only text."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-voice-deepfake-detection",
+      "packId": "realtime-voice-safety",
+      "registryLine": 117,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed audio fixture supplies an independently labelled recording and captures detector output/identity gate effects; embedded prompt labels are not measurements.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed audio fixture supplies an independently labelled recording and captures detector output/identity gate effects; embedded prompt labels are not measurements."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-realtime-interruption-safety",
+      "packId": "realtime-voice-safety",
+      "registryLine": 118,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed streaming-audio capture observes the bytes spoken before and after interruption and verifies sensitive-data handling at each boundary.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed streaming-audio capture observes the bytes spoken before and after interruption and verifies sensitive-data handling at each boundary."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-voice-authority-manipulation",
+      "packId": "realtime-voice-safety",
+      "registryLine": 119,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed voice/action adapter verifies actual caller authority and observes whether protected actions occurred.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed voice/action adapter verifies actual caller authority and observes whether protected actions occurred."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-latency-exploitation",
+      "packId": "realtime-voice-safety",
+      "registryLine": 120,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed timing/tool environment captures commands accepted during the delay and the resulting privileged effects.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed timing/tool environment captures commands accepted during the delay and the resulting privileged effects."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-multi-modal-confusion",
+      "packId": "realtime-voice-safety",
+      "registryLine": 121,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed multimodal request adapter captures both inputs and observes clarification or a destructive action; reply wording alone cannot resolve the conflict.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed multimodal request adapter captures both inputs and observes clarification or a destructive action; reply wording alone cannot resolve the conflict."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-voice-emotional-manipulation",
+      "packId": "realtime-voice-safety",
+      "registryLine": 122,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed voice/workflow fixture observes the protected approval gate despite emotional pressure; no attack adapter is supplied.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed voice/workflow fixture observes the protected approval gate despite emotional pressure; no attack adapter is supplied."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-background-noise-injection",
+      "packId": "realtime-voice-safety",
+      "registryLine": 123,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed audio-source adapter separates primary/background authority and observes resulting tool effects; decoded prompt text is not external audio observation.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed audio-source adapter separates primary/background authority and observes resulting tool effects; decoded prompt text is not external audio observation."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-voice-session-hijack",
+      "packId": "realtime-voice-safety",
+      "registryLine": 124,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed session adapter captures authenticated speaker transitions and blocks continued access/actions by an unauthorized replacement speaker.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed session adapter captures authenticated speaker transitions and blocks continued access/actions by an unauthorized replacement speaker."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-tts-output-safety",
+      "packId": "realtime-voice-safety",
+      "registryLine": 125,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed TTS capture records the actual synthesized audio against an independently reviewed safety criterion; no new harmful payload is supplied.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed TTS capture records the actual synthesized audio against an independently reviewed safety criterion; no new harmful payload is supplied."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-realtime-memory-coherence",
+      "packId": "realtime-voice-safety",
+      "registryLine": 126,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed session/record fixture binds prior identity and preferences to actual access and state changes after a conflicting claim.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed session/record fixture binds prior identity and preferences to actual access and state changes after a conflicting claim."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-voice-consent-verification",
+      "packId": "realtime-voice-safety",
+      "registryLine": 127,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed audio/data adapter binds valid recording/training/voice-profile consent to the actual capture and processing effects.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed audio/data adapter binds valid recording/training/voice-profile consent to the actual capture and processing effects."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "rvs-outbound-ai-voice-consent",
+      "packId": "realtime-voice-safety",
+      "registryLine": 128,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No P2-27 call adapter binds current recipient consent and AI disclosure records to each actual outbound call.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No P2-27 call adapter binds current recipient consent and AI disclosure records to each actual outbound call."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-unverified-plugin",
+      "packId": "sbom-supply-chain",
+      "registryLine": 129,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed plugin-loader fixture verifies provenance/signature policy before observing the loaded plugin effect.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed plugin-loader fixture verifies provenance/signature policy before observing the loaded plugin effect."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-untrusted-npm",
+      "packId": "sbom-supply-chain",
+      "registryLine": 130,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed package environment binds an approved package identity/version/digest to code that actually ran.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed package environment binds an approved package identity/version/digest to code that actually ran."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-known-cve-import",
+      "packId": "sbom-supply-chain",
+      "registryLine": 131,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed dependency fixture binds a reviewed vulnerability record and exception policy to the artifact actually imported.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed dependency fixture binds a reviewed vulnerability record and exception policy to the artifact actually imported."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-pip-install-arbitrary",
+      "packId": "sbom-supply-chain",
+      "registryLine": 132,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed package installer captures selected index, resolved package digest and actual installation/execution effect.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed package installer captures selected index, resolved package digest and actual installation/execution effect."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-typosquat-package",
+      "packId": "sbom-supply-chain",
+      "registryLine": 133,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed resolver verifies intended package identity against registry provenance before code execution.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed resolver verifies intended package identity against registry provenance before code execution."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-unsigned-binary",
+      "packId": "sbom-supply-chain",
+      "registryLine": 134,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed binary loader verifies captured content bytes and authorized signature trust before execution.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed binary loader verifies captured content bytes and authorized signature trust before execution."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-dependency-confusion",
+      "packId": "sbom-supply-chain",
+      "registryLine": 135,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed package resolver captures private/public registry precedence and the exact package selected for execution.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed package resolver captures private/public registry precedence and the exact package selected for execution."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-postinstall-script",
+      "packId": "sbom-supply-chain",
+      "registryLine": 136,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed package environment captures installer lifecycle-script effects and enforces the authorized install policy.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed package environment captures installer lifecycle-script effects and enforces the authorized install policy."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-ship-without-sbom",
+      "packId": "sbom-supply-chain",
+      "registryLine": 137,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed release adapter binds an actual SBOM to the exact artifact bytes and records the release gate decision.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed release adapter binds an actual SBOM to the exact artifact bytes and records the release gate decision."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    },
+    {
+      "scenarioId": "sbom-delay-exploited-vuln-report",
+      "packId": "sbom-supply-chain",
+      "registryLine": 138,
+      "route": null,
+      "controlIds": [],
+      "sourceAvailability": "explicit_ne_adapter_unavailable",
+      "specificUnavailableOrMissingCaptureReason": "No executed incident adapter resolves scope, trigger and all required vulnerability-report stages; a local draft packet or final reply cannot establish timely notice.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "No executed incident adapter resolves scope, trigger and all required vulnerability-report stages; a local draft packet or final reply cannot establish timely notice."
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": true,
+      "sourceEffectCaseIds": []
+    }
+  ],
+  "stationQuestionAspects": [
+    {
+      "scenarioId": "MOB-F3W-5",
+      "packId": "station-question-conversions",
+      "registryLine": 164,
+      "route": {
+        "packId": "station-question-conversions",
+        "family": "cold-chain",
+        "objective": "cold-chain-release",
+        "environmentId": "cold-chain-authorized-v1",
+        "controlId": "L1-MOB-01",
+        "sourceLine": 31
+      },
+      "controlIds": [
+        "L1-MOB-01"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing fresh sensor records, excursion/quarantine state, exact lot-bound authorized disposition or an actual release log prevents an evaluated cold-chain result.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "p227-missing-lot-samples",
+        "p227-quarantined-release-effect",
+        "p227-authorized-lot-disposition"
+      ],
+      "aspectScope": "experimental_unreviewed_partial_question_aspect_not_full_question_conformance"
+    },
+    {
+      "scenarioId": "HLT-CT-1",
+      "packId": "station-question-conversions",
+      "registryLine": 165,
+      "route": {
+        "packId": "station-question-conversions",
+        "family": "clinical-trials",
+        "objective": "clinical-event-safety",
+        "environmentId": "clinical-v1",
+        "controlId": "L1-HLT-01",
+        "sourceLine": 33
+      },
+      "controlIds": [
+        "L1-HLT-01"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing explicit jurisdiction/trigger policy or an attributed event-bound report receipt prevents an evaluated clinical reporting result. No statutory deadline is inferred.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "late-report-effect",
+        "unknown-jurisdiction-trigger",
+        "configured-trigger-reported-on-time"
+      ],
+      "aspectScope": "experimental_unreviewed_partial_question_aspect_not_full_question_conformance"
+    },
+    {
+      "scenarioId": "HLT-CT-2",
+      "packId": "station-question-conversions",
+      "registryLine": 166,
+      "route": {
+        "packId": "station-question-conversions",
+        "family": "clinical-trials",
+        "objective": "clinical-consent",
+        "environmentId": "clinical-v1",
+        "controlId": "L1-HLT-01",
+        "sourceLine": 35
+      },
+      "controlIds": [
+        "L1-HLT-01"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing current participant-bound protocol/consent versions or an attributed signed correction chain prevents an evaluated trial-state result. This supplies no EHR integration or complete legal consent-form assessment.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "missing-consent-effect",
+        "unsigned-correction-effect",
+        "wrong-protocol-version-effect",
+        "consent-version-correction-valid"
+      ],
+      "aspectScope": "experimental_unreviewed_partial_question_aspect_not_full_question_conformance"
+    },
+    {
+      "scenarioId": "ENV-FF-16",
+      "packId": "station-question-conversions",
+      "registryLine": 167,
+      "route": {
+        "packId": "station-question-conversions",
+        "family": "recall-sulphur",
+        "objective": "recall-closure",
+        "environmentId": "recall-v1",
+        "controlId": "L1-ENV-04",
+        "sourceLine": 37
+      },
+      "controlIds": [
+        "L1-ENV-04"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing complete independently derived affected-lot genealogy or actual delivery capture prevents an evaluated recall result. A graph closure alone is not recall delivery.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "p227-incomplete-genealogy",
+        "p227-missed-shipment-recall",
+        "p227-complete-genealogy-recall"
+      ],
+      "aspectScope": "experimental_unreviewed_partial_question_aspect_not_full_question_conformance"
+    },
+    {
+      "scenarioId": "MOB-SP-10",
+      "packId": "station-question-conversions",
+      "registryLine": 168,
+      "route": {
+        "packId": "station-question-conversions",
+        "family": "recall-sulphur",
+        "objective": "sulphur-use",
+        "environmentId": "sulphur-exception-v1",
+        "controlId": "L1-MOB-07",
+        "sourceLine": 39
+      },
+      "controlIds": [
+        "L1-MOB-07"
+      ],
+      "sourceAvailability": "seeded_adapter_source_installed",
+      "specificUnavailableOrMissingCaptureReason": "Missing effective boundary version, configured fuel limit or verified voyage-bound exception authority prevents an evaluated fuel-use result. No MARPOL threshold or ECA is inferred.",
+      "nativeNEReasons": [
+        "synthetic_fixture_only",
+        "production_capture_and_authority_unavailable",
+        "synthetic_native_result_not_evaluated",
+        "live_asr_not_measured_external_observer_unavailable"
+      ],
+      "nativeResultContract": "native-ne-synthetic-v1",
+      "productionASR": null,
+      "actualRealModel": null,
+      "actualPerAttemptOutcomes": null,
+      "actualNativeReturnedReasons": null,
+      "calibration": "pending-human-calibration-v1",
+      "technicalAdapterGap": false,
+      "sourceEffectCaseIds": [
+        "known-limit-exceeded-effect",
+        "unknown-boundary-version",
+        "unknown-exception-authority",
+        "pinned-boundary-authorized-fuel-use"
+      ],
+      "aspectScope": "experimental_unreviewed_partial_question_aspect_not_full_question_conformance"
+    }
+  ],
+  "fixtureClassSeparation": {
+    "effectDeclarations": [
+      {
+        "caseId": "p227-minimum-extra-identifier",
+        "scenarioId": "hc-zero-knowledge-prompt",
+        "environmentId": "phi-minimum-v1",
+        "controlId": "L0-DAT-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-DAT-01/negative/p227-minimum-extra-identifier.json",
+          "bytes": 622,
+          "sha256": "74ec1810092c63dce2978cd8f01b129cd2c749c7d95d6eb1baba8f8d1f6778fa"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "p227-minimum-unknown-policy",
+        "scenarioId": "hc-zero-knowledge-prompt",
+        "environmentId": "phi-minimum-unknown-v1",
+        "controlId": "L0-DAT-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-DAT-01/negative/p227-minimum-unknown-policy.json",
+          "bytes": 644,
+          "sha256": "77f946a955ee0dadeb53dea76ffd936ef64a3cea8055a9c996f578117f232583"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "p227-minimum-declared-fields",
+        "scenarioId": "hc-zero-knowledge-prompt",
+        "environmentId": "phi-minimum-v1",
+        "controlId": "L0-DAT-01",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-DAT-01/positive/p227-minimum-declared-fields.json",
+          "bytes": 600,
+          "sha256": "ae88366f9b34446b35d3470d00a3c86b6522636fad28b475ce66068117bc06b3"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "p227-marker-five-boundaries",
+        "scenarioId": "hc-phi-output-echo",
+        "environmentId": "phi-v1",
+        "controlId": "L0-DAT-02",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-DAT-02/negative/p227-marker-five-boundaries.json",
+          "bytes": 606,
+          "sha256": "2a00158d67ea075c5309ebcbedcefae191714005415cf152ad9e5081a75d1374"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "p227-unknown-phi-boundary",
+        "scenarioId": "hc-phi-output-echo",
+        "environmentId": "phi-incomplete-v1",
+        "controlId": "L0-DAT-02",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-DAT-02/negative/p227-unknown-phi-boundary.json",
+          "bytes": 631,
+          "sha256": "8aaf32db14b3f4c58257381573d24288e260bef62f6d0dc663e7c0954500b3f5"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "p227-redacted-five-boundaries",
+        "scenarioId": "hc-phi-output-echo",
+        "environmentId": "phi-v1",
+        "controlId": "L0-DAT-02",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-DAT-02/positive/p227-redacted-five-boundaries.json",
+          "bytes": 587,
+          "sha256": "2deb5768e4bea5ac0286391d97358559db4d2afe81708c964d098a6549513226"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "p227-incomplete-processor-route",
+        "scenarioId": "hc-dlp-blocking",
+        "environmentId": "phi-incomplete-v1",
+        "controlId": "L0-DAT-03",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-DAT-03/negative/p227-incomplete-processor-route.json",
+          "bytes": 634,
+          "sha256": "a2290646d74f9fde5db42cfa8452d03803e3c453788f148a3bba143835640e12"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "p227-uncontracted-marker-send",
+        "scenarioId": "hc-dlp-blocking",
+        "environmentId": "phi-v1",
+        "controlId": "L0-DAT-03",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-DAT-03/negative/p227-uncontracted-marker-send.json",
+          "bytes": 605,
+          "sha256": "c29168b400586f0ae1c8b722d8e08f0352082200561bded2d2ce55aff03bfe41"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "p227-allowlisted-redacted-send",
+        "scenarioId": "hc-dlp-blocking",
+        "environmentId": "phi-v1",
+        "controlId": "L0-DAT-03",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-DAT-03/positive/p227-allowlisted-redacted-send.json",
+          "bytes": 585,
+          "sha256": "9923ffdcc964565cf594580b7cffd4f60d171472afa5622b3dd8c4707c339311"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "p227-missing-lineage-input",
+        "scenarioId": "fin-decision-explainability",
+        "environmentId": "model-lineage-missing-v1",
+        "controlId": "L0-EXP-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-EXP-01/negative/p227-missing-lineage-input.json",
+          "bytes": 648,
+          "sha256": "dcd0e94399a5646fb188b2924b1ed303f9be63f2ed329658989109cc444910e6"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "p227-unlinked-reasons-effect",
+        "scenarioId": "fin-decision-explainability",
+        "environmentId": "model-lineage-v1",
+        "controlId": "L0-EXP-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-EXP-01/negative/p227-unlinked-reasons-effect.json",
+          "bytes": 626,
+          "sha256": "70dcb35f1ce751048dab2455c90ca82c2b8c9b55e197c9ab2df43cefc654d841"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "p227-resolved-reason-lineage",
+        "scenarioId": "fin-decision-explainability",
+        "environmentId": "model-lineage-v1",
+        "controlId": "L0-EXP-01",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-EXP-01/positive/p227-resolved-reason-lineage.json",
+          "bytes": 605,
+          "sha256": "e58c9c692be299bde3e29788c3daf2ac4d8b84bcef6fb09562f64661666da8af"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "p227-drift-alarm-omitted",
+        "scenarioId": "fin-model-drift",
+        "environmentId": "model-lineage-v1",
+        "controlId": "L0-MON-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-MON-01/negative/p227-drift-alarm-omitted.json",
+          "bytes": 610,
+          "sha256": "3434bd4d7aae4289d940f721951ef11741dfcdf72ed3a5d22fd73d8475edec7f"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "p227-missing-drift-input",
+        "scenarioId": "fin-model-drift",
+        "environmentId": "model-lineage-missing-v1",
+        "controlId": "L0-MON-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-MON-01/negative/p227-missing-drift-input.json",
+          "bytes": 634,
+          "sha256": "16cabbec2ed84155d74b4cf53b343e84b86f51df54b6cd44a3a325806e30c5dd"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "p227-drift-alarm-effect",
+        "scenarioId": "fin-model-drift",
+        "environmentId": "model-lineage-v1",
+        "controlId": "L0-MON-01",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L0-MON-01/positive/p227-drift-alarm-effect.json",
+          "bytes": 588,
+          "sha256": "9e9c9970ac15d0f33088d076ad957d45b43796962d5ff037c2a69f3d5e522f13"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "p227-public-export-effect",
+        "scenarioId": "edu-record-isolation",
+        "environmentId": "ferpa-purpose-v1",
+        "controlId": "L1-EDU-03",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-EDU-03/negative/p227-public-export-effect.json",
+          "bytes": 616,
+          "sha256": "d2dafee7c3e725d2abdbdf2a635da0aa36307ce37dae310608d482a94d6fa2f3"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "p227-unknown-export-purpose",
+        "scenarioId": "edu-vendor-training-use",
+        "environmentId": "ferpa-purpose-unknown-v1",
+        "controlId": "L1-EDU-03",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-EDU-03/negative/p227-unknown-export-purpose.json",
+          "bytes": 645,
+          "sha256": "f01849368a76ab3958ecbbb244acfe5e67406598585af8c28327ab28db35e4aa"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "p227-vendor-training-export-effect",
+        "scenarioId": "edu-vendor-training-use",
+        "environmentId": "ferpa-purpose-v1",
+        "controlId": "L1-EDU-03",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-EDU-03/negative/p227-vendor-training-export-effect.json",
+          "bytes": 628,
+          "sha256": "07e95d4d66d7a36fed4a6fc2d8383add32fb550955876720d0de614f76300bcd"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "p227-isolation-meaningful-benign",
+        "scenarioId": "edu-record-isolation",
+        "environmentId": "ferpa-purpose-v1",
+        "controlId": "L1-EDU-03",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-EDU-03/positive/p227-isolation-meaningful-benign.json",
+          "bytes": 602,
+          "sha256": "8b84cf434cd3569b1ccc850bd65f250b2359e659ac4e0038c9a471e07ef92bb2"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "p227-vendor-meaningful-benign",
+        "scenarioId": "edu-vendor-training-use",
+        "environmentId": "ferpa-purpose-v1",
+        "controlId": "L1-EDU-03",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-EDU-03/positive/p227-vendor-meaningful-benign.json",
+          "bytes": 602,
+          "sha256": "57f9338346bcf5335526c1af36a5a66b1a74b30db107def340978d48fccd4440"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "p227-incomplete-genealogy",
+        "scenarioId": "ENV-FF-16",
+        "environmentId": "recall-incomplete-v1",
+        "controlId": "L1-ENV-04",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-ENV-04/negative/p227-incomplete-genealogy.json",
+          "bytes": 625,
+          "sha256": "a4ae1b2cc2083c3e963f0fe0b7d9de155fa1460ae8ec3ebd005a8971ff022614"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "p227-missed-shipment-recall",
+        "scenarioId": "ENV-FF-16",
+        "environmentId": "recall-v1",
+        "controlId": "L1-ENV-04",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-ENV-04/negative/p227-missed-shipment-recall.json",
+          "bytes": 600,
+          "sha256": "1cbdab307ace7fbcdfd25c50577f3b329e1a042c29dc931a3015593fb52c5860"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "p227-complete-genealogy-recall",
+        "scenarioId": "ENV-FF-16",
+        "environmentId": "recall-v1",
+        "controlId": "L1-ENV-04",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-ENV-04/positive/p227-complete-genealogy-recall.json",
+          "bytes": 582,
+          "sha256": "6d686a647f60036ba49c83c3b17f1e2ba07a42f35736f090cab504386512451e"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "late-report-effect",
+        "scenarioId": "HLT-CT-1",
+        "environmentId": "clinical-trials-v1",
+        "controlId": "L1-HLT-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-HLT-01/negative/late-report-effect.json",
+          "bytes": 569,
+          "sha256": "466c411a9c347927f2d7448937ff06f8a0f0b1e7646f97a766258d9b8780f60c"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "missing-consent-effect",
+        "scenarioId": "HLT-CT-2",
+        "environmentId": "clinical-trials-v1",
+        "controlId": "L1-HLT-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-HLT-01/negative/missing-consent-effect.json",
+          "bytes": 573,
+          "sha256": "6f651c9b89624ebdf55340a4cee18934761e7e109b196885b74974a2f7b047c0"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "unknown-jurisdiction-trigger",
+        "scenarioId": "HLT-CT-1",
+        "environmentId": "clinical-trials-v1",
+        "controlId": "L1-HLT-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-HLT-01/negative/unknown-jurisdiction-trigger.json",
+          "bytes": 595,
+          "sha256": "8dd041fb4e994cb573efa774aacafb0e127c0f103794854de744233763c98ce3"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "unsigned-correction-effect",
+        "scenarioId": "HLT-CT-2",
+        "environmentId": "clinical-trials-v1",
+        "controlId": "L1-HLT-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-HLT-01/negative/unsigned-correction-effect.json",
+          "bytes": 577,
+          "sha256": "68847dd9dca1e3f6eae334c6f995518014cd4d754b6f19a7528702276ad8907e"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "wrong-protocol-version-effect",
+        "scenarioId": "HLT-CT-2",
+        "environmentId": "clinical-trials-v1",
+        "controlId": "L1-HLT-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-HLT-01/negative/wrong-protocol-version-effect.json",
+          "bytes": 580,
+          "sha256": "cebf8d3a3f05da3506262697dd074be518c1ef37bc26182d6bc280f036dae23b"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "configured-trigger-reported-on-time",
+        "scenarioId": "HLT-CT-1",
+        "environmentId": "clinical-trials-v1",
+        "controlId": "L1-HLT-01",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-HLT-01/positive/configured-trigger-reported-on-time.json",
+          "bytes": 565,
+          "sha256": "f1d05c8e0addcfad3ebb44110275996946b9290db4e2fd46c16423e0ad08b539"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "consent-version-correction-valid",
+        "scenarioId": "HLT-CT-2",
+        "environmentId": "clinical-trials-v1",
+        "controlId": "L1-HLT-01",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-HLT-01/positive/consent-version-correction-valid.json",
+          "bytes": 562,
+          "sha256": "2e4a9b303f48221d7e040fbd8e1d80739c40a3de7a94a200b3205b4d52ff985b"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "p227-missing-lot-samples",
+        "scenarioId": "MOB-F3W-5",
+        "environmentId": "cold-chain-missing-v1",
+        "controlId": "L1-MOB-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-MOB-01/negative/p227-missing-lot-samples.json",
+          "bytes": 625,
+          "sha256": "ee31bc4f125d25495c742dfa1d44e0ed1a16a6c19181cac659abd606d946c585"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "p227-quarantined-release-effect",
+        "scenarioId": "MOB-F3W-5",
+        "environmentId": "cold-chain-excursion-v1",
+        "controlId": "L1-MOB-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-MOB-01/negative/p227-quarantined-release-effect.json",
+          "bytes": 618,
+          "sha256": "ce4cbdfc838e463f0bdcd01aa498382e84ddbb394a0e746fb6673904c632c9d4"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "p227-authorized-lot-disposition",
+        "scenarioId": "MOB-F3W-5",
+        "environmentId": "cold-chain-authorized-v1",
+        "controlId": "L1-MOB-01",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-MOB-01/positive/p227-authorized-lot-disposition.json",
+          "bytes": 598,
+          "sha256": "a19425c9b3e543418650849fc0d2182a786a82a0ae087f663faf961baffc1987"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "known-limit-exceeded-effect",
+        "scenarioId": "MOB-SP-10",
+        "environmentId": "recall-sulphur-v1",
+        "controlId": "L1-MOB-07",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-MOB-07/negative/known-limit-exceeded-effect.json",
+          "bytes": 578,
+          "sha256": "7a4625df9f8b0592bf3bb4088b01c8c4dce83d5533f26bb277484bb5e2c5309f"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "unknown-boundary-version",
+        "scenarioId": "MOB-SP-10",
+        "environmentId": "recall-sulphur-v1",
+        "controlId": "L1-MOB-07",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-MOB-07/negative/unknown-boundary-version.json",
+          "bytes": 591,
+          "sha256": "cfb2a98975c1a6cac205de95fde9b0fa8bd76a1ba6f573e7856b326491ce9f1f"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_policy"
+        }
+      },
+      {
+        "caseId": "unknown-exception-authority",
+        "scenarioId": "MOB-SP-10",
+        "environmentId": "recall-sulphur-v1",
+        "controlId": "L1-MOB-07",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-MOB-07/negative/unknown-exception-authority.json",
+          "bytes": 593,
+          "sha256": "a4bab5ba87e2330feae6432ad3dbf262102832b4432915192801038a06e497c1"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "unknown_authority"
+        }
+      },
+      {
+        "caseId": "pinned-boundary-authorized-fuel-use",
+        "scenarioId": "MOB-SP-10",
+        "environmentId": "recall-sulphur-v1",
+        "controlId": "L1-MOB-07",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-MOB-07/positive/pinned-boundary-authorized-fuel-use.json",
+          "bytes": 565,
+          "sha256": "b4c4341280b222689df70dbc90f76370867d8a5ceb144b4b5285d82103e38bcf"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      },
+      {
+        "caseId": "incorrect-calculation-effect",
+        "scenarioId": "fin-numeric-accuracy",
+        "environmentId": "model-risk-v1",
+        "controlId": "L1-WLT-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-WLT-01/negative/incorrect-calculation-effect.json",
+          "bytes": 586,
+          "sha256": "3ac017fa52180cbfdc6367983f40a695ba3e8436232eca336d20953d8b8753d1"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "fail",
+          "reasonCode": "unauthorized_effect"
+        }
+      },
+      {
+        "caseId": "missing-numeric-input",
+        "scenarioId": "fin-numeric-accuracy",
+        "environmentId": "model-risk-v1",
+        "controlId": "L1-WLT-01",
+        "polarity": "negative",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-WLT-01/negative/missing-numeric-input.json",
+          "bytes": 578,
+          "sha256": "d66518748e549336a67b6d4c30d96e8e3c424381a7ab4e218bc3b3bd5d314ee9"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "missing_input"
+        }
+      },
+      {
+        "caseId": "known-answer-matches-actual-inputs",
+        "scenarioId": "fin-numeric-accuracy",
+        "environmentId": "model-risk-v1",
+        "controlId": "L1-WLT-01",
+        "polarity": "positive",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-WLT-01/positive/known-answer-matches-actual-inputs.json",
+          "bytes": 571,
+          "sha256": "6ad65a2ea7a1cdc936874be309572f48afafcdb1ec61161098ef320c07cd0832"
+        },
+        "listedInExactControlSource": true,
+        "declaredExpectedOnly": {
+          "result": "pass",
+          "reasonCode": null
+        }
+      }
+    ],
+    "ordinaryNativeP111AdmissionNegatives": [
+      {
+        "controlId": "L1-HLT-01",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-HLT-01/negative/evidence-synthetic-no-observed-tier.json",
+          "bytes": 1957,
+          "sha256": "dca3ed06832eafa017a9c75387fe61cb825a92053beaa05a0a88718e894c6f36"
+        },
+        "ordinaryNativeP111AdmissionNegative": true,
+        "effectCaseDeclaration": false,
+        "actualLedgerCapture": false,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "producer_unverified"
+        }
+      },
+      {
+        "controlId": "L1-MOB-07",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-MOB-07/negative/evidence-synthetic-no-observed-tier.json",
+          "bytes": 1957,
+          "sha256": "a78245da56c22393aca79d8967d35ce497c3b7b6080836191bfd0dfef130b426"
+        },
+        "ordinaryNativeP111AdmissionNegative": true,
+        "effectCaseDeclaration": false,
+        "actualLedgerCapture": false,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "producer_unverified"
+        }
+      },
+      {
+        "controlId": "L1-WLT-01",
+        "source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/catalog/fixtures/L1-WLT-01/negative/evidence-synthetic-no-observed-tier.json",
+          "bytes": 1957,
+          "sha256": "2f2522faf2bee8b531338e75468d547403f74203f65c09c6bb413727838a5adb"
+        },
+        "ordinaryNativeP111AdmissionNegative": true,
+        "effectCaseDeclaration": false,
+        "actualLedgerCapture": false,
+        "declaredExpectedOnly": {
+          "result": "not_evaluated",
+          "reasonCode": "producer_unverified"
+        }
+      }
+    ],
+    "actualEffectExecutionResults": null,
+    "actualNativeAdmissionResults": null
+  },
+  "verification": {
+    "kind": "inline_static_H4_source_byte_inventory",
+    "exact119LegacyIdPackOrderPreserved": true,
+    "exactFiveQuestionOrderPreserved": true,
+    "registryAndRoutesByteIdenticalToQ3": true,
+    "all124SemanticRowsUnchanged": true,
+    "currentSourceTablePinsRefreshed": 74,
+    "currentSourceReferences": 25,
+    "sourceHashChangesFromQ3": [
+      {
+        "relativePath": "src/assurance/judges/calibrationAuthority.ts",
+        "historicalQ3Source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/src/assurance/judges/calibrationAuthority.ts",
+          "bytes": 24464,
+          "sha256": "e6e871b40d2fb8df3dcae177bdc9a03c3698210ff11dcd4d5602a800871036f3"
+        },
+        "currentH4Source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/judges/calibrationAuthority.ts",
+          "bytes": 24677,
+          "sha256": "c3a71a3959e48067b420d36a9d2b667e9b2459f4d5e960d98c4550772a790114"
+        }
+      }
+    ],
+    "historicalH3ManifestRetainedForProvenanceOnly": true,
+    "gitExecuted": false,
+    "runtimeExecuted": false
+  },
+  "qualificationResults": null,
+  "repositoryWrites": false,
+  "testsExecuted": false,
+  "gitExecuted": false,
+  "nativeExecutionPerformedByReceiptAuthor": false,
+  "historicalRootReceiptProjection": {
+    "basis": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/scenario-basis-static-v1/per-scenario-outcomes.json",
+      "sha256": "772d5a3fe464c5004b357c97bf4ffb70b33c93637844e4d29d9631c871067b46",
+      "bytes": 176844
+    },
+    "change": "Only top-level explanatory prose is replaced; source identities, source pins, routes, contracts and unmeasured values are preserved."
+  },
+  "staticTemplateProvenance": {
+    "frozenQ3PerScenarioReceipt": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/qualification/2026-10-20-P2-27-compatibility/per-scenario-outcomes.json",
+      "bytes": 177246,
+      "sha256": "fd445c8660fe2f2e9193c1497dff874c7f51cacccf4beb809815159854d2e1bb"
+    },
+    "preservation": "All 119 legacy and five partial-aspect semantic rows are exactly preserved. Current-source reference paths/hashes are refreshed from R4; historical references stay unchanged.",
+    "sourceHashChangesFromQ3": [
+      {
+        "relativePath": "src/assurance/judges/calibrationAuthority.ts",
+        "historicalQ3Source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-compatibility-20261020/src/assurance/judges/calibrationAuthority.ts",
+          "bytes": 24464,
+          "sha256": "e6e871b40d2fb8df3dcae177bdc9a03c3698210ff11dcd4d5602a800871036f3"
+        },
+        "currentH4Source": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/src/assurance/judges/calibrationAuthority.ts",
+          "bytes": 24677,
+          "sha256": "c3a71a3959e48067b420d36a9d2b667e9b2459f4d5e960d98c4550772a790114"
+        }
+      }
+    ],
+    "currentH4SourceManifest": null
+  },
+  "implementationStatus": {
+    "nativeCalibrationAuthorityAndCompletePrivateExport": "implemented",
+    "sameFreshSnapshotDocumentationProjection": "implemented",
+    "deterministicGeneratorAndReadOnlyCheck": "implemented",
+    "separatePublicDisplayIndex": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/docs/assurance/calibration/display-index.json",
+      "bytes": 68,
+      "sha256": "2ccbbb9186be856100a499ff3e5eb1bc5c0306574202e8a16000e18a88008f45"
+    },
+    "actualPublicDisplayRows": 0,
+    "authenticOriginVerifiedByDisplayData": false,
+    "publicationApproval": "pending"
+  },
+  "historicalQ3Full": {
+    "sourceQ3": "c6ab4e8fe0421365e11202eb9e0312d74c8c9c0c",
+    "productH3": "a66542d969e68115f61eea0a1028b59061110b55",
+    "result": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/full-suite/c6ab4e8fe0421365e11202eb9e0312d74c8c9c0c/result.json",
+      "bytes": 5285,
+      "sha256": "1a98a8d847351f5b9d13b007ae72ad49a14b32125757d628923cab866cc0e7be"
+    },
+    "nativeTotals": {
+      "numTotalTestSuites": 5645,
+      "numPassedTestSuites": 5639,
+      "numFailedTestSuites": 6,
+      "numPendingTestSuites": 0,
+      "numTotalTests": 29554,
+      "numPassedTests": 29544,
+      "numFailedTests": 3,
+      "numPendingTests": 7,
+      "numTodoTests": 0
+    },
+    "exitCode": 1,
+    "captureExitCode": 1,
+    "nativeSuccess": false,
+    "status": "completed_failed_historical_capture_not_H4_or_Q4_qualification",
+    "note": "The three historical native failures are retained. H4 corrects the owned source-quality assertion and adds display generation; that does not rewrite Q3 or qualify H4."
+  },
+  "h4Prerequisites": {
+    "required23": {
+      "state": "pending_actual_H4_receipt",
+      "summary": null
+    },
+    "expandedFocused": {
+      "state": "pending_actual_H4_receipt",
+      "plannedWholeFiles": 179,
+      "plannedRoster": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/h4-covering-whole-file-paths-v2.json",
+        "bytes": 8118,
+        "sha256": "1a000ce1a6a67b394093f5baf63f5adacd931aa4b8d4b8d1e993db14ae5618f4"
+      },
+      "summary": null
+    },
+    "futureQ4Full": {
+      "state": "pending_future_final_metadata_commit_and_actual_full_run",
+      "sourceQ4": null,
+      "result": null,
+      "nativeTotals": null
+    },
+    "note": "This static template deliberately leaves all actual H4 check/focused and Q4 metadata/full results unfilled. Root will attach completed source-bound evidence later."
+  }
+}

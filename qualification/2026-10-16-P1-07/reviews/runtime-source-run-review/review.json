@@ -1,0 +1,468 @@
+{
+  "schema": "p107-runtime-source-run-peer-audit/1",
+  "at": "2026-10-16T18:07:21.678804+00:00",
+  "state": "ACTUAL_SCOPED_SOURCE_RUNTIME_AUDIT_CLOSED",
+  "blockers": [],
+  "phases": [
+    {
+      "phase": "p107-runtime-v2",
+      "classification": "RED_PRESERVED",
+      "exit": 1,
+      "durationMs": 3188,
+      "ownedPgid": 2705,
+      "groupAbsentByRecordedESRCH": true,
+      "rawTestCounts": {
+        "numTotalTests": 1,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "observerUniqueTestIds": 1,
+      "orderedIdentityJoin": true,
+      "observerTaskErrorCount": 2,
+      "unhandledErrors": [],
+      "actualAfterAllPassEntries": 1,
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/public-evidence.json",
+        "bytes": 27690,
+        "sha256": "5f0bed636d7cd4cab32707130171c0ab6e061292c1de38154cc022852d76a09b",
+        "readScope": "Full actual public record read; repeated pin arrays compared exactly."
+      },
+      "nativeCallOutcomes": [
+        "OK",
+        "DENIED",
+        "OK",
+        "DENIED"
+      ],
+      "signedClosedSessions": 2,
+      "rowCount": 24,
+      "roots": [
+        {
+          "v": 1,
+          "sessionId": "7af96778-7837-4e81-a42f-c0d594f608bb",
+          "lifecycle": "closed",
+          "runtime": "amc",
+          "agentId": "default",
+          "startedTs": 1792173557314,
+          "endedTs": 1792173557413,
+          "eventCount": 12,
+          "turnCount": 1,
+          "sealCount": 1,
+          "sealEventHashes": [
+            "251e9c7c99652861b532b9b4720e9d76b232405475acd3c22309e97377c0c053"
+          ],
+          "sessionMerkleRoot": "4038f67f4e52a3e42b2ef73ad8eab0ce10391840fe646cf010f80766eeeec55a",
+          "openEventHash": "e6b48a500e9c18f64145b99b6ecabd4e9c08bc44438cb938579043aac93db88a",
+          "closeEventHash": "69dd0ca7c6fdd1ee3c5d8e1c2784a3dc132a4dfacc60141dc3ce1d173065e7c1",
+          "monitorKeyFingerprint": "1f65860e5ec91826f7a8eaca7e437f2584988e10456de336ce2c7f806f122e17"
+        },
+        {
+          "v": 1,
+          "sessionId": "62ee58a8-5111-4f6c-8f2f-32644c4e100c",
+          "lifecycle": "closed",
+          "runtime": "amc",
+          "agentId": "default",
+          "startedTs": 1792173557414,
+          "endedTs": 1792173557452,
+          "eventCount": 12,
+          "turnCount": 1,
+          "sealCount": 1,
+          "sealEventHashes": [
+            "13269bc06d89dc34a923dc1de170747d1bd6dcf2dde25252d7cb3dce843612ba"
+          ],
+          "sessionMerkleRoot": "c37aa9fc2002a5c578d6970a7947855b2f39444be127cfc2d0d5a52469648dc0",
+          "openEventHash": "f7c24a76526d9b26f1a132b5f0792b0142d7619b54cc40de44ad7ef0743ae54b",
+          "closeEventHash": "8336c37a4896f6419da42704a0f48f6d200e43cd31bdbdb9f8bcb4a45a9ce290",
+          "monitorKeyFingerprint": "1f65860e5ec91826f7a8eaca7e437f2584988e10456de336ce2c7f806f122e17"
+        }
+      ],
+      "fourMappedAuditIds": [
+        "c73f6d24-b896-4d9c-b73c-f3da0aa07077",
+        "cbc7fc28-febf-4b7c-bdcd-2dc00c2d7ab0",
+        "39f52e12-76e8-44ae-ad99-df9b513b0311",
+        "a395d39a-41d1-4b1d-8985-3e8864168667"
+      ],
+      "mappingIdsExact": true,
+      "earnedLevel": 1,
+      "l2": {
+        "events": 4,
+        "minEvents": 4,
+        "sessions": 2,
+        "minSessions": 2,
+        "days": 1,
+        "minDays": 2,
+        "status": "fail"
+      },
+      "l3L5": "not_evaluated",
+      "protectedInputs": 8,
+      "pinChanges": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub",
+          "differences": {
+            "inode": {
+              "before": 542975566,
+              "after": 542975703
+            }
+          }
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub",
+          "differences": {
+            "inode": {
+              "before": 542975568,
+              "after": 542975704
+            }
+          }
+        }
+      ],
+      "nativeRecordedPinsExact": true,
+      "environmentRestored": true,
+      "vaultLocked": true,
+      "poolClosed": true,
+      "poolActiveBeforeClose": 0,
+      "guardCloseInvoked": true,
+      "noActualCleanupError": false,
+      "bodyFailed": true,
+      "sourceWorkerCheckout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "borrowedWrapperCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "borrowedRunnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "actualConfinement": [
+        {
+          "ready": true,
+          "blockerCount": 0,
+          "confined": false,
+          "confinementVerdict": "unconfined",
+          "actualProbeResult": "permitted",
+          "sandboxBackendAvailable": true
+        },
+        {
+          "ready": true,
+          "blockerCount": 0,
+          "confined": false,
+          "confinementVerdict": "unconfined",
+          "actualProbeResult": "permitted",
+          "sandboxBackendAvailable": true
+        }
+      ]
+    },
+    {
+      "phase": "p107-runtime-v3",
+      "classification": "SCOPED_SOURCE_GREEN",
+      "exit": 0,
+      "durationMs": 3413,
+      "ownedPgid": 3873,
+      "groupAbsentByRecordedESRCH": true,
+      "rawTestCounts": {
+        "numTotalTests": 1,
+        "numPassedTests": 1,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "observerUniqueTestIds": 1,
+      "orderedIdentityJoin": true,
+      "observerTaskErrorCount": 0,
+      "unhandledErrors": [],
+      "actualAfterAllPassEntries": 1,
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/public-evidence.json",
+        "bytes": 29024,
+        "sha256": "67a33986b5fe6c905638d550f968c9d89ddce99d0ed01d0d47a798f5f0de80df",
+        "readScope": "Full actual public record read; repeated pin arrays compared exactly."
+      },
+      "nativeCallOutcomes": [
+        "OK",
+        "DENIED",
+        "OK",
+        "DENIED"
+      ],
+      "signedClosedSessions": 2,
+      "rowCount": 24,
+      "roots": [
+        {
+          "v": 1,
+          "sessionId": "19317829-feeb-422f-86ce-f59ac2a6a570",
+          "lifecycle": "closed",
+          "runtime": "amc",
+          "agentId": "default",
+          "startedTs": 1792173860659,
+          "endedTs": 1792173860709,
+          "eventCount": 12,
+          "turnCount": 1,
+          "sealCount": 1,
+          "sealEventHashes": [
+            "ba3e4458132862565a4603ccfa3503db976b967617d763d29bbe948343f510c5"
+          ],
+          "sessionMerkleRoot": "cf943139fa2068e80fcc8ca3bc7974bac200d036c244b825ae272667a470f987",
+          "openEventHash": "0804dec4d29a780e4202790c1fe367fbedc6fe763957b1ce8de2e78df05d2eb0",
+          "closeEventHash": "b39d8ff6f32d917e92b5ab09a36ed60b1f04211e2749cc20f5ef3f6423f65141",
+          "monitorKeyFingerprint": "2ac696632f9890c75186bc3cb9168112b8b950fc83f10be67ffd213e4eb1f967"
+        },
+        {
+          "v": 1,
+          "sessionId": "2604e95d-b10c-4bdb-8195-f299f562aa40",
+          "lifecycle": "closed",
+          "runtime": "amc",
+          "agentId": "default",
+          "startedTs": 1792173860710,
+          "endedTs": 1792173860746,
+          "eventCount": 12,
+          "turnCount": 1,
+          "sealCount": 1,
+          "sealEventHashes": [
+            "ba6dcd8ae009dbe3ffee6b9581d464b99063fa94f2a0b79c4a7aff51ec45e573"
+          ],
+          "sessionMerkleRoot": "a2b62b795026d4c92655dedf77948603b609315076d82e8509260d4b4a90d12c",
+          "openEventHash": "ca7b9c87316774f4dc6a3c9fed40566e2a9c2d49280c265fb438486be1297da1",
+          "closeEventHash": "d2af2b522f6a2ac2f15ff583f710d95e908e0c106c203bf86cbcbef5114d2cd5",
+          "monitorKeyFingerprint": "2ac696632f9890c75186bc3cb9168112b8b950fc83f10be67ffd213e4eb1f967"
+        }
+      ],
+      "fourMappedAuditIds": [
+        "8e6bdcb2-f723-4d68-9910-d4276a03d6c3",
+        "1553bd78-39c4-48c4-a4cc-9ef43a9e3e72",
+        "61a3e55f-c75b-4bdf-8b6a-4402da310851",
+        "67b6fde7-55db-4915-b293-e46a831aa76c"
+      ],
+      "mappingIdsExact": true,
+      "earnedLevel": 1,
+      "l2": {
+        "events": 4,
+        "minEvents": 4,
+        "sessions": 2,
+        "minSessions": 2,
+        "days": 1,
+        "minDays": 2,
+        "status": "fail"
+      },
+      "l3L5": "not_evaluated",
+      "protectedInputs": 10,
+      "pinChanges": [],
+      "nativeRecordedPinsExact": true,
+      "environmentRestored": true,
+      "vaultLocked": true,
+      "poolClosed": true,
+      "poolActiveBeforeClose": 0,
+      "guardCloseInvoked": true,
+      "noActualCleanupError": true,
+      "bodyFailed": false,
+      "sourceWorkerCheckout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "borrowedWrapperCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "borrowedRunnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "actualConfinement": [
+        {
+          "ready": true,
+          "blockerCount": 0,
+          "confined": false,
+          "confinementVerdict": "unconfined",
+          "actualProbeResult": "permitted",
+          "sandboxBackendAvailable": true
+        },
+        {
+          "ready": true,
+          "blockerCount": 0,
+          "confined": false,
+          "confinementVerdict": "unconfined",
+          "actualProbeResult": "permitted",
+          "sandboxBackendAvailable": true
+        }
+      ]
+    }
+  ],
+  "originalFailures": "All actual raw failure messages and observer error identities are retained in identity-joins.json and the immutable pinned original raw/observer/log inputs. V2 remains exit1 with both body and cleanup errors.",
+  "masking": {
+    "v2": "First failure line365 protected-input equality. NativeAfter body equality line366 and final successful ownership/cleanup assertions after AggregateError did not execute. Native stored equality and recorded cleanup facts were independently compared, without granting those masked assertions execution credit. All native disposition/crypto/root/mapping/gate assertions precede line365.",
+    "v3": "Natural1/1 passing run has no body/cleanup error and reaches all unchanged final assertions. This establishes this exact one-case source run only."
+  },
+  "physicalRecheck": {
+    "uniqueSelectedFiles": 19,
+    "rows": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/allowed.txt",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/allowed.txt",
+        "bytes": 40,
+        "sha256": "490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab",
+        "dev": 16777231,
+        "inode": 542975679,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/denied.txt",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/workspace/denied.txt",
+        "bytes": 38,
+        "sha256": "512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84",
+        "dev": 16777231,
+        "inode": 542975680,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml",
+        "bytes": 348,
+        "sha256": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+        "dev": 16777231,
+        "inode": 542975681,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml.sig",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/tools.yaml.sig",
+        "bytes": 247,
+        "sha256": "087e5ea99c916382156a9c0be2dd93168f54402666f467aef147ccdaca9be22a",
+        "dev": 16777231,
+        "inode": 542975682,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json",
+        "bytes": 476,
+        "sha256": "d67722c0a6306f95b59000cc9386d9cdc1acc9b86e7e915eb9849530bfbb4330",
+        "dev": 16777231,
+        "inode": 542975697,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json.sig",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/firewall/policy.json.sig",
+        "bytes": 862,
+        "sha256": "474df779c4bf417cbfbede70118bc2dbdaa16dc7843f69d7cc9e1b679d971b67",
+        "dev": 16777231,
+        "inode": 542975698,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/monitor_ed25519.pub",
+        "bytes": 113,
+        "sha256": "1f65860e5ec91826f7a8eaca7e437f2584988e10456de336ce2c7f806f122e17",
+        "dev": 16777231,
+        "inode": 542975703,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/keys/auditor_ed25519.pub",
+        "bytes": 113,
+        "sha256": "80dddeea1bddd4fbeb6b890d67601eedbf13591d73d681d51f2be61dc7c4e40a",
+        "dev": 16777231,
+        "inode": 542975704,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/workspace/allowed.txt",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/workspace/allowed.txt",
+        "bytes": 40,
+        "sha256": "490f37e4cb23e0a481ee9bcd7f2c6d47033b776666efca3b3c3bbdb7bbd74cab",
+        "dev": 16777231,
+        "inode": 542981874,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/workspace/denied.txt",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/workspace/denied.txt",
+        "bytes": 38,
+        "sha256": "512661706f674e96b22c55630f761fc268e0f1930da00587c85b583ba5668b84",
+        "dev": 16777231,
+        "inode": 542981875,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/tools.yaml",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/tools.yaml",
+        "bytes": 348,
+        "sha256": "f1c2bc923947fd515f763172e0015adce317ca4a570c3ffdf83111dc4e6b9475",
+        "dev": 16777231,
+        "inode": 542981876,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/tools.yaml.sig",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/tools.yaml.sig",
+        "bytes": 247,
+        "sha256": "1cb3635437b29903747cb5f0b2d6756f5b245fd2dce3d9f4f3314f2792606ede",
+        "dev": 16777231,
+        "inode": 542981877,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/firewall/policy.json",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/firewall/policy.json",
+        "bytes": 476,
+        "sha256": "0d77e83bdc1a49ee9f6594fffd2e37ead59bd25e789a1f858f6d73f98265bc45",
+        "dev": 16777231,
+        "inode": 542981892,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/firewall/policy.json.sig",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/firewall/policy.json.sig",
+        "bytes": 862,
+        "sha256": "cd37839d22fcdefb11604a7267aa92174af6ff7ad1e636872ec57f2e4f89495b",
+        "dev": 16777231,
+        "inode": 542981893,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/blob-keys/current.json",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/blob-keys/current.json",
+        "bytes": 91,
+        "sha256": "5971a3414db041bba62a9e04270532feedeabfa7b226a7dd70c8af37b29e17bd",
+        "dev": 16777231,
+        "inode": 542981871,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/blob-keys/current.json.sig",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/blob-keys/current.json.sig",
+        "bytes": 247,
+        "sha256": "b60da5f5d6b2125908baccecc876fad36dbf94e624b6971d2c7c092b3b430668",
+        "dev": 16777231,
+        "inode": 542981872,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/keys/monitor_ed25519.pub",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/keys/monitor_ed25519.pub",
+        "bytes": 113,
+        "sha256": "2ac696632f9890c75186bc3cb9168112b8b950fc83f10be67ffd213e4eb1f967",
+        "dev": 16777231,
+        "inode": 542981866,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/keys/auditor_ed25519.pub",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/workspace/.amc/keys/auditor_ed25519.pub",
+        "bytes": 113,
+        "sha256": "1bb5aa0865b094eb7bb54bd37438ad9820733781f9cb34f1b85e0a8d7fd2b857",
+        "dev": 16777231,
+        "inode": 542981867,
+        "nlink": 1
+      }
+    ],
+    "allCurrentHashStatFieldsMatchRecordedFinalPins": true,
+    "noVaultPrivateKeyOrPayloadDatabaseRead": true
+  },
+  "privacyAndCleanupLimits": [
+    "Known file canary text and PEM private-key headers are absent from the actual public/raw/observer/log/pre-call artifacts; no public string value equals the fixture passphrase. Only public facts were copied into this review; vault, decrypted payload and database contents were not read.",
+    "Actual fixture environment restores and owned vault/pool closures are recorded and asserted in V3. Each real retained store belongs to its session; successful SessionService.close releases it. No fallback store release was needed.",
+    "Public closeGuardDb is best-effort and only invocation is observable here; no private native-handle attestation is invented. The public record is written before the final two test assertions, so their execution credit comes from the actual passing raw/observer test, not from an in-record result field.",
+    "Observer records end before global teardown; the full post-exit merged log was read. Recorded owned PGID ESRCH is bounded process-group closure, not universal descendant or filesystem isolation.",
+    "Actual confinement is unconfined/probe permitted, while sandboxBackendAvailable is true. This machine capability is not evidence of sandbox enforcement or OS isolation.",
+    "R runner cwd/HEAD bf3 is distinct from S sourceRoot bf8836 and actual test paths/--root. No commit/fresh-source binding is inferred from wrapper HEAD.",
+    "Two same-day sessions prove real signed mapped native evidence and L1; L2 continuity remains unsatisfied, L3-L5 not evaluated. No model-loop, external identity, fresh-Q, causal-control, full suite, full P1-07 or plan completion credit is granted."
+  ],
+  "readBoundary": "Raw/observer/log/public records were fully parsed/read, with bounded follow-up displays for repeated arrays after one combined dump truncated. Exact joins and all row/pin facts were independently checked with stdlib data comparisons; no product verifier or runtime was rerun. Prior static source reviews are reused by exact pins.",
+  "noExecution": true,
+  "checkoutIndexQaWrites": false
+}

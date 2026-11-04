@@ -1,0 +1,19 @@
+{
+  "serverId": "oauth_fixture",
+  "catalogDigest": "25592d15431056566b4dde61e8de7fa3ceabbf6c4a25d497b21cb49446d11d48",
+  "protocol": {
+    "negotiatedVersion": "2026-07-28",
+    "mode": "stateless",
+    "serverInfo": {
+      "name": "synthetic-oauth-catalog",
+      "version": "1"
+    }
+  },
+  "auth": {
+    "issuer": "http://127.0.0.1:53951/issuer/path",
+    "scopes": [
+      "read"
+    ],
+    "tokenExpiresAt": "2026-10-16T17:03:30.208Z"
+  }
+}

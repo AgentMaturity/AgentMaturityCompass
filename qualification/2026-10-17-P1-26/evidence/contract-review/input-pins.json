@@ -1,0 +1,289 @@
+{
+  "schema": "p126-static-input-pins/1",
+  "inputs": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-26.md",
+      "bytes": 12893,
+      "sha256": "fffd189dcd70286906ed3f4e4f84944e7208d73bb9595e71d004871be1120300",
+      "readScope": "full requirement text"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/branch-adoption.json",
+      "bytes": 833,
+      "sha256": "953351ecaaccf6eb9cd72694c3b339926778a8258bd659e8bb1d7e34004fa088",
+      "readScope": "full finite root/sibling admission record; not independently rerun"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/review.json",
+      "bytes": 6265,
+      "sha256": "b4906bfb3ad054f35abe48cfa21bdedc34be5b3b3eac420d3fa0f72465600214",
+      "readScope": "full finite root/sibling admission record; not independently rerun"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/seal.json",
+      "bytes": 1227,
+      "sha256": "2d9e21c2280ffb39a3c44627b47353392da7ecaafe4d45c4589ebf47178c2d13",
+      "readScope": "full finite root/sibling admission record; not independently rerun"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/review.json",
+      "bytes": 4365,
+      "sha256": "c05d04a188efb0a329c01df6a446a9eba45dd00eb7d51de4ad7d49f06f779a04",
+      "readScope": "full finite root/sibling admission record; not independently rerun"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/seal.json",
+      "bytes": 1274,
+      "sha256": "38ccfec55c3445ee448ebd70ec1d62f446ff1aa6ee4d517564e6d824d13977ac",
+      "readScope": "full finite root/sibling admission record; not independently rerun"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/hosted-path-admission.json",
+      "bytes": 10757,
+      "sha256": "7f1d38ff1190565731f7162f07ef6a04f71ce499d8db145c4d9e521487cebba9",
+      "readScope": "full finite root/sibling admission record; not independently rerun"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/rfc9162.ts",
+      "bytes": 6476,
+      "sha256": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35",
+      "readScope": "full source"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/merkle.ts",
+      "bytes": 5703,
+      "sha256": "09769ff79c9eba6d06c841dc9cc87b5f83a04520e0ed9756f861a55106c69468",
+      "readScope": "full source"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/merkleFrontier.ts",
+      "bytes": 5224,
+      "sha256": "7d5ed84bf1520545b0407d662f0f8468862a2ce32ceb3e34675fec1b52fb0305",
+      "readScope": "full source"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/bench/benchProofs.ts",
+      "bytes": 10578,
+      "sha256": "1df60fe2be9ae8583b2661a8646954405939b64f7049d8f6f4c40f6c307d3b16",
+      "readScope": "selected verifier caller span, including algorithm and signed-root leafCount forwarding"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/sessionAnchorVerify.ts",
+      "bytes": 11674,
+      "sha256": "b0925fb77901172d7bb524521b147d61a043e076093452319787be213e6d5871",
+      "readScope": "selected inclusion caller span, including signed-row treeSize forwarding"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/transparency/merkleIndexStore.ts",
+      "bytes": 35332,
+      "sha256": "f59f267bd79bfa35ab20601f126e4bf8f7283eef629454ddd171ae2ee3d8c7df",
+      "readScope": "selected migration and bundledRootTree verification spans"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparencyMerkleIncremental.test.ts",
+      "bytes": 13968,
+      "sha256": "aa5ef81844a0cf8e72b6484b57a061171b3889cdc750952711b9f3b73dd6da14",
+      "readScope": "full source; unchanged regression recommendation only"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparencyMerkleFailLoud.test.ts",
+      "bytes": 7925,
+      "sha256": "4a161131357ddc30f42a530c31076b83b6a8529b0983976d5e52ca6acc4f9c4e",
+      "readScope": "full source; unchanged regression recommendation only"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/sessionAnchorOfflineProof.test.ts",
+      "bytes": 20097,
+      "sha256": "b14a6a44d4f6aef9cd7f6241cb23655e94c01cbb8a5b93f74ffedbef9f089dde",
+      "readScope": "selected positive/negative source bodies; no lifecycle audit or runtime claim"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "readScope": "finite input hash only; existing configuration protected, not altered"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "readScope": "finite input hash only; existing configuration protected, not altered"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "readScope": "finite input hash only; existing configuration protected, not altered"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "readScope": "finite input hash only; existing configuration protected, not altered"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+      "readScope": "finite input hash only; existing configuration protected, not altered"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+      "readScope": "finite input hash only; existing configuration protected, not altered"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "readScope": "finite input hash only; existing configuration protected, not altered"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+      "readScope": "finite input hash only; existing configuration protected, not altered"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/navigation/summary.json",
+      "bytes": 36920,
+      "sha256": "82e79208a9a7415b15f77e93c8e73e338859399bad1b41ad6c152e0abebb0ecb",
+      "readScope": "generation/version/revision metadata only; historical navigation"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/manifest.json",
+      "bytes": 697781,
+      "sha256": "c0976d8b42699a5c169fbb2f089418083eccbec3fe40a00cb5814b4fae879838",
+      "readScope": "Merkle path presence and historical manifest rows only"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/inventory.json",
+      "bytes": 1233,
+      "sha256": "e02d2416eb96b2812e2751e9f4565e01e2adacaf1cf1c659bebc87f021d7ecd8",
+      "readScope": "full JSON metadata, selected provenance fields compared locally"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/selected-source-pins.json",
+      "bytes": 3892,
+      "sha256": "d2cbc50c65398130135dec0711b78f62d26e39dcf0393f50bc019a4da0ef684b",
+      "readScope": "full JSON metadata, selected provenance fields compared locally"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/extra-source-pins.json",
+      "bytes": 975,
+      "sha256": "417a8377d58232e3f3762d8f7126d05148b3962b388532b42de5b0887fd6e483",
+      "readScope": "full JSON metadata, selected provenance fields compared locally"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/commit.json",
+      "bytes": 15099,
+      "sha256": "57fa263d1e4f3998ff2b148b23728b7e856de827a7e4e349837917c53c30ffb7",
+      "readScope": "full JSON metadata, selected provenance fields compared locally"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/tree.json",
+      "bytes": 214198,
+      "sha256": "23b5d62b6ccc52396ba2b3c075691c046a9ddb009dcf3cc49e29c9519dbda74f",
+      "readScope": "full JSON metadata, selected provenance fields compared locally"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/license-response.json",
+      "bytes": 16620,
+      "sha256": "b5c465ab9c886e8c0e85c11ac604655cb147ae143e63f5c63fa4b56b1c6571bd",
+      "readScope": "full JSON metadata, selected provenance fields compared locally"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/rfc6962/rfc6962_test.go",
+      "bytes": 3368,
+      "sha256": "6237bd8f8131c49832575d4ce03395a62f98a6555080783b7ca5d1fb06a83678",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/0/happy-path.json",
+      "bytes": 209,
+      "sha256": "5aae6059f25e905b9ba2eb20471d584e50f31ba5dc8a1797547fb38af25d032e",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/1/happy-path.json",
+      "bytes": 365,
+      "sha256": "3d94a9f4a5ecd5ec6338beba1a523798a8553553cadb8247ed5d9e3ba9b3cea6",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/2/happy-path.json",
+      "bytes": 365,
+      "sha256": "084d20811521ec2017cb0cf8d4ebe9aa987e7415e559374f51f5647635b12636",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/3/happy-path.json",
+      "bytes": 313,
+      "sha256": "2254557f34595bcbeff662da226507648be8cbf570653f54d053806024d12f8c",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/consistency/4/happy-path.json",
+      "bytes": 365,
+      "sha256": "e57266a3bff16d997c57a1a30b6f9283cf8dd150d165201016cb4d9774cde020",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/0/happy-path.json",
+      "bytes": 216,
+      "sha256": "c572c07efd1183529a7139b88d7b9785969067bcc6fa7cac54c9b14ac7f5ef01",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/1/happy-path.json",
+      "bytes": 372,
+      "sha256": "d345b72a74b4647f68f92e9bcd05c19f7fd3080858bc6ff25979270d9d9b0083",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/2/happy-path.json",
+      "bytes": 372,
+      "sha256": "4eede9de7ed9989bcc2f53cb8ae770cecf5c56dbfae25e2d38d9e551e7226722",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/3/happy-path.json",
+      "bytes": 268,
+      "sha256": "be604298d4ed651d66dd96dc769fdd6c60f3b04db1080afaff4b10a1070d2e23",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testdata/inclusion/4/happy-path.json",
+      "bytes": 372,
+      "sha256": "0d5679d8a828eebda5d498ca0187a568c805e4d1be17f373ec5058c99b74a9cc",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/cmd/proofgen/main.go",
+      "bytes": 33874,
+      "sha256": "8a8792670f67a1453970824b4385d22f13c186766f985a1f02efbd3bffa06585",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/proof/verify_test.go",
+      "bytes": 7410,
+      "sha256": "ee9aafcb201119b92b4e45db4bc048ebc054be428e54f0822047a6c399bcc97a",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/testonly/constants.go",
+      "bytes": 4201,
+      "sha256": "6faf1957b5727c99593412ca0375f7e1f90ba10d7747dc42624585f948da32a8",
+      "readScope": "full bytes hashed; source/constants and proof/vector contents reviewed as declared"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "readScope": "full licence byte/hash comparison; no legal compliance claim"
+    }
+  ],
+  "missingInputs": [],
+  "readScopeIsExplicit": true
+}

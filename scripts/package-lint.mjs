@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { publint } from "publint";
+import { isEntrypoint } from "./lib/entrypoint.mjs";
 
 /** Check the actual npm publish file set without running package lifecycle scripts. */
 export async function lintPackage(root = process.cwd()) {
@@ -19,7 +19,7 @@ export async function lintPackage(root = process.cwd()) {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+if (isEntrypoint(import.meta.url)) {
   const { messages } = await lintPackage();
   const errors = messages.filter(message => message.type === "error");
   console.log(JSON.stringify({ status: errors.length ? "failed" : "passed", messages }, null, 2));

@@ -1,0 +1,179 @@
+{
+  "schemaVersion": 2,
+  "source": "pi-ai",
+  "routes": [
+    {
+      "route": "pi-ai:groq",
+      "protocol": "pi-ai-openai-completions",
+      "adapter": "pi-ai-openai-completions@1",
+      "encoder": "pi-ai:groq@1",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "unknown",
+        "image-output": "unknown",
+        "audio-input": "unknown",
+        "audio-output": "unknown",
+        "video-input": "unknown",
+        "thinking-output": "unknown",
+        "thinking-replay": "unknown",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "unsupported",
+        "tool-result-error-text": "unsupported",
+        "usage": "supported",
+        "cache-read-usage": "unknown",
+        "cache-write-usage": "unknown",
+        "prompt-cache-control": "unknown"
+      },
+      "library": "@earendil-works/pi-ai@1.3.0"
+    },
+    {
+      "route": "pi-ai:huggingface",
+      "protocol": "pi-ai-openai-completions",
+      "adapter": "pi-ai-openai-completions@1",
+      "encoder": "pi-ai:huggingface@1",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "unknown",
+        "image-output": "unknown",
+        "audio-input": "unknown",
+        "audio-output": "unknown",
+        "video-input": "unknown",
+        "thinking-output": "unknown",
+        "thinking-replay": "unknown",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "unsupported",
+        "tool-result-error-text": "unsupported",
+        "usage": "supported",
+        "cache-read-usage": "unknown",
+        "cache-write-usage": "unknown",
+        "prompt-cache-control": "unknown"
+      },
+      "library": "@earendil-works/pi-ai@1.3.0"
+    },
+    {
+      "route": "pi-ai:together",
+      "protocol": "pi-ai-openai-completions",
+      "adapter": "pi-ai-openai-completions@1",
+      "encoder": "pi-ai:together@1",
+      "declared": {
+        "text-input": "supported",
+        "text-output": "supported",
+        "image-input": "unknown",
+        "image-output": "unknown",
+        "audio-input": "unknown",
+        "audio-output": "unknown",
+        "video-input": "unknown",
+        "thinking-output": "unknown",
+        "thinking-replay": "unknown",
+        "tool-calls": "supported",
+        "tool-replay": "supported",
+        "tool-result-error-flag": "unsupported",
+        "tool-result-error-text": "unsupported",
+        "usage": "supported",
+        "cache-read-usage": "unknown",
+        "cache-write-usage": "unknown",
+        "prompt-cache-control": "unknown"
+      },
+      "library": "@earendil-works/pi-ai@1.3.0"
+    }
+  ],
+  "claims": [
+    {
+      "route": "pi-ai:groq",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
+      "support": "supported",
+      "file": "tests/piAi/piAiAdapterContract.test.ts",
+      "title": "groq: the fixture receives exactly the bytes the signed header commits to, and text and usage decode"
+    },
+    {
+      "route": "pi-ai:huggingface",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
+      "support": "supported",
+      "file": "tests/piAi/piAiAdapterContract.test.ts",
+      "title": "huggingface: the fixture receives exactly the bytes the signed header commits to, and text and usage decode"
+    },
+    {
+      "route": "pi-ai:together",
+      "features": [
+        "text-input",
+        "text-output",
+        "usage"
+      ],
+      "support": "supported",
+      "file": "tests/piAi/piAiAdapterContract.test.ts",
+      "title": "together: the fixture receives exactly the bytes the signed header commits to, and text and usage decode"
+    },
+    {
+      "route": "pi-ai:groq",
+      "features": [
+        "tool-calls",
+        "tool-replay"
+      ],
+      "support": "supported",
+      "file": "tests/piAi/piAiAdapterContract.test.ts",
+      "title": "groq: a streamed tool call decodes under the offered name and replays as history"
+    },
+    {
+      "route": "pi-ai:huggingface",
+      "features": [
+        "tool-calls",
+        "tool-replay"
+      ],
+      "support": "supported",
+      "file": "tests/piAi/piAiAdapterContract.test.ts",
+      "title": "huggingface: a streamed tool call decodes under the offered name and replays as history"
+    },
+    {
+      "route": "pi-ai:together",
+      "features": [
+        "tool-calls",
+        "tool-replay"
+      ],
+      "support": "supported",
+      "file": "tests/piAi/piAiAdapterContract.test.ts",
+      "title": "together: a streamed tool call decodes under the offered name and replays as history"
+    },
+    {
+      "route": "pi-ai:groq",
+      "features": [
+        "tool-result-error-flag",
+        "tool-result-error-text"
+      ],
+      "support": "unsupported",
+      "file": "tests/piAi/piAiAdapterContract.test.ts",
+      "title": "groq: a failed tool result is refused before a header, because the pinned encoding cannot carry it"
+    },
+    {
+      "route": "pi-ai:huggingface",
+      "features": [
+        "tool-result-error-flag",
+        "tool-result-error-text"
+      ],
+      "support": "unsupported",
+      "file": "tests/piAi/piAiAdapterContract.test.ts",
+      "title": "huggingface: a failed tool result is refused before a header, because the pinned encoding cannot carry it"
+    },
+    {
+      "route": "pi-ai:together",
+      "features": [
+        "tool-result-error-flag",
+        "tool-result-error-text"
+      ],
+      "support": "unsupported",
+      "file": "tests/piAi/piAiAdapterContract.test.ts",
+      "title": "together: a failed tool result is refused before a header, because the pinned encoding cannot carry it"
+    }
+  ]
+}

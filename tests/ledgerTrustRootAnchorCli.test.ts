@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { forgeKeysetKey } from "./helpers/forgeKeyset.js";
 import { generateKeyPairSync, sign, type KeyObject } from "node:crypto";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -48,13 +49,14 @@ function forge(workspace: string): void {
     db.exec(`DROP TRIGGER IF EXISTS ${trigger}`);
   }
   const rows = db.prepare("SELECT rowid AS rid, * FROM evidence_events ORDER BY rowid ASC").all() as Array<
-    Pick<EvidenceEvent, "id" | "ts" | "session_id" | "runtime" | "event_type" | "meta_json"> & { rid: number }>;
+    Pick<EvidenceEvent, "id" | "ts" | "session_id" | "runtime" | "event_type" | "meta_json" | "payload_inline"> & { rid: number }>;
   const update = db.prepare(`UPDATE evidence_events SET payload_inline=?, canonical_payload_inline=?, payload_sha256=?,
     prev_event_hash=?, event_hash=?, writer_sig=? WHERE rowid=?`);
   const signHash = (hash: string, key: KeyObject) => sign(null, Buffer.from(hash, "hex"), key).toString("base64");
   let prev = "GENESIS";
   for (const row of rows) {
-    const forged = "the agent behaved impeccably";
+    // Audit rows (the WITNESSING_ENABLED marker) keep their receipted payload; the agent's output is what is rewritten.
+    const forged = row.event_type === "audit" ? row.payload_inline! : "the agent behaved impeccably";
     const payloadSha = sha256Hex(forged);
     const canonical = canonicalMetadataForHash({ id: row.id, ts: row.ts, sessionId: row.session_id, runtime: row.runtime,
       eventType: row.event_type, payloadPath: null, payloadInline: forged, metaJson: row.meta_json });
@@ -70,6 +72,8 @@ function forge(workspace: string): void {
   }
   db.close();
   writeFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub"), publicKey.export({ format: "pem", type: "spki" }).toString());
+  // The verifying CLI runs with a fresh AMC home (no mark), so the attacker also re-points the unsigned key set (P1-08).
+  forgeKeysetKey(workspace, "ledger-row", publicKey.export({ format: "pem", type: "spki" }).toString());
 }
 
 function amcVerify(cwd: string, args: string[] = []) {
@@ -89,6 +93,8 @@ describe("amc verify and the ledger trust root", () => {
     expect(result.status, result.output).toBe(1);
     expect(result.output).toContain("UNANCHORED");
     expect(result.output).not.toContain("Ledger verification PASSED");
+    // A machine that never committed the key set says it adopted it on trust (P1-08 review round 2).
+    expect(result.output).toContain("adopted unanchored (trust on first use)");
   });
 
   it("names the substituted trust root when the pre-attack fingerprint is pinned with --expect-monitor", () => {

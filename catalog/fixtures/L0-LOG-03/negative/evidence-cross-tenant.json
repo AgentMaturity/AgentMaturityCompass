@@ -1,0 +1,56 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-LOG-03",
+  "polarity": "negative",
+  "evidenceClass": "cross_tenant",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2025-01-01T00:00:00.000Z",
+      "end": "2026-09-30T23:59:59.000Z"
+    },
+    "subject": {
+      "tenantId": "tenant-a",
+      "workspaceId": "ws-a",
+      "deploymentId": "dep-a",
+      "agentId": "agent-1",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [
+      {
+        "ref": {
+          "kind": "external",
+          "id": "L0-LOG-03-residency-deletionGate-1"
+        },
+        "producerId": "amc.residency.deletionGate",
+        "provenance": {
+          "verified": true,
+          "producerId": "amc.residency.deletionGate",
+          "trustTier": "OBSERVED"
+        },
+        "recordedAt": "2026-09-20T10:00:00.000Z",
+        "binding": {
+          "workspaceId": "ws-a",
+          "controlId": "L0-LOG-03",
+          "tenantId": "tenant-b"
+        },
+        "verdict": "conforms",
+        "attributes": {
+          "receiptId": "L0-LOG-03-residency-deletionGate-1-receipt",
+          "observationKey": "L0-LOG-03-observation-1",
+          "observation": "conforms"
+        }
+      }
+    ],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "cross_tenant"
+  }
+}

@@ -1,0 +1,124 @@
+{
+  "roots": 181,
+  "selectedChecks": 2896,
+  "presentSourcePins": 1730,
+  "sourceDeltas": 0,
+  "targetChecks": 362,
+  "targetsPresent": [],
+  "targetDirty": [],
+  "sourceDirty": [],
+  "histories": 14,
+  "historyNonempty": [],
+  "gitFailures": [],
+  "heldPins": 36,
+  "heldMismatches": [],
+  "runnerExact": true,
+  "nativePins": 6,
+  "nativeMismatches": [],
+  "sourceState": {
+    "head": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7\n",
+      "stderr": ""
+    },
+    "branch": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "branch",
+        "--show-current"
+      ],
+      "exit": 0,
+      "stdout": "codex/p1-25-client-qualification\n",
+      "stderr": ""
+    },
+    "status": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "index": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "diff",
+        "--cached",
+        "--name-status"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  },
+  "variantCountsUnchanged": true,
+  "qaAppendExact": true,
+  "Q126": {
+    "head": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "32435b41d59e651ad2b259a59703cd137e5c925a\n",
+      "stderr": ""
+    },
+    "status": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "index": {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout",
+        "diff",
+        "--cached",
+        "--name-status"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    "controlTarget": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/src/transparency/rfc9162.ts",
+      "bytes": 6476,
+      "sha256": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35"
+    }
+  }
+}

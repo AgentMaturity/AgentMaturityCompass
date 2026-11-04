@@ -1,0 +1,422 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass
+
+ ✓ tests/claims/claimAdapters.test.ts (39 tests) 24ms
+ ✓ tests/claims/claimEligibility.test.ts (76 tests) 21ms
+ ✓ tests/claims/claimLabels.test.ts (8 tests) 38ms
+instruments=278 sourced=130 unverified=148
+ ✓ tests/industryPackSchema.test.ts (11 tests) 51ms
+ ✓ tests/claimBadge.test.ts (9 tests) 8ms
+ ✓ tests/industryPackEntitlement.test.ts (13 tests) 23ms
+ ✓ tests/openapiContracts.test.ts (8 tests) 505ms
+ ✓ tests/mcpServerTools.test.ts (3 tests) 16ms
+ ✓ tests/mcpServer.test.ts (11 tests) 13ms
+ ❯ tests/apiClaimLabels.test.ts (8 tests | 3 failed) 1406ms
+     × saved OpenAPI has every registered result operation and its ClaimResult JSON schema 214ms
+     × generated OpenAPI has every registered result operation and its ClaimResult JSON schema 11ms
+     ✓ the stored-run route retains protected human-read access metadata 1ms
+     × a real sealed 1.1.1 stored run stays legacy self-reported in the actual dispatcher response 302ms
+     ✓ a current sealed stored run preserves its observed claim and current result 231ms
+     ✓ a tampered current stored run never inherits observed or positive claim fields 220ms
+     ✓ an unsealed current stored run cannot promote its own observed metadata 207ms
+     ✓ a missing stored run keeps the actual 404 error contract without fabricated claims 216ms
+ ✓ tests/industryPackCli.test.ts (5 tests) 6020ms
+     ✓ a locally signed paid fixture accepts a legitimate pack with current syntax  2321ms
+     ✓ refuses inherited pack ID __proto__ after valid paid control  922ms
+     ✓ refuses inherited pack ID constructor after valid paid control  952ms
+     ✓ refuses inherited pack ID toString after valid paid control  905ms
+     ✓ refuses inherited pack ID hasOwnProperty after valid paid control  906ms
+ ❯ tests/studioClaimLabels.test.ts (15 tests | 4 failed) 3392ms
+     × a sealed legacy run retains the canonical legacy claim after Studio report decoration 333ms
+     ✓ a current sealed run with stored readiness retains its observed claim 248ms
+     × a legacy version cannot become observed even when its stored readiness also verifies 218ms
+     × adding display readiness does not invalidate a current report's valid stored seal 207ms
+     ✓ an unsealed current report cannot promote its own observed metadata 202ms
+     ✓ a tampered current report cannot inherit its prior valid seal 209ms
+     ✓ refuses report access with admin credential null 250ms
+     ✓ refuses report access with admin credential invalid-owned-studio-token 191ms
+     × a missing stored run returns 404 without a fabricated result claim 297ms
+     ✓ an unknown authenticated Studio route keeps its 404 error contract 240ms
+     ✓ paid catalog access changes content availability without changing any pack claim or truth-rule note 183ms
+     ✓ a genuine signed entitlement still refuses inherited pack ID __proto__ 167ms
+     ✓ a genuine signed entitlement still refuses inherited pack ID constructor 287ms
+     ✓ a genuine signed entitlement still refuses inherited pack ID toString 171ms
+     ✓ a genuine signed entitlement still refuses inherited pack ID hasOwnProperty 184ms
+ ✓ tests/mcpClaimLabels.test.ts (23 tests) 4941ms
+     ✓ discovers the exact 11 default tools with A4 preview disabled  303ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/apiClaimLabels.test.ts > API result claim contracts (P0-23) > saved OpenAPI has every registered result operation and its ClaimResult JSON schema
+AssertionError: expected [ …(57) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "GET /api/v1/score/evidence-drilldown/:runId/:questionId: expected exactly one operation, found 0",
++   "POST /api/v1/score/industry/adjust: expected exactly one operation, found 0",
++   "GET /api/v1/score/industry/models: expected exactly one operation, found 0",
++   "GET /api/v1/score/industry/model/:industryId: expected exactly one operation, found 0",
++   "POST /api/v1/score/lane/safety-research: expected exactly one operation, found 0",
++   "POST /api/v1/score/judge-calibration: expected exactly one operation, found 0",
++   "POST /api/v1/score/live-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/promptfoo-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/inspect-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/tensorzero-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/helm-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/patronus-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/trust/verify-claim: expected exactly one operation, found 0",
++   "POST /api/v1/score/trust/transitive: expected exactly one operation, found 0",
++   "POST /api/v1/score/trust/decay: expected exactly one operation, found 0",
++   "POST /api/v1/score/trust/inherited: expected exactly one operation, found 0",
++   "POST /api/v1/passport/trust-token/verify: expected exactly one operation, found 0",
++   "POST /api/v1/passport/trust-token/translate: expected exactly one operation, found 0",
++   "POST /api/v1/badge/export: expected exactly one operation, found 0",
++   "POST /api/v1/bundle/verify: expected exactly one operation, found 0",
++   "POST /api/v1/bundle/inspect: expected exactly one operation, found 0",
++   "POST /api/v1/bundle/diff: expected exactly one operation, found 0",
++   "POST /api/v1/bundle/export: expected exactly one operation, found 0",
++   "POST /api/v1/bom/verify: expected exactly one operation, found 0",
++   "POST /api/v1/enforce/formal/certificate: expected exactly one operation, found 0",
++   "POST /api/v1/enforce/formal/verify: expected exactly one operation, found 0",
++   "POST /api/v1/assurance: expected exactly one operation, found 0",
++   "GET /api/v1/assurance: expected exactly one operation, found 0",
++   "GET /api/v1/assurance/:runId: expected exactly one operation, found 0",
++   "GET /api/v1/assurance/history: expected exactly one operation, found 0",
++   "POST /api/v1/assurance/verify: expected exactly one operation, found 0",
++   "GET /api/v1/assurance/workspace/verify: expected exactly one operation, found 0",
++   "POST /api/v1/assurance/lab/:packName: expected exactly one operation, found 0",
++   "POST /api/v1/assurance/cert: expected exactly one operation, found 0",
++   "GET /api/v1/assurance/cert/latest: expected exactly one operation, found 0",
++   "POST /api/v1/assurance/cert/verify: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/verify: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/promptfoo-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/inspect-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/tensorzero-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/helm-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/shield/red-team/run: expected exactly one operation, found 0",
++   "POST /api/v1/shield/trust-pipeline/run: expected exactly one operation, found 0",
++   "POST /api/v1/shield/exploit-confirmation/run: 201 response schemas lack #/components/schemas/ClaimResult",
++   "POST /api/v1/shield/replay-corpus/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/live-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/judge-calibration/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/promptfoo-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/inspect-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/tensorzero-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/helm-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/patronus-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/compliance/regulatory/check: expected exactly one operation, found 0",
++   "GET /api/v1/incidents/:id/clocks: expected exactly one operation, found 0",
++ ]
+
+ ❯ tests/apiClaimLabels.test.ts:212:73
+    210|     const spec = YAML.parse(readFileSync(new URL("../website/openapi.y…
+    211|     requireClaimComponents(spec);
+    212|     expect(resultOperationViolations(spec, "saved-openapi-accounting")…
+       |                                                                         ^
+    213|   });
+    214|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/apiClaimLabels.test.ts > API result claim contracts (P0-23) > generated OpenAPI has every registered result operation and its ClaimResult JSON schema
+AssertionError: expected [ …(106) ] to deeply equal []
+
+- Expected
++ Received
+
+- []
++ [
++   "GET /api/v1/score/latest: expected exactly one operation, found 0",
++   "GET /api/v1/score/history: expected exactly one operation, found 0",
++   "GET /api/v1/score/runs: expected exactly one operation, found 0",
++   "POST /api/v1/score/run: expected exactly one operation, found 0",
++   "GET /api/v1/score/run/:runId: expected exactly one operation, found 0",
++   "GET /api/v1/score/report: expected exactly one operation, found 0",
++   "GET /api/v1/score/report/:runId: expected exactly one operation, found 0",
++   "GET /api/v1/score/result/:sessionId: expected exactly one operation, found 0",
++   "POST /api/v1/score/quick: expected exactly one operation, found 0",
++   "POST /api/v1/score/quickscore: expected exactly one operation, found 0",
++   "GET /api/v1/score/compare: expected exactly one operation, found 0",
++   "POST /api/v1/score/compare: expected exactly one operation, found 0",
++   "POST /api/v1/score/formal-spec: expected exactly one operation, found 0",
++   "POST /api/v1/score/adversarial: expected exactly one operation, found 0",
++   "POST /api/v1/score/industry/adjust: expected exactly one operation, found 0",
++   "GET /api/v1/score/industry/models: expected exactly one operation, found 0",
++   "GET /api/v1/score/industry/model/:industryId: expected exactly one operation, found 0",
++   "POST /api/v1/score/lane/safety-research: expected exactly one operation, found 0",
++   "POST /api/v1/score/judge-calibration: expected exactly one operation, found 0",
++   "POST /api/v1/score/live-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/promptfoo-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/inspect-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/tensorzero-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/helm-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/patronus-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/score/trust/verify-claim: expected exactly one operation, found 0",
++   "POST /api/v1/score/trust/transitive: expected exactly one operation, found 0",
++   "POST /api/v1/score/trust/decay: expected exactly one operation, found 0",
++   "POST /api/v1/score/trust/inherited: expected exactly one operation, found 0",
++   "GET /api/v1/passport/:id: expected exactly one operation, found 0",
++   "GET /api/v1/passport/:id/verify: expected exactly one operation, found 0",
++   "GET /api/v1/passports: expected exactly one operation, found 0",
++   "POST /api/v1/passport/trust-token/verify: expected exactly one operation, found 0",
++   "POST /api/v1/passport/trust-token/translate: expected exactly one operation, found 0",
++   "POST /api/v1/badge/export: expected exactly one operation, found 0",
++   "POST /api/v1/bundle/verify: expected exactly one operation, found 0",
++   "POST /api/v1/bundle/inspect: expected exactly one operation, found 0",
++   "POST /api/v1/bundle/diff: expected exactly one operation, found 0",
++   "POST /api/v1/bundle/export: expected exactly one operation, found 0",
++   "POST /api/v1/bom/verify: expected exactly one operation, found 0",
++   "POST /api/v1/attest/notary: expected exactly one operation, found 0",
++   "POST /api/v1/attest/notary/verify: expected exactly one operation, found 0",
++   "POST /api/v1/attest/outcome: expected exactly one operation, found 0",
++   "POST /api/v1/export/badge: expected exactly one operation, found 0",
++   "GET /api/v1/export/badge/generate: expected exactly one operation, found 0",
++   "GET /api/v1/export/badge/url: expected exactly one operation, found 0",
++   "GET /api/v1/security/sleeper-detection: expected exactly one operation, found 0",
++   "GET /api/v1/security/gaming-resistance: expected exactly one operation, found 0",
++   "POST /api/v1/security/adversarial: expected exactly one operation, found 0",
++   "GET /api/v1/security/insider/scores: expected exactly one operation, found 0",
++   "GET /api/v1/security/insider/report: expected exactly one operation, found 0",
++   "POST /api/v1/crypto/cert/issue: expected exactly one operation, found 0",
++   "POST /api/v1/crypto/cert/verify: expected exactly one operation, found 0",
++   "POST /api/v1/crypto/cert/inspect: expected exactly one operation, found 0",
++   "POST /api/v1/crypto/cert/verify-revocation: expected exactly one operation, found 0",
++   "POST /api/v1/crypto/notary/verify-attest: expected exactly one operation, found 0",
++   "GET /api/v1/crypto/notary/log-verify: expected exactly one operation, found 0",
++   "POST /api/v1/crypto/merkle/verify-proof: expected exactly one operation, found 0",
++   "POST /api/v1/enforce/formal/certificate: expected exactly one operation, found 0",
++   "POST /api/v1/enforce/formal/verify: expected exactly one operation, found 0",
++   "GET /api/v1/fleet/report: expected exactly one operation, found 0",
++   "GET /api/v1/fleet/agents/:agentId: expected exactly one operation, found 0",
++   "POST /api/v1/ci/gate: expected exactly one operation, found 0",
++   "POST /api/v1/ci/predict: expected exactly one operation, found 0",
++   "POST /api/v1/proof/check: expected exactly one operation, found 0",
++   "GET /api/v1/proof/status: expected exactly one operation, found 0",
++   "GET /api/v1/compliance/verify: expected exactly one operation, found 0",
++   "POST /api/v1/assurance: expected exactly one operation, found 0",
++   "GET /api/v1/assurance: expected exactly one operation, found 0",
++   "GET /api/v1/assurance/:runId: expected exactly one operation, found 0",
++   "GET /api/v1/assurance/history: expected exactly one operation, found 0",
++   "GET /api/v1/assurance/readiness: expected exactly one operation, found 0",
++   "POST /api/v1/assurance/verify: expected exactly one operation, found 0",
++   "GET /api/v1/assurance/workspace/verify: expected exactly one operation, found 0",
++   "POST /api/v1/assurance/lab/:packName: expected exactly one operation, found 0",
++   "POST /api/v1/assurance/cert: expected exactly one operation, found 0",
++   "GET /api/v1/assurance/cert/latest: expected exactly one operation, found 0",
++   "POST /api/v1/assurance/cert/verify: expected exactly one operation, found 0",
++   "GET /api/v1/benchmarks/stats: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/verify: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/promptfoo-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/inspect-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/tensorzero-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/benchmarks/helm-provider-drift: expected exactly one operation, found 0",
++   "POST /api/v1/shield/red-team/run: expected exactly one operation, found 0",
++   "POST /api/v1/shield/trust-pipeline/run: expected exactly one operation, found 0",
++   "POST /api/v1/shield/exploit-confirmation/run: expected exactly one operation, found 0",
++   "POST /api/v1/shield/replay-corpus/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/live-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/judge-calibration/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/promptfoo-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/inspect-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/tensorzero-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/helm-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/shield/patronus-provider-drift/verify: expected exactly one operation, found 0",
++   "POST /api/v1/compliance/report: expected exactly one operation, found 0",
++   "POST /api/v1/compliance/fleet: expected exactly one operation, found 0",
++   "POST /api/v1/compliance/diff: expected exactly one operation, found 0",
++   "POST /api/v1/compliance/regulatory/check: expected exactly one operation, found 0",
++   "GET /api/v1/regulatory/eu-ai-act: expected exactly one operation, found 0",
++   "GET /api/v1/regulatory/owasp-llm: expected exactly one operation, found 0",
++   "GET /api/v1/regulatory/readiness: expected exactly one operation, found 0",
++   "GET /api/v1/incidents/:id/clocks: expected exactly one operation, found 0",
++ ]
+
+ ❯ tests/apiClaimLabels.test.ts:218:77
+    216|     const spec = generateFullOpenApiSpec();
+    217|     requireClaimComponents(spec);
+    218|     expect(resultOperationViolations(spec, "generated-openapi-accounti…
+       |                                                                             ^
+    219|   });
+    220|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/apiClaimLabels.test.ts > API result claim contracts (P0-23) > a real sealed 1.1.1 stored run stays legacy self-reported in the actual dispatcher response
+AssertionError: expected { ok: true, data: { …(28) }, …(3) } to match object { claimKind: 'self_reported', …(2) }
+(30 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "claimKind": "self_reported",
+-   "claimLabel": "Claim: Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
++   "claimKind": "observed",
++   "claimLabel": "Claim: Observed · Result: pass · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
+    "statusDimensions": {
+      "applicability": {
+        "state": "applicable",
+      },
+      "enforcement": {
+        "state": "none",
+      },
+      "evidence": "sufficient",
+-     "result": "not_evaluated",
++     "result": "pass",
+      "review": "pending",
+    },
+  }
+
+ ❯ tests/apiClaimLabels.test.ts:238:27
+    236|     const response = await readRun(workspace, report.runId);
+    237|     requireSuccess(response, report);
+    238|     expect(response.json).toMatchObject(expected);
+       |                           ^
+    239|   });
+    240|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/studioClaimLabels.test.ts > Studio claims over actual authenticated loopback HTTP (P0-23) > a sealed legacy run retains the canonical legacy claim after Studio report decoration
+AssertionError: expected { agentId: 'default', …(31) } to match object { claimKind: 'self_reported', …(2) }
+(67 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+    "claimKind": "self_reported",
+-   "claimLabel": "Claim: Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
++   "claimLabel": "Claim: Self-reported · Result: not evaluated (this result is not yet bound to claim-eligible evidence) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable",
+    "statusDimensions": {
+      "applicability": {
+        "state": "applicable",
+      },
+      "enforcement": {
+        "state": "none",
+      },
+-     "evidence": "sufficient",
++     "evidence": "incomplete",
+      "result": "not_evaluated",
+      "review": "pending",
+    },
+  }
+
+ ❯ tests/studioClaimLabels.test.ts:176:27
+    174|     const response = await get(fixture, `/runs/${report.runId}/report`…
+    175|     requireReport(response, report);
+    176|     expect(response.json).toMatchObject(expected);
+       |                           ^
+    177|   });
+    178|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/studioClaimLabels.test.ts > Studio claims over actual authenticated loopback HTTP (P0-23) > a legacy version cannot become observed even when its stored readiness also verifies
+AssertionError: expected { agentId: 'default', …(31) } to match object { claimKind: 'self_reported', …(2) }
+(67 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "claimKind": "self_reported",
+-   "claimLabel": "Claim: Legacy (1.x), self-reported (notice AMC-LEGACY-2026-001 v1) · Result: not evaluated · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
++   "claimKind": "observed",
++   "claimLabel": "Claim: Observed · Result: pass · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
+    "statusDimensions": {
+      "applicability": {
+        "state": "applicable",
+      },
+      "enforcement": {
+        "state": "none",
+      },
+      "evidence": "sufficient",
+-     "result": "not_evaluated",
++     "result": "pass",
+      "review": "pending",
+    },
+  }
+
+ ❯ tests/studioClaimLabels.test.ts:199:27
+    197|     const response = await get(fixture, `/runs/${report.runId}/report`…
+    198|     requireReport(response, report);
+    199|     expect(response.json).toMatchObject(expected);
+       |                           ^
+    200|   });
+    201|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/studioClaimLabels.test.ts > Studio claims over actual authenticated loopback HTTP (P0-23) > adding display readiness does not invalidate a current report's valid stored seal
+AssertionError: expected { agentId: 'default', …(31) } to match object { claimKind: 'observed', …(2) }
+(67 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "claimKind": "observed",
+-   "claimLabel": "Claim: Observed · Result: pass · Evidence: sufficient · Enforcement: none · Review: pending · Applicability: applicable",
++   "claimKind": "self_reported",
++   "claimLabel": "Claim: Self-reported · Result: not evaluated (this result is not yet bound to claim-eligible evidence) · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable",
+    "statusDimensions": {
+      "applicability": {
+        "state": "applicable",
+      },
+      "enforcement": {
+        "state": "none",
+      },
+-     "evidence": "sufficient",
+-     "result": "pass",
++     "evidence": "incomplete",
++     "result": "not_evaluated",
+      "review": "pending",
+    },
+  }
+
+ ❯ tests/studioClaimLabels.test.ts:210:27
+    208|     const response = await get(fixture, `/runs/${report.runId}/report`…
+    209|     requireReport(response, report);
+    210|     expect(response.json).toMatchObject(expected);
+       |                           ^
+    211|   });
+    212|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/studioClaimLabels.test.ts > Studio claims over actual authenticated loopback HTTP (P0-23) > a missing stored run returns 404 without a fabricated result claim
+AssertionError: {"error":"internal server error"}: expected 500 to be 404 // Object.is equality
+
+- Expected
++ Received
+
+- 404
++ 500
+
+ ❯ tests/studioClaimLabels.test.ts:249:44
+    247|     const response = await get(fixture, "/runs/studio-missing-run/repo…
+    248|     requireError(response);
+    249|     expect(response.status, response.body).toBe(404);
+       |                                            ^
+    250|   });
+    251|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  2 failed | 11 passed (13)
+      Tests  7 failed | 222 passed (229)
+   Start at  23:02:35
+   Duration  10.05s (transform 18.47s, setup 445ms, import 29.76s, tests 16.46s, environment 1ms)
+
+JSON report written to /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tmp/p0-23-qualification/final-bounded-node22.json

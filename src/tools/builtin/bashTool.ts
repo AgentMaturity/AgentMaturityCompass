@@ -1,9 +1,11 @@
+import { statSync } from "node:fs";
 import { z } from "zod";
 import { runProcess } from "../../exec/runProcess.js";
-import { stripProviderKeys } from "../../utils/providerKeys.js";
+import { commandEnv } from "../../utils/providerKeys.js";
 import { defineTool } from "../toolRegistry.js";
 import { DefiniteFailureError, type ToolDefinition, type ToolExecution } from "../toolTypes.js";
 import type { SandboxOutcome } from "../../sandbox/sandboxTypes.js";
+import { insideWorkspace } from "./fsTools.js";
 
 /**
  * The one-shot shell tool (P4.3).
@@ -29,8 +31,19 @@ import type { SandboxOutcome } from "../../sandbox/sandboxTypes.js";
 
 const bashArgs = z.object({
   command: z.string().min(1),
+  workdir: z.string().min(1).optional(),
+  description: z.string().min(1).max(200).optional(),
+  // Background execution requires the governed job tools, not an ignored flag.
+  run_in_background: z.never().optional(),
   timeoutMs: z.number().int().positive().max(600_000).default(120_000)
 });
+
+/** The call's own `description` when it is a valid one: agent-supplied and unverified, for receipts and approval questions. */
+export function bashDescription(args: Readonly<Record<string, unknown>>): string | null {
+  const parsed = bashArgs.shape.description.safeParse(args.description);
+  // Control and format characters (newlines, bidi overrides) could redraw what an approver reads: dropped, not shown.
+  return parsed.success && parsed.data !== undefined && !/[\p{Cc}\p{Cf}]/u.test(parsed.data) ? parsed.data : null;
+}
 
 /** Per stream. Output past this is counted and reported, never silently lost. */
 const MAX_OUTPUT_BYTES = 64_000;
@@ -42,7 +55,7 @@ export interface BashToolDeps {
   /** Values removed from output before anyone sees them, e.g. a live lease. */
   readonly scrubValues?: readonly string[];
   /** Native Linux composition supplies a fail-closed, receipt-recording launcher. */
-  readonly runConfined?: (execution: ToolExecution, command: string, timeoutMs: number) => Promise<SandboxOutcome>;
+  readonly runConfined?: (execution: ToolExecution, command: string, timeoutMs: number, cwd: string) => Promise<SandboxOutcome>;
 }
 
 export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
@@ -53,8 +66,10 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
     parameters: {
       type: "object",
       properties: {
-        command: { type: "string", description: "the shell command" },
-        timeoutMs: { type: "integer", description: "milliseconds before the process tree is killed" }
+        command: { type: "string", minLength: 1, description: "the shell command" },
+        workdir: { type: "string", minLength: 1, description: "existing directory inside the workspace; defaults to the workspace" },
+        description: { type: "string", minLength: 1, maxLength: 200, description: "short human-readable purpose of this command" },
+        timeoutMs: { type: "integer", minimum: 1, maximum: 600_000, description: "milliseconds before the process tree is killed" }
       },
       required: ["command"]
     },
@@ -63,16 +78,24 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       const parsed = bashArgs.safeParse(execution.arguments);
       if (!parsed.success) throw new DefiniteFailureError(parsed.error.message, { cause: parsed.error });
       const args = parsed.data;
+      let cwd: string;
+      try {
+        cwd = insideWorkspace(execution.workspace, args.workdir ?? ".").full;
+        if (!statSync(cwd).isDirectory()) throw new Error(`workdir is not a directory: ${args.workdir}`);
+      } catch (error) {
+        throw new DefiniteFailureError(error instanceof Error ? error.message : "Invalid shell workdir", { cause: error });
+      }
       if (execution.effectiveMode === "SIMULATE") {
-        return { output: `SIMULATE bash: ${args.command}`, exitCode: null };
+        return { ok: true, output: `SIMULATE bash in ${cwd}${args.description ? ` (${args.description})` : ""}: ${args.command}`, exitCode: null };
       }
 
       if (deps.runConfined) {
-        const outcome = await deps.runConfined(execution, args.command, args.timeoutMs);
+        const outcome = await deps.runConfined(execution, args.command, args.timeoutMs, cwd);
         const sections = [outcome.stdout, outcome.stderr].filter(Boolean);
-        if (outcome.droppedBytes) sections.push(`[amc: ${outcome.droppedBytes} bytes of output not shown]`);
+        if (outcome.droppedBytes) sections.push(`[amc: ${outcome.droppedBytes} bytes of output not shown; head and tail retained]`);
         if (outcome.timedOut) sections.push(`[amc: killed after ${args.timeoutMs}ms]`);
         if (outcome.cancelled) sections.push("[amc: shell cancelled]");
+        if (outcome.exitCode !== 0) sections.push(`[amc: exit ${outcome.exitCode ?? "unknown"}]`);
         // No trustworthy command exit exists on refusal, cancellation or
         // incomplete cleanup. Proven command exits retain their orthogonal
         // exit/timeout facts; ok:false keeps nonzero exits on the failure path.
@@ -84,11 +107,11 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
 
       const running = runProcess({
         argv: ["/bin/sh", "-c", args.command],
-        cwd: execution.workspace,
-        // The provider keys AMC holds are stripped, exactly as the wrap path
-        // does. A shell that can echo $ANTHROPIC_API_KEY into model context is
-        // a credential disclosure with extra steps.
-        env: definedEnv(stripProviderKeys(process.env)),
+        cwd,
+        // An allow-list, as the confined shells use: a shell that can echo
+        // $ANTHROPIC_API_KEY or $AMC_VAULT_PASSPHRASE into model context is a
+        // credential disclosure with extra steps (WP36, DXB-14).
+        env: commandEnv(process.env),
         stdin: "ignore",
         stdout: "capture",
         stderr: "capture",
@@ -105,27 +128,24 @@ export function bashTool(deps: BashToolDeps = {}): ToolDefinition {
       if (outcome.stderr.text.length > 0) sections.push(outcome.stderr.text);
       const dropped = outcome.stdout.droppedBytes + outcome.stderr.droppedBytes;
       if (dropped > 0) {
-        sections.push(`[amc: ${dropped} bytes of output not shown; the cap is ${MAX_OUTPUT_BYTES} per stream]`);
+        sections.push(`[amc: ${dropped} bytes of output not shown; head and tail retained; the cap is ${MAX_OUTPUT_BYTES} per stream]`);
       }
-      if (outcome.terminatedBy === "timeout") {
+      const timedOut = outcome.terminatedBy === "timeout";
+      if (timedOut) {
         sections.push(`[amc: killed after ${args.timeoutMs}ms]`);
       }
+      // The status reaches the model in the text too, not only in the error flag.
+      if (outcome.exitCode !== 0) sections.push(`[amc: exit ${outcome.exitCode ?? "unknown"}]`);
 
       return {
+        // A nonzero, unknown or timed-out exit is a failed call, as on the confined path (DXC-02, PXA-02).
+        ok: outcome.exitCode === 0 && !timedOut,
         output: sections.join("\n"),
         // Orthogonal, as everywhere else: a killed process reports the timeout
         // AND whatever status the kernel gave it.
         exitCode: outcome.exitCode,
-        timedOut: outcome.terminatedBy === "timeout"
+        timedOut
       };
     }
   });
-}
-
-function definedEnv(env: NodeJS.ProcessEnv): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const [key, value] of Object.entries(env)) {
-    if (typeof value === "string") out[key] = value;
-  }
-  return out;
 }

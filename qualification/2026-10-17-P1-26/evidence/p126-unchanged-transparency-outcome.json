@@ -1,0 +1,191 @@
+{
+  "phase": "p126-unchanged-transparency",
+  "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "tests": {
+    "total": 41,
+    "passed": 41,
+    "failed": 0,
+    "skipped": 0
+  },
+  "hookTaskEntries": 44,
+  "individualHookValues": 44,
+  "orderedIdentities": [
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session root anchoring anchors a closed session as a session-root transparency artifact"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session root anchoring re-anchoring an unchanged session reuses the existing entry"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session root anchoring the exporter refuses to issue a proof against an unsigned root"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification verifies from a directory with no .amc, after the workspace is deleted"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification a truncated seal list breaks the session root it claims"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification an edited descriptor no longer matches the digest the log anchored"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification an edited transparency entry fails its own hash recomputation"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification a tampered proof path no longer resolves to the anchored root"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification a root that was never signed is rejected even when the path is consistent"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification a leaf index outside the signed tree is rejected"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification verification fails against a fingerprint the holder did not expect"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification an empty pin is refused rather than treated as no pin"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification a bundle re-signed with an attacker's auditor key fails the pin"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification a descriptor carrying an unrecognised field is rejected, not silently ignored"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification a fingerprint that disagrees with the bundle's own key is reported"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification anchoring and offline verification work on the JSONL backend"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification refuses a proof when the LEDGER does not verify, not just the log"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "session anchor proof \u2014 offline verification auditorKeyFingerprint is the sha256 of the exported PEM"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "the cryptographic checks fire in the failing direction a forged root signature is rejected \u2014 the one check that makes this cryptography"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "the cryptographic checks fire in the failing direction a truncated seal list is rejected by the sealCount cross-check"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "the cryptographic checks fire in the failing direction a descriptor whose sealCount disagrees with its seal list is rejected"
+    ],
+    [
+      "tests/sessionAnchorOfflineProof.test.ts",
+      "the cryptographic checks fire in the failing direction a descriptor whose turnCount is inflated is rejected"
+    ],
+    [
+      "tests/transparencyMerkleFailLoud.test.ts",
+      "a failed merkle update is surfaced, not swallowed appendTransparencyEntry throws when the root cannot be advanced"
+    ],
+    [
+      "tests/transparencyMerkleFailLoud.test.ts",
+      "a failed merkle update is surfaced, not swallowed the entry is still in the log, and the log itself still verifies"
+    ],
+    [
+      "tests/transparencyMerkleFailLoud.test.ts",
+      "a failed merkle update is surfaced, not swallowed the lag outlives the process that hit it and names the entry"
+    ],
+    [
+      "tests/transparencyMerkleFailLoud.test.ts",
+      "a failed merkle update is surfaced, not swallowed the explicit repair path clears the lag"
+    ],
+    [
+      "tests/transparencyMerkleFailLoud.test.ts",
+      "a failed merkle update is surfaced, not swallowed a recorded lag fails verification on its own, and a healthy append clears it"
+    ],
+    [
+      "tests/transparencyMerkleFailLoud.test.ts",
+      "a failed merkle update is surfaced, not swallowed a corrupt pending marker still reports a lag rather than being ignored"
+    ],
+    [
+      "tests/transparencyMerkleFailLoud.test.ts",
+      "merkle verification reports instead of throwing an unparseable log line is a verification error, not an exception"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (amc-legacy-v1)"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "transparency merkle frontier equivalence frontier root equals the full rebuild at every leaf count (rfc9162-sha256)"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "transparency merkle frontier equivalence a wrong odd-node rule diverges from the rebuild \u2014 the equivalence oracle discriminates"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "transparency merkle frontier equivalence frontier shape check rejects a leaf count the nodes cannot have produced"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "incremental transparency merkle updates appends produce the root and the leaves file a full rebuild would produce"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "incremental transparency merkle updates history is appended, not rewritten"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "incremental transparency merkle updates the resume state tracks the log and points at the published root"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "incremental resume is used, and untrusted resume state falls back a resumable append takes the incremental path"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "incremental resume is used, and untrusted resume state falls back a workspace written before the frontier existed migrates itself on the next append"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "incremental resume is used, and untrusted resume state falls back a tampered frontier is rebuilt from the log instead of steering the root"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "incremental resume is used, and untrusted resume state falls back a frontier that does not cover this append's parent is not resumed"
+    ],
+    [
+      "tests/transparencyMerkleIncremental.test.ts",
+      "incremental resume is used, and untrusted resume state falls back a truncated leaves file is detected and repaired rather than appended to"
+    ]
+  ],
+  "taskErrors": [],
+  "rawObserverOrderedJoin": true,
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "command": {
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/transparencyMerkleIncremental.test.ts tests/transparencyMerkleFailLoud.test.ts tests/sessionAnchorOfflineProof.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p126-unchanged-transparency.raw.json",
+    "exit": 0,
+    "durationMs": 8451
+  },
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "publicEvidencePaths": [],
+  "reuseBoundary": "Read-only import of the pinned existing ordered raw/observer/hook/late-error audit; only the finite cohort is selected here. No test execution or evidence rewriting."
+}

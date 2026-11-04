@@ -1,0 +1,69 @@
+{
+  "schema": "amc-p139-oauth-first/1",
+  "label": "redirect-source",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout",
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-FV9SJD",
+  "observations": {
+    "metadataRefused": true,
+    "metadataFixed": true,
+    "challengeRefused": true,
+    "challengeFixed": true,
+    "forbidden": [
+      true,
+      true,
+      true
+    ],
+    "targetRequests": 0,
+    "sourceRequests": 2
+  },
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/redirect-metadata",
+      "status": 302,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "POST",
+      "path": "/mcp/v1",
+      "status": 307,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "clients": [],
+  "sockets": [
+    {
+      "closed": true,
+      "hadError": false
+    },
+    {
+      "closed": true,
+      "hadError": false
+    }
+  ],
+  "lifecycle": {
+    "started": true,
+    "closed": true,
+    "listening": false,
+    "openSockets": 0
+  },
+  "errors": [],
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "environmentMutated": false,
+  "productionCallbackServerCloseObserved": false,
+  "childProcessCreated": false,
+  "signalsSent": false
+}

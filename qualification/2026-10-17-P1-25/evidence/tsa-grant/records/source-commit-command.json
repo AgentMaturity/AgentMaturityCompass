@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "git",
+    "-C",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "commit",
+    "-m",
+    "test(time): qualify genuine timestamp grant and ordered fallback"
+  ],
+  "exit": 0,
+  "stdout": "[codex/p1-25-grant-qualification 188681b32] test(time): qualify genuine timestamp grant and ordered fallback\n 11 files changed, 448 insertions(+), 15 deletions(-)\n create mode 100644 tests/time/tsaGrant.test.ts\n",
+  "stderr": ""
+}

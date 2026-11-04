@@ -26,6 +26,7 @@ import { runAssurance } from "../../src/assurance/assuranceRunner.js";
 import { initAssurancePolicy, loadAssurancePolicy, saveAssurancePolicy } from "../../src/assurance/assurancePolicyStore.js";
 import { issueAssuranceCertificate } from "../../src/assurance/assuranceCertificates.js";
 import { handleBomRoute } from "../../src/api/bomRouter.js";
+import { API_RESULT_ROUTES, labelResult, matchResultRoute } from "../../src/api/resultRouteRegistry.js";
 import { handleCryptoRoute } from "../../src/api/cryptoRouter.js";
 import { handleAssuranceRoute } from "../../src/api/assuranceRouter.js";
 import { handleToolsRoute } from "../../src/api/toolsRouter.js";
@@ -49,6 +50,8 @@ import { installedPluginTrust, pluginKeygen, pluginPack, verifyPluginPackage } f
 import { initPluginRegistry, publishPluginToRegistry } from "../../src/plugins/pluginRegistry.js";
 import { browseRegistry, resolveRegistryPackage } from "../../src/plugins/pluginRegistryClient.js";
 import { operatorTrustHome, pinnedTrust } from "../helpers/trustContext.js";
+import { writeAnchoredRun } from "../helpers/sealedRun.js";
+import { getAgentPaths } from "../../src/fleet/paths.js";
 
 /**
  * P0-09 forgery suite: one describe per verifier in the PR 2 and PR 3 rows of the issue table. Each builds a real
@@ -130,14 +133,21 @@ function expectRow(row: {
   /** Pins that are not the issuer key, kept with --allow-unpinned (the monitor pin for ledger anchoring). */
   anchor?: () => string[];
 }) {
+  // A copy that fails verification makes no evidence-sufficiency claim: its claim line, if any, reads untrusted.
+  const noSufficiencyClaim = (output: string) => {
+    expect(output).not.toContain("Evidence: sufficient");
+    if (output.includes("Claim: ")) expect(output).toContain("Evidence: untrusted");
+  };
   test("a forged copy re-signed with an embedded key fails as not-pinned by default", () => {
     const result = row.verify(row.forged(), []);
     expect(result.status, result.output).toBe(1);
     expect(result.output).toContain("not-pinned");
+    noSufficiencyClaim(result.output);
   });
   test("a forged copy still fails when the legitimate key is pinned", () => {
     const result = row.verify(row.forged(), row.pin());
     expect(result.status, result.output).toBe(1);
+    noSufficiencyClaim(result.output);
   });
   test("the untouched artifact with its key pinned is trusted", () => {
     const result = row.verify(row.genuine(), row.pin());
@@ -147,6 +157,7 @@ function expectRow(row: {
     const result = row.verify(row.genuine(), [...(row.anchor?.() ?? []), "--allow-unpinned"]);
     expect(result.status, result.output).toBe(2);
     expect(result.stderr.trimStart().startsWith("UNTRUSTED:"), result.stderr).toBe(true);
+    noSufficiencyClaim(result.output);
   });
 }
 
@@ -293,15 +304,16 @@ describe("verifyEvidenceBundle (amc bundle verify)", () => {
     expect(result.output).toContain("distrusted");
   });
 
-  test("an issuer key superseded after it sealed the bundle is admitted on the claimed signing time", () => {
+  // P1-06: a signing time the bundle claims is its own word, so it never reaches back before a revocation.
+  test("an issuer key superseded after it sealed the bundle is refused, whatever signing time the bundle claims", () => {
     const pem = readFileSync(evidence.auditorPub, "utf8");
     const now = Date.now();
     const superseded = listEntry({ publicKeyPem: pem, privateKeyPem: "", keyId: sha(pem) }, { validFrom: new Date(now - 86_400_000).toISOString(),
       validTo: null, revokedAt: new Date(now - 1_000).toISOString(), revocationReason: "superseded" });
     const result = amc(evidence.workspace, ["bundle", "verify", evidence.bundle, ...monitorPin(), ...listFlags([superseded]), "--json"]);
-    expect(result.status, result.output).toBe(0);
+    expect(result.status, result.output).toBe(1);
     const report = (JSON.parse(result.stdout) as { report: { issuerAdmission: { signatures: Array<{ signature: string; status: string; timeBasis: string | null }> } } }).report;
-    expect(report.issuerAdmission.signatures.find(row => row.signature === "manifest.sig")).toMatchObject({ status: "admitted", timeBasis: "claimed" });
+    expect(report.issuerAdmission.signatures.find(row => row.signature === "manifest.sig")).toMatchObject({ status: "revoked", timeBasis: null });
   });
 });
 
@@ -488,8 +500,10 @@ describe("verifyTrustCertificateEnvelope (amc cert verify, trust-certificate JSO
     initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
     const auditorPub = join(dir("amc-forgery-records-"), "auditor.pub");
     writeFileSync(auditorPub, readFileSync(join(workspace, ".amc", "keys", "auditor_ed25519.pub")));
-    mkdirSync(join(workspace, ".amc", "agents", "default", "runs"), { recursive: true });
-    writeJson(join(workspace, ".amc", "agents", "default", "runs", "run-1.json"), { runId: "run-1", ts: Date.now(), integrityIndex: 0.4 });
+    // Sealed and ledger-anchored: a trust certificate is signed only from the agent's trusted run (WP37, run trust).
+    const ts = Date.now();
+    writeAnchoredRun(workspace, getAgentPaths(workspace, "default").runsDir,
+      { runId: "run-1", agentId: "default", ts, integrityIndex: 0.4, windowStartTs: ts - 1000, windowEndTs: ts, status: "VALID" });
     const file = generateTrustCertificate({ workspace, agentId: "default", outputPath: "trust.json" }).outputPath;
     fixture = { workspace, file, auditorPub };
   }, 60_000);
@@ -613,6 +627,10 @@ describe("API verify routes use the server's trust context and refuse request-su
       expect(out.json.data?.ok).toBe(false);
       expect(out.json.data?.report?.trusted).toBe(false);
       expect(out.json.data?.report?.issuerAdmission.status).toBe("fail");
+      // The claim the API dispatcher attaches to a result route (src/api/index.ts), if any, claims no sufficient evidence.
+      const resultRoute = matchResultRoute(API_RESULT_ROUTES, "POST", pathname);
+      const claim = resultRoute ? labelResult(resultRoute, out.json.data, evidence.workspace).claim : undefined;
+      if (claim) expect(claim.statusDimensions).toMatchObject({ evidence: expect.not.stringMatching(/^sufficient$/), result: "not_evaluated" });
     });
   }
 

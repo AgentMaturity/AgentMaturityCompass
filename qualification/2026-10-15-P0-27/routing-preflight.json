@@ -1,0 +1,433 @@
+{
+  "purpose": "Read-only next-key routing after the active P0-20 bounded receipt. No new qualification implementation/runtime, live dist read, repository edit, build, ref change, Claude message or status closure.",
+  "capturedUtc": "2026-10-14T20:13:04.711850+00:00",
+  "ownedWorktree": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass",
+  "ownedHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "primaryMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "heldPendingMain": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+  "gitStatusObserved": "",
+  "pendingP020WrapperCandidate": {
+    "path": "src/audit/auditCli.ts",
+    "diffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "observedBehavior": "Early local diff added withClaimFields(artifactClaim(\"audit:industry-pack\")) only to the industry branch. Current source has no such wrapper and matches accepted-main bytes. This preflight infers neither why the interim diff was restored nor a committed wrapper repair.",
+    "state": "A dirty wrapper was observed during early reads at534460; it is absent in the final committed1291 tree, which matches accepted main for auditCli.",
+    "currentTreePin": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+    "lastAcceptedSourceChange": "6855b395491eca920172bde693c0b4a562ef2f83"
+  },
+  "acceptedRefs": {
+    "P027_originalMerge": {
+      "commit": "f4f377584885dc865e1e57797c18ac159d75824d",
+      "ancestorOfMain": true,
+      "ancestorOfOwned": true
+    },
+    "P019_originalMerge": {
+      "commit": "3aa75a1196417570f9199980c290dad36a55dea3",
+      "ancestorOfMain": true,
+      "ancestorOfOwned": true
+    },
+    "P019_v1Followup": {
+      "commit": "da093617408162ac38a3a01a52bf9e4209fca292",
+      "ancestorOfMain": true,
+      "ancestorOfOwned": true
+    },
+    "P055_followups": {
+      "commit": "5d4740de268e513bfa63e6fecb3cd3fa1cb2a48b",
+      "ancestorOfMain": true,
+      "ancestorOfOwned": true
+    }
+  },
+  "inputHashes": [
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-27.md",
+      "sha256": "dcfab371fdb076e688ab79d1ea9e471c16e68088f46ea1cde4c240283067a889"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-19.md",
+      "sha256": "6cdeabe21d7f1512dbf5919e554daedeb8182e9457b894db473582d8131d404b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-55.md",
+      "sha256": "d77a082bd93e1dd71c16063854c1be74d574a0d9b73ecffdbc890bf31783398d"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+      "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870"
+    }
+  ],
+  "sourceComparisons": [
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "lines": 975,
+      "mainSha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "sameAsMain": true,
+      "heldSha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "lines": 288,
+      "mainSha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "sameAsMain": true,
+      "heldSha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/assurance/agentResponder.ts",
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "lines": 597,
+      "mainSha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "sameAsMain": true,
+      "heldSha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/assurance/scenarioGrading.ts",
+      "sha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "lines": 93,
+      "mainSha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "sameAsMain": true,
+      "heldSha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "sha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "lines": 343,
+      "mainSha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "sameAsMain": true,
+      "heldSha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/ledger/ledgerSessionTransactions.ts",
+      "sha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72",
+      "lines": 53,
+      "mainSha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72",
+      "sameAsMain": true,
+      "heldSha256": "0bba4d284e53916f52981b5ea0bd534ac4c77938dbe72970d26ab09c0bc6ed72",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/ledger/ledgerConnection.ts",
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "lines": 71,
+      "mainSha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "sameAsMain": true,
+      "heldSha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/ledger/ledger.ts",
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "lines": 1295,
+      "mainSha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "sameAsMain": true,
+      "heldSha256": "2eecd0c82faa48d8b6d520626c960a8bc00981acc2fd98900ebb7af8e74379e0",
+      "sameAsHeld": false
+    },
+    {
+      "path": "src/budgets/nativeBudgetUsage.ts",
+      "sha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980",
+      "lines": 263,
+      "mainSha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980",
+      "sameAsMain": true,
+      "heldSha256": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/agent/nativeFailureGuidance.ts",
+      "sha256": "e797ef59196351467b5fd8e41e0ce2fc81936e19ffda50f6afef4a0c05f0b01b",
+      "lines": 126,
+      "mainSha256": "e797ef59196351467b5fd8e41e0ce2fc81936e19ffda50f6afef4a0c05f0b01b",
+      "sameAsMain": true,
+      "heldSha256": "e797ef59196351467b5fd8e41e0ce2fc81936e19ffda50f6afef4a0c05f0b01b",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/llm/adapter/llmRuntime.ts",
+      "sha256": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c",
+      "lines": 512,
+      "mainSha256": "16f508efb7b0b2897794654333f058e1edc9143e11e47e6b13f1f347467f607f",
+      "sameAsMain": false,
+      "heldSha256": "093fb673e04beffbebe9ce3b64c2c215b13fa387446d136705bfc76915d60140",
+      "sameAsHeld": false
+    },
+    {
+      "path": "src/lifecycle/signedControlJournal.ts",
+      "sha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "lines": 713,
+      "mainSha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "sameAsMain": true,
+      "heldSha256": "d17bd55ff75bfe3918a8d01aae3b2ff09cf3176235afb445fffebe3d7a13a0c7",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/evidence/exporter.ts",
+      "sha256": "30837bbe636fcae29331041f6cb4f7aa314687034d7f0416f0dde55bed31041a",
+      "lines": 521,
+      "mainSha256": "30837bbe636fcae29331041f6cb4f7aa314687034d7f0416f0dde55bed31041a",
+      "sameAsMain": true,
+      "heldSha256": "30837bbe636fcae29331041f6cb4f7aa314687034d7f0416f0dde55bed31041a",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/diagnostic/runner.ts",
+      "sha256": "7e07cb0b29a19e9629838303b601663feaea6854703c5edc49fa77e60abb3ecd",
+      "lines": 1909,
+      "mainSha256": "7e07cb0b29a19e9629838303b601663feaea6854703c5edc49fa77e60abb3ecd",
+      "sameAsMain": true,
+      "heldSha256": "7e07cb0b29a19e9629838303b601663feaea6854703c5edc49fa77e60abb3ecd",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/ledger/monitor.ts",
+      "sha256": "2fa631a7fca5c2e7e8279f985a84d456a991e5bc775750f1568f53a35a95c589",
+      "lines": 483,
+      "mainSha256": "2fa631a7fca5c2e7e8279f985a84d456a991e5bc775750f1568f53a35a95c589",
+      "sameAsMain": true,
+      "heldSha256": "2fa631a7fca5c2e7e8279f985a84d456a991e5bc775750f1568f53a35a95c589",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/redteam/runner.ts",
+      "sha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "lines": 649,
+      "mainSha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "sameAsMain": true,
+      "heldSha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "sameAsHeld": true
+    },
+    {
+      "path": "src/audit/auditCli.ts",
+      "sha256": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee",
+      "lines": 248,
+      "mainSha256": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee",
+      "sameAsMain": true,
+      "heldSha256": "f4f1a84bcd26d062a0ccf829f20d39b03524c6295137e553d84c8fe638e827ec",
+      "sameAsHeld": false
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "lines": 24430,
+      "mainSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "sameAsMain": true,
+      "heldSha256": "aab9e5a84ab6270ff9a5e08b9fad8858c79ac9547c232251c74e8ddf295a2cc1",
+      "sameAsHeld": false
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "lines": 314,
+      "mainSha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "sameAsMain": true,
+      "heldSha256": "26f1e09753fde699947a4beca4af2f8a6f3ac55bba1b39b96ca9748822bce8c1",
+      "sameAsHeld": false
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "lines": 520,
+      "mainSha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "sameAsMain": true,
+      "heldSha256": "22a5e5add0f7bbc7d0d7facdea094ae1b67509cda330e983d99a85cf840a12da",
+      "sameAsHeld": false
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "lines": 405,
+      "mainSha256": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+      "sameAsMain": false,
+      "heldSha256": "8924e889f1c7d6fe43773f77d0a29dc530add8172971b9b4d502ff1c479a2e40",
+      "sameAsHeld": false
+    }
+  ],
+  "recommendation": {
+    "nextKey": "P0-27",
+    "basis": "Prioritize the direct prerequisite of Urgent P0-55 after P0-20. P0-27 is High due October25 with no issue blockers and also blocks installed acceptance/G0. P0-19 is High due October22 and appears earlier in its workstream, but does not block P0-55 and still carries the explicit P2-27 echo deferral. This is a dependency-driven choice, not an assertion that P0-27 has an earlier date or higher intrinsic priority.",
+    "startCondition": "Close P0-20 bounded receipt first, then branch from the committed parent candidate1291b900f2c345a55ee5b1800ec9c44cceb2bce4 (or the newer actual final pin) and recheck reservations. Do not incorporate held pending-main.",
+    "scope": "Qualification of existing accepted F1-F4 and relevant implemented P0-55 follow-ups; new owned tests/private fixtures first, no generic session/writer rewrite."
+  },
+  "P027": {
+    "existingImplementation": [
+      {
+        "path": "src/assurance/evidenceWriters.ts",
+        "lines": [
+          18,
+          36,
+          48,
+          74
+        ],
+        "evidence": "Session start plus first audit row are transactional; aborted-session helper records ASSURANCE_RUN_ABORTED, seals and preserves the original error with a seal failure as cause."
+      },
+      {
+        "path": "src/assurance/assuranceRunner.ts",
+        "lines": [
+          348,
+          365,
+          388,
+          395,
+          644,
+          649,
+          944
+        ],
+        "evidence": "AMC_NO_SIGN selects unsigned store; real target resolution occurs inside the sealing catch; both run and patch paths use the abort helper."
+      },
+      {
+        "path": "src/diagnostic/runner.ts",
+        "lines": [
+          503,
+          522,
+          1310,
+          1385
+        ],
+        "evidence": "Unsigned diagnostics route separately, borrow signed evidence read-only and remain not cryptographically verified."
+      },
+      {
+        "path": "src/ledger/monitor.ts",
+        "lines": [
+          98,
+          99,
+          449
+        ],
+        "evidence": "Monitored process/start-monitor writers choose unsigned store under AMC_NO_SIGN."
+      },
+      {
+        "path": "src/budgets/nativeBudgetUsage.ts",
+        "lines": [
+          23,
+          52,
+          79
+        ],
+        "evidence": "Typed budget integrity failures identify rows/seals; llmRuntime.ts:340-341 maps them to AMC_EVIDENCE_INTEGRITY rather than QUOTA."
+      },
+      {
+        "path": "src/lifecycle/signedControlJournal.ts",
+        "lines": [
+          119,
+          125
+        ],
+        "evidence": "Segment-aware checkpoint containment and explicit root/workspace/AMC_CONTROL_CHECKPOINT_DIR refusal are present."
+      },
+      {
+        "path": "src/evidence/exporter.ts",
+        "lines": [
+          373,
+          386
+        ],
+        "evidence": "Version2 row-meta-or-owned-session selection emits sessionsIncluded and rowsExcluded."
+      }
+    ],
+    "smallestFirstSlice": "A new assurance-session qualification file should call real runAssurance in a fresh owned initialized workspace under signed and AMC_NO_SIGN=1 modes, with explicit offline target and absent credentials so real resolver unavailability aborts before scenario execution. Capture monitor/operator pins first, original structured error, valid abort audit/seal, empty assurance_runs, DB/sidecar snapshots, and unchanged signed-store rows/bytes for unsigned runs. Bound any child/transport work; do not allow real provider/model calls. Add an owned DB-trigger failure fixture only if needed for first-row rollback and seal-failure cause semantics, instead of mutating source. Preserve any real failure.",
+    "followupSlices": [
+      "F2: actual budget-reader integrity versus quota failure projection with valid signed and deliberately unsigned/corrupt fixture rows; healthy signed controls first. Any llmRuntime dependency is the primary accepted source, not the held correction.",
+      "F3: actual checkpoint layout matrix with fresh external operator HOME/checkpoint root, nested/equal/..cache and macOS /var alias cases. Treat explicit storage-admission/P0-57 held behavior as separate; do not import it.",
+      "F4: genuine signed session-owned and explicit-agent/foreign/system row controls through collectVerifierEvidence; assert complete selected IDs, sessionsIncluded, rowsExcluded and schemaVersion2. A seeded collector witness is not an executed native-turn witness. Coordinate any later actual compiled CLI/stub run separately with root."
+    ],
+    "newTestOwnership": "Assign one new assurance qualification file and, if needed, a separate new checkpoint/export qualification file. Preserve existing tests and all source paths initially. No production path is released merely because its helper or test is absent.",
+    "noGenericWrapperGap": "withSealedSession is absent because the accepted closing note deliberately skipped an unused helper: existing assurance/diagnostic/actions sites were transactional or sealed in catch/finally. Its absence is not a defect or authorization to add one.",
+    "residuals": "The pending note separately lists other unsealed startSession/openLedger writers. Original P0-27 explicitly excludes those from F1-F4. Keep them unresolved and routed under their existing scopes; do not rewrite ledger.ts or scan-and-fix all56/58 sites."
+  },
+  "P019": {
+    "priority": "High due October22; source blockers P0-13/P0-17/P0-25 are merged ancestry, not fresh qualification proof.",
+    "acceptedSource": "Original grading merge and v1-inconclusive follow-up are main/current ancestors. Actual gradeScenarioReply branches handle tool calls, artifact tokens and ungradable evidence; both assurance and redteam call them.",
+    "laterBoundedScope": "Qualify pure actual grading/refusal regex contracts first, then real stored inconclusive/tool-call response and compliance-not-evaluated behavior using existing isolated fixtures. Do not treat pack existence or keyword success as regulated evidence.",
+    "echoLimit": "pending-checks.md:54 retains47 in-scope echo scenarios assigned to validator redesign/P2-27. Do not silently close P0-19, expand P2-27, resume that reserved code or reinterpret echoes as successful measurements. The v1-inconclusive severity issue has an accepted follow-up; historical note alone is not proof of a current defect."
+  },
+  "existingTests": [
+    {
+      "path": "tests/assuranceRunNoSign.test.ts",
+      "sha256": "c3b703dc4cc4ba9d432514af313d6265c10876abf1ca275d540335d008a40e31"
+    },
+    {
+      "path": "tests/assuranceAgentResponder.test.ts",
+      "sha256": "4e2aaba81d0e12e63fa571902e63770511a0cef24892d858765f5dd679e24b30"
+    },
+    {
+      "path": "tests/nativeBudgets.test.ts",
+      "sha256": "62f8aa98b6dd62d0b699107a7794ff906245e964d8d954963dae49bafdbb64c0"
+    },
+    {
+      "path": "tests/nativeFailureGuidance.test.ts",
+      "sha256": "f186edc9ec2026a36c1fef42466577b2fa4ad013e33b1b43b0863185cd5de2e5"
+    },
+    {
+      "path": "tests/ledgerVerificationReadOnly.test.ts",
+      "sha256": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96"
+    },
+    {
+      "path": "tests/ledgerGovernanceFailureClassification.test.ts",
+      "sha256": "7462c5d102a112b79fb816c035892023b12c6ebfd482c3f09c142f11742e795f"
+    },
+    {
+      "path": "tests/regulatoryAssurancePacks.test.ts",
+      "sha256": "b5601b3e44b127b677bdf351b78cd74c359c157726a6cf8ae91f04fc09d97853"
+    },
+    {
+      "path": "tests/assurance/industryPackFailClosed.test.ts",
+      "sha256": "0fe16ae6c7727ea1aa381c35a4611b6d814098800c4212b4565009cb41798b32"
+    },
+    {
+      "path": "tests/validators.test.ts",
+      "sha256": "290c6970177de5d1414a36371e8447a388d5d2d94c4516441b39b836b092bca7"
+    },
+    {
+      "path": "tests/assuranceScenarioContextParity.test.ts",
+      "sha256": "0c2220eb87d67d239523f5cb4db805c3cb9c49cce586c02fc95757fbbc8535da"
+    }
+  ],
+  "missingNamedTests": [
+    "tests/assuranceAbortSeal.test.ts",
+    "tests/assuranceNoSignIsolation.test.ts",
+    "tests/controlCheckpointRoot.test.ts",
+    "tests/evidenceExportAgentFilter.test.ts",
+    "tests/assurance/scenarioGrading.test.ts",
+    "tests/assurance/runnerInconclusive.test.ts",
+    "tests/assurance/promptAnswerLeak.test.ts"
+  ],
+  "testAssessment": "Current no-sign CLI tests use a real local fake-agent endpoint and assert stdout/status, but do not assert signed/unsigned DB isolation or abort seals. Native budget tests have meaningful reservation/chain/seal controls, not complete O20 F2 projection. Regulatory/industry fail-closed tests exercise token/inconclusive grading, and validators have refusal/secret contracts; the named P0-19 full runner/echo qualification files are absent. No test was executed here.",
+  "recommendedCommands": [
+    "Fresh owned Node22 frozen install/build coordinated by root after P0-20 closure.",
+    "Unique rawJSON phases for the newly assigned test file plus selected existing meaningful tests.",
+    "pnpm exec vitest run tests/nativeBudgets.test.ts tests/nativeFailureGuidance.test.ts tests/assuranceAgentResponder.test.ts --reporter=json --outputFile=<unique-private-file>",
+    "For later P0-19: pnpm exec vitest run tests/validators.test.ts tests/regulatoryAssurancePacks.test.ts tests/assurance/industryPackFailClosed.test.ts --reporter=json --outputFile=<unique-private-file>",
+    "Root final typecheck/typecheck:tests/lint/counts/docs/architecture/clean-source/freeze on the committed final pin."
+  ],
+  "reservations": [
+    "RESERVATIONS.md:1490-1502 keeps listed non-Codex work with Claude; explicit P2-27 remains reserved. Absence of P0-27/P0-19 from a list is not broad source clearance.",
+    "RESERVATIONS.md:1583/1603 preserves src/a4 and A4 browser assets;1585-1588 holds shared CLI/registry/REPL/freeze work and requires owner coordination before edits. No message to Claude was sent.",
+    "Paused P2-02/tokenization and held P1-78/native initiator scope remain preserved. New private tests may exercise accepted source without resuming those implementations."
+  ],
+  "D15": "Ledger/validators/exporter/checkpoint/types paths already have existing plan-edits history as applicable. No manifest/archive/baseline was read as an edit license or changed. Before any later authorized production repair, verify the exact existing registration and frozen parity first; never re-register a path or rebaseline a failure.",
+  "serialDebt": [
+    "P0-52 alias-history/containment evidence and its narrow pending decision are retained; this routing does not settle it.",
+    "User-skipped P0-29 successor routing and P0-22 empty-result acceptance remain unresolved.",
+    "P0-51 pin-compromise precedence contradictions and API/Studio scope still limit whole Urgent P0-55 closure.",
+    "These are bounded existing-source receipts, not release/G0 or tracker Done proofs."
+  ],
+  "graph": {
+    "query": "unsigned store seal session assurance grading refusal",
+    "log": "/private/tmp/p0-52-graph-navigation-w8xr443v/p0-20-next-routing-query.log",
+    "sha256": "d15bf7a7100a787d77646f35721db66f291fcdf52c7ea429ce38cef85fa7d5cd",
+    "limit": "Existing graph is stale;219 nodes found/18 shown under600-token budget. Used only for navigation, with direct source pins and ancestry for current proof. No refresh/watch/server."
+  }
+}

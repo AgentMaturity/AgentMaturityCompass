@@ -1,0 +1,53 @@
+{
+  "at": "2026-10-16T10:52:56.167085+00:00",
+  "sourceHead": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+  "closedCertificate": {
+    "path": "/private/tmp/p1-37-qualification-20261016/compiler-natural-closure.json",
+    "bytes": 4968,
+    "sha256": "a0d667b589c87a8237f40c820d82c8ae414235b2e7577c48a8c585b00537f3d4"
+  },
+  "independentAudit": {
+    "path": "/private/tmp/p1-37-qualification-20261016/compiler-closure-independent-audit/review.json",
+    "bytes": 7397,
+    "sha256": "f089f5a58d01062e03849460ae183dac6a0684fc94320ae15d6cc79b501361c9"
+  },
+  "wrapperDeltaAudit": {
+    "path": "/private/tmp/p1-37-qualification-20261016/compiler-closure-independent-audit/wrapper-delta-review.json",
+    "bytes": 5421,
+    "sha256": "8c935d947690c4bc85267abfbc8b2f3ab7c7f1447161f42e86063fec72d592f4"
+  },
+  "wrapper": {
+    "path": "/private/tmp/p1-37-qualification-20261016/post-typecheck-run-prepared.py",
+    "bytes": 13593,
+    "sha256": "db4eedc8a92405a19fd1368e1a77ecaba713d668cb55456af81cbdb0c2832d01"
+  },
+  "freshOwnedProbes": [
+    {
+      "kind": "pid",
+      "id": 38063,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    },
+    {
+      "kind": "pgid",
+      "id": 38063,
+      "signal": 0,
+      "errno": 3,
+      "absentByESRCH": true
+    }
+  ],
+  "oldNamespacePreserved": true,
+  "newNamespace": "/private/tmp/p1-37-post-typecheck-20261016",
+  "testCorrection": {
+    "path": "/private/tmp/p1-37-qualification-20261016/test-proposal-v4/autoCompaction.test.ts",
+    "bytes": 44184,
+    "sha256": "f81a60b6b46acc37f4003bd76d384e22637225100a7b805623db540ea8bc0f48"
+  },
+  "admittedEdit": "Only existing owned new tests/autoCompaction.test.ts: strengthen the fixture runtime guard to v2+locator. No cast/source/helper/guard/baseline/compiler changes.",
+  "sameExitWhitelist": [
+    0,
+    1
+  ],
+  "formalDone": false
+}

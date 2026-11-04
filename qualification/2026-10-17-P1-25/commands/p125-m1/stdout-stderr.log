@@ -1,0 +1,57 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout
+
+ ❯ tests/time/verifyTimestamp.test.ts (17 tests | 1 failed) 31ms
+   ✓ verifies the genuine raw CMS timestamp against its digest nonce and pinned test root 4ms
+   ✓ verifies the granted response and returns its exact signed CMS token bytes 1ms
+   × refuses a different expected digest for the unchanged genuine signed token 5ms
+   ✓ refuses a different expected nonce for the unchanged genuine signed token 1ms
+   ✓ refuses the independently located signed-attribute corruption 1ms
+   ✓ refuses the genuine token under a different real root with the same permitted policy 1ms
+   ✓ refuses a policy excluded by the correctly pinned real root 1ms
+   ✓ refuses a genuinely signed TSA certificate without an EKU extension 0ms
+   ✓ refuses a genuinely signed TSA certificate with noncritical timestamping EKU 1ms
+   ✓ refuses a genuinely signed TSA certificate expired at the fixed signed genTime 0ms
+   ✓ refuses explicit rejection status before requiring a timestamp token 0ms
+   ✓ refuses a truncated copy of the genuine token 0ms
+   ✓ refuses 65537 bytes at the token size boundary before DER parsing 0ms
+   ✓ keeps claimed time separate from the genuine attested upper bound 1ms
+   ✓ keeps an artifact without a timestamp at claimed time 0ms
+   ✓ reports an untrusted TSA as a warning while the artifact time stays claimed 1ms
+   ✓ reports a broken supplied token as an artifact integrity error 0ms
+ ✓ tests/trust/verifierReport.test.ts (5 tests) 9ms
+ ✓ tests/trust/trustList.test.ts (25 tests) 566ms
+     ✓ accepts 4,096 distinct entries and refuses 4,097 on the size limit  544ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/time/verifyTimestamp.test.ts > refuses a different expected digest for the unchanged genuine signed token
+AssertionError: expected { ok: true, attested: { …(9) } } to match object { ok: false, …(1) }
+(10 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "code": "TST_IMPRINT_MISMATCH",
+-   "ok": false,
++   "ok": true,
+  }
+
+ ❯ tests/time/verifyTimestamp.test.ts:127:63
+    125|   validAttestation();
+    126|   const wrong = fixture.provenance.input.digestHex === "00".repeat(32)…
+    127|   expect(verify(fixture.valid, { expectedDigestHex: wrong })).toMatchO…
+       |                                                               ^
+    128| });
+    129|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 46 passed (47)
+   Start at  00:27:54
+   Duration  832ms (transform 190ms, setup 62ms, import 307ms, tests 606ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p125-m1.raw.json

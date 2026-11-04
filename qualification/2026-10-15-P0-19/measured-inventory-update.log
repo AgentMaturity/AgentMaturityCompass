@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 gen-counts /Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass
+> node scripts/gen-counts.mjs --write
+
+Updated 10 file(s).

@@ -4,6 +4,7 @@ import YAML from "yaml";
 import { z } from "zod";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { verifySignedFileWithAuditor, signFileWithAuditor } from "../org/orgSigner.js";
+import { PASSPORT_POLICY_CONFIGURED, witnessConfiguration } from "../transparency/configWitness.js";
 import { defaultPassportPolicy, passportPolicySchema, type PassportPolicy } from "./passportPolicySchema.js";
 import { passportJsonSchema, type PassportJson } from "./passportSchema.js";
 
@@ -17,7 +18,7 @@ function passportRoot(workspace: string): string {
   return join(workspace, ".amc", "passport");
 }
 
-function passportPolicyPath(workspace: string): string {
+export function passportPolicyPath(workspace: string): string {
   return join(passportRoot(workspace), "policy.yaml");
 }
 
@@ -37,7 +38,7 @@ function passportRevocationsPath(workspace: string): string {
   return join(passportRoot(workspace), "revocations.json");
 }
 
-function passportLatestCachePath(
+export function passportLatestCachePath(
   workspace: string,
   scopeType: "WORKSPACE" | "NODE" | "AGENT",
   scopeId: string
@@ -130,9 +131,10 @@ export function savePassportPolicy(workspace: string, policy: PassportPolicy): {
   sigPath: string;
 } {
   ensurePassportDirs(workspace);
-  const path = passportPolicyPath(workspace);
-  writeFileAtomic(path, YAML.stringify(passportPolicySchema.parse(policy)), 0o644);
+  const path = passportPolicyPath(workspace), bytes = Buffer.from(YAML.stringify(passportPolicySchema.parse(policy)));
+  writeFileAtomic(path, bytes, 0o644);
   const sigPath = signFileWithAuditor(workspace, path);
+  witnessConfiguration(workspace, PASSPORT_POLICY_CONFIGURED, path, bytes);
   return {
     path,
     sigPath
@@ -240,3 +242,6 @@ export function listPassportExportFiles(workspace: string): string[] {
   walk(root);
   return out.sort((a, b) => b.localeCompare(a));
 }
+
+export { savePassportPolicyAsync, loadPassportPolicyAsync,
+  savePassportCacheAsync, preparePassportCacheAsync } from "./passportPairPublication.js";

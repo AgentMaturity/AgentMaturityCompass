@@ -1,0 +1,134 @@
+{
+  "schema": "p126-unchanged-neighbor-cohort-static-readiness/1",
+  "at": "2026-10-16T20:29:28.931131+00:00",
+  "sourceCommit": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+  "sourceBranch": "codex/p1-26-tree-qualification",
+  "readiness": "No concrete source-read blocker found for root observing these unchanged neighboring files. Inherent fixture/resource/environment limits below remain visible; no source repair, new guard, timeout change or extra approval is proposed.",
+  "blockers": [],
+  "declaredInventory": {
+    "basis": "Full static reading; MERKLE_ALGORITHMS literal tuple expansion only. This is not actual Vitest discovery, an executed total, a pass prediction or a historical receipt sum.",
+    "incremental": 12,
+    "failLoud": 7,
+    "sessionAnchorOfflineProof": 22,
+    "total": 41,
+    "caseIndex": "declared-cases.json",
+    "declarationSites": 40,
+    "parameterizedSite": "Incremental line98 expands amc-legacy-v1 and rfc9162-sha256; ten ordinary declarations follow.",
+    "noSkipOrTodoOrOnlyDeclarations": true,
+    "hookRegistrations": "One fixture afterEach in each test file. Each selected file also receives guardWorkspace afterAll and repoWorkspaceGuard afterAll through setupFiles; one globalSetup registers run teardown. Runtime hook invocation/pass totals are unclaimed.",
+    "perFileOrderOnly": "The index records source order within each file. Vitest scheduling/order across files is not predicted."
+  },
+  "files": [
+    {
+      "path": "tests/transparencyMerkleIncremental.test.ts",
+      "declaredCases": 12,
+      "bodyScope": "Four expanded pure frontier cases; eight workspace-backed cases. Frontier roots are compared with production entryTreeRoot for 0..160 leaves under both algorithms, the deliberately wrong legacy odd-node fold must diverge, and invalid frontier shapes fail. Workspace cases cover signed root/leaf rebuild identity, append-only history, recorded resume state, direct resumable append, missing/tampered/stale frontier fallback and truncated-leaves repair.",
+      "resources": "Eight declared bodies invoke newWorkspace once on their normal path. newWorkspace sets the fixture vault passphrase, creates amc-tmerkle-* under os.tmpdir, records it before initWorkspace, then initializes a real isolated workspace. Tests write transparency files; appendRawLogEntry intentionally writes a canonical raw line to drive updateTransparencyMerkleAfterAppend.",
+      "cleanup": "afterEach pops and recursively force-removes recorded roots. It does not restore the passphrase, explicitly lock each vault or close each workspace SQLite pool. The pure first four cases create no workspace themselves, though shared setup still owns its guard temp root.",
+      "evidenceLimit": "Production tree versus production frontier equivalence and one inline wrong fold are regression assertions, not independent vendor conformance or later source-control sensitivity credit."
+    },
+    {
+      "path": "tests/transparencyMerkleFailLoud.test.ts",
+      "declaredCases": 7,
+      "bodyScope": "Six Merkle publish/lag/refusal/repair cases and one malformed-log verification-report case. Tests require the committed log entry to remain named after failed root publication and pending markers to fail verification until an explicit repair/healthy append.",
+      "resources": "Each declared body normally creates one amc-tmerkle-loud-* workspace and real vault/ledger/config files. breakRootPublish replaces only its own temporary current.root.json with a nonempty directory to make atomic publication fail. repairRootPublish removes that owned directory; no server, notary outage or network bypass is simulated.",
+      "cleanup": "Same pop/remove afterEach and un-restored passphrase behavior as incremental. Expected body exceptions are caught or asserted, but actual assertion/hook failures must remain in runtime reports. No AggregateError framework or per-workspace native-pool closure is present.",
+      "evidenceLimit": "Deterministic owned-filesystem failure does not establish actual remote-notary/network failure handling."
+    },
+    {
+      "path": "tests/sessionAnchorOfflineProof.test.ts",
+      "declaredCases": 22,
+      "bodyScope": "Three session anchoring/export gate cases, fifteen offline-proof cases and four cryptographic negative cases. Each normal body drives a real two-turn SessionService session; the whole-ledger refusal case drives a second unrelated session. Typed model/provider/header strings are recorded test data, not an actual provider call.",
+      "resources": "Each body normally creates amc-anchor-ws-* under os.tmpdir. Sixteen declarations use anchorAndDetach/verifyMutated, which copy a JSON proof into an additional amc-anchor-holder-* root and remove the original workspace before offline verification. Explicit attacker Ed25519 keys are generated in memory. One case opens a direct better-sqlite3 handle on its owned evidence.sqlite, drops its owned immutable trigger and changes one unrelated row; the handle closes in finally.",
+      "lifecycle": "runSession opens SessionService, records two turns, ends/seals each turn, then closes the session. Successful SessionService.close seals the session and closes the store. There is no fixture try/finally retaining the service if an earlier operation fails. Sqlite store close releases its Ledger lease; a pooled native connection can remain idle. Descriptor read-only store and ledger-verifier handles have product finally cleanup.",
+      "cleanup": "afterEach pops/removes every recorded workspace/holder; detached already-removed workspaces are removed again with force. AMC_VAULT_PASSPHRASE is overwritten without restoration. The JSONL case alone saves AMC_SESSION_STORE and restores/deletes it in finally.",
+      "trustAndOfflineBoundary": "The exporter checks Merkle index, hash-chained transparency log and wider ledger before issuing, then self-verifies the exact written JSON. The detached verifier takes a required out-of-band expected auditor fingerprint and reads only its proof file plus pure schemas/hash/Merkle/crypto helpers; no workspace/key-history/network lookup is in that verifier. Fixture pins derive from an owned local key and prove integrity under that pin, not independent external issuer admission/public anchoring.",
+      "negativeCoverage": "Descriptor seal/root/count/digest, transparency entry/hash, inclusion path/index, signed-root bytes/signature, wrong/empty/falsely self-consistent issuer fingerprint, unknown descriptor field, JSONL, unrelated ledger corruption and exported PEM fingerprint are asserted. Actual execution order, masking and error lists remain for the observed run."
+    }
+  ],
+  "setupAndCallPaths": {
+    "vitest": "vitest.config.ts sets node environment, tests/**/*.test.ts, testTimeout30000 and the existing global/setup files. No selected fixture overrides a timeout. Hook timeout, pool and worker scheduling are not overridden in this config; no inferred effective hook deadline is supplied. Coverage floors remain unchanged; this review does not claim a coverage run.",
+    "guardWorkspace": "Per-file setup creates amc-vitest-guard-* and directly replaces only AMC_GUARD_EVENTS_DB_PATH and AMC_GUARD_RECEIPTS_WORKSPACE. afterAll, when .amc exists, imports actual closeGuardDb and closes the exact guard ledger pool; it removes its own root and restores those two prior env values in finally. closeGuardDb internally swallows close errors, so invocation is not native-handle closure proof. No universal resource/env guarantee follows.",
+    "repositoryGuard": "Global setup snapshots only this repository own .amc, sets AMC_TEST_REPO_SNAPSHOT, and later compares it without restoring product files; small files use content hashes and larger files use size/mtime. The per-file guard uses stat/directory-mtime snapshots and can attribute a concurrent shared write to multiple files. It does not sandbox HOME, arbitrary filesystem paths or network. No bypass/removal is proposed.",
+    "native": "initWorkspace opens then closes a Ledger. Ledger.close releases pooled leases rather than closing every native connection; sqlitePool release returns pooled handles idle, bounded idle-pool pruning can close some later, and readonly handles close directly. Existing fixture deletion is not native handle closure proof. The direct corruption handle has its own finally; earlier service/constructor failures lack equivalent fixture ownership cleanup. No ABI probe/import/database operation occurred in this review.",
+    "vault": "initWorkspace ensureSigningKeys creates/unlocks a workspace vault. The vault keeps module-level sessions/private payloads until explicit lock/eviction or worker lifetime; these fixtures do not explicitly lock them. Removing the workspace does not prove in-memory key/passphrase erasure.",
+    "environment": "The frozen wrapper overrides private HOME, Node22 PATH, GIT_NO_LAZY_FETCH and the observer output key when observed, while inheriting other environment. The fixtures do not scrub environment, freeze time or select a private TMPDIR. AMC_SESSION_STORE can choose a sticky backend, AMC_NO_SIGN and AMC_EXPECTED_MONITOR_FINGERPRINT can affect signing/verification, and SQLite pool knobs affect native reuse. Record actual command/environment policy; no unobserved unset/default assumption or new override is proposed.",
+    "network": "No selected fixture creates a server/socket, submits a public log entry, invokes a provider, fetches, or spawns a child. New isolated workspaces receive LOCAL_VAULT trust, so the normal signing route is local; optional configured NOTARY source has a network/bridge path but is not selected by those defaults. The detached proof verifier is offline by its actual import/call boundary. Neither fixtures nor repo guards prove universal network isolation; F37 remains skipped and no network-bypass test/guard is introduced.",
+    "wrapper": {
+      "pin": {
+        "path": "/private/tmp/p1-37-qualification-20261016/post-typecheck-run-prepared.py",
+        "bytes": 13593,
+        "sha256": "db4eedc8a92405a19fd1368e1a77ecaba713d668cb55456af81cbdb0c2832d01"
+      },
+      "boundary": "Unchanged frozen wrapper/reporter; direct explicit observed argv remains root-owned. Wrapper inherits env except listed overrides, waits naturally without an outer wait timeout, does not rewrite test deadlines and records owned process-group closure. Actual exit/hooks/unhandled/owned-group absence must come from the later run, not this source review."
+    },
+    "noPublicRecordInvention": "These unchanged files emit no dedicated public body/cleanup/native/environment record. Reporter test/hook results are not invented as per-resource closure records. Any full runtime facts and failure masking must be read from actual retained raw/observer/log."
+  },
+  "ownership": {
+    "reusedInventoryRoots": 180,
+    "selectedFileObservations": 540,
+    "actualPresentPins": 423,
+    "allCohortStatusesExit0Empty": true,
+    "variants": {
+      "tests/transparencyMerkleIncremental.test.ts": 2,
+      "tests/transparencyMerkleFailLoud.test.ts": 1,
+      "tests/sessionAnchorOfflineProof.test.ts": 2
+    },
+    "priorTwoFilePresenceHashChanges": 0,
+    "selectedSetupConfigsMatchPriorScope": [
+      {
+        "relativePath": "vitest.config.ts",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+          "bytes": 1324,
+          "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+        },
+        "presentInPriorScope": true,
+        "matchesPriorScope": true
+      },
+      {
+        "relativePath": "tsconfig.tests.json",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+          "bytes": 300,
+          "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+        },
+        "presentInPriorScope": true,
+        "matchesPriorScope": true
+      },
+      {
+        "relativePath": "tests/setup/guardWorkspace.ts",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+          "bytes": 1894,
+          "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+        },
+        "presentInPriorScope": false,
+        "matchesPriorScope": null
+      },
+      {
+        "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+          "bytes": 3675,
+          "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+        },
+        "presentInPriorScope": true,
+        "matchesPriorScope": true
+      },
+      {
+        "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+        "pin": {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+          "bytes": 1133,
+          "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+        },
+        "presentInPriorScope": true,
+        "matchesPriorScope": true
+      }
+    ],
+    "meaning": "All 2/1/2 cohort variants and historical authorship remain protected, including clean files. No absence/clean/merge fact releases ownership. This task reviewed current S without integrating any variant; prior held36pins and missing-reservation limitation are reused from the unchanged scope seal, not freshly broadened."
+  },
+  "staticReadLimitation": "One preliminary rg command used a zsh glob for nonexistent src/session/*Store*.ts and failed before that first search. The actual SessionService import identified persistence/openSessionEventStore.ts; the correct modules were then read. This was a static navigation error, not product execution or qualification credit.",
+  "executionBoundary": "Full static source reads, file hashes and read-only Git exact-path status/HEAD checks across the reused inventory, plus private metadata. No product/helper/test/compiler/native/SQL/network/probe execution, source/index/checkout/config/guard edit, timeout change, graph refresh, public entry or Claude message. No predicted pass or full P1-26 readiness claim."
+}

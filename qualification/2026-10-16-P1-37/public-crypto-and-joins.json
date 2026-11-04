@@ -1,0 +1,314 @@
+{
+  "schema": "p137-offline-public-digest-crypto/1",
+  "evidence": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/public-evidence.json",
+    "bytes": 48514,
+    "sha256": "017453fd36fb7855a795874a9ab04f687396c874452108a5aba89e1096ebefe2"
+  },
+  "publicKey": {
+    "type": "ed25519",
+    "pemCanonical": true,
+    "pemSha256": "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00",
+    "spkiDerSha256": "7976a79fef6eef3f0df899bed65034802678c8615e63cacbb8076d6c93942f73"
+  },
+  "signatures": [
+    {
+      "id": "9c387978-e7fc-419a-b755-9007637a545e",
+      "eventType": "loop/compact",
+      "eventHash": "23d48909becc8b183f73418883aa86ff00d3290b6505d9cf7d6a20ff3d2d4808",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "c2d7bfeb-7e91-4a44-a65f-b92fcb99fdd7",
+      "eventType": "step/end",
+      "eventHash": "e7f2d9c3d829d81b019564e483cf9be2559c07fcdc2f91a678ce2d8624a8312d",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "830afb49-3d52-4357-97c0-9847829cd30d",
+      "eventType": "request/header",
+      "eventHash": "8340449cd9f4be64dcb1bc28e0338d54ead171521abd348780a5902bd65b7c10",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "4aa45620-9b0f-45a1-8888-64810d1958eb",
+      "eventType": "tool/call",
+      "eventHash": "37c4f68c765b239392500224efe175ef30f0fd6dea911c8c3be9428ac9c71d41",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "010d0396-34de-4f9a-856d-80f93ca8e736",
+      "eventType": "tool/call",
+      "eventHash": "98e004e83f4a45904ce5ffd0811374f7da5bfcad2aa34fa3c844603d1a6c3af5",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "5954fdad-e699-4eda-968f-5cd1f902a989",
+      "eventType": "assistant/block",
+      "eventHash": "ebad26cb13b686f269e1550417b91cfbe459162350e6a6553625256099ba99e9",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "8b0b5a10-9c91-42b5-b992-2a69a02831e2",
+      "eventType": "loop/compact",
+      "eventHash": "d1ce266d00a4d54583d0429d8efd5b84088862d002612c8d9e177ae4e10044dd",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "5bff6ec2-80ec-41c8-88ee-5fdc2e60db3c",
+      "eventType": "loop/compact",
+      "eventHash": "7eaa7503e884525213b5fc7f35bf9e1e8dd8f03430ba80fe4f1b2be637332922",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "0890c1b1-34ae-4b54-91fd-0a6f905a0158",
+      "eventType": "request/response",
+      "eventHash": "2946f2b44493e1ffa815f5253dbd6cf2404e2103287d9e1bc43fd19112b94658",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "7280e589-90f1-4bb4-a0ff-0204c475ed24",
+      "eventType": "request/response",
+      "eventHash": "ce6d86a157f7ca2c6264fd785961bffd8b87730f57e9782da4f5306ec2961eb2",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "f0a74576-71f7-4391-bbb8-e7200031809d",
+      "eventType": "request/response",
+      "eventHash": "7262b947d8391581b8e0ffbbd3ac20cfcf642749d6e1d098524594884deb49f4",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "2530abf5-211e-44a1-90aa-e7fcc03981b5",
+      "eventType": "request/response",
+      "eventHash": "2fbd6852b4aaeaa39784ea5fc74bc792f92bfc85970d60ba435770ca2c6614b1",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "3beac34e-c439-46b2-8f10-7a35bd37e1ac",
+      "eventType": "request/response",
+      "eventHash": "4f192155d0a8a06e1d115857ab604abedb4c5a91372222bc3b464b648489536b",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "954d0dad-ae73-41be-a6dc-71154f4fa4aa",
+      "eventType": "request/response",
+      "eventHash": "0936f6204c75d7333e916f42b50ab8111d1b1707dde3f1cb4e01f2c2cdd44421",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    },
+    {
+      "id": "b2f86507-66df-42e1-8628-ba95995aace6",
+      "eventType": "request/response",
+      "eventHash": "18f248a339043eec5f59eb980bced3a942743965a37227dcdc0157de81102438",
+      "signatureBytes": 64,
+      "verifiedOverRetained32ByteDigest": true
+    }
+  ],
+  "signaturesVerified": 15,
+  "retainedSignatureCount": 15,
+  "summary": {
+    "bytes": 272,
+    "sha256": "50d172d6a85a79eb75b3b383803dbaa3b6e60efcedf8f5b03ac3875906df4fbe",
+    "replacedBytes": 11052,
+    "replacementBytes": 272,
+    "savedBytes": 10780,
+    "assistantFencedSelfReported": true
+  },
+  "primarySourceJoins": [
+    {
+      "originEventId": "4aa45620-9b0f-45a1-8888-64810d1958eb",
+      "sourceEventId": "4aa45620-9b0f-45a1-8888-64810d1958eb",
+      "eventType": "tool/call",
+      "sourceEventHashMatches": true,
+      "payloadDigestMatches": true,
+      "recordedBytes": 2,
+      "sourcePayloadIncluded": false
+    },
+    {
+      "originEventId": "795a76d1-eb9c-4998-94b0-63d86d699260",
+      "sourceEventId": "5bff6ec2-80ec-41c8-88ee-5fdc2e60db3c",
+      "eventType": "loop/compact",
+      "sourceEventHashMatches": true,
+      "payloadDigestMatches": true,
+      "recordedBytes": 199,
+      "sourcePayloadIncluded": false
+    },
+    {
+      "originEventId": "010d0396-34de-4f9a-856d-80f93ca8e736",
+      "sourceEventId": "010d0396-34de-4f9a-856d-80f93ca8e736",
+      "eventType": "tool/call",
+      "sourceEventHashMatches": true,
+      "payloadDigestMatches": true,
+      "recordedBytes": 2,
+      "sourcePayloadIncluded": false
+    },
+    {
+      "originEventId": "e98b1637-463f-47be-865b-fed677e56b16",
+      "sourceEventId": "8b0b5a10-9c91-42b5-b992-2a69a02831e2",
+      "eventType": "loop/compact",
+      "sourceEventHashMatches": true,
+      "payloadDigestMatches": true,
+      "recordedBytes": 199,
+      "sourcePayloadIncluded": false
+    },
+    {
+      "originEventId": "5954fdad-e699-4eda-968f-5cd1f902a989",
+      "sourceEventId": "5954fdad-e699-4eda-968f-5cd1f902a989",
+      "eventType": "assistant/block",
+      "sourceEventHashMatches": true,
+      "payloadDigestMatches": true,
+      "recordedBytes": 10650,
+      "sourcePayloadIncluded": false
+    }
+  ],
+  "measurementJoin": {
+    "id": "c2d7bfeb-7e91-4a44-a65f-b92fcb99fdd7",
+    "promptTokens": 8500,
+    "contextWindowTokens": 10000,
+    "threshold": 0.8,
+    "ratio": 0.85,
+    "formula": "inputTokens+cacheRead+cacheWrite"
+  },
+  "summarizerJoin": {
+    "headerEventId": "830afb49-3d52-4357-97c0-9847829cd30d",
+    "requestDigest": "29a143db6b721dca8aba3718af743472e029b1d7036ab81d1537efb1836a64fb",
+    "toolSchemaEventId": null,
+    "turn": 2,
+    "step": 3,
+    "promptVersion": 1,
+    "model": "claude-loop-test",
+    "claimKind": "self_reported"
+  },
+  "settlementJoins": [
+    {
+      "id": "0890c1b1-34ae-4b54-91fd-0a6f905a0158",
+      "headerEventId": "d3b3ce3e-3eb7-4cd1-a273-068a61ef5687",
+      "requestDigest": "d31214502510dd00ec416a10a5d8b45d82f65c2651be86757600f62dcdbe9a47",
+      "adapterId": "scripted-loop",
+      "outcome": "completed",
+      "inputTokens": 7000,
+      "outputTokens": 4,
+      "reported": true,
+      "complete": true
+    },
+    {
+      "id": "7280e589-90f1-4bb4-a0ff-0204c475ed24",
+      "headerEventId": "131e2b4b-0b73-46bb-9900-b06b2c4ab7d9",
+      "requestDigest": "8c81bf4b4577c8f44fe4de19c2927a0a3461dd2dc20a853a1f4ea3bf1e03de99",
+      "adapterId": "scripted-loop",
+      "outcome": "completed",
+      "inputTokens": 7000,
+      "outputTokens": 4,
+      "reported": true,
+      "complete": true
+    },
+    {
+      "id": "f0a74576-71f7-4391-bbb8-e7200031809d",
+      "headerEventId": "5396c643-c194-4d31-8282-e1468109ccc0",
+      "requestDigest": "ed396e696c29462be25aac839a606c40158218b63bcf7028d7f55753ec525dfb",
+      "adapterId": "scripted-loop",
+      "outcome": "completed",
+      "inputTokens": 7000,
+      "outputTokens": 4,
+      "reported": true,
+      "complete": true
+    },
+    {
+      "id": "2530abf5-211e-44a1-90aa-e7fcc03981b5",
+      "headerEventId": "533752a7-9016-4749-a6ca-c1c39c81eab6",
+      "requestDigest": "18aa8279d819a5e14bda7d7f4d53e48f444233bcf709f51435cba04270e9d00b",
+      "adapterId": "scripted-loop",
+      "outcome": "completed",
+      "inputTokens": 8500,
+      "outputTokens": 4,
+      "reported": true,
+      "complete": true
+    },
+    {
+      "id": "3beac34e-c439-46b2-8f10-7a35bd37e1ac",
+      "headerEventId": "2cb8b0e3-7c70-4530-b845-bdf424773ec9",
+      "requestDigest": "11c9b15de827c9722dc8b0e0bdb12395f5373aabf227e37ba58d41e9f97bb5e0",
+      "adapterId": "scripted-loop",
+      "outcome": "completed",
+      "inputTokens": 8500,
+      "outputTokens": 4,
+      "reported": true,
+      "complete": true
+    },
+    {
+      "id": "954d0dad-ae73-41be-a6dc-71154f4fa4aa",
+      "headerEventId": "830afb49-3d52-4357-97c0-9847829cd30d",
+      "requestDigest": "29a143db6b721dca8aba3718af743472e029b1d7036ab81d1537efb1836a64fb",
+      "adapterId": "scripted-loop",
+      "outcome": "completed",
+      "inputTokens": 2000,
+      "outputTokens": 4,
+      "reported": true,
+      "complete": true
+    },
+    {
+      "id": "b2f86507-66df-42e1-8628-ba95995aace6",
+      "headerEventId": "452cbc2e-a1a8-4378-93af-170459ccf0dc",
+      "requestDigest": "c318975132cb992bec0f928a97f0fcc5d8f7dc6f3d280a4834d37fb6a74a6961",
+      "adapterId": "scripted-loop",
+      "outcome": "completed",
+      "inputTokens": 3000,
+      "outputTokens": 4,
+      "reported": true,
+      "complete": true
+    }
+  ],
+  "nestedReceiptArithmetic": [
+    {
+      "id": "8b0b5a10-9c91-42b5-b992-2a69a02831e2",
+      "replacedBytes": 6000,
+      "replacementBytes": 199,
+      "savedBytes": 5801,
+      "sourceRowIds": [
+        "e98b1637-463f-47be-865b-fed677e56b16"
+      ],
+      "missingSourceRowIds": [
+        "e98b1637-463f-47be-865b-fed677e56b16"
+      ],
+      "measurementRowRetained": false,
+      "basisRowRetained": false
+    },
+    {
+      "id": "5bff6ec2-80ec-41c8-88ee-5fdc2e60db3c",
+      "replacedBytes": 5000,
+      "replacementBytes": 199,
+      "savedBytes": 4801,
+      "sourceRowIds": [
+        "795a76d1-eb9c-4998-94b0-63d86d699260"
+      ],
+      "missingSourceRowIds": [
+        "795a76d1-eb9c-4998-94b0-63d86d699260"
+      ],
+      "measurementRowRetained": false,
+      "basisRowRetained": true
+    }
+  ],
+  "basisCommitmentsMatch": true,
+  "basisRowRetained": false,
+  "limits": [
+    "Only retained 32-byte event-digest Ed25519 signatures are independently verified here; canonical row preimages/event hashes and complete global/session/seal chains are not recomputed.",
+    "Five primary source rows are retained but none of their actual blob payload bytes is included; receipt byte counts are checked arithmetically, not by independently reopening the removed successful workspace.",
+    "Two nested pruning source rows and their measurement/basis rows are absent from this public subset.",
+    "The local public key and its pre-request capture statement do not independently establish external authorship.",
+    "Request reconstruction outcomes and captured digests join consistently, but complete original request bytes are not retained for a new independent reconstruction."
+  ]
+}

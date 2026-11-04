@@ -1,0 +1,71 @@
+{
+  "schema": "p125w-controls-author-static-review/1",
+  "at": "2026-10-17T00:09:26.610193+00:00",
+  "scope": "Private inert preparation only; author static checks, not independent review or runtime proof.",
+  "baselineHelperPin": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.py",
+    "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.py",
+    "bytes": 19281,
+    "sha256": "585b761a615a4fed59c1961ccd15b353728b73ab8c583dc5d83cbc4df89f6f27",
+    "dev": 16777231,
+    "inode": 543730118,
+    "nlink": 1
+  },
+  "preferredHelperPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control.py.source.txt",
+    "bytes": 21957,
+    "sha256": "2a7181aca9d9f3c76889b460495c426d3969f1e05279c400ab1c9414da775137",
+    "dev": 16777231,
+    "inode": 543743090,
+    "nlink": 1
+  },
+  "controlsPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/controls.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/controls.json",
+    "bytes": 5499,
+    "sha256": "20328ea86febed06507f121d56d4dc28b4389acbb494298367d73e828f53ff78",
+    "dev": 16777231,
+    "inode": 543742989,
+    "nlink": 1
+  },
+  "selectedNamesPin": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+    "bytes": 6867,
+    "sha256": "68e48c9fa34740becdd93ff48cbabd548674a4064479a3ed2d2a8836f8292606",
+    "dev": 16777231,
+    "inode": 543742990,
+    "nlink": 1
+  },
+  "staticChecks": {
+    "pythonAstParseOnly": true,
+    "bothUniqueMutationSpansAndWholeFileHashesComputed": true,
+    "mutantsNotStoredOrApplied": true,
+    "bothProductionSourcesMatchPristinePins": true,
+    "prior94NamesAnd19PairsExact": true,
+    "candidateWitness445And452AndZeroHeader457Assertion458Read": true,
+    "frozenInactiveAndHaltingAndClosedEvidenceGuardsRetained": true,
+    "inPlaceRegularSingleLinkPhysicalRestoreGuardsRetained": true,
+    "existingCompiledAndTenNativePinsPlusDistinctEleventhFreshRequired": true,
+    "onlyTwoOwnTestSourceSuccessorsAndOther149ExactRequired": true,
+    "actualCohortTotalsDerivedNotPredicted": true,
+    "everyActualFailureManualOrderedNameAndMessagesRequired": true,
+    "oldCaseToleranceFailuresExplicitlyRetained": true,
+    "noHelperOrProductExecution": true,
+    "noRepositoryWrites": true,
+    "noUnknownStreamsKeysSigningRootsOrReservationProbe": true
+  },
+  "rootBindingNotCreated": true,
+  "rootBindingInterface": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/README.md",
+  "blockers": [],
+  "runtimePrerequisites": [
+    "Root source allocation/materialization and actual source outcome closure/audit",
+    "Actual ordinary two-path source commit and actual clean-source fresh binding",
+    "Actual fresh outcome closure/public audit with same ordered cohort and hooks",
+    "Root runtime151 plus explicit original mappings and separate exact control-root-bindings.json",
+    "Root independent code review/adoption and actual per-control all-failure classification before explicit restore"
+  ],
+  "runtimeResult": null,
+  "allHoldsRetained": true
+}

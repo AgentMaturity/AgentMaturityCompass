@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-42",
+  "date": "2026-10-29",
+  "commit": "538f0a9120e4fda7884d7bec88221fe2ddc9ebfc",
+  "branch": "rtd/w5-p2-42",
+  "node": "22 (major only; README.md records Node 22 for suite-run1.txt)",
+  "pnpm": "not recorded",
+  "os": "not recorded",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:schemas",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <101 test files: tests/a4, every test importing src/a4, the console-asset tests, the pinned suites and wormSideTables; output in suite-run2.txt>",
+      "exit": 0,
+      "durationMs": 493700
+    },
+    {
+      "cmd": "npx vitest run tests/a4/p242ShippedCatalog.test.ts (output in p242-final-v2.txt)",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 1048,
+    "passed": 1048,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks-final.txt",
+      "sha256": "c62c5e886156fc318b891d88c91ca7feeb03129b9ea7118a6a7d27ab4d0389f2"
+    },
+    {
+      "path": "checks-v2.txt",
+      "sha256": "62e0109f421410d0c629908788fb4d9a6aa69b7fef4d78391caf80c170ec84b5"
+    },
+    {
+      "path": "checks.txt",
+      "sha256": "5b106b29713005316433acbfed37d8e277d7ec6d6d8cea41d5b9c66a8425b556"
+    },
+    {
+      "path": "mutations-v2.txt",
+      "sha256": "7a26f8767ae40e1b44f6ffd3555c113179b63ab59708c19a43b0714f6db179de"
+    },
+    {
+      "path": "mutations.txt",
+      "sha256": "1f24e079fe6a87bae7794c6ee75011a6dfde3f83ea527ce8978bea1e39c1b750"
+    },
+    {
+      "path": "p242-final-v2.txt",
+      "sha256": "fd722bb4231f09db22aa79ce76a57145c7958f1d21a2da7aa883a31d2f0db58e"
+    },
+    {
+      "path": "p242-final.txt",
+      "sha256": "e9e10ac4864360ce76c4f749f1d021c454b5d63a9b7b81b715a62215708b478e"
+    },
+    {
+      "path": "red-first-seven-stations.txt",
+      "sha256": "b4a5dbaf4089e6db9a87c12b82d39c3ab04833deb9c7b4db97eff22b6878c646"
+    },
+    {
+      "path": "red-first.txt",
+      "sha256": "69bf5e8f2e61e46b9152bff1c26cb2e6d1930721122f776123826123174bd57b"
+    },
+    {
+      "path": "spec-sizes-v2.txt",
+      "sha256": "768ef1422560a7fea345dc4400fba61076d7a689af20c89ad8919d622052316c"
+    },
+    {
+      "path": "spec-sizes.txt",
+      "sha256": "764b1ffba84b02a9d9fde5cff50421beba47c0f8764e22e9b1586ff1243362f1"
+    },
+    {
+      "path": "suite-run1.txt",
+      "sha256": "516033a997d7c4b5b1155b6daecce434961666522af9a868471a8f8ef84275a1"
+    },
+    {
+      "path": "suite-run2.txt",
+      "sha256": "412b6be7aae221fa07c07655c6bafe2190c82a595eca3fef7eb9d591a5f7413e"
+    }
+  ],
+  "notes": "P2-42 on rtd/w5-p2-42, base 88f77309b, in two commits: d895e5177 (Adapt's compiled plan bound by sha256) and the follow-up 538f0a912 (every catalog-sized part bound, all seven stations), the commit named here. Rows 1-9 are checks-v2.txt, the follow-up's checks, written as the npm scripts they name; flags were not recorded. Rows 10 and 11 are the follow-up's suite run (suite-run2.txt) and the P2-42 file after the mutation runs (p242-final-v2.txt), written as vitest commands because their command lines were not recorded; row 10's durationMs is the Duration vitest reported, and p242-final-v2.txt records none. Row 11's file is the one red-first.txt names. tests is suite-run2.txt (101 files, 1048 tests passed), which includes row 11's file (9 tests). Follow-up red: red-first-seven-stations.txt, with only the plan bound by digest, the all-seven project got 413 at Review and the resolved-view test failed (2 failed, 7 skipped). Sizes: spec-sizes-v2.txt, 14.6 KiB stored at Review and 809.4 KiB resolved for all seven stations. Mutations: mutations-v2.txt, nine more (kind-for-place, json parts, stateOf check, both revision routes), each killed. First commit d895e5177, not listed as commands because it is not the commit named here: red-first.txt, every journey refused at POST …/stages/adapt/propose with 413 INPUT_TOO_LARGE on the base code (4 failed); spec-sizes.txt, stored Adapt row sizes per station against the plan inline; suite-run1.txt, 49 files and 580 tests passed (Node 22, --maxWorkers=2); p242-final.txt, 2 files and 9 tests passed (the P2-42 file and scenario 06) after the mutation runs; mutations.txt, nine guard mutations, each killed; checks.txt and checks-final.txt, lint, check:gates, check:dead-code, check:duplicates, check:counts, check:api-ref, check:docs-drift, check:schemas and check:architecture-boundaries all exit 0. The folder records no build, typecheck or typecheck:tests run, so none are listed. Not recorded: the exact Node version, pnpm, the OS and the other commands' durations (durationMs 0 means not recorded). arch is not recorded either; arm64 is a same-host inference from the receipts of the same day that record it (2026-10-29-P0-36 and 2026-10-29-P3-19: darwin 25.6.0 arm64), because the schema allows only arm64 or x64."
+}

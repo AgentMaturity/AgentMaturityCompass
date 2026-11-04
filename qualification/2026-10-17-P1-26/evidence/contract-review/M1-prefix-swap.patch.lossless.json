@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/contract-review/M1-prefix-swap.patch",
+    "bytes": 641,
+    "sha256": "6755b8c5ef22f3983da97385c9576f6bd182bec6ffd1c926a5f1369c33d5e9a9"
+  },
+  "dataBase64": "LS0tIGEvc3JjL3RyYW5zcGFyZW5jeS9yZmM5MTYyLnRzCisrKyBiL3NyYy90cmFuc3BhcmVuY3kvcmZjOTE2Mi50cwpAQCAtMjAsMTIgKzIwLDEyIEBACiAKIC8qKiBTSEEtMjU2KDB4MDAgfHwgZGF0YSkuICovCiBleHBvcnQgZnVuY3Rpb24gbGVhZkhhc2goZGF0YTogVWludDhBcnJheSk6IHN0cmluZyB7Ci0gIHJldHVybiBzaGEyNTYoVWludDhBcnJheS5vZigwKSwgZGF0YSk7CisgIHJldHVybiBzaGEyNTYoVWludDhBcnJheS5vZigxKSwgZGF0YSk7CiB9CiAKIC8qKiBTSEEtMjU2KDB4MDEgfHwgbGVmdCB8fCByaWdodCksIG92ZXIgdGhlIHJhdyAzMi1ieXRlIGhhc2hlcy4gKi8KIGV4cG9ydCBmdW5jdGlvbiBub2RlSGFzaChsZWZ0OiBzdHJpbmcsIHJpZ2h0OiBzdHJpbmcpOiBzdHJpbmcgewotICByZXR1cm4gc2hhMjU2KFVpbnQ4QXJyYXkub2YoMSksIEJ1ZmZlci5mcm9tKGxlZnQsICJoZXgiKSwgQnVmZmVyLmZyb20ocmlnaHQsICJoZXgiKSk7CisgIHJldHVybiBzaGEyNTYoVWludDhBcnJheS5vZigwKSwgQnVmZmVyLmZyb20obGVmdCwgImhleCIpLCBCdWZmZXIuZnJvbShyaWdodCwgImhleCIpKTsKIH0KIAogLyoqIGs6IHRoZSBsYXJnZXN0IHBvd2VyIG9mIHR3byBzbWFsbGVyIHRoYW4gbiAobiA+IDEpLiAqLwo=",
+  "boundary": "Exact original bytes, including whitespace, are preserved by base64. Decode and verify original.bytes and original.sha256. The original producer remains retained privately; no normalization or command-result change."
+}

@@ -1,4 +1,6 @@
 import { existsSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { analyzeMcpSecurity } from "../src/shield/mcpSecurityAnalyzer.js";
 
@@ -14,7 +16,7 @@ import { analyzeMcpSecurity } from "../src/shield/mcpSecurityAnalyzer.js";
  * means analysing a server a caller names, and a server URL is exactly the
  * untrusted string that would arrive there.
  */
-const MARKER = "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/c5c61ae5-1f16-447b-bd19-a171b760d0cc/scratchpad/injection-marker.txt";
+const MARKER = join(tmpdir(), `amc-injection-marker-${process.pid}.txt`);
 
 describe("the analyzer does not hand a URL to a shell", () => {
   it("does not execute a subshell embedded in the URL", () => {

@@ -1,0 +1,472 @@
+{
+  "schema": "amc.mutation-batch.result.v1",
+  "commit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "startedAt": "2026-10-11T08:15:12.027Z",
+  "finishedAt": "2026-10-11T08:18:07.967Z",
+  "node": "v22.22.0",
+  "platform": "darwin arm64",
+  "summary": {
+    "entries": 14,
+    "killed": 9,
+    "survived": 5,
+    "equivalent": 0,
+    "equivalentKilled": 0,
+    "errors": 0,
+    "byIssue": {
+      "AMC-1511": {
+        "entries": 8,
+        "killed": 5,
+        "survived": 3,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1545": {
+        "entries": 3,
+        "killed": 1,
+        "survived": 2,
+        "equivalent": 0,
+        "other": 0
+      },
+      "AMC-1520": {
+        "entries": 1,
+        "killed": 1,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      },
+      "P0-31": {
+        "entries": 2,
+        "killed": 2,
+        "survived": 0,
+        "equivalent": 0,
+        "other": 0
+      }
+    }
+  },
+  "baselines": [
+    {
+      "tests": [
+        "tests/nativeRecoveryControl.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 12838,
+      "totals": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/subagentHookInheritance.test.ts",
+        "tests/nativeDelegationInheritance.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 17359,
+      "totals": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/dshRunnerReverify.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 10737,
+      "totals": {
+        "total": 2,
+        "passed": 2,
+        "failed": 0
+      }
+    },
+    {
+      "tests": [
+        "tests/qualificationNodeVersions.test.ts"
+      ],
+      "exitCode": 0,
+      "durationMs": 558,
+      "totals": {
+        "total": 22,
+        "passed": 22,
+        "failed": 0
+      }
+    }
+  ],
+  "results": [
+    {
+      "id": "1511-config-composition",
+      "oldIssue": "AMC-1511",
+      "file": "src/session/sessionContinuationControls.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeRecoveryControl.test.ts"
+      ],
+      "note": "resume ignores a changed composition digest",
+      "line": 23,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 14519,
+      "totals": {
+        "total": 16,
+        "passed": 14,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on sqlite changed compositionDigest refuses before writer acquisition",
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on jsonl changed compositionDigest refuses before writer acquisition"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "1511-config-policy",
+      "oldIssue": "AMC-1511",
+      "file": "src/session/sessionContinuationControls.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeRecoveryControl.test.ts"
+      ],
+      "note": "resume ignores a changed signed policy digest",
+      "line": 24,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 13369,
+      "totals": {
+        "total": 16,
+        "passed": 14,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on sqlite changed policyDigest refuses before writer acquisition",
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on jsonl changed policyDigest refuses before writer acquisition"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "1511-stop-control",
+      "oldIssue": "AMC-1511",
+      "file": "src/session/sessionContinuationControls.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeRecoveryControl.test.ts"
+      ],
+      "note": "a parent or hook stop is discarded by resume",
+      "line": 42,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10516,
+      "totals": {
+        "total": 16,
+        "passed": 10,
+        "failed": 6
+      },
+      "failingTests": [
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on sqlite parent stopped sessions retain the original controller refusal",
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on sqlite hook stopped sessions retain the original controller refusal",
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on sqlite a requested parent stop cannot be erased by a subsequently complete ending",
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on jsonl parent stopped sessions retain the original controller refusal",
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on jsonl hook stopped sessions retain the original controller refusal",
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on jsonl a requested parent stop cannot be erased by a subsequently complete ending"
+      ],
+      "failingTestCount": 6,
+      "failedFiles": []
+    },
+    {
+      "id": "1511-unresolved-child",
+      "oldIssue": "AMC-1511",
+      "file": "src/session/sessionContinuationControls.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeRecoveryControl.test.ts"
+      ],
+      "note": "a parent resumes past an unresolved child",
+      "line": 47,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 12998,
+      "totals": {
+        "total": 16,
+        "passed": 14,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on sqlite a parent cannot abandon an unresolved child during continuation",
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on jsonl a parent cannot abandon an unresolved child during continuation"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "1511-delegated-session",
+      "oldIssue": "AMC-1511",
+      "file": "src/session/sessionContinuationControls.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeRecoveryControl.test.ts"
+      ],
+      "note": "a delegated child resumes as a standalone writer",
+      "line": 51,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10369,
+      "totals": {
+        "total": 16,
+        "passed": 14,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on sqlite a delegated child cannot become a standalone root-agent writer",
+        "tests/nativeRecoveryControl.test.ts > native continuation controls on jsonl a delegated child cannot become a standalone root-agent writer"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "1511-turn-end-format",
+      "oldIssue": "AMC-1511",
+      "file": "src/session/sessionContinuationControls.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeRecoveryControl.test.ts"
+      ],
+      "note": "an unreadable turn ending is accepted",
+      "line": 40,
+      "outcome": "survived",
+      "ok": false,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 10428,
+      "totals": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0
+      },
+      "failingTests": [],
+      "failingTestCount": 0,
+      "failedFiles": []
+    },
+    {
+      "id": "1511-resume-runtime",
+      "oldIssue": "AMC-1511",
+      "file": "src/session/sessionResume.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeRecoveryControl.test.ts"
+      ],
+      "note": "resume under a different native runtime",
+      "line": 207,
+      "outcome": "survived",
+      "ok": false,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 11787,
+      "totals": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0
+      },
+      "failingTests": [],
+      "failingTestCount": 0,
+      "failedFiles": []
+    },
+    {
+      "id": "1511-resume-history-moved",
+      "oldIssue": "AMC-1511",
+      "file": "src/session/sessionResume.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/nativeRecoveryControl.test.ts"
+      ],
+      "note": "control inspection runs on a history that moved after authentication",
+      "line": 204,
+      "outcome": "survived",
+      "ok": false,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 10123,
+      "totals": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0
+      },
+      "failingTests": [],
+      "failingTestCount": 0,
+      "failedFiles": []
+    },
+    {
+      "id": "1545-narrower-turns",
+      "oldIssue": "AMC-1545",
+      "file": "src/agent/subagentRunner.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/subagentHookInheritance.test.ts",
+        "tests/nativeDelegationInheritance.test.ts"
+      ],
+      "note": "a child grant widens the inherited max-turns",
+      "line": 130,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 10229,
+      "totals": {
+        "total": 16,
+        "passed": 14,
+        "failed": 2
+      },
+      "failingTests": [
+        "tests/nativeDelegationInheritance.test.ts > native child cancellation and inherited governance nested delegation receives numeric minima and snapshots the configured stops",
+        "tests/subagentHookInheritance.test.ts > spawned children inherit the parent's hook control the inheritance is recorded in the child's signed session before its first turn, naming every control that governed it"
+      ],
+      "failingTestCount": 2,
+      "failedFiles": []
+    },
+    {
+      "id": "1545-narrower-timeout",
+      "oldIssue": "AMC-1545",
+      "file": "src/agent/subagentRunner.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/subagentHookInheritance.test.ts",
+        "tests/nativeDelegationInheritance.test.ts"
+      ],
+      "note": "a child grant widens the inherited timeout",
+      "line": 131,
+      "outcome": "survived",
+      "ok": false,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 9384,
+      "totals": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0
+      },
+      "failingTests": [],
+      "failingTestCount": 0,
+      "failedFiles": []
+    },
+    {
+      "id": "1545-narrower-parent-only",
+      "oldIssue": "AMC-1545",
+      "file": "src/agent/subagentRunner.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/subagentHookInheritance.test.ts",
+        "tests/nativeDelegationInheritance.test.ts"
+      ],
+      "note": "a parent-only limit is dropped when the grant sets none (branch named as a gap during scoping)",
+      "line": 129,
+      "outcome": "survived",
+      "ok": false,
+      "exitCode": 0,
+      "signal": null,
+      "durationMs": 9897,
+      "totals": {
+        "total": 16,
+        "passed": 16,
+        "failed": 0
+      },
+      "failingTests": [],
+      "failingTestCount": 0,
+      "failedFiles": []
+    },
+    {
+      "id": "1520-spawn-recheck",
+      "oldIssue": "AMC-1520",
+      "file": "src/adapters/adapterRunner.ts",
+      "expect": "killed",
+      "tests": [
+        "tests/dshRunnerReverify.test.ts"
+      ],
+      "note": "the spawn-site re-hash is removed",
+      "line": 296,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 7644,
+      "totals": {
+        "total": 2,
+        "passed": 1,
+        "failed": 1
+      },
+      "failingTests": [
+        "tests/dshRunnerReverify.test.ts > AMC-1520 adapterRunner.ts — DSH launch files are re-verified at spawn an approved file changed after preparation and before spawn rejects the run and never spawns"
+      ],
+      "failingTestCount": 1,
+      "failedFiles": []
+    },
+    {
+      "id": "p031-crash-node-pattern",
+      "oldIssue": "P0-31",
+      "file": "scripts/installed-crash-recovery-check.mjs",
+      "expect": "killed",
+      "tests": [
+        "tests/qualificationNodeVersions.test.ts"
+      ],
+      "note": "crash harness admits any v2x",
+      "line": 18,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 624,
+      "totals": {
+        "total": 22,
+        "passed": 18,
+        "failed": 4
+      },
+      "failingTests": [
+        "tests/qualificationNodeVersions.test.ts > scripts/installed-crash-recovery-check.mjs Node version pattern rejects v20.19.5",
+        "tests/qualificationNodeVersions.test.ts > scripts/installed-crash-recovery-check.mjs Node version pattern rejects v25.5.0",
+        "tests/qualificationNodeVersions.test.ts > scripts/installed-crash-recovery-check.mjs Node version pattern rejects v23.11.0",
+        "tests/qualificationNodeVersions.test.ts > scripts/installed-crash-recovery-check.mjs Node version pattern rejects v26.0.0"
+      ],
+      "failingTestCount": 4,
+      "failedFiles": []
+    },
+    {
+      "id": "p031-studio-node-pattern",
+      "oldIssue": "P0-31",
+      "file": "scripts/installed-studio-browser-check.py",
+      "expect": "killed",
+      "tests": [
+        "tests/qualificationNodeVersions.test.ts"
+      ],
+      "note": "Studio harness admits any v2x",
+      "line": 10,
+      "outcome": "killed",
+      "ok": true,
+      "exitCode": 1,
+      "signal": null,
+      "durationMs": 611,
+      "totals": {
+        "total": 22,
+        "passed": 18,
+        "failed": 4
+      },
+      "failingTests": [
+        "tests/qualificationNodeVersions.test.ts > scripts/installed-studio-browser-check.py Node version pattern rejects v20.19.5",
+        "tests/qualificationNodeVersions.test.ts > scripts/installed-studio-browser-check.py Node version pattern rejects v25.5.0",
+        "tests/qualificationNodeVersions.test.ts > scripts/installed-studio-browser-check.py Node version pattern rejects v23.11.0",
+        "tests/qualificationNodeVersions.test.ts > scripts/installed-studio-browser-check.py Node version pattern rejects v26.0.0"
+      ],
+      "failingTestCount": 4,
+      "failedFiles": []
+    }
+  ]
+}

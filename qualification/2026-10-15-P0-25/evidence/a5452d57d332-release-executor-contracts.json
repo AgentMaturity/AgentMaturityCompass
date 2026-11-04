@@ -1,0 +1,300 @@
+{
+  "schema": "amc-private-citation-qualification-runtime-observer/1",
+  "pid": 7863,
+  "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/releaseGateExecution.test.ts"
+  ],
+  "testCount": 22,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1584357985",
+      "name": "tests/releaseGateExecution.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/releaseGateExecution.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1584357985_0",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_0",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope fails release qualification when the real lint step fails",
+      "fullName": "release gate execution and qualification scope fails release qualification when the real lint step fails",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_1",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope fails release qualification when strict package lint fails",
+      "fullName": "release gate execution and qualification scope fails release qualification when strict package lint fails",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_2",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope fails release qualification when the citation check fails, after build",
+      "fullName": "release gate execution and qualification scope fails release qualification when the citation check fails, after build",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_3",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope blocks qualification on unresolved source-duplicates findings",
+      "fullName": "release gate execution and qualification scope blocks qualification on unresolved source-duplicates findings",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_4",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope blocks qualification on unresolved source-dead-code findings",
+      "fullName": "release gate execution and qualification scope blocks qualification on unresolved source-dead-code findings",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_5",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope executes packed acceptance once after build without another build or tracked inventory write",
+      "fullName": "release gate execution and qualification scope executes packed acceptance once after build without another build or tracked inventory write",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_6",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope marks every quick omission while preserving the process result contract",
+      "fullName": "release gate execution and qualification scope marks every quick omission while preserving the process result contract",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_7",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope does not equate an omitted live check with complete qualification in full mode",
+      "fullName": "release gate execution and qualification scope does not equate an omitted live check with complete qualification in full mode",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_8",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope never invokes build-dependent consumers after build failure, even with a stale CLI present",
+      "fullName": "release gate execution and qualification scope never invokes build-dependent consumers after build failure, even with a stale CLI present",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_9",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope fails the gate when installed evidence fails even if every other registered check passed",
+      "fullName": "release gate execution and qualification scope fails the gate when installed evidence fails even if every other registered check passed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_10",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful CLI exit without an actual inventory artifact",
+      "fullName": "release gate execution and qualification scope rejects successful CLI exit without an actual inventory artifact",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_11",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful Vitest exit with a missing JSON report",
+      "fullName": "release gate execution and qualification scope rejects successful Vitest exit with a missing JSON report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_12",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful Vitest exit with a malformed JSON report",
+      "fullName": "release gate execution and qualification scope rejects successful Vitest exit with a malformed JSON report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_13",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful Vitest exit with a failed JSON report",
+      "fullName": "release gate execution and qualification scope rejects successful Vitest exit with a failed JSON report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_14",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful Vitest exit with a skipped JSON report",
+      "fullName": "release gate execution and qualification scope rejects successful Vitest exit with a skipped JSON report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_15",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful Vitest exit with a some-pending JSON report",
+      "fullName": "release gate execution and qualification scope rejects successful Vitest exit with a some-pending JSON report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_16",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful Vitest exit with a todo JSON report",
+      "fullName": "release gate execution and qualification scope rejects successful Vitest exit with a todo JSON report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_17",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful Vitest exit with a invalid-count JSON report",
+      "fullName": "release gate execution and qualification scope rejects successful Vitest exit with a invalid-count JSON report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_18",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful Vitest exit with a suite-error JSON report",
+      "fullName": "release gate execution and qualification scope rejects successful Vitest exit with a suite-error JSON report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_19",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope rejects successful Vitest exit with a file-error JSON report",
+      "fullName": "release gate execution and qualification scope rejects successful Vitest exit with a file-error JSON report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_20",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope does not let a successful JSON report override Vitest process failure",
+      "fullName": "release gate execution and qualification scope does not let a successful JSON report override Vitest process failure",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1584357985_0_21",
+      "name": "tests/releaseGateExecution.test.ts release gate execution and qualification scope retains separate full-suite reports so a later run cannot reuse a stale report",
+      "fullName": "release gate execution and qualification scope retains separate full-suite reports so a later run cannot reuse a stale report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

@@ -1,0 +1,126 @@
+# mobility.vehicles.safety-impact-before-change. Experimental and unreviewed; local synthetic results do not establish production enforcement.
+"id": "L1-MOB-04"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "vehicle-software-change"
+"stations":
+  - "mobility"
+"title": "Bind synthetic safety-change records to captured change bytes"
+"statement": "Release a synthetic safety-related change only when complete impact analysis and separate human approval bind its captured bytes and current digest."
+"riskRationale": "A prior analysis or approval can be reused after safety-related change bytes have changed."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "mobility"
+      - "fact": "domains"
+        "includesAny":
+          - "mobility.vehicles-aviation"
+      - "fact": "useCases"
+        "includesAny":
+          - "vehicle_safety_change"
+      - "fact": "entityTypes"
+        "includesAny":
+          - "vehicle_software_provider"
+          - "fleet_operator"
+      - "fact": "roles"
+        "includesAny":
+          - "provider"
+          - "deployer"
+  "reasons":
+    - "Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name."
+    - "A synthetic human label is not a verified principal, independent review or safety authority. No live P2-26 change envelope, P1-78 approval flow, type approval, Annex I route or actual vehicle safety case is implemented."
+    - "Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "mobility.vehicles-aviation"
+      "reason": "An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass."
+    - "when":
+        "not":
+          "fact": "useCases"
+          "includesAny":
+            - "vehicle_safety_change"
+      "reason": "The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved."
+"citations": []
+"binding":
+  "kind": "manual"
+  "points": []
+  "mechanism": "Experimental, unreviewed manual-duty draft. A local synthetic result does not establish performance by a real deployment or named human; production remains not evaluated without admitted evidence and authority."
+  "parameters": []
+  "manualDuty":
+    "duty": "Obtain the safety owner's classification, applicable type-approval and operating-domain determination, complete impact analysis and distinct authorized human approval for the exact change before production release."
+    "ownerRole": "head_of_qa"
+    "cadence": "Before each safety-related change and whenever its bytes, analysis, scope or approval changes."
+    "evidenceOfPerformance": "Actual captured UTF-8 change bytes and computed digest, ordered bound impact/approval records, distinct proposer/approver identity and the in-memory mergeReleases log. Synthetic fixtures are not production performance evidence."
+"tests":
+  - "id": "L1-MOB-04-T1"
+    "type": "configuration_check"
+    "oracle":
+      "kind": "system_of_record"
+      "observes": "Actual captured UTF-8 change bytes and computed digest, ordered bound impact/approval records, distinct proposer/approver identity and the in-memory mergeReleases log."
+    "fixtures":
+      "positive":
+        - "L1-MOB-04/positive/evidence-valid.json"
+        - "L1-MOB-04/positive/oracle-change-bound-approval.json"
+      "negative":
+        - "L1-MOB-04/negative/evidence-contradictory.json"
+        - "L1-MOB-04/negative/evidence-cross-tenant.json"
+        - "L1-MOB-04/negative/evidence-empty.json"
+        - "L1-MOB-04/negative/evidence-replayed.json"
+        - "L1-MOB-04/negative/evidence-stale.json"
+        - "L1-MOB-04/negative/evidence-violation.json"
+        - "L1-MOB-04/negative/oracle-change-expired-approval.json"
+        - "L1-MOB-04/negative/oracle-change-missing-analysis.json"
+        - "L1-MOB-04/negative/oracle-change-missing-approval.json"
+        - "L1-MOB-04/negative/oracle-change-unclassified.json"
+        - "L1-MOB-04/negative/oracle-change-wrong-digest.json"
+    "passCriteria": "Synthetic fixture behavior only. Known safety-related change bytes have complete matching analysis and positive current approval from a separate synthetic human, ordered creation/analysis/approval times and no expired record. Missing records, wrong digest or expired approval fail. Unknown classification is not evaluated. Separate native questionnaire evidence can never create a regulated pass; missing production evidence is not evaluated."
+    "attempts": 1
+"evidence":
+  - "id": "L1-MOB-04-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "head_of_qa"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk": []
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-19"
+  "approvedBy": null

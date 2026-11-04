@@ -10,7 +10,7 @@
  */
 import { Context } from "@amc/cordis";
 import { type UnsettledFiber } from "./bootAudit.ts";
-import { type CompositionSource } from "./composition.ts";
+import { type CompositionSignatureVerifier, type CompositionSource } from "./composition.ts";
 export interface BootOptions {
     /** Workspace root; the composition file is resolved beneath it. */
     workspace: string;
@@ -23,8 +23,19 @@ export interface BootOptions {
      * that sells tamper-evident evidence the plugin tree — which decides what is
      * enforced and what is recorded — is the last thing that should be editable
      * without attestation.
+     *
+     * Default false: boot() has no production caller yet, so unsigned
+     * development compositions keep booting and their `signature` status says
+     * unverified. Whether a production carrier requires it is decided where
+     * boot() is adopted (GAP-WP39), not here.
      */
     requireSignature?: boolean;
+    /**
+     * Authenticates the composition signature (the main package builds it from
+     * the workspace's admitted key history). Without it no signature verifies,
+     * so requireSignature refuses every composition.
+     */
+    verifySignature?: CompositionSignatureVerifier;
     /** Fail when any plugin has not reached ACTIVE. Default true. */
     auditSettled?: boolean;
     /**
@@ -43,7 +54,8 @@ export interface BootOptions {
 }
 export interface BootResult {
     ctx: Context;
-    composition: CompositionSource;
+    /** The composition as last admitted: at boot, then after each accepted reload. */
+    readonly composition: CompositionSource;
     /** Non-empty only when auditSettled is false. */
     unsettled: UnsettledFiber[];
     /**

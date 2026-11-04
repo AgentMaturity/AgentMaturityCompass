@@ -1,0 +1,226 @@
+{
+  "schema": "p112-independent-quality-delta-review/1",
+  "at": "2026-10-16T20:05:07.538548+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "executionByReviewer": false,
+  "sourceIndexQaWrites": false,
+  "scannerSemantics": [
+    "Existing scanSourceQuality export invokes installed Knip with configured workspace selectors; capture imports the same S scanner module for both roots, so tool resolution uses the same installed CLI. Both actual reports name Knip6.39.0.",
+    "No baseline, ratchet, finding cache or waiver is added. Finding normalization removes only line/col/pos and sorts structural identities. Any remaining findings keep the quality gate failed.",
+    "Duplicates scan is src-only; new tests and count/qualification metadata are not duplicate scan inputs. Actual duplicate count stays1268."
+  ],
+  "inputEquivalence": {
+    "schema": "p112-static-scanner-input-equivalence/1",
+    "baselineRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+    "currentRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "configuredProjectExtensions": {
+      "src": [
+        ".ts",
+        ".js"
+      ],
+      "api": [
+        ".ts"
+      ],
+      "scripts": [
+        ".mjs",
+        ".cjs",
+        ".js",
+        ".ts"
+      ],
+      "tests": [
+        ".ts"
+      ],
+      "examples": [
+        ".ts",
+        ".js"
+      ],
+      "integrations": [
+        ".ts",
+        ".js"
+      ],
+      "sdk": [
+        ".ts",
+        ".js"
+      ]
+    },
+    "enumerationExcludedDirectories": [
+      "node_modules",
+      ".git",
+      "dist"
+    ],
+    "projectBeforeFiles": 4108,
+    "projectCurrentFiles": 4109,
+    "added": [
+      "tests/policy/compiledPolicyGuard.test.ts"
+    ],
+    "removed": [],
+    "changedPreexistingFiles": [],
+    "baselineCanonicalPathByteHashMapSha256": "de44fd427e286811e7d0f2319954b4511b9308cd2b6c32ef0f08e085d68a5e34",
+    "currentCanonicalPathByteHashMapSha256": "1ae43ebf224350f7af0f93b376802449afd6f5e709cc5b267aee032c1deff889",
+    "all4108PreexistingProjectBytesEqual": true,
+    "addedFilePin": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+    },
+    "equalConfigManifestRows": [
+      {
+        "relativePath": "scripts/source-quality.mjs",
+        "bytes": 5010,
+        "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+      },
+      {
+        "relativePath": "knip.json",
+        "bytes": 1928,
+        "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1"
+      },
+      {
+        "relativePath": ".jscpd.json",
+        "bytes": 126,
+        "sha256": "b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209"
+      },
+      {
+        "relativePath": "package.json",
+        "bytes": 8631,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+      },
+      {
+        "relativePath": "pnpm-lock.yaml",
+        "bytes": 155432,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+      },
+      {
+        "relativePath": "tsconfig.json",
+        "bytes": 504,
+        "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+      },
+      {
+        "relativePath": "tsconfig.tests.json",
+        "bytes": 300,
+        "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+      },
+      {
+        "relativePath": "vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      {
+        "relativePath": "pnpm-workspace.yaml",
+        "bytes": 1521,
+        "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23"
+      },
+      {
+        "relativePath": "examples/langchain-node/package.json",
+        "bytes": 391,
+        "sha256": "c928269230358ddfea6cb06cd4e657bf3742818e31e6f24d979420bcfd73038a"
+      }
+    ],
+    "qualificationAndCountBoundary": "Qualification metadata is outside configured project and entry patterns. All ten admitted numeric count surfaces are README/CONTRIBUTING/website/docs/whitepaper paths, also outside those project patterns. No full-tree cleanliness premise is needed.",
+    "limit": "This is direct configured-project/config byte equivalence, not independent reimplementation of all Knip plugin discovery or an environment-isolation claim. Actual two-root same-scanner finding sets supply the diagnostic evidence."
+  },
+  "actualFindingDelta": {
+    "baseline": {
+      "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+      "count": 2724,
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-baseline-full.json",
+      "bytes": 248255,
+      "sha256": "7dbd9bc5036e9d763aaac5291ec63360d305b70465fcadd18dfb961e2d8ab0bc"
+    },
+    "current": {
+      "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "count": 2723,
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-current-full.json",
+      "bytes": 248137,
+      "sha256": "6b82381cb434c3f7d787815280a9fc4e7279ae64f5e5b48cf61603ca9495b7a3"
+    },
+    "removed": [
+      "[\"src/tools/guards/compiledPolicyGuard.ts\",\"exports\",{\"name\":\"compiledPolicyDenial\"}]"
+    ],
+    "added": [],
+    "fullSetsIndependentlyCompared": true
+  },
+  "causalConclusion": "The only configured-project addition imports compiledPolicyDenial from the unchanged guard module and uses it directly in helper assertions. Actual same-scanner full sets lose exactly that unused-export identity and gain none. Together, these support removal caused by the new legitimate test import; this does not establish production reachability or runtime enforcement.",
+  "commands": [
+    {
+      "phase": "p112-duplicates-before",
+      "exit": 1,
+      "durationMs": 599,
+      "ownedPgid": 22790,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "findingCount": 1268,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-duplicates-before/stdout-stderr.log",
+        "bytes": 2064,
+        "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29"
+      }
+    },
+    {
+      "phase": "p112-duplicates-after",
+      "exit": 1,
+      "durationMs": 686,
+      "ownedPgid": 24963,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "findingCount": 1268,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-duplicates-after/stdout-stderr.log",
+        "bytes": 2064,
+        "sha256": "62545f898b95ab3125616ea8bf2872244314dd98d3db67b8ff58c707e6d31e29"
+      }
+    },
+    {
+      "phase": "p112-dead-code-before",
+      "exit": 1,
+      "durationMs": 2941,
+      "ownedPgid": 22816,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "findingCount": 2724,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-dead-code-before/stdout-stderr.log",
+        "bytes": 1207,
+        "sha256": "ac0b3f8267fa0fa6ae81a88f85239c55077fbc6ba9e9664393058d2567b4bd8f"
+      }
+    },
+    {
+      "phase": "p112-dead-code-after",
+      "exit": 1,
+      "durationMs": 2852,
+      "ownedPgid": 24997,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "findingCount": 2723,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-dead-code-after/stdout-stderr.log",
+        "bytes": 1207,
+        "sha256": "f66f89641fca49dc02526604787c436ca25a2631120205be6b220f8c9b5fb40b"
+      }
+    },
+    {
+      "phase": "p112-quality-delta-diagnostic",
+      "exit": 0,
+      "durationMs": 5532,
+      "ownedPgid": 25228,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "findingCount": null,
+      "log": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-quality-delta-diagnostic/stdout-stderr.log",
+        "bytes": 1140,
+        "sha256": "61a62ffc37be8e34a4c1a92a70b488d85a16a2d8be65de65d17953de2a840120"
+      }
+    }
+  ],
+  "qualityStatus": "Both duplicate gates exit1 at1268; dead-code gates exit1 at2724 before and2723 after. The separate diagnostic exits0 because comparison completed, not because the quality gates passed. All findings remain unwaived.",
+  "preservedStop": {
+    "pin": {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/precommit-assumption-stop.json",
+      "bytes": 884,
+      "sha256": "3853a1ee0418c921d6d00fcffe24d1b3d73cbcfd1595fa5fcae0fddc458f7a19"
+    },
+    "boundary": "The copied private metadata predicate incorrectly expected count equality and stopped before staging. Preserve the stop; correcting private metadata to actual values is not a source-quality/config/baseline change."
+  },
+  "preservation": "Reviewer compared bytes only. Root owns source stage/commit and all product execution. S need not be globally clean while it contains admitted new test/count paths. P1-07 closure, held authorization/archive/package decisions, F37 skip and Claude work stay intact."
+}

@@ -1,0 +1,69 @@
+{
+  "schema": "p125ec-independent-completed-source-evidence-review/1",
+  "at": "2026-10-17T01:04:28.090458+00:00",
+  "blockers": [],
+  "runAdmissionBase": "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+  "laterObservedSourceCommit": "80268079f804ed0ecb7659cd02a75e8b88ee3e0d",
+  "tests": {
+    "total": 23,
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0
+  },
+  "exit": 0,
+  "durationMs": 4348,
+  "ownedPgid": 77212,
+  "groupAbsentByESRCH": true,
+  "hooks": {
+    "entries": 3,
+    "values": 4
+  },
+  "publicCounts": {
+    "tsa": 6,
+    "checkpoint": 4,
+    "children": 38,
+    "recordedStreamHashes": 76,
+    "closedSockets": 10,
+    "ledgerOwners": 28,
+    "childrenWithNonemptyStderr": 32,
+    "refusalRequestsWithoutPersistedQueryReply": 3
+  },
+  "checks": {
+    "orderedUnique23RawObserverJoinsAndAllHooksPass": true,
+    "recordedTaskUnhandledLateErrorsAbsent": true,
+    "allEmittedOldThreeAndNewCadencePublicsPresent": true,
+    "cadenceFiveActualResultsAndTwoOwnQueryProofs": true,
+    "defaultSignedTrustHomePublicPinsAndConfigExact": true,
+    "sourceFinalLedgerAndPreservedStoredHeadsGood": true,
+    "all12OrdinarySourceChecksNaturalZero": true,
+    "quality2712OrderedExact1268RootFullEqualityRedUnwaived": true,
+    "onlyAdmittedE5a7SourceAndOldThreeBodiesPreserved": true,
+    "all161PhysicalPins11NativesHeldR18Exact": true,
+    "later802680SourceCleanEmptyIndexObserved": true
+  },
+  "boundaries": [
+    "All 76 recorded stream hash rows match child metadata and the actual successful public audit. This reviewer opened no stream files, signing keys or sibling paths. Nonempty stderr exists; no absence-of-diagnostics claim.",
+    "Three HTTP-first refusals retain request/lifecycle facts without persisted query/reply files; only explicitly named successful query/reply paths were read. No refusal oracle is fabricated.",
+    "Signed trust/PKI/ledger assertions are actual source execution and audited public facts. No crypto, product/helper, parser/compiler, OpenSSL, native or SQL verification was reexecuted.",
+    "Run admission base 8506539 is distinct from later ordinary source checkpoint 80268079f804ed0ecb7659cd02a75e8b88ee3e0d. Concurrent clean-source activity is outside this review.",
+    "No fresh/control/full-suite/whole-P1-25/plan/release credit. All held decisions, F37 skip, missing-reservation limitation and unchanged freeze/quality checks remain intact."
+  ],
+  "readOnlyDiagnostics": [
+    {
+      "chunk": "affe69",
+      "exit": 1,
+      "cause": "Directory assumption for source-checks-review was corrected to the inventoried source-checks-review.json."
+    },
+    {
+      "chunk": "fc97c4",
+      "exit": 1,
+      "cause": "Running clean-source directory had no closed command record; excluded without result inference."
+    },
+    {
+      "chunk": "76ac55",
+      "exit": 1,
+      "cause": "Independent supplemental query scan encountered a null path on an HTTP-first refusal. Corrected to read only explicitly named persisted query/reply paths."
+    }
+  ],
+  "noProductExecutionOrSourceIndexQaWrite": true
+}

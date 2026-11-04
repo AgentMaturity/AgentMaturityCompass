@@ -1,0 +1,223 @@
+{
+  "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "runtime": "v22.23.3",
+  "cases": [
+    {
+      "name": "emotion-json",
+      "cmd": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/dist/cli.js",
+        "compliance",
+        "risk-classify",
+        "--emotion-recognition",
+        "--json"
+      ],
+      "exit": 0,
+      "durationMs": 1387,
+      "stdout": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/emotion-json/stdout.txt",
+      "stderr": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/emotion-json/stderr.txt",
+      "beforeProcess": {
+        "files": [],
+        "directories": [
+          "amc-home",
+          "cache",
+          "config",
+          "home",
+          "tmp",
+          "workspace"
+        ]
+      },
+      "afterProcessBeforeCapturingStreams": {
+        "files": [],
+        "directories": [
+          "amc-home",
+          "cache",
+          "config",
+          "home",
+          "tmp",
+          "workspace"
+        ]
+      },
+      "parsed": {
+        "riskTier": "UNACCEPTABLE",
+        "articles": [
+          "Art. 5(1)(f)"
+        ],
+        "findings": [
+          {
+            "article": "Art. 5(1)(f)",
+            "title": "Emotion recognition in the workplace or education",
+            "description": "Systems that infer emotions of natural persons in the areas of workplace and education institutions are prohibited (since 2 Feb 2025), except where intended for medical or safety reasons.",
+            "severity": "CRITICAL"
+          }
+        ],
+        "remediation": [
+          {
+            "priority": "IMMEDIATE",
+            "action": "Cease deployment immediately \u2014 system falls into prohibited AI practices under Art. 5.",
+            "article": "Art. 5"
+          },
+          {
+            "priority": "IMMEDIATE",
+            "action": "Conduct legal review with qualified EU AI Act counsel before any further use.",
+            "article": "Art. 5"
+          }
+        ],
+        "summary": "\u26d4 UNACCEPTABLE RISK: This agent uses 1 prohibited AI practice(s) under Art. 5 of the EU AI Act. Deployment is illegal in the EU without fundamental redesign.",
+        "applicationDates": [
+          {
+            "basis": "Art. 5",
+            "appliesFrom": "2025-02-02"
+          }
+        ],
+        "classifiedAt": 1792015669751,
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "unresolved",
+            "reason": "no applicability decision recorded"
+          },
+          "evidence": "sufficient",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "claimLabel": "Claim: Self-reported \u00b7 Result: not evaluated (no applicability decision is recorded) \u00b7 Evidence: sufficient \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: unresolved"
+      },
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "emotion-text",
+      "cmd": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/dist/cli.js",
+        "compliance",
+        "risk-classify",
+        "--emotion-recognition"
+      ],
+      "exit": 0,
+      "durationMs": 739,
+      "stdout": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/emotion-text/stdout.txt",
+      "stderr": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/emotion-text/stderr.txt",
+      "beforeProcess": {
+        "files": [],
+        "directories": [
+          "amc-home",
+          "cache",
+          "config",
+          "home",
+          "tmp",
+          "workspace"
+        ]
+      },
+      "afterProcessBeforeCapturingStreams": {
+        "files": [],
+        "directories": [
+          "amc-home",
+          "cache",
+          "config",
+          "home",
+          "tmp",
+          "workspace"
+        ]
+      },
+      "parsed": null,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "name": "false-emotion-chatbot-json",
+      "cmd": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/dist/cli.js",
+        "compliance",
+        "risk-classify",
+        "--capabilities",
+        "{\"emotionRecognition\":false,\"chatbot\":true}",
+        "--json"
+      ],
+      "exit": 0,
+      "durationMs": 716,
+      "stdout": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/false-emotion-chatbot-json/stdout.txt",
+      "stderr": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/false-emotion-chatbot-json/stderr.txt",
+      "beforeProcess": {
+        "files": [],
+        "directories": [
+          "amc-home",
+          "cache",
+          "config",
+          "home",
+          "tmp",
+          "workspace"
+        ]
+      },
+      "afterProcessBeforeCapturingStreams": {
+        "files": [],
+        "directories": [
+          "amc-home",
+          "cache",
+          "config",
+          "home",
+          "tmp",
+          "workspace"
+        ]
+      },
+      "parsed": {
+        "riskTier": "LIMITED",
+        "articles": [
+          "Art. 50(1)"
+        ],
+        "findings": [
+          {
+            "article": "Art. 50(1)",
+            "title": "Chatbot transparency obligation",
+            "description": "AI systems intended to interact with humans must disclose they are AI, unless obvious from context.",
+            "severity": "MEDIUM"
+          }
+        ],
+        "remediation": [
+          {
+            "priority": "SHORT_TERM",
+            "action": "Implement transparency notification required by Art. 50(1): Chatbot transparency obligation.",
+            "article": "Art. 50(1)"
+          },
+          {
+            "priority": "MEDIUM_TERM",
+            "action": "Review voluntary Code of Conduct for GPAI models (Art. 56) if applicable.",
+            "article": "Art. 56"
+          }
+        ],
+        "summary": "\ud83d\udfe1 LIMITED RISK: This agent has 1 transparency obligation(s) under Art. 50. Disclosure notices required but no conformity assessment needed.",
+        "applicationDates": [
+          {
+            "basis": "Art. 50",
+            "appliesFrom": "2026-08-02"
+          }
+        ],
+        "classifiedAt": 1792015671213,
+        "claimKind": "self_reported",
+        "statusDimensions": {
+          "applicability": {
+            "state": "unresolved",
+            "reason": "no applicability decision recorded"
+          },
+          "evidence": "sufficient",
+          "result": "not_evaluated",
+          "enforcement": {
+            "state": "none"
+          },
+          "review": "pending"
+        },
+        "claimLabel": "Claim: Self-reported \u00b7 Result: not evaluated (no applicability decision is recorded) \u00b7 Evidence: sufficient \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: unresolved"
+      },
+      "errors": [],
+      "passed": true
+    }
+  ],
+  "total": 3,
+  "passed": 3,
+  "scope": "Actual cold CLI classification and regulated self-reported labels under credential-free environments, new private 0700 homes and cwd. No agent/model/API/server/enforcement or legal/expert approval. Snapshot interval ends after process and before captured streams; directory effects are explicitly recorded. No source, user-home, existing credentials, baseline or guard writes."
+}

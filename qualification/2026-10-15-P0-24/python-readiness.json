@@ -1,0 +1,190 @@
+{
+  "schemaVersion": 1,
+  "kind": "Read-only P0-24 Python follow-up readiness; no project Python execution",
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+    "head": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+    "alreadyLandedFix": "3b088c3c7ca1f10daf2b1576f9bd208a6605a7b5",
+    "fixScope": [
+      "platform/python/amc/watch/prebuilt_policy_packs.py",
+      "platform/python/tests/test_prebuilt_policy_packs.py"
+    ],
+    "observedStatus": "Parent was staging its P0-27 canonical packet; no preflight file or source edit was made in the repository."
+  },
+  "scope": {
+    "writesOnly": [
+      "/private/tmp/p0-24-python-readiness-20261015.json",
+      "/private/tmp/p0-24-python-readiness-20261015.md"
+    ],
+    "performed": [
+      "Source/config/test/import-closure reads",
+      "Git HEAD/fix history and static file hashes",
+      "Interpreter executable-path discovery only"
+    ],
+    "notPerformed": [
+      "Python interpreter invocation or project imports",
+      "venv creation or package installation",
+      "test collection or tests",
+      "pack construction or product runtime",
+      "servers/providers/transport",
+      "production/tested-module edits",
+      "legal/current-ATLAS verification or expert approval"
+    ]
+  },
+  "graphify": {
+    "graphAtReviewedRoot": "No graphify-out/graph.json observed.",
+    "treatment": "No refresh, install, watcher, or query runtime; verified current files directly. Existing earlier primary graph is stale navigation evidence only."
+  },
+  "interpreter": {
+    "requiresPython": ">=3.11",
+    "preferredCandidate": "/opt/homebrew/Cellar/python@3.12/3.12.14/bin/python3.12",
+    "pathObserved": true,
+    "homebrewDirectoryLabel": "3.12.14",
+    "actualExecutableVersionNotExecuted": true,
+    "defaultPython3Observed": "/usr/bin/python3",
+    "reason": "Use explicit compatible Homebrew interpreter in a fresh owned venv; do not assume the default macOS Python meets >=3.11."
+  },
+  "actualFlow": [
+    "Import amc.watch.prebuilt_policy_packs normally, not through an alias/loader that bypasses package initialization.",
+    "amc/__init__.py imports amc.core.config.settings; get_settings reads cwd .env and creates logs_dir, cache_dir, and receipts_export_path.parent.",
+    "amc.watch/__init__.py eagerly imports W1/W2/W4/W5/W6/W7/W8/W9/W10. This adds real aiosqlite, structlog, and cryptography requirements despite the targeted constructor using Pydantic and standard-library hashing.",
+    "mitre_atlas_policy_pack constructs actual PolicyPack version 1.1 with six rules/eight modules and calls with_digest. Corrected rules are ATLAS_T0051_PROMPT_INJECTION and ATLAS_T0054_JAILBREAK with corresponding AML remediation text.",
+    "PolicyPack.with_digest and verify_digest hash model_dump excluding digest with sorted compact JSON. Registry.install rejects a bad digest before assigning _packs; activation and scan are in-memory for these tests.",
+    "Existing conftest inserts platform/python on sys.path. No editable/full project installation is needed for these two existing sync test files."
+  ],
+  "dependencies": {
+    "pythonProjectLock": "No uv.lock, poetry.lock, Pipfile.lock, pdm.lock, or requirements*.txt was observed at platform/python's root or immediate children. pyproject lower bounds are not a frozen environment.",
+    "runtimeDirect": [
+      {
+        "constraint": "pydantic>=2.6.0",
+        "basis": "PolicyPack/core models; eager imports"
+      },
+      {
+        "constraint": "pydantic-settings>=2.2.0",
+        "basis": "amc/core/config.py"
+      },
+      {
+        "constraint": "aiosqlite>=0.20.0",
+        "basis": "eager amc.watch.w1_receipts import"
+      },
+      {
+        "constraint": "structlog>=24.1.0",
+        "basis": "eager watch imports"
+      },
+      {
+        "constraint": "cryptography>=42.0.0",
+        "basis": "eager amc.watch.w5_agent_bus Ed25519 import"
+      }
+    ],
+    "testDirect": [
+      {
+        "constraint": "pytest>=8.1.0",
+        "basis": "Existing test functions"
+      },
+      {
+        "constraint": "pytest-asyncio>=0.23.0",
+        "basis": "Honor existing asyncio_mode=auto configuration; target cases themselves are synchronous"
+      }
+    ],
+    "transitive": "Resolve these actual declared constraints only into the owned venv; record exact versions, pip check, install report and freeze. Do not claim reproducibility from lower bounds before retaining that resolution.",
+    "notNeededForThisSlice": [
+      "full editable amc-platform install",
+      "hatchling",
+      "fastapi/uvicorn",
+      "HTTP clients",
+      "SQLAlchemy",
+      "LLM/PII/SBOM optional extras",
+      "Docker/vault extras",
+      "pytest-cov/ruff/mypy"
+    ],
+    "native": "Pydantic-core/cryptography may use native wheels. A concrete owned-venv installation/import failure must remain visible; do not mutate shared runtimes to fix it."
+  },
+  "staticExistingTests": {
+    "prebuilt": {
+      "path": "platform/python/tests/test_prebuilt_policy_packs.py",
+      "functionDefinitions": 9,
+      "coverage": "Six constructors, all-six install, all-six activation, all-six marketplace scan. ATLAS existing case already asserts version1.1 and both corrected IDs."
+    },
+    "registry": {
+      "path": "platform/python/tests/test_w10_policy_packs.py",
+      "functionDefinitions": 3,
+      "coverage": "Install/activate/list, digest-tampered refusal, clean marketplace scan."
+    },
+    "totalDefinitions": 12,
+    "actualCollectionOrPassNotObserved": true
+  },
+  "minimalActualBehaviorCases": [
+    {
+      "case": "Current ATLAS constructor contract",
+      "assertions": "Actual PolicyPack; name MITRE ATLAS/version1.1; exact six unique current IDs, eight current modules; old ATLAS_T0048_PROMPT_INJECTION and ATLAS_T0051_JAILBREAK absent; both corrected rules retain deny/llm_input, their existing detection conditions, and exact AML.T0051/AML.T0054 remediation."
+    },
+    {
+      "case": "Actual digest round trip",
+      "assertions": "Recompute SHA256 from actual model_dump(exclude={'digest'}) sorted compact JSON; require verify_digest true and actual digest equality. Retain actual random pack_id/created_at in evidence rather than inventing a deterministic artifact."
+    },
+    {
+      "case": "Registry positive",
+      "assertions": "Install the actual returned object, activate that ID, require active instance/current version and genuine zero-risk/no-finding scan."
+    },
+    {
+      "case": "Corrected prompt ID tamper",
+      "assertions": "Deep-copy the actual pack, replace only prompt-injection ID with historical wrong ID without recomputing digest; require verify_digest false and PackInstallError. Capture registry IDs/active object/model dumps before and after and require byte/value equality."
+    },
+    {
+      "case": "Corrected jailbreak ID tamper",
+      "assertions": "Same real digest refusal and unchanged registry proof for historical wrong jailbreak ID; no mocked constructor/digest/registry."
+    }
+  ],
+  "futureCommandTemplate": [
+    "# PROPOSAL ONLY. Wait for parent assignment of a fresh P0-24 worktree and Python runtime scope; none of the following commands ran.",
+    "umask 077\nP024_SOURCE='<parent-assigned-fresh-P0-24-tree>'\nP024_PRIVATE=$(mktemp -d /private/tmp/p0-24-python-owned-XXXXXX)\nP024_BASE_PY=/opt/homebrew/Cellar/python@3.12/3.12.14/bin/python3.12\nmkdir -p \"$P024_PRIVATE/home\" \"$P024_PRIVATE/cwd\" \"$P024_PRIVATE/evidence\"\n\"$P024_BASE_PY\" -m venv \"$P024_PRIVATE/venv\"",
+    "env -i HOME=\"$P024_PRIVATE/home\" PATH=\"$P024_PRIVATE/venv/bin:/usr/bin:/bin\" PIP_CONFIG_FILE=/dev/null \"$P024_PRIVATE/venv/bin/python\" -s -m pip install --disable-pip-version-check --report \"$P024_PRIVATE/evidence/install.json\" 'pydantic>=2.6.0' 'pydantic-settings>=2.2.0' 'aiosqlite>=0.20.0' 'structlog>=24.1.0' 'cryptography>=42.0.0' 'pytest>=8.1.0' 'pytest-asyncio>=0.23.0' >\"$P024_PRIVATE/evidence/install.log\" 2>&1",
+    "env -i HOME=\"$P024_PRIVATE/home\" PATH=\"$P024_PRIVATE/venv/bin:/usr/bin:/bin\" PIP_CONFIG_FILE=/dev/null \"$P024_PRIVATE/venv/bin/python\" -s -m pip check >\"$P024_PRIVATE/evidence/pip-check.log\" 2>&1\n\"$P024_PRIVATE/venv/bin/python\" -s -m pip freeze --all >\"$P024_PRIVATE/evidence/freeze.txt\"\n\"$P024_PRIVATE/venv/bin/python\" -s -c 'import sys,platform; print(sys.version); print(sys.executable); print(platform.platform()); print(sys.prefix); print(sys.base_prefix)' >\"$P024_PRIVATE/evidence/interpreter.log\" 2>&1",
+    "cd \"$P024_PRIVATE/cwd\"\nenv -i HOME=\"$P024_PRIVATE/home\" PATH=\"$P024_PRIVATE/venv/bin:/usr/bin:/bin\" PYTHONNOUSERSITE=1 PYTHONDONTWRITEBYTECODE=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONPATH=\"$P024_SOURCE/platform/python\" AMC_WORKSPACE_DIR=\"$P024_PRIVATE/workspace\" AMC_LOGS_DIR=\"$P024_PRIVATE/logs\" AMC_CACHE_DIR=\"$P024_PRIVATE/cache\" AMC_RECEIPTS_DB=\"$P024_PRIVATE/receipts.db\" AMC_RECEIPTS_EXPORT_PATH=\"$P024_PRIVATE/exports/receipts.jsonl\" \"$P024_PRIVATE/venv/bin/python\" -s -m pytest -p pytest_asyncio.plugin -p no:cacheprovider \"$P024_SOURCE/platform/python/tests/test_prebuilt_policy_packs.py\" \"$P024_SOURCE/platform/python/tests/test_w10_policy_packs.py\" --junitxml=\"$P024_PRIVATE/evidence/existing-tests.xml\" >\"$P024_PRIVATE/evidence/existing-tests.log\" 2>&1",
+    "# After explicit assignment, run the owned standard-library unittest/assert constructor witness using the same isolated environment and retained source pin. Record actual exits/cases, dependency versions, source/module resolution paths and all effects. Retain failures; do not convert import/setup errors into product passes."
+  ],
+  "phaseOrder": [
+    "Parent finalizes current P0-27 stage and assigns fresh P0-24 source/runtime scope.",
+    "Pin interpreter physical path/version, Python source/test/config bytes and Git head before installation/runtime.",
+    "Create new owned venv without --system-site-packages; resolve only seven direct packages and preserve installation log/report/freeze.",
+    "Run genuine imports/existing12 tests from unrelated private cwd under clean env; verify __file__ points at assigned source, no sys.modules/package-loader bypass.",
+    "Run minimal constructor/digest/registry witness, preserving actual identifiers/timestamps/digest/registry refusal snapshots.",
+    "If causal current-ID assertion proof is useful and separately authorized, change only an owned private full-package copy to historical two-ID/version values, run identical witness expecting real constructor failures, restore exact bytes and rerun. Do not edit live/old source/tests.",
+    "Retain all errors, warnings, report counts, source/dependency hashes and private effects; no automatic cleanup or wider install."
+  ],
+  "sourcePins": {
+    "platform/python/pyproject.toml": "de3a20a7c1e0fe4ba52333974bf3197729de478c3ec9be4648ad83608bcd0ec5",
+    "platform/python/amc/__init__.py": "913d432004dab7348ab2da5b9bb6346432c899adb03a7f8dd906fab31f1204cf",
+    "platform/python/amc/watch/__init__.py": "9780a1fdc1f08083216778e2d2babbbbc850f88f19f6c2c649eb00be3c6d0187",
+    "platform/python/amc/watch/prebuilt_policy_packs.py": "50a7256ea64c83d1e6ee8721a635121f6da4d872f90f98fbb26aabbad9fe62b1",
+    "platform/python/amc/watch/w10_policy_packs.py": "139678dd455c42c348c70669ee9ede489c242b116a6deb16abd8ce0efbcc039f",
+    "platform/python/amc/core/config.py": "4814477dcd7a5decd4fb1efb76d7b0744a7ef70dab85eb9f8078253244e913e6",
+    "platform/python/conftest.py": "f0413791eebc3993a74d6ddbc235500b5d37859aaa97c5c2618fad91554de8ca",
+    "platform/python/tests/test_prebuilt_policy_packs.py": "2868755642efb44799e44bb37db714f89bc4bbb3f75e05ff2b374fd361a482eb",
+    "platform/python/tests/test_w10_policy_packs.py": "516aaa7f10f77e31df14b4579c90d91deb4bc3b5aa17ab82a877a2643bcf99f6",
+    "platform/python/amc/core/__init__.py": "257109832468dbc45941efec9475759450a6c4c1c32a1c4422214d27ec32e378",
+    "platform/python/amc/core/models.py": "8d3df441efd74f60fe5b532b52322b2fafc81c1bf405c9c8fab7435109fbab81",
+    "platform/python/amc/core/exceptions.py": "df77b4941f393142c6d2434d6c870e85c37aa8ecab2fee70af492403fd6d7795",
+    "platform/python/amc/watch/w1_receipts.py": "e37b12faba40cbd2d38ebad4c836468a48690d87a45f9ce1ad48358439474335",
+    "platform/python/amc/watch/w2_assurance.py": "bc8e0bbdfa175fc6f8fca86d51d02135cd9f18f7488f01b98b70d834a198a063",
+    "platform/python/amc/watch/w4_safety_testkit.py": "41aee15f15c969aa07a210c179297dc11e85a26345ea69d5572db425f29aca27",
+    "platform/python/amc/watch/w5_agent_bus.py": "285918ede7aaa5226307c3f0a50f4d402c6344f686704c1a89425ad61f7358a6",
+    "platform/python/amc/watch/w6_output_attestation.py": "6c609e1a13fd7212d9d4c0f8a8a12b919ea4669c89329bee3e5b1210e1c74d4b",
+    "platform/python/amc/watch/w7_explainability_packet.py": "2455afdc3fecfd97912aa32b9e02120c0bab851a9bfd17eaf83f04c0ff713b46",
+    "platform/python/amc/watch/w8_host_hardening.py": "26f6bc113bf1775d5d143c63356176288c734da506f92782ba5d4cae364bbe60",
+    "platform/python/amc/watch/w9_multi_tenant_verifier.py": "f17ba7f862e911883f2c16f632bba9cf84bf001e090c6292cc351e12ffbe9471"
+  },
+  "limits": [
+    "No legal/current ATLAS correctness or expert approval: observed IDs/remediation match the already-landed source contract only.",
+    "Do not redo corrected IDs or rewrite historical pending-checks/correction-log notes.",
+    "TypeScript citation collector does not inspect Python, so it cannot qualify these constructors.",
+    "Digest/registry controls establish content consistency and local refusal, not issuer authentication or certification.",
+    "No real enforcement, live transport, server, full Python platform, packaging/CLI, full AMC suite/coverage or release acceptance.",
+    "No current source repair is justified by this preflight; root must explicitly assign runtime/test scope before execution."
+  ],
+  "observerNotes": [
+    "A zsh unmatched unquoted optional glob interrupted one read-only file-list command; the later bounded find confirmed no listed lock/requirements files. No install/import/test followed.",
+    "An optional nonexistent workflow glob and missing owned-root AGENTS.md returned read errors; primary user-provided AGENTS instructions remain applicable."
+  ],
+  "memoryUse": "MEMORY.md:28 only reinforced exact bounded ownership/preservation; all source/interpreter/dependency facts above were observed currently."
+}

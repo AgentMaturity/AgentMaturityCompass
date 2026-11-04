@@ -1,7 +1,7 @@
 import type { EvidenceEvent, SessionRecord } from "../types.js";
 import type { SessionStoreBackendId } from "../persistence/sessionEventStore.js";
 import { verifyStoredSessionEventMetadata, verifyStoredSessionEvents, type StoredSessionTrustRoot } from "../persistence/sessionStoreVerification.js";
-import { extractEnvelope, SESSION_ENVELOPE_META_KEY } from "./sessionTypes.js";
+import { admitSessionEnvelope, extractEnvelope } from "./sessionTypes.js";
 import { exactHistoryId, historyRefuse, openHistoryReader, SessionHistoryRefused } from "./sessionHistoryReader.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -54,20 +54,8 @@ function assertRows(events: readonly EvidenceEvent[]): void {
       || !/^[a-f0-9]{64}$/.test(row.event_hash) || !/^[a-f0-9]{64}$/.test(row.payload_sha256)) {
       historyRefuse("TAMPERED", "A persisted event has invalid timestamp or digest fields.");
     }
-    let metadata: Record<string, unknown>;
-    try {
-      const value: unknown = JSON.parse(row.meta_json);
-      if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error();
-      metadata = value as Record<string, unknown>;
-    } catch { return historyRefuse("TAMPERED", "A persisted event has malformed metadata."); }
-    if (Object.hasOwn(metadata, SESSION_ENVELOPE_META_KEY)) {
-      const raw = metadata[SESSION_ENVELOPE_META_KEY];
-      if (!raw || typeof raw !== "object" || Array.isArray(raw)) historyRefuse("TAMPERED", "Malformed native session envelope.");
-      if (!("v" in raw) || raw.v !== 1) historyRefuse("UNSUPPORTED_FORMAT", "Unsupported session envelope version; signed rows are never migrated in place.");
-      if (extractEnvelope(row.meta_json) === null) historyRefuse("TAMPERED", "Malformed native session envelope.");
-    } else if (row.event_type.includes("/")) {
-      historyRefuse("UNSUPPORTED_FORMAT", "Native event has no supported session envelope; history cannot silently skip it.");
-    }
+    const admission = admitSessionEnvelope(row.meta_json, row.event_type);
+    if (!admission.ok) historyRefuse(admission.code, admission.message);
   }
 }
 function assertRecord(record: SessionRecord | null, id: string, events: readonly EvidenceEvent[]): asserts record is SessionRecord {

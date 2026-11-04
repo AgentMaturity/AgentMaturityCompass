@@ -1,0 +1,46 @@
+{
+  "schema": "p125pc-root-inert-receipt-helper-adoption/1",
+  "at": "2026-10-17T02:10:28.908816+00:00",
+  "activeHelperPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/assemble-extension.py",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/assemble-extension.py",
+    "bytes": 41612,
+    "sha256": "00144c15ee50956f0ef82ddabe1a9e70f6ffdc161390c72ac48120cd24d1cc23",
+    "dev": 16777231,
+    "inode": 544002232,
+    "nlink": 1
+  },
+  "preferredCandidatePin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+    "bytes": 41612,
+    "sha256": "00144c15ee50956f0ef82ddabe1a9e70f6ffdc161390c72ac48120cd24d1cc23",
+    "dev": 16777231,
+    "inode": 543998944,
+    "nlink": 1
+  },
+  "fullV2AndCompleteC39DeltaRead": true,
+  "fullNarrowV3DeltaAndActualActionContractRead": true,
+  "independentFullV2ReviewPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-helper-static-review/review.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-helper-static-review/review.json",
+    "bytes": 4800,
+    "sha256": "f9b20c9a6768a5ab972545215e74bc22e04d250aeab36c8f63a797ef55fe339d",
+    "dev": 16777231,
+    "inode": 543993873,
+    "nlink": 1
+  },
+  "independentV3ReviewPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/receipt-helper-static-review/v3/review.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/receipt-helper-static-review/v3/review.json",
+    "bytes": 1928,
+    "sha256": "af962b826d89753cc2fc8429c89b2f0782f761e768d1663b2866df8dc51176df",
+    "dev": 16777231,
+    "inode": 544002171,
+    "nlink": 1
+  },
+  "immutableActionsAndOriginalTemplatesPreserved": true,
+  "activeAssemblerMandatoryHashOnlyBeforeAnyEncoding": true,
+  "manifestNotYetFilledReady": true,
+  "executionAssemblySourceCopyCommitCredit": false
+}

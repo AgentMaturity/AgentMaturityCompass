@@ -1,0 +1,272 @@
+{
+  "schema": "p126-unchanged-cohort-declaration-index/1",
+  "basis": "Static full-source reading and literal test.each expansion, not Vitest discovery/execution or historical receipt counts.",
+  "files": [
+    {
+      "relativePath": "tests/transparencyMerkleIncremental.test.ts",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparencyMerkleIncremental.test.ts",
+        "bytes": 13968,
+        "sha256": "aa5ef81844a0cf8e72b6484b57a061171b3889cdc750952711b9f3b73dd6da14"
+      },
+      "declarationSites": 11,
+      "expandedDeclaredCases": 12,
+      "cases": [
+        {
+          "line": 98,
+          "declaredTitle": "frontier root equals the full rebuild at every leaf count (%s)",
+          "expandedTitle": "frontier root equals the full rebuild at every leaf count (amc-legacy-v1)",
+          "parameter": "amc-legacy-v1",
+          "staticExpansion": "MERKLE_ALGORITHMS literal two-value tuple from merkle.ts"
+        },
+        {
+          "line": 98,
+          "declaredTitle": "frontier root equals the full rebuild at every leaf count (%s)",
+          "expandedTitle": "frontier root equals the full rebuild at every leaf count (rfc9162-sha256)",
+          "parameter": "rfc9162-sha256",
+          "staticExpansion": "MERKLE_ALGORITHMS literal two-value tuple from merkle.ts"
+        },
+        {
+          "line": 110,
+          "declaredTitle": "a wrong odd-node rule diverges from the rebuild \u2014 the equivalence oracle discriminates",
+          "expandedTitle": "a wrong odd-node rule diverges from the rebuild \u2014 the equivalence oracle discriminates"
+        },
+        {
+          "line": 127,
+          "declaredTitle": "frontier shape check rejects a leaf count the nodes cannot have produced",
+          "expandedTitle": "frontier shape check rejects a leaf count the nodes cannot have produced"
+        },
+        {
+          "line": 137,
+          "declaredTitle": "appends produce the root and the leaves file a full rebuild would produce",
+          "expandedTitle": "appends produce the root and the leaves file a full rebuild would produce"
+        },
+        {
+          "line": 161,
+          "declaredTitle": "history is appended, not rewritten",
+          "expandedTitle": "history is appended, not rewritten"
+        },
+        {
+          "line": 182,
+          "declaredTitle": "the resume state tracks the log and points at the published root",
+          "expandedTitle": "the resume state tracks the log and points at the published root"
+        },
+        {
+          "line": 219,
+          "declaredTitle": "a resumable append takes the incremental path",
+          "expandedTitle": "a resumable append takes the incremental path"
+        },
+        {
+          "line": 235,
+          "declaredTitle": "a workspace written before the frontier existed migrates itself on the next append",
+          "expandedTitle": "a workspace written before the frontier existed migrates itself on the next append"
+        },
+        {
+          "line": 258,
+          "declaredTitle": "a tampered frontier is rebuilt from the log instead of steering the root",
+          "expandedTitle": "a tampered frontier is rebuilt from the log instead of steering the root"
+        },
+        {
+          "line": 284,
+          "declaredTitle": "a frontier that does not cover this append's parent is not resumed",
+          "expandedTitle": "a frontier that does not cover this append's parent is not resumed"
+        },
+        {
+          "line": 305,
+          "declaredTitle": "a truncated leaves file is detected and repaired rather than appended to",
+          "expandedTitle": "a truncated leaves file is detected and repaired rather than appended to"
+        }
+      ],
+      "fixtureHookRegistrations": [
+        {
+          "line": 53,
+          "kind": "afterEach"
+        }
+      ]
+    },
+    {
+      "relativePath": "tests/transparencyMerkleFailLoud.test.ts",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/transparencyMerkleFailLoud.test.ts",
+        "bytes": 7925,
+        "sha256": "4a161131357ddc30f42a530c31076b83b6a8529b0983976d5e52ca6acc4f9c4e"
+      },
+      "declarationSites": 7,
+      "expandedDeclaredCases": 7,
+      "cases": [
+        {
+          "line": 89,
+          "declaredTitle": "appendTransparencyEntry throws when the root cannot be advanced",
+          "expandedTitle": "appendTransparencyEntry throws when the root cannot be advanced"
+        },
+        {
+          "line": 110,
+          "declaredTitle": "the entry is still in the log, and the log itself still verifies",
+          "expandedTitle": "the entry is still in the log, and the log itself still verifies"
+        },
+        {
+          "line": 129,
+          "declaredTitle": "the lag outlives the process that hit it and names the entry",
+          "expandedTitle": "the lag outlives the process that hit it and names the entry"
+        },
+        {
+          "line": 148,
+          "declaredTitle": "the explicit repair path clears the lag",
+          "expandedTitle": "the explicit repair path clears the lag"
+        },
+        {
+          "line": 167,
+          "declaredTitle": "a recorded lag fails verification on its own, and a healthy append clears it",
+          "expandedTitle": "a recorded lag fails verification on its own, and a healthy append clears it"
+        },
+        {
+          "line": 187,
+          "declaredTitle": "a corrupt pending marker still reports a lag rather than being ignored",
+          "expandedTitle": "a corrupt pending marker still reports a lag rather than being ignored"
+        },
+        {
+          "line": 200,
+          "declaredTitle": "an unparseable log line is a verification error, not an exception",
+          "expandedTitle": "an unparseable log line is a verification error, not an exception"
+        }
+      ],
+      "fixtureHookRegistrations": [
+        {
+          "line": 47,
+          "kind": "afterEach"
+        }
+      ]
+    },
+    {
+      "relativePath": "tests/sessionAnchorOfflineProof.test.ts",
+      "sourcePin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/sessionAnchorOfflineProof.test.ts",
+        "bytes": 20097,
+        "sha256": "b14a6a44d4f6aef9cd7f6241cb23655e94c01cbb8a5b93f74ffedbef9f089dde"
+      },
+      "declarationSites": 22,
+      "expandedDeclaredCases": 22,
+      "cases": [
+        {
+          "line": 157,
+          "declaredTitle": "anchors a closed session as a session-root transparency artifact",
+          "expandedTitle": "anchors a closed session as a session-root transparency artifact"
+        },
+        {
+          "line": 181,
+          "declaredTitle": "re-anchoring an unchanged session reuses the existing entry",
+          "expandedTitle": "re-anchoring an unchanged session reuses the existing entry"
+        },
+        {
+          "line": 193,
+          "declaredTitle": "the exporter refuses to issue a proof against an unsigned root",
+          "expandedTitle": "the exporter refuses to issue a proof against an unsigned root"
+        },
+        {
+          "line": 212,
+          "declaredTitle": "verifies from a directory with no .amc, after the workspace is deleted",
+          "expandedTitle": "verifies from a directory with no .amc, after the workspace is deleted"
+        },
+        {
+          "line": 227,
+          "declaredTitle": "a truncated seal list breaks the session root it claims",
+          "expandedTitle": "a truncated seal list breaks the session root it claims"
+        },
+        {
+          "line": 236,
+          "declaredTitle": "an edited descriptor no longer matches the digest the log anchored",
+          "expandedTitle": "an edited descriptor no longer matches the digest the log anchored"
+        },
+        {
+          "line": 245,
+          "declaredTitle": "an edited transparency entry fails its own hash recomputation",
+          "expandedTitle": "an edited transparency entry fails its own hash recomputation"
+        },
+        {
+          "line": 254,
+          "declaredTitle": "a tampered proof path no longer resolves to the anchored root",
+          "expandedTitle": "a tampered proof path no longer resolves to the anchored root"
+        },
+        {
+          "line": 265,
+          "declaredTitle": "a root that was never signed is rejected even when the path is consistent",
+          "expandedTitle": "a root that was never signed is rejected even when the path is consistent"
+        },
+        {
+          "line": 277,
+          "declaredTitle": "a leaf index outside the signed tree is rejected",
+          "expandedTitle": "a leaf index outside the signed tree is rejected"
+        },
+        {
+          "line": 286,
+          "declaredTitle": "verification fails against a fingerprint the holder did not expect",
+          "expandedTitle": "verification fails against a fingerprint the holder did not expect"
+        },
+        {
+          "line": 295,
+          "declaredTitle": "an empty pin is refused rather than treated as no pin",
+          "expandedTitle": "an empty pin is refused rather than treated as no pin"
+        },
+        {
+          "line": 312,
+          "declaredTitle": "a bundle re-signed with an attacker's auditor key fails the pin",
+          "expandedTitle": "a bundle re-signed with an attacker's auditor key fails the pin"
+        },
+        {
+          "line": 346,
+          "declaredTitle": "a descriptor carrying an unrecognised field is rejected, not silently ignored",
+          "expandedTitle": "a descriptor carrying an unrecognised field is rejected, not silently ignored"
+        },
+        {
+          "line": 355,
+          "declaredTitle": "a fingerprint that disagrees with the bundle's own key is reported",
+          "expandedTitle": "a fingerprint that disagrees with the bundle's own key is reported"
+        },
+        {
+          "line": 370,
+          "declaredTitle": "anchoring and offline verification work on the JSONL backend",
+          "expandedTitle": "anchoring and offline verification work on the JSONL backend"
+        },
+        {
+          "line": 400,
+          "declaredTitle": "refuses a proof when the LEDGER does not verify, not just the log",
+          "expandedTitle": "refuses a proof when the LEDGER does not verify, not just the log"
+        },
+        {
+          "line": 431,
+          "declaredTitle": "auditorKeyFingerprint is the sha256 of the exported PEM",
+          "expandedTitle": "auditorKeyFingerprint is the sha256 of the exported PEM"
+        },
+        {
+          "line": 454,
+          "declaredTitle": "a forged root signature is rejected \u2014 the one check that makes this cryptography",
+          "expandedTitle": "a forged root signature is rejected \u2014 the one check that makes this cryptography"
+        },
+        {
+          "line": 468,
+          "declaredTitle": "a truncated seal list is rejected by the sealCount cross-check",
+          "expandedTitle": "a truncated seal list is rejected by the sealCount cross-check"
+        },
+        {
+          "line": 479,
+          "declaredTitle": "a descriptor whose sealCount disagrees with its seal list is rejected",
+          "expandedTitle": "a descriptor whose sealCount disagrees with its seal list is rejected"
+        },
+        {
+          "line": 487,
+          "declaredTitle": "a descriptor whose turnCount is inflated is rejected",
+          "expandedTitle": "a descriptor whose turnCount is inflated is rejected"
+        }
+      ],
+      "fixtureHookRegistrations": [
+        {
+          "line": 52,
+          "kind": "afterEach"
+        }
+      ]
+    }
+  ],
+  "expandedDeclaredCases": 41,
+  "runtimeResultsClaimed": false,
+  "globalFileOrderPredicted": false
+}

@@ -1,0 +1,161 @@
+{
+  "issue": "P0-26",
+  "status": "awaiting Sid: no decision recorded; nothing applied",
+  "reviewedBy": null,
+  "reviewedAt": null,
+  "floorPolicy": null,
+  "proposedFloorPolicy": "retire-floor",
+  "legend": "decision is keep, drop or defer. defer keeps the question on main, exactly like keep, until Sid decides; only drop removes it (tests/f5DropDecisions.test.ts).",
+  "items": [
+    {
+      "id": "EDU-HE-3",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "EDU-SE-11",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "EDU-SE-13",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "EDU-SE-15",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "ENV-SS-5",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "ENV-SS-14",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "GOV-DCR-14",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "GOV-DD-15",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "GOV-PL-14",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "GOV-PPC-15",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "HLT-WM-17",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "HLT-PL-17",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "MOB-SC-14",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "MOB-RE-15",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "MOB-VI-14",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "MOB-F3W-8",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "TECH-OS-4",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "TECH-OS-15",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "TECH-INF-15",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "TECH-PP-7",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "TECH-PP-13",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "TECH-PP-14",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "WLT-FW-6",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "WLT-FW-14",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "WLT-NP-6",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "WLT-NP-11",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "WLT-NP-14",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "WLT-CE-14",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "WLT-CE-15",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    },
+    {
+      "id": "WLT-BC-15",
+      "decision": "defer",
+      "note": "deferred: awaiting Sid"
+    }
+  ]
+}

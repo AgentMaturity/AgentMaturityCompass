@@ -1,0 +1,428 @@
+{
+  "schemaVersion": 1,
+  "issue": "P0-20",
+  "kind": "read-only scope/freeze/ownership preflight",
+  "createdUtc": "2026-10-14T19:59:44.884594+00:00",
+  "source": {
+    "worktree": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass",
+    "head": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+    "base": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+    "statusAtCapture": "?? tests/industryPackAuditReaderQualification.test.ts\n?? tests/industryPackAuditSigningQualification.test.ts",
+    "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "primaryHeld": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+    "durableClaude": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4"
+  },
+  "approvalGranted": false,
+  "authorizedQualificationScope": "Root/test agents qualify only new tests and private actual CLI fixtures. Existing production/shared paths, old tests, frozen originals, guards/floors and held candidates remain unchanged. This audit releases no source path and creates no new permission requirement.",
+  "contractDrift": [
+    {
+      "old": "Spec dispatch names amc.industry-pack-audit/1 and a generic claimKind field.",
+      "current": "Producer emits /3; claimKind is overall.claimKind. File verifier dispatches any amc.industry-pack-audit/ prefix; old unsigned bundles stay unsigned.",
+      "constraint": "Use actual /3 producer and explicitly record version/location drift; do not weaken signature or restore old assumptions."
+    },
+    {
+      "old": "Eight-case table includes no-response baseline classification.",
+      "current": "No answers => synthetic_example; signing throws synthetic_example results cannot be signed before vault/crypto. Answered audits are self_reported and stay not_evaluated after signing.",
+      "constraint": "Do not sign a synthetic baseline to manufacture a successful control. Unsigned baseline remains a classification/checksum control."
+    },
+    {
+      "old": "Spec trustedPublicKeysPem/workspace verification API.",
+      "current": "verifyIndustryPackAuditSignature takes {trust,publicKeyPem?,artifact?}; publicKeyPem only locates signer, TrustContext must admit artifact-seal.",
+      "constraint": "Capture out-of-band actual auditor public key before signing and construct pinnedTrust. Never pin from the artifact being checked."
+    },
+    {
+      "old": "Spec skip digest comparison mutation.",
+      "current": "Removing only mismatch-error check is redundant because cryptography still verifies the calculated body digest.",
+      "constraint": "Require causal RED. Private-copy mutation can replace calculated digest with signature.digestSha256; do not claim a noncausal guard removal as proof."
+    }
+  ],
+  "genuineFixtureDesign": {
+    "base": "Actual clinical-trials pack; responses are every actual pack question id at level3. Use fixed builder now, separate fresh A/B workspaces with actual vault keys, HOME/AMC_HOME/checkpoints outside workspace. Capture A/B pubkey and canonical ed25519KeyId before any sign call.",
+    "trust": "pinnedTrust([{publicKeyPem:A,purposes:[artifact-seal]}]); empty signed-list/pins context controls unpinned rejection. No allow flags in expected trusted/refused controls. Current pin-compromise ordering remains separate P0-51 debt.",
+    "valid": "Actual signIndustryPackAudit(A, answered): ok/report.trusted/checksumOk/signatureOk/signed true; report.integrity pass, overrides[], admission admitted; fingerprint sha256:<captured A id>; claims stay self_reported/not_evaluated.",
+    "foreign": "Sign the identical answered audit using actual B signer; A-only trust. Crypto/checksum pass and B fingerprint match; issuer admission not-pinned, SIGNER_UNTRUSTED, trusted/ok false.",
+    "attackerEnvelope": "Retain A body/receiptHash. Sign exact unsigned body with actual B signIndustryPackAuditJson, then coherently replace digestSha256/signature/signedTs/envelope and fingerprint with B values. envelope.sigB64 must equal replacement signature. A-only trust refuses; B trust verifies, proving genuine cryptographic attack bytes. Swapping pubkey alone is a bad-signature fixture, not this attack.",
+    "unsigned": "Actual build result signature:null; valid receipt checksum, signed/signatureOk/trusted/ok false, UNSIGNED and no fingerprint.",
+    "tamper": "Clone actual A-signed level3 audit; set one control level5/statusPASS, recompute receiptHash with canonicalize+sha256Hex excluding BOTH receiptHash and signature; retain original signature. checksumOk true but signature/ok false; DIGEST_MISMATCH or SIGNATURE_INVALID.",
+    "baseline": "Actual responses:{} builder; overall synthetic_example. Unsigned checksum works; sign throws before any key operation. Do not substitute guessed question ids: they may still produce no-answer baseline.",
+    "lockedVault": "Fresh process or lock actual fixture vault and unset passphrase before signing. Prove refusal and unchanged preexisting output; avoid warm unlocked-vault cache invalidating the negative."
+  },
+  "paidGate": {
+    "sourcePattern": "tests/cliClaimLabels.e2e.test.ts293\u2013303",
+    "status": "Paid gate stays active. Local fixture uses genuine Ed25519 pair and createIndustryPackLicenseKey with explicitly configured test issuer.",
+    "childEnvironment": "Only configured public issuer PEM plus actual signed license token; producer private issuer key stays local. Existing getIndustryPackEntitlement verifies token under that public key.",
+    "negative": "No license => real paywall refusal; no file written. Wrong/expired/invalid fixture license remains refusal.",
+    "limits": "Not a real commercial purchase, live entitlement service, remote notary or activation. No gate override/no-sign licensing bypass/no online checkout."
+  },
+  "actualCLI": {
+    "cwd": "Fresh fixture-owned workspace; absolute path to owned dist/cli.js after root normal build. No execution by this audit.",
+    "signedWriteArgv": [
+      "domain",
+      "apply",
+      "--agent",
+      "default",
+      "--pack",
+      "clinical-trials",
+      "--audit",
+      "--responses",
+      "answers.json",
+      "--audit-bundle",
+      "signed.json"
+    ],
+    "signedVerifyArgv": [
+      "audit",
+      "binder",
+      "verify",
+      "signed.json",
+      "--pubkey",
+      "recorded-auditor.pub",
+      "--json"
+    ],
+    "unsignedWriteArgv": [
+      "domain",
+      "apply",
+      "--agent",
+      "default",
+      "--pack",
+      "clinical-trials",
+      "--audit",
+      "--responses",
+      "answers.json",
+      "--audit-bundle",
+      "unsigned.json",
+      "--no-sign"
+    ],
+    "unsignedVerifyArgv": [
+      "audit",
+      "binder",
+      "verify",
+      "unsigned.json",
+      "--pubkey",
+      "recorded-auditor.pub",
+      "--json"
+    ],
+    "foreignVerifyArgv": [
+      "audit",
+      "binder",
+      "verify",
+      "foreign.json",
+      "--pubkey",
+      "recorded-auditor-A.pub",
+      "--json"
+    ],
+    "tamperVerifyArgv": [
+      "audit",
+      "binder",
+      "verify",
+      "tampered-rehashed.json",
+      "--pubkey",
+      "recorded-auditor.pub",
+      "--json"
+    ],
+    "expected": "Valid signed write/verify exit0 with authentic file/signature/fingerprint and claims; unsigned write exit0 checksum-only text but verify exit1; foreign/tamper verify exit1. Signing no-answer baseline exit1 with Pass your answers with --responses and no new audit file. Default no allow flags. Explicit allow-unpinned, if separately tested, means exit2 integrity-only/UNTRUSTED, never trusted."
+  },
+  "heldDifferences": [
+    {
+      "path": "src/audit/auditApi.ts",
+      "difference": "P1-78 adds initiator to export approval request only, outside verifier reader. Preserve held body; no overlay."
+    },
+    {
+      "path": "src/audit/auditCli.ts",
+      "difference": "P1-78 CLI initiator carrier for export request only. Preserve separately."
+    },
+    {
+      "path": "src/crypto/signing/signerVault.ts",
+      "difference": "P1-08 selects config-signature for CONFIG_KINDS and artifact-seal for other kinds through getSigningKey/getSigningPublicKeyPem. Current accepted uses auditor key. BUNDLE maps artifact-seal in held. Do not migrate or overlay signing families in this qualification."
+    }
+  ],
+  "ownership": {
+    "reservationPath": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+    "historicalFacts": "Wave1 P0-55 paths recorded merged/no-longer-in-flight, but later generic non-E17/non-Codex reservation1496 and protected A4/shared-CLI rules1581\u20131588 remain. Exact P0-20 omission or equal current source is not permission.",
+    "effectiveScope": "Current human serial qualification/fixes authority remains controlling; this delegated audit and current root/test scope are read-only existing source. No source repair/ownership release inferred."
+  },
+  "D15": {
+    "metadataMethod": "Read tracked originals/restoration JSON and landed-reader literals statically; no product/parity test or needs-snapshot helper executed.",
+    "selectedCore": "No frozen indicator or D15 row found for industryPackAudit, domainApplyCli, binderSigner, auditApi, auditCli, orgSigner or signerVault. This is not edit clearance.",
+    "frozenStudio": {
+      "path": "src/studio/studioServer.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/studio/studioServer.ts.landed",
+      "sha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815"
+    },
+    "archiveActualSha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815",
+    "archiveMatchesRowAndBase": true,
+    "baseAncestor": true,
+    "originals": [
+      {
+        "path": "unused-code/2026-10-01-main/studio-route-role-context/originals/src/studio/studioServer.ts.original",
+        "sha256": "29c1b1ce86930c8a4566f1c2768f547f2d122d9331cc6097c7f9924a2085f515"
+      },
+      {
+        "path": "unused-code/2026-10-02-main/studio-vault-signing-context/originals/src/studio/studioServer.ts.original",
+        "sha256": "7d7bc92acecfaec70812adf2053476fbc9fcdabccf047a1be8979d089ccbd1e7"
+      },
+      {
+        "path": "unused-code/2026-10-02-native/api-router-responses/originals/src/studio/studioServer.ts",
+        "sha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815"
+      }
+    ],
+    "constraints": "Preserve first P0-09 Studio snapshot, original archives, row/order/hash; do not resnapshot registered paths. Before any separately authorized frozen-source repair run actual path check and approved snapshot utility before its first edit/rebuild, preserving compiled pins. No archive/manifest operation occurred."
+  },
+  "freeze": {
+    "active": true,
+    "counts": {
+      "cliCommandPaths": 1236,
+      "cliInventoryPaths": 1236,
+      "stationPacks": 41,
+      "stationPackQuestions": 632
+    },
+    "P020AllowedException": false,
+    "heldCounts": {
+      "cliCommandPaths": 1255,
+      "cliInventoryPaths": 1255,
+      "stationPacks": 41,
+      "stationPackQuestions": 632
+    },
+    "constraint": "No new CLI paths, baseline/key/floor/guard changes; keep1236/1236,41packs,632questions. Held1255/A4/P1-65 baseline cannot clear accepted1236 source. Runtime ordinary freeze and architecture checks are root follow-up obligations, not executed here."
+  },
+  "lineBudgets": "architecture-boundaries uses text.split(newline).length, including final empty element. CLI24431/24431 and Studio8858/8858 have zero headroom; static per-file counts/caps follow below. Do not compare raw splitlines count to ratchet.",
+  "sourceHashesAndBudgets": [
+    {
+      "path": "src/domains/industryPackAudit.ts",
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+      "architectureLines": 517,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same",
+      "D15Rows": []
+    },
+    {
+      "path": "src/domains/domainApplyCli.ts",
+      "sha256": "e381955cf4f1ac136c86d39be33eac29e47c6a8cb83f9781c4abdd78c9d8d84b",
+      "architectureLines": 239,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same",
+      "D15Rows": []
+    },
+    {
+      "path": "src/domains/industryPackEntitlement.ts",
+      "sha256": "07cb4a8cfe1c84a25a60f2465830ac172bc36ba60634142e277e9de19fd14401",
+      "architectureLines": 548,
+      "cap": 800,
+      "acceptedMain": "different",
+      "primaryHeld": "different",
+      "durableClaude": "different",
+      "D15Rows": [
+        {
+          "path": "src/domains/industryPackEntitlement.ts",
+          "issue": "P0-51",
+          "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+          "archivePath": "unused-code/plan-edits/P0-51/src/domains/industryPackEntitlement.ts.landed",
+          "sha256": "37e6ae0bc7dadb519826a2e7f3181643843383da7458c68b5cd0e565e214b294"
+        }
+      ]
+    },
+    {
+      "path": "src/audit/binderSigner.ts",
+      "sha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+      "architectureLines": 27,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same",
+      "D15Rows": []
+    },
+    {
+      "path": "src/audit/auditApi.ts",
+      "sha256": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+      "architectureLines": 563,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different",
+      "D15Rows": []
+    },
+    {
+      "path": "src/audit/auditCli.ts",
+      "sha256": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee",
+      "architectureLines": 249,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different",
+      "D15Rows": []
+    },
+    {
+      "path": "src/org/orgSigner.ts",
+      "sha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+      "architectureLines": 145,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same",
+      "D15Rows": []
+    },
+    {
+      "path": "src/crypto/signing/signerVault.ts",
+      "sha256": "ae59a131cbd76f813d8160356bd73f62b1830321e34153fd2fb9e92cecd3bcaa",
+      "architectureLines": 34,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different",
+      "D15Rows": []
+    },
+    {
+      "path": "src/trust/signatureCheck.ts",
+      "sha256": "460aea518cdf88b219e75696e0e5244008f4739b5cbeaea42a370a2062d2a3b6",
+      "architectureLines": 85,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same",
+      "D15Rows": []
+    },
+    {
+      "path": "src/trust/admission.ts",
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "architectureLines": 147,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "different",
+      "D15Rows": []
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "architectureLines": 24431,
+      "cap": 24431,
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different",
+      "D15Rows": []
+    },
+    {
+      "path": "src/cli-trust-flags.ts",
+      "sha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081",
+      "architectureLines": 118,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different",
+      "D15Rows": []
+    },
+    {
+      "path": "src/studio/studioServer.ts",
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+      "architectureLines": 8858,
+      "cap": 8858,
+      "acceptedMain": "same",
+      "primaryHeld": "different",
+      "durableClaude": "different",
+      "D15Rows": [
+        {
+          "path": "src/studio/studioServer.ts",
+          "issue": "P0-09",
+          "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+          "archivePath": "unused-code/plan-edits/P0-09/src/studio/studioServer.ts.landed",
+          "sha256": "a8d3defe6eaa9baa8acabfade809921f37c399a9a0d12cc12129540060929815"
+        }
+      ]
+    },
+    {
+      "path": "tests/industryPackAudit.test.ts",
+      "sha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+      "architectureLines": 148,
+      "cap": 800,
+      "acceptedMain": "different",
+      "primaryHeld": "different",
+      "durableClaude": "different",
+      "D15Rows": []
+    },
+    {
+      "path": "tests/cliClaimLabels.e2e.test.ts",
+      "sha256": "b97c8895ddc35398d174a42433d7dee40f75beff2ca4bfcc5fe600d43681b11e",
+      "architectureLines": 418,
+      "cap": 800,
+      "acceptedMain": "absent",
+      "primaryHeld": "absent",
+      "durableClaude": "absent",
+      "D15Rows": []
+    },
+    {
+      "path": "tests/helpers/trustContext.ts",
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "architectureLines": 78,
+      "cap": 800,
+      "acceptedMain": "same",
+      "primaryHeld": "same",
+      "durableClaude": "same",
+      "D15Rows": []
+    }
+  ],
+  "inputHashes": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-20.md",
+      "sha256": "37ec0c324825688883f173007800cdcf3e9e1fdc3f1dc811971cf0244805ffc9",
+      "bytes": 11001
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "bytes": 275376
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0",
+      "bytes": 3052
+    },
+    {
+      "path": "/private/tmp/p0-54-next-routing-preflight-20261015.json",
+      "sha256": "181650a72845cb8f9fe3c4d848a7f9d3836b2cea9155641afae9c34d41a80016",
+      "bytes": 22434
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "bytes": 2713
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "bytes": 554
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "bytes": 9946
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/snapshot-plan-edit.mjs",
+      "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+      "bytes": 7012
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/scripts/architecture-boundaries-check.mjs",
+      "sha256": "485eee162256218e2d51c1ada9dd4185a478a632ba86288e89438d1c2b24a067",
+      "bytes": 9087
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "bytes": 18181
+    }
+  ],
+  "mutantDesignsOnly": [
+    "Private copied built audit module only: inject an envelope-derived artifact-seal explicit pin into context passed to checkDigestSignature. Actual B-signed refusal assertion must RED while A positive stays valid.",
+    "Private copied built verifier only: replace recomputed digest with signature.digestSha256. Rechecksummed tamper-refusal assertion must RED; genuine unedited positive passes.",
+    "Resolve copied relative static imports to original built dependency file URLs and hash untouched inputs; never patch source/dist, generic admission or guard files. Designs are unexecuted; no mutation qualification claimed."
+  ],
+  "limits": "No routed A4 or HTTP authentication claim; direct read helper not route coverage. Static links not atomic/race-free OS confinement; no cross-store transaction, full suite/coverage/Node24/hosted/release/Done claim. Existing P0-22/23/51/52 failures and pending Sync scope remain separate and active.",
+  "performed": "Read-only source/spec/reservation/Git/metadata comparisons and this private JSON/Markdown pair mode0600. No product imports, CLI, tests, build, dependency operation, source/oldtest/archive/guard/ref edit, app/external message or source release."
+}

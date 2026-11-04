@@ -1,0 +1,38 @@
+{
+  "currentProductScope": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/product-scope-and-preserved-qualification-cab126-v1.json",
+    "sha256": "1d582ee2d4c92c194358e4374650fc0146c5bbf9a0a363c233e22896456cd875",
+    "bytes": 4710
+  },
+  "staticPrototypeReview": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/independent-cut-first-prototype-semantic-audit-v2.json",
+    "sha256": "08c4be80df33fe7f0ae6ae63293a355ca3a3027e5c7870e9e25e8528dfa7425a",
+    "bytes": 19555
+  },
+  "proseReview": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/docs-current-integration-review-c9e29-v1.json",
+    "sha256": "1a1cc05f6c8e11773fcde8c47a243dd38abc1f4f6c4e834d0e760461d930e2a4",
+    "bytes": 16719
+  },
+  "generation": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/solo-20261019/owner-generation-cab126-v1/summary.json",
+    "sha256": "433352a5d143557fc915cf0b94fd7a92c0eed30ef157ca39d09f9d8f3d3af164",
+    "bytes": 7958
+  },
+  "sourcePins": [
+    {
+      "path": "src/sandbox/windowsRunnerPrototype.ts",
+      "sha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef",
+      "bytes": 6467
+    },
+    {
+      "path": "tests/containment/windowsRunnerPrototype.test.ts",
+      "sha256": "d57d37652979c23911f0f1d846357f90fb22114ad42c2101572259e67cd3c190",
+      "bytes": 12491
+    }
+  ],
+  "oldQualificationPreserved": true,
+  "onlyNewSrc": "src/sandbox/windowsRunnerPrototype.ts",
+  "otherNativeCoreAndReservedPathsEqualInt": true,
+  "currentFullBaselineClassification": "not performed at assembly"
+}

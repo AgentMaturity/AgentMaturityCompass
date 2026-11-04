@@ -1,0 +1,37 @@
+"""Bind actual closed clean-source output; read-only source/fresh authority, private JSON only."""
+from pathlib import Path
+import json,hashlib,subprocess,datetime,stat,re
+B=Path('/private/tmp/p1-25-window-qualification-20261017');S=Path('/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass');R=Path('/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass');N=Path('/private/tmp/p1-39-post-typecheck-20261016')
+def git(root,*args):return subprocess.check_output(['git','--no-optional-locks',*args],cwd=root)
+def pin(p):
+ p=Path(p);s=p.lstat();assert stat.S_ISREG(s.st_mode) and s.st_nlink==1 and p.resolve()==p
+ d=p.read_bytes();e=p.lstat();assert (s.st_dev,s.st_ino,s.st_size,s.st_mtime_ns)==(e.st_dev,e.st_ino,e.st_size,e.st_mtime_ns)
+ return {'path':str(p),'physicalPath':str(p.resolve()),'bytes':len(d),'sha256':hashlib.sha256(d).hexdigest(),'dev':s.st_dev,'inode':s.st_ino,'nlink':s.st_nlink}
+def verify(row,physical=False):
+ a=pin(row['path']);keys=('bytes','sha256','physicalPath','dev','inode','nlink') if physical else ('bytes','sha256');assert all(a[k]==row[k] for k in keys),row['path'];return a
+assert all(not (N/n).exists() for n in ('ACTIVE','ACTIVE.json','HALTED','HALTED.json'))
+p=json.loads((B/'runtime-protected-inputs.json').read_text());proposal=json.loads((B/'control-preparation/source-pinset.json').read_text());c=json.loads((N/'command-p125w-clean-source/command.json').read_text());source=json.loads((B/'source-checkpoint.json').read_text());commit=source['commit'];assert re.fullmatch('[0-9a-f]{40}',commit)
+assert len(p['inputs'])==proposal['activeProtectedInputsRequired']==151 and len(p['nativePins'])==proposal['existingNativePinsRequired']==10
+assert proposal['schema']=='p125w-finite-fresh-source-pinset-proposal/1' and proposal['sourceRoot']==str(S)
+assert len(proposal['relativePaths'])==len(set(proposal['relativePaths']))==proposal['selectedPathCount']==94
+assert len(proposal['compiledPairs'])==proposal['compiledPairCount']==19
+assert all(not Path(rel).is_absolute() and '..' not in Path(rel).parts for rel in proposal['relativePaths'])
+assert all(pair['sourceRelativePath'] in proposal['relativePaths'] and pair['compiledRelativePath'] in proposal['relativePaths'] for pair in proposal['compiledPairs'])
+assert c['exit']==0 and c['endedUtc'] and c['groupAbsentByESRCH'] and not c['signalsOtherThanZeroSent'] and c['cwd']==str(R) and c['head']==c['headAfter']==p['heldRHead']
+assert c['ownedProcess']['argv']==['/opt/homebrew/bin/pnpm','--dir',str(S),'exec','/opt/homebrew/opt/node@22/bin/node','scripts/clean-source-check.mjs','--keep']
+log=(N/'command-p125w-clean-source/stdout-stderr.log').read_text();kept=re.findall('^kept: (/.+)$',log,re.M);assert len(kept)==1;q=(Path(kept[0])/'checkout').resolve();assert q.name=='checkout' and q.parent.name.startswith('amc-clean-source-') and q not in (S,R)
+for root in (S,q):
+ assert git(root,'rev-parse','HEAD').decode().strip()==commit and git(root,'status','--porcelain=v1')==b'' and git(root,'diff','--cached','--name-only')==b''
+assert git(R,'rev-parse','HEAD').decode().strip()==p['heldRHead'] and git(R,'status','--porcelain=v1').decode()==p['heldRStatus'] and git(R,'diff','--cached','--name-only').decode()==p['heldRStaged']==''
+for row in p['inputs']:verify(row)
+seen=set();rows=[]
+for rel in proposal['relativePaths']:
+ a,z=pin(S/rel),pin(q/rel);assert (a['bytes'],a['sha256'])==(z['bytes'],z['sha256']),rel
+ for t in (a,z):
+  k=(t['dev'],t['inode']);assert k not in seen;seen.add(k)
+ rows.append({'relativePath':rel,'bytes':a['bytes'],'sha256':a['sha256'],'source':a,'fresh':z})
+assert len(rows)==94 and len(proposal['compiledPairs'])==19
+natives=[verify(r,True) for r in p['nativePins']];fresh=pin(q/'node_modules/better-sqlite3/build/Release/better_sqlite3.node');assert fresh['sha256']==natives[0]['sha256'] and fresh['bytes']==natives[0]['bytes'];alln=[*natives,fresh];ids={(a['dev'],a['inode']) for a in alln};assert len(ids)==11 and not ids&seen
+value={'schema':'p125w-actual-fresh-source-binding/1','at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'sourceRoot':str(S),'freshRoot':str(q),'sourceCommit':commit,'boundPaths':rows,'compiledPairs':proposal['compiledPairs'],'existingNativePins':p['nativePins'],'freshNative':fresh,'helper':c,'runtimeProtectedInputsPin':pin(B/'runtime-protected-inputs.json'),'vitestCreditFromHelper':False,'prospectiveCountOrCompiledHashesAdopted':False,'all151ActiveProtectedInputsExact':True,'allSelected188FilesDistinctRegularSingleLink':True,'heldRHead18RowsIndexExact':True,'bothTreesCleanAndIndexesEmpty':True,'universalDescendantFilesystemEnvironmentLoaderIsolationClaim':False,'allHoldsRetained':True}
+with (B/'fresh-source-binding.json').open('x') as f:json.dump(value,f,indent=2);f.write('\n')
+print(json.dumps({'commit':commit,'freshRoot':str(q),'selectedPathsEachRoot':94,'compiledPairs':19,'activeProtectedPins':151,'nativePins':11,'freshNative':fresh}))

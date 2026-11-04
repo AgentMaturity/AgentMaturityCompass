@@ -1,12 +1,15 @@
+import { manageObjective, readObjective } from "./autonomy/objectiveStore.js";
 import { createHash } from "node:crypto";
 import { readFileSync, statSync } from "node:fs";
 import type { Command } from "commander";
-import { assertScheduleOwner, manageSchedule, scheduleStatus } from "./autonomy/scheduleStore.js";
+import { assertScheduleOwner, closeInterruptedClaim, manageScheduleAsync as manageSchedule, scheduleStatus, parseScheduleDefinition, readSchedules } from "./autonomy/scheduleStore.js";
+import { resolve } from "node:path";
 import { assertNativeScheduleAdmission, startNativeScheduleService } from "./autonomy/scheduleService.js";
 import { approvalGateFor, integerOption, paramsFor, routeFor, type AgentLoopCliIo, type RunOptions } from "./cli-agent-options.js";
 import { STUB_PROVIDER_ID, STUB_PROVIDER_MODEL, stubProviderTransport } from "./agent/stubProvider.js";
 import { nativeApprovalInstructions } from "./setup/nativeApprovalInstructions.js";
 import { loadVerifiedToolsConfigSnapshot } from "./toolhub/toolhubValidators.js";
+import { runLease } from "./leases/runLease.js";
 
 const defaultIo: AgentLoopCliIo = {
   log: line => console.log(line), error: line => console.error(line), fail: () => { process.exitCode = 1; }
@@ -41,14 +44,16 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
     io.error(error instanceof Error ? error.message : "Native schedule operation failed; no successful closure is claimed.");
     io.fail();
   };
-  const group = program.command("native-schedule")
-    .description("Manage signed native goals and explicitly own one due pass or a foreground polling lifecycle");
+  // D-12: never qualified (AMC-1548), so hidden from help and the inventory; the commands still parse.
+  const group = program.command("native-schedule", { hidden: true })
+    .description("Experimental, not qualified: manage signed native goals and explicitly own one due pass or a foreground polling lifecycle");
   group.command("list").description("Read signed configuration, its digest and operational due/in-flight status without running jobs")
     .action(() => {
       try {
         const status = scheduleStatus(workspace(), now());
         const tools = loadVerifiedToolsConfigSnapshot(workspace());
-        report({ ...status, toolsPolicy: { digestSha256: tools.digestSha256,
+        report({ ...status, objectives: status.schedules.filter(schedule => schedule.objective !== undefined)
+          .map(schedule => ({ scheduleId: schedule.id, record: readObjective(workspace(), schedule.id) })), toolsPolicy: { digestSha256: tools.digestSha256,
           signatureValid: tools.signatureValid, schemaValid: tools.config !== null, reason: tools.reason } });
       } catch (error) { failed(error); }
     });
@@ -57,21 +62,49 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
   group.command("put <file>").description("Add or replace one reviewed definition using the existing workspace signer; does not start a runner")
     .requiredOption("--expect-input-sha256 <digest>", "exact JSON bytes reviewed through inspect-file")
     .requiredOption("--expect-digest <digest>", "current signed config digest from list, or absent for a new configuration")
-    .action((file: string, opts: { expectInputSha256: string; expectDigest: string }) => {
+    .option("--objective-action <action>", "explicit human create, edit, pause or resume of this definition's durable objective; does not replace schedule policy")
+    .option("--expect-objective-revision <revision>", "exact signed objective revision, or absent for create")
+    .action(async (file: string, opts: { expectInputSha256: string; expectDigest: string; objectiveAction?: string; expectObjectiveRevision?: string }) => {
       try {
-        assertScheduleOwner(workspace());
-        const input = definition(file);
-        if (input.inputSha256 !== opts.expectInputSha256) throw new Error("Schedule definition changed; inspect-file again before signing.");
-        manageSchedule(workspace(), opts.expectDigest, { kind: "put", schedule: input.schedule });
-        report(scheduleStatus(workspace(), now()));
+        const root = resolve(workspace()), inputPath = resolve(file), expectedInput = opts.expectInputSha256;
+        assertScheduleOwner(root);
+        const input = definition(inputPath);
+        if (input.inputSha256 !== expectedInput) throw new Error("Schedule definition changed; inspect-file again before signing.");
+        const beforePublish = () => { if (definition(inputPath).inputSha256 !== expectedInput) throw new Error("Schedule definition changed; inspect-file again before signing."); };
+        beforePublish();
+        if (opts.objectiveAction !== undefined) {
+          if (!["create", "edit", "pause", "resume"].includes(opts.objectiveAction)) throw new Error("--objective-action must be create, edit, pause or resume.");
+          const expected = opts.expectObjectiveRevision;
+          if (expected === undefined || (expected !== "absent" && (!/^[1-9][0-9]*$/.test(expected) || !Number.isSafeInteger(Number(expected)))))
+            throw new Error("--expect-objective-revision must be an exact positive integer or absent.");
+          const selected = parseScheduleDefinition(input.schedule);
+          const reviewed = readSchedules(root);
+          if (!reviewed.ok) throw new Error(reviewed.reason);
+          const current = reviewed.schedules.find(schedule => schedule.id === selected.id);
+          if (reviewed.digest !== opts.expectDigest || JSON.stringify(current) !== JSON.stringify(selected))
+            throw new Error("Objective input does not match the exact current signed schedule definition; review list and inspect-file again.");
+          const record = await manageObjective(root, selected.id, expected === "absent" ? "absent" : Number(expected), opts.expectDigest,
+            opts.objectiveAction as "create" | "edit" | "pause" | "resume", { beforePublish });
+          report({ objective: record });
+        } else {
+          if (opts.expectObjectiveRevision !== undefined) throw new Error("--expect-objective-revision requires --objective-action.");
+          await manageSchedule(root, opts.expectDigest, { kind: "put", schedule: input.schedule }, { beforePublish });
+          report(scheduleStatus(root, now()));
+        }
       } catch (error) { failed(error); }
     });
   for (const kind of ["enable", "disable", "remove", "reset-failures"] as const) {
-    group.command(`${kind} <id>`)
+    const command = group.command(`${kind} <id>`)
       .description(kind === "disable" ? "Prevent future claims; does not pretend to cancel an already running owner" : `Explicitly ${kind} a schedule without discarding its cadence or claim history`)
-      .requiredOption("--expect-digest <digest>", "current signed schedule configuration digest from list")
-      .action((id: string, opts: { expectDigest: string }) => {
-        try { manageSchedule(workspace(), opts.expectDigest, { kind, id }); report(scheduleStatus(workspace(), now())); }
+      .requiredOption("--expect-digest <digest>", "current signed schedule configuration digest from list");
+    if (kind === "reset-failures") command.option("--close-interrupted <claim-id>", "close this exact dead native owner as an audited interrupted failure instead of resetting failures; never re-runs the goal");
+    command.action(async (id: string, opts: { expectDigest: string; closeInterrupted?: string }) => {
+        const root = resolve(workspace());
+        try {
+          if (opts.closeInterrupted !== undefined) await closeInterruptedClaim(root, id, opts.closeInterrupted, opts.expectDigest);
+          else await manageSchedule(root, opts.expectDigest, { kind, id });
+          report(scheduleStatus(root, now()));
+        }
         catch (error) { failed(error); }
       });
   }
@@ -105,7 +138,7 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
         const root = workspace();
         assertScheduleOwner(root);
         if (opts.agent.trim().length === 0) throw new Error("--agent must identify the governing root agent.");
-        const gate = approvalGateFor(io, opts);
+        const gate = approvalGateFor(io, opts, { workspace: root, agentId: opts.agent });
         if (gate == null) return;
         const route = routeFor(io, opts.provider, opts, opts.model);
         if (route === null) return;
@@ -128,7 +161,9 @@ export function registerNativeScheduleCommands(program: Command, io: AgentLoopCl
           if (!status.schedules.some(schedule => schedule.due)) return { sessionId: null, scheduleResults: [], cancelled: false };
           const runtime = await loadRuntime();
           if (signal.aborted) return { sessionId: null, scheduleResults: [], cancelled: true };
-          const outcome = await runtime.runComposedTurn({ workspace: root, agentId: opts.agent, prompt: "",
+          // P1-79: the pass's lease, which its scheduled children inherit, or PRINCIPAL_UNRESOLVED before any session row.
+          const lease = runLease({ workspace: root, agentId: opts.agent, model: route.models?.[0] ?? STUB_PROVIDER_MODEL, tools: "workspace" });
+          const outcome = await runtime.runComposedTurn({ workspace: root, agentId: opts.agent, prompt: "", ...lease,
             route: { providerId: opts.provider, model: route.models?.[0] ?? STUB_PROVIDER_MODEL, params: requestParams },
             routes: [route], ...(opts.provider === STUB_PROVIDER_ID ? { transport: stubProviderTransport({}) } : {}),
             config: { maxStepsPerTurn: maxSteps },

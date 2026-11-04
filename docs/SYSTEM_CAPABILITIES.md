@@ -20,7 +20,7 @@ This is the go-live contract for AMC integration state.
 | Ops hardening | `amc ops *`, `amc retention *`, `amc backup *`, `amc maintenance *`, `amc metrics status` | Retention, encrypted storage, backup/restore, maintenance, metrics |
 | Release engineering | `amc release *` | Deterministic `.amcrelease` bundles + offline verification |
 | Trust boundary / Notary | `amc trust *`, `amc notary *` | Fail-closed signing boundary and runtime attestations |
-| Multi-workspace host mode | `amc host *`, `amc workspace *` | Tenant isolation, host portfolio, workspace-scoped ops |
+| Multi-workspace host mode | `amc host *`, `amc host workspace *` | Tenant isolation, host portfolio, workspace-scoped ops |
 | Enterprise identity | `amc identity *`, `amc scim *` | Signed IdP config, OIDC/SAML login, SCIM provisioning |
 | End-to-end smoke | `amc e2e smoke --mode local|docker|helm-template --json` | Full-system go-live validation summary |
 
@@ -34,7 +34,7 @@ This is the go-live contract for AMC integration state.
 | Compare | `/w/:id/console/compare.html` | Workspace | Node-vs-node deltas and gap/win lists |
 | Systemic | `/w/:id/console/systemic.html` | Workspace | 5 strategy-failure risks + contributors |
 | Transform | `/w/:id/console/transform.html` | Workspace | 4C progress + kanban tasks |
-| Mechanic Mode | `/w/:id/console/mechanic.html` | Workspace | 126-question equalizer + what-if + target apply |
+| Mechanic Mode | `/w/:id/console/mechanic.html` | Workspace | equalizer over the default diagnostic question bank + what-if + target apply |
 | Forecast | `/w/:id/console/forecast*.html` | Workspace | Trend bands, drift/anomaly warnings, ETA |
 | Advisories | `/w/:id/console/advisories.html` | Workspace | Evidence-bound warnings and acknowledgements |
 | Benchmarks | `/w/:id/console/bench*.html` | Workspace + Host | Exports/imports, registry browse, percentiles, portfolio compare |

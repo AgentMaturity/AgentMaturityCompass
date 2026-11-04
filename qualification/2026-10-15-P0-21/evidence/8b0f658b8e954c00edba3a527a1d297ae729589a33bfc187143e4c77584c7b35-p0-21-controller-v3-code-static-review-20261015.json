@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-21",
+  "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+  "productionAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "reviewKind": "Independent read-only final v3 code delta review against frozen v1",
+  "state": "NO_BLOCKING_CODE_FINDINGS_SETUP_SEAL_PENDING",
+  "findings": [],
+  "blockingCodeFindings": 0,
+  "closedV1Findings": [
+    {
+      "id": "F1",
+      "result": "Closed for v3 code only",
+      "evidence": "LATE now matches the exact installed error during close, close timed out, Tests closed successfully but something prevents, and explicit error during global teardown messages. classify scans the complete retained stream and raises before writing classification, clearing ACTIVE or allowing main to restore. V1 remains blocked and immutable."
+    },
+    {
+      "id": "F2",
+      "result": "Closed for v3 code only",
+      "evidence": "Catch receipt now records automaticRestorationOnException:false. This accurately describes the handler, including when normal restoration preceded a later failure."
+    }
+  ],
+  "combinedDeltaReview": {
+    "basis": "The complete in-memory unified v1\u2192v3 text diff was read; no source parser or controller/helper execution was used.",
+    "serialScheduling": "Adds --maxWorkers=1 and --no-file-parallelism without changing original config/tests/assertions/imports/deadlines. This matches the parent core37 schedule.",
+    "groupObservation": "After actual child.wait returns, signal-zero group probes repeat until observed ESRCH or a5-second monotonic deadline, sleeping at most50ms and retaining every observation. No phase rerun or nonzero signal is added. EPERM/existence/other uncertainty remains false and fails before restoration/runtime. This improves one-shot false-block behavior without equating forced termination to cleanup.",
+    "releaseBindings": "All setup reads point to setup-v3.json and release hashes use setup-index-v3.json. Explicit setupPath/setupIndexPath/controllerPath now bind the selected variant as well as its hashes, roots and control token. Frozen own-input membership still depends on the unread final setup contents.",
+    "unchanged": "All other v1 controller text, proposal, reporter, six recipes, source-only mutation path,90-second timeout hold, ACTIVE/HALTED behavior, started marker, raw/observer body classifier, preservation comparisons and survivor semantics remain unchanged."
+  },
+  "retainedChecks": {
+    "recipes": "All6 source baselines, exact-once edits and candidate SHA256 calculations passed the prior code-only audit; C6 remains2 edits in one source file. No mutant was written or evaluated.",
+    "routing": "Core37 remains original source-mode Vitest. Dist, source imports, tests/fixtures/config/guards/deadlines and coverage floors remain unchanged. No compiler, adapter or new witness appears.",
+    "failureAttribution": "The classifier checks fixed case memberships/states/counts, zero infrastructure/hooks/unhandled/pending, AssertionError names and message consistency; it retains raw/structured errors and says awaiting-root-attribution. Exact source frames/first causes/masking and full raw-stack multiplicity still require actual independent review; this static report supplies no kill verdict.",
+    "processState": "Actual Popen PID, session/group observation, reporter PID/cwd and ESRCH gate remain. Timeout does not signal, retry, clean up or restore; ACTIVE/HALTED retain uncertainty. Started markers and pristine checks prevent repeated/next runtime after an interrupted mutant. No arbitrary hard-kill/power-loss recovery or universal detached-descendant proof follows.",
+    "environment": "The unchanged outer literal contains7 allowlisted keys and does not copy os.environ. No OS/universal network/credential-isolation claim follows.",
+    "dependencies": "The observed closure/node_modules symlink targets only this P021 parent's dependencies. Native bytes/identity and link/preservation code remain checked; no independent install or full dependency/cache immutability is established."
+  },
+  "setupAndRuntimeHold": {
+    "partialMetadataRead": false,
+    "setupApproved": false,
+    "privateCopyApproved": false,
+    "runtimeAuthorized": false,
+    "required": "Author must freeze final setup-v3.json/setup-index-v3.json and complete physical copy/source/dist/case identities/preservation/native/borrowed link/immutable input pins. Root must verify those sealed contents and this review, then provide a separate exact per-control root release. Code clearance alone cannot release runtime.",
+    "scope": "No setup, index or mutable future phase/copy evidence was read in this code-only review. The author-reported7945+4529=12474 construction remains separately unverified here."
+  },
+  "scopeLimits": [
+    "V1/v2 remain unexecuted immutable historical preparations; v3 code alone is not qualified runtime.",
+    "Current OBSERVEDL2, empty/not-evaluatedL3 maps, current emitters/reader provenance, audit schema/3 and other trust/signature guards remain untouched.",
+    "No source/private mutant, product import/parser/compiler/test, native load, process enumeration/nonzero signal, network or Git ran.",
+    "Root's literal wording acceptance gap and all held fullsuite/quality/Node24/installed/hosted/release/Done dependencies remain unresolved; these code changes waive none."
+  ],
+  "operations": {
+    "readOnlyTextJSONHashStat": true,
+    "partialSetupIndexReads": 0,
+    "controllerOrProductExecution": 0,
+    "sourceParsersImportsOrCompiler": 0,
+    "producerOrSourceWrites": 0,
+    "writes": "Only this new separate v3 code-review JSON/Markdown pair."
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+      "bytes": 18783,
+      "sha256": "df22405c146c82099182f19e4f3aa8b9200103ed2b518cdf8842c430776158c8"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+      "bytes": 19822,
+      "sha256": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/proposal.json",
+      "bytes": 11790,
+      "sha256": "fa4c77f0bbcbb976cd8d7a505eae72db7689888f145154b9c1af76900e0645d2"
+    },
+    {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "/private/tmp/p0-21-controller-code-static-review-20261015.json",
+      "bytes": 13306,
+      "sha256": "ef26d2fc131285c9efb202fcb74483ca14c0382f4d81d03c7fa5b10d768e073d"
+    },
+    {
+      "path": "/private/tmp/p0-21-controller-code-static-review-20261015.md",
+      "bytes": 2004,
+      "sha256": "f10ab17ba9072621cd4c47e817abb923115acc38931b55d1ceee35164ec97ac5"
+    },
+    {
+      "path": "/private/tmp/p0-21-recipes-static-review-20261015.json",
+      "bytes": 35844,
+      "sha256": "ea8358143ca8508452a9ae99ee53903ab0d276e0ba17bc9c77d333d1d0c95135"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js",
+      "bytes": 498779,
+      "sha256": "a236001d048380e2c67d05423fc9ea3f26b07ee019ba8d6e622082f29d49102e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    }
+  ],
+  "combinedDiff": {
+    "bytes": 5788,
+    "sha256": "e738389e65ba10d34b1c3633ce4a6a63c66ae8616b82b6e41f3402f0700ad45a",
+    "text": "--- frozen-v1/controller.py\n+++ final-v3/controller-v3.py\n@@ -19,7 +19,9 @@\n NODE = Path('/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node')\n LATE = [r'Unhandled Errors?', r'Unhandled Rejection', r'uncaught exception',\n         r'Error during teardown', r'Tests modified the repository workspace',\n-        r'Hook timed out', r'Error:.*global.?teardown', r'ELIFECYCLE']\n+        r'Hook timed out', r'Error:.*global.?teardown', r'ELIFECYCLE',\n+        r'error during close', r'close timed out', r'error during global teardown',\n+        r'Tests closed successfully but something prevents']\n \n class Stop(Exception):\n     pass\n@@ -67,7 +69,7 @@\n \n def check_inputs(expected_source):\n     preservation = read(BASE / 'inputs/preservation.json')\n-    setup = read(BASE / 'setup.json')\n+    setup = read(BASE / 'setup-v3.json')\n     own_changed = [p['path'] for p in setup['frozenOwnInputs']\n                    if not Path(p['path']).is_file() or digest(p['path']) != p['sha256']]\n     require(not own_changed, 'Frozen controller/proposal/observer/input changed: ' + str(own_changed))\n@@ -195,7 +197,8 @@\n     log = directory / 'stdout-stderr.log'\n     proposal = read(BASE / 'proposal.json')\n     argv = [str(NODE), str(ROOT / 'node_modules/vitest/vitest.mjs'), 'run', *proposal['corpus'],\n-            '--cache=false', '--reporter=default', '--reporter=json',\n+            '--cache=false', '--maxWorkers=1', '--no-file-parallelism',\n+            '--reporter=default', '--reporter=json',\n             '--reporter=' + str(BASE / 'driver/observer-reporter.mjs'), '--outputFile.json=' + str(raw)]\n     env = {'PATH': str(NODE.parent) + ':/usr/bin:/bin:/usr/sbin:/sbin',\n            'HOME': str(BASE / 'home'), 'TMPDIR': str(BASE / 'tmp'), 'NODE_ENV': 'test',\n@@ -222,10 +225,25 @@\n                       'timeoutSeconds': 90, 'action': 'No signal, no further wait, no restoration; ACTIVE persists.',\n                       'outputFilesMayStillChange': True})\n             raise Stop('90-second wait expired; owned process/output lifecycle remains unresolved')\n-    probe = group_probe(child.pid)\n-    write_new(directory / 'owned-group-after-exit.json', probe)\n+    probe_started = time.monotonic()\n+    probe_deadline = probe_started + 5.0\n+    probes = []\n+    while True:\n+        probe = group_probe(child.pid)\n+        probes.append(probe)\n+        if probe['absentByESRCH']:\n+            break\n+        remaining = probe_deadline - time.monotonic()\n+        if remaining <= 0:\n+            break\n+        time.sleep(min(0.05, remaining))\n+    write_new(directory / 'owned-group-after-exit.json',\n+              {'observations': probes, 'lastProbe': probe, 'maxPollingSeconds': 5,\n+               'pollIntervalSeconds': 0.05, 'signalsOtherThanZeroSent': False})\n     write_new(directory / 'command.json', process | {'exit': code, 'endedUtc': stamp(),\n-              'durationMs': round((time.monotonic() - started) * 1000), 'groupAbsentByESRCH': probe['absentByESRCH']})\n+              'durationMs': round((time.monotonic() - started) * 1000),\n+              'groupAbsentByESRCH': probe['absentByESRCH'], 'ownedGroupProbes': probes,\n+              'groupPollingDurationMs': round((time.monotonic() - probe_started) * 1000)})\n     require(probe['absentByESRCH'], 'Owned group remains or is uncertain; no restoration/new runtime')\n     require(observed_pgid in [None, child.pid], 'Observed process group was not owned session')\n     result = classify(raw, observer, log, code, stage)\n@@ -238,16 +256,19 @@\n     return result\n \n def release_check(path, control):\n-    setup = read(BASE / 'setup.json')\n+    setup = read(BASE / 'setup-v3.json')\n     release = read(path)\n     require(release.get('authorization') == 'START_P021_CAUSAL_' + control, 'Exact root START token missing')\n-    expected = {'setupSha256': digest(BASE / 'setup.json'), 'controllerSha256': digest(Path(__file__)),\n+    expected = {'setupSha256': digest(BASE / 'setup-v3.json'), 'controllerSha256': digest(Path(__file__)),\n                 'proposalSha256': digest(BASE / 'proposal.json'),\n                 'sourceManifestSha256': digest(BASE / 'inputs/source-manifest.json'),\n                 'compiledManifestSha256': digest(BASE / 'inputs/compiled-manifest.json'),\n                 'preservationSha256': digest(BASE / 'inputs/preservation.json'),\n                 'observerSha256': digest(BASE / 'driver/observer-reporter.mjs'),\n-                'setupIndexSha256': digest(BASE / 'setup-index.json'),\n+                'setupIndexSha256': digest(BASE / 'setup-index-v3.json'),\n+                'setupPath': str(BASE / 'setup-v3.json'),\n+                'setupIndexPath': str(BASE / 'setup-index-v3.json'),\n+                'controllerPath': str(Path(__file__).resolve()),\n                 'closureRoot': str(COPY), 'parentRoot': str(ROOT), 'control': control}\n     require(all(release.get(k) == v for k, v in expected.items()), 'Release input-hash binding mismatch')\n     require(setup['noMutantWritten'] is True and setup['testExecutionPerformed'] is False, 'Unexpected preparation boundary')\n@@ -303,7 +324,7 @@\n         marker = BASE / 'HALTED.json'\n         if not marker.exists():\n             write_new(marker, {'capturedUtc': stamp(), 'errorType': type(error).__name__, 'message': str(error),\n-                      'activeMarkerRetained': ACTIVE.exists(), 'restorationAttempted': False,\n+                      'activeMarkerRetained': ACTIVE.exists(), 'automaticRestorationOnException': False,\n                       'rule': 'No automatic signal, retry, cleanup, restoration or further runtime. Root must review retained state.'})\n         print(json.dumps({'halted': True, 'errorType': type(error).__name__, 'message': str(error),\n                           'activeMarkerRetained': ACTIVE.exists()}), flush=True)\n"
+  },
+  "capturedUtc": "2026-10-15T05:09:56.768238+00:00",
+  "allReadsFinishedUtc": "2026-10-15T05:09:56.768238+00:00"
+}

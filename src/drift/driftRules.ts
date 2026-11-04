@@ -1,11 +1,9 @@
 import type { DiagnosticReport, LayerName } from "../types.js";
 import type { AssurancePackResult } from "../types.js";
 import type { AlertsConfig } from "./alerts.js";
+import { bootstrapDifferenceCI, deterministicSeed } from "../experiments/stats.js";
 
 function overall(report: DiagnosticReport): number {
-  if (report.layerScores.length === 0) {
-    return 0;
-  }
   return report.layerScores.reduce((sum, row) => sum + row.avgFinalLevel, 0) / report.layerScores.length;
 }
 
@@ -13,8 +11,31 @@ function layerMap(report: DiagnosticReport): Map<LayerName, number> {
   return new Map(report.layerScores.map((row) => [row.layerName, row.avgFinalLevel]));
 }
 
+function assertComparable(baseline: DiagnosticReport[], current: DiagnosticReport): void {
+  if (baseline.length === 0) throw new Error("INSUFFICIENT_EVIDENCE: drift baseline is empty; comparison unconfirmed");
+  let expectedLayers: string | undefined;
+  for (const run of [...baseline, current]) {
+    if (!Array.isArray(run.layerScores) || run.layerScores.length === 0
+      || ![run.integrityIndex, run.ts, run.windowStartTs, run.windowEndTs].every(Number.isFinite)
+      || (run.correlationRatio !== null && !Number.isFinite(run.correlationRatio))
+      || run.layerScores.some(row => !row || typeof row.layerName !== "string" || !row.layerName || !Number.isFinite(row.avgFinalLevel)))
+      throw new Error("INSUFFICIENT_EVIDENCE: drift run has missing or nonfinite comparison metrics; comparison unconfirmed");
+    const names = run.layerScores.map(row => row.layerName);
+    const layers = JSON.stringify([...names].sort());
+    if (new Set(names).size !== names.length || (expectedLayers !== undefined && layers !== expectedLayers))
+      throw new Error("INSUFFICIENT_EVIDENCE: drift runs have incomparable layer sets; comparison unconfirmed");
+    expectedLayers = layers;
+  }
+}
+
+function median(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  return (sorted[Math.floor((sorted.length - 1) / 2)]! + sorted[Math.floor(sorted.length / 2)]!) / 2;
+}
+
 export interface DriftEvaluation {
   triggered: boolean;
+  confirmation: "confirmed" | "unconfirmed";
   ruleId: string | null;
   reasons: string[];
   deltas: {
@@ -28,45 +49,70 @@ export interface DriftEvaluation {
 export function evaluateDriftRules(params: {
   config: AlertsConfig;
   previousRun: DiagnosticReport;
+  baselineRuns?: DiagnosticReport[];
   currentRun: DiagnosticReport;
   assuranceByPack: Map<string, AssurancePackResult>;
 }): DriftEvaluation {
-  const previousOverall = overall(params.previousRun);
-  const currentOverall = overall(params.currentRun);
-  const overallDrop = Number((previousOverall - currentOverall).toFixed(4));
-  const integrityDrop = Number((params.previousRun.integrityIndex - params.currentRun.integrityIndex).toFixed(4));
-  const correlationDrop = Number((params.previousRun.correlationRatio - params.currentRun.correlationRatio).toFixed(4));
-  const previousLayers = layerMap(params.previousRun);
-  const currentLayers = layerMap(params.currentRun);
-  let maxLayerDrop = 0;
-  for (const [layer, prevValue] of previousLayers.entries()) {
-    const currValue = currentLayers.get(layer) ?? 0;
-    maxLayerDrop = Math.max(maxLayerDrop, Number((prevValue - currValue).toFixed(4)));
-  }
+  const baseline = params.baselineRuns ?? [params.previousRun];
+  assertComparable(baseline, params.currentRun);
+  let insufficientInterval = false;
+  const significantDrop = (values: number[], current: number, metric: string): boolean => {
+    if (baseline.length === 1) return true;
+    const interval = bootstrapDifferenceCI({ baseline: values, candidate: [current],
+      seed: deterministicSeed([...baseline.map(run => run.runId), params.currentRun.runId, metric]) });
+    // An interval that could not be estimated neither confirms nor hides the drop: keep it, mark the result unconfirmed.
+    if (!Array.isArray(interval)) { insufficientInterval = true; return true; }
+    return interval[1] < 0;
+  };
+  const overallValues = baseline.map(overall), integrityValues = baseline.map(run => run.integrityIndex);
+  const overallDrop = Number((median(overallValues) - overall(params.currentRun)).toFixed(4));
+  const integrityDrop = Number((median(integrityValues) - params.currentRun.integrityIndex).toFixed(4));
+  // A run with no receipted trace measured no correlation (null): it is left out of the baseline, never read as 0.
+  const correlationBaseline = baseline.flatMap(run => run.correlationRatio === null ? [] : [run.correlationRatio]);
+  const currentCorrelation = params.currentRun.correlationRatio;
+  const correlationDrop = currentCorrelation === null || correlationBaseline.length === 0 ? 0
+    : Number((median(correlationBaseline) - currentCorrelation).toFixed(4));
+  const overallConfirmed = significantDrop(overallValues, overall(params.currentRun), "overall");
+  const integrityConfirmed = significantDrop(integrityValues, params.currentRun.integrityIndex, "integrity");
+  const previousLayers = layerMap(baseline[0]!), currentLayers = layerMap(params.currentRun);
+  const baselineLayers = baseline.map(layerMap);
+  const layerDrops = [...previousLayers.keys()].map(layer => {
+    const values = baselineLayers.map(layers => layers.get(layer)!), current = currentLayers.get(layer)!;
+    return { drop: Number((median(values) - current).toFixed(4)), confirmed: significantDrop(values, current, layer) };
+  });
+  const maxLayerDrop = Math.max(0, ...layerDrops.map(layer => layer.drop));
 
   for (const rule of params.config.alerts.rules) {
     const reasons: string[] = [];
-    if (overallDrop >= rule.when.overallDropGte) {
+    if (overallDrop >= rule.when.overallDropGte && overallConfirmed) {
       reasons.push(`overall drop ${overallDrop} >= ${rule.when.overallDropGte}`);
     }
-    if (maxLayerDrop >= rule.when.layerDropGte) {
+    if (layerDrops.some(layer => layer.drop >= rule.when.layerDropGte && layer.confirmed)) {
       reasons.push(`layer drop ${maxLayerDrop} >= ${rule.when.layerDropGte}`);
     }
-    if (integrityDrop >= rule.when.integrityDropGte) {
+    if (integrityDrop >= rule.when.integrityDropGte && integrityConfirmed) {
       reasons.push(`integrity drop ${integrityDrop} >= ${rule.when.integrityDropGte}`);
     }
-    if (params.currentRun.correlationRatio < rule.when.correlationDropBelow) {
-      reasons.push(`correlation ${params.currentRun.correlationRatio} < ${rule.when.correlationDropBelow}`);
+    if (currentCorrelation === null) {
+      if (rule.when.correlationDropBelow > 0) reasons.push("correlation not measured (INSUFFICIENT_EVIDENCE)");
+    } else if (currentCorrelation < rule.when.correlationDropBelow) {
+      reasons.push(`correlation ${currentCorrelation} < ${rule.when.correlationDropBelow}`);
     }
     for (const [packId, minScore] of Object.entries(rule.when.assuranceDropBelow)) {
       const pack = params.assuranceByPack.get(packId);
-      if (!pack || pack.score0to100 < minScore) {
-        reasons.push(`assurance ${packId} score ${(pack?.score0to100 ?? 0).toFixed(1)} < ${minScore}`);
+      if (!pack || !Number.isFinite(pack.score0to100)) {
+        reasons.push(`assurance ${packId} unavailable (INSUFFICIENT_EVIDENCE)`);
+      } else if (pack.score0to100 < minScore) {
+        reasons.push(`assurance ${packId} score ${pack.score0to100.toFixed(1)} < ${minScore}`);
       }
     }
     if (reasons.length > 0) {
+      if (insufficientInterval) reasons.push("drift interval insufficient (INSUFFICIENT_EVIDENCE)");
+      const confirmation = baseline.length === 1 || reasons.some(reason => reason.includes("INSUFFICIENT_EVIDENCE")) ? "unconfirmed" : "confirmed";
+      if (confirmation === "unconfirmed") reasons.unshift("unconfirmed: single-run comparison, insufficient interval or unavailable assurance evidence");
       return {
         triggered: true,
+        confirmation,
         ruleId: rule.id,
         reasons,
         deltas: {
@@ -81,6 +127,7 @@ export function evaluateDriftRules(params: {
 
   return {
     triggered: false,
+    confirmation: baseline.length === 1 || insufficientInterval ? "unconfirmed" : "confirmed",
     ruleId: null,
     reasons: [],
     deltas: {

@@ -1,0 +1,8 @@
+tests/lifecycle/heldAgents.test.ts and admission.test.ts on 5df22153a sources:
+     × a suspended agent's read (an unbound READ_ONLY call) is denied too 1504ms
+     × ToolHub: a suspended agent's READ_ONLY call is denied 1824ms
+     × ToolHub: a retired agent's READ_ONLY call is denied 1455ms
+     × hook: a suspended agent's read decision is denied 1515ms
+     × hook: a retired agent's read decision is denied 1732ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+      Tests  5 failed | 6 passed (11)

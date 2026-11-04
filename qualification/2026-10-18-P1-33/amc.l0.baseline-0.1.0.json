@@ -1,0 +1,2439 @@
+{
+  "reportVersion": 1,
+  "checker": {
+    "name": "amc-catalog-check",
+    "version": "1.2.0"
+  },
+  "checkedAt": "2026-10-18T11:52:19.311Z",
+  "catalog": {
+    "id": "amc.catalog",
+    "version": "0.1.0",
+    "digest": "sha256:99a7cf3f9c9fde698da2f4a8845e5c417ab3d0116b04d6ecd99f682d9aa81fba"
+  },
+  "pack": {
+    "id": "amc.l0.baseline",
+    "version": "0.1.0",
+    "digest": "sha256:5fbce9ef6ae025335d9c3d59eeda437454ec7cc4fad29afb74bbcf839d11debc",
+    "declaredSupport": "experimental"
+  },
+  "criteria": [
+    {
+      "criterion": 1,
+      "title": "Manifest metadata and a reproducible digest",
+      "kind": "mechanical",
+      "status": "not_met",
+      "checked": 7,
+      "findings": [
+        {
+          "code": "ADM1_COMPILER_INCOMPATIBLE",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml#/compilerCompat",
+          "message": "compilerCompat \"^0.1.0\" is not satisfied by the running compiler 1.2.0"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "packs[amc.l0.baseline]",
+          "sha256": "5fbce9ef6ae025335d9c3d59eeda437454ec7cc4fad29afb74bbcf839d11debc"
+        }
+      ]
+    },
+    {
+      "criterion": 2,
+      "title": "Citations verified and legally reviewed",
+      "kind": "mixed",
+      "status": "not_met",
+      "checked": 47,
+      "findings": [
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-CHG-04",
+          "path": "layers/l0-baseline/controls/L0-CHG-04.yaml#/citations/0",
+          "message": "eu-dora-art-28: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-CHG-04",
+          "path": "layers/l0-baseline/controls/L0-CHG-04.yaml#/citations/0",
+          "message": "eu-dora-art-28: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_INVALID",
+          "severity": "error",
+          "controlId": "L0-DAT-03",
+          "path": "layers/l0-baseline/controls/L0-DAT-03.yaml#/citations/0",
+          "message": "CAT_NO_REGISTER_ENTRY: hipaa-164-502-e: no S5 register entry; the control cannot leave experimental until one exists"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-DAT-03",
+          "path": "layers/l0-baseline/controls/L0-DAT-03.yaml#/citations/0",
+          "message": "hipaa-164-502-e: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-DAT-03",
+          "path": "layers/l0-baseline/controls/L0-DAT-03.yaml#/citations/0",
+          "message": "hipaa-164-502-e: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-EXP-01",
+          "path": "layers/l0-baseline/controls/L0-EXP-01.yaml#/citations/0",
+          "message": "eu-gdpr-art-15-1-h: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-EXP-01",
+          "path": "layers/l0-baseline/controls/L0-EXP-01.yaml#/citations/0",
+          "message": "eu-gdpr-art-15-1-h: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-EXP-01",
+          "path": "layers/l0-baseline/controls/L0-EXP-01.yaml#/citations/1",
+          "message": "us-ecoa-1002-9: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-EXP-01",
+          "path": "layers/l0-baseline/controls/L0-EXP-01.yaml#/citations/1",
+          "message": "us-ecoa-1002-9: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/citations/0",
+          "message": "eu-ai-act-art-86: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/citations/0",
+          "message": "eu-ai-act-art-86: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/citations/1",
+          "message": "eu-ccd2-art-18: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/citations/1",
+          "message": "eu-ccd2-art-18: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/citations/2",
+          "message": "us-co-sb26-189-deployers: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/citations/2",
+          "message": "us-co-sb26-189-deployers: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/citations/3",
+          "message": "us-ca-cppa-admt-7220: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/citations/3",
+          "message": "us-ca-cppa-admt-7220: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-EXP-03",
+          "path": "layers/l0-baseline/controls/L0-EXP-03.yaml#/citations/0",
+          "message": "eu-gdpr-art-22: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-EXP-03",
+          "path": "layers/l0-baseline/controls/L0-EXP-03.yaml#/citations/0",
+          "message": "eu-gdpr-art-22: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-EXP-03",
+          "path": "layers/l0-baseline/controls/L0-EXP-03.yaml#/citations/1",
+          "message": "eu-ccd2-art-18: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-EXP-03",
+          "path": "layers/l0-baseline/controls/L0-EXP-03.yaml#/citations/1",
+          "message": "eu-ccd2-art-18: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-EXP-03",
+          "path": "layers/l0-baseline/controls/L0-EXP-03.yaml#/citations/2",
+          "message": "us-co-sb26-189-deployers: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-EXP-03",
+          "path": "layers/l0-baseline/controls/L0-EXP-03.yaml#/citations/2",
+          "message": "us-co-sb26-189-deployers: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-FAI-01",
+          "path": "layers/l0-baseline/controls/L0-FAI-01.yaml#/citations/0",
+          "message": "us-ecoa-1002-4-6: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-FAI-01",
+          "path": "layers/l0-baseline/controls/L0-FAI-01.yaml#/citations/0",
+          "message": "us-ecoa-1002-4-6: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-FAI-02",
+          "path": "layers/l0-baseline/controls/L0-FAI-02.yaml#/citations/0",
+          "message": "us-nyc-ll144: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-FAI-02",
+          "path": "layers/l0-baseline/controls/L0-FAI-02.yaml#/citations/0",
+          "message": "us-nyc-ll144: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-FAI-03",
+          "path": "layers/l0-baseline/controls/L0-FAI-03.yaml#/citations/0",
+          "message": "us-ecoa-1002-4-6: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-FAI-03",
+          "path": "layers/l0-baseline/controls/L0-FAI-03.yaml#/citations/0",
+          "message": "us-ecoa-1002-4-6: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-FAI-03",
+          "path": "layers/l0-baseline/controls/L0-FAI-03.yaml#/citations/1",
+          "message": "us-ca-crd-ads: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-FAI-03",
+          "path": "layers/l0-baseline/controls/L0-FAI-03.yaml#/citations/1",
+          "message": "us-ca-crd-ads: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_INVALID",
+          "severity": "error",
+          "controlId": "L0-IDN-01",
+          "path": "layers/l0-baseline/controls/L0-IDN-01.yaml#/citations/0",
+          "message": "CAT_NO_REGISTER_ENTRY: hipaa-164-312: no S5 register entry; the control cannot leave experimental until one exists"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-IDN-01",
+          "path": "layers/l0-baseline/controls/L0-IDN-01.yaml#/citations/0",
+          "message": "hipaa-164-312: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-IDN-01",
+          "path": "layers/l0-baseline/controls/L0-IDN-01.yaml#/citations/0",
+          "message": "hipaa-164-312: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_INVALID",
+          "severity": "error",
+          "controlId": "L0-IDN-01",
+          "path": "layers/l0-baseline/controls/L0-IDN-01.yaml#/citations/1",
+          "message": "CAT_NO_REGISTER_ENTRY: glba-safeguards-314-4: no S5 register entry; the control cannot leave experimental until one exists"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-IDN-01",
+          "path": "layers/l0-baseline/controls/L0-IDN-01.yaml#/citations/1",
+          "message": "glba-safeguards-314-4: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-IDN-01",
+          "path": "layers/l0-baseline/controls/L0-IDN-01.yaml#/citations/1",
+          "message": "glba-safeguards-314-4: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-INV-02",
+          "path": "layers/l0-baseline/controls/L0-INV-02.yaml#/citations/0",
+          "message": "us-cisa-sbom-2026: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-INV-02",
+          "path": "layers/l0-baseline/controls/L0-INV-02.yaml#/citations/0",
+          "message": "us-cisa-sbom-2026: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-INV-03",
+          "path": "layers/l0-baseline/controls/L0-INV-03.yaml#/citations/0",
+          "message": "eu-ai-act-art-6-2: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-INV-03",
+          "path": "layers/l0-baseline/controls/L0-INV-03.yaml#/citations/0",
+          "message": "eu-ai-act-art-6-2: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-INV-04",
+          "path": "layers/l0-baseline/controls/L0-INV-04.yaml#/citations/0",
+          "message": "eu-ai-act-art-6-3: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-INV-04",
+          "path": "layers/l0-baseline/controls/L0-INV-04.yaml#/citations/0",
+          "message": "eu-ai-act-art-6-3: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-INV-04",
+          "path": "layers/l0-baseline/controls/L0-INV-04.yaml#/citations/1",
+          "message": "eu-ai-act-art-6-2: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-INV-04",
+          "path": "layers/l0-baseline/controls/L0-INV-04.yaml#/citations/1",
+          "message": "eu-ai-act-art-6-2: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_INVALID",
+          "severity": "error",
+          "controlId": "L0-LOG-01",
+          "path": "layers/l0-baseline/controls/L0-LOG-01.yaml#/citations/0",
+          "message": "CAT_NO_REGISTER_ENTRY: hipaa-164-312-b: no S5 register entry; the control cannot leave experimental until one exists"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-LOG-01",
+          "path": "layers/l0-baseline/controls/L0-LOG-01.yaml#/citations/0",
+          "message": "hipaa-164-312-b: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-LOG-01",
+          "path": "layers/l0-baseline/controls/L0-LOG-01.yaml#/citations/0",
+          "message": "hipaa-164-312-b: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_INVALID",
+          "severity": "error",
+          "controlId": "L0-LOG-01",
+          "path": "layers/l0-baseline/controls/L0-LOG-01.yaml#/citations/1",
+          "message": "CAT_NO_REGISTER_ENTRY: glba-safeguards-314-4-c-8: no S5 register entry; the control cannot leave experimental until one exists"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-LOG-01",
+          "path": "layers/l0-baseline/controls/L0-LOG-01.yaml#/citations/1",
+          "message": "glba-safeguards-314-4-c-8: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-LOG-01",
+          "path": "layers/l0-baseline/controls/L0-LOG-01.yaml#/citations/1",
+          "message": "glba-safeguards-314-4-c-8: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-LOG-03",
+          "path": "layers/l0-baseline/controls/L0-LOG-03.yaml#/citations/0",
+          "message": "eu-ai-act-art-26-6: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-LOG-03",
+          "path": "layers/l0-baseline/controls/L0-LOG-03.yaml#/citations/0",
+          "message": "eu-ai-act-art-26-6: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-MON-02",
+          "path": "layers/l0-baseline/controls/L0-MON-02.yaml#/citations/0",
+          "message": "eu-ai-act-art-73: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-MON-02",
+          "path": "layers/l0-baseline/controls/L0-MON-02.yaml#/citations/0",
+          "message": "eu-ai-act-art-73: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-MON-02",
+          "path": "layers/l0-baseline/controls/L0-MON-02.yaml#/citations/1",
+          "message": "eu-gdpr-art-33: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-MON-02",
+          "path": "layers/l0-baseline/controls/L0-MON-02.yaml#/citations/1",
+          "message": "eu-gdpr-art-33: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-MON-02",
+          "path": "layers/l0-baseline/controls/L0-MON-02.yaml#/citations/2",
+          "message": "eu-dora-art-19: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-MON-02",
+          "path": "layers/l0-baseline/controls/L0-MON-02.yaml#/citations/2",
+          "message": "eu-dora-art-19: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-MON-05",
+          "path": "layers/l0-baseline/controls/L0-MON-05.yaml#/citations/0",
+          "message": "eu-dora-art-28: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-MON-05",
+          "path": "layers/l0-baseline/controls/L0-MON-05.yaml#/citations/0",
+          "message": "eu-dora-art-28: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-OVS-01",
+          "path": "layers/l0-baseline/controls/L0-OVS-01.yaml#/citations/0",
+          "message": "eu-ai-act-art-26: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-OVS-01",
+          "path": "layers/l0-baseline/controls/L0-OVS-01.yaml#/citations/0",
+          "message": "eu-ai-act-art-26: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-TRN-01",
+          "path": "layers/l0-baseline/controls/L0-TRN-01.yaml#/citations/0",
+          "message": "eu-ai-act-art-50-1: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-TRN-01",
+          "path": "layers/l0-baseline/controls/L0-TRN-01.yaml#/citations/0",
+          "message": "eu-ai-act-art-50-1: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-TRN-01",
+          "path": "layers/l0-baseline/controls/L0-TRN-01.yaml#/citations/1",
+          "message": "us-co-sb26-189-deployers: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-TRN-01",
+          "path": "layers/l0-baseline/controls/L0-TRN-01.yaml#/citations/1",
+          "message": "us-co-sb26-189-deployers: no legal review is declared"
+        },
+        {
+          "code": "ADM2_CITATION_UNVERIFIED",
+          "severity": "error",
+          "controlId": "L0-TRN-03",
+          "path": "layers/l0-baseline/controls/L0-TRN-03.yaml#/citations/0",
+          "message": "eu-ai-act-art-50-2: retrieval is not verified with a content hash"
+        },
+        {
+          "code": "ADM2_LEGAL_REVIEW_MISSING",
+          "severity": "error",
+          "controlId": "L0-TRN-03",
+          "path": "layers/l0-baseline/controls/L0-TRN-03.yaml#/citations/0",
+          "message": "eu-ai-act-art-50-2: no legal review is declared"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-04]",
+          "sha256": "0e77c6590fd64286266f277bc782f25b9224571ad1e9cf93a72beea63830d809"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-03]",
+          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-01]",
+          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-02]",
+          "sha256": "b7c2f53224d5ea17cac97031ddb82de212bed2894d8abd9ec3bb8ba4c7088008"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-03]",
+          "sha256": "ff40e23ef35818ea992f559ee2bf0f3d5469cb181df93f627f7507ef486c644c"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-01]",
+          "sha256": "01cfd361ac41be483c0af45e5334e48b55b3a85c587a466222610a1f14d71f34"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-02]",
+          "sha256": "dcd307a21c4cf20ece4e43b84812f003e68b1cf867f088299a5d32fa0d2b5cba"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-03]",
+          "sha256": "9de81afadc9be252c879c5613e2f357c174100ca00b58a0478874ad08d31e5c8"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-01]",
+          "sha256": "1f42b20e089ee2be80eeaba8fc330d26edcdee50de4268c5adc31c74a3d2188a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-02]",
+          "sha256": "0f408721b62932fb63735dbc797be731d03e83cf6a2ebce90e51eb6d3c02be21"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-03]",
+          "sha256": "ec23861226b56b4e58aaf4991f0fc6b55a4116c92b7062a13f0c32d020e0054e"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-04]",
+          "sha256": "38ac464db785cad7106ae4d548f885b93686064e0f30de4085492d5e7ee37274"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-01]",
+          "sha256": "bb1d1ab8bb0a912a148f854981c798722bfbed76106203442fa6b7563340a77f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-03]",
+          "sha256": "0fab0fe819a978564481c9c5781754af9fccfeb810a956bb86d5427816f40b0f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-02]",
+          "sha256": "2387ce8f36146c5b85372e717fbd19d35fb2527881776312cfe3a31f5b614f22"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-05]",
+          "sha256": "925be09717bc73e31e09be8bae3cb00224ae1c144f887cabbca26d19fa9259d9"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-01]",
+          "sha256": "7c364c207cc19717808edcf4ef719ceeaf4c8843aaa539f992c8c087a3dc1dd6"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-01]",
+          "sha256": "05a71bdcdfaf9ed3893e7f418899c0a5368008cc8323757aa0786134d226798b"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-03]",
+          "sha256": "28b651d036e3738ea978289ce65def1539de12752c7ff3ae4e1e084276127495"
+        }
+      ]
+    },
+    {
+      "criterion": 3,
+      "title": "Applicability predicates, reasons and exclusions",
+      "kind": "mechanical",
+      "status": "not_met",
+      "checked": 47,
+      "findings": [
+        {
+          "code": "ADM3_EXCLUSIONS_MISSING",
+          "severity": "error",
+          "controlId": "L0-INV-04",
+          "path": "layers/l0-baseline/controls/L0-INV-04.yaml#/applicability/exclusions",
+          "message": "empty exclusions are allowed only with predicate { always: true }"
+        },
+        {
+          "code": "ADM3_EXCLUSIONS_MISSING",
+          "severity": "error",
+          "controlId": "L0-TRN-01",
+          "path": "layers/l0-baseline/controls/L0-TRN-01.yaml#/applicability/exclusions",
+          "message": "empty exclusions are allowed only with predicate { always: true }"
+        },
+        {
+          "code": "ADM3_EXCLUSIONS_MISSING",
+          "severity": "error",
+          "controlId": "L0-TRN-02",
+          "path": "layers/l0-baseline/controls/L0-TRN-02.yaml#/applicability/exclusions",
+          "message": "empty exclusions are allowed only with predicate { always: true }"
+        },
+        {
+          "code": "ADM3_EXCLUSIONS_MISSING",
+          "severity": "error",
+          "controlId": "L0-TRN-03",
+          "path": "layers/l0-baseline/controls/L0-TRN-03.yaml#/applicability/exclusions",
+          "message": "empty exclusions are allowed only with predicate { always: true }"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-01]",
+          "sha256": "84228f941e91b49503c57d1bb230068d218b142644bd1d08d0bac7d861850ac2"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-02]",
+          "sha256": "9ec286a9c2af98175a99a25cf301518bb4f34608de833a7b7f5a3cf88137b59b"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-03]",
+          "sha256": "69b1dd95ecc3f0f8cd482761bafcaf1c11f670512826b570338c918cd5b35eb4"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-04]",
+          "sha256": "b1d72414358f651231b63662e8d52a3214f8261b71160ccd6705482257eef318"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-01]",
+          "sha256": "90719ed7f7cb86bdba98cd5ce5c77b90469703fb89cdedf8c03c6ddca7cc0480"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-02]",
+          "sha256": "208efc5f67b35e888b4bb8ff10e03863322d5100f084580ab1c7465314754693"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-03]",
+          "sha256": "fcb59508f2b430e3a5a4143277b19e83f4acb32e6101683d836324ebc2d15439"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-04]",
+          "sha256": "0e77c6590fd64286266f277bc782f25b9224571ad1e9cf93a72beea63830d809"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-01]",
+          "sha256": "05095c64c5403218b12e4207a61f19d3739837f610027966ef90257fcde76d7d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-02]",
+          "sha256": "129e7cacc4aec1d815a2c7aa260fec63f418ec99806e9aa434c206bbff2854bd"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-03]",
+          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-04]",
+          "sha256": "4ff5caa481dea8bcd4123a9936ce077029852b0a817105844a11c33e38b27f78"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-01]",
+          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-02]",
+          "sha256": "b7c2f53224d5ea17cac97031ddb82de212bed2894d8abd9ec3bb8ba4c7088008"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-03]",
+          "sha256": "ff40e23ef35818ea992f559ee2bf0f3d5469cb181df93f627f7507ef486c644c"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-01]",
+          "sha256": "01cfd361ac41be483c0af45e5334e48b55b3a85c587a466222610a1f14d71f34"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-02]",
+          "sha256": "dcd307a21c4cf20ece4e43b84812f003e68b1cf867f088299a5d32fa0d2b5cba"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-03]",
+          "sha256": "9de81afadc9be252c879c5613e2f357c174100ca00b58a0478874ad08d31e5c8"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-04]",
+          "sha256": "c1950aa02d23e480444bb7274862864d604d420ef4a3531de2d26897babd7c41"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-01]",
+          "sha256": "1f42b20e089ee2be80eeaba8fc330d26edcdee50de4268c5adc31c74a3d2188a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-02]",
+          "sha256": "9550cf923cb260bd096295ea3ffc230ea32598886e5174c2f26f6371ff357ad3"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-03]",
+          "sha256": "14a17f7b91a53194b71cdb06b9549ca33825fb32dbafdff501c9574247de11e1"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-04]",
+          "sha256": "a3b2d8140f28475d1823455fecc8c26ee0ac7470c3b20da7b1e2ad9ad5297a86"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-01]",
+          "sha256": "3246cd8f270d9cb140b2eb385748da6ce9541d68335150aa0b5150c425aa0e59"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-02]",
+          "sha256": "0f408721b62932fb63735dbc797be731d03e83cf6a2ebce90e51eb6d3c02be21"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-03]",
+          "sha256": "ec23861226b56b4e58aaf4991f0fc6b55a4116c92b7062a13f0c32d020e0054e"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-04]",
+          "sha256": "38ac464db785cad7106ae4d548f885b93686064e0f30de4085492d5e7ee37274"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-01]",
+          "sha256": "bb1d1ab8bb0a912a148f854981c798722bfbed76106203442fa6b7563340a77f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-02]",
+          "sha256": "e563bce8356ecb98636eb2723af7b1871470f755acf467514609fb64c04154f7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-03]",
+          "sha256": "0fab0fe819a978564481c9c5781754af9fccfeb810a956bb86d5427816f40b0f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-04]",
+          "sha256": "0a3840570bc2c7a0a01c20caa610bd525ed3b86723b91966463a178af1755ae0"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-01]",
+          "sha256": "1a1629265f6faf0f7bafc8abe6360dc58d5686f10dbd3c0f4ca96cd43ecbeb61"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-02]",
+          "sha256": "2387ce8f36146c5b85372e717fbd19d35fb2527881776312cfe3a31f5b614f22"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-03]",
+          "sha256": "ae693afad436deb54102a43cdadda31836ed57a919e42219fd563ffda2075613"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-04]",
+          "sha256": "46b2ab3a7cb846cec6d007d2a22316cbdb63478f7c1e0099c361174dfe4e3204"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-05]",
+          "sha256": "925be09717bc73e31e09be8bae3cb00224ae1c144f887cabbca26d19fa9259d9"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-01]",
+          "sha256": "7c364c207cc19717808edcf4ef719ceeaf4c8843aaa539f992c8c087a3dc1dd6"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-02]",
+          "sha256": "997fdbcba0710ad644ed0582c66af8f48fa6806eacfe02fd1e7ee2768a142bec"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-03]",
+          "sha256": "9a564c134b98f91a13c2ee3850fb64a17ff99af49727167dd52c257ae4a152a4"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-04]",
+          "sha256": "30d9c30a178ee9bb397ca1e6e77de83599c354e18584043ad72b9be45516a22d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-01]",
+          "sha256": "c65dbce531be29815a0350f07a63f5b97ac720eefcf91dc9cd7d0def91ed5115"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-02]",
+          "sha256": "c4c45f4991cf4a4a5c3d2b978dfd83f85eb9b57db87c25c8739b3c780be1e83d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-03]",
+          "sha256": "f8bfaedd668adc63908d02d2f88748bda53580b881f24f2a0d2177c7bdbab4e6"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-04]",
+          "sha256": "672d162798bd9ba786ca2b539861bc66237686ac8a925ac05beb87455d3496f7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-01]",
+          "sha256": "05a71bdcdfaf9ed3893e7f418899c0a5368008cc8323757aa0786134d226798b"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-02]",
+          "sha256": "3e2e6f0071db5bb97f7ad22c6157aba93c0fc64a325ad9d11cea068a2e6a8cd2"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-03]",
+          "sha256": "28b651d036e3738ea978289ce65def1539de12752c7ff3ae4e1e084276127495"
+        }
+      ]
+    },
+    {
+      "criterion": 4,
+      "title": "Binding to an enforcement point or an owned manual duty",
+      "kind": "mechanical",
+      "status": "met",
+      "checked": 47,
+      "findings": [],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-01]",
+          "sha256": "84228f941e91b49503c57d1bb230068d218b142644bd1d08d0bac7d861850ac2"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-02]",
+          "sha256": "9ec286a9c2af98175a99a25cf301518bb4f34608de833a7b7f5a3cf88137b59b"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-03]",
+          "sha256": "69b1dd95ecc3f0f8cd482761bafcaf1c11f670512826b570338c918cd5b35eb4"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-04]",
+          "sha256": "b1d72414358f651231b63662e8d52a3214f8261b71160ccd6705482257eef318"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-01]",
+          "sha256": "90719ed7f7cb86bdba98cd5ce5c77b90469703fb89cdedf8c03c6ddca7cc0480"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-02]",
+          "sha256": "208efc5f67b35e888b4bb8ff10e03863322d5100f084580ab1c7465314754693"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-03]",
+          "sha256": "fcb59508f2b430e3a5a4143277b19e83f4acb32e6101683d836324ebc2d15439"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-04]",
+          "sha256": "0e77c6590fd64286266f277bc782f25b9224571ad1e9cf93a72beea63830d809"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-01]",
+          "sha256": "05095c64c5403218b12e4207a61f19d3739837f610027966ef90257fcde76d7d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-02]",
+          "sha256": "129e7cacc4aec1d815a2c7aa260fec63f418ec99806e9aa434c206bbff2854bd"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-03]",
+          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-04]",
+          "sha256": "4ff5caa481dea8bcd4123a9936ce077029852b0a817105844a11c33e38b27f78"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-01]",
+          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-02]",
+          "sha256": "b7c2f53224d5ea17cac97031ddb82de212bed2894d8abd9ec3bb8ba4c7088008"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-03]",
+          "sha256": "ff40e23ef35818ea992f559ee2bf0f3d5469cb181df93f627f7507ef486c644c"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-01]",
+          "sha256": "01cfd361ac41be483c0af45e5334e48b55b3a85c587a466222610a1f14d71f34"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-02]",
+          "sha256": "dcd307a21c4cf20ece4e43b84812f003e68b1cf867f088299a5d32fa0d2b5cba"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-03]",
+          "sha256": "9de81afadc9be252c879c5613e2f357c174100ca00b58a0478874ad08d31e5c8"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-04]",
+          "sha256": "c1950aa02d23e480444bb7274862864d604d420ef4a3531de2d26897babd7c41"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-01]",
+          "sha256": "1f42b20e089ee2be80eeaba8fc330d26edcdee50de4268c5adc31c74a3d2188a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-02]",
+          "sha256": "9550cf923cb260bd096295ea3ffc230ea32598886e5174c2f26f6371ff357ad3"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-03]",
+          "sha256": "14a17f7b91a53194b71cdb06b9549ca33825fb32dbafdff501c9574247de11e1"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-04]",
+          "sha256": "a3b2d8140f28475d1823455fecc8c26ee0ac7470c3b20da7b1e2ad9ad5297a86"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-01]",
+          "sha256": "3246cd8f270d9cb140b2eb385748da6ce9541d68335150aa0b5150c425aa0e59"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-02]",
+          "sha256": "0f408721b62932fb63735dbc797be731d03e83cf6a2ebce90e51eb6d3c02be21"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-03]",
+          "sha256": "ec23861226b56b4e58aaf4991f0fc6b55a4116c92b7062a13f0c32d020e0054e"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-04]",
+          "sha256": "38ac464db785cad7106ae4d548f885b93686064e0f30de4085492d5e7ee37274"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-01]",
+          "sha256": "bb1d1ab8bb0a912a148f854981c798722bfbed76106203442fa6b7563340a77f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-02]",
+          "sha256": "e563bce8356ecb98636eb2723af7b1871470f755acf467514609fb64c04154f7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-03]",
+          "sha256": "0fab0fe819a978564481c9c5781754af9fccfeb810a956bb86d5427816f40b0f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-04]",
+          "sha256": "0a3840570bc2c7a0a01c20caa610bd525ed3b86723b91966463a178af1755ae0"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-01]",
+          "sha256": "1a1629265f6faf0f7bafc8abe6360dc58d5686f10dbd3c0f4ca96cd43ecbeb61"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-02]",
+          "sha256": "2387ce8f36146c5b85372e717fbd19d35fb2527881776312cfe3a31f5b614f22"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-03]",
+          "sha256": "ae693afad436deb54102a43cdadda31836ed57a919e42219fd563ffda2075613"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-04]",
+          "sha256": "46b2ab3a7cb846cec6d007d2a22316cbdb63478f7c1e0099c361174dfe4e3204"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-05]",
+          "sha256": "925be09717bc73e31e09be8bae3cb00224ae1c144f887cabbca26d19fa9259d9"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-01]",
+          "sha256": "7c364c207cc19717808edcf4ef719ceeaf4c8843aaa539f992c8c087a3dc1dd6"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-02]",
+          "sha256": "997fdbcba0710ad644ed0582c66af8f48fa6806eacfe02fd1e7ee2768a142bec"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-03]",
+          "sha256": "9a564c134b98f91a13c2ee3850fb64a17ff99af49727167dd52c257ae4a152a4"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-04]",
+          "sha256": "30d9c30a178ee9bb397ca1e6e77de83599c354e18584043ad72b9be45516a22d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-01]",
+          "sha256": "c65dbce531be29815a0350f07a63f5b97ac720eefcf91dc9cd7d0def91ed5115"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-02]",
+          "sha256": "c4c45f4991cf4a4a5c3d2b978dfd83f85eb9b57db87c25c8739b3c780be1e83d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-03]",
+          "sha256": "f8bfaedd668adc63908d02d2f88748bda53580b881f24f2a0d2177c7bdbab4e6"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-04]",
+          "sha256": "672d162798bd9ba786ca2b539861bc66237686ac8a925ac05beb87455d3496f7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-01]",
+          "sha256": "05a71bdcdfaf9ed3893e7f418899c0a5368008cc8323757aa0786134d226798b"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-02]",
+          "sha256": "3e2e6f0071db5bb97f7ad22c6157aba93c0fc64a325ad9d11cea068a2e6a8cd2"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-03]",
+          "sha256": "28b651d036e3738ea978289ce65def1539de12752c7ff3ae4e1e084276127495"
+        }
+      ]
+    },
+    {
+      "criterion": 5,
+      "title": "Tests with an oracle that observes the effect",
+      "kind": "mechanical",
+      "status": "not_met",
+      "checked": 47,
+      "findings": [
+        {
+          "code": "ADM5_ORACLE_MISMATCH",
+          "severity": "error",
+          "controlId": "L0-IDN-04",
+          "path": "layers/l0-baseline/controls/L0-IDN-04.yaml#/tests/0/oracle/kind",
+          "message": "L0-IDN-04-T1: a drill test needs a ledger_state or system_of_record oracle, not enforcement_receipt"
+        },
+        {
+          "code": "ADM5_ORACLE_MISMATCH",
+          "severity": "error",
+          "controlId": "L0-LOG-03",
+          "path": "layers/l0-baseline/controls/L0-LOG-03.yaml#/tests/0/oracle/kind",
+          "message": "L0-LOG-03-T1: a configuration_check test needs a signed_config oracle, not enforcement_receipt"
+        },
+        {
+          "code": "ADM5_ORACLE_MISMATCH",
+          "severity": "error",
+          "controlId": "L0-MON-03",
+          "path": "layers/l0-baseline/controls/L0-MON-03.yaml#/tests/0/oracle/kind",
+          "message": "L0-MON-03-T1: a drill test needs a ledger_state or system_of_record oracle, not enforcement_receipt"
+        },
+        {
+          "code": "ADM5_ORACLE_MISMATCH",
+          "severity": "error",
+          "controlId": "L0-TRN-01",
+          "path": "layers/l0-baseline/controls/L0-TRN-01.yaml#/tests/0/oracle/kind",
+          "message": "L0-TRN-01-T1: a runtime_enforced test needs a enforcement_receipt or ledger_state oracle, not system_of_record"
+        },
+        {
+          "code": "ADM5_ORACLE_MISMATCH",
+          "severity": "error",
+          "controlId": "L0-TRN-02",
+          "path": "layers/l0-baseline/controls/L0-TRN-02.yaml#/tests/0/oracle/kind",
+          "message": "L0-TRN-02-T1: a runtime_enforced test needs a enforcement_receipt or ledger_state oracle, not system_of_record"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-01]",
+          "sha256": "84228f941e91b49503c57d1bb230068d218b142644bd1d08d0bac7d861850ac2"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-02]",
+          "sha256": "9ec286a9c2af98175a99a25cf301518bb4f34608de833a7b7f5a3cf88137b59b"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-03]",
+          "sha256": "69b1dd95ecc3f0f8cd482761bafcaf1c11f670512826b570338c918cd5b35eb4"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-04]",
+          "sha256": "b1d72414358f651231b63662e8d52a3214f8261b71160ccd6705482257eef318"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-01]",
+          "sha256": "90719ed7f7cb86bdba98cd5ce5c77b90469703fb89cdedf8c03c6ddca7cc0480"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-02]",
+          "sha256": "208efc5f67b35e888b4bb8ff10e03863322d5100f084580ab1c7465314754693"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-03]",
+          "sha256": "fcb59508f2b430e3a5a4143277b19e83f4acb32e6101683d836324ebc2d15439"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-04]",
+          "sha256": "0e77c6590fd64286266f277bc782f25b9224571ad1e9cf93a72beea63830d809"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-01]",
+          "sha256": "05095c64c5403218b12e4207a61f19d3739837f610027966ef90257fcde76d7d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-02]",
+          "sha256": "129e7cacc4aec1d815a2c7aa260fec63f418ec99806e9aa434c206bbff2854bd"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-03]",
+          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-04]",
+          "sha256": "4ff5caa481dea8bcd4123a9936ce077029852b0a817105844a11c33e38b27f78"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-01]",
+          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-02]",
+          "sha256": "b7c2f53224d5ea17cac97031ddb82de212bed2894d8abd9ec3bb8ba4c7088008"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-03]",
+          "sha256": "ff40e23ef35818ea992f559ee2bf0f3d5469cb181df93f627f7507ef486c644c"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-01]",
+          "sha256": "01cfd361ac41be483c0af45e5334e48b55b3a85c587a466222610a1f14d71f34"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-02]",
+          "sha256": "dcd307a21c4cf20ece4e43b84812f003e68b1cf867f088299a5d32fa0d2b5cba"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-03]",
+          "sha256": "9de81afadc9be252c879c5613e2f357c174100ca00b58a0478874ad08d31e5c8"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-04]",
+          "sha256": "c1950aa02d23e480444bb7274862864d604d420ef4a3531de2d26897babd7c41"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-01]",
+          "sha256": "1f42b20e089ee2be80eeaba8fc330d26edcdee50de4268c5adc31c74a3d2188a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-02]",
+          "sha256": "9550cf923cb260bd096295ea3ffc230ea32598886e5174c2f26f6371ff357ad3"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-03]",
+          "sha256": "14a17f7b91a53194b71cdb06b9549ca33825fb32dbafdff501c9574247de11e1"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-04]",
+          "sha256": "a3b2d8140f28475d1823455fecc8c26ee0ac7470c3b20da7b1e2ad9ad5297a86"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-01]",
+          "sha256": "3246cd8f270d9cb140b2eb385748da6ce9541d68335150aa0b5150c425aa0e59"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-02]",
+          "sha256": "0f408721b62932fb63735dbc797be731d03e83cf6a2ebce90e51eb6d3c02be21"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-03]",
+          "sha256": "ec23861226b56b4e58aaf4991f0fc6b55a4116c92b7062a13f0c32d020e0054e"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-04]",
+          "sha256": "38ac464db785cad7106ae4d548f885b93686064e0f30de4085492d5e7ee37274"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-01]",
+          "sha256": "bb1d1ab8bb0a912a148f854981c798722bfbed76106203442fa6b7563340a77f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-02]",
+          "sha256": "e563bce8356ecb98636eb2723af7b1871470f755acf467514609fb64c04154f7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-03]",
+          "sha256": "0fab0fe819a978564481c9c5781754af9fccfeb810a956bb86d5427816f40b0f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-04]",
+          "sha256": "0a3840570bc2c7a0a01c20caa610bd525ed3b86723b91966463a178af1755ae0"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-01]",
+          "sha256": "1a1629265f6faf0f7bafc8abe6360dc58d5686f10dbd3c0f4ca96cd43ecbeb61"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-02]",
+          "sha256": "2387ce8f36146c5b85372e717fbd19d35fb2527881776312cfe3a31f5b614f22"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-03]",
+          "sha256": "ae693afad436deb54102a43cdadda31836ed57a919e42219fd563ffda2075613"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-04]",
+          "sha256": "46b2ab3a7cb846cec6d007d2a22316cbdb63478f7c1e0099c361174dfe4e3204"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-05]",
+          "sha256": "925be09717bc73e31e09be8bae3cb00224ae1c144f887cabbca26d19fa9259d9"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-01]",
+          "sha256": "7c364c207cc19717808edcf4ef719ceeaf4c8843aaa539f992c8c087a3dc1dd6"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-02]",
+          "sha256": "997fdbcba0710ad644ed0582c66af8f48fa6806eacfe02fd1e7ee2768a142bec"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-03]",
+          "sha256": "9a564c134b98f91a13c2ee3850fb64a17ff99af49727167dd52c257ae4a152a4"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-04]",
+          "sha256": "30d9c30a178ee9bb397ca1e6e77de83599c354e18584043ad72b9be45516a22d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-01]",
+          "sha256": "c65dbce531be29815a0350f07a63f5b97ac720eefcf91dc9cd7d0def91ed5115"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-02]",
+          "sha256": "c4c45f4991cf4a4a5c3d2b978dfd83f85eb9b57db87c25c8739b3c780be1e83d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-03]",
+          "sha256": "f8bfaedd668adc63908d02d2f88748bda53580b881f24f2a0d2177c7bdbab4e6"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-04]",
+          "sha256": "672d162798bd9ba786ca2b539861bc66237686ac8a925ac05beb87455d3496f7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-01]",
+          "sha256": "05a71bdcdfaf9ed3893e7f418899c0a5368008cc8323757aa0786134d226798b"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-02]",
+          "sha256": "3e2e6f0071db5bb97f7ad22c6157aba93c0fc64a325ad9d11cea068a2e6a8cd2"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-03]",
+          "sha256": "28b651d036e3738ea978289ce65def1539de12752c7ff3ae4e1e084276127495"
+        }
+      ]
+    },
+    {
+      "criterion": 6,
+      "title": "Negative fixtures run with no false mandatory pass",
+      "kind": "mechanical",
+      "status": "not_evaluated",
+      "checked": 426,
+      "findings": [
+        {
+          "code": "ADM6_HARNESS_NOT_REGISTERED",
+          "severity": "warning",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml",
+          "message": "83 fixture(s) name guard harnesses this process has not registered (agent_config, approval_quorum, bound_approval, compiled_identity, data_admission, deletion_gate, drift, egress_guard, incident_clocks, lease, lease_revocation_drill, ledger_tamper, ledger_trace, residency_egress, tool_allowlist); they run in the test suite, not here"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "fixture_run",
+          "ref": "fixtureRun",
+          "sha256": "57950613728d8b2636fdd5db290bfca918712a76b15f0143e4970998656d6ee7"
+        }
+      ]
+    },
+    {
+      "criterion": 7,
+      "title": "Evidence contracts with an available producer",
+      "kind": "mechanical",
+      "status": "not_met",
+      "checked": 47,
+      "findings": [
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-ADV-01",
+          "path": "layers/l0-baseline/controls/L0-ADV-01.yaml#/evidence/0/producer",
+          "message": "L0-ADV-01-E1: producer amc.adversarial.observer is planned (P1-48)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-ADV-02",
+          "path": "layers/l0-baseline/controls/L0-ADV-02.yaml#/evidence/0/producer",
+          "message": "L0-ADV-02-E1: producer amc.adversarial.observer is planned (P1-48)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-ADV-03",
+          "path": "layers/l0-baseline/controls/L0-ADV-03.yaml#/evidence/0/producer",
+          "message": "L0-ADV-03-E1: producer amc.adversarial.observer is planned (P1-48)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-ADV-04",
+          "path": "layers/l0-baseline/controls/L0-ADV-04.yaml#/evidence/0/producer",
+          "message": "L0-ADV-04-E1: producer amc.adversarial.observer is planned (P1-48)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-CHG-01",
+          "path": "layers/l0-baseline/controls/L0-CHG-01.yaml#/evidence/0/producer",
+          "message": "L0-CHG-01-E1: producer amc.versionManifest is planned (P1-75)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-CHG-02",
+          "path": "layers/l0-baseline/controls/L0-CHG-02.yaml#/evidence/0/producer",
+          "message": "L0-CHG-02-E1: producer amc.regression.sequestered is planned (P1-75)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-CHG-03",
+          "path": "layers/l0-baseline/controls/L0-CHG-03.yaml#/evidence/0/producer",
+          "message": "L0-CHG-03-E1: producer amc.versionManifest is planned (P1-75)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-CHG-04",
+          "path": "layers/l0-baseline/controls/L0-CHG-04.yaml#/evidence/0/producer",
+          "message": "L0-CHG-04-E1: producer amc.manualDuty.record is planned (P1-76)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-DAT-02",
+          "path": "layers/l0-baseline/controls/L0-DAT-02.yaml#/evidence/0/producer",
+          "message": "L0-DAT-02-E1: producer amc.redaction.receipt is planned (P2-02)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-EXP-01",
+          "path": "layers/l0-baseline/controls/L0-EXP-01.yaml#/evidence/0/producer",
+          "message": "L0-EXP-01-E1: producer amc.explanation.lineage is planned (P1-73)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/evidence/0/producer",
+          "message": "L0-EXP-02-E1: producer amc.explanation.notice is planned (P1-73)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-EXP-03",
+          "path": "layers/l0-baseline/controls/L0-EXP-03.yaml#/evidence/0/producer",
+          "message": "L0-EXP-03-E1: producer amc.explanation.appeal is planned (P1-73)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-FAI-01",
+          "path": "layers/l0-baseline/controls/L0-FAI-01.yaml#/evidence/0/producer",
+          "message": "L0-FAI-01-E1: producer amc.fairness.harness is planned (P1-74)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-FAI-02",
+          "path": "layers/l0-baseline/controls/L0-FAI-02.yaml#/evidence/0/producer",
+          "message": "L0-FAI-02-E1: producer amc.fairness.harness is planned (P1-74)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-FAI-03",
+          "path": "layers/l0-baseline/controls/L0-FAI-03.yaml#/evidence/0/producer",
+          "message": "L0-FAI-03-E1: producer amc.fairness.harness is planned (P1-74)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-FAI-04",
+          "path": "layers/l0-baseline/controls/L0-FAI-04.yaml#/evidence/0/producer",
+          "message": "L0-FAI-04-E1: producer amc.fairness.harness is planned (P1-74)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-IDN-03",
+          "path": "layers/l0-baseline/controls/L0-IDN-03.yaml#/evidence/0/producer",
+          "message": "L0-IDN-03-E1: producer amc.delegation.chain is planned (P2-25)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-INV-02",
+          "path": "layers/l0-baseline/controls/L0-INV-02.yaml#/evidence/0/producer",
+          "message": "L0-INV-02-E1: producer amc.aibom.attestation is planned (P1-27)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-INV-03",
+          "path": "layers/l0-baseline/controls/L0-INV-03.yaml#/evidence/0/producer",
+          "message": "L0-INV-03-E1: producer amc.profile.riskTier is planned (P1-15)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-INV-04",
+          "path": "layers/l0-baseline/controls/L0-INV-04.yaml#/evidence/0/producer",
+          "message": "L0-INV-04-E1: producer amc.profile.euRecords is planned (P2-11)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-LOG-04",
+          "path": "layers/l0-baseline/controls/L0-LOG-04.yaml#/evidence/0/producer",
+          "message": "L0-LOG-04-E1: producer amc.evidence.wormExport is planned (P2-09)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-MON-02",
+          "path": "layers/l0-baseline/controls/L0-MON-02.yaml#/evidence/1/producer",
+          "message": "L0-MON-02-E2: producer amc.incidents.notices is planned (P2-26)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-MON-03",
+          "path": "layers/l0-baseline/controls/L0-MON-03.yaml#/evidence/0/producer",
+          "message": "L0-MON-03-E1: producer amc.killSwitch is planned (P2-26)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-MON-04",
+          "path": "layers/l0-baseline/controls/L0-MON-04.yaml#/evidence/0/producer",
+          "message": "L0-MON-04-E1: producer amc.providerOutage.safeState is planned (P1-76)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-MON-05",
+          "path": "layers/l0-baseline/controls/L0-MON-05.yaml#/evidence/0/producer",
+          "message": "L0-MON-05-E1: producer amc.manualDuty.record is planned (P1-76)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-OVS-04",
+          "path": "layers/l0-baseline/controls/L0-OVS-04.yaml#/evidence/0/producer",
+          "message": "L0-OVS-04-E1: producer amc.oversight.telemetry is planned (P1-71)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-TOOL-02",
+          "path": "layers/l0-baseline/controls/L0-TOOL-02.yaml#/evidence/0/producer",
+          "message": "L0-TOOL-02-E1: producer amc.mandate.limits is planned (P1-20)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-TOOL-03",
+          "path": "layers/l0-baseline/controls/L0-TOOL-03.yaml#/evidence/0/producer",
+          "message": "L0-TOOL-03-E1: producer amc.mcp.authorization is planned (P1-39)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-TRN-01",
+          "path": "layers/l0-baseline/controls/L0-TRN-01.yaml#/evidence/0/producer",
+          "message": "L0-TRN-01-E1: producer amc.transparency.outputCheck is planned (P1-72)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-TRN-02",
+          "path": "layers/l0-baseline/controls/L0-TRN-02.yaml#/evidence/0/producer",
+          "message": "L0-TRN-02-E1: producer amc.transparency.outputCheck is planned (P1-72)"
+        },
+        {
+          "code": "ADM7_PRODUCER_NOT_AVAILABLE",
+          "severity": "error",
+          "controlId": "L0-TRN-03",
+          "path": "layers/l0-baseline/controls/L0-TRN-03.yaml#/evidence/0/producer",
+          "message": "L0-TRN-03-E1: producer amc.provenance.c2pa is planned (P1-72)"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-01]",
+          "sha256": "84228f941e91b49503c57d1bb230068d218b142644bd1d08d0bac7d861850ac2"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-02]",
+          "sha256": "9ec286a9c2af98175a99a25cf301518bb4f34608de833a7b7f5a3cf88137b59b"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-03]",
+          "sha256": "69b1dd95ecc3f0f8cd482761bafcaf1c11f670512826b570338c918cd5b35eb4"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-ADV-04]",
+          "sha256": "b1d72414358f651231b63662e8d52a3214f8261b71160ccd6705482257eef318"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-01]",
+          "sha256": "90719ed7f7cb86bdba98cd5ce5c77b90469703fb89cdedf8c03c6ddca7cc0480"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-02]",
+          "sha256": "208efc5f67b35e888b4bb8ff10e03863322d5100f084580ab1c7465314754693"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-03]",
+          "sha256": "fcb59508f2b430e3a5a4143277b19e83f4acb32e6101683d836324ebc2d15439"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-CHG-04]",
+          "sha256": "0e77c6590fd64286266f277bc782f25b9224571ad1e9cf93a72beea63830d809"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-01]",
+          "sha256": "05095c64c5403218b12e4207a61f19d3739837f610027966ef90257fcde76d7d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-02]",
+          "sha256": "129e7cacc4aec1d815a2c7aa260fec63f418ec99806e9aa434c206bbff2854bd"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-03]",
+          "sha256": "60c0768f7a2b665e2923c2850f188c2aab5c6eb94fdac870d523d3a7db64d46f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-DAT-04]",
+          "sha256": "4ff5caa481dea8bcd4123a9936ce077029852b0a817105844a11c33e38b27f78"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-01]",
+          "sha256": "71d4c861cf9863b2c6eb826e90dc06da4286c8fdca1888f048a324db4469b560"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-02]",
+          "sha256": "b7c2f53224d5ea17cac97031ddb82de212bed2894d8abd9ec3bb8ba4c7088008"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-EXP-03]",
+          "sha256": "ff40e23ef35818ea992f559ee2bf0f3d5469cb181df93f627f7507ef486c644c"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-01]",
+          "sha256": "01cfd361ac41be483c0af45e5334e48b55b3a85c587a466222610a1f14d71f34"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-02]",
+          "sha256": "dcd307a21c4cf20ece4e43b84812f003e68b1cf867f088299a5d32fa0d2b5cba"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-03]",
+          "sha256": "9de81afadc9be252c879c5613e2f357c174100ca00b58a0478874ad08d31e5c8"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-FAI-04]",
+          "sha256": "c1950aa02d23e480444bb7274862864d604d420ef4a3531de2d26897babd7c41"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-01]",
+          "sha256": "1f42b20e089ee2be80eeaba8fc330d26edcdee50de4268c5adc31c74a3d2188a"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-02]",
+          "sha256": "9550cf923cb260bd096295ea3ffc230ea32598886e5174c2f26f6371ff357ad3"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-03]",
+          "sha256": "14a17f7b91a53194b71cdb06b9549ca33825fb32dbafdff501c9574247de11e1"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-IDN-04]",
+          "sha256": "a3b2d8140f28475d1823455fecc8c26ee0ac7470c3b20da7b1e2ad9ad5297a86"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-01]",
+          "sha256": "3246cd8f270d9cb140b2eb385748da6ce9541d68335150aa0b5150c425aa0e59"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-02]",
+          "sha256": "0f408721b62932fb63735dbc797be731d03e83cf6a2ebce90e51eb6d3c02be21"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-03]",
+          "sha256": "ec23861226b56b4e58aaf4991f0fc6b55a4116c92b7062a13f0c32d020e0054e"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-INV-04]",
+          "sha256": "38ac464db785cad7106ae4d548f885b93686064e0f30de4085492d5e7ee37274"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-01]",
+          "sha256": "bb1d1ab8bb0a912a148f854981c798722bfbed76106203442fa6b7563340a77f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-02]",
+          "sha256": "e563bce8356ecb98636eb2723af7b1871470f755acf467514609fb64c04154f7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-03]",
+          "sha256": "0fab0fe819a978564481c9c5781754af9fccfeb810a956bb86d5427816f40b0f"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-LOG-04]",
+          "sha256": "0a3840570bc2c7a0a01c20caa610bd525ed3b86723b91966463a178af1755ae0"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-01]",
+          "sha256": "1a1629265f6faf0f7bafc8abe6360dc58d5686f10dbd3c0f4ca96cd43ecbeb61"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-02]",
+          "sha256": "2387ce8f36146c5b85372e717fbd19d35fb2527881776312cfe3a31f5b614f22"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-03]",
+          "sha256": "ae693afad436deb54102a43cdadda31836ed57a919e42219fd563ffda2075613"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-04]",
+          "sha256": "46b2ab3a7cb846cec6d007d2a22316cbdb63478f7c1e0099c361174dfe4e3204"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-MON-05]",
+          "sha256": "925be09717bc73e31e09be8bae3cb00224ae1c144f887cabbca26d19fa9259d9"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-01]",
+          "sha256": "7c364c207cc19717808edcf4ef719ceeaf4c8843aaa539f992c8c087a3dc1dd6"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-02]",
+          "sha256": "997fdbcba0710ad644ed0582c66af8f48fa6806eacfe02fd1e7ee2768a142bec"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-03]",
+          "sha256": "9a564c134b98f91a13c2ee3850fb64a17ff99af49727167dd52c257ae4a152a4"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-OVS-04]",
+          "sha256": "30d9c30a178ee9bb397ca1e6e77de83599c354e18584043ad72b9be45516a22d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-01]",
+          "sha256": "c65dbce531be29815a0350f07a63f5b97ac720eefcf91dc9cd7d0def91ed5115"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-02]",
+          "sha256": "c4c45f4991cf4a4a5c3d2b978dfd83f85eb9b57db87c25c8739b3c780be1e83d"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-03]",
+          "sha256": "f8bfaedd668adc63908d02d2f88748bda53580b881f24f2a0d2177c7bdbab4e6"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TOOL-04]",
+          "sha256": "672d162798bd9ba786ca2b539861bc66237686ac8a925ac05beb87455d3496f7"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-01]",
+          "sha256": "05a71bdcdfaf9ed3893e7f418899c0a5368008cc8323757aa0786134d226798b"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-02]",
+          "sha256": "3e2e6f0071db5bb97f7ad22c6157aba93c0fc64a325ad9d11cea068a2e6a8cd2"
+        },
+        {
+          "kind": "lockfile",
+          "ref": "controls[L0-TRN-03]",
+          "sha256": "28b651d036e3738ea978289ce65def1539de12752c7ff3ae4e1e084276127495"
+        }
+      ]
+    },
+    {
+      "criterion": 8,
+      "title": "Unknown facts fail closed",
+      "kind": "mechanical",
+      "status": "not_met",
+      "checked": 55,
+      "findings": [
+        {
+          "code": "ADM8_HARNESS_NOT_REGISTERED",
+          "severity": "warning",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml",
+          "message": "8 fixture(s) name guard harnesses this process has not registered (compiled_identity, data_admission, deletion_gate, lease, lease_revocation_drill, residency_egress, tool_allowlist); they run in the test suite, not here"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-DAT-01",
+          "path": "layers/l0-baseline/controls/L0-DAT-01.yaml#/tests",
+          "message": "bound to tool_pipeline, egress but has no unknown_residency fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-DAT-02",
+          "path": "layers/l0-baseline/controls/L0-DAT-02.yaml#/tests",
+          "message": "bound to tool_pipeline, egress but has no unknown_residency fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-DAT-03",
+          "path": "layers/l0-baseline/controls/L0-DAT-03.yaml#/tests",
+          "message": "bound to egress but has no unknown_residency fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-LOG-01",
+          "path": "layers/l0-baseline/controls/L0-LOG-01.yaml#/tests",
+          "message": "bound to tool_pipeline, approvals but has no unknown_authority fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-OVS-01",
+          "path": "layers/l0-baseline/controls/L0-OVS-01.yaml#/tests",
+          "message": "bound to tool_pipeline, approvals but has no unknown_authority fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-OVS-02",
+          "path": "layers/l0-baseline/controls/L0-OVS-02.yaml#/tests",
+          "message": "bound to approvals, tool_pipeline but has no unknown_authority fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-OVS-03",
+          "path": "layers/l0-baseline/controls/L0-OVS-03.yaml#/tests",
+          "message": "bound to approvals but has no unknown_authority fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-OVS-04",
+          "path": "layers/l0-baseline/controls/L0-OVS-04.yaml#/tests",
+          "message": "bound to approvals but has no unknown_authority fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-TOOL-03",
+          "path": "layers/l0-baseline/controls/L0-TOOL-03.yaml#/tests",
+          "message": "bound to tool_pipeline, egress but has no unknown_residency fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-TOOL-04",
+          "path": "layers/l0-baseline/controls/L0-TOOL-04.yaml#/tests",
+          "message": "bound to tool_pipeline, egress but has no unknown_residency fixture"
+        },
+        {
+          "code": "ADM8_UNKNOWN_FIXTURE_MISSING",
+          "severity": "error",
+          "controlId": "L0-TRN-03",
+          "path": "layers/l0-baseline/controls/L0-TRN-03.yaml#/tests",
+          "message": "bound to egress but has no unknown_residency fixture"
+        }
+      ],
+      "evidence": [
+        {
+          "kind": "fixture_run",
+          "ref": "fixtureRun",
+          "sha256": "57950613728d8b2636fdd5db290bfca918712a76b15f0143e4970998656d6ee7"
+        }
+      ]
+    },
+    {
+      "criterion": 9,
+      "title": "Signed human sign-offs; AI drafts approved by a human",
+      "kind": "record",
+      "status": "not_met",
+      "checked": 48,
+      "findings": [
+        {
+          "code": "ADM9_SIGNOFF_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml",
+          "message": "no verified domain lead sign-off credentialed for the pack's stations"
+        },
+        {
+          "code": "ADM9_SIGNOFF_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml",
+          "message": "no verified legal reviewer sign-off"
+        },
+        {
+          "code": "ADM9_SIGNOFF_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml",
+          "message": "no verified risk owner sign-off"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-ADV-01",
+          "path": "layers/l0-baseline/controls/L0-ADV-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-ADV-02",
+          "path": "layers/l0-baseline/controls/L0-ADV-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-ADV-03",
+          "path": "layers/l0-baseline/controls/L0-ADV-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-ADV-04",
+          "path": "layers/l0-baseline/controls/L0-ADV-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-CHG-01",
+          "path": "layers/l0-baseline/controls/L0-CHG-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-CHG-02",
+          "path": "layers/l0-baseline/controls/L0-CHG-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-CHG-03",
+          "path": "layers/l0-baseline/controls/L0-CHG-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-CHG-04",
+          "path": "layers/l0-baseline/controls/L0-CHG-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-DAT-01",
+          "path": "layers/l0-baseline/controls/L0-DAT-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-DAT-02",
+          "path": "layers/l0-baseline/controls/L0-DAT-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-DAT-03",
+          "path": "layers/l0-baseline/controls/L0-DAT-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-DAT-04",
+          "path": "layers/l0-baseline/controls/L0-DAT-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-EXP-01",
+          "path": "layers/l0-baseline/controls/L0-EXP-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-EXP-02",
+          "path": "layers/l0-baseline/controls/L0-EXP-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-EXP-03",
+          "path": "layers/l0-baseline/controls/L0-EXP-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-FAI-01",
+          "path": "layers/l0-baseline/controls/L0-FAI-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-FAI-02",
+          "path": "layers/l0-baseline/controls/L0-FAI-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-FAI-03",
+          "path": "layers/l0-baseline/controls/L0-FAI-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-FAI-04",
+          "path": "layers/l0-baseline/controls/L0-FAI-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-IDN-01",
+          "path": "layers/l0-baseline/controls/L0-IDN-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-IDN-02",
+          "path": "layers/l0-baseline/controls/L0-IDN-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-IDN-03",
+          "path": "layers/l0-baseline/controls/L0-IDN-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-IDN-04",
+          "path": "layers/l0-baseline/controls/L0-IDN-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-INV-01",
+          "path": "layers/l0-baseline/controls/L0-INV-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-INV-02",
+          "path": "layers/l0-baseline/controls/L0-INV-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-INV-03",
+          "path": "layers/l0-baseline/controls/L0-INV-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-INV-04",
+          "path": "layers/l0-baseline/controls/L0-INV-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-LOG-01",
+          "path": "layers/l0-baseline/controls/L0-LOG-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-LOG-02",
+          "path": "layers/l0-baseline/controls/L0-LOG-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-LOG-03",
+          "path": "layers/l0-baseline/controls/L0-LOG-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-LOG-04",
+          "path": "layers/l0-baseline/controls/L0-LOG-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-MON-01",
+          "path": "layers/l0-baseline/controls/L0-MON-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-MON-02",
+          "path": "layers/l0-baseline/controls/L0-MON-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-MON-03",
+          "path": "layers/l0-baseline/controls/L0-MON-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-MON-04",
+          "path": "layers/l0-baseline/controls/L0-MON-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-MON-05",
+          "path": "layers/l0-baseline/controls/L0-MON-05.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-OVS-01",
+          "path": "layers/l0-baseline/controls/L0-OVS-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-OVS-02",
+          "path": "layers/l0-baseline/controls/L0-OVS-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-OVS-03",
+          "path": "layers/l0-baseline/controls/L0-OVS-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-OVS-04",
+          "path": "layers/l0-baseline/controls/L0-OVS-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-TOOL-01",
+          "path": "layers/l0-baseline/controls/L0-TOOL-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-TOOL-02",
+          "path": "layers/l0-baseline/controls/L0-TOOL-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-TOOL-03",
+          "path": "layers/l0-baseline/controls/L0-TOOL-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-TOOL-04",
+          "path": "layers/l0-baseline/controls/L0-TOOL-04.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-TRN-01",
+          "path": "layers/l0-baseline/controls/L0-TRN-01.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-TRN-02",
+          "path": "layers/l0-baseline/controls/L0-TRN-02.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        },
+        {
+          "code": "ADM9_CONTROL_UNREVIEWED",
+          "severity": "error",
+          "controlId": "L0-TRN-03",
+          "path": "layers/l0-baseline/controls/L0-TRN-03.yaml#/support",
+          "message": "its effective support is experimental, so no review is verified"
+        }
+      ],
+      "evidence": []
+    },
+    {
+      "criterion": 10,
+      "title": "Stewardship and coverage document",
+      "kind": "record",
+      "status": "not_met",
+      "checked": 4,
+      "findings": [
+        {
+          "code": "ADM10_COVERAGE_DOC_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml#/stewardship/coverageDoc",
+          "message": "no coverage document"
+        },
+        {
+          "code": "ADM10_PARTNER_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml#/stewardship/partner",
+          "message": "no stewardship partner"
+        },
+        {
+          "code": "ADM10_TRIAGE_TARGET_MISSING",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml#/stewardship/triageTargetDays",
+          "message": "no triage target"
+        },
+        {
+          "code": "ADM10_UPDATE_PLAN_INCOMPLETE",
+          "severity": "error",
+          "controlId": null,
+          "path": "layers/l0-baseline/pack.yaml#/stewardship/updatePlan",
+          "message": "the update plan must name an owner and funding (\"owner: ...; funding: ...\")"
+        }
+      ],
+      "evidence": []
+    }
+  ],
+  "fixtureRun": {
+    "mandatoryControls": 47,
+    "fixtures": 343,
+    "falseMandatoryPasses": 0,
+    "failures": []
+  },
+  "maxAdmissibleSupport": "experimental",
+  "decision": "admit",
+  "support": "experimental",
+  "reasons": [
+    "experimental, unreviewed: not admitted as reviewed or qualified",
+    "not admissible as reviewed: criterion 1 not met: ADM1_COMPILER_INCOMPATIBLE",
+    "not admissible as reviewed: criterion 2 not met: ADM2_CITATION_UNVERIFIED, ADM2_LEGAL_REVIEW_MISSING, ADM2_CITATION_INVALID",
+    "not admissible as reviewed: criterion 3 not met: ADM3_EXCLUSIONS_MISSING",
+    "not admissible as reviewed: criterion 5 not met: ADM5_ORACLE_MISMATCH",
+    "not admissible as reviewed: criterion 6 not evaluated: ADM6_HARNESS_NOT_REGISTERED",
+    "not admissible as reviewed: criterion 7 not met: ADM7_PRODUCER_NOT_AVAILABLE",
+    "not admissible as reviewed: criterion 8 not met: ADM8_HARNESS_NOT_REGISTERED, ADM8_UNKNOWN_FIXTURE_MISSING",
+    "not admissible as reviewed: criterion 9 not met: ADM9_SIGNOFF_MISSING, ADM9_CONTROL_UNREVIEWED",
+    "not admissible as reviewed: criterion 10 not met: ADM10_COVERAGE_DOC_MISSING, ADM10_PARTNER_MISSING, ADM10_TRIAGE_TARGET_MISSING, ADM10_UPDATE_PLAN_INCOMPLETE"
+  ],
+  "digest": "sha256:c7ed082e754d60b5bbcf9c9163aa3bc2da7d0bf408962c4cb3f4a4ff9183ba3d"
+}

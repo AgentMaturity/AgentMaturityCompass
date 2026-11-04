@@ -1,0 +1,67 @@
+{
+  "schema": "p031-installed-rows/v1",
+  "startedAt": "2026-10-11T11:13:12.180Z",
+  "node": "v22.23.3",
+  "npm": "10.9.9",
+  "platform": "linux",
+  "arch": "arm64",
+  "osRelease": "6.8.0-117-generic",
+  "tarballSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "harnessSha256": {
+    "run-rows.mjs": "8f03a3eed09ccaaf19e34f3a27c3dff27f8dba0ba4041e82166bab1a5fb95768",
+    "fixtures.mjs": "2974ff6ee103808feb216166b251269601cba6bf8aaeef217cf1b2c06766c9bd",
+    "mcp-stdio-fixture.mjs": "a09692f75c229a1c793b6c9300cabba416a5b57f1fa2733ce5f2c5a8cc5b00dc",
+    "chat-pty.py": "4eb8cba86c742044a2463ba8ccc9e2c9cef816d4f7517baf743117d27fbeb819"
+  },
+  "row": "AMC-1533",
+  "status": "passed",
+  "checks": [
+    {
+      "name": "inspect reports the unsigned manifest digest",
+      "ok": true,
+      "signatureValid": false
+    },
+    {
+      "name": "sign with the reviewed digest",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "name": "install with the reviewed digest",
+      "ok": true,
+      "exit": 0
+    },
+    {
+      "name": "run expands the signed command and attributes the context",
+      "ok": true,
+      "exit": 0,
+      "templateSent": true,
+      "contextSent": true
+    },
+    {
+      "name": "chat loads, uses and unloads the extension",
+      "ok": true,
+      "matched": [
+        "you> ",
+        "manifest path",
+        "Loaded reviewer; pinned manifest d35d12d7a0f06dc2a888848542ba54b13a21b67b6a10aa756ad4275688e31f50",
+        "you> ",
+        "Using signed command reviewer/review",
+        "you> ",
+        "extension ID to unload",
+        "Extension unloaded for future turns.",
+        "you> "
+      ],
+      "error": null
+    },
+    {
+      "name": "an edited signed content file is refused",
+      "ok": true,
+      "runExit": 1,
+      "inspectExit": 1,
+      "message": "An extension content hash differs from its reviewed manifest.\n"
+    }
+  ],
+  "durationMs": 39196
+}

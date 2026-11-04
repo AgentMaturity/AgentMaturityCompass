@@ -1,0 +1,23 @@
+{
+  "kind": "CANONICAL_VALIDATION_AUGMENTATION",
+  "stagedDiffExit": 2,
+  "diagnostics": [
+    "qualification/2026-10-15-P0-41/evidence/100-stdout-stderr.log:21: new blank line at EOF."
+  ],
+  "immutableWarningSource": {
+    "path": "/private/tmp/p0-41-qualification-20261015/command-build/stdout-stderr.log",
+    "bytes": 945,
+    "sha256": "c9a2b39730721a7b9743caa605585fa92aaf3532cc27ddf563d69e5104837121"
+  },
+  "copiedArtifact": {
+    "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-41/evidence/100-stdout-stderr.log",
+    "bytes": 945,
+    "sha256": "c9a2b39730721a7b9743caa605585fa92aaf3532cc27ddf563d69e5104837121"
+  },
+  "line": 21,
+  "sourceAndCopyByteExact": true,
+  "reason": "One original build-log blank EOF is retained byte-for-byte. No whitespace ignore, trimming, guard/baseline/quality rewrite or no-verify option was used.",
+  "sourceCommandsFrozen13Unchanged": true,
+  "laterValidationUsesSeparateJournal": "/private/tmp/p0-41-final-commands-20261015.jsonl",
+  "formalAcceptanceClosed": false
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "reservation-read-only-scan-unobserved-closure/1",
+  "sessionLogPath": "/Users/sid/.codex/sessions/2026/10/16/rollout-2026-10-16T17-33-35-01a14498-9ebd-7691-b29d-827e9e8cfa57.jsonl",
+  "exactFunctionsExecCallId": "call_8a0c2b00974e4561b622b8f3f8ba56e5",
+  "exactFunctionsExecItemId": "ctc_0f58c44744eef62a016ad26ef2813081919a66a4d1dbe70b95",
+  "recordedTimestamps": [
+    "2026-10-16T18:37:46.433Z",
+    "2026-10-16T18:37:56.677Z"
+  ],
+  "approximateLaunchUtc": "2026-10-16T18:37:38Z to 18:37:47Z (recorded creation/tool-call timestamps; no independently observed OS launch)",
+  "exactToolScript": "text((await tools.exec_command({cmd:\"python3 - <<'PY'\\nfrom pathlib import Path\\nimport os,re,hashlib,json,base64\\nroot=Path('/private/tmp');want='9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca';size=275376\\nroots=sorted(p for p in root.iterdir() if p.is_dir() and re.fullmatch(r'p[0-3]-\\\\d{2}.*qualification.*202610(?:14|15|16)',p.name))\\nchecked=0;candidates=[];matches=[];hashref=0\\nfor base in roots:\\n for dn,ds,fs in os.walk(base):\\n  ds[:]=[d for d in ds if d not in ['node_modules','.git','generation','checkout','workspace','home'] and not d.startswith('retained-')]\\n  for fn in fs:\\n   p=Path(dn)/fn\\n   if p.is_symlink() or not p.is_file() or p.suffix in ['.sqlite','.db','.blob','.amcvault','.key','.pem','.gz','.tar']:continue\\n   st=p.stat();checked+=1\\n   if st.st_size==size:\\n    d=p.read_bytes();sha=hashlib.sha256(d).hexdigest();candidates.append({'path':str(p),'bytes':len(d),'sha256':sha})\\n    if sha==want:matches.append({'path':str(p),'kind':'exact raw snapshot'})\\n   if p.suffix=='.json' and st.st_size<=1048576:\\n    d=p.read_bytes()\\n    if want.encode() not in d:continue\\n    hashref+=1\\n    try:v=json.loads(d)\\n    except:continue\\n    if isinstance(v,dict) and v.get('schema')=='amc-qualification-lossless-original/1' and v.get('original',{}).get('sha256')==want:\\n     decoded=base64.b64decode(v['dataBase64'],validate=True)\\n     if len(decoded)==size and hashlib.sha256(decoded).hexdigest()==want:matches.append({'path':str(p),'kind':'exact lossless snapshot envelope'})\\nprint(json.dumps({'roots':[str(x) for x in roots],'pruned':['node_modules','.git','generation','checkout','workspace','home','retained-*','binary/private-key suffixes'],'regularFiniteFilesConsidered':checked,'exactSizeCandidates':candidates,'jsonHashReferences':hashref,'exactSnapshotMatches':matches},indent=2))\\nPY\",\"max_output_tokens\":4200})).output);\n",
+  "exactExecCommandString": "python3 - <<'PY'\nfrom pathlib import Path\nimport os,re,hashlib,json,base64\nroot=Path('/private/tmp');want='9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca';size=275376\nroots=sorted(p for p in root.iterdir() if p.is_dir() and re.fullmatch(r'p[0-3]-\\d{2}.*qualification.*202610(?:14|15|16)',p.name))\nchecked=0;candidates=[];matches=[];hashref=0\nfor base in roots:\n for dn,ds,fs in os.walk(base):\n  ds[:]=[d for d in ds if d not in ['node_modules','.git','generation','checkout','workspace','home'] and not d.startswith('retained-')]\n  for fn in fs:\n   p=Path(dn)/fn\n   if p.is_symlink() or not p.is_file() or p.suffix in ['.sqlite','.db','.blob','.amcvault','.key','.pem','.gz','.tar']:continue\n   st=p.stat();checked+=1\n   if st.st_size==size:\n    d=p.read_bytes();sha=hashlib.sha256(d).hexdigest();candidates.append({'path':str(p),'bytes':len(d),'sha256':sha})\n    if sha==want:matches.append({'path':str(p),'kind':'exact raw snapshot'})\n   if p.suffix=='.json' and st.st_size<=1048576:\n    d=p.read_bytes()\n    if want.encode() not in d:continue\n    hashref+=1\n    try:v=json.loads(d)\n    except:continue\n    if isinstance(v,dict) and v.get('schema')=='amc-qualification-lossless-original/1' and v.get('original',{}).get('sha256')==want:\n     decoded=base64.b64decode(v['dataBase64'],validate=True)\n     if len(decoded)==size and hashlib.sha256(decoded).hexdigest()==want:matches.append({'path':str(p),'kind':'exact lossless snapshot envelope'})\nprint(json.dumps({'roots':[str(x) for x in roots],'pruned':['node_modules','.git','generation','checkout','workspace','home','retained-*','binary/private-key suffixes'],'regularFiniteFilesConsidered':checked,'exactSizeCandidates':candidates,'jsonHashReferences':hashref,'exactSnapshotMatches':matches},indent=2))\nPY",
+  "execArgumentsKnown": {
+    "cmd": "python3 - <<'PY'\nfrom pathlib import Path\nimport os,re,hashlib,json,base64\nroot=Path('/private/tmp');want='9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca';size=275376\nroots=sorted(p for p in root.iterdir() if p.is_dir() and re.fullmatch(r'p[0-3]-\\d{2}.*qualification.*202610(?:14|15|16)',p.name))\nchecked=0;candidates=[];matches=[];hashref=0\nfor base in roots:\n for dn,ds,fs in os.walk(base):\n  ds[:]=[d for d in ds if d not in ['node_modules','.git','generation','checkout','workspace','home'] and not d.startswith('retained-')]\n  for fn in fs:\n   p=Path(dn)/fn\n   if p.is_symlink() or not p.is_file() or p.suffix in ['.sqlite','.db','.blob','.amcvault','.key','.pem','.gz','.tar']:continue\n   st=p.stat();checked+=1\n   if st.st_size==size:\n    d=p.read_bytes();sha=hashlib.sha256(d).hexdigest();candidates.append({'path':str(p),'bytes':len(d),'sha256':sha})\n    if sha==want:matches.append({'path':str(p),'kind':'exact raw snapshot'})\n   if p.suffix=='.json' and st.st_size<=1048576:\n    d=p.read_bytes()\n    if want.encode() not in d:continue\n    hashref+=1\n    try:v=json.loads(d)\n    except:continue\n    if isinstance(v,dict) and v.get('schema')=='amc-qualification-lossless-original/1' and v.get('original',{}).get('sha256')==want:\n     decoded=base64.b64decode(v['dataBase64'],validate=True)\n     if len(decoded)==size and hashlib.sha256(decoded).hexdigest()==want:matches.append({'path':str(p),'kind':'exact lossless snapshot envelope'})\nprint(json.dumps({'roots':[str(x) for x in roots],'pruned':['node_modules','.git','generation','checkout','workspace','home','retained-*','binary/private-key suffixes'],'regularFiniteFilesConsidered':checked,'exactSizeCandidates':candidates,'jsonHashReferences':hashref,'exactSnapshotMatches':matches},indent=2))\nPY",
+    "max_output_tokens": 4200
+  },
+  "nestedExecSessionId": null,
+  "sessionIdMeaning": "Not forwarded by original code, which emitted only result.output. No session ID is recovered from retained tool outputs.",
+  "naturalProcessClosureEstablished": false,
+  "resultUsedForQualificationOrAbsence": false,
+  "actionsSince": "No retry, signal, deletion, or process probe. Only this exact owned tool-call metadata was read.",
+  "selectedMetadataRecords": [
+    {
+      "line": 5041,
+      "timestamp": "2026-10-16T18:37:46.433Z",
+      "recordSha256": "953b06a888f1fdeab4e2cee76b6b229e456f6483556bb05c81ebd0d360003d85",
+      "payload": {
+        "type": "custom_tool_call",
+        "id": "ctc_0f58c44744eef62a016ad26ef2813081919a66a4d1dbe70b95",
+        "status": "completed",
+        "call_id": "call_8a0c2b00974e4561b622b8f3f8ba56e5",
+        "name": "exec",
+        "input": "text((await tools.exec_command({cmd:\"python3 - <<'PY'\\nfrom pathlib import Path\\nimport os,re,hashlib,json,base64\\nroot=Path('/private/tmp');want='9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca';size=275376\\nroots=sorted(p for p in root.iterdir() if p.is_dir() and re.fullmatch(r'p[0-3]-\\\\d{2}.*qualification.*202610(?:14|15|16)',p.name))\\nchecked=0;candidates=[];matches=[];hashref=0\\nfor base in roots:\\n for dn,ds,fs in os.walk(base):\\n  ds[:]=[d for d in ds if d not in ['node_modules','.git','generation','checkout','workspace','home'] and not d.startswith('retained-')]\\n  for fn in fs:\\n   p=Path(dn)/fn\\n   if p.is_symlink() or not p.is_file() or p.suffix in ['.sqlite','.db','.blob','.amcvault','.key','.pem','.gz','.tar']:continue\\n   st=p.stat();checked+=1\\n   if st.st_size==size:\\n    d=p.read_bytes();sha=hashlib.sha256(d).hexdigest();candidates.append({'path':str(p),'bytes':len(d),'sha256':sha})\\n    if sha==want:matches.append({'path':str(p),'kind':'exact raw snapshot'})\\n   if p.suffix=='.json' and st.st_size<=1048576:\\n    d=p.read_bytes()\\n    if want.encode() not in d:continue\\n    hashref+=1\\n    try:v=json.loads(d)\\n    except:continue\\n    if isinstance(v,dict) and v.get('schema')=='amc-qualification-lossless-original/1' and v.get('original',{}).get('sha256')==want:\\n     decoded=base64.b64decode(v['dataBase64'],validate=True)\\n     if len(decoded)==size and hashlib.sha256(decoded).hexdigest()==want:matches.append({'path':str(p),'kind':'exact lossless snapshot envelope'})\\nprint(json.dumps({'roots':[str(x) for x in roots],'pruned':['node_modules','.git','generation','checkout','workspace','home','retained-*','binary/private-key suffixes'],'regularFiniteFilesConsidered':checked,'exactSizeCandidates':candidates,'jsonHashReferences':hashref,'exactSnapshotMatches':matches},indent=2))\\nPY\",\"max_output_tokens\":4200})).output);\n",
+        "internal_chat_message_metadata_passthrough": {
+          "turn_id": "01a14600-0bf9-7512-b025-c5f2a4572419",
+          "create_time": 1792175858.5285833
+        }
+      }
+    },
+    {
+      "line": 5043,
+      "timestamp": "2026-10-16T18:37:56.677Z",
+      "recordSha256": "4f8c58aaf63f0014833f7c8d230bf05f398aeb2b24a561d87ace9660a1d93cae",
+      "payload": {
+        "type": "custom_tool_call_output",
+        "id": "ctco_01a14601-aa45-70d1-9c91-8be3c0f890aa",
+        "call_id": "call_8a0c2b00974e4561b622b8f3f8ba56e5",
+        "output": [
+          {
+            "type": "input_text",
+            "text": "Script completed\nWall time 10.2 seconds\nOutput:\n"
+          },
+          {
+            "type": "input_text",
+            "text": ""
+          }
+        ],
+        "internal_chat_message_metadata_passthrough": {
+          "turn_id": "01a14600-0bf9-7512-b025-c5f2a4572419",
+          "create_time": 1792175876.677079
+        }
+      }
+    }
+  ]
+}

@@ -297,3 +297,33 @@ describe("maturityConfidenceIntervals", () => {
     expect(ci99["eval"].marginOfError).toBeGreaterThan(ci90["eval"].marginOfError);
   });
 });
+
+
+describe("AXE-30 score inference compatibility", () => {
+  it("retains a bounded small-sample t interval rather than a bootstrap interval", () => {
+    const interval = scoreConfidenceInterval([0, 1]);
+    expect(interval).toMatchObject({ estimate: 0.5, lower: 0, upper: 1, sampleSize: 2 });
+    expect(interval.marginOfError).toBeGreaterThan(1.96 * 0.5);
+  });
+
+  it("retains B-minus-A effect direction and direct sample variance pooling", () => {
+    const a = [0.1, 0.2, 0.7];
+    const b = [0.3, 0.9];
+    const result = compareScores(a, b);
+    const meanA = (0.1 + 0.2 + 0.7) / 3;
+    const meanB = (0.3 + 0.9) / 2;
+    const varianceA = ((0.1 - meanA) ** 2 + (0.2 - meanA) ** 2 + (0.7 - meanA) ** 2) / 2;
+    const varianceB = (0.3 - meanB) ** 2 + (0.9 - meanB) ** 2;
+    expect(result.effectSize).toBe((meanB - meanA) / Math.sqrt((2 * varianceA + varianceB) / 3));
+    expect(result.effectSize).toBeGreaterThan(0);
+  });
+});
+
+
+it("AXE-30 retains sparse score samples as unknown instead of skipping absent observations", () => {
+  const interval = scoreConfidenceInterval(Array<number>(2));
+  expect(interval.estimate).toBeNaN();
+  expect(interval.marginOfError).toBeNaN();
+  expect(interval.lower).toBeNaN();
+  expect(interval.upper).toBeNaN();
+});

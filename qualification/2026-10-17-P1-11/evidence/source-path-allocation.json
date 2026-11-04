@@ -1,0 +1,19 @@
+{
+  "schema": "p111-root-path-allocation/1",
+  "at": "2026-10-16T19:26:30.936257+00:00",
+  "paths": [
+    "tests/catalog/evidence/decisive.test.ts",
+    "qualification/2026-10-17-P1-11/"
+  ],
+  "candidate": {
+    "path": "/private/tmp/p1-11-decisive-qualification-20261017/test-design/v2/decisive.test.ts",
+    "bytes": 18998,
+    "sha256": "db7c355932623e3babedc68e5ee3f6089df5bb6d05b2ee2636cb05d213e0f018"
+  },
+  "sourceHead": "315bac6aa7fe55596bc9d89ddb32755c9436ceb9",
+  "rootAllLinesRead": true,
+  "rootReviewedV2Delta": true,
+  "independentPreliminaryReview": "Otherwise clear; reviewer agreed immutable replay refinement. Final exact signoff remains separate evidence.",
+  "admission": "178 roots disjoint; current hosted all PR paths no overlap/WIP0; D15none; unchanged freeze0; protected88pins exact. Shared RES missing, prior binding retained and private append pending.",
+  "boundary": "Only typed evaluator rule tests and receipt allocated. Existing source/tests/docs/packages/guards read-only; count surfaces not allocated yet. No crypto or compiled-plan/public-report qualification claim. All holds retained."
+}

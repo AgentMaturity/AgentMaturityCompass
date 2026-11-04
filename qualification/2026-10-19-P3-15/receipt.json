@@ -1,0 +1,303 @@
+{
+  "schemaVersion": 1,
+  "key": "P3-15",
+  "date": "2026-10-19",
+  "commit": "a625ee5cae3cde551701f7c9cfed33a4f142480f",
+  "branch": "codex/p3-15-education-overlay",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O; local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 93784
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/formal-checks/a625ee5cae3cde551701f7c9cfed33a4f142480f/raw/checks/focused-report.json tests/catalog/stations/education tests/catalog/catalogLoader.test.ts tests/catalog/controlRecordSchema.test.ts tests/catalog/citations.test.ts tests/catalog/lockfile.test.ts tests/catalog/predicate.test.ts tests/usRegister.test.ts tests/catalog/compiler/unknown.test.ts tests/compilerStationDefaults.test.ts tests/catalog/evidence/decisive.test.ts tests/catalog/admission/checker.test.ts tests/catalog/admission/gatedLoads.test.ts tests/catalog/governance/promotion.test.ts tests/catalog/governance/currency.test.ts tests/catalog/governance/reverify.test.ts tests/catalog/governance/changelogGuard.test.ts tests/industryPacksEducation.test.ts tests/deepIndustryPacksStations.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/wealthOverlay.test.ts",
+      "exit": 1,
+      "durationMs": 85520
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 75354
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 190350
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 7908
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 1,
+      "durationMs": 3161
+    },
+    {
+      "cmd": "node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 2226
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 2043
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 1844
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 1732
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 923
+    },
+    {
+      "cmd": "pnpm check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 6010
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 5805
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 1164
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 1741
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 999
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 1031
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 1316
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 4246
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 1008
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 3221
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 1438
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+      "exit": 1,
+      "durationMs": 3484
+    },
+    {
+      "cmd": "node scripts/check-catalog-changelog.mjs",
+      "exit": 1,
+      "durationMs": 1567
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1954
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 8903
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 306213
+    },
+    {
+      "cmd": "pnpm exec tsx /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/probe-education-final-attempt-2.mts a625ee5cae3cde551701f7c9cfed33a4f142480f",
+      "exit": 0,
+      "durationMs": 5721
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/initial-green-report.json",
+      "exit": 0,
+      "durationMs": 20653
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires approval for the exact grade value' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/grade-exact-value-report.json",
+      "exit": 1,
+      "durationMs": 2556
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'refuses an emotion-inference capability before execution' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/emotion-capability-refusal-report.json",
+      "exit": 1,
+      "durationMs": 2595
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'compares every subject, control, version and plan binding field' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/shared-context-binding-report.json",
+      "exit": 1,
+      "durationMs": 2378
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'refuses writes when the approval store is unavailable' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/approval-store-availability-report.json",
+      "exit": 1,
+      "durationMs": 1915
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires an issued, unexpired approval with a nonempty time window' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/approval-expiry-report.json",
+      "exit": 1,
+      "durationMs": 1826
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires the same student, assessment, request and authorized teacher' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/teacher-authority-report.json",
+      "exit": 1,
+      "durationMs": 2185
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires the registry and capability log, and binds both registry and calls' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-log-availability-report.json",
+      "exit": 1,
+      "durationMs": 2448
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires the registry and capability log, and binds both registry and calls' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-registry-availability-report.json",
+      "exit": 1,
+      "durationMs": 2170
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires a uniquely registered capability class and exact tool version' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/capability-resolution-report.json",
+      "exit": 1,
+      "durationMs": 2519
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'requires a uniquely registered capability class and exact tool version' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/tool-version-binding-report.json",
+      "exit": 1,
+      "durationMs": 2674
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'does not invent a FERPA permission adapter or accept an availability claim' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/missing-ferpa-dependency-report.json",
+      "exit": 1,
+      "durationMs": 2272
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'rejects impossible or lossy timestamps: .*0001Z' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/utc-precision-report.json",
+      "exit": 1,
+      "durationMs": 2856
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'never treats string availability flags as authority' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/strict-availability-boolean-report.json",
+      "exit": 1,
+      "durationMs": 3015
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'keeps synthetic checker-summary units separate from browser observations' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/axe-violation-classifier-report.json",
+      "exit": 1,
+      "durationMs": 1976
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'keeps synthetic checker-summary units separate from browser observations' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/axe-incomplete-or-no-rules-report.json",
+      "exit": 1,
+      "durationMs": 2091
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'L1-EDU-04/negative/oracle-checker-unavailable\\.json' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/checker-disabled-fails-open-report.json",
+      "exit": 1,
+      "durationMs": 1838
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'L1-EDU-04/negative/oracle-image-alt-missing\\.json' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/actual-axe-violations-binding-report.json",
+      "exit": 1,
+      "durationMs": 3912
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'does not treat an empty rendered document as a generated lesson' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/empty-rendered-lesson-report.json",
+      "exit": 1,
+      "durationMs": 2182
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/fixtures.test.ts --maxWorkers=1 --testNamePattern 'refuses external resources without sending a network request' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/external-resource-result-report.json",
+      "exit": 1,
+      "durationMs": 3228
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education/compiledPolicy.test.ts --maxWorkers=1 --testNamePattern 'refuses a fixture subject outside the actual compiled deployment' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/compiled-subject-profile-binding-report.json",
+      "exit": 1,
+      "durationMs": 10668
+    },
+    {
+      "cmd": "node node_modules/vitest/vitest.mjs run tests/catalog/stations/education --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-15/isolated-mutations/a625ee5cae3cde551701f7c9cfed33a4f142480f/restored-green-report.json",
+      "exit": 0,
+      "durationMs": 17390
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "f3ea116815516e150f9f325aff5603f75b78421388882e11e0b318a40e0664f3"
+    },
+    {
+      "path": "case-command.json",
+      "sha256": "fa5a4a58bf441122a53957bcdb9f5672183cd6b4ffe7e8a387d43b4de0c04c88"
+    },
+    {
+      "path": "case-results.json",
+      "sha256": "47ba7f32d546e7fdb658a67bff3662f9923ef8b07965eeaa36a3ce8895380139"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "2f5f284b06e9698635c0357b5352ed2d5244ac510e94c222f856a9e42ca2a4df"
+    },
+    {
+      "path": "decisions.json",
+      "sha256": "22c0d913f671e198de306ec24846452fafda9c272664b0b0b8ca99260c52b85f"
+    },
+    {
+      "path": "education-plan.json",
+      "sha256": "5cdc21607eb20344998859c1c19499c2a263f5e2a35d13c0fa3e763e64d46afd"
+    },
+    {
+      "path": "git-state.json",
+      "sha256": "dbae9f8ca7dcc103314403f44e07582a739362d25c34b0900419513f956dc5cc"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "f0863a2ed3bcad92e23c6a3c07a7192bbe23e01861a52f95e24d3507d83b7704"
+    },
+    {
+      "path": "source-audit.json",
+      "sha256": "1c4b16136cecdd9cefa585e4cf9c89c04e49bc0b5c7964ad0b0eb8bb30c34a84"
+    }
+  ],
+  "notes": "Authorized experimental, unreviewed draft handoff with dependent checks pending. Current focused 481/480/1; sole changelog guard failure is pending the directly deferred landing version bump, not baseline. Own 118 pass; isolated same-commit 20 intended assertion kills and restored 118 pass. Current 45 native cases: 41 not evaluated, four fail, zero pass; 17 synthetic local observations, six empty production all not evaluated/enforcement none. Full NOT_RUN/tests null; final merged-HEAD/two-worker policy remains binding. Ten generated count outputs archived/restored, not committed. Historical failed/superseded/checker-output-collision/bootstrap attempts are source-pinned in source-audit. No primary-source read, legal approval, production pass, third-party contact, push, int/main landing or promotion."
+}

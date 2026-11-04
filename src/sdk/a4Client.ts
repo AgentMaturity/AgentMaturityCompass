@@ -42,7 +42,7 @@ export interface A4MutationResult { projectId: string; seq: number; kind: string
 interface Control { readonly expectedHeadSeq: number; readonly clientRequestId?: string }
 interface Decision { readonly reason: string; readonly expectedGateSeq: number; readonly clientRequestId?: string }
 
-/** `timeoutMs` bounds each request, its answer included; a timeout throws `NETWORK_ERROR` whose cause is the `TimeoutError`. */
+/** `timeoutMs` bounds each request, its answer included; a timeout throws `NETWORK_ERROR` whose cause is the `TimeoutError`. @experimental A4 preview (AMC_A4_PREVIEW=1). */
 export function createA4Client(options: { baseUrl: string; session: A4Session; timeoutMs?: number }) {
   const origin = new URL(options.baseUrl).origin;
   const root = `${options.baseUrl.replace(/\/+$/, "")}/api/v1/a4`;
@@ -110,10 +110,10 @@ export function createA4Client(options: { baseUrl: string; session: A4Session; t
     members: (projectId: string) => call<{ members: A4Member[]; candidates: Array<{ principalKey: string; authSource: string; userId: string; username: string }> | null;
       candidatesLimited: boolean | null }>("GET", `${project(projectId)}/members`),
     /** POST …/comments: a self-reported comment as the session's user (read roles plus project membership). */
-    comment: (projectId: string, body: { body: string; cardId: string; inReplyTo?: string | null; clientRequestId?: string }) =>
+    comment: (projectId: string, body: { body: string; cardId: string; inReplyTo?: string | null; clientRequestId?: string; via?: "studio" | "mcp" }) =>
       call<A4MutationResult>("POST", `${project(projectId)}/comments`, body),
     comments: (projectId: string, opts: { card?: string } = {}) => call<{ comments: Array<{ commentId: string; cardId: string; revisionNo: number; stage: string;
-      authorKey: string; inReplyTo: string | null; body: string | null; reasonCode: string | null; ts: number }> }>("GET", `${project(projectId)}/comments${query(opts)}`),
+      authorKey: string; inReplyTo: string | null; via: "studio" | "mcp" | null; body: string | null; reasonCode: string | null; ts: number }> }>("GET", `${project(projectId)}/comments${query(opts)}`),
     events: (projectId: string, opts: { cursor?: number; card?: string } = {}) =>
       call<ReturnType<typeof a4Events>>("GET", `${project(projectId)}/events${query(opts)}`),
     verify: (projectId: string) => call<{ schema: "amc.a4-verify/v1"; projectId: string; section: "integrity"; report: VerifierReportV1; boundary: string;

@@ -1,0 +1,312 @@
+{
+  "schema": "p126-receipt-prose-preparation-input-pins/1",
+  "count": 34,
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-commit.json",
+      "bytes": 666,
+      "sha256": "028c6055333f16cc1f046bc8cadaf96f21c8488dfa4ba110a1a1fccca8aafc61",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-commit.json",
+      "dev": 16777231,
+      "inode": 543344212,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-precommit-review.json",
+      "bytes": 2207,
+      "sha256": "42e5b145794d824c8c7090d87a0d60e5df2897f0f51eff0a4c8c179637ac9ebd",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-precommit-review.json",
+      "dev": 16777231,
+      "inode": 543344136,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-stage.json",
+      "bytes": 401,
+      "sha256": "aa220fdd707afd15973f2f1fdd15c00cb9a676c2eea1f0ed587ab5f73d71b032",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-stage.json",
+      "dev": 16777231,
+      "inode": 543344177,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/p126-source-combined-outcome.json",
+      "bytes": 11051,
+      "sha256": "b81c1584f4bf9364ce154ce36e45e37dbe8c866a093abd82366c03f075a9c35b",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/p126-source-combined-outcome.json",
+      "dev": 16777231,
+      "inode": 543338558,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/p126-unchanged-transparency-outcome.json",
+      "bytes": 8846,
+      "sha256": "2e2b46e8368ddf5aa94e5c7a11e7505c2e0f58ca84edcba0da3d8aa61d28e2d4",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/p126-unchanged-transparency-outcome.json",
+      "dev": 16777231,
+      "inode": 543332037,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/p126-fresh-canonical-outcome.json",
+      "bytes": 11083,
+      "sha256": "a6f960f5b68c7b6919366123bf243399a4f2b0201e0a9e2ed338e175d3aa8810",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/p126-fresh-canonical-outcome.json",
+      "dev": 16777231,
+      "inode": 543407856,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/p126-m1-outcome.json",
+      "bytes": 37272,
+      "sha256": "37b584889b59b7cd0323e247753be4b205df72fb738a5da8132d5d6734b2ffe9",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/p126-m1-outcome.json",
+      "dev": 16777231,
+      "inode": 543414336,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-source-binding.json",
+      "bytes": 80054,
+      "sha256": "0a13c12198469de7ed9ce373728e015b97cc5209c8b346b721913c73b72df6be",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-source-binding.json",
+      "dev": 16777231,
+      "inode": 543401491,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/README.md",
+      "bytes": 1479,
+      "sha256": "c3126babc6326909384aea0f81ef8a021a24a4be5cb0746946a02de4234ef756",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/README.md",
+      "dev": 16777231,
+      "inode": 543407879,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/review.json",
+      "bytes": 7091,
+      "sha256": "8b3f7147246f03ced61abf58784c2f98c7e5ca80d9c1dc69375fbbd2edeb97cd",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/review.json",
+      "dev": 16777231,
+      "inode": 543407877,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/seal.json",
+      "bytes": 1866,
+      "sha256": "9ca1f1f00e1b34cf9d949e9066b2b684c15006908a49362074edd598dbf6793b",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/fresh-binding-review/seal.json",
+      "dev": 16777231,
+      "inode": 543407880,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/quality-source-delta.json",
+      "bytes": 467,
+      "sha256": "68726110a8f832f2d88bf7313e415318a18307507216984c6a7a6839ad2d1380",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/quality-source-delta.json",
+      "dev": 16777231,
+      "inode": 543344068,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-actual.json",
+      "bytes": 5558,
+      "sha256": "cfbb422f421a311e6c236c7eccbf7ed0bfa3a764fa9b2d14d4b7468ee8a8267c",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/count-surface-actual.json",
+      "dev": 16777231,
+      "inode": 543338893,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/count-generator-command-correction.json",
+      "bytes": 526,
+      "sha256": "e0f1211c10bad9a8a91d03fa4c0abacbb58be0549095f721c71b08517aba2b83",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/count-generator-command-correction.json",
+      "dev": 16777231,
+      "inode": 543338854,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/rfc9162.test.ts",
+      "bytes": 18552,
+      "sha256": "bd5b0eca45ad2ff59a19a50c9947225c316fbce078bad94d249cdd9981ea3999",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-design/rfc9162.test.ts",
+      "dev": 16777231,
+      "inode": 543324878,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/legacyAmbiguity.test.ts",
+      "bytes": 3053,
+      "sha256": "6accfff0a621a3dac27bf63ad2cfcfdc18bfb0a8f99647a0f65fb2a5dc5f7349",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-design/legacyAmbiguity.test.ts",
+      "dev": 16777231,
+      "inode": 543324879,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/seal.json",
+      "bytes": 2803,
+      "sha256": "d89c5bb154dfb07c06e7c91ba60eef4e6a6d80d7880994594f872cfc196fae89",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-design/seal.json",
+      "dev": 16777231,
+      "inode": 543325429,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/README.md",
+      "bytes": 1543,
+      "sha256": "9615301b238c05e8bdac36d9b84febaeb383ab5cf1a4bfdbef3c2cef6fa26810",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/README.md",
+      "dev": 16777231,
+      "inode": 543325611,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/seal.json",
+      "bytes": 1183,
+      "sha256": "627db1cc030139e83358a8b2256fa51fcdc80de2d00c7e2ece8aa0b9c17ec99f",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/seal.json",
+      "dev": 16777231,
+      "inode": 543325612,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/README.md",
+      "bytes": 2193,
+      "sha256": "13f4ab6972e804888e75f604dd3847fd8b346f2ffe6833ce01dc410d0bc1dbc8",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/README.md",
+      "dev": 16777231,
+      "inode": 543338912,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/seal.json",
+      "bytes": 2191,
+      "sha256": "35ae140a9cb549cd2c3927afbad15a338d86e06d3aa64e7da5412d77682cb5f0",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-run-review/seal.json",
+      "dev": 16777231,
+      "inode": 543338914,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/unchanged-cohort-review/README.md",
+      "bytes": 3865,
+      "sha256": "ef0d8ee2a10a1d010733c7a64ac819d68d189694efdb30041a6948392d673046",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/unchanged-cohort-review/README.md",
+      "dev": 16777231,
+      "inode": 543325060,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/unchanged-cohort-review/seal.json",
+      "bytes": 1266,
+      "sha256": "9a6954ed29ccda7ff79517b3c228ef29a939b899d584605e0b3c9e8359ea3861",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/unchanged-cohort-review/seal.json",
+      "dev": 16777231,
+      "inode": 543325062,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/inventory.json",
+      "bytes": 1233,
+      "sha256": "e02d2416eb96b2812e2751e9f4565e01e2adacaf1cf1c659bebc87f021d7ecd8",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/inventory.json",
+      "dev": 16777231,
+      "inode": 543324289,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/selected-source-pins.json",
+      "bytes": 3892,
+      "sha256": "d2cbc50c65398130135dec0711b78f62d26e39dcf0393f50bc019a4da0ef684b",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/selected-source-pins.json",
+      "dev": 16777231,
+      "inode": 543324373,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/extra-source-pins.json",
+      "bytes": 975,
+      "sha256": "417a8377d58232e3f3762d8f7126d05148b3962b388532b42de5b0887fd6e483",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/extra-source-pins.json",
+      "dev": 16777231,
+      "inode": 543324429,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/LICENSE",
+      "dev": 16777231,
+      "inode": 543324301,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/discovery-correction.json",
+      "bytes": 2962,
+      "sha256": "0b0d0e09f6136c72877e9b8108808fa793ffcd0c0c816d53b07d65fc33c0502f",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/discovery-correction.json",
+      "dev": 16777231,
+      "inode": 543325074,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/actual-delta.json",
+      "bytes": 1250,
+      "sha256": "3be487b6e982916cec3d557f82cd36c2a9943d6f9847aae57b9e593836eeacc6",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/actual-delta.json",
+      "dev": 16777231,
+      "inode": 543325562,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/metadata-repair-commit.json",
+      "bytes": 1063,
+      "sha256": "5a03a19b5bdeac1094da065b8794b8e9162bbdeadca5e7147559d4331cd5ce3c",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/metadata-discovery/metadata-repair-commit.json",
+      "dev": 16777231,
+      "inode": 543332178,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/metadata-repair-review/seal.json",
+      "bytes": 1253,
+      "sha256": "61d3a896841a8ff042dbea7a22ce23b97bfa1fb4ed9adea0a590167fe6ead347",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/metadata-repair-review/seal.json",
+      "dev": 16777231,
+      "inode": 543332072,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/assemble-receipt.py",
+      "bytes": 4099,
+      "sha256": "9266e852cb73180b3ddb6b98a2dbc6966f56bfdc600cff968604e54c47ca2914",
+      "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/assemble-receipt.py",
+      "dev": 16777231,
+      "inode": 543401344,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/private-receipt-root-v2/2026-10-17-P1-12/README.md",
+      "bytes": 4745,
+      "sha256": "b1dd46c21354c840d85893bd7f1cf73c403bcc33f7059f6ac1d40edd5c4c8685",
+      "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/private-receipt-root-v2/2026-10-17-P1-12/README.md",
+      "dev": 16777231,
+      "inode": 543322932,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-26.md",
+      "bytes": 12893,
+      "sha256": "fffd189dcd70286906ed3f4e4f84944e7208d73bb9595e71d004871be1120300",
+      "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-26.md",
+      "dev": 16777231,
+      "inode": 473795894,
+      "nlink": 1
+    }
+  ]
+}

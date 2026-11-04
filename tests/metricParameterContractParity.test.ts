@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { relative, resolve } from "node:path";
 import ts from "typescript";
 import { beforeAll, describe, expect, it } from "vitest";
 import { landedBytes, landedText } from "./helpers/landedSource.js";
@@ -64,8 +64,15 @@ function parameterContracts(text: string): Compilation {
   if (config.error) throw new Error(ts.flattenDiagnosticMessageText(config.error.messageText, "\n"));
   const options = ts.parseJsonConfigFileContent(config.config, ts.sys, root).options;
   const host = ts.createCompilerHost(options), getSource = host.getSourceFile.bind(host);
-  host.getSourceFile = (file, version, onError, fresh) => resolve(file) === filename
-    ? ts.createSourceFile(file, text + compilerProbes, version, true) : getSource(file, version, onError, fresh);
+  // Freeze comparisons read landed bytes (D-15): the module's own sources compile as landed too, so a frozen
+  // snapshot is never type-checked against a later edit of a file it imports (src/types.ts, for one).
+  host.getSourceFile = (file, version, onError, fresh) => {
+    const path = resolve(file);
+    if (path === filename) return ts.createSourceFile(file, text + compilerProbes, version, true);
+    const repoPath = relative(root, path);
+    return repoPath.startsWith("src/") && repoPath.endsWith(".ts") && !repoPath.endsWith(".d.ts")
+      ? ts.createSourceFile(file, landedText(repoPath), version, true) : getSource(file, version, onError, fresh);
+  };
   const program = ts.createProgram([filename], options, host), checker = program.getTypeChecker();
   const source = program.getSourceFile(filename);
   if (!source) throw new Error("Metric module not loaded by actual TypeScript compiler");

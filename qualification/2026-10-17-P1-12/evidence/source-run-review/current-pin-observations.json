@@ -1,0 +1,2270 @@
+{
+  "schema": "p112-source-run-current-pin-observations/1",
+  "at": "2026-10-16T19:56:56.528607+00:00",
+  "protectedCount": 88,
+  "candidateInputCount": 32,
+  "nativeCount": 4,
+  "target": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+    "bytes": 11155,
+    "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0",
+    "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+    "dev": 16777231,
+    "inode": 543246712,
+    "nlink": 1
+  },
+  "rows": [
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+      },
+      "current": {
+        "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "bytes": 157127,
+        "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+        "physicalPath": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+        "dev": 16777231,
+        "inode": 472466527,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+        "bytes": 12911,
+        "sha256": "db346645bc6ac0b783f22bbba50cb07b36e74832507218e4a2488a6d8b68f279"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+        "bytes": 12911,
+        "sha256": "db346645bc6ac0b783f22bbba50cb07b36e74832507218e4a2488a6d8b68f279",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+        "dev": 16777231,
+        "inode": 473795983,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/next-plan-routing2/routing.json",
+        "bytes": 13613,
+        "sha256": "8548f63873e1401989b7216243edab60d7d74e8d4cb6cd560eeeb23080feb0ff"
+      },
+      "current": {
+        "path": "/private/tmp/p1-35-legacy-qualification-20261016/next-plan-routing2/routing.json",
+        "bytes": 13613,
+        "sha256": "8548f63873e1401989b7216243edab60d7d74e8d4cb6cd560eeeb23080feb0ff",
+        "physicalPath": "/private/tmp/p1-35-legacy-qualification-20261016/next-plan-routing2/routing.json",
+        "dev": 16777231,
+        "inode": 542969334,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/ownership.json",
+        "bytes": 140164,
+        "sha256": "d3dcd561d6be4e3e2583d55e4eaa1cbc4e1f0a4b7999fe60523fc0e6e2672556"
+      },
+      "current": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/ownership.json",
+        "bytes": 140164,
+        "sha256": "d3dcd561d6be4e3e2583d55e4eaa1cbc4e1f0a4b7999fe60523fc0e6e2672556",
+        "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/ownership.json",
+        "dev": 16777231,
+        "inode": 542972288,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-observations.json",
+        "bytes": 486198,
+        "sha256": "110a8eb14275715bb2f6a3b5a61a4643f7494808137562fb12e253e3427ae2a7"
+      },
+      "current": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-observations.json",
+        "bytes": 486198,
+        "sha256": "110a8eb14275715bb2f6a3b5a61a4643f7494808137562fb12e253e3427ae2a7",
+        "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-observations.json",
+        "dev": 16777231,
+        "inode": 542975820,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-facts.json",
+        "bytes": 48112,
+        "sha256": "ea3112ff7c487dc4a696dd4748b3ebfb47e708dfff7873b7ad0989ea14deb99a"
+      },
+      "current": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-facts.json",
+        "bytes": 48112,
+        "sha256": "ea3112ff7c487dc4a696dd4748b3ebfb47e708dfff7873b7ad0989ea14deb99a",
+        "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-facts.json",
+        "dev": 16777231,
+        "inode": 542975821,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/source-history.json",
+        "bytes": 3152,
+        "sha256": "4ec793790fb372d4e30fb0f524cd6f26fe8a4e9d3ed5f2c9baa6f9749749fc7a"
+      },
+      "current": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/source-history.json",
+        "bytes": 3152,
+        "sha256": "4ec793790fb372d4e30fb0f524cd6f26fe8a4e9d3ed5f2c9baa6f9749749fc7a",
+        "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/source-history.json",
+        "dev": 16777231,
+        "inode": 542976018,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/graph-freshness.json",
+        "bytes": 1273,
+        "sha256": "ee7b3f6a10b91b01019c520109a4cd1adbb4b4488870088de52ccb56b0fcb797"
+      },
+      "current": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/graph-freshness.json",
+        "bytes": 1273,
+        "sha256": "ee7b3f6a10b91b01019c520109a4cd1adbb4b4488870088de52ccb56b0fcb797",
+        "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/graph-freshness.json",
+        "dev": 16777231,
+        "inode": 542976021,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+        "bytes": 16478,
+        "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+        "bytes": 16478,
+        "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+        "dev": 16777231,
+        "inode": 542461054,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/der.ts",
+        "bytes": 5959,
+        "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/der.ts",
+        "bytes": 5959,
+        "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/der.ts",
+        "dev": 16777231,
+        "inode": 542461051,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "bytes": 3278,
+        "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "bytes": 3278,
+        "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "dev": 16777231,
+        "inode": 542461052,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+        "dev": 16777231,
+        "inode": 542461053,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "dev": 16777231,
+        "inode": 542461050,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+        "bytes": 7104,
+        "sha256": "31028027dbd972b8eb8999ff52900c157cc9c1158bc6841adab0f7bbe7ba48d4"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+        "bytes": 7104,
+        "sha256": "31028027dbd972b8eb8999ff52900c157cc9c1158bc6841adab0f7bbe7ba48d4",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+        "dev": 16777231,
+        "inode": 542455347,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+        "bytes": 2428,
+        "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+        "bytes": 2428,
+        "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+        "dev": 16777231,
+        "inode": 542455632,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+        "bytes": 10386,
+        "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+        "bytes": 10386,
+        "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+        "dev": 16777231,
+        "inode": 542461150,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/verifierReport.ts",
+        "bytes": 6887,
+        "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/verifierReport.ts",
+        "bytes": 6887,
+        "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/verifierReport.ts",
+        "dev": 16777231,
+        "inode": 542461151,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+        "bytes": 3844,
+        "sha256": "fb0a60cf941af3c124923f91d114aa80a2355a8c44eeb37f27e61b6ed6e05ad7"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+        "bytes": 3844,
+        "sha256": "fb0a60cf941af3c124923f91d114aa80a2355a8c44eeb37f27e61b6ed6e05ad7",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+        "dev": 16777231,
+        "inode": 542463304,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+        "bytes": 8031,
+        "sha256": "c953d12203c9ec6cbdab8ec14c3c2c827774f6afdb80aba3f33cf4644157c807"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+        "bytes": 8031,
+        "sha256": "c953d12203c9ec6cbdab8ec14c3c2c827774f6afdb80aba3f33cf4644157c807",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+        "dev": 16777231,
+        "inode": 542463302,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+        "bytes": 8631,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+        "bytes": 8631,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+        "dev": 16777231,
+        "inode": 542456404,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "bytes": 155432,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "bytes": 155432,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "dev": 16777231,
+        "inode": 542456844,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+        "dev": 16777231,
+        "inode": 542464352,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+        "bytes": 300,
+        "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+        "bytes": 300,
+        "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+        "dev": 16777231,
+        "inode": 542463392,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "dev": 16777231,
+        "inode": 542463190,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "dev": 16777231,
+        "inode": 542463194,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "dev": 16777231,
+        "inode": 542458558,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "bytes": 9946,
+        "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "bytes": 9946,
+        "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "dev": 16777231,
+        "inode": 542458537,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/snapshot-plan-edit.mjs",
+        "bytes": 7012,
+        "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/snapshot-plan-edit.mjs",
+        "bytes": 7012,
+        "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/snapshot-plan-edit.mjs",
+        "dev": 16777231,
+        "inode": 542458604,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+        "bytes": 6764,
+        "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+        "bytes": 6764,
+        "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+        "dev": 16777231,
+        "inode": 542458540,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/graphify-navigation.py",
+        "bytes": 23480,
+        "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/graphify-navigation.py",
+        "bytes": 23480,
+        "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/graphify-navigation.py",
+        "dev": 16777231,
+        "inode": 542458564,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+        "bytes": 16478,
+        "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+        "bytes": 16478,
+        "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+        "dev": 16777231,
+        "inode": 539135760,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/der.ts",
+        "bytes": 5959,
+        "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/der.ts",
+        "bytes": 5959,
+        "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/der.ts",
+        "dev": 16777231,
+        "inode": 539135757,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "bytes": 3278,
+        "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "bytes": 3278,
+        "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "dev": 16777231,
+        "inode": 539135758,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/tsaClient.ts",
+        "dev": 16777231,
+        "inode": 539135759,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/checkpoint.ts",
+        "dev": 16777231,
+        "inode": 539135756,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+        "bytes": 7104,
+        "sha256": "31028027dbd972b8eb8999ff52900c157cc9c1158bc6841adab0f7bbe7ba48d4"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+        "bytes": 7104,
+        "sha256": "31028027dbd972b8eb8999ff52900c157cc9c1158bc6841adab0f7bbe7ba48d4",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+        "dev": 16777231,
+        "inode": 539130401,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+        "bytes": 2428,
+        "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+        "bytes": 2428,
+        "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+        "dev": 16777231,
+        "inode": 539130686,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/verifyTimestamp.ts",
+        "bytes": 16478,
+        "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/verifyTimestamp.ts",
+        "bytes": 16478,
+        "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/verifyTimestamp.ts",
+        "dev": 16777231,
+        "inode": 473082109,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/der.ts",
+        "bytes": 5959,
+        "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/der.ts",
+        "bytes": 5959,
+        "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/der.ts",
+        "dev": 16777231,
+        "inode": 473082106,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/timeEvidence.ts",
+        "bytes": 3278,
+        "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/timeEvidence.ts",
+        "bytes": 3278,
+        "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/timeEvidence.ts",
+        "dev": 16777231,
+        "inode": 473082107,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/tsaClient.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/tsaClient.ts",
+        "dev": 16777231,
+        "inode": 473082108,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "5ad270cb43b734c9e7cf32f3b2a2329c43d5fe3e17ef657c444de0c8b8f530a5"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "5ad270cb43b734c9e7cf32f3b2a2329c43d5fe3e17ef657c444de0c8b8f530a5",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/checkpoint.ts",
+        "dev": 16777231,
+        "inode": 507179680,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/TRUSTED_TIME.md",
+        "bytes": 7310,
+        "sha256": "ec74d153256f572aa03fa62a29a4435d7fb309d2e64f03b71fa3ef531c6d264f"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/TRUSTED_TIME.md",
+        "bytes": 7310,
+        "sha256": "ec74d153256f572aa03fa62a29a4435d7fb309d2e64f03b71fa3ef531c6d264f",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/TRUSTED_TIME.md",
+        "dev": 16777231,
+        "inode": 516408298,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/security/dependency-reviews/rfc3161.md",
+        "bytes": 2428,
+        "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/security/dependency-reviews/rfc3161.md",
+        "bytes": 2428,
+        "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/security/dependency-reviews/rfc3161.md",
+        "dev": 16777231,
+        "inode": 473078267,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass/graphify-out/manifest.json",
+        "bytes": 697781,
+        "sha256": "c0976d8b42699a5c169fbb2f089418083eccbec3fe40a00cb5814b4fae879838"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass/graphify-out/manifest.json",
+        "bytes": 697781,
+        "sha256": "c0976d8b42699a5c169fbb2f089418083eccbec3fe40a00cb5814b4fae879838",
+        "physicalPath": "/Users/sid/AgentMaturityCompass/graphify-out/manifest.json",
+        "dev": 16777231,
+        "inode": 288322422,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass/graphify-out/navigation/summary.json",
+        "bytes": 36920,
+        "sha256": "82e79208a9a7415b15f77e93c8e73e338859399bad1b41ad6c152e0abebb0ecb"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass/graphify-out/navigation/summary.json",
+        "bytes": 36920,
+        "sha256": "82e79208a9a7415b15f77e93c8e73e338859399bad1b41ad6c152e0abebb0ecb",
+        "physicalPath": "/Users/sid/AgentMaturityCompass/graphify-out/navigation/summary.json",
+        "dev": 16777231,
+        "inode": 288701263,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-25-time-qualification-20261016/branch-preparation.json",
+        "bytes": 616,
+        "sha256": "4c320d28c40930dc95ccf0949b063b834e21f6f3f7b5bb207e7240101d2f49ba"
+      },
+      "current": {
+        "path": "/private/tmp/p1-25-time-qualification-20261016/branch-preparation.json",
+        "bytes": 616,
+        "sha256": "4c320d28c40930dc95ccf0949b063b834e21f6f3f7b5bb207e7240101d2f49ba",
+        "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/branch-preparation.json",
+        "dev": 16777231,
+        "inode": 543068100,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+        "bytes": 11026,
+        "sha256": "8b2dfb76a10435847b92e768b6eac044a012bf73c7184345d515cb0e3b3c7af7"
+      },
+      "current": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+        "bytes": 11026,
+        "sha256": "8b2dfb76a10435847b92e768b6eac044a012bf73c7184345d515cb0e3b3c7af7",
+        "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+        "dev": 16777231,
+        "inode": 543036988,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/bounded-closure.json",
+        "bytes": 1622,
+        "sha256": "b3f116c938e9f91eeb73ec4cba74f27c0b410a355d29f51a58940d5dce12ed87"
+      },
+      "current": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/bounded-closure.json",
+        "bytes": 1622,
+        "sha256": "b3f116c938e9f91eeb73ec4cba74f27c0b410a355d29f51a58940d5dce12ed87",
+        "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/bounded-closure.json",
+        "dev": 16777231,
+        "inode": 543068046,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/final-preservation.json",
+        "bytes": 2158,
+        "sha256": "b5990312dfcb50aaa828a8a731d292932aa2acb352723fdbe0f8c2497f3c5ae7"
+      },
+      "current": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/final-preservation.json",
+        "bytes": 2158,
+        "sha256": "b5990312dfcb50aaa828a8a731d292932aa2acb352723fdbe0f8c2497f3c5ae7",
+        "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/final-preservation.json",
+        "dev": 16777231,
+        "inode": 543054617,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/root-final-review.json",
+        "bytes": 3363,
+        "sha256": "2e8df42109331e180ff5885309c65734817c157d851b8f44f7b851406016a806"
+      },
+      "current": {
+        "path": "/private/tmp/p1-07-gate-qualification-20261016/root-final-review.json",
+        "bytes": 3363,
+        "sha256": "2e8df42109331e180ff5885309c65734817c157d851b8f44f7b851406016a806",
+        "physicalPath": "/private/tmp/p1-07-gate-qualification-20261016/root-final-review.json",
+        "dev": 16777231,
+        "inode": 543065887,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-11.md",
+        "bytes": 16438,
+        "sha256": "410ddda0cdd3731fdc7ea3d6edb542bedf6ed3e7402a9ac5708178048266e7c5"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-11.md",
+        "bytes": 16438,
+        "sha256": "410ddda0cdd3731fdc7ea3d6edb542bedf6ed3e7402a9ac5708178048266e7c5",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-11.md",
+        "dev": 16777231,
+        "inode": 473795984,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/p2-07-oidc-validation-policy.md",
+        "bytes": 672,
+        "sha256": "808776f4676986361dc85c9fbf30a21f66a3fb7f823b10b2d11da63453bf1bee"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/p2-07-oidc-validation-policy.md",
+        "bytes": 672,
+        "sha256": "808776f4676986361dc85c9fbf30a21f66a3fb7f823b10b2d11da63453bf1bee",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/p2-07-oidc-validation-policy.md",
+        "dev": 16777231,
+        "inode": 542436583,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+        "dev": 16777231,
+        "inode": 539129984,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+        "bytes": 59828,
+        "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+        "bytes": 59828,
+        "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+        "dev": 16777231,
+        "inode": 539129989,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+        "bytes": 7630,
+        "sha256": "8eb9a7b8e856a4d0a6219788596164138abae2d67278c69df856ff7e40c820e9"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+        "bytes": 7630,
+        "sha256": "8eb9a7b8e856a4d0a6219788596164138abae2d67278c69df856ff7e40c820e9",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+        "dev": 16777231,
+        "inode": 539130383,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+        "dev": 16777231,
+        "inode": 539130493,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+        "dev": 16777231,
+        "inode": 539130494,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+        "dev": 16777231,
+        "inode": 539130644,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+        "dev": 16777231,
+        "inode": 539130648,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+        "bytes": 13743,
+        "sha256": "bc1bdcfea46856cab6569ee7df78e9f4323d9821a8130158fb7b23c525be9b41"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+        "bytes": 13743,
+        "sha256": "bc1bdcfea46856cab6569ee7df78e9f4323d9821a8130158fb7b23c525be9b41",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+        "dev": 16777231,
+        "inode": 539134748,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+        "bytes": 13771,
+        "sha256": "6505b2e201bba6b0d450f7d1760a2c4bad30dac2ea604930877973f113c84847"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+        "bytes": 13771,
+        "sha256": "6505b2e201bba6b0d450f7d1760a2c4bad30dac2ea604930877973f113c84847",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+        "dev": 16777231,
+        "inode": 539134750,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+        "bytes": 6089,
+        "sha256": "9fb46be0392a1164d6de12a32468c59dfc6c7840e4883e8f5d37ef933c091cf9"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+        "bytes": 6089,
+        "sha256": "9fb46be0392a1164d6de12a32468c59dfc6c7840e4883e8f5d37ef933c091cf9",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+        "dev": 16777231,
+        "inode": 539134752,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+        "bytes": 47452,
+        "sha256": "79776f1dfd4657b5bd28a0de3397ed333a7b3833f9c1f3ff2c619adf79b6c458"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+        "bytes": 47452,
+        "sha256": "79776f1dfd4657b5bd28a0de3397ed333a7b3833f9c1f3ff2c619adf79b6c458",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+        "dev": 16777231,
+        "inode": 542232699,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/oidcValidationConfig.test.ts",
+        "bytes": 25711,
+        "sha256": "e0f92ce9257eda0a436b27e4ce60da948c4b73e2c8349fe85f0dd15031dca253"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/oidcValidationConfig.test.ts",
+        "bytes": 25711,
+        "sha256": "e0f92ce9257eda0a436b27e4ce60da948c4b73e2c8349fe85f0dd15031dca253",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/oidcValidationConfig.test.ts",
+        "dev": 16777231,
+        "inode": 542434917,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+        "bytes": 18504,
+        "sha256": "6c8bbf1605de739c13c1645640f825af67edbf4ca1420d1718a55f453570cdf2"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+        "bytes": 18504,
+        "sha256": "6c8bbf1605de739c13c1645640f825af67edbf4ca1420d1718a55f453570cdf2",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+        "dev": 16777231,
+        "inode": 539138673,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+        "bytes": 44169,
+        "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+        "bytes": 44169,
+        "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+        "dev": 16777231,
+        "inode": 539138990,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+        "bytes": 43520,
+        "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+        "bytes": 43520,
+        "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+        "dev": 16777231,
+        "inode": 539138991,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+        "bytes": 11197,
+        "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+        "bytes": 11197,
+        "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+        "dev": 16777231,
+        "inode": 539138995,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+        "dev": 16777231,
+        "inode": 539139027,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+        "dev": 16777231,
+        "inode": 539138935,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "dev": 16777231,
+        "inode": 539137776,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "dev": 16777231,
+        "inode": 539137777,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "bytes": 9946,
+        "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "bytes": 9946,
+        "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-freeze.mjs",
+        "dev": 16777231,
+        "inode": 539133248,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+        "bytes": 5010,
+        "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+        "bytes": 5010,
+        "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+        "dev": 16777231,
+        "inode": 539133317,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed",
+        "bytes": 13501,
+        "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed",
+        "bytes": 13501,
+        "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed",
+        "dev": 16777231,
+        "inode": 542431915,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p2-07-provider-validation-20261016/preserved-tracked-candidate.patch",
+        "bytes": 47279,
+        "sha256": "edda17505b7c80a22561c35753f9051cf1ff80b731f145671f5e437150367129"
+      },
+      "current": {
+        "path": "/private/tmp/p2-07-provider-validation-20261016/preserved-tracked-candidate.patch",
+        "bytes": 47279,
+        "sha256": "edda17505b7c80a22561c35753f9051cf1ff80b731f145671f5e437150367129",
+        "physicalPath": "/private/tmp/p2-07-provider-validation-20261016/preserved-tracked-candidate.patch",
+        "dev": 16777231,
+        "inode": 542453925,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/private/tmp/p2-07-provider-validation-20261016/count-overlay-result.json",
+        "bytes": 3952,
+        "sha256": "8380ef85741b16eff973fb2851cdb2cf247ad881fbe489524a12255a69465546"
+      },
+      "current": {
+        "path": "/private/tmp/p2-07-provider-validation-20261016/count-overlay-result.json",
+        "bytes": 3952,
+        "sha256": "8380ef85741b16eff973fb2851cdb2cf247ad881fbe489524a12255a69465546",
+        "physicalPath": "/private/tmp/p2-07-provider-validation-20261016/count-overlay-result.json",
+        "dev": 16777231,
+        "inode": 542453731,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/classify.ts",
+        "bytes": 8451,
+        "sha256": "da93bdaf7af938ce1c75323440cd3c4be5c97e92f6bcb87b1509d9c228c324a0"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/classify.ts",
+        "bytes": 8451,
+        "sha256": "da93bdaf7af938ce1c75323440cd3c4be5c97e92f6bcb87b1509d9c228c324a0",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/classify.ts",
+        "dev": 16777231,
+        "inode": 473081379,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices.ts",
+        "bytes": 1187,
+        "sha256": "91380ebd370671d953181bac6ef2370091644fd36abf22a91d91366ed691d023"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices.ts",
+        "bytes": 1187,
+        "sha256": "91380ebd370671d953181bac6ef2370091644fd36abf22a91d91366ed691d023",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices.ts",
+        "dev": 16777231,
+        "inode": 473081380,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices/AMC-LEGACY-2026-001.json",
+        "bytes": 1876,
+        "sha256": "165b430d830da41eb845144daa9fd151983516bbf7ccc95162da77dd186bebe4"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices/AMC-LEGACY-2026-001.json",
+        "bytes": 1876,
+        "sha256": "165b430d830da41eb845144daa9fd151983516bbf7ccc95162da77dd186bebe4",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices/AMC-LEGACY-2026-001.json",
+        "dev": 16777231,
+        "inode": 473081382,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/relabelLog.ts",
+        "bytes": 5262,
+        "sha256": "8a6496aa3c1e6785ba27d74000251d5f4114f8a7ee3ecba8e2a2468c6f8cec39"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/relabelLog.ts",
+        "bytes": 5262,
+        "sha256": "8a6496aa3c1e6785ba27d74000251d5f4114f8a7ee3ecba8e2a2468c6f8cec39",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/relabelLog.ts",
+        "dev": 16777231,
+        "inode": 473081384,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/receipt.ts",
+        "bytes": 4086,
+        "sha256": "0a3e40ddd273ae16e3503c1c0f7c58323d406b7f52315078dfda432bf40c9a89"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/receipt.ts",
+        "bytes": 4086,
+        "sha256": "0a3e40ddd273ae16e3503c1c0f7c58323d406b7f52315078dfda432bf40c9a89",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/receipt.ts",
+        "dev": 16777231,
+        "inode": 473081383,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/scan.ts",
+        "bytes": 16329,
+        "sha256": "a857c9dc27a993db83036a2044a5de7da5d1b262d3ac60ec2840e6950d87f272"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/scan.ts",
+        "bytes": 16329,
+        "sha256": "a857c9dc27a993db83036a2044a5de7da5d1b262d3ac60ec2840e6950d87f272",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/scan.ts",
+        "dev": 16777231,
+        "inode": 473081385,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/migration/LEGACY_RESULTS.md",
+        "bytes": 10048,
+        "sha256": "2602db07712be8b6e84acfe552bf2932d83a4ec20531cce3a482a72fba07b309"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/migration/LEGACY_RESULTS.md",
+        "bytes": 10048,
+        "sha256": "2602db07712be8b6e84acfe552bf2932d83a4ec20531cce3a482a72fba07b309",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/migration/LEGACY_RESULTS.md",
+        "dev": 16777231,
+        "inode": 487509755,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/cli.ts",
+        "bytes": 1064495,
+        "sha256": "c4627270c37e5fe7e9314df604c01c0155f566df90e32a29ac690cb26113e5cb"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/cli.ts",
+        "bytes": 1064495,
+        "sha256": "c4627270c37e5fe7e9314df604c01c0155f566df90e32a29ac690cb26113e5cb",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/cli.ts",
+        "dev": 16777231,
+        "inode": 517311039,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/crypto/signing/signerTypes.ts",
+        "bytes": 880,
+        "sha256": "4b9def9a2d936e47cd1e52467fb34992cca62fbbe8226bfb50bc842b2a386ad4"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/crypto/signing/signerTypes.ts",
+        "bytes": 880,
+        "sha256": "4b9def9a2d936e47cd1e52467fb34992cca62fbbe8226bfb50bc842b2a386ad4",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/crypto/signing/signerTypes.ts",
+        "dev": 16777231,
+        "inode": 515932565,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "protected",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/trust/trustConfig.ts",
+        "bytes": 14680,
+        "sha256": "39c8b85eda085b68984a52ca4e306b26f86eaee798730a60a33df95003e5039e"
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/trust/trustConfig.ts",
+        "bytes": 14680,
+        "sha256": "39c8b85eda085b68984a52ca4e306b26f86eaee798730a60a33df95003e5039e",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/trust/trustConfig.ts",
+        "dev": 16777231,
+        "inode": 515932571,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "native",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1,
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "native",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1,
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "native",
+      "expected": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543125595,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543125595,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "native",
+      "expected": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543200130,
+        "nlink": 1,
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "current": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543200130,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/compiledPolicyGuard.ts",
+        "bytes": 7685,
+        "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/compiledPolicyGuard.ts",
+        "dev": 16777231,
+        "inode": 542461096,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/compiledPolicyGuard.ts",
+        "bytes": 7685,
+        "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/compiledPolicyGuard.ts",
+        "dev": 16777231,
+        "inode": 542461096,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolTypes.ts",
+        "bytes": 8042,
+        "sha256": "2f9d346695b05d83f045a9ac5ad1689ddd83032a5444d088ed6665aa026c3d03",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolTypes.ts",
+        "dev": 16777231,
+        "inode": 542619635,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolTypes.ts",
+        "bytes": 8042,
+        "sha256": "2f9d346695b05d83f045a9ac5ad1689ddd83032a5444d088ed6665aa026c3d03",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolTypes.ts",
+        "dev": 16777231,
+        "inode": 542619635,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+        "bytes": 32571,
+        "sha256": "1fe7a8eab3a954ff876c780c373c4fb3243abc8652561cda3af2c53fc4a755f9",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+        "dev": 16777231,
+        "inode": 542619636,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+        "bytes": 32571,
+        "sha256": "1fe7a8eab3a954ff876c780c373c4fb3243abc8652561cda3af2c53fc4a755f9",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+        "dev": 16777231,
+        "inode": 542619636,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+        "bytes": 9250,
+        "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+        "dev": 16777231,
+        "inode": 542459294,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+        "bytes": 9250,
+        "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+        "dev": 16777231,
+        "inode": 542459294,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/types.ts",
+        "bytes": 10272,
+        "sha256": "c9bbf1dd73d3b37309b19d18af17021190ce11a7a150291a3a80f6bc17e92827",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/types.ts",
+        "dev": 16777231,
+        "inode": 542459306,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/types.ts",
+        "bytes": 10272,
+        "sha256": "c9bbf1dd73d3b37309b19d18af17021190ce11a7a150291a3a80f6bc17e92827",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/types.ts",
+        "dev": 16777231,
+        "inode": 542459306,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/runtimePolicy.ts",
+        "bytes": 11453,
+        "sha256": "293ce8862991a5a15c9f6e25be84e0746e05cac4d205b91819c5ce33b1d473fa",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/runtimePolicy.ts",
+        "dev": 16777231,
+        "inode": 542459303,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/runtimePolicy.ts",
+        "bytes": 11453,
+        "sha256": "293ce8862991a5a15c9f6e25be84e0746e05cac4d205b91819c5ce33b1d473fa",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/runtimePolicy.ts",
+        "dev": 16777231,
+        "inode": 542459303,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+        "bytes": 20450,
+        "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+        "dev": 16777231,
+        "inode": 542458760,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+        "bytes": 20450,
+        "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+        "dev": 16777231,
+        "inode": 542458760,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+        "bytes": 4176,
+        "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+        "dev": 16777231,
+        "inode": 542458759,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+        "bytes": 4176,
+        "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+        "dev": 16777231,
+        "inode": 542458759,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+        "bytes": 3279,
+        "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+        "dev": 16777231,
+        "inode": 542459634,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+        "bytes": 3279,
+        "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+        "dev": 16777231,
+        "inode": 542459634,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+        "bytes": 12366,
+        "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+        "dev": 16777231,
+        "inode": 542458918,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+        "bytes": 12366,
+        "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+        "dev": 16777231,
+        "inode": 542458918,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+        "bytes": 2472,
+        "sha256": "fb7f5bbe8f1711d994e20a982a73c817a6f0651873b9ad091cc9b3d19f2d1456",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+        "dev": 16777231,
+        "inode": 542458919,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+        "bytes": 2472,
+        "sha256": "fb7f5bbe8f1711d994e20a982a73c817a6f0651873b9ad091cc9b3d19f2d1456",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+        "dev": 16777231,
+        "inode": 542458919,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+        "bytes": 29046,
+        "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+        "dev": 16777231,
+        "inode": 542458806,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+        "bytes": 29046,
+        "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/agent/agentToolset.ts",
+        "dev": 16777231,
+        "inode": 542458806,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/kernel/services/toolServices.ts",
+        "bytes": 4729,
+        "sha256": "ff4027cf862d1363d93e3fe25d21122a3db0272def9114e9acdac216d9d619d0",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/kernel/services/toolServices.ts",
+        "dev": 16777231,
+        "inode": 542460132,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/kernel/services/toolServices.ts",
+        "bytes": 4729,
+        "sha256": "ff4027cf862d1363d93e3fe25d21122a3db0272def9114e9acdac216d9d619d0",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/kernel/services/toolServices.ts",
+        "dev": 16777231,
+        "inode": 542460132,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/studio/nativeTaskService.ts",
+        "bytes": 50275,
+        "sha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/studio/nativeTaskService.ts",
+        "dev": 16777231,
+        "inode": 542461020,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/studio/nativeTaskService.ts",
+        "bytes": 50275,
+        "sha256": "8628cd51af4cbd8cb164e5a96f7beb22854190e82a840a6cb4f404a3bb7effa6",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/studio/nativeTaskService.ts",
+        "dev": 16777231,
+        "inode": 542461020,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/a4/stages/assemble.ts",
+        "bytes": 35883,
+        "sha256": "da35505bc530e591c08293f7330561e40a84db779cad929c6e936da0887e25ee",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/a4/stages/assemble.ts",
+        "dev": 16777231,
+        "inode": 542458736,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/a4/stages/assemble.ts",
+        "bytes": 35883,
+        "sha256": "da35505bc530e591c08293f7330561e40a84db779cad929c6e936da0887e25ee",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/a4/stages/assemble.ts",
+        "dev": 16777231,
+        "inode": 542458736,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+        "bytes": 124482,
+        "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+        "dev": 16777231,
+        "inode": 542461161,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+        "bytes": 124482,
+        "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+        "dev": 16777231,
+        "inode": 542461161,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPipeline.test.ts",
+        "bytes": 13997,
+        "sha256": "c172a33f5605a939ca9504a3f2a3eb594cd5dece890467dcb16456bb49d8e7c9",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPipeline.test.ts",
+        "dev": 16777231,
+        "inode": 542463280,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPipeline.test.ts",
+        "bytes": 13997,
+        "sha256": "c172a33f5605a939ca9504a3f2a3eb594cd5dece890467dcb16456bb49d8e7c9",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPipeline.test.ts",
+        "dev": 16777231,
+        "inode": 542463280,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts",
+        "bytes": 28977,
+        "sha256": "297e55b5dd88e7adea27c9f9c6189b78115821de5a5f56ff944f9c7dcb4bf375",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts",
+        "dev": 16777231,
+        "inode": 542461337,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts",
+        "bytes": 28977,
+        "sha256": "297e55b5dd88e7adea27c9f9c6189b78115821de5a5f56ff944f9c7dcb4bf375",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/actions/authorizationRecheck.test.ts",
+        "dev": 16777231,
+        "inode": 542461337,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+        "bytes": 8631,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+        "dev": 16777231,
+        "inode": 542456404,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+        "bytes": 8631,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+        "dev": 16777231,
+        "inode": 542456404,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "bytes": 155432,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "dev": 16777231,
+        "inode": 542456844,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "bytes": 155432,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+        "dev": 16777231,
+        "inode": 542456844,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+        "bytes": 504,
+        "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+        "dev": 16777231,
+        "inode": 542463391,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+        "bytes": 504,
+        "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+        "dev": 16777231,
+        "inode": 542463391,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+        "bytes": 300,
+        "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+        "dev": 16777231,
+        "inode": 542463392,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+        "bytes": 300,
+        "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+        "dev": 16777231,
+        "inode": 542463392,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+        "dev": 16777231,
+        "inode": 542464352,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+        "dev": 16777231,
+        "inode": 542464352,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/README-v2.md",
+        "bytes": 2588,
+        "sha256": "c0ec77a4f91319da191b72761e607ecd6a1a07a7471704914c4cef93f126f59d",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/README-v2.md",
+        "dev": 16777231,
+        "inode": 543200185,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/README-v2.md",
+        "bytes": 2588,
+        "sha256": "c0ec77a4f91319da191b72761e607ecd6a1a07a7471704914c4cef93f126f59d",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/README-v2.md",
+        "dev": 16777231,
+        "inode": 543200185,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/review.json",
+        "bytes": 10189,
+        "sha256": "dd4767117dd66c42658ef10ac5ab0c6b9d5d44b1903021886407efb451d40525",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/review.json",
+        "dev": 16777231,
+        "inode": 543200159,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/review.json",
+        "bytes": 10189,
+        "sha256": "dd4767117dd66c42658ef10ac5ab0c6b9d5d44b1903021886407efb451d40525",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/review.json",
+        "dev": 16777231,
+        "inode": 543200159,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/seal.json",
+        "bytes": 1482,
+        "sha256": "b3a86dfcbd45ba61e2f3a44e82630165f080b13f3cd7a2a871489b2335b89757",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/seal.json",
+        "dev": 16777231,
+        "inode": 543200162,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/seal.json",
+        "bytes": 1482,
+        "sha256": "b3a86dfcbd45ba61e2f3a44e82630165f080b13f3cd7a2a871489b2335b89757",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/seal.json",
+        "dev": 16777231,
+        "inode": 543200162,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/graph-navigation.json",
+        "bytes": 810,
+        "sha256": "be7ff2c6f76aefca3cba03be8d70eb97d5c48df2eae4e2e86569a083044ac959",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/graph-navigation.json",
+        "dev": 16777231,
+        "inode": 543200158,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/graph-navigation.json",
+        "bytes": 810,
+        "sha256": "be7ff2c6f76aefca3cba03be8d70eb97d5c48df2eae4e2e86569a083044ac959",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/graph-navigation.json",
+        "dev": 16777231,
+        "inode": 543200158,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/README.md",
+        "bytes": 1577,
+        "sha256": "6236643145e29bc8cdebaf82d2c45114b373c82d3df2f188578d184e9fdb43b7",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/README.md",
+        "dev": 16777231,
+        "inode": 543238341,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/README.md",
+        "bytes": 1577,
+        "sha256": "6236643145e29bc8cdebaf82d2c45114b373c82d3df2f188578d184e9fdb43b7",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/README.md",
+        "dev": 16777231,
+        "inode": 543238341,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/review.json",
+        "bytes": 5801,
+        "sha256": "09e92c155ab416a35edaf58c930dcb931c7c7c0c9efddb2405a090b4471360ad",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/review.json",
+        "dev": 16777231,
+        "inode": 543238340,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/review.json",
+        "bytes": 5801,
+        "sha256": "09e92c155ab416a35edaf58c930dcb931c7c7c0c9efddb2405a090b4471360ad",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/review.json",
+        "dev": 16777231,
+        "inode": 543238340,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/seal.json",
+        "bytes": 1289,
+        "sha256": "e87884b5c0498b03dfdbd94451c4a06ab30d7a5edae2c1c66cd4d2f94bb0e8fc",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/seal.json",
+        "dev": 16777231,
+        "inode": 543238343,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/seal.json",
+        "bytes": 1289,
+        "sha256": "e87884b5c0498b03dfdbd94451c4a06ab30d7a5edae2c1c66cd4d2f94bb0e8fc",
+        "physicalPath": "/private/tmp/p1-11-decisive-qualification-20261017/next-routing/current179/seal.json",
+        "dev": 16777231,
+        "inode": 543238343,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-12.md",
+        "bytes": 13970,
+        "sha256": "5628e7b045ac658ca36544ddb02454c5eb6efd0a86c62f17f1cafa61ebb2747d",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-12.md",
+        "dev": 16777231,
+        "inode": 473795899,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-12.md",
+        "bytes": 13970,
+        "sha256": "5628e7b045ac658ca36544ddb02454c5eb6efd0a86c62f17f1cafa61ebb2747d",
+        "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-12.md",
+        "dev": 16777231,
+        "inode": 473795899,
+        "nlink": 1
+      }
+    },
+    {
+      "group": "candidate-input",
+      "expected": {
+        "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/branch-adoption.json",
+        "bytes": 559,
+        "sha256": "649b101ee360584de6a082cca28794ab67888d5fea1e477b0c6ccfd4f999a3ba",
+        "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/branch-adoption.json",
+        "dev": 16777231,
+        "inode": 543244654,
+        "nlink": 1
+      },
+      "current": {
+        "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/branch-adoption.json",
+        "bytes": 559,
+        "sha256": "649b101ee360584de6a082cca28794ab67888d5fea1e477b0c6ccfd4f999a3ba",
+        "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/branch-adoption.json",
+        "dev": 16777231,
+        "inode": 543244654,
+        "nlink": 1
+      }
+    }
+  ]
+}

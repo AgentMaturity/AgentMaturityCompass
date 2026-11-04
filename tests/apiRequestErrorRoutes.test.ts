@@ -1,12 +1,20 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { Readable } from "node:stream";
-import { describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test } from "vitest";
 import { handleProductRoute } from "../src/api/productRouter.js";
+import { setApiLogSink, type ApiErrorLogLine } from "../src/api/requestContext.js";
 import { handleVaultRoute } from "../src/api/vaultRouter.js";
 import { handleEnforceRoute } from "../src/api/enforceRouter.js";
 import { handleShieldRoute } from "../src/api/shieldRouter.js";
 
 type Handler = (pathname: string, method: string, req: IncomingMessage, res: ServerResponse) => Promise<boolean>;
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+const lines: ApiErrorLogLine[] = [];
+beforeEach(() => {
+  lines.length = 0;
+  setApiLogSink((line) => { lines.push(line); });
+});
+afterEach(() => setApiLogSink(null));
 
 const product: Handler = (pathname, method, req, res) => handleProductRoute(pathname, method, req, res, {
   workspace: process.cwd(),
@@ -54,9 +62,19 @@ async function requestError(handler: Handler, pathname: string, input: { body: s
   } as unknown as ServerResponse;
   expect(await handler(pathname, "POST", req, res)).toBe(true);
   expect(statuses).toHaveLength(1);
-  expect(headers).toEqual([{ "Content-Type": "application/json" }]);
   expect(bodies).toHaveLength(1);
-  return { status: statuses[0], body: JSON.parse(bodies[0]!) };
+  // P1-55: every error carries one request id, in the body and the header.
+  const { requestId, ...body } = JSON.parse(bodies[0]!) as { requestId?: string };
+  expect(requestId).toMatch(UUID);
+  expect(headers).toEqual([{ "Content-Type": "application/json", "X-Request-Id": requestId }]);
+  return { status: statuses[0], body };
+}
+
+// P1-55: a 500 body never carries the message. P0-55: nor does any other status; the body is the route's fallback
+// text and the internal detail is kept in the error log line instead.
+function expectRouteMessage(status: number, fallback: string, detail: string) {
+  expect(lines.map((line) => line.detail?.message)).toEqual([detail]);
+  return { ok: false, error: status === 500 ? "Internal server error" : fallback };
 }
 
 for (const [handler, pathname, fallbackStatus, fallback] of routes) {
@@ -75,18 +93,22 @@ for (const [handler, pathname, fallbackStatus, fallback] of routes) {
       });
     });
 
-    test("preserves the ordinary stream error's status and message", async () => {
-      expect(await requestError(handler, pathname, { error: new Error("request stream failed") })).toEqual({
-        status: fallbackStatus,
-        body: { ok: false, error: "request stream failed" }
-      });
+    test("keeps the ordinary stream error's status and its message in the log only", async () => {
+      const out = await requestError(handler, pathname, { error: new Error("request stream failed") });
+      expect(out).toEqual({ status: fallbackStatus, body: expectRouteMessage(fallbackStatus, fallback, "request stream failed") });
     });
 
-    test("preserves the route-specific non-Error fallback", async () => {
-      expect(await requestError(handler, pathname, { error: "non-Error failure" })).toEqual({
-        status: fallbackStatus,
-        body: { ok: false, error: fallback }
-      });
+    test("answers the route-specific fallback for a non-Error failure and logs the failure", async () => {
+      const out = await requestError(handler, pathname, { error: "non-Error failure" });
+      expect(out).toEqual({ status: fallbackStatus, body: expectRouteMessage(fallbackStatus, fallback, "non-Error failure") });
     });
   });
 }
+
+// P0-55: a certificate with no proof tree is a malformed request (400), never a 500 from inside the verifier.
+test("formal/certificate refuses { proof: true } as an invalid request body", async () => {
+  const out = await requestError(handleEnforceRoute, "/api/v1/enforce/formal/certificate", { body: JSON.stringify({ certificate: { proof: true } }) });
+  expect(out.status).toBe(400);
+  expect(out.body).toMatchObject({ ok: false, error: expect.stringContaining("Invalid request body:") });
+  expect(JSON.stringify(out.body)).not.toContain("argument must be of type");
+});

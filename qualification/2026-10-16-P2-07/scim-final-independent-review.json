@@ -1,0 +1,833 @@
+{
+  "reviewPin": {
+    "path": "/private/tmp/p2-07-scim-qualification-20261016/final-causal-chain-independent-review/review.json",
+    "bytes": 34555,
+    "sha256": "4654cabca161ee7a737a373ea008de2fd3fa97b5d1d66ecbd03aaaf6d3aae458"
+  },
+  "review": {
+    "schema": "amc-p207-scim-final-causal-chain-independent-review/1",
+    "at": "2026-10-16T14:42:48.535361+00:00",
+    "blockers": [],
+    "allReadsFinished": true,
+    "scope": "Finite independent static audit of actual fresh, source-only silent-noop control, and restored observations; no helper/product/runtime execution or checkout writes by this reviewer.",
+    "sourceCommit": "5d5604758d5a8cf5a519346c98318667b88059a2",
+    "sourceCwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout",
+    "borrowedRunnerCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "borrowedRunnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "phaseObservations": [
+      {
+        "phase": "p207s-fresh-six-files",
+        "outcome": {
+          "path": "/private/tmp/p2-07-scim-qualification-20261016/p207s-fresh-six-files-outcome.json",
+          "bytes": 120548,
+          "sha256": "c4a354cf709ff9be1eb9bc0dcb464b095f7cc7b0aae1788b0576e6ac706b1479"
+        },
+        "exit": 0,
+        "tests": {
+          "total": 160,
+          "passed": 160,
+          "failed": 0,
+          "skipped": 0
+        },
+        "uniqueIdentities": 160,
+        "prior154Preserved": true,
+        "sixNewSCIMIdentities": 6,
+        "hooksPassed": 28,
+        "ownedPgid": 70538,
+        "durationMs": 11977,
+        "naturalOwnedGroupClosure": true,
+        "lateOrUnhandled": [],
+        "publicRecords": [
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "algorithm-RS256",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-2cU1vq/observations/public-evidence.json",
+              "bytes": 1458,
+              "sha256": "bdaa85858a811b1c687701acd6d18f9379ecc4e48310c9f74f27a178f2f83205"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "algorithm-PS256",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-1Tdiju/observations/public-evidence.json",
+              "bytes": 1458,
+              "sha256": "2cb7d3a32204a207095d7eeb45da48d0aa546528c668bb33cbcb37d15794f2bd"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "algorithm-ES256",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-ifxAwD/observations/public-evidence.json",
+              "bytes": 1458,
+              "sha256": "aa37935cb130a06299c2acfd99d78a05b06f76edf2fb97798d5ec5a5217b906d"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "rotation-real-clock",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-QImHDt/observations/public-evidence.json",
+              "bytes": 1688,
+              "sha256": "69330e902f473befc02f0d60f745b97a6e4d1ebcfbaee5f183f19fa59d926c53"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "failed-refresh",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-vDHSQK/observations/public-evidence.json",
+              "bytes": 1616,
+              "sha256": "47f716f70a2007262f082dd2ab9859601f384f588908802f3151a2f3bf6c2abc"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "active-false-existing-session",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-gQV5z3/observations/public-evidence.json",
+              "bytes": 6380,
+              "sha256": "1c8e03f44a66da9448f6df4917c571580302be650b452c211bf505858e6fe5bb"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 13
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "cold-router-and-replay",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-19bVhe/observations/public-evidence.json",
+              "bytes": 5337,
+              "sha256": "6b01a392f51f7c3ab9f5bffffa68c4af3bcfb15695bc3c69b9e374ca73de16a3"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 12
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "router-exact-ttl",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-t4ff94/observations/public-evidence.json",
+              "bytes": 3004,
+              "sha256": "864d7fffa0fbabbf0672980d51a171637b9d2956cd680ea968c9fe588fc73491"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 9
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "public-single-use",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-UmbEJO/observations/public-evidence.json",
+              "bytes": 917,
+              "sha256": "b84cb70159f92c6f98ea2af377135ece19ded66f8668ab46337b22943fa308d1"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 2
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "public-ttl-boundary",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-47WHsk/observations/public-evidence.json",
+              "bytes": 1007,
+              "sha256": "d55752f9a58c67d09838c591333b94da5b0f4ab8b1a208e274fdf6ddb36ca63e"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 3
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "user-patch-values-paths",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-wHLdOA/observations/public-evidence.json",
+              "bytes": 20754,
+              "sha256": "b07b7fb4c1962325a7728750e55c903f09e5c91d416fdabbd7d4e7af68c0153d"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 34
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "filtered-member-role-revocation",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-tZmuPZ/observations/public-evidence.json",
+              "bytes": 7006,
+              "sha256": "907785237cc368af0ae717ba3ae9368cb44240a70bf8aef0022cb142c373543d"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 14
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "group-patch-validation",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-qXdFvA/observations/public-evidence.json",
+              "bytes": 21354,
+              "sha256": "1803c12f25d7e6badf4218827b9dabd3963a89556cf597919f1234de027297a6"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 32
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "user-filter-contract",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-somQbF/observations/public-evidence.json",
+              "bytes": 7314,
+              "sha256": "3a263ca95e73ebd5cdfb99c658bf55d8bcbf240f9c1b09b0e2d82d4bc4af0d38"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 14
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "patch-parser-wire-and-typed-contract",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-i5P6pE/observations/public-evidence.json",
+              "bytes": 24756,
+              "sha256": "4807b5f4fc8d16bf88fbd7c00b6fa9757576eb70cfd7149919c7ae84abad677d"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 33
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "real-ten-second-timeout",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-JTuFuX/observations/public-evidence.json",
+              "bytes": 1120,
+              "sha256": "66d648a785338ccdcc740e364860e576be9a2605d855696baace04a637cd343f"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          }
+        ],
+        "SCIMHttpObservationRows": 101,
+        "SCIMHttpRowsByFamily": {
+          "active-false-existing-session": 7,
+          "user-patch-values-paths": 28,
+          "filtered-member-role-revocation": 7,
+          "group-patch-validation": 23,
+          "user-filter-contract": 8,
+          "patch-parser-wire-and-typed-contract": 28
+        },
+        "coldChildPid": 70552,
+        "coldChildNaturalZeroAndEmptyStreams": true
+      },
+      {
+        "phase": "p207s-filtered-remove-control",
+        "outcome": {
+          "path": "/private/tmp/p2-07-scim-qualification-20261016/p207s-filtered-remove-control-outcome.json",
+          "bytes": 121779,
+          "sha256": "1678074dcce6d64ca5515bde42951e7f21c8d41641eda84c5302603283497217"
+        },
+        "exit": 1,
+        "tests": {
+          "total": 160,
+          "passed": 159,
+          "failed": 1,
+          "skipped": 0
+        },
+        "uniqueIdentities": 160,
+        "prior154Preserved": true,
+        "sixNewSCIMIdentities": 6,
+        "hooksPassed": 28,
+        "ownedPgid": 71245,
+        "durationMs": 10916,
+        "naturalOwnedGroupClosure": true,
+        "lateOrUnhandled": [],
+        "publicRecords": [
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "algorithm-RS256",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-U8jG8q/observations/public-evidence.json",
+              "bytes": 1458,
+              "sha256": "ddb665cf4e13f00b1ac01c5d4a0e1cf3df67479d090f9fc571dbe9590d1b5765"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "algorithm-PS256",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-3H7ZEA/observations/public-evidence.json",
+              "bytes": 1458,
+              "sha256": "cd2a5cc19e0fa8ead376e6cbbafcf15a12fdca69bf91efa4ea16cb85ac6577e7"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "algorithm-ES256",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-w53Qwl/observations/public-evidence.json",
+              "bytes": 1458,
+              "sha256": "9866432bd3d3b213c66bf46d347393c3b3aff5775e498f6a16ffa8e3a5d47f4c"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "rotation-real-clock",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-VMwZX4/observations/public-evidence.json",
+              "bytes": 1688,
+              "sha256": "169bcea5256368170583403855ad0b29ac4736e58f73c34b41953de9c7ea20c0"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "failed-refresh",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-KOOaws/observations/public-evidence.json",
+              "bytes": 1616,
+              "sha256": "0b842e194f60d24ee520909706808ccf39291be9208a650c96ba9d62efa70013"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "active-false-existing-session",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-GsfGZr/observations/public-evidence.json",
+              "bytes": 6380,
+              "sha256": "afe7707cb67e75a75c91ededd77c2eb97116f419cca0ed1ba963fbba36e4d5bd"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 13
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "cold-router-and-replay",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-JQsDFL/observations/public-evidence.json",
+              "bytes": 5337,
+              "sha256": "d1a0eb932105b283c227ec0b22873391a42721c917ad89a3183a867197873481"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 12
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "router-exact-ttl",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-uuXfHd/observations/public-evidence.json",
+              "bytes": 3004,
+              "sha256": "f6aa884260110ec694f0e4657c33e216686c222d8a1c1e22408816e534a03442"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 9
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "public-single-use",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-sRXTzy/observations/public-evidence.json",
+              "bytes": 917,
+              "sha256": "052c225ddda159f98bfbb83d717abf0c0244fd1dce15a34559b69d72ec577d13"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 2
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "public-ttl-boundary",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-2px3SN/observations/public-evidence.json",
+              "bytes": 1007,
+              "sha256": "e6183c2d9b09794864d1af97cd711088b085d2b1342b0d8f0360440aa399fcb7"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 3
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "user-patch-values-paths",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-6ycXsY/observations/public-evidence.json",
+              "bytes": 20754,
+              "sha256": "669fe35145f387931e636f2aca1e4c415829854399de5e9ed64a44967f227357"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 34
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "filtered-member-role-revocation",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-Wsqf05/observations/public-evidence.json",
+              "bytes": 7945,
+              "sha256": "ecff7f7ce1f9ef287ffec62b3c7f69f9528dc4129c26218ead897e82df9dde90"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 14
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "group-patch-validation",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-uO0zZL/observations/public-evidence.json",
+              "bytes": 21354,
+              "sha256": "8323a94e9631aaa4092fd8a8865c6331f703c044cf1b555533f63b5d54995f1a"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 32
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "user-filter-contract",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-ovRYd9/observations/public-evidence.json",
+              "bytes": 7314,
+              "sha256": "735b1663b9ffebc516c725adc672e02461004e4c4b039dee80cad84c1975f719"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 14
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "patch-parser-wire-and-typed-contract",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-gnJvXb/observations/public-evidence.json",
+              "bytes": 24756,
+              "sha256": "7bc5876cf18608816ab43ce616739da919bf3d96fa04f7ff5cf72fc6746200a3"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 33
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "real-ten-second-timeout",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-RDIz34/observations/public-evidence.json",
+              "bytes": 1127,
+              "sha256": "6cd7fd8b0e341cd8294d6af5c76dfc5eb8e26b4314747565a33a94ad58a6a3b7"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          }
+        ],
+        "SCIMHttpObservationRows": 101,
+        "SCIMHttpRowsByFamily": {
+          "active-false-existing-session": 7,
+          "user-patch-values-paths": 28,
+          "filtered-member-role-revocation": 7,
+          "group-patch-validation": 23,
+          "user-filter-contract": 8,
+          "patch-parser-wire-and-typed-contract": 28
+        },
+        "coldChildPid": 71446,
+        "coldChildNaturalZeroAndEmptyStreams": true
+      },
+      {
+        "phase": "p207s-filtered-remove-restored",
+        "outcome": {
+          "path": "/private/tmp/p2-07-scim-qualification-20261016/p207s-filtered-remove-restored-outcome.json",
+          "bytes": 120675,
+          "sha256": "4634628b16898b069ac4e45e06e385f7a46a4f021f5eed860817f83d483ccc90"
+        },
+        "exit": 0,
+        "tests": {
+          "total": 160,
+          "passed": 160,
+          "failed": 0,
+          "skipped": 0
+        },
+        "uniqueIdentities": 160,
+        "prior154Preserved": true,
+        "sixNewSCIMIdentities": 6,
+        "hooksPassed": 28,
+        "ownedPgid": 71583,
+        "durationMs": 10938,
+        "naturalOwnedGroupClosure": true,
+        "lateOrUnhandled": [],
+        "publicRecords": [
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "algorithm-RS256",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-8Wdtd2/observations/public-evidence.json",
+              "bytes": 1458,
+              "sha256": "966c47c671d255670af448673869ea8dee9cdd43ca3f4c12324c85dc7bcf54ba"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "algorithm-PS256",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-OVy4iA/observations/public-evidence.json",
+              "bytes": 1458,
+              "sha256": "8a40b5f56aa9a248761711491a93f1289de4ced9e509b160e5ff83c6e120f3c7"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "algorithm-ES256",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-ukRD6z/observations/public-evidence.json",
+              "bytes": 1458,
+              "sha256": "fdb386a75ebf1c4e94417d9d8c48c8fc6659348999be341c3af1de9599354eed"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "rotation-real-clock",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-DAg7RA/observations/public-evidence.json",
+              "bytes": 1688,
+              "sha256": "e76ab295e3a4fdac15b1ead96392aa9b59a6c30186f6cf4e6abe5fc578bf0386"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "failed-refresh",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-SVJKCD/observations/public-evidence.json",
+              "bytes": 1616,
+              "sha256": "b2c1a14d1fef9468724a4d767e0df22a205359ebdb82a5fcdaf7350356b04615"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "active-false-existing-session",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-a5hfch/observations/public-evidence.json",
+              "bytes": 6380,
+              "sha256": "54c865c1421826ba637880c222884fb9b511fcf14cbe2cff06903557f4ddd39f"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 13
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "cold-router-and-replay",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-yDwlzq/observations/public-evidence.json",
+              "bytes": 5337,
+              "sha256": "4b2911d09e25efa770334b0c18f0f0ad7220a0a805e02f512fd41d8cdcdf5fc0"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 12
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "router-exact-ttl",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-KrqCzI/observations/public-evidence.json",
+              "bytes": 3004,
+              "sha256": "b9aa354ff24a2a02352283fb4f77082d9341fc182b66676787956aff2be0c25a"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 9
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "public-single-use",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-F3hPMx/observations/public-evidence.json",
+              "bytes": 917,
+              "sha256": "dc352820ff4cebbcf28a943e947e6d1dd976386efbab375abbcf57b5347d6103"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 2
+          },
+          {
+            "kind": "AMC_P207_PENDING_PUBLIC_EVIDENCE",
+            "label": "public-ttl-boundary",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-tgtKoc/observations/public-evidence.json",
+              "bytes": 1007,
+              "sha256": "85b6e46828bc5a9c500de6863f08af189652a60a9d3d5fd580c0d8026131214b"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 3
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "user-patch-values-paths",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-Vq9SZT/observations/public-evidence.json",
+              "bytes": 20754,
+              "sha256": "916d957c3331eeb4cc30d9e1ef387817b3f6b04bd6704f151d72c76b04b89db5"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 34
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "filtered-member-role-revocation",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-9LtKrd/observations/public-evidence.json",
+              "bytes": 7006,
+              "sha256": "009778891eddd8652d44ff0bfd721b75b05aa848b2c32cab3ee298a4e9a59ac5"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 14
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "group-patch-validation",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-7frHC2/observations/public-evidence.json",
+              "bytes": 21354,
+              "sha256": "18c76897ebc3ba41104a40ef6e24be1f89956867ad8b95cca6c9a3477bc848ba"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 32
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "user-filter-contract",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-yqpBGT/observations/public-evidence.json",
+              "bytes": 7314,
+              "sha256": "8d7fbb6e51fd286a65a43db6e142a6ff62a518a4cd28503b8034960fbc5e9741"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 14
+          },
+          {
+            "kind": "AMC_P207_SCIM_PUBLIC_EVIDENCE",
+            "label": "patch-parser-wire-and-typed-contract",
+            "pin": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-1jjje8/observations/public-evidence.json",
+              "bytes": 24756,
+              "sha256": "bfb4523a27ea290aa23ecfdcf260874471f9ac2fa2dc8f6edd162180d93b5d49"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 33
+          },
+          {
+            "kind": "AMC_P207_PUBLIC_EVIDENCE",
+            "label": "real-ten-second-timeout",
+            "pin": {
+              "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-v9ATuW/observations/public-evidence.json",
+              "bytes": 1121,
+              "sha256": "ef8a1c7a8f34b371ca30afa9bea9d056efebbcd9a657f8d851a0549cccd0259b"
+            },
+            "strictClosureAndEnvironment": true,
+            "observationRows": 1
+          }
+        ],
+        "SCIMHttpObservationRows": 101,
+        "SCIMHttpRowsByFamily": {
+          "active-false-existing-session": 7,
+          "user-patch-values-paths": 28,
+          "filtered-member-role-revocation": 7,
+          "group-patch-validation": 23,
+          "user-filter-contract": 8,
+          "patch-parser-wire-and-typed-contract": 28
+        },
+        "coldChildPid": 71595,
+        "coldChildNaturalZeroAndEmptyStreams": true
+      }
+    ],
+    "causalWitness": {
+      "operator": "filtered-remove-silent-noop",
+      "targetRel": "src/identity/scim/scimGroups.ts",
+      "original": {
+        "path": "/private/tmp/p2-07-scim-qualification-20261016/executed-controls/originals/filtered-remove-silent-noop/src/identity/scim/scimGroups.ts",
+        "bytes": 8432,
+        "sha256": "8c893ef273dcd620adc058864c19f18783642693ea3f09d2ae9163bffabf1640"
+      },
+      "mutantBytes": 8431,
+      "mutantSha256": "8702a52c88d5eb9c53806b3e42ff87b545ca74b4613a0119b1e3a12c14d172d1",
+      "uniqueReplacementCount": 1,
+      "mechanism": "The validated filtered remove becomes an empty add; no member is deleted and its SCIM grant remains. Existing filtered-operation/value rejection stays before the changed return.",
+      "actualBodyAssertion": "scimHardening.test.ts:337:33 after line336 HTTP200 passed",
+      "actualFailure": "AssertionError: expected [ AUDITOR, VIEWER ] to deeply equal [ AUDITOR ]",
+      "publicPhaseWitnesses": [
+        {
+          "phase": "p207s-fresh-six-files",
+          "publicEvidence": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-tZmuPZ/observations/public-evidence.json",
+            "bytes": 7006,
+            "sha256": "907785237cc368af0ae717ba3ae9368cb44240a70bf8aef0022cb142c373543d"
+          },
+          "httpStatus": 200,
+          "targetRoles": [
+            "AUDITOR"
+          ],
+          "survivorRoles": [
+            "VIEWER"
+          ],
+          "targetRetainedInBothResponses": false
+        },
+        {
+          "phase": "p207s-filtered-remove-control",
+          "publicEvidence": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-Wsqf05/observations/public-evidence.json",
+            "bytes": 7945,
+            "sha256": "ecff7f7ce1f9ef287ffec62b3c7f69f9528dc4129c26218ead897e82df9dde90"
+          },
+          "httpStatus": 200,
+          "targetRoles": [
+            "AUDITOR",
+            "VIEWER"
+          ],
+          "survivorRoles": [
+            "VIEWER"
+          ],
+          "targetRetainedInBothResponses": true
+        },
+        {
+          "phase": "p207s-filtered-remove-restored",
+          "publicEvidence": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-9LtKrd/observations/public-evidence.json",
+            "bytes": 7006,
+            "sha256": "009778891eddd8652d44ff0bfd721b75b05aa848b2c32cab3ee298a4e9a59ac5"
+          },
+          "httpStatus": 200,
+          "targetRoles": [
+            "AUDITOR"
+          ],
+          "survivorRoles": [
+            "VIEWER"
+          ],
+          "targetRetainedInBothResponses": false
+        }
+      ],
+      "masks": "Control line337 failed first. Survivor-role line338 and complete patched/fetched group equality line339 were masked, although their snapshots were gathered. They are not credited as reached control assertions. Fresh and restored passing tests reach all of those assertions.",
+      "other159TestsPassedInControl": true,
+      "cleanupSucceededWithOriginalAssertionPreserved": true,
+      "rootReview": {
+        "path": "/private/tmp/p2-07-scim-qualification-20261016/filtered-remove-root-body-review.json",
+        "bytes": 1970,
+        "sha256": "c1b3656d79a927a36f281b3e653ea8dcd2dbfc49de159acbd497cf413bec8334"
+      },
+      "apply": {
+        "path": "/private/tmp/p2-07-scim-qualification-20261016/filtered-remove-silent-noop-apply.json",
+        "bytes": 2464,
+        "sha256": "992f6e398288608c3c97b025523a9f7719d7b0b76e425794570b0957def9077a"
+      },
+      "restore": {
+        "path": "/private/tmp/p2-07-scim-qualification-20261016/filtered-remove-silent-noop-restore.json",
+        "bytes": 2801,
+        "sha256": "cb6b12d554f0b32a87344fe56da13c1688eeb4e53bd04ab11781a8cd2c1c9507"
+      },
+      "exactRestorationVerified": true,
+      "compiledMutantCredit": false,
+      "pendingChildScimControlCredit": false
+    },
+    "finalPreservation": {
+      "binding": {
+        "path": "/private/tmp/p2-07-scim-qualification-20261016/fresh-source-binding.json",
+        "bytes": 159566,
+        "sha256": "f7cf557f2138073ff2a053f50a50dc7672d518ac55901f51ade73f5b65d790c9"
+      },
+      "sourcePairs": 86,
+      "compiledRows": 28,
+      "emittedPhysicalPinsVerified": 204,
+      "heldRBytePinsVerified": 24,
+      "finiteDistinctPhysicalIdentities": 228,
+      "allEmittedBytesDevicesInodesLinkCountsRestored": true,
+      "held24RegularNlink1AndDistinctNow": true,
+      "held24HistoricalInodeEquivalenceClaim": false,
+      "nativeSourceFreshRunnerInodes": [
+        542501039,
+        542572479,
+        539175547
+      ],
+      "checkoutStates": {
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass": {
+          "head": "5d5604758d5a8cf5a519346c98318667b88059a2",
+          "status": [],
+          "indexEmpty": true,
+          "branch": "codex/p2-07-scim-handler-qualification"
+        },
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout": {
+          "head": "5d5604758d5a8cf5a519346c98318667b88059a2",
+          "status": [],
+          "indexEmpty": true,
+          "branch": ""
+        },
+        "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass": {
+          "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+          "status": [
+            " M CONTRIBUTING.md",
+            " M README.md",
+            " M docs/SSO_OIDC.md",
+            " M docs/content/reddit-launch-drafts.md",
+            " M docs/content/show-hn-draft.md",
+            " M docs/internal/competitive-landscape.md",
+            " M docs/internal/mirofish-simulation-council.md",
+            " M src/identity/identityConfig.ts",
+            " M src/identity/oidc/jwtVerify.ts",
+            " M src/identity/oidc/oidcRoutes.ts",
+            " M tests/identity/jwtVerify.test.ts",
+            " M unused-code/plan-edits/manifest.json",
+            " M website/i18n.js",
+            " M website/index.html",
+            " M website/lite.html",
+            " M whitepaper/AMC_WHITEPAPER_v1.md",
+            "?? .changeset/p2-07-oidc-validation-policy.md",
+            "?? tests/identity/oidcValidationConfig.test.ts"
+          ],
+          "indexEmpty": true,
+          "branch": "codex/p2-07-provider-validation"
+        }
+      },
+      "sixHistoricalCompilerHaltPinsPreserved": true,
+      "threeClosureCertificatesAndPinnedMembersPreserved": true,
+      "reservationAndFiveDonorPinsPreserved": true,
+      "currentNamespaceFourMarkerAliasesAbsent": true,
+      "rootFinalReview": {
+        "path": "/private/tmp/p2-07-scim-qualification-20261016/root-final-restoration-review.json",
+        "bytes": 3081,
+        "sha256": "d35b9854bad1812900dec0ead61b92c5a9eb1ac074ed0b471b805a6d17ae9bee"
+      }
+    },
+    "accounting": {
+      "publicRecordsAudited": 48,
+      "publicPerPhase": 16,
+      "SCIMHttpObservationRowsPerPhase": 101,
+      "uniqueTestsPerCohort": 160,
+      "composition": "128 verifier + 10 enterprise + 8 API security + 4 binding + 4 pending + 6 SCIM",
+      "repeatedRunsNotSummed": true,
+      "oldRedInitialAuditRemainsSeparate": {
+        "path": "/private/tmp/p2-07-scim-qualification-20261016/red-initial-runtime-independent-audit/review.json",
+        "bytes": 51756,
+        "sha256": "e7d2c4a669f494880a9a0b48cc19ad10167de049afde6da5640d747e2e0374b6"
+      }
+    },
+    "limits": [
+      "This selected-source test evidence does not close all P2-07 acceptance or the complete plan.",
+      "Held provider/config/archive decision remains open; held R byte pins and index are preserved.",
+      "Duplicate and dead-code quality failures remain unwaived; no all-quality-green or release qualification claim.",
+      "Source-only mutant was not compiled; unchanged compiled pending child gets no SCIM control sensitivity credit.",
+      "Finite 228-file preservation and recorded closures do not prove all transitive inputs, universal descendants or OS isolation."
+    ],
+    "formalDone": false
+  }
+}

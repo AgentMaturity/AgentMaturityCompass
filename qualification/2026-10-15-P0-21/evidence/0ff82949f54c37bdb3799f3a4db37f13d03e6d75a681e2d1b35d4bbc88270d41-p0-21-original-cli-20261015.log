@@ -1,0 +1,24 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass
+
+ ✓ tests/industryAdjustCurrentScore.test.ts (14 tests) 9417ms
+     ✓ uses the latest run integrity score when --score is omitted  756ms
+     ✓ still accepts explicit manual score input  741ms
+     ✓ --score is a percentage 0-100: 75 means 75%  730ms
+     ✓ --score 1.5 is refused instead of being reinterpreted  717ms
+     ✓ --score 0.75 is refused instead of being reinterpreted  702ms
+     ✓ --score 101 is refused instead of being reinterpreted  720ms
+     ✓ --score -5 is refused instead of being reinterpreted  721ms
+     ✓ --score abc is refused instead of being reinterpreted  731ms
+     ✓ explains how adjusted score differs from raw score  723ms
+     ✓ shows per-dimension weighting drilldown on request  723ms
+     ✓ includes per-dimension drilldown in JSON on request  715ms
+     ✓ exports an industry-adjusted comparison report across scored runs  723ms
+     ✓ includes run comparison rows in JSON history output  710ms
+
+ Test Files  1 passed (1)
+      Tests  14 passed (14)
+   Start at  10:24:38
+   Duration  9.55s (transform 14ms, setup 20ms, import 10ms, tests 9.42s, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-original-cli-20261015.json

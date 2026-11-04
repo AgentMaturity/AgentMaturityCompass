@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "evidence/event-cadence/commands/p125ec-public-curator/stdout-stderr.log",
+    "bytes": 340,
+    "sha256": "91c92fa86d3537605818e168f9ceecc93adb2a400bce1a325cbe30759ee3fafd"
+  },
+  "dataBase64": "eyJjb3VudCI6IDE3OCwgInJvbGVzIjogeyJwdWJsaWMtY2VydGlmaWNhdGVzIjogMzYsICJwdWJsaWMtY2hlY2twb2ludCI6IDI0LCAicHVibGljLWxpZmVjeWNsZSI6IDM2LCAicHVibGljLXF1ZXJ5IjogNDEsICJwdWJsaWMtcmVzcG9uc2UiOiA0MX0sICJjZXJ0aWZpY2F0ZUJ1bmRsZXMiOiAzNiwgIm5vU2lnbmluZ1Jvb3RUcmF2ZXJzYWxQcml2YXRlS2V5T3JDaGlsZFN0cmVhbVJlYWQiOiB0cnVlLCAibm9DdXJyZW50RGlhZ25vc3RpY1BoYXNlIjogdHJ1ZSwgImNhZGVuY2VWZXJpZmllZFJlcXVlc3RzIjogMTAsICJjYWRlbmNlT2JzZXJ2YXRpb25hbFVudmVyaWZpZWRSZXF1ZXN0cyI6IDF9Cg==",
+  "boundary": "Exact original bytes retained losslessly; decode and verify bytes/SHA256 before use. No command result changes."
+}

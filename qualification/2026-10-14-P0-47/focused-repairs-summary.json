@@ -1,0 +1,86 @@
+{
+  "sourceCommit": "71ed73e5886bc957130f9712985281d1b1149fca",
+  "scope": "Three focused Node22 runs at repaired bytes, committed afterward; not the whole suite",
+  "runs": [
+    {
+      "name": "focused-fixture-repairs",
+      "rawReport": "/private/tmp/p0-47-focused-fixture-repairs-20261014.json",
+      "rawSha256": "69292c0cad56195f9284d2bc1ad86125c69049966fcdc96d4942af46ab3eb641",
+      "result": {
+        "success": true,
+        "numTotalTests": 110,
+        "numPassedTests": 110,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "files": [
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/apiRouters.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/enterpriseSsoScim.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/questionScoreExplainability.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/studioNativeTaskService.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/security/api-security.test.ts"
+      ]
+    },
+    {
+      "name": "additional-fixture-repairs",
+      "rawReport": "/private/tmp/p0-47-additional-fixture-repairs-20261014.json",
+      "rawSha256": "6a6db47a9ce5b33a232f6e85112c05406cdbc72b57dd0bbb29f2a9e954732d33",
+      "result": {
+        "success": true,
+        "numTotalTests": 70,
+        "numPassedTests": 70,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "files": [
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/jsonlWriterResume.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeManagedRecovery.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeSandboxPolicyBinding.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/nativeValidationOutcomeSurfaces.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/compliance/dataResidencyPersistence.test.ts"
+      ]
+    },
+    {
+      "name": "doc-source-repairs",
+      "rawReport": "/private/tmp/p0-47-doc-source-repairs-20261014.json",
+      "rawSha256": "09c3b1fb6b26d53d20e5220c5c83f610b0d62d2d3aceacf83ac7ef2b5ed8972a",
+      "result": {
+        "success": true,
+        "numTotalTests": 71,
+        "numPassedTests": 71,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "files": [
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/compareBadgeDocs.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/evidencePathsExist.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/llmResponsesCapabilities.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/publicDocsArtifact.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/publicDocsGraph.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts"
+      ]
+    },
+    {
+      "name": "performance",
+      "rawReport": "/private/tmp/p0-47-performance-20261014.json",
+      "rawSha256": "0aeba44809e3c83dc318f24f7c8083b8ffb7f6ae0812e7f4ca6b66f27461efa4",
+      "result": {
+        "success": true,
+        "numTotalTests": 5,
+        "numPassedTests": 5,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "files": [
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/performance/ingestPipeline.performance.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/performance/ledgerConcurrency.performance.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/performance/scoringEngine.performance.test.ts",
+        "/Users/sid/.codex/worktrees/p0-47-qualification/AgentMaturityCompass/tests/performance/sessionSpine.performance.test.ts"
+      ]
+    }
+  ]
+}

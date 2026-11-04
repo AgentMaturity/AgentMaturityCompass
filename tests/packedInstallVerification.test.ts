@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { createHash } from "node:crypto";
+import { spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { verifyPackedRun } from "../scripts/packed-evidence-verification.mjs";
-import { isolatedInstallEnvironment, verifyPackedComposition } from "../scripts/packed-install-check.mjs";
+import { installPackedConsumer, isolatedInstallEnvironment, verifyPackedComposition } from "../scripts/packed-install-check.mjs";
 
 function fixture() {
   return {
@@ -106,6 +110,46 @@ describe("packed runtime evidence gate", () => {
         : { ok: kind !== "exit", stdout: kind === "malformed" ? "VERIFIED unsigned 0" : JSON.stringify(f.run) };
     } })).toBe(false);
   });
+
+  it.each(["normal", "dry-run"] as const)("checks the real npm %s packed-consumer boundary inside an owned ancestor project", (kind) => {
+    const work = realpathSync(mkdtempSync(join(tmpdir(), "amc-packed-prefix-fixture-")));
+    try {
+      const home = join(work, "home"), artifact = join(work, "artifact"), consumer = join(work, "nested", "consumer"), npmTemp = join(work, "tmp");
+      for (const directory of [home, artifact, consumer, npmTemp]) mkdirSync(directory, { recursive: true });
+      const ancestorManifest = join(work, "package.json");
+      const ancestorBytes = Buffer.from(JSON.stringify({ name: "amc-owned-prefix-parent", version: "1.0.0", private: true }, null, 2) + "\n");
+      writeFileSync(ancestorManifest, ancestorBytes);
+      const packageName = "amc-owned-packed-destination-fixture";
+      writeFileSync(join(artifact, "package.json"), JSON.stringify({ name: packageName, version: "1.0.0", files: ["index.js"] }));
+      writeFileSync(join(artifact, "index.js"), 'module.exports = "owned packed fixture";\n');
+      const env = { ...isolatedInstallEnvironment(process.env, home), TMPDIR: npmTemp,
+        npm_config_offline: "true", npm_config_ignore_scripts: "true" };
+      writeFileSync(join(home, ".npmrc"), "");
+      writeFileSync(join(home, ".npmrc-global"), "");
+      // Before invoking the deliberately unsafe Stage-1 helper/mutant, prove npm's implicit destination is owned.
+      const prefix = spawnSync("npm", ["prefix"], { cwd: consumer, env, encoding: "utf8", timeout: 15_000 });
+      expect(prefix.status, prefix.stderr).toBe(0);
+      expect(prefix.stdout.trim()).toBe(work);
+      const packed = spawnSync("npm", ["pack", "--prefix", artifact, "--ignore-scripts", "--pack-destination", work, "--json"],
+        { cwd: artifact, env, encoding: "utf8", timeout: 15_000 });
+      expect(packed.status, packed.stderr).toBe(0);
+      const packedRows = JSON.parse(packed.stdout) as Array<{ filename: string }>;
+      expect(packedRows).toHaveLength(1);
+      expect(packedRows[0]!.filename).toBe(packageName + "-1.0.0.tgz");
+      const tarball = join(work, packedRows[0]!.filename);
+      expect(existsSync(tarball)).toBe(true);
+      // The real pack is complete before enabling npm's successful no-install mode.
+      if (kind === "dry-run") writeFileSync(join(home, ".npmrc"), "dry-run=true\n");
+      const installed = installPackedConsumer(tarball, consumer, env, packageName);
+      const installedManifest = join(consumer, "node_modules", packageName, "package.json");
+      expect.soft(installed).toBe(kind === "normal");
+      expect.soft(existsSync(installedManifest)).toBe(kind === "normal");
+      expect.soft(readFileSync(ancestorManifest)).toEqual(ancestorBytes);
+      if (kind === "normal" && existsSync(installedManifest)) {
+        expect(JSON.parse(readFileSync(installedManifest, "utf8")).name).toBe(packageName);
+      }
+    } finally { rmSync(work, { recursive: true, force: true }); }
+  }, 45_000);
 
   it("removes inherited npm destinations and loader/AMC overrides before installing locally", () => {
     const base = { PATH: "/usr/bin", HOME: "/operator", npm_config_global: "true",

@@ -1,0 +1,167 @@
+{
+  "schema": "p107-mirror-diagnosis-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/p107-runtime-v2-outcome.json",
+      "bytes": 17747,
+      "sha256": "bdb531244876917dcd7412f3b6b89bcc1a5200a25694f757db31ad30810e0dfb",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/public-evidence.json",
+      "bytes": 27690,
+      "sha256": "5f0bed636d7cd4cab32707130171c0ab6e061292c1de38154cc022852d76a09b",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/pre-call-public-pins.json",
+      "bytes": 4387,
+      "sha256": "17c96453601cab0632a42b4527670020a5892f80cc4f8fcafbf41fa51c571b51",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/blob-keys/current.json",
+      "bytes": 91,
+      "sha256": "b3a72d9a781218ab0a1ec5bb98fff399d44d110cbe19e6e7a6c8497ec8f6c207",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-HPqWkX/workspace/.amc/blob-keys/current.json.sig",
+      "bytes": 247,
+      "sha256": "092f8abb2b45d92f1ec5d8ec1728e6e4d3c4332bc395105d96c5c754c06ae0d1",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/runtimeEvidenceEndToEnd.test.ts",
+      "bytes": 28111,
+      "sha256": "4dfc2dc3a9c96a900286a728d5c2e0bace934a37c4ec549d45ef49486509c8ed",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v2/seal.json",
+      "bytes": 2027,
+      "sha256": "d991aeb111ad789ad8043e7eaa5d461fd959cd1df2c14b2374a9de70af56aa6e",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review-v2/review.json",
+      "bytes": 5689,
+      "sha256": "150c35d956b648dacb4c95ab2511728895738319f915f14c386edf55be0234e3",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review-v2/seal.json",
+      "bytes": 1048,
+      "sha256": "a93c59c161995ebafdfeeb51fab361e4d95d2d3f0642510c06193acb47058d02",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/command.json",
+      "bytes": 2714,
+      "sha256": "eb69b6b875e84fb5da19a3d9cc51d4c84df12d88e058b3af73ab9a177e88c9f5",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/raw.json",
+      "bytes": 2386,
+      "sha256": "94db801554162a8d81132e40e31b852bba1c72d39d6f46153fe2354a5d6323dc",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/observer.json",
+      "bytes": 13715,
+      "sha256": "c022a68299d4f7aff8f648100612a232025c39b5a1c84e1ffb8031f515f4581f",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/stdout-stderr.log",
+      "bytes": 3715,
+      "sha256": "e7a84a68a146ad0b60cfef2c311289750e5de571c7c5bbbd399ebb06c6a62543",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v2/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "d48a8f7b878a5910b37d17e82519d7bc42eb2758812963a9de563954f12130ef",
+      "readScope": "Actual retained machine artifact fully read or exact prior seal/provenance reused."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/fs.ts",
+      "bytes": 1006,
+      "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/storage/blobs/blobKeys.ts",
+      "bytes": 9331,
+      "sha256": "621760aae5d6439e8bf25e01220ad0bd9f0c50684fc6cfda48ed05c35552dd93",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/storage/blobs/blobStore.ts",
+      "bytes": 12178,
+      "sha256": "3be0ed5f62c63f9e0c98afa0dc3275fc7a495de8ee8276ad283b18b818fed277",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/persistence/sqliteSessionEventStore.ts",
+      "bytes": 5575,
+      "sha256": "a7670667f4ddf2db4fc82b3328139eb160048882e077b0412675126fd76257d4",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/session/sessionSpine.ts",
+      "bytes": 14439,
+      "sha256": "a5bf435606892bb27645b0c7629bf20b0dc6207fdbbfc14e226cbcb854989641",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/session/sessionService.ts",
+      "bytes": 36194,
+      "sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/workspace.ts",
+      "bytes": 27587,
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/ops/policy.ts",
+      "bytes": 6472,
+      "sha256": "cd0cee51e3207c191d74acedbed08579396a5d11c63d5c430b1384d94fe92b44",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+      "readScope": "Relevant exact public API/call-chain spans read; full-byte pin, not an exhaustive whole-file architecture read."
+    }
+  ]
+}

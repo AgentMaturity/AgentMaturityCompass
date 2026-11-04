@@ -2,6 +2,7 @@ import { lstatSync, readFileSync, realpathSync } from "node:fs";
 import { join } from "node:path";
 import { openLedger } from "../ledger/ledger.js";
 import { budgetMeta, NATIVE_BUDGET_RESERVATION, projectBudgetUsage, readBudgetEvents } from "../budgets/nativeBudgetUsage.js";
+import { workspaceSelfTrust } from "../trust/trustContext.js";
 import { assertJsonlWriterAvailable } from "../persistence/jsonl/jsonlWriterLock.js";
 import { jsonlEventsPath, jsonlLockPath, jsonlSessionsPath } from "../persistence/jsonl/jsonlEventLog.js";
 import type { SessionEventStore } from "../persistence/sessionEventStore.js";
@@ -114,7 +115,7 @@ function assertAccounting(workspace: string, rows: readonly EvidenceEvent[], age
     const stat = lstatSync(path);
     if (!stat.isFile() || stat.isSymbolicLink()) throw new Error();
     ledger = openLedger(workspace, { readonly: true });
-    const budgetRows = readBudgetEvents(workspace, ledger);
+    const budgetRows = readBudgetEvents(workspace, ledger, { trust: workspaceSelfTrust(workspace) });
     projectBudgetUsage(budgetRows, agentId, Date.now()); // Existing verifier/projection; no new counters or reservations.
     const reservations = budgetRows.filter(row => row.event_type === "audit" && budgetMeta(row).auditType === NATIVE_BUDGET_RESERVATION)
       .map(budgetMeta).filter(value => value.nativeSessionId === rows[0]!.session_id && value.agentId === agentId);

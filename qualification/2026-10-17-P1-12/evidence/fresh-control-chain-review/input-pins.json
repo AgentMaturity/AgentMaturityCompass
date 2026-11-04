@@ -1,0 +1,2155 @@
+{
+  "pins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/p2-07-oidc-validation-policy.md",
+      "bytes": 672,
+      "sha256": "808776f4676986361dc85c9fbf30a21f66a3fb7f823b10b2d11da63453bf1bee"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+      "bytes": 7630,
+      "sha256": "8eb9a7b8e856a4d0a6219788596164138abae2d67278c69df856ff7e40c820e9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+      "bytes": 7104,
+      "sha256": "31028027dbd972b8eb8999ff52900c157cc9c1158bc6841adab0f7bbe7ba48d4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+      "bytes": 2428,
+      "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "bytes": 43,
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+      "bytes": 13743,
+      "sha256": "bc1bdcfea46856cab6569ee7df78e9f4323d9821a8130158fb7b23c525be9b41"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+      "bytes": 13771,
+      "sha256": "6505b2e201bba6b0d450f7d1760a2c4bad30dac2ea604930877973f113c84847"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+      "bytes": 6089,
+      "sha256": "9fb46be0392a1164d6de12a32468c59dfc6c7840e4883e8f5d37ef933c091cf9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+      "bytes": 47452,
+      "sha256": "79776f1dfd4657b5bd28a0de3397ed333a7b3833f9c1f3ff2c619adf79b6c458"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/oidcValidationConfig.test.ts",
+      "bytes": 25711,
+      "sha256": "e0f92ce9257eda0a436b27e4ce60da948c4b73e2c8349fe85f0dd15031dca253"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed",
+      "bytes": 13501,
+      "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18504,
+      "sha256": "6c8bbf1605de739c13c1645640f825af67edbf4ca1420d1718a55f453570cdf2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "94da70f37fc7181a806b93b80c027042f7c215d8b5d65727eaff2d608ecc6ba6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "3b39cfb5d8279b295afe74fd89db694e2d2f210b430be3644935619368d5f44a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/actions/authorize.js",
+      "bytes": 17905,
+      "sha256": "3c078af911e6f4bf2e987bef21399247c9a9cc79d02ecc523a3ac6a125f0f0ea"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/catalog/compiler/activate.js",
+      "bytes": 7409,
+      "sha256": "4257dfe280c39c631d1c25afffab16ff46cf50e3b2ffb8927b233f13a30a8626"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/enforce/guardrailRuntimeBindings.js",
+      "bytes": 6013,
+      "sha256": "711a8e4ac1f744776b6c22172f116efcc948ff236dac26be630f270a1b6c68ac"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/policy/effectivePolicyReceipt.js",
+      "bytes": 4983,
+      "sha256": "23dabcca5117075f50ac3dd7bdad19bf6b715fe7660a5a4737333331037c37bd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/tools/guards/compiledPolicyGuard.js",
+      "bytes": 7048,
+      "sha256": "bad740a70f83bcad35f39a2114134878e867d5110f8858de084189c5158676dd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/tools/guards/policyGuards.js",
+      "bytes": 10115,
+      "sha256": "55ccd85f9c07e9bab72871ead7dbf977dfda80e302ece56a814fa9de4685107f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/tools/toolPipeline.js",
+      "bytes": 26934,
+      "sha256": "90dbf392d9dcf1cdc750ccd2fe1479d8bb22fb0d6012d452f7da9d71a55c62a9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/tools/toolRegistry.js",
+      "bytes": 7054,
+      "sha256": "b5fa412d5fc5fac3612974a6366041a9794732218ec2150ec9429452691f35fc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/TRUSTED_TIME.md",
+      "bytes": 7104,
+      "sha256": "31028027dbd972b8eb8999ff52900c157cc9c1158bc6841adab0f7bbe7ba48d4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "af0c5f47077494b8cc2106d63c5849223f210f470263de8b09a59d5479f92065"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "def5e0e91b20400671f5c40d2069cdabd090afb5b2cac40d4663bf74e8104a8f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "97ca78747fcbab5faa9630ba4bff8cb1e8b3aec265976c38ce247c75df053db9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5c0a952587cf63ed23e58262bff6d9dba08286715defd2fee2dd56d25423dad5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/security/dependency-reviews/rfc3161.md",
+      "bytes": 2428,
+      "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/graphify-navigation.py",
+      "bytes": 23480,
+      "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/snapshot-plan-edit.mjs",
+      "bytes": 7012,
+      "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+      "bytes": 4176,
+      "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/normalizeArguments.ts",
+      "bytes": 6300,
+      "sha256": "4efdbc0db4e4926c87509754e94867b1eafd45b13a2d14dca9a79749dbe81908"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/receiptStates.ts",
+      "bytes": 7612,
+      "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+      "bytes": 2472,
+      "sha256": "fb7f5bbe8f1711d994e20a982a73c817a6f0651873b9ad091cc9b3d19f2d1456"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/budgets/nativeBudgetAdmission.ts",
+      "bytes": 5574,
+      "sha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+      "bytes": 9250,
+      "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/runtimePolicy.ts",
+      "bytes": 11453,
+      "sha256": "293ce8862991a5a15c9f6e25be84e0746e05cac4d205b91819c5ce33b1d473fa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/types.ts",
+      "bytes": 10272,
+      "sha256": "c9bbf1dd73d3b37309b19d18af17021190ce11a7a150291a3a80f6bc17e92827"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/enforce/guardrailRuntimeBindings.ts",
+      "bytes": 6802,
+      "sha256": "65a79a2350da57c66b6120e2bcbf44e9a0a7fc30ee9811748da8e388ae5afbfa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/policy/effectivePolicyReceipt.ts",
+      "bytes": 7579,
+      "sha256": "f4f57e8bdaa0f3dea812d327e4907b2c6766d286cd2cd66001a33dbd64a6358a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/runtime/firewall.ts",
+      "bytes": 60642,
+      "sha256": "922b0b6891478e7e234bc65eab67acf50d806f76d10ace5c560dbbd3cbd9fe05"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/compiledPolicyGuard.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/policyGuards.ts",
+      "bytes": 10949,
+      "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 32571,
+      "sha256": "1fe7a8eab3a954ff876c780c373c4fb3243abc8652561cda3af2c53fc4a755f9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolRegistry.ts",
+      "bytes": 8048,
+      "sha256": "450c22e67f490d19fb7e90236c7240090ed05b4366e31eb179bde4384f8eae7c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolTypes.ts",
+      "bytes": 8042,
+      "sha256": "2f9d346695b05d83f045a9ac5ad1689ddd83032a5444d088ed6665aa026c3d03"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/verifierReport.ts",
+      "bytes": 6887,
+      "sha256": "e1d0cf40a349af2f2490b652f516f04b43a97f38c7043eb640ffbe12c39f2af2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/hash.ts",
+      "bytes": 259,
+      "sha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/version.ts",
+      "bytes": 337,
+      "sha256": "2e16763d1764e9426b7850201ac5e65ec93cd4a2e66ed70faebb25b2093e0593"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPipeline.test.ts",
+      "bytes": 13997,
+      "sha256": "c172a33f5605a939ca9504a3f2a3eb594cd5dece890467dcb16456bb49d8e7c9"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPolicyGuards.test.ts",
+      "bytes": 7827,
+      "sha256": "01b97f54dcf6af81aa4e5df33ed591e1f1e10c03bbd6cbcd846ce93917969a8c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustList.test.ts",
+      "bytes": 8031,
+      "sha256": "c953d12203c9ec6cbdab8ec14c3c2c827774f6afdb80aba3f33cf4644157c807"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/verifierReport.test.ts",
+      "bytes": 3844,
+      "sha256": "fb0a60cf941af3c124923f91d114aa80a2355a8c44eeb37f27e61b6ed6e05ad7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "413ed4eaba823bd0c0a1ad77422662f4ee8d5a221b9a95d19a2f95e113726433"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "3eb4d3313271913abb81ac391084aec461628132be9687ab4c927e232de8d4a4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "d71d1fbd6d0a13fa42cd7be83b4d25c6a5eeec21dd1343d7a723582221196370"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "e300a8c31c72767655c974f4642a9a8ebc45588416043b6ee7ed90c0548e87f2"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/TRUSTED_TIME.md",
+      "bytes": 7310,
+      "sha256": "ec74d153256f572aa03fa62a29a4435d7fb309d2e64f03b71fa3ef531c6d264f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/migration/LEGACY_RESULTS.md",
+      "bytes": 10048,
+      "sha256": "2602db07712be8b6e84acfe552bf2932d83a4ec20531cce3a482a72fba07b309"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/security/dependency-reviews/rfc3161.md",
+      "bytes": 2428,
+      "sha256": "abcca570b46810af858131ca1be3d994c8e4e1c828172540521e8dda314f1cce"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/cli.ts",
+      "bytes": 1064495,
+      "sha256": "c4627270c37e5fe7e9314df604c01c0155f566df90e32a29ac690cb26113e5cb"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/crypto/signing/signerTypes.ts",
+      "bytes": 880,
+      "sha256": "4b9def9a2d936e47cd1e52467fb34992cca62fbbe8226bfb50bc842b2a386ad4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/classify.ts",
+      "bytes": 8451,
+      "sha256": "da93bdaf7af938ce1c75323440cd3c4be5c97e92f6bcb87b1509d9c228c324a0"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices.ts",
+      "bytes": 1187,
+      "sha256": "91380ebd370671d953181bac6ef2370091644fd36abf22a91d91366ed691d023"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/notices/AMC-LEGACY-2026-001.json",
+      "bytes": 1876,
+      "sha256": "165b430d830da41eb845144daa9fd151983516bbf7ccc95162da77dd186bebe4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/receipt.ts",
+      "bytes": 4086,
+      "sha256": "0a3e40ddd273ae16e3503c1c0f7c58323d406b7f52315078dfda432bf40c9a89"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/relabelLog.ts",
+      "bytes": 5262,
+      "sha256": "8a6496aa3c1e6785ba27d74000251d5f4114f8a7ee3ecba8e2a2468c6f8cec39"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/migration/legacy/scan.ts",
+      "bytes": 16329,
+      "sha256": "a857c9dc27a993db83036a2044a5de7da5d1b262d3ac60ec2840e6950d87f272"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "5ad270cb43b734c9e7cf32f3b2a2329c43d5fe3e17ef657c444de0c8b8f530a5"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/src/trust/trustConfig.ts",
+      "bytes": 14680,
+      "sha256": "39c8b85eda085b68984a52ca4e306b26f86eaee798730a60a33df95003e5039e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-11.md",
+      "bytes": 16438,
+      "sha256": "410ddda0cdd3731fdc7ea3d6edb542bedf6ed3e7402a9ac5708178048266e7c5"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+      "bytes": 12911,
+      "sha256": "db346645bc6ac0b783f22bbba50cb07b36e74832507218e4a2488a6d8b68f279"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/manifest.json",
+      "bytes": 697781,
+      "sha256": "c0976d8b42699a5c169fbb2f089418083eccbec3fe40a00cb5814b4fae879838"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass/graphify-out/navigation/summary.json",
+      "bytes": 36920,
+      "sha256": "82e79208a9a7415b15f77e93c8e73e338859399bad1b41ad6c152e0abebb0ecb"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2110,
+      "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/bounded-closure.json",
+      "bytes": 1622,
+      "sha256": "b3f116c938e9f91eeb73ec4cba74f27c0b410a355d29f51a58940d5dce12ed87"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/final-preservation.json",
+      "bytes": 2158,
+      "sha256": "b5990312dfcb50aaa828a8a731d292932aa2acb352723fdbe0f8c2497f3c5ae7"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/fresh-source-binding.json",
+      "bytes": 11026,
+      "sha256": "8b2dfb76a10435847b92e768b6eac044a012bf73c7184345d515cb0e3b3c7af7"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/graph-freshness.json",
+      "bytes": 1273,
+      "sha256": "ee7b3f6a10b91b01019c520109a4cd1adbb4b4488870088de52ccb56b0fcb797"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-facts.json",
+      "bytes": 48112,
+      "sha256": "ea3112ff7c487dc4a696dd4748b3ebfb47e708dfff7873b7ad0989ea14deb99a"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/ownership-observations.json",
+      "bytes": 486198,
+      "sha256": "110a8eb14275715bb2f6a3b5a61a4643f7494808137562fb12e253e3427ae2a7"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/next-p125-admission/source-history.json",
+      "bytes": 3152,
+      "sha256": "4ec793790fb372d4e30fb0f524cd6f26fe8a4e9d3ed5f2c9baa6f9749749fc7a"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/root-final-review.json",
+      "bytes": 3363,
+      "sha256": "2e8df42109331e180ff5885309c65734817c157d851b8f44f7b851406016a806"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-evidence-design/ownership.json",
+      "bytes": 140164,
+      "sha256": "d3dcd561d6be4e3e2583d55e4eaa1cbc4e1f0a4b7999fe60523fc0e6e2672556"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/assemble-receipt.py",
+      "bytes": 4119,
+      "sha256": "55a5d8ef05e6ae776e0f6e9b69e49e2dc6c948275b3da606122487e3f3217868"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/candidate-static-review/review.json",
+      "bytes": 5903,
+      "sha256": "96550d5f62aa37789c3217c62c0b9cba843260666886e1b02b9d2fa2f821e985"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/check-preservation.py",
+      "bytes": 2792,
+      "sha256": "84c8091a5a61cb3e63912b4a4c4fa246fea678949611cb11ea410e993967aaf2"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/contract-review/controls.json",
+      "bytes": 4715,
+      "sha256": "77004cfb385395daca564a826acd68a62caf5de4b5eec3b0bca6e919dd2a3226"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-binding-review/review.json",
+      "bytes": 7650,
+      "sha256": "413481581e151a163f37c3ca1acc1453fd262f908b2b98367906509fefaae1a1"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-control-audit-plan/source-pinset.json",
+      "bytes": 66635,
+      "sha256": "d3638eb336a2aaf6043dad6c9c58643c9424b6fd6788f2560be153472c0e55ad"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/fresh-source-binding.json",
+      "bytes": 72394,
+      "sha256": "3f33395304145cb7b705b7253ae564b713a6043f24468c7ceb727f6e9e8ba118"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1-apply.json",
+      "bytes": 943,
+      "sha256": "9f0c582a45c82b433ed035c6c6f5187d9ee542b029b74c19df085679f0406878"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1-classification.json",
+      "bytes": 947,
+      "sha256": "6fd0e49adeeb52c8cf8c0274af16bcc5c92f6056ad9a2738566942aa1dfd16d9"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1-original.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1-restore.json",
+      "bytes": 783,
+      "sha256": "e2f7b8d4e5312ee35b599d6a0250a3429abf9e81e95e7b06d915069824ec3884"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m1.patch",
+      "bytes": 1086,
+      "sha256": "096ca77b7b5df7b2990ad6b7af42ea8a5a207445d9515a8e629297bae6d1a2f5"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2-apply.json",
+      "bytes": 939,
+      "sha256": "0420f93ffb558a7830376d76316ae80b5af96e6ca60458a6310c95a4dfe2e56f"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2-classification.json",
+      "bytes": 1595,
+      "sha256": "a2a32b5624e413394b8525dfa38dea6e1554e2cb873112086a5dab6f1ef02ec4"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2-original.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2-restore.json",
+      "bytes": 779,
+      "sha256": "810e68b1df102bae327bdbb62605e96dc798dbe88af04542a1ce8018baa01fdf"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m2.patch",
+      "bytes": 978,
+      "sha256": "5161f7597ebbd9c29959be464fec86caf79039ef2a47ce646f910d49c2c3ca4f"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3-apply.json",
+      "bytes": 942,
+      "sha256": "a92ff496b3ea945170534ff3cf69401a64a28d60a9b245578d5d857f12d610e6"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3-classification.json",
+      "bytes": 1522,
+      "sha256": "fc95a817c34498e55df566f653315cb6be4f383a85b4796987c9cc62967a8265"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3-original.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3-restore.json",
+      "bytes": 782,
+      "sha256": "ec000aca46c4184bf2fbed93734fd19b3cf7392698204e43303497ffef888dbb"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/m3.patch",
+      "bytes": 887,
+      "sha256": "d80e5b2a542aa03d28b35cb90a1c5ddbcf898a6c3b43b5a9a4c1be5585e2ee0d"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-fresh-canonical-outcome.json",
+      "bytes": 6916,
+      "sha256": "2280d85c833fd1f314125cf7ae73a677fbf413d9e7bc178d67eecb5db81e9ade"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-m1-outcome.json",
+      "bytes": 9350,
+      "sha256": "b2da655c01d46dca232e362e9fa67c74fda72bd9652c42918fa39e665a6f0462"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-m2-outcome.json",
+      "bytes": 12314,
+      "sha256": "72be478e657ddb8d4ac4df8ba483adbc32456c98668bf5fb973ae68c100894a9"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-m3-outcome.json",
+      "bytes": 12129,
+      "sha256": "2051574b880c704e67c2af082dd3796b8c33f8d2ee6a84d4c7ecb3ace7d716ea"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-restore1-outcome.json",
+      "bytes": 6902,
+      "sha256": "f95d9ac121d5c70002ac7b78d2c00a7ff781a8172291952a288100c18a6d2c3b"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-restore2-outcome.json",
+      "bytes": 6902,
+      "sha256": "c0cda2954202c90f2666a20db00add0cfa54165e3500c8aeda33c3c8a2027222"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/p112-restore3-outcome.json",
+      "bytes": 6902,
+      "sha256": "edb2f4878c8de60c8354428fcf94334e781aaeaf1076b0a988569d86b85ef2f0"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/preservation-after-m2.json",
+      "bytes": 480,
+      "sha256": "f49931231c749f65e277ee259d2e954bdae69babdb9bccbba9ecfb56f93fc0d7"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/preservation-final.json",
+      "bytes": 477,
+      "sha256": "e8ee149c6639b37cca5100fe1bae18f80a8cbbecc6234d6489dc8d74af9118dc"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/protected-inputs.json",
+      "bytes": 23429,
+      "sha256": "70037c62238cb088e1034713236be9ccc2d9ae991e44dcf3ce734760772560c2"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/quality-delta-review/review.json",
+      "bytes": 9348,
+      "sha256": "67fcb7cdb2570494a42ffab0f60d7a4163f39ea5f5203401fcf5eb98e33d7027"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-commit.json",
+      "bytes": 526,
+      "sha256": "7cb7776c2c674a92cb8e74e24c17e1d8f12d46b6ed39979ed94fdb7c4f034dfe"
+    },
+    {
+      "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control.py",
+      "bytes": 5206,
+      "sha256": "61844915b8ce3fedcaa2a28f8a602f60f2f2b24ae557df29a3ced6554c834104"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/branch-preparation.json",
+      "bytes": 616,
+      "sha256": "4c320d28c40930dc95ccf0949b063b834e21f6f3f7b5bb207e7240101d2f49ba"
+    },
+    {
+      "path": "/private/tmp/p1-35-legacy-qualification-20261016/next-plan-routing2/routing.json",
+      "bytes": 13613,
+      "sha256": "8548f63873e1401989b7216243edab60d7d74e8d4cb6cd560eeeb23080feb0ff"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-fresh-canonical/command.json",
+      "bytes": 2892,
+      "sha256": "4c76c2c02392ff95844ff951cb6438e16655a8add25951386bbaa00997a5096c"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-fresh-canonical/observer.json",
+      "bytes": 18998,
+      "sha256": "d6cc7d185ea4cbee71f302cae0852da67db3cd7ffbba983e986a228a63485aff"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-fresh-canonical/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "b5f89b8b17d18684861d466e53ee9ae820869cabd2981afa5ca71b7f7cc738cf"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-fresh-canonical/owned-process.json",
+      "bytes": 911,
+      "sha256": "1b2c22de13b21b78582cb3e98587481516584609e8fa171a528fffea6e1846fe"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-fresh-canonical/raw.json",
+      "bytes": 12955,
+      "sha256": "40db7543dd9078c417d5b9a33552cf65726f948a3416c16a67e775349b3c2166"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-fresh-canonical/stdout-stderr.log",
+      "bytes": 535,
+      "sha256": "4f2004ce173158c0596055dd632f765028a4b2f1c3796b60656b7e0fecd6a9dd"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m1/command.json",
+      "bytes": 2801,
+      "sha256": "a01c0136e999e5b6ce79a90a19b36a2b54fe7dbbf878b0df6248560e00865d9b"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m1/observer.json",
+      "bytes": 21275,
+      "sha256": "9f4ed257f1397173430233f2266fc587f72e7b18624b968ed423d839f39740e9"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m1/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "54e841c88c247e68866a79498a0070da10a472d6653a468ac208cb5de49179e1"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m1/owned-process.json",
+      "bytes": 898,
+      "sha256": "7dcc6ccacc6d9eb4a3ee30cdbdb6eece98fb3f748f476078f8f202a22e4e465d"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m1/raw.json",
+      "bytes": 14316,
+      "sha256": "f496ca78eb5072ff9440828157e1293aa7ac2a8b157d9f37ae7d855d9425b41e"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m1/stdout-stderr.log",
+      "bytes": 2429,
+      "sha256": "7996c418e5999a359318fa72ee971425cec374e65dc1dd4d674b723319abf8aa"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m2/command.json",
+      "bytes": 2801,
+      "sha256": "f8fe4a09cf477142c9eb0654494f5dbc938ea0e3e5e003708d4f6cbc639acd3b"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m2/observer.json",
+      "bytes": 24004,
+      "sha256": "16a962d834efb317e112b8950f544e0f59c390eb126dff9bf7a3910011beb80a"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m2/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "b7cb647d7cbcf7927c656a5fdb904f2437a8b043188236495a065823519d3d02"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m2/owned-process.json",
+      "bytes": 898,
+      "sha256": "6db0c9481eab1635e4163b9892a68817da6de5cefcdf71a23a9a8f5f0242a6a0"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m2/raw.json",
+      "bytes": 15709,
+      "sha256": "1b9824df6eefb3d9e1534d68d8facde2fb41f6a4c05c8c020c6fa4bd9a44f3f8"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m2/stdout-stderr.log",
+      "bytes": 3795,
+      "sha256": "52d8da55db2a5f6163a2fde81131a0bed4488fb07ae8991db10e6e85933a8c90"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m3/command.json",
+      "bytes": 2801,
+      "sha256": "7b608d050e654e04c487deb0e733d27d3b5fa102451b7db8686dc4e322531ceb"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m3/observer.json",
+      "bytes": 23806,
+      "sha256": "02b6b20149a52931ccbc9fc72c2cd4785eee984b17ac32619a5a6c61a6de74b6"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m3/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "56629906f8af2064fe3d340ec2b396ad4860a98411016a4bdb605dde19db0c06"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m3/owned-process.json",
+      "bytes": 898,
+      "sha256": "e51a7ce44164e1cef0db5e6f3a1fd210e112273c198437a1ea0d6583d3eea20a"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m3/raw.json",
+      "bytes": 15654,
+      "sha256": "b661c903ca13124506565a837bfeda9456919468154ba442f4d3d841b8b42ab9"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-m3/stdout-stderr.log",
+      "bytes": 3595,
+      "sha256": "13d4c6b2d8582334ea18eca0bb36f83968d7984acfadcea7dab56e2c051445b1"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore1/command.json",
+      "bytes": 2843,
+      "sha256": "6dadd2506bcbb0059ef233a1cc8d3f92938211505f18e247928baf6cc8b044cb"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore1/observer.json",
+      "bytes": 18998,
+      "sha256": "7a4fb05a7623f17ad76aca39684d34e395067b6c4f1ec7fd86d3bff13f8828a8"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore1/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "bc8e993089fde12b2756bf75eba2961050923c22f57200949df4810c7d40caa9"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore1/owned-process.json",
+      "bytes": 904,
+      "sha256": "0ee0ae288ff8db73c532ceb55f9a486a77cec7331ba8e7eb784fa4b40d6f84a0"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore1/raw.json",
+      "bytes": 12949,
+      "sha256": "a15b339c4cfdc7c15b48d25ec18cb1b168ed50eba8daad3560bf1082fc06601f"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore1/stdout-stderr.log",
+      "bytes": 528,
+      "sha256": "93a8c3c0e4cf5ce924f76efb98da65be7095d223ecf15e42ebe48e6bd4bde52a"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore2/command.json",
+      "bytes": 2843,
+      "sha256": "48b73548cd68a477f88659c2e676000cd07f7e3ff3cf9d60c43da07233d1df90"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore2/observer.json",
+      "bytes": 18998,
+      "sha256": "57997353a473421cf70cd36d91190225f35ed82372fb50c23dd6b0f202f87fae"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore2/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "c6852cbc83d92bf05dc59950c6267ae85e9339e500f90e05316414261ecfe642"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore2/owned-process.json",
+      "bytes": 904,
+      "sha256": "d7bb4c1eed59e842633817e11c85b58b439ebc73ba51480d8059cee83b454723"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore2/raw.json",
+      "bytes": 12944,
+      "sha256": "cdc0e054b5d726f9a42ca4d6e6453f3d0bbdd74a67e11c74a5af8e7ca061aad2"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore2/stdout-stderr.log",
+      "bytes": 608,
+      "sha256": "8854b48c0b3c215a0ad7e2aa595110267078b9e53a3cc9be33e926a5bd7a034c"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore3/command.json",
+      "bytes": 2843,
+      "sha256": "521c941a479fad56f2c8e81ce97a31c4d102b2f3d8c5598775cd8bfae10eebce"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore3/observer.json",
+      "bytes": 18998,
+      "sha256": "055ad880d232162f00b725e284c6545b9c4b0af17a7a24dfa8536d56d9f341de"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore3/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "7f0ea566f2f3f9ad0169e406faf367598c16d823742a35cf48831fd845dbec0d"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore3/owned-process.json",
+      "bytes": 904,
+      "sha256": "7ef882049f10b24c9f299f096cd21bc56d32cdbd34f94d56b42ae6a73f6f1c21"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore3/raw.json",
+      "bytes": 12956,
+      "sha256": "7d629de2c843d07ecab53584a42e06b4c3e8fae15c632d911737f4f33e8c2ccf"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p112-restore3/stdout-stderr.log",
+      "bytes": 528,
+      "sha256": "2da371e89f501b91e90eea6f4a356a5ba727961569a180368dd04e98073e907c"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p112-fresh-canonical.raw.json",
+      "bytes": 12955,
+      "sha256": "40db7543dd9078c417d5b9a33552cf65726f948a3416c16a67e775349b3c2166"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p112-m1.raw.json",
+      "bytes": 14316,
+      "sha256": "f496ca78eb5072ff9440828157e1293aa7ac2a8b157d9f37ae7d855d9425b41e"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p112-m2.raw.json",
+      "bytes": 15709,
+      "sha256": "1b9824df6eefb3d9e1534d68d8facde2fb41f6a4c05c8c020c6fa4bd9a44f3f8"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p112-m3.raw.json",
+      "bytes": 15654,
+      "sha256": "b661c903ca13124506565a837bfeda9456919468154ba442f4d3d841b8b42ab9"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p112-restore1.raw.json",
+      "bytes": 12949,
+      "sha256": "a15b339c4cfdc7c15b48d25ec18cb1b168ed50eba8daad3560bf1082fc06601f"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p112-restore2.raw.json",
+      "bytes": 12944,
+      "sha256": "cdc0e054b5d726f9a42ca4d6e6453f3d0bbdd74a67e11c74a5af8e7ca061aad2"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/p112-restore3.raw.json",
+      "bytes": 12956,
+      "sha256": "7d629de2c843d07ecab53584a42e06b4c3e8fae15c632d911737f4f33e8c2ccf"
+    },
+    {
+      "path": "/private/tmp/p2-07-provider-validation-20261016/count-overlay-result.json",
+      "bytes": 3952,
+      "sha256": "8380ef85741b16eff973fb2851cdb2cf247ad881fbe489524a12255a69465546"
+    },
+    {
+      "path": "/private/tmp/p2-07-provider-validation-20261016/preserved-tracked-candidate.patch",
+      "bytes": 47279,
+      "sha256": "edda17505b7c80a22561c35753f9051cf1ff80b731f145671f5e437150367129"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "94da70f37fc7181a806b93b80c027042f7c215d8b5d65727eaff2d608ecc6ba6"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/README.md",
+      "bytes": 59828,
+      "sha256": "3b39cfb5d8279b295afe74fd89db694e2d2f210b430be3644935619368d5f44a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/actions/authorize.js",
+      "bytes": 17905,
+      "sha256": "3c078af911e6f4bf2e987bef21399247c9a9cc79d02ecc523a3ac6a125f0f0ea"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/catalog/compiler/activate.js",
+      "bytes": 7409,
+      "sha256": "4257dfe280c39c631d1c25afffab16ff46cf50e3b2ffb8927b233f13a30a8626"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/enforce/guardrailRuntimeBindings.js",
+      "bytes": 6013,
+      "sha256": "711a8e4ac1f744776b6c22172f116efcc948ff236dac26be630f270a1b6c68ac"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/policy/effectivePolicyReceipt.js",
+      "bytes": 4983,
+      "sha256": "23dabcca5117075f50ac3dd7bdad19bf6b715fe7660a5a4737333331037c37bd"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/tools/guards/compiledPolicyGuard.js",
+      "bytes": 7048,
+      "sha256": "bad740a70f83bcad35f39a2114134878e867d5110f8858de084189c5158676dd"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/tools/guards/policyGuards.js",
+      "bytes": 10115,
+      "sha256": "55ccd85f9c07e9bab72871ead7dbf977dfda80e302ece56a814fa9de4685107f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/tools/toolPipeline.js",
+      "bytes": 26934,
+      "sha256": "90dbf392d9dcf1cdc750ccd2fe1479d8bb22fb0d6012d452f7da9d71a55c62a9"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/tools/toolRegistry.js",
+      "bytes": 7054,
+      "sha256": "b5fa412d5fc5fac3612974a6366041a9794732218ec2150ec9429452691f35fc"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "af0c5f47077494b8cc2106d63c5849223f210f470263de8b09a59d5479f92065"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "def5e0e91b20400671f5c40d2069cdabd090afb5b2cac40d4663bf74e8104a8f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "97ca78747fcbab5faa9630ba4bff8cb1e8b3aec265976c38ce247c75df053db9"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5c0a952587cf63ed23e58262bff6d9dba08286715defd2fee2dd56d25423dad5"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/clean-source-check.mjs",
+      "bytes": 7910,
+      "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/actions/authorizationRecord.ts",
+      "bytes": 4176,
+      "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/actions/normalizeArguments.ts",
+      "bytes": 6300,
+      "sha256": "4efdbc0db4e4926c87509754e94867b1eafd45b13a2d14dca9a79749dbe81908"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/actions/receiptStates.ts",
+      "bytes": 7612,
+      "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/approvals/approvalPolicySchema.ts",
+      "bytes": 2472,
+      "sha256": "fb7f5bbe8f1711d994e20a982a73c817a6f0651873b9ad091cc9b3d19f2d1456"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/budgets/nativeBudgetAdmission.ts",
+      "bytes": 5574,
+      "sha256": "5c39db72dffdb8b4d3fe08119bc6e17b1ff0abced55b725c731c9c06a93642db"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/catalog/compiler/activate.ts",
+      "bytes": 9250,
+      "sha256": "09bcf8d146e417a70b73b7333da60761d730805afc0bd481916e75ccf2731fc0"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/catalog/compiler/runtimePolicy.ts",
+      "bytes": 11453,
+      "sha256": "293ce8862991a5a15c9f6e25be84e0746e05cac4d205b91819c5ce33b1d473fa"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/catalog/compiler/types.ts",
+      "bytes": 10272,
+      "sha256": "c9bbf1dd73d3b37309b19d18af17021190ce11a7a150291a3a80f6bc17e92827"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/enforce/guardrailRuntimeBindings.ts",
+      "bytes": 6802,
+      "sha256": "65a79a2350da57c66b6120e2bcbf44e9a0a7fc30ee9811748da8e388ae5afbfa"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/policy/effectivePolicyReceipt.ts",
+      "bytes": 7579,
+      "sha256": "f4f57e8bdaa0f3dea812d327e4907b2c6766d286cd2cd66001a33dbd64a6358a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/runtime/firewall.ts",
+      "bytes": 60642,
+      "sha256": "922b0b6891478e7e234bc65eab67acf50d806f76d10ace5c560dbbd3cbd9fe05"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/guards/compiledPolicyGuard.ts",
+      "bytes": 7685,
+      "sha256": "19f4a72aebfe5d4eab606164cc25aab18e3dce4f2cdbcde1ea261730cae9b710"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/guards/policyGuards.ts",
+      "bytes": 10949,
+      "sha256": "60ef9aa1db917a75a7bf9df75606b8b0383b3197e87d7f560aeb307708074658"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/toolPipeline.ts",
+      "bytes": 32571,
+      "sha256": "1fe7a8eab3a954ff876c780c373c4fb3243abc8652561cda3af2c53fc4a755f9"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/toolRegistry.ts",
+      "bytes": 8048,
+      "sha256": "450c22e67f490d19fb7e90236c7240090ed05b4366e31eb179bde4384f8eae7c"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/toolTypes.ts",
+      "bytes": 8042,
+      "sha256": "2f9d346695b05d83f045a9ac5ad1689ddd83032a5444d088ed6665aa026c3d03"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/utils/hash.ts",
+      "bytes": 259,
+      "sha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/version.ts",
+      "bytes": 337,
+      "sha256": "2e16763d1764e9426b7850201ac5e65ec93cd4a2e66ed70faebb25b2093e0593"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/policy/compiledPolicyGuard.test.ts",
+      "bytes": 11155,
+      "sha256": "0b045ee76d6136d72543b567f1345212d1284faee5259e1b2dc8ab3ddd988da0"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/toolPipeline.test.ts",
+      "bytes": 13997,
+      "sha256": "c172a33f5605a939ca9504a3f2a3eb594cd5dece890467dcb16456bb49d8e7c9"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/toolPolicyGuards.test.ts",
+      "bytes": 7827,
+      "sha256": "01b97f54dcf6af81aa4e5df33ed591e1f1e10c03bbd6cbcd846ce93917969a8c"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "413ed4eaba823bd0c0a1ad77422662f4ee8d5a221b9a95d19a2f95e113726433"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/website/index.html",
+      "bytes": 43520,
+      "sha256": "3eb4d3313271913abb81ac391084aec461628132be9687ab4c927e232de8d4a4"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/website/lite.html",
+      "bytes": 11197,
+      "sha256": "d71d1fbd6d0a13fa42cd7be83b4d25c6a5eeec21dd1343d7a723582221196370"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "e300a8c31c72767655c974f4642a9a8ebc45588416043b6ee7ed90c0548e87f2"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    }
+  ],
+  "selectedPhysicalRows": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+      "dev": 16777231,
+      "inode": 542454930,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/CONTRIBUTING.md",
+      "dev": 16777231,
+      "inode": 543258040,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+      "dev": 16777231,
+      "inode": 542454935,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/README.md",
+      "dev": 16777231,
+      "inode": 543258045,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/actions/authorize.js",
+      "dev": 16777231,
+      "inode": 543248982,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/actions/authorize.js",
+      "dev": 16777231,
+      "inode": 543305843,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/catalog/compiler/activate.js",
+      "dev": 16777231,
+      "inode": 543249282,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/catalog/compiler/activate.js",
+      "dev": 16777231,
+      "inode": 543306143,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/enforce/guardrailRuntimeBindings.js",
+      "dev": 16777231,
+      "inode": 543249399,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/enforce/guardrailRuntimeBindings.js",
+      "dev": 16777231,
+      "inode": 543306260,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/policy/effectivePolicyReceipt.js",
+      "dev": 16777231,
+      "inode": 543249402,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/policy/effectivePolicyReceipt.js",
+      "dev": 16777231,
+      "inode": 543306263,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/tools/guards/compiledPolicyGuard.js",
+      "dev": 16777231,
+      "inode": 543249397,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/tools/guards/compiledPolicyGuard.js",
+      "dev": 16777231,
+      "inode": 543306258,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/tools/guards/policyGuards.js",
+      "dev": 16777231,
+      "inode": 543249395,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/tools/guards/policyGuards.js",
+      "dev": 16777231,
+      "inode": 543306256,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/tools/toolPipeline.js",
+      "dev": 16777231,
+      "inode": 543248986,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/tools/toolPipeline.js",
+      "dev": 16777231,
+      "inode": 543305847,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/dist/tools/toolRegistry.js",
+      "dev": 16777231,
+      "inode": 543248963,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/dist/tools/toolRegistry.js",
+      "dev": 16777231,
+      "inode": 543305824,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "dev": 16777231,
+      "inode": 542455439,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/docs/content/reddit-launch-drafts.md",
+      "dev": 16777231,
+      "inode": 543258550,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "dev": 16777231,
+      "inode": 542455440,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/docs/content/show-hn-draft.md",
+      "dev": 16777231,
+      "inode": 543258551,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "dev": 16777231,
+      "inode": 542455590,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/docs/internal/competitive-landscape.md",
+      "dev": 16777231,
+      "inode": 543258701,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "dev": 16777231,
+      "inode": 542455594,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/docs/internal/mirofish-simulation-council.md",
+      "dev": 16777231,
+      "inode": 543258705,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/package.json",
+      "dev": 16777231,
+      "inode": 542456404,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/package.json",
+      "dev": 16777231,
+      "inode": 543259515,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "dev": 16777231,
+      "inode": 542456844,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/pnpm-lock.yaml",
+      "dev": 16777231,
+      "inode": 543259955,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/receipt.schema.json",
+      "dev": 16777231,
+      "inode": 542458522,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/qualification/receipt.schema.json",
+      "dev": 16777231,
+      "inode": 543263070,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "dev": 16777231,
+      "inode": 542458537,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/check-freeze.mjs",
+      "dev": 16777231,
+      "inode": 543263085,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "dev": 16777231,
+      "inode": 542458540,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/check-qualification-receipts.mjs",
+      "dev": 16777231,
+      "inode": 543263088,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/clean-source-check.mjs",
+      "dev": 16777231,
+      "inode": 542458545,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/clean-source-check.mjs",
+      "dev": 16777231,
+      "inode": 543263093,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "dev": 16777231,
+      "inode": 542458558,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/freeze-baseline.json",
+      "dev": 16777231,
+      "inode": 543263106,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+      "dev": 16777231,
+      "inode": 542458561,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/gen-counts.mjs",
+      "dev": 16777231,
+      "inode": 543263109,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/source-quality.mjs",
+      "dev": 16777231,
+      "inode": 542458605,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/scripts/source-quality.mjs",
+      "dev": 16777231,
+      "inode": 543263154,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+      "dev": 16777231,
+      "inode": 542458759,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/actions/authorizationRecord.ts",
+      "dev": 16777231,
+      "inode": 543263308,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/authorize.ts",
+      "dev": 16777231,
+      "inode": 542458760,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/actions/authorize.ts",
+      "dev": 16777231,
+      "inode": 543263309,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/normalizeArguments.ts",
+      "dev": 16777231,
+      "inode": 542458762,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/actions/normalizeArguments.ts",
+      "dev": 16777231,
+      "inode": 543263311,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/actions/receiptStates.ts",
+      "dev": 16777231,
+      "inode": 542458763,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/actions/receiptStates.ts",
+      "dev": 16777231,
+      "inode": 543263312,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "dev": 16777231,
+      "inode": 542458918,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/approvals/approvalPolicyEngine.ts",
+      "dev": 16777231,
+      "inode": 543263467,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+      "dev": 16777231,
+      "inode": 542458919,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/approvals/approvalPolicySchema.ts",
+      "dev": 16777231,
+      "inode": 543263468,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/budgets/nativeBudgetAdmission.ts",
+      "dev": 16777231,
+      "inode": 542459266,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/budgets/nativeBudgetAdmission.ts",
+      "dev": 16777231,
+      "inode": 543263812,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/activate.ts",
+      "dev": 16777231,
+      "inode": 542459294,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/catalog/compiler/activate.ts",
+      "dev": 16777231,
+      "inode": 543263840,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/runtimePolicy.ts",
+      "dev": 16777231,
+      "inode": 542459303,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/catalog/compiler/runtimePolicy.ts",
+      "dev": 16777231,
+      "inode": 543263849,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/catalog/compiler/types.ts",
+      "dev": 16777231,
+      "inode": 542459306,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/catalog/compiler/types.ts",
+      "dev": 16777231,
+      "inode": 543263852,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "dev": 16777231,
+      "inode": 542459634,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/contracts/v1/authorizationRecord.ts",
+      "dev": 16777231,
+      "inode": 543264180,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "dev": 16777231,
+      "inode": 542459674,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/crypto/keys.ts",
+      "dev": 16777231,
+      "inode": 543264220,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/enforce/guardrailRuntimeBindings.ts",
+      "dev": 16777231,
+      "inode": 542459870,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/enforce/guardrailRuntimeBindings.ts",
+      "dev": 16777231,
+      "inode": 543264416,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/policy/effectivePolicyReceipt.ts",
+      "dev": 16777231,
+      "inode": 542460506,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/policy/effectivePolicyReceipt.ts",
+      "dev": 16777231,
+      "inode": 543265052,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/runtime/firewall.ts",
+      "dev": 16777231,
+      "inode": 542460665,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/runtime/firewall.ts",
+      "dev": 16777231,
+      "inode": 543265211,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/compiledPolicyGuard.ts",
+      "dev": 16777231,
+      "inode": 542461096,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/guards/compiledPolicyGuard.ts",
+      "dev": 16777231,
+      "inode": 543265642,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/guards/policyGuards.ts",
+      "dev": 16777231,
+      "inode": 542461097,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/guards/policyGuards.ts",
+      "dev": 16777231,
+      "inode": 543265643,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "dev": 16777231,
+      "inode": 542619636,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/toolPipeline.ts",
+      "dev": 16777231,
+      "inode": 543265646,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolRegistry.ts",
+      "dev": 16777231,
+      "inode": 542461101,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/toolRegistry.ts",
+      "dev": 16777231,
+      "inode": 543265647,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolTypes.ts",
+      "dev": 16777231,
+      "inode": 542619635,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/tools/toolTypes.ts",
+      "dev": 16777231,
+      "inode": 543265648,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/hash.ts",
+      "dev": 16777231,
+      "inode": 542461172,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/utils/hash.ts",
+      "dev": 16777231,
+      "inode": 543265718,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "dev": 16777231,
+      "inode": 542461173,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/utils/json.ts",
+      "dev": 16777231,
+      "inode": 543265719,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/version.ts",
+      "dev": 16777231,
+      "inode": 542461232,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/src/version.ts",
+      "dev": 16777231,
+      "inode": 543265778,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/policy/compiledPolicyGuard.test.ts",
+      "dev": 16777231,
+      "inode": 543246712,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/policy/compiledPolicyGuard.test.ts",
+      "dev": 16777231,
+      "inode": 543267563,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "dev": 16777231,
+      "inode": 542463190,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/setup/guardWorkspace.ts",
+      "dev": 16777231,
+      "inode": 543267767,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "dev": 16777231,
+      "inode": 542463193,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/setup/repoWorkspaceGuard.global.ts",
+      "dev": 16777231,
+      "inode": 543267770,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "dev": 16777231,
+      "inode": 542463194,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/setup/repoWorkspaceGuard.ts",
+      "dev": 16777231,
+      "inode": 543267771,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPipeline.test.ts",
+      "dev": 16777231,
+      "inode": 542463280,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/toolPipeline.test.ts",
+      "dev": 16777231,
+      "inode": 543267859,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/toolPolicyGuards.test.ts",
+      "dev": 16777231,
+      "inode": 542463281,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tests/toolPolicyGuards.test.ts",
+      "dev": 16777231,
+      "inode": 543267860,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "dev": 16777231,
+      "inode": 542463391,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tsconfig.json",
+      "dev": 16777231,
+      "inode": 543267970,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "dev": 16777231,
+      "inode": 542463392,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/tsconfig.tests.json",
+      "dev": 16777231,
+      "inode": 543267971,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "dev": 16777231,
+      "inode": 542464352,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/vitest.config.ts",
+      "dev": 16777231,
+      "inode": 543268932,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+      "dev": 16777231,
+      "inode": 542464407,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/website/i18n.js",
+      "dev": 16777231,
+      "inode": 543268987,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+      "dev": 16777231,
+      "inode": 542464408,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/website/index.html",
+      "dev": 16777231,
+      "inode": 543268988,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+      "dev": 16777231,
+      "inode": 542464412,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/website/lite.html",
+      "dev": 16777231,
+      "inode": 543268992,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "dev": 16777231,
+      "inode": 542464444,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+      "dev": 16777231,
+      "inode": 543269024,
+      "nlink": 1
+    }
+  ],
+  "allReadsFinished": true
+}

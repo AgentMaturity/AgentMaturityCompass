@@ -1,0 +1,1203 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1547",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T01:51:40.182724+00:00",
+  "state": "BOUNDED_ORIGINAL_CORPORA_AND_EIGHT_SOURCE_CONTROLS_COMPLETE",
+  "workspace": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-30-AMC-1547-qualification-20261015",
+  "construction": "Independent physical filesystem copy, not a Git clone.",
+  "initialOriginalTenFileBaseline": {
+    "counts": {
+      "numTotalTests": 170,
+      "numPassedTests": 170,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true,
+      "exit": 0
+    },
+    "perFileActualRegisteredCounts": {
+      "tests/bundleSpill.test.ts": 4,
+      "tests/cliSpillCommands.test.ts": 65,
+      "tests/retentionSpill.test.ts": 5,
+      "tests/sessionAttachmentSpill.test.ts": 10,
+      "tests/sessionInboxSpill.test.ts": 5,
+      "tests/sessionSpill.test.ts": 15,
+      "tests/sessionSpillCommitment.test.ts": 15,
+      "tests/sessionSpillRead.test.ts": 11,
+      "tests/spillEncryption.test.ts": 25,
+      "tests/spillLifecycle.test.ts": 15
+    },
+    "formalSevenActualSubsetCount": 140,
+    "recipeEightActualUnionSubsetCount": 155,
+    "raw": {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/combined-original-ten-file-baseline/raw-tests.json",
+      "bytes": 70358,
+      "sha256": "95cadc21104236ac53f1c568045950b8c9ea6b8518ba5bc2e8839423ebd20660"
+    },
+    "command": {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/combined-original-ten-file-baseline/command.json",
+      "bytes": 2046,
+      "sha256": "75c9353f00652ce2ca13b2ffe579a6c13e631b8e9a430ca1f64889792ab4c104"
+    }
+  },
+  "controls": [
+    {
+      "id": "P30-1547-write-before-commit",
+      "sourceTarget": "src/session/spill/spillStore.ts",
+      "files": [
+        "tests/spillEncryption.test.ts",
+        "tests/sessionSpillCommitment.test.ts",
+        "tests/sessionAttachmentSpill.test.ts",
+        "tests/sessionInboxSpill.test.ts"
+      ],
+      "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+      "historicalExpectationOnly": "killed",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 55,
+          "numPassedTests": 55,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 55,
+          "numPassedTests": 42,
+          "numFailedTests": 13,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 55,
+          "numPassedTests": 55,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [
+        {
+          "name": "user attachments above the per-event cap are retained through the signed spill store a signed commitment row is durable before any object exists; the attachment row carries a descriptor and the same reference",
+          "firstLine": "SpilledInputRetentionError: Attachment \"large.png\" is 65537 bytes, above the 65536-byte limit for one signed session event, and the encrypted spill store could not retain it (commit: expected [ Array(1) ] to deeply equal []). No object was published and no attachment row was recorded; if the commitment append itself was durable it remains as an explicitly missing object. Retaining oversize input needs vault-backed blob keys and a signed ops policy with blob encryption enabled; otherwise attach smaller media or split the input across turns.",
+          "locations": [
+            "src/session/spill/spillPolicy.ts:197:13",
+            "src/session/spill/spillPolicy.ts:230:14",
+            "src/session/sessionService.ts:536:32",
+            "src/session/sessionService.ts:511:41",
+            "tests/sessionAttachmentSpill.test.ts:133:26"
+          ],
+          "typePrefix": "SpilledInputRetentionError",
+          "fullFailureMessageSha256": "3ac3e1a280f37a38e0f45be1196e8a2b6b4ac7c8438f5f80ccef845d52fe07ec",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "user attachments above the per-event cap are retained through the signed spill store a commitment refused at admission never publishes an object or an attachment row",
+          "firstLine": "AssertionError: expected [ Array(1) ] to deeply equal []",
+          "locations": [
+            "tests/sessionAttachmentSpill.test.ts:367:42"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "5ba7e157c036b1881afbc94a362ee1df676fee0c303ae694e0c42cd579065742",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "queued inputs above the per-event cap are retained through the signed spill store the loop/inbox commitment is durable before any object exists; the inbox row carries a descriptor and keeps its format; replay, claim, continuity and projection carry the original bytes",
+          "firstLine": "SpilledInputRetentionError: The queued input (text plus encoded media) is 87538 bytes, above the 65536-byte limit for one signed session event, and the encrypted spill store could not retain it (commit: expected [ Array(1) ] to deeply equal []). No object was published and no attachment row was recorded; if the commitment append itself was durable it remains as an explicitly missing object. Retaining oversize input needs vault-backed blob keys and a signed ops policy with blob encryption enabled; otherwise attach smaller media or split the input across turns.",
+          "locations": [
+            "src/session/spill/spillPolicy.ts:197:13",
+            "src/session/spill/spillPolicy.ts:230:14",
+            "src/session/sessionService.ts:536:32",
+            "src/agent/inbox.ts:93:49",
+            "tests/sessionInboxSpill.test.ts:131:27"
+          ],
+          "typePrefix": "SpilledInputRetentionError",
+          "fullFailureMessageSha256": "6958709fd4e5ee2e648d64f86593d0b3560a6f13dc35b966580c7c94740f0331",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "signed spill commitment precedes encrypted persistence admits the signed non-surface commitment before any spill file, then admits the result after persistence",
+          "firstLine": "AssertionError: expected [ Array(1) ] to deeply equal []",
+          "locations": [
+            "tests/sessionSpillCommitment.test.ts:129:51",
+            "tests/sessionSpillCommitment.test.ts:87:11",
+            "src/session/sessionSpine.ts:190:31",
+            "src/session/sessionService.ts:633:12",
+            "src/session/spill/spillPolicy.ts:158:35",
+            "src/session/sessionService.ts:632:41",
+            "tests/sessionSpillCommitment.test.ts:151:12"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "f0b9a29135ff2004328fdaeb5c8beebb116a6d56503754b24894ac5c4d34a7b3",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "signed spill commitment precedes encrypted persistence a commitment failure at before-admission never persists an object or publishes a result",
+          "firstLine": "AssertionError: expected [Function] to throw error including 'synthetic commitment admission failure' but got 'expected [ Array(1) ] to deeply equal\u2026'",
+          "locations": [
+            "tests/sessionSpillCommitment.test.ts:181:53"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "865d8d730f05e2409867d91279c68c74d97bb7fbd2eaf271faaa630a9bfb346b",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "signed spill commitment precedes encrypted persistence a commitment failure at after-commit-return-lost never persists an object or publishes a result",
+          "firstLine": "AssertionError: expected [Function] to throw error including 'synthetic commitment admission failure' but got 'expected [ Array(1) ] to deeply equal\u2026'",
+          "locations": [
+            "tests/sessionSpillCommitment.test.ts:181:53"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "865d8d730f05e2409867d91279c68c74d97bb7fbd2eaf271faaa630a9bfb346b",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication prepares only in memory and publishes encrypted bytes from the input snapshot",
+          "firstLine": "AssertionError: expected true to be false // Object.is equality",
+          "locations": [
+            "tests/spillEncryption.test.ts:72:46"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "444b8d8afe51cea872465c38d1e320198288eb58630039b636e576155ab0835c",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication requires a completed commitment callback before any publication",
+          "firstLine": "AssertionError: expected true to be false // Object.is equality",
+          "locations": [
+            "tests/spillEncryption.test.ts:93:46"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "e222370f43e28313928626881759f14438adef7e769dfced9664f90347561ed1",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication refuses asynchronous commitment callbacks without writing",
+          "firstLine": "AssertionError: expected true to be false // Object.is equality",
+          "locations": [
+            "tests/spillEncryption.test.ts:104:46"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "d9e262a3604c6e75f8cbb1d5f8eee7dc9f678e83740b118ab62e2988779a246f",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication finishes short writes instead of publishing a truncated object",
+          "firstLine": "AssertionError: expected 0 to be greater than 1",
+          "locations": [
+            "tests/spillEncryption.test.ts:115:20"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "2af25b503f0f9dd13400e65dc194714cc68b61eb4b6271d54feda9b0c2f8075c",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication removes its partial file when a write makes no progress",
+          "firstLine": "AssertionError: expected [Function] to throw an error",
+          "locations": [
+            "tests/spillEncryption.test.ts:122:38"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "9699929cf829d7a1241e2adf28e2845cbe198bc5a89c2928a827b53827b42b01",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication does not overwrite a name planted after preparation",
+          "firstLine": "AssertionError: expected [Function] to throw an error",
+          "locations": [
+            "tests/spillEncryption.test.ts:130:38"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "e57b4dfd1c633030968847379d4b249ee93c0eac6bbec42e8188f06654172d32",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication refuses a linked parent and an exposed private directory",
+          "firstLine": "Error: EEXIST: file already exists, symlink '/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-write-before-commit-mutant/amc-spill-encryption-pDbyfS/elsewhere' -> '/private/tmp/p0-30-AMC-1547-qualification-20261015/tmp/P30-1547-write-before-commit-mutant/amc-spill-encryption-pDbyfS/.amc/spill'",
+          "locations": [
+            "tests/spillEncryption.test.ts:282:5"
+          ],
+          "typePrefix": "Error",
+          "fullFailureMessageSha256": "448f54bf063c93f8418099c685ab5ffff905de2f54625f5d6295cebd8aa28963",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-write-before-commit-mutant/raw-tests.json",
+            "bytes": 43179,
+            "sha256": "022cd8e839dc8a849e2b6194238ced9989c68125a10eb36d2a396c8c11aabdc7"
+          }
+        }
+      ],
+      "classificationAndMasking": {
+        "classification": "Exact source publication-order sensitivity:10 direct assertions,2 wrapped inner assertions and1 body collision; not13 independent security assertions.",
+        "notes": [
+          "Actual 55 \u2192 42 \u2192 55, with zero pending/todo. The 13 failures split into ten direct AssertionErrors, two SpilledInputRetentionError wrappers retaining original nonempty-object admission assertions, and one original-body EEXIST. Fixed wrapper prose saying no object was published is not evidence: observed early publication contradicts it.",
+          "The commitment assertion at line 129 stops before commit at 133. Both synthetic admission-fault variants fail their inner assertion at 175 before the intended commit at 176 or throw at 177; their mismatch at 181 does not exercise the intended two fault timings. Attachment refusal line 367 stops before row comparison 368.",
+          "Encryption assertions at 72/93/104 stop before later ciphertext, retrieval and positive controls. At 115 the spy observes zero writes because publication preceded spy installation. Failed throw assertions at 122/130 mask later partial-file and owner-data checks. The linked-parent body raises EEXIST at 282 because prepare already created the root; linked-parent and exposed-directory guards are not reached. Intact baselines/restorations execute the complete controls."
+        ]
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-write-before-commit-matrix.json",
+        "bytes": 139968,
+        "sha256": "53c0a68ecdadf4f9d7bd7386d3398672fc7337611b70586e90af5ca22513af3a"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-write-before-commit-source-change.json",
+        "bytes": 3534,
+        "sha256": "d11fed1c6d584580d85db153a5b401093216543525b78339175f3509d49c0e1f"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-write-before-commit-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "35e47ce1cef69527577e5e7b9fd0edd073a6faf0b68f91acee66e515ae87778a"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-write-before-commit-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1547-default-key",
+      "sourceTarget": "src/session/spill/spillEncryption.ts",
+      "files": [
+        "tests/spillEncryption.test.ts",
+        "tests/sessionSpillCommitment.test.ts",
+        "tests/sessionAttachmentSpill.test.ts"
+      ],
+      "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+      "historicalExpectationOnly": "killed",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 50,
+          "numPassedTests": 50,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 50,
+          "numPassedTests": 40,
+          "numFailedTests": 10,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 50,
+          "numPassedTests": 50,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [
+        {
+          "name": "user attachments above the per-event cap are retained through the signed spill store before any blob has provisioned the workspace key, the spill store cannot prepare and the attachment is refused with nothing recorded",
+          "firstLine": "AssertionError: expected undefined to be an instance of SpilledInputRetentionError",
+          "locations": [
+            "tests/sessionAttachmentSpill.test.ts:343:21"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "e4d251afeab5426044f71cb0591cddf252d2d2fa54397eb93570f865f8e1b5b6",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        },
+        {
+          "name": "signed spill commitment precedes encrypted persistence missing current-key signature produces only an explicit unretrievable preview and creates no key",
+          "firstLine": "AssertionError: expected { v: 2, format: 'amc-blob-v1', \u2026(10) } to match object { v: 2, format: 'amc-blob-v1', \u2026(4) }",
+          "locations": [
+            "tests/sessionSpillCommitment.test.ts:224:17"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "420ae3af051f0a0b8eb45e1c49c9096f74bb1ab8b9ef647eaa33e6d40925a164",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        },
+        {
+          "name": "signed spill commitment precedes encrypted persistence unavailable vault cannot produce a signed result or spill plaintext, fallback keys or replacement material",
+          "firstLine": "AssertionError: expected [ Array(1) ] to deeply equal []",
+          "locations": [
+            "tests/sessionSpillCommitment.test.ts:242:47"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "017e1318aa60b4a9380bcc2d74a743348b5893dab66b6ff4462499252aaf02e4",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication refuses no-sign mode without creating an unvaulted spill key",
+          "firstLine": "AssertionError: expected function to throw an error, but it didn't",
+          "locations": [
+            "tests/spillEncryption.test.ts:136:65"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "b11882c12e6aaf3e7514ac12cf47a4d125fe192d9ba0cf2ec31f088079c4e452",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication does not repair missing current key metadata",
+          "firstLine": "AssertionError: expected function to throw an error, but it didn't",
+          "locations": [
+            "tests/spillEncryption.test.ts:144:65"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "4a88914f0f15666487e8d805d6e2682e4b3f5c731087256f6db7ff6be2b33fcf",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication does not repair missing current key signature",
+          "firstLine": "AssertionError: expected function to throw an error, but it didn't",
+          "locations": [
+            "tests/spillEncryption.test.ts:144:65"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "4a88914f0f15666487e8d805d6e2682e4b3f5c731087256f6db7ff6be2b33fcf",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication rejects tampered current metadata instead of selecting its unverified version",
+          "firstLine": "AssertionError: expected [Function] to throw an error",
+          "locations": [
+            "tests/spillEncryption.test.ts:154:65"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "e8745c5fff4fb18ad5177889cc36a3c4282bcc401479f9e57e36b05f78f52b07",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication refuses signed unsupported key version 0 before encoding",
+          "firstLine": "AssertionError: expected [Function] to throw an error",
+          "locations": [
+            "tests/spillEncryption.test.ts:180:65"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "3c2074239b4f16cd2776d99b1f92176ecdf0134c7e65e6a74cb593fa7e4a4c25",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication refuses signed unsupported key version 4294967296 before encoding",
+          "firstLine": "AssertionError: expected [Function] to throw an error",
+          "locations": [
+            "tests/spillEncryption.test.ts:180:65"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "3c2074239b4f16cd2776d99b1f92176ecdf0134c7e65e6a74cb593fa7e4a4c25",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        },
+        {
+          "name": "retained spill encryption and publication uses read-only vault access when supplied, then refuses after credentials disappear",
+          "firstLine": "AssertionError: expected function to throw an error, but it didn't",
+          "locations": [
+            "tests/spillEncryption.test.ts:201:66"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "1bea3e6841f7d4840a57bc5579be8702115406ce292259f36a9a7d7502db2498",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-default-key-mutant/raw-tests.json",
+            "bytes": 35080,
+            "sha256": "2b4a6ab67f6284c5af0c850ff1b69f71245c0140fca68e044e82935e5eb6a306"
+          }
+        }
+      ],
+      "classificationAndMasking": {
+        "classification": "Ten direct original assertions demonstrate loss of writer-key refusal/retention semantics, with earlier policy validation still intact.",
+        "notes": [
+          "Actual 50 \u2192 40 \u2192 50, with zero pending/todo. Seven low-level cases first fail expected throws at 136, 144(two variants), 154, 180(two versions) and 201; later no-repair/no-object comparisons are masked. Signed operations policy checks still precede the mutated writerKey fallback.",
+          "Commitment line 224 sees a populated retained reference instead of null fields; later unretrievable, preview, object and key-snapshot checks at 226\u2013233 are masked. The unavailable-vault case still throws as required at 241, then finds an object at 242; later key/no-result assertions at 243\u2013244 are masked, so no accepted-operation or signed-result claim is made.",
+          "The unprovisioned attachment case sees no expected SpilledInputRetentionError at 343; its later no-row/no-object and provisioning/retry controls are masked. The fresh unprovisioned workspace is a same-process fixture, not a fully cold credential-absence process."
+        ]
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-default-key-matrix.json",
+        "bytes": 116831,
+        "sha256": "c52752e596e426ee683d653b548678895100e96bcdb8c260cf3e8ce2aae2ad2e"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-default-key-source-change.json",
+        "bytes": 2490,
+        "sha256": "c1ba435ad996cc6abe18f075a7fcb5f40a08863e6062fd5e647a77d0e17e99e6"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-default-key-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "a3784ff8296aac717d7c8c4595d2df0d77df3c4f6265f3a0f9fcda6beec3ad3d"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-default-key-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1547-skip-verify",
+      "sourceTarget": "src/session/spill/spillEvidence.ts",
+      "files": [
+        "tests/sessionSpill.test.ts",
+        "tests/sessionAttachmentSpill.test.ts"
+      ],
+      "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+      "historicalExpectationOnly": "killed",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 25,
+          "numPassedTests": 21,
+          "numFailedTests": 4,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [
+        {
+          "name": "user attachments above the per-event cap are retained through the signed spill store retention, erasure and export already cover the spilled attachment through its signed references",
+          "firstLine": "AssertionError: expected [] to have a length of 2 but got +0",
+          "locations": [
+            "tests/sessionAttachmentSpill.test.ts:289:58"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "529078b1ccd4c596d59a60f7719d26236a93b2622c2c11a01df923c24524c16d",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-mutant/raw-tests.json",
+            "bytes": 17723,
+            "sha256": "446e10bd8dab884ffe252cb492c31d6ea6837e5ab431692cb02eeab5f2104cca"
+          }
+        },
+        {
+          "name": "spill \u2014 oversized tool output leaves the ledger, its commitment does not detects a tampered spill file whose length is unchanged",
+          "firstLine": "AssertionError: expected true to be false // Object.is equality",
+          "locations": [
+            "tests/sessionSpill.test.ts:276:22"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "8e36391a7da382d92b1eaf068750f4ae4dfabcf2ae6785e0a001432228415a23",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-mutant/raw-tests.json",
+            "bytes": 17723,
+            "sha256": "446e10bd8dab884ffe252cb492c31d6ea6837e5ab431692cb02eeab5f2104cca"
+          }
+        },
+        {
+          "name": "spill \u2014 oversized tool output leaves the ledger, its commitment does not reports a deleted spill object as missing, not as tampering",
+          "firstLine": "AssertionError: expected '' to contain '1113270a-4a75-4bbf-aa12-2704d788edab'",
+          "locations": [
+            "tests/sessionSpill.test.ts:302:38"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "be909a75dfe8626899e6a75cf7193c50f864bc6c8e7c4c4cb9e6ddaa81ad7984",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-mutant/raw-tests.json",
+            "bytes": 17723,
+            "sha256": "446e10bd8dab884ffe252cb492c31d6ea6837e5ab431692cb02eeab5f2104cca"
+          }
+        },
+        {
+          "name": "spill \u2014 oversized tool output leaves the ledger, its commitment does not degrades honestly when the spill store cannot write: no locator, but still a commitment",
+          "firstLine": "AssertionError: an unavailable result cannot excuse an unsafe commitment path: expected true to be false // Object.is equality",
+          "locations": [
+            "tests/sessionSpill.test.ts:477:87"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "58e09c5ee94c4d021ff29fede06db231c6b7f4a8ae71a9e763b62cb149233067",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-skip-verify-mutant/raw-tests.json",
+            "bytes": 17723,
+            "sha256": "446e10bd8dab884ffe252cb492c31d6ea6837e5ab431692cb02eeab5f2104cca"
+          }
+        }
+      ],
+      "classificationAndMasking": {
+        "classification": "Four direct original sweep assertions; ciphertext/missing diagnostics lost while direct inspection/retrieval and signed-reference authentication remain.",
+        "notes": [
+          "Actual 25 \u2192 21 \u2192 25, with zero pending/todo. This changes the verification sweep only: authenticateWithContext still checks reference shape, signature and session binding, but does not read ciphertext. Direct inspect/retrieve damage refusals before the failed checks still pass.",
+          "The tamper assertion at 276 sees sweep.ok=true and masks the event-ID comparison at 277. The deleted-object case passes direct missing and sweep.ok=true, then fails missing-ID at 302. Attachment line 289 gets no missing references instead of two, after actual export/erase and direct payload-missing refusal have passed.",
+          "Unsafe-parent direct commitment inspection remains tampered, but the sweep returns true at 477. Later error-ID comparisons at 478\u2013479, obstruction removal/missing-gap checks at 483\u2013487 and whole-ledger/session checks at 491\u2013493 are masked. This does not show direct retrieval accepted damaged bytes or row authentication was removed."
+        ]
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-skip-verify-matrix.json",
+        "bytes": 62838,
+        "sha256": "b10e732872c786ee5512deee6c14a9b09c95bd761384643f3d470a2c68345e87"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-skip-verify-source-change.json",
+        "bytes": 2253,
+        "sha256": "e88a47f3889e76834fbc56d1e4434b5ebce99199c363481c63f1eac6802c282b"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-skip-verify-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "ea69979583a1185a0a52185a41ebf3b3e4152c2a85ba207893c8e3b0009b9d08"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-skip-verify-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1547-dotdot-path",
+      "sourceTarget": "src/session/spill/spillTypes.ts",
+      "files": [
+        "tests/sessionSpill.test.ts"
+      ],
+      "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+      "historicalExpectationOnly": "killed",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 15,
+          "numPassedTests": 14,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [
+        {
+          "name": "spill \u2014 oversized tool output leaves the ledger, its commitment does not rejects a locator that tries to name a path outside the session directory",
+          "firstLine": "AssertionError: amc-spill:v2:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:../../../../etc/passwd: expected '/private/tmp/p0-30-AMC-1547-qualifica\u2026' to be null",
+          "locations": [
+            "tests/sessionSpill.test.ts:445:55"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "64f75086f5387700bbea582fb8be2561d391155972d22f3861a46d0de36552b0",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-dotdot-path-mutant/raw-tests.json",
+            "bytes": 8379,
+            "sha256": "b8d04d0e8c8e069e477511616120ff70566933eebf14b05d95ad05395857164d"
+          }
+        }
+      ],
+      "classificationAndMasking": {
+        "classification": "One direct original path-resolution grammar assertion, with first hostile-vector masking.",
+        "notes": [
+          "Actual 15 \u2192 14 \u2192 15, with zero pending/todo. The original assertion at 445 for amc-spill:v2:<session-hash>:../../../../etc/passwd receives a resolved path instead of null.",
+          "The first invalid-session-hash vector passes both checks. The second vector fails path resolution at 445 before its readSpilled invalid-locator check at 446 and before the remaining six vectors. This is one registered case; a resolved path string is not an observed external-file read, and remaining owner/type/link/stable-file defenses stay intact."
+        ]
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-dotdot-path-matrix.json",
+        "bytes": 34290,
+        "sha256": "9dad8565b1ee6fe01e04ba480030aa5ca0a547843eab8e14262f8a80b5e1df16"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-dotdot-path-source-change.json",
+        "bytes": 2280,
+        "sha256": "77ded25b1b76b96f4598c8cdd4a6e620ba6b7ee7bcb98abe90898fd6433d8f83"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-dotdot-path-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "3d9646aadcae8df6e9f529d622e2a7c851db13f4c4d4104e37aaf069bee56a95"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-dotdot-path-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1547-export-unauthenticated",
+      "sourceTarget": "src/session/spill/spillLifecycle.ts",
+      "files": [
+        "tests/spillLifecycle.test.ts"
+      ],
+      "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+      "historicalExpectationOnly": "killed",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 15,
+          "numPassedTests": 14,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [
+        {
+          "name": "authenticated spill inventory distinguishes missing encrypted objects from modified ciphertext",
+          "firstLine": "AssertionError: expected true to be false // Object.is equality",
+          "locations": [
+            "tests/spillLifecycle.test.ts:101:37"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "c9d728a92570685a62254feacceda9fb4812c6c940d6039c64bdc00772e19370",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-export-unauthenticated-mutant/raw-tests.json",
+            "bytes": 7199,
+            "sha256": "c417d195faad1e94fb783da120f55abc060cd6fb417eec767655090b71855ab3"
+          }
+        }
+      ],
+      "classificationAndMasking": {
+        "classification": "One direct final destination-absence assertion demonstrates side effects before an otherwise retained export refusal.",
+        "notes": [
+          "Actual 15 \u2192 14 \u2192 15, with zero pending/todo. Inventory remains not-ok at 96 and still distinguishes missing at 97 from tampered at 98. The required throw(/refused/) at 100 also passes. The sole failure at 101 observes that the destination exists instead of remaining absent.",
+          "Source creates destination/objects at 242\u2013243 before later ciphertext reinspection at 251\u2013255 rejects the changed object. No empty index, successful unauthenticated export, tampered ciphertext export or lost row authentication is inferred. There is no later assertion in this body; the separate held conflicting/unauthentic-row export-destination case remains absent."
+        ]
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-export-unauthenticated-matrix.json",
+        "bytes": 30711,
+        "sha256": "6c0e1518d834f7d05abfb099c2213d2231a55872add7c8bf88639e9854116fc0"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-export-unauthenticated-source-change.json",
+        "bytes": 2336,
+        "sha256": "ddae06e7fe49d9998f4465f45169e91473a7aa5a8bd3a9b75457f5c03ef75d6b"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-export-unauthenticated-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "98578f4c5a373f9202796ad2e9185b36cb800f6935c81e9aecd0d865e4425185"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-export-unauthenticated-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1547-erase-scope",
+      "sourceTarget": "src/session/spill/spillLifecycle.ts",
+      "files": [
+        "tests/spillLifecycle.test.ts",
+        "tests/retentionSpill.test.ts",
+        "tests/cliSpillCommands.test.ts"
+      ],
+      "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+      "historicalExpectationOnly": "killed",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 85,
+          "numPassedTests": 85,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 85,
+          "numPassedTests": 80,
+          "numFailedTests": 5,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 85,
+          "numPassedTests": 85,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [
+        {
+          "name": "native spill commands over sqlite history plans read-only, canonicalizes repeated exact IDs, then calls native intent/unlink/outcome for only the reviewed scope",
+          "firstLine": "AssertionError: expected [ { \u2026(4) }, { \u2026(4) } ] to match object [ { \u2026(3) } ]",
+          "locations": [
+            "tests/cliSpillCommands.test.ts:259:37"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "bb873ef62c837bb6185934eabbd266586576a215da0e31e2d613ad83c276fe91",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-mutant/raw-tests.json",
+            "bytes": 38683,
+            "sha256": "c43f5dc7fede74db038a061dd7378ac833bdead3c1ed65894b2d697c67aab6f1"
+          }
+        },
+        {
+          "name": "native spill commands over jsonl history plans read-only, canonicalizes repeated exact IDs, then calls native intent/unlink/outcome for only the reviewed scope",
+          "firstLine": "AssertionError: expected [ { \u2026(4) }, { \u2026(4) } ] to match object [ { \u2026(3) } ]",
+          "locations": [
+            "tests/cliSpillCommands.test.ts:259:37"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "bb873ef62c837bb6185934eabbd266586576a215da0e31e2d613ad83c276fe91",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-mutant/raw-tests.json",
+            "bytes": 38683,
+            "sha256": "c43f5dc7fede74db038a061dd7378ac833bdead3c1ed65894b2d697c67aab6f1"
+          }
+        },
+        {
+          "name": "retention reaches committed spill objects without selecting active sessions makes retention progress when a backlog exceeds one signed audit payload while keeping every locator's exact references together",
+          "firstLine": "Error: Spill erasure selection exceeds the signed audit payload limit; select a smaller batch of exact event IDs",
+          "locations": [
+            "src/session/spill/spillLifecycle.ts:146:11",
+            "src/ops/retention/retentionEngine.ts:335:22",
+            "tests/retentionSpill.test.ts:147:20"
+          ],
+          "typePrefix": "Error",
+          "fullFailureMessageSha256": "6d68cb1b2d838a194f7318cd424925a6ff8469e4a15fe3eda284626a1a2357e8",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-mutant/raw-tests.json",
+            "bytes": 38683,
+            "sha256": "c43f5dc7fede74db038a061dd7378ac833bdead3c1ed65894b2d697c67aab6f1"
+          }
+        },
+        {
+          "name": "explicit local spill erasure rejects empty scope and scope that leaves another signed reference outside it",
+          "firstLine": "AssertionError: expected [Function] to throw an error",
+          "locations": [
+            "tests/spillLifecycle.test.ts:109:115"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "351dfebc11e074aa17caeb47f40ba6b8b434a9579833461ba8d5a63995bc9321",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-mutant/raw-tests.json",
+            "bytes": 38683,
+            "sha256": "c43f5dc7fede74db038a061dd7378ac833bdead3c1ed65894b2d697c67aab6f1"
+          }
+        },
+        {
+          "name": "explicit local spill erasure signs intention before real unlink and records exact outcomes while preserving other sessions",
+          "firstLine": "AssertionError: expected false to be true // Object.is equality",
+          "locations": [
+            "tests/spillLifecycle.test.ts:124:23"
+          ],
+          "typePrefix": "AssertionError",
+          "fullFailureMessageSha256": "da8cd3d0538bf4d23bab34e02043c27246c56419d6ea32d029676680fd89401e",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/phases/P30-1547-erase-scope-mutant/raw-tests.json",
+            "bytes": 38683,
+            "sha256": "c43f5dc7fede74db038a061dd7378ac833bdead3c1ed65894b2d697c67aab6f1"
+          }
+        }
+      ],
+      "classificationAndMasking": {
+        "classification": "Four direct assertions plus one retained production audit-size Error; overscope response and progress semantics weakened without bypassing size or empty-scope controls.",
+        "notes": [
+          "Actual 85 \u2192 80 \u2192 85, with zero pending/todo. Incomplete-reference scope refusal at 109 no longer throws, but empty-scope refusal at 108 still passes; subsequent no-unlink/no-audit checks at 110\u2013111 are masked.",
+          "Lifecycle result.ok=false at 124 stops before its two-audit check and exact outcomes, preserved-other, audit-payload and ledger checks at 125\u2013137. Its removal spy at 120 requires the selected file still exist for each removal; after removing selected, attempted other removal can throw that spy assertion and be caught as a failed outcome. This case does not prove the other object was deleted.",
+          "Both CLI backends reach native invocation, history, closed-handle and audit-boundary checks, then line 259 gets two outcomes instead of one. File preservation at 260 and audit IDs/signatures/JSONL history at 261\u2013271 are masked. No unobserved later file/audit effect is inferred.",
+          "The retention aggregate-size refusal and unchanged bytes/no-intent checks at 141\u2013145 pass, then actual runRetention at 147 throws the existing signed-audit-size Error because the mutant selects too much. Later progress/exact per-locator audit assertions from 148 onward are masked. This is a retained production bound, not infrastructure, a bypass of the size check or an extra AssertionError."
+        ]
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-erase-scope-matrix.json",
+        "bytes": 146164,
+        "sha256": "ec55fc5ca51e077f87f10589a30c5c8c556adecb2a85c758a5cf15b553105a9d"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-erase-scope-source-change.json",
+        "bytes": 2349,
+        "sha256": "011da6b841429902aece9ee6e581b09dabb4082f31a2f3022806b6f89b898da0"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-erase-scope-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "553ae57056ed8fa04b0afd68e81faaa2ed1855679df4a1848b93490b0f3320ac"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-erase-scope-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1547-store-root",
+      "sourceTarget": "src/session/spill/spillStore.ts",
+      "files": [
+        "tests/spillLifecycle.test.ts"
+      ],
+      "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+      "historicalExpectationOnly": "killed",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "restored": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [],
+      "classificationAndMasking": {
+        "classification": "Bounded original-corpus survivor and missing parent/sibling coverage; not equivalence.",
+        "notes": [
+          "Actual 15 \u2192 15 \u2192 15, with zero failed/pending/todo. The current lifecycle corpus uses default object storage roots and never supplies a parent/sibling options.root. Its selected source/destination alias tests address transport roots, not the storage-root confinement guard.",
+          "The exact mutant still rejects the empty suffix(workspace itself). Passing this unchanged corpus provides no parent/sibling storage confinement evidence and does not establish equivalence. The separately proposed two-case supplement is not staged or executed."
+        ]
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-store-root-matrix.json",
+        "bytes": 27743,
+        "sha256": "e505c6b93ade3ccd98971c19ad1eda225c3d9c59153157d7f232255874404c9c"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-store-root-source-change.json",
+        "bytes": 2195,
+        "sha256": "628a408630df8d0a2f5ca0e20943c673acdf9615a77faccd92312267c77ca7f6"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-store-root-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "755cc130d9c04b5fafa55c4ead68a05cc716a0259608bf9e81e486242420729f"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-store-root-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    },
+    {
+      "id": "P30-1547-transport-dotdot",
+      "sourceTarget": "src/session/spill/spillLifecycle.ts",
+      "files": [
+        "tests/spillLifecycle.test.ts",
+        "tests/sessionSpill.test.ts"
+      ],
+      "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+      "historicalExpectationOnly": "equivalent",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "restored": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "actualFailures": [],
+      "classificationAndMasking": {
+        "classification": "Bounded current-corpus survivor with unchanged upstream public-path constraints; historical equivalence is not inherited.",
+        "notes": [
+          "Actual 30 \u2192 30 \u2192 30, with zero failed/pending/todo. No current assertion was relaxed, and the historical equivalent label remains historical rather than a fresh global equivalence result.",
+          "Current source calls transportDirectory only through readTransportFile, using fixed index.json or a parseIndex-validated objectFile. The public objectFile is objects/<sha256(locator)>.blob and exact equality is required before reading. Realpath ownership, bounded single-link/NOFOLLOW/stable reads and signed-row authorization remain intact. This source58 public-path reasoning explains the bounded survivor without turning it into universal equivalence or conflating it with the store-root parent/sibling coverage gap."
+        ]
+      },
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-transport-dotdot-matrix.json",
+        "bytes": 53226,
+        "sha256": "e93bdcbabc08eda678dfc8e2526942973a940a307e7180b9c25832b287a97f69"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-transport-dotdot-source-change.json",
+        "bytes": 2543,
+        "sha256": "340142a44ca1342c7a184c7633aa855e5d2ee8a39411434655aa15e7c2dbaff8"
+      },
+      "mutantManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-transport-dotdot-mutant-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "6b8d8b9c3ee0fed4f9534f14b243bb4f5ff9e40135745201818b6baf7520767b"
+      },
+      "restoredManifest": {
+        "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/P30-1547-transport-dotdot-restored-full-closure.json",
+        "bytes": 1399777,
+        "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+      },
+      "sourceRestoredExact": true,
+      "compiledBytesNeverChanged": true
+    }
+  ],
+  "intentionalMutantFailureTypes": {
+    "SpilledInputRetentionError": 2,
+    "AssertionError": 30,
+    "Error": 2
+  },
+  "boundedStaticSubreview": {
+    "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/bounded-static-subreview.json",
+    "bytes": 1353,
+    "sha256": "efecc128e3b7906b299430652de8673acba3c12087986b6d024cbd054ee48326"
+  },
+  "caseStatusInventory": {
+    "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/case-status-inventory.json",
+    "bytes": 227260,
+    "sha256": "aed887038d2e0b6e346ed5fe4157c3cb0361e046d61307cb83a9510c9c5f8596"
+  },
+  "semanticClassification": {
+    "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/semantic-classification.json",
+    "bytes": 57529,
+    "sha256": "515b508070320e4d1988b9b5d815a76935b56a843c24894864cb8b724c6757c6"
+  },
+  "runtime": {
+    "actualCurrentProcessOnlyFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "scope": "Actual qualified launcher observes Node v22.23.3/ABI 127. Tests use its explicit executable; the unchanged attachment child uses process.execPath/tsx. Original child output does not print ABI, so direct child or per-worker ABI is not invented.",
+    "environment": "Own allowlisted credential-free launch environment and phase-specific private 0700 HOME/AMC_HOME/TMPDIR. Original tests generate local fixture credentials and use synthetic transport. No blanket transport/process isolation claim."
+  },
+  "preservation": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "completePrivateClosureFiles": 12268,
+    "newCasesStaged": 0,
+    "sourceRestoredExact": true,
+    "allCompiledBytesNeverChanged": true,
+    "protectedPins": 156,
+    "priorArtifactReferences": 1795,
+    "latePredecessorPins": 2,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "rootSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "rootGitStatus": "clean",
+    "allReferencedPriorArtifactsAndManifestListedActualClosuresRecheckedExact": true,
+    "configGuardsCriteriaSetupCleanupDeadlines": "Original source imports/config/global and per-file workspace guards/criteria/setup/cleanup unchanged. Source-mode one worker, no file parallelism, dual reporters. Original 30s cases, bundle 60s, tar 10s and image child 30s/32MiB unchanged."
+  },
+  "measurementAndEffectsLimits": [
+    "Real encryption, signed local rows, retained ciphertext and actual local unlink are measured only by reached original assertions. Existing node:fs short/stalled/racing I/O spies and admission callbacks are injected faults, not universal successful persistence proofs.",
+    "Lifecycle/CLI fixture ciphertext uses a known synthetic key distinct from workspace decryption material. Keyless inventory/transport flags remain not-decrypted/plaintextVerified=false; successful ciphertext checks are not plaintext decryption.",
+    "Attachment/inbox custom canned SSE/transport reconstructs local requests; no actual provider/model ability or real external network operation is qualified.",
+    "CLI 65 uses in-process Commander and captured IO, not full src/cli.ts, installed executable or a hosted service. Actual bundle tar operations and genuine local re-signing remain unchanged.",
+    "Existing local fixture trust or workspace-consistency-only monitor expectations are not independently pre-recorded external operator/person identity. Authentic signed rows are not whole-log chain/seal completeness or proof no omitted histories exist.",
+    "Original coldRows is a same-process reader. The image fixture is a genuine fresh child after writer.close, but an idle parent SQLite pool can remain. CLI snapshots exclude WAL/SHM; no universal physical-close/no-effects interval or repair of prior P0-27 mixed-parent SQLITE_CORRUPT cause is inferred.",
+    "Erase selection authenticates supplied references and records local intent/outcomes; final audit can fail after unlink. It is not remote/backups/subject deletion or all-or-nothing cross-store transaction proof."
+  ],
+  "historicalAndCoverageLimits": [
+    "Eight exact recovered source recipes are freshly controlled; no held helper/test/runner is transferred or historical full-batch/Node25 result represented as current.",
+    "Original 15-case store-root corpus lacks parent/sibling negatives. Any survivor is bounded coverage debt, not equivalence. The separately proposed new two-case supplement is not staged or executed.",
+    "Historical transport-dotdot equivalent wording stays historical; current survival is classified from the actual corpus and is not automatically current equivalence.",
+    "Current lifecycle 15 remains distinct from held 19, and its missing conflicting/unauthentic export-destination case remains open.",
+    "No production/permanent test/helper/CLI/counter/guard/archive/dependency/native/root Git edit, compiler/build/import adapter or compiled mutation.",
+    "No whole cold/race/tenant/full P0-30/old batch/Node24/full suite/coverage/hosted/G0/release/Done or AMC1522/P0-32 dependency closure."
+  ],
+  "setupChronology": {
+    "frozenReport": {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/setup-prepared.json",
+      "bytes": 6708,
+      "sha256": "208d82506a28d82b08eb05513cb9b7411a48c134ab15391d9c5f686a84ddef71"
+    },
+    "frozenMarkdown": {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/setup-prepared.md",
+      "bytes": 2042,
+      "sha256": "8ea2cc01e3bfefb7e0f06b34e9773048490a081707d8f31c7995beb191cce76a"
+    },
+    "frozenIndex": {
+      "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 452921,
+      "sha256": "b4abba9d0e96a71317bb298278f6a325b5387dc03fae3747e84c2fed6a0a5af8"
+    }
+  },
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 43219,
+    "sha256": "82c19408be255dc690885a921d40bf98de8ca86aff5a6aace07649ac90eb0441"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/artifact-index.json",
+    "bytes": 503425,
+    "sha256": "546348ba9dab584c48e0ffacd628216fc338b92db0976196041327629bded9dc"
+  },
+  "allRuntimeAndLiveReadsFinished": true
+}

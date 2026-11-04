@@ -1,0 +1,1998 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 34100,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/importOriginals.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/neutralImportMapping.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/neutralImporter.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/requestFieldGuard.test.ts"
+  ],
+  "testCount": 109,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "538871869",
+      "name": "tests/dshSessionImport.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "538871869_0",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_0",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts parses a synthetic v2 physical session and previews source-reported output without writes",
+      "fullName": "P1-24 explicit DSH session contracts parses a synthetic v2 physical session and previews source-reported output without writes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_1",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses DSH v0 with its typed, pinned public plan message and no generic fallback",
+      "fullName": "P1-24 explicit DSH session contracts refuses DSH v0 with its typed, pinned public plan message and no generic fallback",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format v0 is not supporte…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session format v0 is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session format v0 is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format v0 is not supporte…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:83:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 83,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_2",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses DSH v1 with its typed, pinned public plan message and no generic fallback",
+      "fullName": "P1-24 explicit DSH session contracts refuses DSH v1 with its typed, pinned public plan message and no generic fallback",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format v1 is not supporte…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session format v1 is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session format v1 is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format v1 is not supporte…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:83:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 83,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_3",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses DSH v3 with its typed, pinned public plan message and no generic fallback",
+      "fullName": "P1-24 explicit DSH session contracts refuses DSH v3 with its typed, pinned public plan message and no generic fallback",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format v3 is not supporte…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session format v3 is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session format v3 is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format v3 is not supporte…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:83:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 83,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_4",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses DSH v4 with its typed, pinned public plan message and no generic fallback",
+      "fullName": "P1-24 explicit DSH session contracts refuses DSH v4 with its typed, pinned public plan message and no generic fallback",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format v4 is not supporte…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session format v4 is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session format v4 is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format v4 is not supporte…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:83:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 83,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_5",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses a missing or invalid DSH version without rendering source values (undefined)",
+      "fullName": "P1-24 explicit DSH session contracts refuses a missing or invalid DSH version without rendering source values (undefined)",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format with a missing or …' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session format with a missing or invalid version is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session format with a missing or invalid version is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format with a missing or …' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:90:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 90,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_6",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses a missing or invalid DSH version without rendering source values (\"synthetic-private-version\")",
+      "fullName": "P1-24 explicit DSH session contracts refuses a missing or invalid DSH version without rendering source values (\"synthetic-private-version\")",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format with a missing or …' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session format with a missing or invalid version is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session format with a missing or invalid version is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format with a missing or …' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:90:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 90,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_7",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses a missing or invalid DSH version without rendering source values ({\"private\":\"synthetic-private-version\"})",
+      "fullName": "P1-24 explicit DSH session contracts refuses a missing or invalid DSH version without rendering source values ({\"private\":\"synthetic-private-version\"})",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format with a missing or …' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session format with a missing or invalid version is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session format with a missing or invalid version is not supported; AMC imports DSH v2 (revision c389f96b). No migration is attempted.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session format with a missing or …' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:90:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 90,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_8",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses an invalid v2 physical header instead of reclassifying it as Pi or generic events",
+      "fullName": "P1-24 explicit DSH session contracts refuses an invalid v2 physical header instead of reclassifying it as Pi or generic events",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session import refused: invalid o…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session import refused: invalid or unsupported v2 physical header.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session import refused: invalid or unsupported v2 physical header.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session import refused: invalid o…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:98:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 98,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_9",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts recognizes a torn DSH-only header marker and refuses without echoing its private suffix",
+      "fullName": "P1-24 explicit DSH session contracts recognizes a torn DSH-only header marker and refuses without echoing its private suffix",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session import refused: malformed…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session import refused: malformed DSH header; no generic fallback.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session import refused: malformed DSH header; no generic fallback.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session import refused: malformed…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:105:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 105,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_10",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses a malformed event line rather than silently repairing a torn tail",
+      "fullName": "P1-24 explicit DSH session contracts refuses a malformed event line rather than silently repairing a torn tail",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session import refused: malformed…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session import refused: malformed JSON at line 2; torn tails are not silently repaired.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session import refused: malformed JSON at line 2; torn tails are not silently repaired.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session import refused: malformed…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:112:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 112,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_11",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts refuses unknown required events rather than silently losing them",
+      "fullName": "P1-24 explicit DSH session contracts refuses unknown required events rather than silently losing them",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session import refused: unknown r…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "DSH session import refused: unknown required event at seq 0; upgrade the importer rather than skipping it.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"DSH session import refused: unknown required event at seq 0; upgrade the importer rather than skipping it.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'DSH session import refused: unknown r…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:55:41\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:28:5)\n    at previewRefusal (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:48:3)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts:119:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 55,
+              "column": 41
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 28,
+              "column": 5
+            },
+            {
+              "method": "previewRefusal",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 48,
+              "column": 3
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/dshSessionImport.test.ts",
+              "line": 119,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_12",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts retains an explicitly ignorable unknown event with a visible count and interpretation loss",
+      "fullName": "P1-24 explicit DSH session contracts retains an explicitly ignorable unknown event with a visible count and interpretation loss",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_13",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts reports exactly 0 source-reported delivery-accepted markers without treating zero as deployment proof",
+      "fullName": "P1-24 explicit DSH session contracts reports exactly 0 source-reported delivery-accepted markers without treating zero as deployment proof",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "538871869_0_14",
+      "name": "tests/dshSessionImport.test.ts P1-24 explicit DSH session contracts reports exactly 2 source-reported delivery-accepted markers without treating zero as deployment proof",
+      "fullName": "P1-24 explicit DSH session contracts reports exactly 2 source-reported delivery-accepted markers without treating zero as deployment proof",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-459238116",
+      "name": "tests/importOriginals.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/importOriginals.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-459238116_0",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_0",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals reads back exact binary bytes with independent SHA and genuine vaulted encryption",
+      "fullName": "P1-24 encrypted exact import originals reads back exact binary bytes with independent SHA and genuine vaulted encryption",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_1",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals refuses a valid equal-length encrypted payload whose reference SHA names different bytes",
+      "fullName": "P1-24 encrypted exact import originals refuses a valid equal-length encrypted payload whose reference SHA names different bytes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_2",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals also refuses authenticated-decryption failure without changing the altered owned blob",
+      "fullName": "P1-24 encrypted exact import originals also refuses authenticated-decryption failure without changing the altered owned blob",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_3",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals deduplicates repeated exact bytes to one verified blob and one originals-index row",
+      "fullName": "P1-24 encrypted exact import originals deduplicates repeated exact bytes to one verified blob and one originals-index row",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_4",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals refuses encryption-off retention for the whole import before any workspace write",
+      "fullName": "P1-24 encrypted exact import originals refuses encryption-off retention for the whole import before any workspace write",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_5",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals preflights every candidate so an over-limit second original leaves no first blob or import",
+      "fullName": "P1-24 encrypted exact import originals preflights every candidate so an over-limit second original leaves no first blob or import",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_6",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals dry-run lists retained-original writes without writing or minting a blob key",
+      "fullName": "P1-24 encrypted exact import originals dry-run lists retained-original writes without writing or minting a blob key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_7",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals validate lists retained-original writes without writing or minting a blob key",
+      "fullName": "P1-24 encrypted exact import originals validate lists retained-original writes without writing or minting a blob key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_8",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals whole-import operator opt-out records non-retention and its exact loss even when retention is impossible",
+      "fullName": "P1-24 encrypted exact import originals whole-import operator opt-out records non-retention and its exact loss even when retention is impossible",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_9",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals manifest and map/2 bind originals, known DSH revision, explicit unknown Pi revision and stage losses without trust promotion",
+      "fullName": "P1-24 encrypted exact import originals manifest and map/2 bind originals, known DSH revision, explicit unknown Pi revision and stage losses without trust promotion",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_10",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals rollback removes import outputs but preserves exact original blobs and their index",
+      "fullName": "P1-24 encrypted exact import originals rollback removes import outputs but preserves exact original blobs and their index",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_11",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals retains a recognized session above the generic cap when the signed blob policy allows it",
+      "fullName": "P1-24 encrypted exact import originals retains a recognized session above the generic cap when the signed blob policy allows it",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-459238116_0_12",
+      "name": "tests/importOriginals.test.ts P1-24 encrypted exact import originals keeps the generic 1.5 MB cap even when blob retention allows a larger file",
+      "fullName": "P1-24 encrypted exact import originals keeps the generic 1.5 MB cap even when blob retention allows a larger file",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1232887939",
+      "name": "tests/neutralImportMapping.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/neutralImportMapping.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1232887939_0",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_0",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+      "fullName": "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_1",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+      "fullName": "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_2",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+      "fullName": "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_3",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+      "fullName": "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_4",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+      "fullName": "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_5",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+      "fullName": "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_6",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+      "fullName": "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_7",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+      "fullName": "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_8",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+      "fullName": "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1232887939_0_9",
+      "name": "tests/neutralImportMapping.test.ts per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+      "fullName": "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "761514104",
+      "name": "tests/neutralImporter.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/neutralImporter.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "761514104_0",
+      "name": "tests/neutralImporter.test.ts neutral importer",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_0",
+      "name": "tests/neutralImporter.test.ts neutral importer dry run detects representative artifact categories without writing",
+      "fullName": "neutral importer dry run detects representative artifact categories without writing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_1",
+      "name": "tests/neutralImporter.test.ts neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+      "fullName": "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_2",
+      "name": "tests/neutralImporter.test.ts neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+      "fullName": "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_3",
+      "name": "tests/neutralImporter.test.ts neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+      "fullName": "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_4",
+      "name": "tests/neutralImporter.test.ts neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+      "fullName": "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_5",
+      "name": "tests/neutralImporter.test.ts neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+      "fullName": "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_6",
+      "name": "tests/neutralImporter.test.ts neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+      "fullName": "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_7",
+      "name": "tests/neutralImporter.test.ts neutral importer unsupported formats return actionable validation errors",
+      "fullName": "neutral importer unsupported formats return actionable validation errors",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_8",
+      "name": "tests/neutralImporter.test.ts neutral importer rollback removes imported artifacts and records a rollback receipt",
+      "fullName": "neutral importer rollback removes imported artifacts and records a rollback receipt",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "761514104_0_9",
+      "name": "tests/neutralImporter.test.ts neutral importer API exposes dry-run import detection",
+      "fullName": "neutral importer API exposes dry-run import detection",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1000057118",
+      "name": "tests/piDurableDetection.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1000057118_0",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1000057118_0_0",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination 'durable v1' refuses explicitly before generic event-log detection",
+      "fullName": "P1-24 Pi durable format discrimination 'durable v1' refuses explicitly before generic event-log detection",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format v1 is not s…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "Pi durable session format v1 is not supported; AMC imports Pi CLI session v3.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"Pi durable session format v1 is not supported; AMC imports Pi CLI session v3.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format v1 is not s…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 58,
+              "column": 43
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 26,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 53,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1000057118_0_1",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination 'durable v3' refuses explicitly before generic event-log detection",
+      "fullName": "P1-24 Pi durable format discrimination 'durable v3' refuses explicitly before generic event-log detection",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format v3 is not s…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "Pi durable session format v3 is not supported; AMC imports Pi CLI session v3.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"Pi durable session format v3 is not supported; AMC imports Pi CLI session v3.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format v3 is not s…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 58,
+              "column": 43
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 26,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 53,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1000057118_0_2",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination 'durable v4' refuses explicitly before generic event-log detection",
+      "fullName": "P1-24 Pi durable format discrimination 'durable v4' refuses explicitly before generic event-log detection",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format v4 is not s…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "Pi durable session format v4 is not supported; AMC imports Pi CLI session v3.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"Pi durable session format v4 is not supported; AMC imports Pi CLI session v3.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format v4 is not s…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 58,
+              "column": 43
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 26,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 53,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1000057118_0_3",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination 'storageVersion without v' refuses explicitly before generic event-log detection",
+      "fullName": "P1-24 Pi durable format discrimination 'storageVersion without v' refuses explicitly before generic event-log detection",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format with a miss…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "Pi durable session format with a missing or invalid version is not supported; AMC imports Pi CLI session v3.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"Pi durable session format with a missing or invalid version is not supported; AMC imports Pi CLI session v3.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format with a miss…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 58,
+              "column": 43
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 26,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 53,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1000057118_0_4",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination 'string v' refuses explicitly before generic event-log detection",
+      "fullName": "P1-24 Pi durable format discrimination 'string v' refuses explicitly before generic event-log detection",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format with a miss…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "Pi durable session format with a missing or invalid version is not supported; AMC imports Pi CLI session v3.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"Pi durable session format with a missing or invalid version is not supported; AMC imports Pi CLI session v3.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format with a miss…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 58,
+              "column": 43
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 26,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 53,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1000057118_0_5",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination 'object v' refuses explicitly before generic event-log detection",
+      "fullName": "P1-24 Pi durable format discrimination 'object v' refuses explicitly before generic event-log detection",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format with a miss…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "Pi durable session format with a missing or invalid version is not supported; AMC imports Pi CLI session v3.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"Pi durable session format with a missing or invalid version is not supported; AMC imports Pi CLI session v3.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'Pi durable session format with a miss…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:58:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:53:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 58,
+              "column": 43
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 26,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 53,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1000057118_0_6",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination a valid synthetic Pi CLI v3 session stays supported with unknown revision and self-reported semantics",
+      "fullName": "P1-24 Pi durable format discrimination a valid synthetic Pi CLI v3 session stays supported with unknown revision and self-reported semantics",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1000057118_0_7",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination a Pi CLI session v4 refusal remains distinct from the durable-v4 message",
+      "fullName": "P1-24 Pi durable format discrimination a Pi CLI session v4 refusal remains distinct from the durable-v4 message",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to be 'Pi session version 4 is not supported…' // Object.is equality",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "Pi session version 4 is not supported; AMC imports Pi v3 session JSONL. Open the session in pi to migrate it, then re-import.",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"Pi session version 4 is not supported; AMC imports Pi v3 session JSONL. Open the session in pi to migrate it, then re-import.\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to be 'Pi session version 4 is not supported…' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:91:43\n    at withSource (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:26:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts:87:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 91,
+              "column": 43
+            },
+            {
+              "method": "withSource",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 26,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piDurableDetection.test.ts",
+              "line": 87,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1000057118_0_8",
+      "name": "tests/piDurableDetection.test.ts P1-24 Pi durable format discrimination an unrelated generic JSONL event remains supported rather than blanket-refusing all logs",
+      "fullName": "P1-24 Pi durable format discrimination an unrelated generic JSONL event remains supported rather than blanket-refusing all logs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1931203041",
+      "name": "tests/piSessionImport.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1931203041_0",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_0",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import nested tool and model failures reach the Watch failure index",
+      "fullName": "AMC-1507 — Pi v3 session import nested tool and model failures reach the Watch failure index",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_1",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import tool-call ids, tool names, provider/model and entry/parent ids are preserved",
+      "fullName": "AMC-1507 — Pi v3 session import tool-call ids, tool names, provider/model and entry/parent ids are preserved",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_2",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import missing timing is unknown, never a measured zero",
+      "fullName": "AMC-1507 — Pi v3 session import missing timing is unknown, never a measured zero",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_3",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import structural entries stay metadata: no trace, no invented execution",
+      "fullName": "AMC-1507 — Pi v3 session import structural entries stay metadata: no trace, no invented execution",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_4",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import a discarded branch is kept as data but marked off the current path",
+      "fullName": "AMC-1507 — Pi v3 session import a discarded branch is kept as data but marked off the current path",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_5",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import a forked session keeps its parent provenance",
+      "fullName": "AMC-1507 — Pi v3 session import a forked session keeps its parent provenance",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_6",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import aborted counts as a failure; length-truncated is flagged, not failed",
+      "fullName": "AMC-1507 — Pi v3 session import aborted counts as a failure; length-truncated is flagged, not failed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_7",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import malformed entries are counted and flagged, never silently dropped",
+      "fullName": "AMC-1507 — Pi v3 session import malformed entries are counted and flagged, never silently dropped",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_8",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import an unsupported session version is rejected explicitly, with no generic fallback",
+      "fullName": "AMC-1507 — Pi v3 session import an unsupported session version is rejected explicitly, with no generic fallback",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to match /version 1/",
+          "actual": "\"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "expected": "/version 1/",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected:\n/version 1/\n\n+ Received:\n\"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to match /version 1/\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts:184:43\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts",
+              "line": 184,
+              "column": 43
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_9",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import an invalid version value produces a useful diagnostic without echoing source values",
+      "fullName": "AMC-1507 — Pi v3 session import an invalid version value produces a useful diagnostic without echoing source values",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": [
+        {
+          "message": "expected 'Could not parse JSONL. Inspect the so…' to contain 'invalid version field'",
+          "actual": "Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.",
+          "expected": "invalid version field",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "Expected: \"invalid version field\"\nReceived: \"Could not parse JSONL. Inspect the source locally for malformed records or an unsupported version; parser excerpts are omitted to protect source values.\"",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected 'Could not parse JSONL. Inspect the so…' to contain 'invalid version field'\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts:196:43\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/piSessionImport.test.ts",
+              "line": 196,
+              "column": 43
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1931203041_0_10",
+      "name": "tests/piSessionImport.test.ts AMC-1507 — Pi v3 session import provenance stays self-reported and redacted, with the source digest",
+      "fullName": "AMC-1507 — Pi v3 session import provenance stays self-reported and redacted, with the source digest",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1401194169",
+      "name": "tests/requestFieldGuard.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout/tests/requestFieldGuard.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1401194169_0",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_0",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract refuses the exact key without examining its value",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract refuses the exact key without examining its value",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_1",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract refuses the case-folded key without examining its value",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract refuses the case-folded key without examining its value",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_2",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract refuses the NFKC key without examining its value",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract refuses the NFKC key without examining its value",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_3",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract refuses the JSON-escaped key without examining its value",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract refuses the JSON-escaped key without examining its value",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_4",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract refuses the duplicate key without examining its value",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract refuses the duplicate key without examining its value",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_5",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract refuses the null value without examining its value",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract refuses the null value without examining its value",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_6",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract refuses the empty value without examining its value",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract refuses the empty value without examining its value",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_7",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract permits absent key",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract permits absent key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_8",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract permits nested key",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract permits nested key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_9",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract permits array-nested key",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract permits array-nested key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_10",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract permits key as a value",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract permits key as a value",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_11",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract permits different key",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract permits different key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_12",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract permits empty object",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract permits empty object",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_13",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract the configured names, not source values, are reported in configured order",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract the configured names, not source values, are reported in configured order",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_14",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for gzip",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for gzip",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_15",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for mixed encoding",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for mixed encoding",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_16",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for non-UTF8 charset",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for non-UTF8 charset",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_17",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for UTF8 BOM",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for UTF8 BOM",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_18",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for UTF16 BE BOM",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for UTF16 BE BOM",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_19",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for UTF16 LE BOM",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for UTF16 LE BOM",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_20",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for invalid UTF8",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for invalid UTF8",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_21",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for malformed JSON",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for malformed JSON",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_22",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for plain text",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for plain text",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_23",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for array",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for array",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_24",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for null",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for null",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_25",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for string",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for string",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_26",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for number",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for number",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_27",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract fails closed for boolean",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract fails closed for boolean",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_0_28",
+      "name": "tests/requestFieldGuard.test.ts request field refusal preserves the hardened top-level JSON contract empty bodies and unguarded routes preserve the explicit fast paths",
+      "fullName": "request field refusal preserves the hardened top-level JSON contract empty bodies and unguarded routes preserve the explicit fast paths",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1401194169_1",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_0",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress unguarded configs never invoke the resolver",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress unguarded configs never invoke the resolver",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_1",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress unions every route and host alias sharing a checked address",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress unions every route and host alias sharing a checked address",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_2",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress IPv4-mapped address aliases retain the guard",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress IPv4-mapped address aliases retain the guard",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_3",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress unknown guard identity or target addresses retains all fields",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress unknown guard identity or target addresses retains all fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_4",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress a fresh resolution changes alias membership on the next request",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress a fresh resolution changes alias membership on the next request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_5",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress forward tunnels refuse the guarded host, subdomain and address alias only",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress forward tunnels refuse the guarded host, subdomain and address alias only",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_6",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress reverse egress resolves each request and rejects an inward answer",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress reverse egress resolves each request and rejects an inward answer",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_7",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress non-public named addresses require a valid signed opt-in",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress non-public named addresses require a valid signed opt-in",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_8",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress literal/local opt-ins work but an environment expansion is no signed IP opt-in",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress literal/local opt-ins work but an environment expansion is no signed IP opt-in",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_9",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress unresolved named upstreams are explicit transport failures",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress unresolved named upstreams are explicit transport failures",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_1_10",
+      "name": "tests/requestFieldGuard.test.ts field guards share current host/address identity without weakening P1-66 egress connection lookup returns only the checked addresses without another resolver",
+      "fullName": "field guards share current host/address identity without weakening P1-66 egress connection lookup returns only the checked addresses without another resolver",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1401194169_2",
+      "name": "tests/requestFieldGuard.test.ts a signed leased real gateway forwards safe bodies and refuses top-level fields before any upstream hit, with cold signed audit evidence",
+      "fullName": "a signed leased real gateway forwards safe bodies and refuses top-level fields before any upstream hit, with cold signed audit evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

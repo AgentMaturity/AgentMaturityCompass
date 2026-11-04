@@ -1,0 +1,7 @@
+{
+  "id": "TS-2",
+  "scenario": "Credential isolation",
+  "status": "not_run",
+  "reason": "not selected (--only)",
+  "durationMs": 0
+}

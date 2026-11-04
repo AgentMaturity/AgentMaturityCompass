@@ -1,0 +1,19 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-06",
+  "polarity": "positive",
+  "evidenceClass": "valid",
+  "setup": {
+    "harness": "tool_allowlist",
+    "tool": "fixture.customer.read",
+    "actionClass": "READ_ONLY",
+    "listed": [
+      "fixture.customer.read"
+    ],
+    "config": "signed"
+  },
+  "expected": {
+    "result": "allow",
+    "reasonCode": null
+  }
+}

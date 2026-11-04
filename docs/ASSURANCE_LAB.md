@@ -67,6 +67,8 @@ Assurance policy is signed at:
 Fail-closed behavior:
 - invalid policy signature => assurance endpoints fail and workspace readiness includes `ASSURANCE_POLICY_UNTRUSTED`
 - threshold breach with fail-closed enabled => readiness includes `ASSURANCE_THRESHOLD_BREACH`
+- readiness, certificates, drift, the what-if simulator and every per-pack reader count sealed assurance reports only; an unreadable report, one whose seal fails, or an unsealed report newer than the newest sealed one blocks them (readiness includes `ASSURANCE_EVIDENCE_UNVERIFIABLE`, drift reports `INSUFFICIENT_EVIDENCE`) rather than falling back to an older report
+- `amc cert verify` recomputes each carried assurance report's `reportJsonSha256` and verifies its `runSealSig`
 
 ## Commands
 
@@ -80,8 +82,8 @@ amc assurance run --scope workspace --pack all
 amc assurance runs
 amc assurance show --run <runId>
 
-amc assurance cert issue --run <runId>
-amc assurance cert verify .amc/assurance/certificates/latest.amccert
+amc assurance cert-issue --run <runId>
+amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>
 
 amc assurance scheduler status
 amc assurance scheduler run-now
@@ -110,14 +112,14 @@ amc assurance verify-policy
 amc assurance run --demo
 amc assurance runs
 amc assurance show --run <runId>
-amc assurance cert issue --run <runId>
-amc assurance cert verify .amc/assurance/certificates/latest.amccert
+amc assurance cert-issue --run <runId>
+amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>
 ```
 
 What to check before sharing a certificate:
 - The run is signed, not `UNSIGNED`.
 - `amc assurance verify-policy` passes against `.amc/assurance/policy.yaml.sig`.
-- `amc assurance cert verify .amc/assurance/certificates/latest.amccert` passes locally.
+- `amc assurance cert-verify .amc/assurance/certificates/latest.amccert --pubkey <recorded-auditor.pub>` passes locally.
 - The remediation-priority section has no unresolved CRITICAL items unless the exception is explicitly approved and documented.
 
 ## Policy Threshold Tuning

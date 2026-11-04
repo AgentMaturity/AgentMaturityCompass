@@ -1,0 +1,609 @@
+{
+  "schemaVersion": "2026-05-22",
+  "importId": "neutral-import-caa334a696c293d1",
+  "mode": "import",
+  "applied": true,
+  "plan": {
+    "schemaVersion": "2026-05-22",
+    "importId": "neutral-import-caa334a696c293d1",
+    "workspace": "<run>/ws-pi",
+    "agentId": "default",
+    "sourcePath": "<run>/fixture-pi",
+    "detectedAt": "2026-10-11T17:47:05.026Z",
+    "status": "ready",
+    "summary": "Detected 1 neutral artifact(s): event-log.",
+    "candidateCount": 1,
+    "redactionCount": 0,
+    "categories": [
+      "event-log"
+    ],
+    "candidates": [
+      {
+        "category": "event-log",
+        "path": "pi-session.jsonl",
+        "format": "jsonl",
+        "digest": "f485025150b311c440d0dc154c0b20a54a932e8090ab6202750a0c2c4d6141cb",
+        "bytes": 919,
+        "recordCount": 5,
+        "confidence": 0.9,
+        "summary": "Pi v3 session: 4 conversation entries, 0 structural, 2 failure(s)",
+        "redactionCount": 0,
+        "sourceFormat": {
+          "name": "pi-session",
+          "version": 3,
+          "mappingVersion": 2,
+          "sessionId": "sess-1",
+          "entries": {
+            "message": 4,
+            "structural": 0,
+            "total": 4
+          },
+          "malformedEntries": 0,
+          "unknownTraceTimestamps": 0,
+          "branch": {
+            "leafEntryId": "m4",
+            "currentPathLength": 4,
+            "offPathEntries": 0,
+            "branchPoints": [],
+            "orphanedEntries": 0,
+            "forkedFrom": null
+          }
+        }
+      }
+    ],
+    "unsupported": [],
+    "warnings": [],
+    "wouldWrite": [
+      ".amc/imports/runs/neutral-import-caa334a696c293d1/normalized.json",
+      ".amc/imports/runs/neutral-import-caa334a696c293d1/external-evidence",
+      ".amc/imports/manifests/neutral-import-caa334a696c293d1.json",
+      ".amc/imported-runs/neutral-import-caa334a696c293d1.json",
+      ".amc/episodes/neutral-import-caa334a696c293d1.json",
+      ".amc/lifecycle-runs/neutral-import-caa334a696c293d1.json",
+      ".amc/trace-indexes/neutral-import-caa334a696c293d1.json"
+    ],
+    "normalization": {
+      "normalizerVersion": "amc-neutral/2026-09-08",
+      "semanticDigest": "9d536b855d2cc82a58c8e29b0001603f020e7dc2652e33ed1390d5e7f4e83e53",
+      "sourceTrust": "SELF_REPORTED",
+      "evaluation": "NOT_EVALUATED",
+      "confidenceMeaning": "format-classification-only",
+      "recordMapping": {
+        "schemaVersion": "amc-record-map/2",
+        "sourceSemanticDigest": "9d536b855d2cc82a58c8e29b0001603f020e7dc2652e33ed1390d5e7f4e83e53",
+        "counts": {
+          "records": 5,
+          "mapped": 3,
+          "retainedOnly": 2,
+          "malformed": 0,
+          "unsupported": 0,
+          "mappedTraceLinks": 3,
+          "unlinkedTraces": 0,
+          "skippedFilesWithUnknownRecordCount": 0
+        },
+        "sources": [
+          {
+            "path": "pi-session.jsonl",
+            "digest": "f485025150b311c440d0dc154c0b20a54a932e8090ab6202750a0c2c4d6141cb",
+            "originalSha256": "f485025150b311c440d0dc154c0b20a54a932e8090ab6202750a0c2c4d6141cb",
+            "version": 3,
+            "sourceRevision": null,
+            "format": "pi-session",
+            "disposition": "recognized",
+            "recordCount": 5,
+            "reason": null
+          }
+        ],
+        "losses": [
+          {
+            "stage": "projection",
+            "source": "pi-session.jsonl",
+            "detail": "2 of 5 source record(s) produced no trace; they remain only as redacted context or were rejected."
+          },
+          {
+            "stage": "external-evidence",
+            "source": null,
+            "detail": "Portable external-evidence profiles keep an operational trace projection only: payload contents, nested metadata, usage, cost and call/result pairing are omitted. Each profile lists its own losses."
+          }
+        ],
+        "records": [
+          {
+            "source": "pi-session.jsonl",
+            "pointer": "/0",
+            "sourceLine": 1,
+            "disposition": "retained-only",
+            "reason": "Retained as redacted source context; no independent trace is projected.",
+            "fields": {
+              "projected": [],
+              "partial": [],
+              "retainedOnly": [
+                "/0/cwd",
+                "/0/id",
+                "/0/timestamp",
+                "/0/type",
+                "/0/version"
+              ],
+              "redactionMarkers": [],
+              "omitted": 0
+            },
+            "traces": [],
+            "omittedTraceLinks": 0
+          },
+          {
+            "source": "pi-session.jsonl",
+            "pointer": "/1",
+            "sourceLine": 2,
+            "disposition": "retained-only",
+            "reason": "Retained as redacted source context; no independent trace is projected.",
+            "fields": {
+              "projected": [],
+              "partial": [],
+              "retainedOnly": [
+                "/1/id",
+                "/1/message",
+                "/1/parentId",
+                "/1/timestamp",
+                "/1/type"
+              ],
+              "redactionMarkers": [],
+              "omitted": 0
+            },
+            "traces": [],
+            "omittedTraceLinks": 0
+          },
+          {
+            "source": "pi-session.jsonl",
+            "pointer": "/2",
+            "sourceLine": 3,
+            "disposition": "mapped",
+            "reason": "Projected by the existing mapper; source claims remain self-reported and unevaluated.",
+            "fields": {
+              "projected": [
+                "/2/id",
+                "/2/parentId",
+                "/2/timestamp",
+                "/2/type"
+              ],
+              "partial": [
+                "/2/message"
+              ],
+              "retainedOnly": [],
+              "redactionMarkers": [],
+              "omitted": 0
+            },
+            "traces": [
+              {
+                "index": 0,
+                "traceId": "sess-1:m2",
+                "sourceTime": 1788825602000,
+                "sourceTimeStatus": "source",
+                "durationMs": null,
+                "durationStatus": "absent-or-invalid",
+                "inferredDuration": false,
+                "ingestTimeRef": "plan.detectedAt",
+                "failure": false,
+                "outcome": "unknown-or-not-classified",
+                "cost": null,
+                "costStatus": "not-normalized"
+              }
+            ],
+            "omittedTraceLinks": 0
+          },
+          {
+            "source": "pi-session.jsonl",
+            "pointer": "/3",
+            "sourceLine": 4,
+            "disposition": "mapped",
+            "reason": "Projected by the existing mapper; source claims remain self-reported and unevaluated.",
+            "fields": {
+              "projected": [
+                "/3/id",
+                "/3/parentId",
+                "/3/timestamp",
+                "/3/type"
+              ],
+              "partial": [
+                "/3/message"
+              ],
+              "retainedOnly": [],
+              "redactionMarkers": [],
+              "omitted": 0
+            },
+            "traces": [
+              {
+                "index": 1,
+                "traceId": "sess-1:m3",
+                "sourceTime": 1788825603000,
+                "sourceTimeStatus": "source",
+                "durationMs": null,
+                "durationStatus": "absent-or-invalid",
+                "inferredDuration": false,
+                "ingestTimeRef": "plan.detectedAt",
+                "failure": true,
+                "outcome": "source-reported-failure",
+                "cost": null,
+                "costStatus": "not-normalized"
+              }
+            ],
+            "omittedTraceLinks": 0
+          },
+          {
+            "source": "pi-session.jsonl",
+            "pointer": "/4",
+            "sourceLine": 5,
+            "disposition": "mapped",
+            "reason": "Projected by the existing mapper; source claims remain self-reported and unevaluated.",
+            "fields": {
+              "projected": [
+                "/4/id",
+                "/4/parentId",
+                "/4/timestamp",
+                "/4/type"
+              ],
+              "partial": [
+                "/4/message"
+              ],
+              "retainedOnly": [],
+              "redactionMarkers": [],
+              "omitted": 0
+            },
+            "traces": [
+              {
+                "index": 2,
+                "traceId": "sess-1:m4",
+                "sourceTime": 1788825604000,
+                "sourceTimeStatus": "source",
+                "durationMs": null,
+                "durationStatus": "absent-or-invalid",
+                "inferredDuration": false,
+                "ingestTimeRef": "plan.detectedAt",
+                "failure": true,
+                "outcome": "source-reported-failure",
+                "cost": null,
+                "costStatus": "not-normalized"
+              }
+            ],
+            "omittedTraceLinks": 0
+          }
+        ],
+        "detailCoverage": {
+          "complete": true,
+          "emittedRecords": 5,
+          "omittedRecords": 0,
+          "omittedFields": 0,
+          "omittedTraceLinks": 0,
+          "boundedTextValues": 0,
+          "limits": {
+            "records": 2000,
+            "detailBytes": 2000000,
+            "fieldsPerRecord": 80,
+            "traceLinksPerRecord": 32,
+            "textChars": 256
+          }
+        },
+        "semantics": [
+          "Pointers identify retained redacted parsed records; sourceLine is the original 1-based JSONL line where available. A syntax-invalid line has no parsed pointer.",
+          "Trace links identify the primary source record. Cross-record context contributions (for example Pi ancestry or DSH call arguments) are not expanded into secondary links.",
+          "Wrapper metadata is a separate retained context record. Record counts differ from legacy sourceItems, which can count config fields.",
+          "Projected fields can be transformed; partial fields include content or metadata whose full representation is retained only in the source artifact.",
+          "Field detail is top-level; redactionMarkers identify fields containing a redaction marker, including nested values. No source payload excerpts are included.",
+          "Source-reported durations are not independently measured by AMC. No duration, successful outcome, total cost or maturity score is inferred.",
+          "Skipped-file record counts are unknown, not zero. Detail truncation never reduces accounting counts; inspect the retained source for omitted details."
+        ],
+        "digestSha256": "1c4be48d91023f4f77facdcb2bc9687eaf22e77997117198d983d48ef36138f5"
+      },
+      "counts": {
+        "recognizedFiles": 1,
+        "skippedFiles": 0,
+        "malformedFiles": 0,
+        "unsupportedFiles": 0,
+        "oversizedFiles": 0,
+        "sourceItems": 5,
+        "normalizedTraces": 3,
+        "failureTraces": 2,
+        "unknownTimestamps": 0,
+        "unknownDurations": 3
+      },
+      "timing": {
+        "sourceTime": "retained-when-valid-otherwise-null",
+        "ingestTime": "plan.detectedAt",
+        "inferredDurations": false
+      },
+      "losses": [
+        "Redacted source artifacts are retained; only recognized trace fields are projected into the failure index.",
+        "Source item counts include records or config fields; they are not a trace coverage percentage.",
+        "Missing durations remain unknown, not zero latency. No elapsed duration is inferred between events.",
+        "No cost or maturity result is inferred from import completion. Source claims remain self-reported.",
+        "Original bytes not retained by operator choice; only the SHA-256 digest is kept."
+      ],
+      "nextActions": [
+        {
+          "label": "Inspect supported import options",
+          "argv": [
+            "amc",
+            "import",
+            "--help"
+          ]
+        },
+        {
+          "label": "Apply the reviewed import",
+          "argv": [
+            "amc",
+            "import",
+            "<run>/fixture-pi",
+            "--agent",
+            "default",
+            "--expected-digest",
+            "9d536b855d2cc82a58c8e29b0001603f020e7dc2652e33ed1390d5e7f4e83e53",
+            "--no-retain-original"
+          ]
+        },
+        {
+          "label": "Review actual captured evidence",
+          "argv": [
+            "amc",
+            "evidence",
+            "--help"
+          ]
+        }
+      ]
+    }
+  },
+  "normalizedPath": "<run>/ws-pi/.amc/imports/runs/neutral-import-caa334a696c293d1/normalized.json",
+  "importManifestPath": "<run>/ws-pi/.amc/imports/manifests/neutral-import-caa334a696c293d1.json",
+  "externalEvidencePaths": [
+    "<run>/ws-pi/.amc/imports/runs/neutral-import-caa334a696c293d1/external-evidence/0-0.json"
+  ],
+  "signaturePath": null,
+  "diagnosticReportPath": "<run>/ws-pi/.amc/imported-runs/neutral-import-caa334a696c293d1.json",
+  "diagnosticMarkdownPath": "<run>/ws-pi/.amc/imported-reports/neutral-import-caa334a696c293d1.md",
+  "episode": {
+    "episode": {
+      "schemaVersion": "2026-05-22",
+      "episodeId": "episode-neutral-import-caa334a696c293d1",
+      "runId": "neutral-import-caa334a696c293d1",
+      "lifecycleRunId": "lifecycle-neutral-import-caa334a696c293d1",
+      "agentId": "default",
+      "workspace": "<run>/ws-pi",
+      "source": "import",
+      "command": "amc import <run>/fixture-pi",
+      "lifecycleStage": "import.completed",
+      "startedAt": "2026-10-11T17:47:05.031Z",
+      "endedAt": "2026-10-11T17:47:05.031Z",
+      "rawTraceRefs": [
+        "import:pi-session.jsonl:f485025150b3"
+      ],
+      "distilledEvidenceRefs": [
+        {
+          "kind": "diagnostic-json",
+          "path": "<run>/ws-pi/.amc/imported-runs/neutral-import-caa334a696c293d1.json"
+        },
+        {
+          "kind": "diagnostic-markdown",
+          "path": "<run>/ws-pi/.amc/imported-reports/neutral-import-caa334a696c293d1.md"
+        }
+      ],
+      "failureClassifications": [],
+      "evaluations": {
+        "evaluationPerformed": false,
+        "diagnosticRunId": "neutral-import-caa334a696c293d1",
+        "status": "UNSIGNED",
+        "integrityIndex": 0,
+        "evidenceCoverage": 0,
+        "questionCount": 0
+      },
+      "resourceManifestIds": [
+        "enforce-resources-ab4f9c9f3d1819c5"
+      ],
+      "receipts": [],
+      "observabilityRecords": [],
+      "traceFailureIndexRef": {
+        "indexId": "trace-index-neutral-import-caa334a696c293d1",
+        "path": "<run>/ws-pi/.amc/trace-indexes/neutral-import-caa334a696c293d1.json",
+        "clusterCount": 0,
+        "entryCount": 0
+      }
+    },
+    "episodePath": "<run>/ws-pi/.amc/episodes/neutral-import-caa334a696c293d1.json"
+  },
+  "lifecycleRun": {
+    "artifact": {
+      "schemaVersion": "2026-05-22",
+      "lifecycleRunId": "lifecycle-neutral-import-caa334a696c293d1",
+      "runId": "neutral-import-caa334a696c293d1",
+      "agentId": "default",
+      "workspace": "<run>/ws-pi",
+      "source": "import",
+      "command": "amc import <run>/fixture-pi",
+      "stage": "import.completed",
+      "createdAt": "2026-10-11T17:47:05.031Z",
+      "elapsedMs": null,
+      "surfaces": {
+        "Score": {
+          "status": "pending",
+          "summary": "No maturity evaluation was performed. Imported content is SELF_REPORTED and unverified.",
+          "refs": [
+            "neutral-import-caa334a696c293d1"
+          ]
+        },
+        "Shield": {
+          "status": "pending",
+          "summary": "No assurance packs were executed by this import.",
+          "refs": []
+        },
+        "Enforce": {
+          "status": "partial",
+          "summary": "Imported artifacts were recorded in the resource manifest. Policy enforcement was not evaluated.",
+          "refs": [
+            "enforce-resources-ab4f9c9f3d1819c5"
+          ]
+        },
+        "Vault": {
+          "status": "partial",
+          "summary": "Import hashes record artifact integrity; source claims remain unverified.",
+          "refs": [
+            "6bc2c496ced5887f596e7c7b7c1eda5480b6d96398a2426b2348cd0a4c681fb2"
+          ]
+        },
+        "Watch": {
+          "status": "partial",
+          "summary": "Imported traces produced 2 failure index entries. Runtime monitoring was not evaluated.",
+          "refs": [
+            "trace-index-neutral-import-caa334a696c293d1"
+          ]
+        },
+        "Comply": {
+          "status": "pending",
+          "summary": "Compliance was not evaluated by this import.",
+          "refs": []
+        },
+        "Fleet": {
+          "status": "pending",
+          "summary": "Fleet governance was not evaluated by this import.",
+          "refs": []
+        },
+        "Passport": {
+          "status": "pending",
+          "summary": "No portable maturity proof was issued by this import.",
+          "refs": []
+        }
+      },
+      "evidence": {
+        "diagnosticReport": {
+          "runId": "neutral-import-caa334a696c293d1",
+          "status": "UNSIGNED",
+          "artifactStatus": "UNSIGNED",
+          "evidenceStatus": "UNVERIFIED",
+          "claimEligible": false,
+          "jsonPath": "<run>/ws-pi/.amc/imported-runs/neutral-import-caa334a696c293d1.json",
+          "markdownPath": "<run>/ws-pi/.amc/imported-reports/neutral-import-caa334a696c293d1.md",
+          "reportJsonSha256": "6bc2c496ced5887f596e7c7b7c1eda5480b6d96398a2426b2348cd0a4c681fb2"
+        },
+        "episodeRecords": [
+          {
+            "episodeId": "episode-neutral-import-caa334a696c293d1",
+            "path": "<run>/ws-pi/.amc/episodes/neutral-import-caa334a696c293d1.json"
+          }
+        ],
+        "decisionReceipts": [],
+        "lifecycleReceipts": [],
+        "findingProofs": [],
+        "observabilityRecords": [],
+        "resourceManifests": [
+          {
+            "manifestId": "enforce-resources-ab4f9c9f3d1819c5",
+            "path": "<run>/ws-pi/.amc/enforce/resources/manifest.json",
+            "resourcesSha256": "ab4f9c9f3d1819c5ebbd74f979240034c773b43d743159422a70073572a2a280",
+            "resourceCount": 1
+          }
+        ],
+        "runtimeRuns": [],
+        "evidenceCoverage": 0,
+        "trustCoverage": {
+          "observed": 0,
+          "attested": 0,
+          "selfReported": 1
+        }
+      },
+      "setup": {
+        "createdWorkspace": false,
+        "createdAgentContext": false,
+        "signed": false,
+        "vaultReason": null
+      },
+      "receipts": []
+    },
+    "artifactPath": "<run>/ws-pi/.amc/lifecycle-runs/neutral-import-caa334a696c293d1.json",
+    "signaturePath": null
+  },
+  "resourceManifest": {
+    "manifest": {
+      "schemaVersion": "2026-05-22",
+      "manifestId": "enforce-resources-ab4f9c9f3d1819c5",
+      "agentId": "default",
+      "workspace": "<run>/ws-pi",
+      "createdAt": "2026-10-11T17:47:05.034Z",
+      "resourcesSha256": "ab4f9c9f3d1819c5ebbd74f979240034c773b43d743159422a70073572a2a280",
+      "resourceCount": 1,
+      "resources": [
+        {
+          "id": "dataset:.amc/imports/runs",
+          "type": "dataset",
+          "kind": "dataset",
+          "path": ".amc/imports/runs",
+          "exists": true,
+          "digest": "ccbd51cbbc3a195cb0b49023ae6078b01d3c899ed77afebadc1136874b057f7c",
+          "owner": "AMC",
+          "mutable": true,
+          "version": "ccbd51cbbc3a",
+          "parentVersion": null,
+          "currentVersion": "ccbd51cbbc3a",
+          "schema": "neutral-imports",
+          "dependencies": [],
+          "lastEvaluation": null,
+          "validationStatus": "unknown",
+          "lastVerifiedAt": null,
+          "rollbackTarget": null,
+          "rollbackPointer": null,
+          "evidenceRefs": []
+        }
+      ]
+    },
+    "manifestPath": "<run>/ws-pi/.amc/enforce/resources/manifest.json",
+    "snapshotPath": "<run>/ws-pi/.amc/enforce/resources/snapshots/enforce-resources-ab4f9c9f3d1819c5.json",
+    "snapshotBundlePath": "<run>/ws-pi/.amc/enforce/resources/snapshots/enforce-resources-ab4f9c9f3d1819c5",
+    "manifestSigPath": null,
+    "snapshotSigPath": null
+  },
+  "traceFailureIndex": {
+    "path": "<run>/ws-pi/.amc/trace-indexes/neutral-import-caa334a696c293d1.json",
+    "ref": {
+      "indexId": "trace-index-neutral-import-caa334a696c293d1",
+      "path": "<run>/ws-pi/.amc/trace-indexes/neutral-import-caa334a696c293d1.json",
+      "clusterCount": 2,
+      "entryCount": 2
+    },
+    "signaturePath": null
+  },
+  "collaborationTelemetryEvents": [],
+  "writtenPaths": [
+    "<run>/ws-pi/.amc/imports/runs/neutral-import-caa334a696c293d1/normalized.json",
+    "<run>/ws-pi/.amc/imports/runs/neutral-import-caa334a696c293d1/external-evidence/0-0.json",
+    "<run>/ws-pi/.amc/imports/runs/neutral-import-caa334a696c293d1/external-evidence",
+    "<run>/ws-pi/.amc/imported-runs/neutral-import-caa334a696c293d1.json",
+    "<run>/ws-pi/.amc/imported-reports/neutral-import-caa334a696c293d1.md",
+    "<run>/ws-pi/.amc/episodes/neutral-import-caa334a696c293d1.json",
+    "<run>/ws-pi/.amc/trace-indexes/neutral-import-caa334a696c293d1.json",
+    "<run>/ws-pi/.amc/lifecycle-runs/neutral-import-caa334a696c293d1.json",
+    "<run>/ws-pi/.amc/enforce/resources/manifest.json"
+  ],
+  "originals": [
+    {
+      "sha256": "f485025150b311c440d0dc154c0b20a54a932e8090ab6202750a0c2c4d6141cb",
+      "bytes": 919,
+      "mediaType": "application/x-ndjson",
+      "source": {
+        "format": "pi-session",
+        "version": 3,
+        "sourceRevision": null
+      },
+      "storage": {
+        "kind": "not-retained",
+        "reason": "operator-opt-out"
+      }
+    }
+  ],
+  "claimKind": "self_reported",
+  "statusDimensions": {
+    "applicability": {
+      "state": "applicable"
+    },
+    "evidence": "incomplete",
+    "result": "not_evaluated",
+    "enforcement": {
+      "state": "none"
+    },
+    "review": "pending"
+  },
+  "claimLabel": "Claim: Self-reported · Result: not evaluated · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable"
+}

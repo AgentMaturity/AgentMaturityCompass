@@ -6,17 +6,20 @@
  * approval engine's shapes and quorum; A4 never writes an engine decision. Effects live in src/a4/a4Effects.ts.
  */
 import { randomBytes } from "node:crypto";
+import { a4RecordAvailable, A4TransitionPublicationError, type A4TransitionAttempt } from "./a4TransitionSigning.js";
+export { requestGateAsync } from "./a4GateRequest.js";
 import { readFileSync } from "node:fs";
 import { hostname } from "node:os";
 import { join } from "node:path";
 import { ownerAlive } from "../actions/actionJournal.js";
 import { DEFAULT_ACTION_STALE_AFTER_MS } from "../actions/actionRecovery.js";
-import { approvalDecisionSchema, approvalRequestBindingDigest, approvalRequestSchema, type ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
-import { a4FloorFor, approvalRuleForAction, defaultApprovalPolicy, loadApprovalPolicy, loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
+import { approvalDecisionSchema, type ApprovalRequestRecord } from "../approvals/approvalChainStore.js";
+import { a4FloorFor, defaultApprovalPolicy, loadApprovalPolicy, loadVerifiedApprovalPolicy } from "../approvals/approvalPolicyEngine.js";
 import type { ApprovalA4Floor } from "../approvals/approvalPolicySchema.js";
 import { evaluateApprovalQuorum } from "../approvals/approvalQuorum.js";
 import { getPrivateKeyPem } from "../crypto/keys.js";
 import { signingRoute } from "../crypto/signing/signer.js";
+import type { SignKind } from "../crypto/signing/signerTypes.js";
 import { assertOwnerMode } from "../mode/mode.js";
 import { resolveSessionStoreBackend } from "../persistence/openSessionEventStore.js";
 import { runtimeFirewallPolicyPath } from "../runtime/firewall.js";
@@ -25,19 +28,23 @@ import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
 import { auditA4 } from "./a4Audit.js";
 import { controlResultsNow } from "./a4Conformance.js";
+import { compactSpec, hydrateSpecJson } from "./a4Derived.js";
+import { memoryRetentionFloor } from "./adaptMemoryPolicy.js";
+import { releaseEntries } from "./a4Transparency.js";
 import { blockingExecutionsIn, engineRequestStatusesIn, unrecordedResolutionsIn } from "./assembleLockout.js";
 import { resolveRefs } from "./a4Evidence.js";
-import { hostSessionsSince, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
+import { hostSessionsSince, leasePrincipalFacts, liveRolesFor, usersCreatedSince } from "./a4Identity.js";
 import { verifyA4Chain } from "./a4Verify.js";
 import {
-  A4_BOUND_ITEMS, acknowledgeable, ACKNOWLEDGEABLE_ITEMS, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, PLAN_ACTIVATION_DEFERRED,
+  acknowledgeable, ACKNOWLEDGEABLE_ITEMS, acknowledgedRecords, ACKNOWLEDGEMENT_TTL_MS, evaluateA4Readiness, gateStatus, isRegulated, pendingReviews, PLAN_ACTIVATION_DEFERRED,
   readinessBindingDigest, readinessMoved, riskTierOf, selfApprovalFacts, type A4Action, type A4EffectRow, type A4GateRow, type A4LiveFacts, type A4ReadinessQuery, type A4ReadinessState
 } from "./a4Readiness.js";
 import {
   A4_STAGES, DEFAULT_A4_GATE_POLICY, a4DecisionRowSchema, a4EvidenceRefRowSchema, a4GatePolicyV1Schema, a4GateRowSchema, a4IntentV1Schema,
-  a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyFloorViolations, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1,
-  type A4Principal, type A4ReadinessV1, type A4Stage
+  a4RevisionRowSchema, flatSlots, gatePolicyDigestOf, gatePolicyOf, mapRiskTier, type A4GatePolicyV1, type A4IntentV1, type A4Principal, type A4ReadinessV1, type A4Stage
 } from "./a4Schema.js";
+import { ledgerBackendGap } from "./a4LedgerBackend.js";
+import { A4_RUNTIME, holdIncidentIds, retireGovernedAgent, syncRuntimeLifecycle, tuneStage } from "./a4RuntimeLifecycle.js";
 import { authorsOf, buildersOf, evaluateSod } from "./a4SoD.js";
 import { ensureA4Stages } from "./a4Stages.js";
 import {
@@ -58,9 +65,8 @@ export interface A4Call {
   readonly integrity?: A4LiveFacts["integrity"];
 }
 type Facts = Pick<A4Call, "hostedRouter" | "hostMode" | "fullIntegrity" | "integrity">;
-/** Writes the server makes on its own behalf (automatic hold, effect outcomes); never a person. */
-export const A4_RUNTIME: A4Actor = { key: "amc-runtime", username: "amc-runtime" };
-const DAY_MS = 86_400_000;
+export { A4_RUNTIME };
+export const DAY_MS = 86_400_000;
 const EXPIRING_GUARD_MS = 60_000;
 const NOTARY_RETRY_MS = 5 * 60_000;
 /** ponytail: in-process memory of the last failed notary envelope, per workspace; no probe. A shared health record if processes multiply. */
@@ -73,10 +79,10 @@ const SLOT_NAMES: Record<string, string> = { memberSetDigest: "memberSet", evide
 const SLOT_OF_KIND: Record<string, string> = { MEMBER: "memberSet", EVIDENCE_REF: "evidenceRefs", ACKNOWLEDGED: "readiness", REVISION: "spec",
   GATE_POLICY_CHANGED: "policy", GATE_CONSUMED: "consumed", GATE_REQUESTED: "readiness" };
 
-const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
-const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
+export const fail = (status: number, code: string, message: string, detail?: unknown): A4StoreError => new A4StoreError(status, code, message, detail);
+export const randomId = (prefix: string): string => `${prefix}_${randomBytes(16).toString("hex")}`;
 /** A file's sha256, null only when it is absent; any other read error is 409 RESOURCE_UNREADABLE, never "absent". */
-const fileSha = (path: string): string | null => {
+export const fileSha = (path: string): string | null => {
   try {
     return sha256Hex(readFileSync(path));
   } catch (error) {
@@ -129,12 +135,29 @@ function stateOf(store: A4Store, snapshot: ReturnType<A4Store["snapshot"]>, now:
   const resolved = resolveRefs(store.ledger, refRows, loadTrustContext(), now, undefined, integrity);
   return {
     project: snapshot.head, chain: snapshot.links, members: snapshot.members,
-    revisions: snapshot.rows.a4_revisions.map((row) => a4RevisionRowSchema.parse(row)),
+    // Readers see each Adapt plan the row binds by sha256 (a4Derived), checked; GET …/revisions/:n answers the stored form (storedSpecOf).
+    revisions: snapshot.rows.a4_revisions.map((row) => a4RevisionRowSchema.parse(row))
+      .map((row) => ({ ...row, spec_json: hydrateSpecJson(store.workspace, snapshot.head.project_id, row) })),
     gates: snapshot.rows.a4_gates.map((row) => a4GateRowSchema.parse(row)),
     decisions: snapshot.rows.a4_decisions.map((row) => a4DecisionRowSchema.parse(row)),
     refs: resolved.map((ref, index) => ({ ...ref, revisionNo: refRows[index]!.revision_no })), effects: snapshot.effects
   };
 }
+/** A revision's spec as its row stores it: state carries Adapt's plans hydrated, so a text that is not its digest's is compacted back (a4Derived). */
+export function storedSpecOf(row: Pick<A4ReadinessState["revisions"][number], "stage" | "spec_json" | "spec_digest">): Record<string, unknown> {
+  const spec = JSON.parse(row.spec_json) as Record<string, unknown>;
+  return sha256Hex(row.spec_json) === row.spec_digest ? spec : compactSpec(row.stage, spec).spec;
+}
+
+/**
+ * GET …/revisions/:n/resolved (P2-42): the spec with every derived part put back, as stateOf read and checked it against
+ * its ref (a missing or changed part refused the load with 409 A4_INTEGRITY_FAILED). Not content-addressed: `specDigest`
+ * is the stored form's, which GET …/revisions/:n answers. The Studio pages read this view.
+ */
+export const resolvedRevisionOf = (projectId: string, row: A4ReadinessState["revisions"][number]) => ({ schema: "amc.a4-revision-resolved/v1", projectId,
+  revisionNo: row.revision_no, stage: row.stage, specDigest: row.spec_digest, spec: JSON.parse(row.spec_json) as Record<string, unknown>,
+  boundary: "The specification with its derived parts resolved and checked against their sha256 refs; specDigest hashes the stored form (GET …/revisions/:n)." });
+
 /** The project's rows, read in one verified snapshot; refs resolved against the ledger and the trust list now. */
 export const loadA4State = (store: A4Store, projectId: string, now: number): A4ReadinessState => stateOf(store, store.snapshot(projectId), now);
 
@@ -156,7 +179,7 @@ export function effectOwnerLost(row: Pick<A4EffectRow, "effect_id" | "owner_pid"
 
 /** The full chain verification as readiness's integrity section: valid only when every byte check passes. */
 const fullIntegrity = (store: A4Store, projectId: string): A4LiveFacts["integrity"] => {
-  const report = verifyA4Chain(store.ledger, projectId);
+  const report = verifyA4Chain(store.ledger, projectId, undefined, undefined, { mirror: true });
   return { valid: report.integrity.status === "pass", problems: report.integrity.errors, report };
 };
 /**
@@ -168,7 +191,7 @@ export const withFullIntegrity = (store: A4Store, projectId: string, call: A4Cal
 
 const vaultUnlocked = (workspace: string): boolean | null => {
   try {
-    getPrivateKeyPem(workspace, "auditor");
+    for (const purpose of ["ledger-row", "receipt", "artifact-seal"] as const) getPrivateKeyPem(workspace, purpose); // P1-08: the keys a gate decision's commit signs with
     return true;
   } catch (error) {
     return /vault locked/i.test(error instanceof Error ? error.message : String(error)) ? false : null;
@@ -195,17 +218,12 @@ function unrecordedResolutionsOf(store: A4Store, chain: A4ReadinessState["chain"
 /**
  * Everything readiness reads that is not a row; each unreadable source is null. `approvalPolicy` is the verdict of the
  * read evaluateFor used; the action journal and the engine requests the chain names are read only for an evaluation at `stage` Assemble,
- * and the signed control results Adapt's Review recorded and the session store backend only at Adapt.
+ * the signed control results Adapt's Review recorded and the session store backend only at Adapt, the package route, the releases' transparency entries, the lease-principal rule and the active local owners only at Activate.
  */
-export function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage): A4LiveFacts {
+function collectFacts(store: A4Store, state: A4ReadinessState, call: Facts, approvalPolicy: A4LiveFacts["approvalPolicy"], stage?: A4Stage, availability = vaultUnlocked): A4LiveFacts {
   const workspace = store.workspace;
   const live = collectLiveFacts(workspace, state.project, { hostedRouter: call.hostedRouter === true });
-  let route: "vault" | "notary" | null;
-  try {
-    route = signingRoute(workspace, "A4_RECORD");
-  } catch {
-    route = null;
-  }
+  const route = collectRoute(workspace);
   const revision = state.revisions.find((row) => row.revision_no === state.project.revision_no);
   const createdTs = state.chain.find((link) => link.kind === "CREATED")?.body.ts;
   const blocking = stage === "assemble" ? blockingExecutionsOf(store, state.project.agent_id) : null;
@@ -213,7 +231,7 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     activeLocal: live.activeLocal, hostPrincipals: live.hostPrincipals, hostedRouter: live.hostedRouter, hostMode: call.hostMode === true,
     freeze: live.freeze ? { active: live.freeze.active, incidentIds: live.freeze.incidentIds } : null, readOnly: live.readOnly,
     approvalPolicy,
-    vaultUnlocked: vaultUnlocked(workspace), signingRoute: route,
+    vaultUnlocked: availability(workspace), signingRoute: route,
     notaryReachable: route !== "notary" || (notaryFailures.get(workspace) ?? 0) < Date.now() - NOTARY_RETRY_MS,
     // The snapshot verified the chain and every side row whole, or it threw A4_INTEGRITY_FAILED before this point.
     integrity: call.integrity ?? (call.fullIntegrity === true ? fullIntegrity(store, state.project.project_id) : { valid: true, problems: [] }),
@@ -221,11 +239,14 @@ export function collectFacts(store: A4Store, state: A4ReadinessState, call: Fact
     // From the signed CREATED body, never the unsigned head row; a chain without one counts every user (fail closed).
     usersAddedSinceCreated: usersCreatedSince(workspace, typeof createdTs === "number" ? createdTs : 0),
     hostSessionsSinceCreated: hostSessionsSince(workspace, typeof createdTs === "number" ? createdTs : 0),
+    ledgerBackendGap: ledgerBackendGap(workspace, store.ledger.db),
     lostEffects: state.effects.filter((row) => row.state === "running" && effectOwnerLost(row, Date.now() - DEFAULT_ACTION_STALE_AFTER_MS)).map((row) => row.effect_id),
     blockingExecutions: blocking,
     unrecordedResolutions: stage === "assemble" ? unrecordedResolutionsOf(store, state.chain, blocking) : null,
     engineRequests: stage === "assemble" ? engineRequestStatusesIn(workspace, state.project.agent_id, state.chain, blocking ?? []) : null,
-    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace) } : {})
+    ...(stage === "adapt" ? { controlResults: controlResultsNow(workspace, state), sessionStore: resolveSessionStoreBackend(workspace),
+      retentionFloor: memoryRetentionFloor(workspace) } : {}),
+    ...(stage === "activate" ? { packageSigningRoute: collectRoute(workspace, "A4_PACKAGE"), packageTransparency: releaseEntries(workspace, state.chain), ...leasePrincipalFacts(workspace) } : {})
   };
 }
 
@@ -244,13 +265,20 @@ export function signedA4Floor(workspace: string): ApprovalA4Floor {
  * the floor and `approvals.policy_signed` come from one verified read; an unverified policy lends nothing: the defaults
  * stand in for display under the strictest floor, and the BLOCKED item refuses every gate request, decision and progress.
  */
-export function evaluateFor(store: A4Store, state: A4ReadinessState, principal: A4Principal | null, call: Facts,
-  stage: A4Stage, now: number): { readiness: A4ReadinessV1; query: A4ReadinessQuery } {
+function evaluateWith(store: A4Store, state: A4ReadinessState, principal: A4Principal | null, call: Facts,
+  stage: A4Stage, now: number, availability: typeof vaultUnlocked): { readiness: A4ReadinessV1; query: A4ReadinessQuery } {
   ensureA4Stages();
   const signed = loadVerifiedApprovalPolicy(store.workspace);
   const query: A4ReadinessQuery = { stage, principal, policy: signed.policy ?? defaultApprovalPolicy(), gatePolicy: gatePolicyOf(state.chain),
-    floor: signed.policy ? a4FloorFor(signed.policy) : UNVERIFIED_FLOOR, now, live: collectFacts(store, state, call, signed.verdict, stage) };
+    floor: signed.policy ? a4FloorFor(signed.policy) : UNVERIFIED_FLOOR, now, live: collectFacts(store, state, call, signed.verdict, stage, availability) };
   return { readiness: evaluateA4Readiness(state, query), query };
+}
+export function evaluateFor(store: A4Store, state: A4ReadinessState, principal: A4Principal | null, call: Facts, stage: A4Stage, now: number) {
+  return evaluateWith(store, state, principal, call, stage, now, vaultUnlocked);
+}
+/** The selected signed-async record path uses real public policy plus actual local row/receipt prerequisites. */
+export function evaluateForAsyncRecord(store: A4Store, state: A4ReadinessState, principal: A4Principal | null, call: Facts, stage: A4Stage, now: number) {
+  return evaluateWith(store, state, principal, call, stage, now, a4RecordAvailable);
 }
 
 /** The caller with live roles; a revoked or vanished user is refused even with a membership row (design §5.1). */
@@ -260,7 +288,7 @@ export function livePrincipal(store: A4Store, call: A4Call): A4Principal {
   return { ...call.principal, roles };
 }
 
-/** 403 for who-may-act refusals, 409 for everything readiness says is not ready, naming the items. `ignore` drops codes a caller has settled. */
+/** 403 for who-may-act refusals, 409 for everything readiness says is not ready, naming the items (A4_ON_HOLD on a held project, design §17). `ignore` drops codes a caller has settled. */
 export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore: readonly string[] = []): void {
   const codes = (readiness.allowed[action]?.reasonCodes ?? ["UNKNOWN_ACTION"]).filter((code) => !ignore.includes(code));
   if (codes.length === 0) return;
@@ -271,14 +299,19 @@ export function assertAllowed(readiness: A4ReadinessV1, action: A4Action, ignore
     throw fail(403, code, `refused: ${codes.join(", ")}`, codes);
   }
   if (codes.includes("FREEZE_ACTIVE")) throw fail(409, "FREEZE_ACTIVE", "An incident freeze is active for this agent.", codes);
-  throw fail(409, "A4_NOT_READY", `not ready: ${codes.join(", ")}`, { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id)) });
+  const named = { reasonCodes: codes, items: readiness.items.filter((entry) => codes.includes(entry.id)) };
+  if (codes.includes("ON_HOLD")) throw fail(409, "A4_ON_HOLD", "The project is on hold; an owner resumes it.", named);
+  if (codes.includes("A4_STEP_ORDER")) throw fail(409, "A4_STEP_ORDER", "The project is not at that stage; reload it.", { reasonCodes: codes });
+  if (codes.includes("PRINCIPAL_UNRESOLVED")) throw fail(409, "PRINCIPAL_UNRESOLVED", "The active plan requires a principal: an active local users.yaml user runs this effect. Nothing was consumed.", { reasonCodes: codes });
+  throw fail(409, "A4_NOT_READY", `not ready: ${codes.join(", ")}`, named);
 }
 
 /**
  * The automatic HOLD by amc-runtime naming the incidents (design §6.6); a project already held is left as it is. Like a
  * manual hold it is mirrored to the human action log and the A4_HOLD integration event, best effort.
  */
-export function autoHold(store: A4Store, projectId: string, incidentIds: readonly string[]): void {
+export function autoHold(store: A4Store, projectId: string, freezeIds: readonly string[]): void {
+  const incidentIds = holdIncidentIds(store.workspace, freezeIds); // a kill switch's own incident beside its id (P2-34)
   let held: { agentId: string; name: string; reason: string } | null = null;
   try {
     const result = store.transition(projectId, A4_RUNTIME, ({ head }) => {
@@ -297,12 +330,15 @@ export function autoHold(store: A4Store, projectId: string, incidentIds: readonl
   }
 }
 
-/** Refuses under an active or unreadable freeze, writing the automatic hold first. */
+/** Refuses under an active or unreadable freeze (a kill switch included), writing the automatic hold first; else consumes the runtime's changes. */
 export function refuseOnFreeze(store: A4Store, projectId: string): void {
   const head = store.readHead(projectId);
   if (head === null) throw fail(404, "A4_PROJECT_NOT_FOUND", `no A4 project ${projectId}`);
   const { freeze } = refreshVolatileFacts(store.workspace, head);
-  if (freeze !== null && !freeze.active) return;
+  if (freeze !== null && !freeze.active) {
+    syncRuntimeLifecycle(store, projectId); // P2-34: the runtime's change records move a deployed project first
+    return;
+  }
   autoHold(store, projectId, freeze?.incidentIds ?? []);
   throw fail(409, "FREEZE_ACTIVE", "An incident freeze is active for this agent; the project is held until it is lifted and an owner resumes.");
 }
@@ -311,7 +347,7 @@ export function refuseOnFreeze(store: A4Store, projectId: string): void {
 type Plan = (ts: number, load: (now: number) => A4ReadinessState) => { readiness: A4ReadinessV1; specs: A4ChangeSpec | readonly A4ChangeSpec[] };
 
 /**
- * One governed write (design §4.3, C-26): the freeze refusal, the plan on rows read under the project lock, the store's
+ * One governed write (design §4.3, C-26): the freeze refusal (not for a `remedy`, a rollback whose plan applies every other refusal), the plan on rows read under the project lock, the store's
  * envelope signing outside the transaction, and the same plan again inside it. The transition records that evaluation's
  * fullDigest; one that moved rebuilds once, then 409 A4_STALE_HEAD. A freeze found inside writes the automatic hold; a
  * notary that cannot sign is 409 A4_NOT_READY (NOTARY_UNREACHABLE), never a 500.
@@ -324,42 +360,62 @@ type Plan = (ts: number, load: (now: number) => A4ReadinessState) => { readiness
  * effect's engine decisions; and the actor's live roles, which the plan took from `livePrincipal` before the lock and
  * fullDigest does not cover: a revocation is 403 A4_USER_DISABLED, any other role change 409 A4_STALE_HEAD.
  */
-export function governed(store: A4Store, projectId: string, actor: A4Principal, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
-  plan: Plan): A4TransitionResult {
-  refuseOnFreeze(store, projectId);
+function governedInputs(store: A4Store, projectId: string, actor: A4Principal, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
+  plan: Plan, remedy: boolean) {
+  if (!remedy) refuseOnFreeze(store, projectId);
   let planned: string | null = null;
   let snapshot: ReturnType<A4Store["snapshot"]> | null = null;
   const integrity = new Map<string, boolean>();
+  const reset = () => { snapshot = null; integrity.clear(); };
   const load = (now: number): A4ReadinessState => stateOf(store, snapshot ??= store.snapshot(projectId), now, integrity);
-  try {
-    return store.transition(projectId, actor, ({ ts }) => {
-      snapshot = null; // each attempt (a moved head rebuilds once) loads the rows it verified afresh
-      integrity.clear();
-      const result = plan(ts, load);
-      planned = result.readiness.fullDigest;
-      return result.specs;
-    }, { ...options, readiness: () => {
-      const roles = liveRolesFor(store.workspace, actor);
-      if (roles.length === 0) throw fail(403, "A4_USER_DISABLED", "This user has no live roles; a membership row is history, not authority.");
-      if (canonicalize([...roles].sort()) !== canonicalize([...actor.roles].sort())) throw fail(409, "A4_STALE_HEAD", "Your roles changed while this was signed; reload and retry.");
-      const digest = planned ?? plan(Date.now(), load).readiness.fullDigest;
-      planned = null;
-      return digest;
-    } });
-  } catch (error) {
-    if (error instanceof A4StoreError && error.code === "FREEZE_ACTIVE") {
-      autoHold(store, projectId, refreshVolatileFacts(store.workspace, store.readHead(projectId)!).freeze?.incidentIds ?? []);
-    }
-    if (error instanceof A4StoreError && error.code === "A4_SIGNING_UNAVAILABLE" && collectRoute(store.workspace) === "notary") {
-      notaryFailures.set(store.workspace, Date.now());
-      throw fail(409, "A4_NOT_READY", "The notary could not sign this record.", { reasonCodes: ["NOTARY_UNREACHABLE"] });
-    }
-    throw error;
-  }
+  const rolesCurrent = () => {
+    const roles = liveRolesFor(store.workspace, actor);
+    if (roles.length === 0) throw fail(403, "A4_USER_DISABLED", "This user has no live roles; a membership row is history, not authority.");
+    if (canonicalize([...roles].sort()) !== canonicalize([...actor.roles].sort())) throw fail(409, "A4_STALE_HEAD", "Your roles changed while this was signed; reload and retry.");
+  };
+  return { reset, rolesCurrent, build: ({ ts }: { ts: number }) => {
+    reset(); // each actual head attempt loads the verified rows afresh
+    const result = plan(ts, load); planned = result.readiness.fullDigest; return result.specs;
+  }, options: { ...options, readiness: () => {
+    rolesCurrent();
+    const digest = planned ?? plan(Date.now(), load).readiness.fullDigest;
+    planned = null; return digest;
+  } } };
 }
-const collectRoute = (workspace: string): "vault" | "notary" | null => {
+function governedFailure(store: A4Store, projectId: string, error: unknown): never {
+  const cause = error instanceof A4TransitionPublicationError ? error.cause : error;
+  if (cause instanceof A4StoreError && cause.code === "FREEZE_ACTIVE") {
+    autoHold(store, projectId, refreshVolatileFacts(store.workspace, store.readHead(projectId)!).freeze?.incidentIds ?? []);
+  }
+  if (cause instanceof A4StoreError && cause.code === "A4_SIGNING_UNAVAILABLE" && collectRoute(store.workspace) === "notary") {
+    notaryFailures.set(store.workspace, Date.now());
+    const refusal = fail(409, "A4_NOT_READY", "The notary could not sign this record.", { reasonCodes: ["NOTARY_UNREACHABLE"] });
+    if (error instanceof A4TransitionPublicationError) {
+      Object.defineProperty(refusal, "cause", { value: error });
+      throw new A4TransitionPublicationError({ ...error.detail.progress }, refusal, error.completed);
+    }
+    throw refusal;
+  }
+  throw error;
+}
+export function governed(store: A4Store, projectId: string, actor: A4Principal, options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">,
+  plan: Plan, remedy = false): A4TransitionResult {
+  const actual = governedInputs(store, projectId, actor, options, plan, remedy);
+  try { return store.transition(projectId, actor, actual.build, actual.options); }
+  catch (error) { return governedFailure(store, projectId, error); }
+}
+/** No positive ref verdict or snapshot crosses an actual actor/provider wait on the selected async record path. */
+export async function governedAsync(store: A4Store, projectId: string, actor: A4Principal,
+  options: Pick<A4TransitionOptions, "expectedHeadSeq" | "request" | "response">, plan: Plan, beforePublish: () => void): Promise<A4TransitionAttempt> {
+  const actual = governedInputs(store, projectId, actor, options, plan, false);
+  const current = () => { actual.reset(); actual.rolesCurrent(); beforePublish(); actual.rolesCurrent(); actual.reset(); };
+  try { return await store.transitionAsync(projectId, actor, actual.build, actual.options, current); }
+  catch (error) { return governedFailure(store, projectId, error); }
+}
+/** Who signs `kind` under the workspace's trust config; null when that config's signature is invalid. */
+const collectRoute = (workspace: string, kind: SignKind = "A4_RECORD"): "vault" | "notary" | null => {
   try {
-    return signingRoute(workspace, "A4_RECORD");
+    return signingRoute(workspace, kind);
   } catch {
     return null;
   }
@@ -433,81 +489,6 @@ export const gateRowOf = (state: A4ReadinessState, gateId: string): A4GateRow =>
   return row;
 };
 
-/**
- * Opens a documentary gate (design §6.2): an ApprovalRequestRecord whose floors come from the live signed approval policy
- * and the in-force gate policy (which may only raise them), whose `boundHashes.intentHash` binds the A4 intent and whose
- * readiness binding covers exactly `A4_BOUND_ITEMS[stage]`. One open gate per (revision, stage, gate): a repeat while it
- * is open answers 409 A4_GATE_OPEN naming it; a superseded or expired one is replaced. A `policy` gate carries the
- * proposed gate policy, is opened by an owner and always needs an approver distinct from the proposer.
- */
-export function requestGate(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gate: "direction" | "completion" | "policy";
-  proposedGatePolicy?: unknown; expectedHeadSeq: number }): A4TransitionResult {
-  const principal = livePrincipal(store, input);
-  const now = Date.now();
-  const gateId = randomId("a4gate");
-  const proposal = input.gate === "policy" ? a4GatePolicyV1Schema.safeParse(input.proposedGatePolicy) : null;
-  if (proposal && !proposal.success) throw fail(400, "INPUT_INVALID", "proposedGatePolicy is not an amc.a4-gate-policy/v1 document.");
-  if (input.gate !== "policy" && input.proposedGatePolicy !== undefined) throw fail(400, "INPUT_INVALID", "Only a policy gate carries a proposed policy.");
-  return governed(store, projectId, principal, input, (ts, load) => {
-    const state = load(now);
-    const project = state.project;
-    const stage = input.gate === "policy" ? project.stage : input.stage;
-    if (stage === "retired") throw fail(409, "A4_RETIRED", "The project is retired.");
-    const { readiness, query } = evaluateFor(store, state, principal, input, stage, now);
-    assertAllowed(readiness, input.gate === "policy" ? "changeGatePolicy" : "requestGate");
-    // A policy gate binds the stage's items too, so it waits on the same blockers and self-settling items as any gate,
-    // all but the floor item: a policy gate is how a project left below a newly signed floor is brought back within it.
-    if (input.gate === "policy") assertAllowed(readiness, "requestGate", ["gate.policy_floor"]);
-    const revision = state.revisions.find((row) => row.revision_no === project.revision_no && row.stage === stage) ?? null;
-    if (input.gate !== "policy" && (project.stage !== stage || project.step !== (input.gate === "direction" ? "proposed" : "reviewed") || revision === null)) {
-      throw fail(409, "A4_STEP_ORDER", `a ${input.gate} gate opens at step ${input.gate === "direction" ? "proposed" : "reviewed"} of the current stage`);
-    }
-    const prior = state.gates.filter((row) => row.gate === input.gate && row.stage === stage && row.revision_no === project.revision_no)
-      .map((row) => gateStatus(state, row, query.policy, now));
-    // One whose bound readiness moved is refused at decide and complete (assertIntentUnchanged) and readiness reads it STALE: replaceable.
-    const open = prior.find((gate) => (gate.status === "PENDING" || gate.status === "QUORUM_MET") && !readinessMoved(readiness.items, gate));
-    if (open) throw fail(409, "A4_GATE_OPEN", `gate ${open.row.gate_id} is already open`, { gateId: open.row.gate_id });
-    // DENY is terminal for the revision (design §6.4 step 7): a new gate needs a new revision.
-    if (input.gate !== "policy" && prior.some((gate) => gate.status === "DENIED")) throw fail(409, "A4_GATE_DENIED", "This revision's gate was denied; propose a new revision.");
-    const proposed = proposal?.success ? proposal.data : null;
-    if (proposed) {
-      const below = gatePolicyFloorViolations(proposed, query.floor, query.gatePolicy);
-      if (below.length > 0) throw fail(409, "GATE_POLICY_BELOW_FLOOR", below.join("; "), below);
-    }
-    const rule = query.gatePolicy.gates[input.gate === "policy" ? "policy" : `${stage}.${input.gate}` as `${A4Stage}.${"direction" | "completion"}`];
-    const policyRule = approvalRuleForAction(query.policy, rule.actionClass);
-    const regulated = isRegulated(state, query.floor);
-    const rolesAllowed = rule.rolesAllowed ? policyRule.rolesAllowed.filter((role) => rule.rolesAllowed!.includes(role)) : policyRule.rolesAllowed;
-    if (rolesAllowed.length === 0) throw fail(409, "A4_NOT_READY", "The gate policy leaves no role that may approve.", { reasonCodes: ["GATE_POLICY_BELOW_FLOOR"] });
-    const boundItemIds = A4_BOUND_ITEMS[stage];
-    const intent = intentOf(state, { stage, gate: input.gate, revisionNo: project.revision_no, requesterKey: principal.key,
-      specDigest: proposed ? sha256Hex(canonicalize(proposed)) : revision!.spec_digest, boundItemIds }, readiness);
-    const amc = (name: string): string => fileSha(join(store.workspace, ".amc", name)) ?? sha256Hex(`missing-${name}`);
-    const request = approvalRequestSchema.parse({
-      v: 1, approvalRequestId: gateId, agentId: project.agent_id, intentId: `a4-${projectId}-${stage}-${input.gate}-r${project.revision_no}`,
-      toolName: `a4.${stage}.${input.gate}`, actionClass: rule.actionClass, requestedMode: "EXECUTE", effectiveMode: "EXECUTE",
-      riskTier: engineRiskTier(state),
-      createdTs: now, expiresTs: now + Math.min(rule.ttlDays, query.floor.maxTtlDays ?? 90) * DAY_MS, status: "PENDING",
-      requiredApprovals: Math.max(policyRule.requiredApprovals, rule.minApprovals ?? 0, 1),
-      requireDistinctUsers: policyRule.requireDistinctUsers || rule.requireDistinctUsers === true || regulated || input.gate === "policy", rolesAllowed,
-      boundHashes: { intentHash: sha256Hex(canonicalize(intent)), policyHash: amc("approval-policy.yaml"), toolsHash: amc("tools.yaml"),
-        budgetsHash: amc("budgets.yaml"), leaseConstraintsHash: sha256Hex(canonicalize({})) },
-      authorizationIntent: intent
-    });
-    const bindingDigest = approvalRequestBindingDigest(request);
-    return { readiness, specs: {
-      kind: "GATE_REQUESTED", stage, revisionNo: project.revision_no,
-      payload: { gateId, gate: input.gate, bindingDigest, intentHash: request.boundHashes.intentHash, readinessBindingDigest: intent.readinessBindingDigest,
-        // A regulated quorum that can only be LOCAL_USER keys is labelled on the gate from the start (design §5.2).
-        degraded: readiness.items.some((entry) => entry.id === "sod.self_provisioned" && entry.status === "WAITING") ? ["SOD_DEGRADED_SELF_PROVISIONED"] : [],
-        ...(proposed ? { proposedGatePolicy: proposed } : {}) },
-      sideRows: [{ table: "a4_gates", values: { gate_id: gateId, project_id: projectId, revision_no: project.revision_no, stage, gate: input.gate,
-        request_json: canonicalize(request), binding_digest: bindingDigest, intent_json: canonicalize(intent), readiness_sha256: intent.readinessBindingDigest,
-        bound_items_json: JSON.stringify(boundItemIds), gate_policy_digest: intent.gatePolicyDigest, requested_by_key: principal.key,
-        excluded_keys_json: JSON.stringify(intent.excludedKeys), expires_ts: request.expiresTs, envelope_json: null, ts } }]
-    } };
-  });
-}
 
 /**
  * Records one APPROVE or DENY on a documentary gate (design §6.4). The server derives the gate's seq from its own
@@ -542,9 +523,9 @@ export function recordDecision(store: A4Store, projectId: string, input: A4Call 
     if (gate.status !== "PENDING") throw fail(409, "A4_GATE_CLOSED", `the gate is ${gate.status}`);
     // A policy gate is not one of the stage's direction/completion gates: their openness, roles, votes and expiry do not
     // bar it, and its own were just checked (roles just below). Its proposal was floor-checked at request and is again at
-    // GATE_POLICY_CHANGED, so a policy in force below the floor does not bar it.
-    assertAllowed(readiness, "decide", row.gate === "policy"
-      ? ["GATE_NOT_OPEN", "GATE_ROLE_NOT_ALLOWED", "A4_DUPLICATE_DECISION", "GATE_EXPIRING", "gate.policy_floor"] : []);
+    // GATE_POLICY_CHANGED, so a policy in force below the floor does not bar it. `lease.principal` bars approvals only: a DENY mints no lease (at Activate it revokes one).
+    assertAllowed(readiness, "decide", [...(row.gate === "policy" ? ["GATE_NOT_OPEN", "GATE_ROLE_NOT_ALLOWED", "A4_DUPLICATE_DECISION", "GATE_EXPIRING", "gate.policy_floor"] : []),
+      ...(input.decision === "deny" ? ["lease.principal"] : [])]);
     if (!principal.roles.some((role) => gate.request.rolesAllowed.includes(role))) {
       throw fail(403, "PRINCIPAL_ROLE_INSUFFICIENT", `this gate accepts ${gate.request.rolesAllowed.join(", ")}`);
     }
@@ -602,7 +583,7 @@ const headAfterConsume = (row: A4GateRow): { stage?: A4Stage; step: "direction_a
  */
 export function consumeGate(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; gateId: string; expectedHeadSeq: number;
   response?: A4TransitionOptions["response"] },
-  extra?: (ctx: { state: A4ReadinessState; row: A4GateRow; principal: A4Principal; regulated: boolean; ts: number }) => { payload: Record<string, unknown>; specs: A4ChangeSpec[] }): A4TransitionResult {
+  extra?: (ctx: { state: A4ReadinessState; row: A4GateRow; principal: A4Principal; regulated: boolean; ts: number; approverKeys: string[] }) => { payload: Record<string, unknown>; specs: A4ChangeSpec[] }): A4TransitionResult {
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 complete");
   const now = Date.now();
@@ -625,7 +606,7 @@ export function consumeGate(store: A4Store, projectId: string, input: A4Call & {
     if (extra === undefined && state.chain.some((link) => link.kind === "EFFECT_GATE_OPENED" && link.body.gateId === row.gate_id)) {
       throw fail(409, "EFFECT_REQUIRED", "An effect gate is open on this gate; complete runs its effect.");
     }
-    const effect = extra?.({ state, row, principal, regulated: isRegulated(state, query.floor), ts });
+    const effect = extra?.({ state, row, principal, regulated: isRegulated(state, query.floor), ts, approverKeys: approverKeys(gate) });
     return { readiness, specs: [{ kind: "GATE_CONSUMED", stage: row.stage, revisionNo: row.revision_no,
       payload: { gateId: row.gate_id, gate: row.gate, approverKeys: approverKeys(gate), readinessBindingDigest: readiness.bindingDigest, ...effect?.payload },
       head: headAfterConsume(row) }, ...(effect?.specs ?? [])] };
@@ -712,9 +693,6 @@ export function reopenStage(store: A4Store, projectId: string, input: A4Call & {
   }, "a4 reopen");
 }
 
-/** The Assemble-bound slots: a TUNE whose head revision differs from the deployed one in any of them reopens Assemble. */
-const ASSEMBLE_SLOTS = /^(enforce|composition|graph)\./;
-
 /**
  * TUNE (owner, deployed projects only; design §6.6): the stage is derived — Assemble when the owner flags a capability
  * change or any Assemble-bound slot of the head revision differs from the deployed release's revision, else Adapt.
@@ -727,47 +705,52 @@ export function tuneProject(store: A4Store, projectId: string, input: A4Call & {
   return headTransition(store, projectId, input, "tune", (state) => {
     const releaseId = state.project.deployed_release_id;
     if (releaseId === null) throw fail(409, "A4_NOT_DEPLOYED", "Only a deployed project is tuned; retire it to start over.");
-    const release = releases.find((row) => row.release_id === releaseId);
-    const slotsOf = (revisionNo: unknown) => flatSlots(JSON.parse(state.revisions.find((row) => row.revision_no === revisionNo)?.resource_digests_json ?? "{}"));
-    const deployed = slotsOf(release?.revision_no), head = slotsOf(state.project.revision_no);
-    const assemble = input.capabilityChange || release === undefined
-      || Object.keys({ ...deployed, ...head }).some((slot) => ASSEMBLE_SLOTS.test(slot) && deployed[slot] !== head[slot]);
+    const stage = tuneStage(state.revisions, releases, releaseId, state.project.revision_no, input.capabilityChange);
     return { kind: "TUNE", payload: { baseReleaseId: releaseId, capabilityChange: input.capabilityChange, mechanicPlanId: input.mechanicPlanId ?? null, reason: input.reason },
-      head: { stage: assemble ? "assemble" : "adapt", step: "asked", base_release_id: releaseId } };
+      head: { stage, step: "asked", base_release_id: releaseId } };
   }, "a4 tune");
 }
 
 const PRE_PROPOSAL_STEPS = new Set(["asked", "understood", "explained"]);
+type RetireInput = A4Call & { reason: string; acceptanceNote?: string; expectedHeadSeq: number };
+/** RETIRE's plan; `lifecycle` names P2-23's retirement row when the agent was retired with the project. */
+function retirePlan(store: A4Store, principal: A4Principal, input: RetireInput, state: A4ReadinessState, now: number, lifecycle: { lifecycleEventId: string } | null) {
+  if (state.project.stage === "retired") throw fail(409, "A4_RETIRED", "The project is already retired.");
+  const { readiness } = evaluateFor(store, state, principal, input, state.project.stage, now);
+  // "Never reached proposed" from the signed head states (an answers REVISION keeps the step before proposed), and the
+  // creator from the signed CREATED body, never the unsigned head row.
+  const draftCreator = state.chain[0]?.kind === "CREATED" && state.chain[0].body.actorKey === principal.key
+    && state.chain.every((link) => PRE_PROPOSAL_STEPS.has(String((link.body.headAfter as { step?: unknown } | undefined)?.step)));
+  assertAllowed(readiness, "retire", draftCreator ? ["PRINCIPAL_ROLE_INSUFFICIENT"] : []);
+  if (state.effects.some((effect) => effect.state === "running") && !input.acceptanceNote?.trim()) {
+    throw fail(409, "OUTCOME_UNKNOWN_OPEN", "An effect is still running; record an owner acceptance note to retire anyway.");
+  }
+  return { readiness, specs: { kind: "RETIRE" as const, payload: { reason: input.reason, acceptanceNote: input.acceptanceNote ?? null,
+    ...(lifecycle === null ? {} : { lifecycleRetirement: lifecycle }) }, head: { stage: "retired" as const } } };
+}
+
 /**
  * RETIRE (owner; or the creator of a project that never reached `proposed`, so an abandoned draft never holds the agent's
- * slot, answers or not). Refused while an effect is running unless an owner acceptance note is recorded.
+ * slot, answers or not). Refused while an effect is running unless an owner acceptance note is recorded. A deployed
+ * project's agent is retired through P2-23 first, after the same plan passed (P2-34; design §6.6).
  */
-export function retireProject(store: A4Store, projectId: string, input: A4Call & { reason: string; acceptanceNote?: string; expectedHeadSeq: number }): A4TransitionResult {
+export async function retireProject(store: A4Store, projectId: string, input: RetireInput): Promise<A4TransitionResult> {
   const principal = livePrincipal(store, input);
   assertOwnerMode(store.workspace, "a4 retire");
+  refuseOnFreeze(store, projectId); // before P2-23 is asked: a frozen project retires nothing, there or here
   const now = Date.now();
-  return governed(store, projectId, principal, input, (_ts, load) => {
-    const state = load(now);
-    if (state.project.stage === "retired") throw fail(409, "A4_RETIRED", "The project is already retired.");
-    const { readiness } = evaluateFor(store, state, principal, input, state.project.stage, now);
-    // "Never reached proposed" from the signed head states (an answers REVISION keeps the step before proposed), and the
-    // creator from the signed CREATED body, never the unsigned head row.
-    const draftCreator = state.chain[0]?.kind === "CREATED" && state.chain[0].body.actorKey === principal.key
-      && state.chain.every((link) => PRE_PROPOSAL_STEPS.has(String((link.body.headAfter as { step?: unknown } | undefined)?.step)));
-    assertAllowed(readiness, "retire", draftCreator ? ["PRINCIPAL_ROLE_INSUFFICIENT"] : []);
-    if (state.effects.some((effect) => effect.state === "running") && !input.acceptanceNote?.trim()) {
-      throw fail(409, "OUTCOME_UNKNOWN_OPEN", "An effect is still running; record an owner acceptance note to retire anyway.");
-    }
-    return { readiness, specs: { kind: "RETIRE", payload: { reason: input.reason, acceptanceNote: input.acceptanceNote ?? null }, head: { stage: "retired" } } };
-  });
+  const before = loadA4State(store, projectId, now);
+  retirePlan(store, principal, input, before, now, null);
+  const lifecycle = await retireGovernedAgent(store.workspace, before.project, principal, input);
+  return governed(store, projectId, principal, input, (_ts, load) => retirePlan(store, principal, input, load(now), now, lifecycle));
 }
 
 /**
  * ACKNOWLEDGED (owner; D-21, design §7 item 6): an acknowledgeable WAITING item stays WAITING with OWNER_ACKNOWLEDGED for
  * 90 days and is bound into the next gate's intent; a BLOCKED item is never acknowledged. Record it before the request.
- * The evaluator's own rule decides (acknowledgeable): never `plan_unresolved` on a regulated project, and `plan_activated`
- * only from Review on while its activation is deferred (PLAN_ACTIVATION_DEFERRED), so no acknowledgement is recorded
- * that would not count.
+ * The evaluator's own rule decides (acknowledgeable): never `plan_unresolved` on a regulated project, `plan_activated` only from Review on while
+ * deferred (PLAN_ACTIVATION_DEFERRED), Activate's D-21 item and AMC's check from Review on (the check once it names a receipt), and only at the
+ * project's current stage (409 A4_STEP_ORDER otherwise; allowedFor refuses it), so no acknowledgement is recorded that would not count.
  */
 export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call & { stage: A4Stage; itemId: string; reason: string; expectedHeadSeq: number }): A4TransitionResult {
   if (!ACKNOWLEDGEABLE_ITEMS.includes(input.itemId)) throw fail(400, "INPUT_INVALID", `${input.itemId} cannot be acknowledged`);
@@ -775,14 +758,17 @@ export function acknowledgeItem(store: A4Store, projectId: string, input: A4Call
   return headTransition(store, projectId, input, "acknowledge", (state, readiness, ts, query) => {
     const target = readiness.items.find((entry) => entry.id === input.itemId);
     if (target?.status !== "WAITING") throw fail(409, "A4_NOT_ACKNOWLEDGEABLE", `${input.itemId} is ${target?.status ?? "absent"}; only a WAITING item is acknowledged`);
-    if (!acknowledgeable(target, isRegulated(state, query.floor))) {
+    if (!acknowledgeable(target, isRegulated(state, query.floor), input.stage)) {
       throw fail(409, "A4_NOT_ACKNOWLEDGEABLE", input.itemId === "plan_unresolved"
         ? "A regulated project activates only a ready plan: answer the missing facts; an owner's out-of-scope does not settle them."
-        : target.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED)
+        : target.reasonCodes.includes(PLAN_ACTIVATION_DEFERRED) || !target.mandatory
           ? `${input.itemId} is acknowledged after Review: every step before it records a new revision, and an acknowledgement counts only on its own.`
-          : `${input.itemId} is acknowledged only while its activation is deferred (${PLAN_ACTIVATION_DEFERRED}); activation is due.`, { reasonCodes: target.reasonCodes });
+          : `${input.itemId} is acknowledged only ${input.itemId === "plan_activated" ? `while its activation is deferred (${PLAN_ACTIVATION_DEFERRED})` : "once it names the deployment receipt the approval binds"}.`, { reasonCodes: target.reasonCodes });
     }
-    return { kind: "ACKNOWLEDGED", stage: input.stage, payload: { itemId: input.itemId, reason: input.reason.trim(), expiresTs: ts + ACKNOWLEDGEMENT_TTL_MS } };
+    // The receipt and check ids it names: the acknowledgement counts only while the item names the same ones.
+    const records = acknowledgedRecords(target.reasonCodes);
+    return { kind: "ACKNOWLEDGED", stage: input.stage, payload: { itemId: input.itemId, reason: input.reason.trim(), expiresTs: ts + ACKNOWLEDGEMENT_TTL_MS,
+      ...(records.length > 0 ? { recordCodes: records } : {}) } };
   }, "a4 acknowledge");
 }
 

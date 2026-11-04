@@ -1,0 +1,83 @@
+{
+  "schema": "p107-private-control-review-pins/1",
+  "at": "2026-10-16T17:39:29.314631+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/operators.json",
+      "bytes": 2410,
+      "sha256": "af520a085f57d1d0ad644a0a32cba474286a76d8c336f6ee151862c7e295748a"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/README.md",
+      "bytes": 937,
+      "sha256": "24f523655ed4ab7bd4652706a1fa11ca18fc431271caa8f004015420acafe82e"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/README.md",
+      "bytes": 7743,
+      "sha256": "692024f095dbfab6baad25ce61283468f6622c86fbed55113d74bd5304de319d"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/matrix.json",
+      "bytes": 7164,
+      "sha256": "0a5593b6b8f9874193afc7f24eeb2a30dbadbe504c71220e4b95e263fa165a0c"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/pins.json",
+      "bytes": 7118,
+      "sha256": "fce1918e384549940b7c2911d372596927c35fdc2152591750e5d3dce7529314"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/seal.json",
+      "bytes": 825,
+      "sha256": "7895e1122e7db943afd43677066a6ef225bf934e6b7dd154dd44c3efeb954407"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/eligibility/types.ts",
+      "bytes": 3418,
+      "sha256": "4cfc64f7c7ad43b13f16ebae4c68c0ced2e652aa3cf2d9942e826067351c4eb6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M1-highest-pass.patch",
+      "bytes": 459,
+      "sha256": "27d7f6fafeadc9e324280ae2f10599b61e917851988c41450f98996a0e065ff0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M2-register-seeder.patch",
+      "bytes": 872,
+      "sha256": "ccacc51c961cc87b6fa386688b628d517e666e4d85eff9cfa647e98509a7d300"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/M3-remove-denied.patch",
+      "bytes": 1190,
+      "sha256": "e55b8de720912fd4e8d4bea3c547b9b6ee8780a6cf1bb9234d79fcf54b25c6ed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/dogfood/maturityEvidence.ts",
+      "bytes": 15973,
+      "sha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/review.json",
+      "bytes": 6410,
+      "sha256": "73a74d109912fd76b961b20e0246f311d083339c70c357ccdd38a73e11243dd0"
+    }
+  ]
+}

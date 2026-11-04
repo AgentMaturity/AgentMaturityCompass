@@ -33,7 +33,8 @@ let sequence = 0;
 function newWorkspace(prefix = "amc-1480-hook-health-"): string {
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), prefix)));
   roots.push(workspace);
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  // witnessing: false: this suite compares the workspace bytes before and after a read, without the creation marker.
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated", witnessing: false });
   return workspace;
 }
 

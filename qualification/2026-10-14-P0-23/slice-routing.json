@@ -1,0 +1,395 @@
+{
+  "kind": "P0-23 serial slice-routing addendum; read-only and unexecuted",
+  "atUtc": "2026-10-14T16:55:55.336095+00:00",
+  "parentBoundary": "The parent reports P0-22 source candidate a4822f4a829b7724f1213f464d98ace6f6c978e5 is committed and final Node 22 bounded qualification is active. P0-23 remains read-only until that receipt closes.",
+  "acceptedBase": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "spec": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-23.md",
+    "sha256": "468e694e7989aacbf26f3101efa52bf0e734c64a81946daaf216a8683ce9ff1b"
+  },
+  "reservations": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "checkedInputs": [
+    {
+      "path": "src/mcp/amcMcpServer.ts",
+      "acceptedSha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+      "p0-22CandidateSha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+      "equal": true
+    },
+    {
+      "path": "src/mcp/mcpClaimOutput.ts",
+      "acceptedSha256": "10e7132ff8f81ff8f116e97728dabd601bf5b8c72ced079a6f3b26c9944d9e9e",
+      "p0-22CandidateSha256": "10e7132ff8f81ff8f116e97728dabd601bf5b8c72ced079a6f3b26c9944d9e9e",
+      "equal": true
+    },
+    {
+      "path": "src/mcp/a4Tools.ts",
+      "acceptedSha256": "4614662d0246743ea1949aa9fcb93f88b6f9268fb5bdafe2f4747148d953ebca",
+      "p0-22CandidateSha256": "4614662d0246743ea1949aa9fcb93f88b6f9268fb5bdafe2f4747148d953ebca",
+      "equal": true
+    },
+    {
+      "path": "src/a4/a4Schema.ts",
+      "acceptedSha256": "e95c31751121e458dbdbb6fa4041e3f6535bf4d1a713f6dbfe7472178b11ba43",
+      "p0-22CandidateSha256": "e95c31751121e458dbdbb6fa4041e3f6535bf4d1a713f6dbfe7472178b11ba43",
+      "equal": true
+    },
+    {
+      "path": "src/domains/domainEvidence.ts",
+      "acceptedSha256": "964e0eccddeced986aa6e6f68358cb6e30ecf1b6901edc7761a11566d90c545a",
+      "p0-22CandidateSha256": "964e0eccddeced986aa6e6f68358cb6e30ecf1b6901edc7761a11566d90c545a",
+      "equal": true
+    },
+    {
+      "path": "src/api/index.ts",
+      "acceptedSha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+      "p0-22CandidateSha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+      "equal": true
+    },
+    {
+      "path": "src/api/accessPolicy.ts",
+      "acceptedSha256": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+      "p0-22CandidateSha256": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+      "equal": true
+    },
+    {
+      "path": "src/api/resultRouteRegistry.ts",
+      "acceptedSha256": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+      "p0-22CandidateSha256": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+      "equal": true
+    },
+    {
+      "path": "src/studio/studioServer.ts",
+      "acceptedSha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+      "p0-22CandidateSha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+      "equal": true
+    },
+    {
+      "path": "src/studio/openapi.ts",
+      "acceptedSha256": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+      "p0-22CandidateSha256": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+      "equal": true
+    },
+    {
+      "path": "src/console/assets/components/claimBadge.js",
+      "acceptedSha256": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+      "p0-22CandidateSha256": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+      "equal": true
+    },
+    {
+      "path": "src/console/pages/home.html",
+      "acceptedSha256": "690b9a4e9404b731818e3021de4bef5b02ad95877dd518fc8b179ecbd41731c2",
+      "p0-22CandidateSha256": "690b9a4e9404b731818e3021de4bef5b02ad95877dd518fc8b179ecbd41731c2",
+      "equal": true
+    },
+    {
+      "path": "website/openapi.yaml",
+      "acceptedSha256": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+      "p0-22CandidateSha256": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+      "equal": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "acceptedSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "p0-22CandidateSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "equal": true
+    }
+  ],
+  "runtimeInputs": {
+    "node": "Use PATH=/opt/homebrew/opt/node@22/bin:$PATH and explicit /opt/homebrew/opt/node@22/bin/node together.",
+    "ownedSdk": "1.32.1",
+    "primaryInstalledSdk": "1.30.0",
+    "meaning": "Version drift was read from package.json without importing either SDK. The owned pinned runtime supplies InMemoryTransport.createLinkedPair, Client.connect, listTools and callTool. Do not use the primary dependency installation as owned qualification evidence.",
+    "installsPerformed": 0
+  },
+  "smallestFirstSlice": {
+    "name": "Actual MCP SDK discovery and legacy JSON label parity",
+    "startCondition": "Only after the parent closes the P0-22 bounded qualification receipt and assigns an owned P0-23 branch or worktree.",
+    "editScopeFirst": [
+      "tests/mcpClaimLabels.test.ts"
+    ],
+    "productionEditScopeFirst": [],
+    "cases": [
+      {
+        "name": "Default discovery retains the actual 11-tool inventory",
+        "transport": "SDK Client and InMemoryTransport connected to createAmcMcpServer(ownedFixtureWorkspace).",
+        "inputs": "Set AMC_A4_PREVIEW unset or 0, preserving and restoring the host environment.",
+        "assertions": [
+          "SDK listTools returns the exact ten original names plus amc_incident_clocks, without duplicates.",
+          "No amc_a4_* tool is exposed with preview disabled.",
+          "Do not rely only on MCP_TOOL_METADATA, which is created at module import time."
+        ],
+        "expectedPhase": "Harness control; do not manufacture a RED if it already passes."
+      },
+      {
+        "name": "A sealed legacy transparency JSON payload and its MCP wrapper agree",
+        "transport": "Actual Client.callTool({ name: amc_transparency_report, arguments: { agentId, workspace, format: json } }).",
+        "inputs": "Create a complete typed diagnostic fixture with methodology.amcVersion 1.1.1, observed coverage, VALID status and fresh timestamps. Seal its canonical bytes with the owned workspace auditor key. Store it in the selected agent run directory.",
+        "preconditions": [
+          "Use production signing helpers, not fake runSealSig or reportJsonSha256 strings.",
+          "Assert sealedRunReportVerifies is true for the stored fixture before the call, so a missing-seal fallback cannot make the test vacuously pass.",
+          "Use an initialized owned fixture workspace and an actual agent config; do not seed live provider events or invoke a model."
+        ],
+        "assertions": [
+          "The SDK result succeeds; do not accept isError as a label pass.",
+          "The first text block parses as the original transparency JSON object.",
+          "That payload remains self_reported with the Legacy (1.x), self-reported label and not_evaluated result.",
+          "structuredContent and the separate canonical claim text block carry the same kind, dimensions and label as the JSON payload.",
+          "statusDimensionsSchema parses the actual structuredContent dimensions.",
+          "The claim text block contains the canonical line and docs/CLAIM_KINDS.md pointer.",
+          "No independently_reviewed, observed or Certified promotion is introduced by the fixture seal."
+        ],
+        "expectedPhase": "Source-inferred likely RED: transparencyReport.ts:238 uses envelopeForStoredRun, but mcpClaimOutput.ts:32-34 uses domainEvidence.ts:32 and its direct envelopeForDiagnosticReport call."
+      }
+    ],
+    "whySmall": "Two actual SDK cases expose the existing factory and the most concrete cross-surface discrepancy in one new test file. They need no API dispatcher, Studio server, browser, extra MCP tool, production registry or entitlement changes.",
+    "redPolicy": "Capture the actual failing case and raw JSON/logs. Keep its expected legacy semantics. Review the root cause and exact ownership before any production repair; do not alter domain-wide truth or A4 behavior merely to turn this slice green.",
+    "successMeaning": "Passing these two cases proves only this inventory and this legacy transparency path. It does not qualify all ten tools or P0-23 as a whole."
+  },
+  "mcpExpansionAfterFirstRedAndRepair": {
+    "scope": "The same owned test file, existing own-key and metadata tests; no production changes unless a reproduced defect and bounded ownership review justify them.",
+    "toolCases": [
+      {
+        "name": "amc_list_agents",
+        "arguments": {
+          "workspace": "owned fixture",
+          "agentId": "default only when the schema expects it",
+          "format": "json for transparency"
+        }
+      },
+      {
+        "name": "amc_quickscore",
+        "arguments": {
+          "workspace": "owned fixture",
+          "agentId": "default only when the schema expects it",
+          "format": "json for transparency"
+        }
+      },
+      {
+        "name": "amc_get_guide",
+        "arguments": {
+          "workspace": "owned fixture",
+          "agentId": "default only when the schema expects it",
+          "format": "json for transparency"
+        }
+      },
+      {
+        "name": "amc_check_compliance",
+        "arguments": {
+          "workspace": "owned fixture",
+          "agentId": "default only when the schema expects it",
+          "format": "json for transparency"
+        }
+      },
+      {
+        "name": "amc_transparency_report",
+        "arguments": {
+          "workspace": "owned fixture",
+          "agentId": "default only when the schema expects it",
+          "format": "json for transparency"
+        }
+      },
+      {
+        "name": "amc_score_sector_pack",
+        "arguments": {
+          "packId": "clinical-trials",
+          "responses": "All actual pack questions answered 5"
+        }
+      },
+      {
+        "name": "amc_score_agent",
+        "arguments": {
+          "workspace": "owned fixture",
+          "agentId": "default only when the schema expects it",
+          "format": "json for transparency"
+        }
+      },
+      {
+        "name": "amc_list_evidence",
+        "arguments": {
+          "workspace": "owned fixture",
+          "agentId": "default only when the schema expects it",
+          "format": "json for transparency"
+        }
+      },
+      {
+        "name": "amc_query_diagnostic",
+        "arguments": {
+          "workspace": "owned fixture",
+          "agentId": "default only when the schema expects it",
+          "format": "json for transparency"
+        }
+      },
+      {
+        "name": "amc_get_recommendations",
+        "arguments": {
+          "workspace": "owned fixture",
+          "agentId": "default only when the schema expects it",
+          "format": "json for transparency"
+        }
+      }
+    ],
+    "requiredAssertions": [
+      "Every original tool call actually succeeds and provides canonical label text plus structuredContent with one allowed kind and schema-valid five dimensions.",
+      "Preserve the separate first JSON text block for transparency; the claim pointer follows the label in a second block.",
+      "No Certified wording or questionnaire certification. All-5 sector answers remain self_reported and regulated not_evaluated.",
+      "Check amc_list_agents per-agent claims and amc_list_evidence per-event claimKind against the actual controlled fixture provenance. Aggregate labels alone are insufficient.",
+      "Prototype names __proto__, constructor, toString and hasOwnProperty fail Unknown sector pack in actual SDK calls after a locally signed fixture entitlement admits lookup.",
+      "Add current sealed and current unsealed controls to ensure the legacy repair does not lower or promote the wrong records.",
+      "Use no-run and empty-evidence fixtures for not_evaluated cases; no invented default result.",
+      "Preserve amc_incident_clocks as an accepted extension. A separate actual result case can reuse incident clock fixtures without treating it as a newly added P0-23 tool."
+    ],
+    "fixtureReuse": [
+      "initWorkspace without agentId creates the default fleet agent; if selecting another agent, reuse buildAgentConfig and scaffoldAgent rather than copying unvalidated YAML.",
+      "Existing typed diagnostic fixture pattern in tests/diagnosticReportStatus.test.ts; use actual key/seal helpers for the new transport contract.",
+      "Existing local Ed25519 license generation in tests/industryPackEntitlement.test.ts and tests/industryPackWeightingPaymentInvariance.test.ts. Use createIndustryPackLicenseKey and locally verified env/file entitlement, never unsigned ACTIVE flags or fake legacy key strings.",
+      "resetRateLimiter provides documented test isolation; do not change or disable rate limiting in production."
+    ],
+    "lifecycle": "Close Client and McpServer transports, lock only the fixture vault if opened, remove only newly created tracked fixture roots, restore environment values and rate-limiter state. Do not reset shared workspaces or modify the parent install.",
+    "mutation": "After real baseline passes, the root may run the own-key mutant only in the owned scope with exact hash restoration. The API statusDimensions mutant belongs to the later API slice."
+  },
+  "previewPreservation": {
+    "defaultTools": [
+      "amc_list_agents",
+      "amc_quickscore",
+      "amc_get_guide",
+      "amc_check_compliance",
+      "amc_transparency_report",
+      "amc_score_sector_pack",
+      "amc_score_agent",
+      "amc_list_evidence",
+      "amc_query_diagnostic",
+      "amc_get_recommendations",
+      "amc_incident_clocks"
+    ],
+    "previewTools": [
+      "amc_a4_list_projects",
+      "amc_a4_project",
+      "amc_a4_readiness",
+      "amc_a4_conformance",
+      "amc_a4_comment"
+    ],
+    "sourceEvidence": [
+      "src/mcp/a4Tools.ts:43-50 declares the five names.",
+      "a4ToolMetadata at :68-70 and registerA4Tools at :230-231 both gate on a4PreviewEnabled.",
+      "src/mcp/amcMcpServer.ts metadata is initialized at module import; registration is evaluated when the factory runs."
+    ],
+    "firstSliceBoundary": "Do not change or call A4 tools, create A4 records, read sessions, or start Studio. Preserve the existing five tool names, preview gate, schemas and module SHA-256. First discovery runs with preview disabled.",
+    "optionalRegistrationContract": "If the parent later assigns registration-only compatibility coverage, an in-memory listTools call with preview=1 can assert exactly 16 names and then restore the environment. Do not invoke any preview handler or call this A4 behavior qualification. This optional case is not required to start the smallest slice."
+  },
+  "acceptanceRouting": [
+    {
+      "criterion": "All ten original MCP tools carry canonical text and structured fields",
+      "route": "Own SDK suite; preserve 11 accepted default tools.",
+      "firstSliceCloses": false
+    },
+    {
+      "criterion": "Inherited pack IDs refused by MCP, Studio and CLI",
+      "route": "Reuse existing getPackById own-key unit test. Actual MCP refusal can be tested with local entitlement. Studio and CLI require their actual paths; do not infer both from one unit test.",
+      "firstSliceCloses": false
+    },
+    {
+      "criterion": "Every API route, router coverage and mandatory OpenAPI ClaimResult reference",
+      "route": "Owned tests may inspect it; API/registry/OpenAPI production mutation remains held pending exact ownership reconciliation. Saved OpenAPI omissions are already recorded in the preflight.",
+      "firstSliceCloses": false
+    },
+    {
+      "criterion": "Studio route/page labels, six legends, neutral not evaluated",
+      "route": "Later Studio loopback and pure badge/page contracts, with retained console and Studio holds reconciled before production edits.",
+      "firstSliceCloses": false
+    },
+    {
+      "criterion": "No Certified wording and P0-23 pending entries removed",
+      "route": "Check actual SDK responses plus later actual API/page results. The existing no-fabrication allowlist pending array is already empty; do not manufacture a change or equate that static fact with whole-surface qualification.",
+      "firstSliceCloses": false
+    },
+    {
+      "criterion": "Payment invariance, budgets, mutation proof, full checks, docs and changeset",
+      "route": "Local entitlement fixtures for actual claims, followed by required parent checks at the completed owned slice boundary. Keep gate retirement outside P0-23.",
+      "firstSliceCloses": false
+    },
+    {
+      "criterion": "MCP transcript per kind, API sample and dashboard/industry-pack screenshots",
+      "route": "Retain only actual transcripts and responses. Do not mock eligibility or enable held A4 code to fabricate independent-review or synthetic result transcripts. If actual original tool paths cannot produce a requested kind, record the limitation; helper examples must be labeled fixture projections and cannot substitute for actual tool evidence.",
+      "firstSliceCloses": false
+    }
+  ],
+  "retainedProductionHolds": [
+    {
+      "paths": [
+        "src/api/index.ts",
+        "src/api/accessPolicy.ts",
+        "src/api/resultRouteRegistry.ts"
+      ],
+      "evidence": "RESERVATIONS.md:25-27 and :1114-1121 explicitly retain these shared hooks for Claude A4 work.",
+      "whyBlocked": "A non-A4 claim repair would still mutate a file containing accepted and held A4 claim/access hooks. Presence in the P0-23 touch scope does not transfer ownership."
+    },
+    {
+      "paths": [
+        "src/studio/openapi.ts",
+        "src/studio/a4Openapi.ts",
+        "website/openapi.yaml"
+      ],
+      "evidence": "RESERVATIONS.md:28 explicitly lists both OpenAPI modules and the generated website contract.",
+      "whyBlocked": "Regenerating website/openapi.yaml is a real write to a retained shared artifact; it is not ownership-neutral merely because generated."
+    },
+    {
+      "paths": [
+        "src/console/assets/components/claimBadge.js",
+        "src/console/pages/home.html",
+        "src/console/assets/sw.js",
+        "src/console/pages/a4*.html",
+        "src/console/assets/a4*.js"
+      ],
+      "evidence": "RESERVATIONS.md:29 names claimBadge and home; :1326 retains all console paths in the earlier wave; :1541 releases only named wave-5 scope while A4 paths stay held.",
+      "whyBlocked": "The existing badge/page implementation contains later A4 additions. A stale-strip repair needs the exact shared console scope reconciled before edits."
+    },
+    {
+      "paths": [
+        "src/studio/studioServer.ts",
+        "src/approvals/**"
+      ],
+      "evidence": "RESERVATIONS.md:1114-1121 explicitly retains Studio and approval paths after P1-57.",
+      "whyBlocked": "Binding and serialization are shared with A4, access policy and human approvals; no global release is documented."
+    },
+    {
+      "paths": [
+        "src/mcp/a4Tools.ts",
+        "src/sdk/a4Client.ts",
+        "src/sdk/index.ts",
+        "src/a4/**"
+      ],
+      "evidence": "RESERVATIONS.md:32 and :1325-1338 reserve P1-64/A4 paths. P1-64 is reported merged at :1518; A4 paths remain held at :1541 and :1583.",
+      "whyBlocked": "Merged source is preserved. No edit or handler invocation in the smallest MCP slice needs these paths; do not treat merge or idle status as permission to change them."
+    },
+    {
+      "paths": [
+        "src/cli.ts",
+        "src/cli/resultCommandRegistry.ts",
+        "src/repl/replParser.ts",
+        "scripts/freeze-baseline.json"
+      ],
+      "evidence": "RESERVATIONS.md:1587-1588 identifies P1-65 shared-file coordination and a held baseline change.",
+      "whyBlocked": "P0-23 excludes new CLI tools and cannot authorize or import the held freeze exception. Shared CLI/registry/REPL remain unchanged."
+    }
+  ],
+  "ownershipInterpretation": "The explicit later item list does not name P0-23, but that is not broad clearance. Read-only inspection and a parent-assigned owned test file can proceed after the serial boundary. Any source fix needs a current path-specific reservation check and exact ownership reconciliation. The release at RESERVATIONS:1541 applies to the wave-5 paths named at :1538, not every older API/Studio/console hold. No Claude message, release claim or reservation edit was made.",
+  "decisionsAndPauses": [
+    "No D-06 decision is needed to prove payment never changes claims; both options require that rule. Retiring licensing, checkout or access gates remains P1-51 after D-06.",
+    "Keep the user-directed P0-22 empty JSON contract unresolved. Do not manufacture aggregate claims or resolve analogous API/list policy in the MCP slice.",
+    "Do not import pending-main or resume A4/P2-02, tokenization, privacy, native-session composition, D-15 deletion work or release/deployment tasks."
+  ],
+  "execution": {
+    "sourceEdits": 0,
+    "tests": 0,
+    "servers": 0,
+    "builds": 0,
+    "installs": 0,
+    "applicationImports": 0,
+    "reservationWrites": 0,
+    "claudeMessages": 0,
+    "performed": "Source/spec/reservation reads, Git status reads, installed SDK declaration/package reads and input SHA-256 comparisons only."
+  }
+}

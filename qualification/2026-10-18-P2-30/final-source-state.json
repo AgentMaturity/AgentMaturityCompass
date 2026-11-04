@@ -1,0 +1,91 @@
+{
+  "clone": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30",
+  "node": "v22.23.3",
+  "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "int": "577aa79700479634fa4f16cf44c48192fe57a994",
+  "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M qualification/2026-10-18-P2-30/README.md\n M qualification/2026-10-18-P2-30/receipt.json\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-d15.log\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/final-source-state.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/inventory-drift.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json\n",
+  "dirtyProductSourcePaths": [],
+  "generatedCountDirtyPaths": [
+    "CONTRIBUTING.md",
+    "README.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/content/show-hn-draft.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "website/i18n.js",
+    "website/index.html",
+    "website/lite.html",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "formalRunnerSourceState": {
+    "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "int": "577aa79700479634fa4f16cf44c48192fe57a994",
+    "node": "v22.23.3",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+    "statusPorcelain": "?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/inventory-drift.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json",
+    "fullSuite": "Required once on final merged source after non-suite checks; earlier runs preserved."
+  },
+  "expectedStaleCountsRegenerated": true,
+  "inventorySourceHashes": [
+    {
+      "path": "src/domains/packs/stations/technology.ts",
+      "sha256": "4aa5855f12d22b60b74d8713947e860d19d09428c85e88db0b7e69394212ee8f",
+      "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994"
+    },
+    {
+      "path": "src/domains/packs/stations/shared.ts",
+      "sha256": "038c247060a72dea258041eedbba09d8465605a52e28a8903ac8b4129e06e6e5",
+      "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994"
+    },
+    {
+      "path": "src/domains/industryPacks.ts",
+      "sha256": "2d4306f3863c35591457737f2afe4d79f66a50f2066c8b40b394b58cf1aa5fed",
+      "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994"
+    },
+    {
+      "path": "src/domains/deep/technology.ts",
+      "sha256": "744ad5fcc506262c299bba5cac8265e5332f79c91f47266652ca10a2e4154e76",
+      "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994"
+    },
+    {
+      "path": "src/domains/deep/shared.ts",
+      "sha256": "00638c721b0c60804f44651778268bba10e3dba26445c43127cc76015908029e",
+      "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994"
+    },
+    {
+      "path": "src/domains/deepIndustryPacks.ts",
+      "sha256": "af2f4f788063a7a41d284b74f93e1e02aed060b877d75077635e4da7e88ddb27",
+      "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994"
+    },
+    {
+      "path": "src/domains/questionnaireLabel.ts",
+      "sha256": "969f5a757bdc70d4d1ceede9906f26cf0a8a083a4d5d4317f90f6fc88312911e",
+      "sourceRevision": "577aa79700479634fa4f16cf44c48192fe57a994"
+    }
+  ],
+  "inventorySourceMatches": true,
+  "inventoryIntegrationRevision": "577aa79700479634fa4f16cf44c48192fe57a994",
+  "inventorySourceHeadAtReconciliation": "158d4387b75831598cea037fdf97046805c9602d",
+  "inventoryCounts": {
+    "packQuestions": 97,
+    "deepQuestions": 16,
+    "totalQuestions": 113
+  },
+  "inventorySnapshot": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/p1-42-integration/actual-inventory.json",
+    "sha256": "5b707e30ef57bcb102f33c96a200e645e939aa7735f178d231d72594a48866d2"
+  },
+  "inventoryEvidence": {
+    "path": "inventory-drift.json",
+    "sha256": "f80fcbdc18d711502659423424dab13d125a7fcab874a1d6467699cef060a847",
+    "capturedState": "committed_scoped_verified_full_completed_with_recorded_failures_final_receipt_pending",
+    "committedSourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843"
+  },
+  "scopeAudit": {
+    "path": "final-scope-audit.json",
+    "sha256": "3d8765aa7bbe78598ec4e2038d6ee26db3d13457840a1059ece4c3282fc87ed1",
+    "capturedState": "committed_scoped_verified_full_completed_with_recorded_failures_final_receipt_pending",
+    "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "integrationBase": "577aa79700479634fa4f16cf44c48192fe57a994"
+  }
+}

@@ -438,7 +438,7 @@ const runtimeFirewallMigrationMetadataSchema = z.object({
   receipt: runtimeFirewallMigrationReceiptSchema
 }).strict();
 
-function migrationReceiptFromMetadata(metadata: unknown): RuntimeFirewallMigrationReceipt | null {
+export function migrationReceiptFromMetadata(metadata: unknown): RuntimeFirewallMigrationReceipt | null {
   const parsed = runtimeFirewallMigrationMetadataSchema.safeParse(metadata);
   return parsed.success ? parsed.data.receipt : null;
 }
@@ -451,7 +451,7 @@ export function runtimeFirewallPolicyPath(workspace: string): string {
   return join(runtimeFirewallRoot(workspace), "policy.json");
 }
 
-function runtimeFirewallPolicyJournalDir(workspace: string): string {
+export function runtimeFirewallPolicyJournalDir(workspace: string): string {
   return join(runtimeFirewallRoot(workspace), "policy-revisions");
 }
 
@@ -485,7 +485,7 @@ export function defaultRuntimeFirewallPolicy(mode: RuntimeFirewallMode = "warn")
   };
 }
 
-function validateRuntimeFirewallPolicy(raw: unknown): RuntimeFirewallPolicy {
+export function validateRuntimeFirewallPolicy(raw: unknown): RuntimeFirewallPolicy {
   const policy = runtimeFirewallPolicySchema.parse(raw) as RuntimeFirewallPolicy;
   if (policy.thresholds.warnAt > policy.thresholds.blockAt) {
     throw new Error("warnAt must be less than or equal to blockAt");
@@ -493,7 +493,7 @@ function validateRuntimeFirewallPolicy(raw: unknown): RuntimeFirewallPolicy {
   return policy;
 }
 
-function readRuntimeFirewallPolicyJournal(
+export function readRuntimeFirewallPolicyJournal(
   workspace: string,
   recoverPendingPublication = false
 ): SignedControlJournalSnapshot<RuntimeFirewallPolicy> {
@@ -506,7 +506,7 @@ function readRuntimeFirewallPolicyJournal(
   });
 }
 
-function withRuntimeFirewallPolicyLock<T>(workspace: string, operation: () => T): T {
+export function withRuntimeFirewallPolicyLock<T>(workspace: string, operation: () => T): T {
   try {
     return withControlFileLock({ root: runtimeFirewallRoot(workspace), name: "policy", operation });
   } catch (error) {

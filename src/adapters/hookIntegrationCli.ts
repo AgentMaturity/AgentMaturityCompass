@@ -1,109 +1,31 @@
 import chalk from "chalk";
 import type { Command } from "commander";
 import { stdin } from "node:process";
-import { unlockVaultInteractive, vaultStatusNow } from "../vault/vaultCli.js";
+import { promptPassphrase, unlockVaultInteractive, vaultStatusNow } from "../vault/vaultCli.js";
+import { recoverHookAuditLatch } from "../bridge/hookAuditLatch.js";
 import { unlockVault } from "../vault/vault.js";
 import {
-  HookIntegrationError,
-  failClosedProviderControlResponse,
-  forwardProviderHookControl,
-  forwardProviderHookEvent,
+  authorizeForwardInvocation,
   getHookIntegrationStatus,
-  inspectProviderHookEvent,
   installHookIntegration,
   removeHookIntegration,
   type HookFileChange,
+  type HookIntegrationStatus,
   type HookMode,
   type HookProvider
 } from "./hookIntegration.js";
-import { serializeProviderControlResponse } from "../bridge/hookControl.js";
-import { redactBridgeText } from "../bridge/bridgeRedaction.js";
+import { isHookProvider } from "../bridge/hookProviders.js";
+import { findPiPackage } from "./pi/piInstall.js";
+import { findDshPackage } from "./dsh/dshInstall.js";
+import { findClaudeCode } from "./hookProviders/claudeCode.js";
+import { claudeHookSchemasFor } from "./hookProviders/claudeCodePayloads.js";
+import { normalizeBridgeBase } from "./hookProviders/installFiles.js";
 import { verifyClaudeControl, type ClaudeControlVerification } from "./claudeHookProbe.js";
-import { forwardDeadlineMs, HookDeadlineError, withHookDeadline } from "./hookDeadline.js";
+import { readStdinAll, runHookForward, type HookForwardOptions } from "./hookForwarder.js";
+// The hidden `connect hooks forward` and tests still reach the forwarder through here.
+export { runHookForward } from "./hookForwarder.js";
 import { inspectHookActionLifecycle } from "../watch/hookActionLifecycle.js";
 import { inspectHookHealth } from "../watch/hookHealthDiagnostics.js";
-
-async function readStdinAll(): Promise<string> {
-  return new Promise((resolve) => {
-    let data = "";
-    stdin.setEncoding("utf8");
-    stdin.on("data", (chunk) => { data += chunk; });
-    stdin.on("end", () => resolve(data));
-    if (stdin.isTTY) resolve("");
-  });
-}
-
-export interface HookForwardOptions {
-  provider: HookProvider;
-  mode: HookMode;
-  agent: string;
-  tokenFile: string;
-  bridgeUrl: string;
-}
-
-export interface HookForwardOutcome {
-  stdout: string;
-  stderr: string;
-  exitCode: 0 | 1 | 2;
-}
-
-/**
- * Runs one provider hook delivery under forwardDeadlineMs(). Claude Code control mode turns
- * every failure into a deny with exit 2, because Claude Code runs the tool after any other
- * failure; Gemini CLI keeps its earlier outputs and exit codes.
- */
-export async function runHookForward(
-  opts: HookForwardOptions,
-  readInput: () => Promise<string>,
-  workspace = process.cwd(),
-  deadlineMs = forwardDeadlineMs(),
-): Promise<HookForwardOutcome> {
-  const denyExit = opts.provider === "claude-code" && opts.mode === "control" ? 2 : 0;
-  const deny = (message: string): HookForwardOutcome => ({
-    stdout: `${serializeProviderControlResponse(failClosedProviderControlResponse(opts.provider))}\n`,
-    stderr: `${message}\n`,
-    exitCode: denyExit,
-  });
-  // Assigned inside the deadline callback, so the cast stops narrowing to the initial value.
-  let stage = "input" as "empty" | "input" | "control" | "observe";
-  try {
-    return await withHookDeadline(deadlineMs, async (signal) => {
-      const rawInput = await readInput();
-      if (!rawInput.trim()) {
-        stage = "empty";
-        throw new HookIntegrationError("HOOK_INPUT_INVALID", "provider hook input is required on stdin");
-      }
-      const inspection = inspectProviderHookEvent({ provider: opts.provider, rawInput });
-      const forward = { workspace, provider: opts.provider, agentId: opts.agent, tokenFile: opts.tokenFile, bridgeBase: opts.bridgeUrl, rawInput, signal };
-      if (opts.mode === "control" && inspection.phase === "requested") {
-        stage = "control";
-        const { control } = await forwardProviderHookControl(forward);
-        const denied = control.decision === "deny";
-        return {
-          stdout: `${serializeProviderControlResponse(control.providerResponse)}\n`,
-          stderr: denied && denyExit === 2 ? `AMC policy denied the action: ${redactBridgeText(control.reason)}\n` : "",
-          exitCode: denied ? denyExit : 0,
-        };
-      }
-      stage = "observe";
-      await forwardProviderHookEvent({ ...forward, mode: opts.mode });
-      // Both supported providers treat an empty JSON object as a neutral observation result.
-      return { stdout: "{}\n", stderr: "", exitCode: 0 };
-    });
-  } catch (error) {
-    // A post-tool hook cannot stop a call that already ran, so it never claims a deny.
-    if (denyExit === 2 && stage === "observe") {
-      return { stdout: "{}\n", stderr: "AMC could not record the tool outcome; the action already ran.\n", exitCode: 2 };
-    }
-    if (denyExit === 2 || (opts.mode === "control" && stage !== "empty" && stage !== "observe")) {
-      if (error instanceof HookDeadlineError) return deny("AMC hook control timed out; action denied.");
-      return deny(stage === "control"
-        ? "AMC hook control unavailable; action denied."
-        : "AMC hook control input invalid; action denied.");
-    }
-    return { stdout: "", stderr: `${error instanceof Error ? error.message : String(error)}\n`, exitCode: 1 };
-  }
-}
 
 function printControlVerification(control: ClaudeControlVerification): void {
   console.log((control.verified ? chalk.green : chalk.red)(control.summary));
@@ -111,15 +33,30 @@ function printControlVerification(control: ClaudeControlVerification): void {
   for (const note of control.notes) console.log(chalk.yellow(`Note: ${note}`));
 }
 
+/** Pi and Claude Code control: the claim comes from verified session registrations; sessions that ran no AMC hook are invisible. */
+function printGovernance(governance: NonNullable<HookIntegrationStatus["governance"]>): void {
+  console.log(`Governance: ${governance.claim} (${governance.registeredSessions} registered session(s), ${governance.qualifiedSessions} on a qualified version)`);
+  console.log(chalk.gray(governance.note));
+}
+
+/** Why a Claude Code control installation will deny every action, read the way its forwarder reads it; empty when none. */
+function claudeControlWarnings(workspace: string, agentId: string, bridgeUrl: string): string[] {
+  let version: string | null;
+  try {
+    version = authorizeForwardInvocation({ workspace, provider: "claude-code", mode: "control", agentId, bridgeBase: normalizeBridgeBase(bridgeUrl),
+      tokenFile: ".amc/hooks/claude-code.lease" }).claudeCodeVersion;
+  } catch (error) {
+    return [`the installation does not verify (${error instanceof Error ? error.message : String(error)}); the hook denies every action`];
+  }
+  if (claudeHookSchemasFor(version)) return [];
+  return [`${version ? `Claude Code ${version} is not a release AMC qualified` : "no Claude Code was on PATH"}, so the installation binds no qualified release and the hook denies every action; reinstall with a qualified Claude Code on PATH`];
+}
+
 function printFileChanges(files: HookFileChange[]): void {
   for (const file of files) {
     const sensitivity = file.sensitive ? " (secret, mode 0600)" : "";
     console.log(`  ${file.action.padEnd(12)} ${file.path}${sensitivity}`);
   }
-}
-
-function isHookProvider(value: string): value is HookProvider {
-  return value === "claude-code" || value === "gemini-cli";
 }
 
 export function registerHookIntegrationCommands(
@@ -132,8 +69,8 @@ export function registerHookIntegrationCommands(
 
   hooks
     .command("install")
-    .description("Install a reversible project hook for Claude Code or Gemini CLI")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .description("Install a reversible project hook for Claude Code, Gemini CLI, Pi, DSH (control) or Codex (observe)")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--mode <mode>", "observe|control", "observe")
     .option("--agent <agentId>", "agent ID (defaults to active agent)")
     .option("--bridge-url <url>", "Bridge origin", "http://127.0.0.1:3212")
@@ -154,21 +91,28 @@ export function registerHookIntegrationCommands(
       if (!opts.dryRun && !vaultStatusNow(process.cwd()).unlocked) {
         await unlockVaultInteractive(process.cwd());
       }
+      const agentId = opts.agent ?? activeAgent() ?? "default";
       const result = installHookIntegration({
         workspace: process.cwd(),
         provider: opts.provider,
         mode: opts.mode,
-        agentId: opts.agent ?? activeAgent() ?? "default",
+        agentId,
         bridgeBase: opts.bridgeUrl,
         ttl: opts.ttl,
         rpm: Number(opts.rpm),
-        dryRun: opts.dryRun
+        dryRun: opts.dryRun,
+        // Pi and Claude Code control bind the Pi or Claude Code a person gets by running `pi` or `claude` here.
+        piPackageDir: opts.provider === "pi" ? findPiPackage() ?? undefined : undefined,
+        dshPackageDir: opts.provider === "dsh" ? findDshPackage() ?? undefined : undefined,
+        claudeCodeBinary: opts.provider === "claude-code" && opts.mode === "control" && !opts.dryRun ? findClaudeCode() ?? undefined : undefined
       });
+      const warnings = opts.provider === "claude-code" && opts.mode === "control" && !opts.dryRun ? claudeControlWarnings(process.cwd(), agentId, opts.bridgeUrl) : [];
       if (opts.json) {
-        console.log(JSON.stringify(result, null, 2));
+        console.log(JSON.stringify({ ...result, warnings }, null, 2));
         return;
       }
       console.log(chalk.hex("#4AEF79")(opts.dryRun ? "AMC hook install plan" : result.changed ? "AMC hook installed" : "AMC hook already installed"));
+      for (const warning of warnings) console.log(chalk.yellow(`Warning: ${warning}`));
       console.log(`Provider: ${result.provider}`);
       console.log(`Mode: ${result.mode}`);
       console.log(`Hook lease: ${result.lease.scopes.join(", ")} on ${result.lease.route}`);
@@ -178,12 +122,13 @@ export function registerHookIntegrationCommands(
       console.log(result.mode === "control"
         ? "Boundary: control is loopback-only and raw provider input is never retained."
         : "Boundary: observation only; provider control decisions are unchanged.");
+      if (result.provider === "pi" || result.mode === "control") for (const limit of result.limitations) console.log(chalk.yellow(`Limit: ${limit}`));
     });
 
   hooks
     .command("status")
     .description("Verify provider config ownership, mode, signed manifest, and hook lease")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: HookProvider; json: boolean }) => {
       const status = getHookIntegrationStatus({ workspace: process.cwd(), provider: opts.provider });
@@ -200,6 +145,7 @@ export function registerHookIntegrationCommands(
         console.log(`Config owned: ${status.configOwned ? "yes" : "no"}`);
         console.log(`Manifest valid: ${status.manifestValid ? "yes" : "no"}`);
         console.log(`Lease valid: ${status.leaseValid ? "yes" : "no"}`);
+        if (status.governance) printGovernance(status.governance);
         if (status.expiresTs) console.log(`Expires: ${new Date(status.expiresTs).toISOString()}`);
         for (const issue of status.issues) console.log(chalk.yellow(`Issue: ${issue}`));
         if (control) printControlVerification(control);
@@ -210,11 +156,12 @@ export function registerHookIntegrationCommands(
   hooks
     .command("health")
     .description("Verify signed hook setup and show the latest verified provider event")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh")
+    .option("--recover-latch", "owner only: first clear this workspace's hook audit latch (vault passphrase); the recovery is recorded", false)
     .option("--json", "emit structured JSON", false)
-    .action(async (opts: { provider: string; json: boolean }) => {
+    .action(async (opts: { provider: string; json: boolean; recoverLatch: boolean }) => {
       if (!isHookProvider(opts.provider)) {
-        const message = "provider must be claude-code or gemini-cli";
+        const message = "provider must be claude-code, gemini-cli, pi or dsh";
         if (opts.json) console.log(JSON.stringify({ ok: false, error: message }, null, 2));
         else console.error(chalk.red(message));
         process.exitCode = 2;
@@ -229,13 +176,20 @@ export function registerHookIntegrationCommands(
           // The diagnostic below reports unavailable evidence without exposing credential errors.
         }
       }
+      const latchRecovery = opts.recoverLatch
+        ? recoverHookAuditLatch({ workspace, passphrase: passphrase ?? (await promptPassphrase("Vault passphrase (owner):")) })
+        : null;
       const health = inspectHookHealth({ workspace, provider: opts.provider });
       const control = health.provider === "claude-code" && health.mode === "control"
         ? await verifyClaudeControl({ workspace })
         : null;
       if (opts.json) {
-        console.log(JSON.stringify(control ? { ...health, control } : health, null, 2));
+        console.log(JSON.stringify({ ...health, ...(control ? { control } : {}), ...(latchRecovery ? { latchRecovery } : {}) }, null, 2));
       } else {
+        if (latchRecovery) {
+          console.log(latchRecovery.recovered ? `Hook audit latch cleared (was: ${latchRecovery.reason}); recovery recorded as ${latchRecovery.eventId}. `
+            + "Restart the Bridge: a running Bridge keeps the latch it holds in memory." : "Hook audit latch: not latched.");
+        }
         const color = health.status === "observed"
           ? chalk.hex("#4AEF79")
           : health.status === "fail_closed"
@@ -245,6 +199,7 @@ export function registerHookIntegrationCommands(
         console.log(`Provider: ${health.provider}`);
         console.log(`Agent: ${health.agentId ?? "not bound"}`);
         console.log(`Installation: ${health.installation.state}`);
+        if (health.installation.governance) printGovernance(health.installation.governance);
         console.log(`Observed events: ${health.evidence.eventCount}`);
         if (health.evidence.lastEvent) {
           console.log(`Last verified event: ${health.evidence.lastEvent.eventType}`);
@@ -261,7 +216,7 @@ export function registerHookIntegrationCommands(
   hooks
     .command("remove")
     .description("Remove only the signed AMC-owned hook and revoke its lease")
-    .requiredOption("--provider <provider>", "claude-code|gemini-cli")
+    .requiredOption("--provider <provider>", "claude-code|gemini-cli|pi|dsh|codex")
     .option("--dry-run", "show exact files without changing provider config", false)
     .option("--json", "emit structured JSON", false)
     .action(async (opts: { provider: HookProvider; dryRun: boolean; json: boolean }) => {
@@ -305,8 +260,10 @@ export function registerHookIntegrationCommands(
         console.log(`Provider: ${lifecycle.provider ?? "unverified"}`);
         console.log(`Evidence: ${lifecycle.evidenceEventIds.length} signed event(s)`);
         for (const reason of lifecycle.reasonCodes) console.log(chalk.yellow(`Issue: ${reason}`));
+        if (lifecycle.authorizationMismatch) console.log(chalk.red("Authorization mismatch: the tool ran with input other than the input AMC authorized (observed, not prevented)"));
+        if (lifecycle.observationConflict) console.log(chalk.red("Observation conflict: an outcome for this call was unmatched, conflicting or unverifiable"));
       }
-      if (lifecycle.failClosed) process.exitCode = 1;
+      if (lifecycle.failClosed || lifecycle.authorizationMismatch || lifecycle.observationConflict) process.exitCode = 1;
     });
 
   hooks
@@ -317,6 +274,7 @@ export function registerHookIntegrationCommands(
     .requiredOption("--agent <agentId>", "agent ID")
     .requiredOption("--token-file <path>", "dedicated hook lease token")
     .option("--bridge-url <url>", "Bridge origin", "http://127.0.0.1:3212")
+    .option("--event <event>", "the provider hook this handler is installed for (Claude Code control answers only that hook)")
     .action(async (opts: HookForwardOptions) => {
       const outcome = await runHookForward(opts, readStdinAll);
       stdin.destroy();

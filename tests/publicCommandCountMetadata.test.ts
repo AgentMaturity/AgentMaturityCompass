@@ -19,7 +19,7 @@ const CURRENT_COMMAND_COUNT_FILES = [
 
 const HISTORICAL_COMMAND_COUNT_RECEIPTS = [
   {
-    path: "docs/AUDIT_50_AGENTS_BATCH5.md",
+    path: "docs/archive/AUDIT_50_AGENTS_BATCH5.md",
     count: "1,144",
     observedAt: "2026-06-16",
   },

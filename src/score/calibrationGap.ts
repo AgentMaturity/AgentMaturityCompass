@@ -1,3 +1,4 @@
+import type { EvidenceOutcome } from "../types.js";
 /**
  * Calibration Gap Scoring Module
  *
@@ -18,6 +19,9 @@ import { join } from "path";
 import { assessCriterion, scoreWeightedCriteria, notAssessableNote } from "./controlSurfaceScope.js";
 
 export interface CalibrationReport {
+  outcome: EvidenceOutcome;
+  sampleSize: number;
+  metricOutcomes: Record<string, EvidenceOutcome>;
   /** Agent's self-reported confidence per dimension (0-1) */
   selfReported: Record<string, number>;
   /** AMC's observed evidence-based score per dimension (0-1) */
@@ -25,15 +29,15 @@ export interface CalibrationReport {
   /** Per-dimension calibration error: |self - observed| */
   perDimensionGap: Record<string, number>;
   /** Mean absolute calibration error across all dimensions */
-  meanCalibrationError: number;
+  meanCalibrationError: number | null;
   /** Expected Calibration Error (ECE) using binned approach */
-  expectedCalibrationError: number;
+  expectedCalibrationError: number | null;
   /** Overconfidence ratio: dimensions where self > observed */
-  overconfidenceRatio: number;
+  overconfidenceRatio: number | null;
   /** Underconfidence ratio: dimensions where self < observed */
-  underconfidenceRatio: number;
+  underconfidenceRatio: number | null;
   /** Overall calibration score 0-100 */
-  score: number;
+  score: number | null;
   /** Maturity level L0-L5 */
   level: number;
   /** Gaps and recommendations */
@@ -55,8 +59,8 @@ function computeECE(
   selfValues: number[],
   observedValues: number[],
   numBins = 10
-): number {
-  if (selfValues.length === 0) return 1;
+): number | null {
+  if (selfValues.length === 0) return null;
 
   const bins: { confSum: number; accSum: number; count: number }[] = [];
   for (let i = 0; i < numBins; i++) {
@@ -95,7 +99,17 @@ export function scoreCalibrationGap(input: CalibrationInput): CalibrationReport 
   const dimensions = new Set([
     ...Object.keys(selfReported),
     ...Object.keys(observed),
-  ]);
+  ].filter((dimension) => Number.isFinite(selfReported[dimension]) && Number.isFinite(observed[dimension])));
+
+  if (dimensions.size === 0) {
+    return {
+      outcome: "not_evaluated", sampleSize: 0,
+      metricOutcomes: { meanCalibrationError: "not_evaluated", expectedCalibrationError: "not_evaluated", overconfidenceRatio: "not_evaluated", underconfidenceRatio: "not_evaluated", score: "not_evaluated" },
+      selfReported, observed, perDimensionGap: {}, meanCalibrationError: null, expectedCalibrationError: null,
+      overconfidenceRatio: null, underconfidenceRatio: null, score: null, level: 0,
+      gaps: ["No paired finite calibration observations were provided."],
+    };
+  }
 
   const perDimensionGap: Record<string, number> = {};
   const selfValues: number[] = [];
@@ -125,7 +139,7 @@ export function scoreCalibrationGap(input: CalibrationInput): CalibrationReport 
     }
   }
 
-  const dimCount = dimensions.size || 1;
+  const dimCount = dimensions.size;
   const meanCalibrationError = totalGap / dimCount;
   const expectedCalibrationError = computeECE(selfValues, observedValues);
   const overconfidenceRatio = overconfidentCount / dimCount;
@@ -158,13 +172,15 @@ export function scoreCalibrationGap(input: CalibrationInput): CalibrationReport 
   if (dimCount < 3) {
     gaps.push("Insufficient dimensions for reliable calibration measurement — need at least 5");
   }
-  if (expectedCalibrationError > 0.2) {
+  if (expectedCalibrationError !== null && expectedCalibrationError > 0.2) {
     gaps.push(
       `High Expected Calibration Error (${(expectedCalibrationError * 100).toFixed(1)}%) — confidence bins poorly calibrated`
     );
   }
 
   return {
+    outcome: "measured", sampleSize: dimCount,
+    metricOutcomes: { meanCalibrationError: "measured", expectedCalibrationError: "measured", overconfidenceRatio: "measured", underconfidenceRatio: "measured", score: "measured" },
     selfReported,
     observed,
     perDimensionGap,
@@ -233,14 +249,18 @@ export function scanCalibrationInfrastructure(root: string): CalibrationReport {
   const level = infraScore >= 90 ? 5 : infraScore >= 70 ? 4 : infraScore >= 50 ? 3 : infraScore >= 30 ? 2 : infraScore >= 10 ? 1 : 0;
 
   return {
+    outcome: weighted.assessed === 0 ? "not_evaluated" : "measured",
+    sampleSize: weighted.assessed,
+    metricOutcomes: { meanCalibrationError: "not_evaluated", expectedCalibrationError: "not_evaluated", overconfidenceRatio: "not_evaluated", underconfidenceRatio: "not_evaluated", score: weighted.assessed === 0 ? "not_evaluated" : "measured" },
     selfReported: {},
     observed: {},
     perDimensionGap: {},
-    meanCalibrationError: 1 - infraScore / 100,
-    expectedCalibrationError: 1 - infraScore / 100,
-    overconfidenceRatio: 0,
-    underconfidenceRatio: 0,
-    score: infraScore,
+    // Infrastructure criteria do not measure confidence calibration.
+    meanCalibrationError: null,
+    expectedCalibrationError: null,
+    overconfidenceRatio: null,
+    underconfidenceRatio: null,
+    score: weighted.assessed === 0 ? null : infraScore,
     level,
     gaps,
   };

@@ -1,0 +1,485 @@
+{
+  "schema": "p111-independent-actual-fresh-control-review/1",
+  "at": "2026-10-16T19:43:11.476795+00:00",
+  "allReadsFinished": true,
+  "blockers": [],
+  "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+  "scope": "Read/hash/stat audit of actual closed evidence only. No helper/product/test/compiler/native/SQL/network/process execution or checkout/index/QA writes.",
+  "canonical": {
+    "total": 88,
+    "passed": 88,
+    "files": {
+      "tests/compliance/complianceFailClosed.test.ts": 21,
+      "tests/compliance/coverageScorer.test.ts": 2,
+      "tests/compliance/evidenceBinding.test.ts": 40,
+      "tests/catalog/evidence/decisive.test.ts": 25
+    },
+    "authority": "One actual four-file run:25 new unit cases plus63 unchanged cases, not summed cohorts."
+  },
+  "phases": [
+    {
+      "phase": "p111-fresh-canonical",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 29,
+      "individualHookValues": 29,
+      "rawObserverOrderedJoin": true,
+      "uniqueIdentities": 88,
+      "perFileOrderedInventoryEqual": true,
+      "exit": 0,
+      "durationMs": 7682,
+      "ownedPgid": 19278,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": []
+    },
+    {
+      "phase": "p111-m1",
+      "tests": {
+        "total": 88,
+        "passed": 87,
+        "failed": 1,
+        "skipped": 0
+      },
+      "hookTaskEntries": 29,
+      "individualHookValues": 29,
+      "rawObserverOrderedJoin": true,
+      "uniqueIdentities": 88,
+      "perFileOrderedInventoryEqual": true,
+      "exit": 1,
+      "durationMs": 7058,
+      "ownedPgid": 19373,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": []
+    },
+    {
+      "phase": "p111-m1-restored",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 29,
+      "individualHookValues": 29,
+      "rawObserverOrderedJoin": true,
+      "uniqueIdentities": 88,
+      "perFileOrderedInventoryEqual": true,
+      "exit": 0,
+      "durationMs": 6907,
+      "ownedPgid": 19460,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": []
+    },
+    {
+      "phase": "p111-m2",
+      "tests": {
+        "total": 88,
+        "passed": 87,
+        "failed": 1,
+        "skipped": 0
+      },
+      "hookTaskEntries": 29,
+      "individualHookValues": 29,
+      "rawObserverOrderedJoin": true,
+      "uniqueIdentities": 88,
+      "perFileOrderedInventoryEqual": true,
+      "exit": 1,
+      "durationMs": 6896,
+      "ownedPgid": 19588,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": []
+    },
+    {
+      "phase": "p111-m2-restored",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 29,
+      "individualHookValues": 29,
+      "rawObserverOrderedJoin": true,
+      "uniqueIdentities": 88,
+      "perFileOrderedInventoryEqual": true,
+      "exit": 0,
+      "durationMs": 7114,
+      "ownedPgid": 19663,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": []
+    },
+    {
+      "phase": "p111-m3",
+      "tests": {
+        "total": 88,
+        "passed": 87,
+        "failed": 1,
+        "skipped": 0
+      },
+      "hookTaskEntries": 29,
+      "individualHookValues": 29,
+      "rawObserverOrderedJoin": true,
+      "uniqueIdentities": 88,
+      "perFileOrderedInventoryEqual": true,
+      "exit": 1,
+      "durationMs": 7011,
+      "ownedPgid": 20187,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": []
+    },
+    {
+      "phase": "p111-m3-restored",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 29,
+      "individualHookValues": 29,
+      "rawObserverOrderedJoin": true,
+      "uniqueIdentities": 88,
+      "perFileOrderedInventoryEqual": true,
+      "exit": 0,
+      "durationMs": 6885,
+      "ownedPgid": 20256,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": []
+    },
+    {
+      "phase": "p111-m4",
+      "tests": {
+        "total": 88,
+        "passed": 85,
+        "failed": 3,
+        "skipped": 0
+      },
+      "hookTaskEntries": 29,
+      "individualHookValues": 29,
+      "rawObserverOrderedJoin": true,
+      "uniqueIdentities": 88,
+      "perFileOrderedInventoryEqual": true,
+      "exit": 1,
+      "durationMs": 6879,
+      "ownedPgid": 20311,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": []
+    },
+    {
+      "phase": "p111-m4-restored",
+      "tests": {
+        "total": 88,
+        "passed": 88,
+        "failed": 0,
+        "skipped": 0
+      },
+      "hookTaskEntries": 29,
+      "individualHookValues": 29,
+      "rawObserverOrderedJoin": true,
+      "uniqueIdentities": 88,
+      "perFileOrderedInventoryEqual": true,
+      "exit": 0,
+      "durationMs": 7061,
+      "ownedPgid": 20375,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicEvidencePaths": []
+    }
+  ],
+  "same88CaseIdentitiesAcrossNinePhases": true,
+  "orderedNamesWithinEachFilePreserved": true,
+  "fileCompletionOrderNotRequired": true,
+  "controls": [
+    {
+      "operator": "tenant-comparison",
+      "targetRel": "src/catalog/evidence/admission.ts",
+      "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+      "originalBytes": 6419,
+      "originalSha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "mutantBytes": 6233,
+      "mutantSha256": "f343a310f028958440516ac3a85e7ac98d02dc1fa839545d26726a955dae21e9",
+      "livePatch": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/m1.patch",
+        "bytes": 1092,
+        "sha256": "b05f883f03b867d8ebea85acaa734fde38a9513e488119f5cb2da3ec455713f4"
+      },
+      "exactOnceRecipeAndPatch": true,
+      "exactRestoredBytes": true,
+      "sequentialAfterPriorGreen": true,
+      "redClosedBeforeRestore": true,
+      "restoredSameCorpus88": true,
+      "failures": [
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs refuses another tenant and treats its evidence as untrusted",
+          "firstMessage": "AssertionError: expected [] to deeply equal [ { id: 'unit-event-a', \u2026(1) } ]",
+          "sourceFrames": [
+            [
+              "67",
+              "80"
+            ],
+            [
+              "124",
+              "5"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "operator": "freshness",
+      "targetRel": "src/catalog/evidence/admission.ts",
+      "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+      "originalBytes": 6419,
+      "originalSha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "mutantBytes": 6220,
+      "mutantSha256": "b089900e17231953cedff22be388f0f2ba428bcc00962d51cefdbf454804c48f",
+      "livePatch": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/m2.patch",
+        "bytes": 928,
+        "sha256": "3b3e5a398f4c32d2983c3d0d681cfdad6216fdf8e5f7cfb329b2ac703aa97f21"
+      },
+      "exactOnceRecipeAndPatch": true,
+      "exactRestoredBytes": true,
+      "sequentialAfterPriorGreen": true,
+      "redClosedBeforeRestore": true,
+      "restoredSameCorpus88": true,
+      "failures": [
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs uses recorded time for freshness even when claimed time looks fresh",
+          "firstMessage": "AssertionError: expected [] to deeply equal [ { id: 'unit-event-a', \u2026(1) } ]",
+          "sourceFrames": [
+            [
+              "67",
+              "80"
+            ],
+            [
+              "147",
+              "5"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "operator": "operator-tier-consumption",
+      "targetRel": "src/catalog/evidence/admission.ts",
+      "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+      "originalBytes": 6419,
+      "originalSha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "mutantBytes": 6475,
+      "mutantSha256": "3df8eae90e0a1a10100bb1d4ac8c148d9486c6a4b000201e3964554a95397443",
+      "livePatch": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/m3.patch",
+        "bytes": 1006,
+        "sha256": "17fc2f58283f834d330b21761d8ae65a3c5f3f0f876a42a37fecb26fdda6412d"
+      },
+      "exactOnceRecipeAndPatch": true,
+      "exactRestoredBytes": true,
+      "sequentialAfterPriorGreen": true,
+      "redClosedBeforeRestore": true,
+      "restoredSameCorpus88": true,
+      "failures": [
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs consumes the derived SELF_REPORTED tier despite an ignored OBSERVED attribute label",
+          "firstMessage": "AssertionError: expected 'OBSERVED' to be 'SELF_REPORTED' // Object.is equality",
+          "sourceFrames": [
+            [
+              "266",
+              "42"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "operator": "replay",
+      "targetRel": "src/catalog/evidence/admission.ts",
+      "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+      "originalBytes": 6419,
+      "originalSha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+      "mutantBytes": 6370,
+      "mutantSha256": "b1a9156fd714fe25be4897bea7646950b3c9294829ce4c8c45e52133aa74eda8",
+      "livePatch": {
+        "path": "/private/tmp/p1-11-decisive-qualification-20261017/m4.patch",
+        "bytes": 918,
+        "sha256": "866d12374b9b76973911420512cd61f1c9929e28eea57b5be7ff3c0b0f45618b"
+      },
+      "exactOnceRecipeAndPatch": true,
+      "exactRestoredBytes": true,
+      "sequentialAfterPriorGreen": true,
+      "redClosedBeforeRestore": true,
+      "restoredSameCorpus88": true,
+      "failures": [
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs refuses prefixed ref and receipt identities previously used in another window",
+          "firstMessage": "AssertionError: expected [] to deeply equal [ { id: 'unit-event-a', \u2026(1) } ]",
+          "sourceFrames": [
+            [
+              "67",
+              "80"
+            ],
+            [
+              "168",
+              "7"
+            ]
+          ]
+        },
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs admits a receipt identity once per evaluation",
+          "firstMessage": "AssertionError: expected [ 'unit-event-a', 'unit-event-b' ] to deeply equal [ 'unit-event-a' ]",
+          "sourceFrames": [
+            [
+              "177",
+              "52"
+            ]
+          ]
+        },
+        {
+          "file": "tests/catalog/evidence/decisive.test.ts",
+          "case": "catalog evidence decisions on already-derived unit inputs refuses the loader's derived foreign-receipt decision",
+          "firstMessage": "AssertionError: expected [] to deeply equal [ { id: 'unit-event-a', \u2026(1) } ]",
+          "sourceFrames": [
+            [
+              "67",
+              "80"
+            ],
+            [
+              "183",
+              "5"
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "causalInterpretation": {
+    "tenant": "M1 reaches common refusal assertion67 from124 with [] rejected refs; subsequent admitted/evidence/result/kind assertions are masked. Valid positive preceding the refusal passed.",
+    "freshness": "M2 reaches refusal67 from147 with [] rejected refs. The in-window31-day-old recorded time isolates removed freshness; later stale/result/kind assertions are masked.",
+    "operatorTier": "M3 directly observes OBSERVED where derived SELF_REPORTED was required at266. Later not_evaluated and self_reported assertions are masked. This is typed derived-tier consumption, not raw meta.trustTier loader mutation.",
+    "replay": "M4 reaches refusal67 from168 in the first ledger_event-prefix loop iteration, so the later receipt-prefix iteration is masked. Separate receipt dedup body first fails admitted IDs at177 with both events admitted; later rejected-ref assertion178 is masked. The derived foreignReceipt body independently reaches refusal67 from183; later dimensions are masked. replayDetail still ran, so this is refusal-gate sensitivity, not removed seen-ID registration.",
+    "restoredBodies": "Each exact restore separately passes all88 bodies; restored GREEN does not retroactively make masked RED assertions observed."
+  },
+  "preservation": {
+    "actualBoundPathsPerRoot": 57,
+    "sourceFreshRegularDistinctSelectedFiles": 114,
+    "currentByteHashesRechecked": true,
+    "protectedInputHashesRechecked": 88,
+    "actualCompiledPairsBound": [
+      "catalog/evidence/admission",
+      "catalog/evidence/evaluate",
+      "catalog/evidence/dimensions",
+      "catalog/evidence/mappingAdapter",
+      "claims/eligibility/evaluate",
+      "claims/evidenceProvenance",
+      "compliance/complianceEngine",
+      "compliance/coverageScorer"
+    ],
+    "compiledPairCount": 8,
+    "proposedNinthCompiledPairCredited": false,
+    "compiledMutation": false,
+    "nativeMutation": false,
+    "nativePhysicalPinsRechecked": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1,
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1,
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543125595,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "dev": 16777231,
+        "inode": 543200130,
+        "nlink": 1,
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      }
+    ],
+    "nativeIdentitiesDistinct": true,
+    "borrowedRunnerPinRechecked": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "bytes": 43,
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "dev": 16777231,
+      "inode": 539152709,
+      "nlink": 1
+    },
+    "targetRegularSingleLinkNow": true,
+    "targetInode": 543158658,
+    "rootRecordedCleanHeadIndexAndHeldRState": {
+      "sourceAndFreshClean": true,
+      "indexesEmpty": true,
+      "heldR18RowsHeadAndEmptyIndex": true
+    },
+    "gitChecksByReviewer": false,
+    "physicalHistoryBoundary": "Root first captured target regular/single-link physical check after M1 restore. Later and current checks do not create retrospective pre-M1 or continuous-isolation evidence."
+  },
+  "lifecycleBoundary": "All nine actual owned process groups were absent by ESRCH after natural exit, with no nonzero signal sent. All29 hook entries/values pass; no unhandled or late diagnostic found. This does not prove universal descendants, whole filesystem/environment isolation or every underlying resource cleanup. The pure25 tests own no runtime resources; existing63 hook success has its existing scope. No projected PUBLIC_EVIDENCE records were emitted.",
+  "authorityBoundary": "Explicit --root Q governs test/source imports. Wrapper cwd/head remains held R@bf3; source-literal census in evidenceBinding reads R/src and gets no Q/S emission-census credit. Inherited environment with private HOME is not full environment isolation.",
+  "remainingWholeIssueGaps": [
+    "Public compliance context still plan:null with unresolved applicability; pure supplied plan/provenance/review inputs do not prove signed-plan, actual ledger/crypto, public positive report, external trust or import-loader integration.",
+    "Current empty-evaluated score remains null versus spec zero; NOT_EVALUATED versus spec-compatible UNKNOWN remains recorded. No new human hold is invented.",
+    "No new full npm test/global coverage/publish/release/OS matrix/merged-PR proof. All held decisions, F37 skip and Claude variants remain preserved.",
+    "Global source quality remains root-reported RED1268 duplicates/2724 dead-code, unwaived; this audit creates no whole-issue Done or global-green claim.",
+    "Final root count/gates/freeze are separate actual checks; no pending freeze outcome is credited here."
+  ]
+}

@@ -1,0 +1,781 @@
+{
+  "schema": "amc.p128.bounded-ordered-case-audit/1",
+  "sourceCommit": "3b25c1d33febc1f7e3ecd5fdb3d7a9aaa02e28b4",
+  "caseIdentityRule": "Repository-relative file path and exact literal fullName; all70 identities unique. Array is the actual fresh raw order, joined in order to fresh observer tasks. Earlier populations are compared as full identity multisets.",
+  "uniqueCaseCount": 70,
+  "sourceRuns": {
+    "ordinary": {
+      "phase": "p128-common-cli-cohort",
+      "passed": 70,
+      "failed": 0
+    },
+    "mutation": {
+      "phase": "p128-causal-mutation-red",
+      "passed": 65,
+      "failed": 5
+    },
+    "restored": {
+      "phase": "p128-causal-restored-green",
+      "passed": 70,
+      "failed": 0
+    },
+    "fresh": {
+      "phase": "p128-fresh-canonical-cohort",
+      "passed": 70,
+      "failed": 0
+    }
+  },
+  "freshDiagnostics": {
+    "files": 3,
+    "suites": 11,
+    "tests": 70,
+    "rawSuiteCountIncludingFiles": 14,
+    "afterAllHooksPassed": 3,
+    "failedHooks": 0,
+    "unhandledErrors": 0,
+    "nonTestErrors": 0,
+    "allTasksTerminalPass": true,
+    "orderedRawObserverJoin": true
+  },
+  "freshArtifacts": {
+    "raw": {
+      "bytes": 28236,
+      "sha256": "289edfa3a428620a95bbe52bbde94b60eed431db02b7f3bab7846f70ab8761fb"
+    },
+    "observer": {
+      "bytes": 37879,
+      "sha256": "840c3b9300c59a8e2d2ac90bb3e2f9a3dc8933cf193d525324f4c325e916ae26"
+    }
+  },
+  "mutationBoundary": "Only the source converter not_evaluated→satisfied branch changed. Five semantic failures and65passes are actual. The built CLI remained original during mutation; no mutant-CLI causal credit is claimed. The production source seven-field pin and unchanged test seven-field pin matched after restoration.",
+  "fullSuite": {
+    "files": 1697,
+    "passedFiles": 1687,
+    "failedFiles": 10,
+    "tests": 25207,
+    "passed": 25188,
+    "failed": 19,
+    "childExit": 1,
+    "wrapperExit": 70,
+    "normalCompletionRecordAbsent": true,
+    "recovery": {
+      "signalZeroChecks": 1,
+      "pgid": 47499,
+      "errno": 3,
+      "absentByESRCH": true,
+      "ordinaryMarkerRenames": 2,
+      "failedEvidencePreserved": true
+    },
+    "pass": false
+  },
+  "globalQuality": {
+    "deadCode": 2710,
+    "duplicateBlocks": 1268,
+    "state": "RED",
+    "waived": false
+  },
+  "cases": [
+    {
+      "ordinal": 1,
+      "file": "tests/grcEvidenceExport.test.ts",
+      "fullName": "GRC evidence export (schema v2) emits schema v2 with the run claim, labelled signals and the disclaimer",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 2,
+      "file": "tests/grcEvidenceExport.test.ts",
+      "fullName": "GRC evidence export (schema v2) identical input and now give an identical manifestHash",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 3,
+      "file": "tests/grcEvidenceExport.test.ts",
+      "fullName": "GRC evidence export (schema v2) every SARIF rule id starts with AMC-GRC- and no message names a control",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 4,
+      "file": "tests/grcEvidenceExport.test.ts",
+      "fullName": "GRC evidence export (schema v2) a sealed, READY, full-coverage run gives no SARIF error",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 5,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL offline identity and JSON contracts matches a fixed UUIDv5 algorithm vector",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 6,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL offline identity and JSON contracts binds the fixed namespace and 'control:L1-UNIT-01'",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 7,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL offline identity and JSON contracts binds the fixed namespace and 'observation:L1-UNIT-01'",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 8,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL offline identity and JSON contracts binds the fixed namespace and 'control:L1-UNIT-02'",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 9,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL offline identity and JSON contracts uses literal sorted-key JSON, keeps array order and hashes that exact semantic input",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 10,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL loss report on unit inputs preserves positive loss facts, drops zero rows and orders models then fields without changing inputs",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 11,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims keeps 'observed pass' without upgrading it",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 12,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims keeps 'observed fail' without upgrading it",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 13,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims keeps 'self-reported fail' without upgrading it",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 14,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims keeps 'observed not evaluated' without upgrading it",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "failed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 15,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims keeps 'self-reported not evaluated' without upgrading it",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "failed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 16,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims keeps 'synthetic not evaluated' without upgrading it",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "failed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 17,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims keeps 'self-reported pass' without upgrading it",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 18,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims carries reference identities and rejection facts without raw evidence content",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 19,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims returns no document or losses for empty results",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 20,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL assessment conversion on supplied unit claims groups normalized windows deterministically and takes metadata time from supplied results",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 21,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs accepts shape and unkeyed coherence without proving a signature or producer",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 22,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs keeps evaluatedAt and review outside the own-result digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 23,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs allows distinct result digests for one control in different windows",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 24,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs refuses an edited value that retains its old own-result digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 25,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs reaches the 'unknown control' semantic guard after recomputing the unit own digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 26,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs reaches the 'changed control version' semantic guard after recomputing the unit own digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 27,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs reaches the 'changed control digest' semantic guard after recomputing the unit own digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 28,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs reaches the 'different plan' semantic guard after recomputing the unit own digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 29,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs reaches the 'different applicability' semantic guard after recomputing the unit own digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 30,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs reaches the 'synthetic pass' semantic guard after recomputing the unit own digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 31,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs reaches the 'synthetic fail' semantic guard after recomputing the unit own digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 32,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs reaches the 'pass with incomplete evidence' semantic guard after recomputing the unit own digest",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 33,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL results parser on coherent unsigned unit inputs refuses strict-shape edits and an independently-reviewed claim kind",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 34,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL catalog transform on the real synthetic compiler fixture keeps literal controls, statements, structured fields, citation and informational crosswalk",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 35,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL catalog transform on the real synthetic compiler fixture keeps bytes stable under map iteration changes without mutating the loaded input",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 36,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL catalog transform on the real synthetic compiler fixture refuses an actual invalid manifest and an explicit empty-controls input after a positive control",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 37,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL profile transform of actually compiled and locally signed synthetic plans keeps applicable selection, predicate exclusion and informational crosswalk with real signature integrity",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 38,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL profile transform of actually compiled and locally signed synthetic plans returns no profile for an actual compiled and signed empty catalog instead of inventing a selector",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 39,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL exports against unchanged official 1.2.3 schemas validates the real catalog conversion and rejects unknown properties, invalid tokens and invalid calendar dates",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 40,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL exports against unchanged official 1.2.3 schemas validates supplied assessment claims without treating schema conformance as claim truth",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "failed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 41,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL common three-control dataset keeps two selected controls, one exclusion and pass/fail/not-evaluated claims across all three models",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "failed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 42,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL actual built CLI export boundaries exports only the shipped catalog and loss report while explicitly retaining not-evaluated status",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 43,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL actual built CLI export boundaries refuses stale optional documents before replacing any output bytes",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 44,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL actual built CLI export boundaries refuses results without a plan and targets under .amc without creating output",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 45,
+      "file": "tests/oscalExport.test.ts",
+      "fullName": "OSCAL actual built CLI export boundaries verifies normal locally signed shipped-catalog files and refuses independent byte edits",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 46,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs returns all five dimensions for fresh bound observed evidence at its enforcement point",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 47,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs withholds a pass from an empty stream",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 48,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs requires every declared binding field",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 49,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses individually changed subject, control, version, policy and scope bindings",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 50,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses another tenant and treats its evidence as untrusted",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 51,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs requires an available producer named by the contract",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 52,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs requires verified provenance proving the claimed producer and a derived tier",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 53,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs uses recorded time for freshness even when claimed time looks fresh",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 54,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs admits the exact freshness boundary despite an old claimed time",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 55,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses recorded times outside either window boundary or with invalid syntax",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 56,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses prefixed ref and receipt identities previously used in another window",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 57,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs admits a receipt identity once per evaluation",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 58,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs refuses the loader's derived foreign-receipt decision",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 59,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs invalidates evidence only for a listed trigger after its recorded time",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 60,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs withholds passes for absent, unresolved and not-applicable plan decisions",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 61,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs withholds a pass when admitted nonviolating observations contradict each other",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 62,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs preserves trusted violation failure despite incomplete sampling",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 63,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs lets an unadmitted violation block a pass without crediting its provenance",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 64,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs rejects system-session positives but retains their violation-only agent rule",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 65,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs consumes the derived SELF_REPORTED tier despite an ignored OBSERVED attribute label",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 66,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs caps observed provenance at the producer's self-reported or synthetic maximum",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 67,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs withholds a pass when the required observed sampling ratio is not met",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 68,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs distinguishes advisory and observed behavior from enforcement at the binding point",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 69,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs keeps input order and input objects unchanged while binding the result digest to admitted refs",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    },
+    {
+      "ordinal": 70,
+      "file": "tests/catalog/evidence/decisive.test.ts",
+      "fullName": "catalog evidence decisions on already-derived unit inputs binds already-verified review decisions to the digest without promoting claim kind",
+      "ordinaryStatus": "passed",
+      "mutationStatus": "passed",
+      "restoredStatus": "passed",
+      "freshStatus": "passed",
+      "freshObserverState": "pass"
+    }
+  ],
+  "wholeP128Complete": false,
+  "planComplete": false
+}

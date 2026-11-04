@@ -1,0 +1,179 @@
+{
+  "at": "2026-10-16T22:16:01.452249+00:00",
+  "phase": "p125f-source-combined",
+  "rootWholeLogAndAllFourFixtureRecordsRead": true,
+  "records": [
+    {
+      "caseId": "OFFLINE",
+      "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "listenerStarted": false,
+      "listenerClosed": false,
+      "requests": [],
+      "socketCount": 0,
+      "socketsClosed": true,
+      "ownedErrors": [],
+      "bodyFailed": false,
+      "cleanupErrorCount": 0
+    },
+    {
+      "caseId": "NO-ANCHOR",
+      "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "listenerStarted": true,
+      "listenerClosed": true,
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/anchor-positive",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        },
+        {
+          "method": "POST",
+          "path": "/after-skip",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        }
+      ],
+      "socketCount": 2,
+      "socketsClosed": true,
+      "ownedErrors": [],
+      "bodyFailed": false,
+      "cleanupErrorCount": 0
+    },
+    {
+      "caseId": "ORDER",
+      "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "listenerStarted": true,
+      "listenerClosed": true,
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/single-positive",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        },
+        {
+          "method": "POST",
+          "path": "/http-first",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        },
+        {
+          "method": "POST",
+          "path": "/malformed-second",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        },
+        {
+          "method": "POST",
+          "path": "/genuine-third",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        }
+      ],
+      "socketCount": 4,
+      "socketsClosed": true,
+      "ownedErrors": [],
+      "bodyFailed": false,
+      "cleanupErrorCount": 0
+    },
+    {
+      "caseId": "TIMEOUT-CONTINUE",
+      "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "listenerStarted": true,
+      "listenerClosed": true,
+      "requests": [
+        {
+          "method": "POST",
+          "path": "/stall-first",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": false,
+          "responseClosed": true,
+          "replyEndCalled": false,
+          "allowPeerAbort": true,
+          "stall": true
+        },
+        {
+          "method": "POST",
+          "path": "/after-timeout",
+          "bodyBytes": 70,
+          "ended": true,
+          "aborted": false,
+          "closed": true,
+          "responseFinished": true,
+          "responseClosed": true,
+          "replyEndCalled": true,
+          "allowPeerAbort": false,
+          "stall": false
+        }
+      ],
+      "socketCount": 2,
+      "socketsClosed": true,
+      "ownedErrors": [],
+      "bodyFailed": false,
+      "cleanupErrorCount": 0
+    }
+  ],
+  "actualDefaultTimeout": {
+    "checkout": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "configuredMs": 10000,
+    "elapsedMs": 10013.574583000001,
+    "failures": [
+      "stall-first: The operation was aborted",
+      "after-timeout: HTTP 500"
+    ],
+    "routes": [
+      "/stall-first",
+      "/after-timeout"
+    ]
+  },
+  "sameActual21Passed": true,
+  "typedAbortErrorClaim": false,
+  "successfulFreshNonceGrantClaim": false,
+  "boundary": "Actual finite owned fixture terminal observations; no universal process/environment/filesystem/native-loader isolation or F37 proof."
+}

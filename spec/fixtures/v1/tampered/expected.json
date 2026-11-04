@@ -1,0 +1,18 @@
+{
+  "case": "tampered",
+  "normative": true,
+  "dimensions": {
+    "integrity": "fail",
+    "issuerAdmission": "not-evaluated",
+    "scope": "not-evaluated",
+    "freshness": "not-evaluated",
+    "completeness": "not-evaluated",
+    "satisfaction": "not-evaluated"
+  },
+  "reasonCodes": {
+    "integrity": [
+      "SIGNATURE_INVALID"
+    ]
+  },
+  "exitCode": 1
+}

@@ -1,0 +1,71 @@
+{
+  "at": "2026-10-16T23:27:26.801529+00:00",
+  "sourceHead": "3468e29027c32209a5f794b7ffea3f1565de490e",
+  "sourceBranch": "codex/p1-25-checkpoint-qualification",
+  "targets": [
+    {
+      "path": "tests/time/tsaTestFixture.ts",
+      "kind": "new test-only helper",
+      "candidate": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/tsaTestFixture.ts.source.txt",
+        "bytes": 24968,
+        "sha256": "8d46600e3559f4825806b04d43cc7e03cc346f6ec47513c3af673cbe4649f663"
+      }
+    },
+    {
+      "path": "tests/time/checkpointWindow.test.ts",
+      "kind": "new two-body test",
+      "candidate": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/checkpointWindow.test.ts.source.txt",
+        "bytes": 22649,
+        "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7"
+      }
+    },
+    {
+      "path": "tests/time/tsaGrant.test.ts",
+      "kind": "existing own test import/binding-only adaptation; bodies exact",
+      "candidate": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-test-proposal/tsaGrant.test.ts.source.txt",
+        "bytes": 2964,
+        "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+      }
+    }
+  ],
+  "currentGrantBoundedClosure": {
+    "path": "/private/tmp/p1-25-grant-qualification-20261017/bounded-closure.json",
+    "physicalPath": "/private/tmp/p1-25-grant-qualification-20261017/bounded-closure.json",
+    "bytes": 1321,
+    "sha256": "dc1f8fc01611f0ddd8b9a630a2c9781e8acbc570879e9c7c922502a450c50506",
+    "dev": 16777231,
+    "inode": 543658072,
+    "nlink": 1
+  },
+  "knownOwnership184Roots552PathChecksAnd17HistoryAuthorities": true,
+  "metadataOnlyAdvanceAfterScopeSnapshot": "188681b32 to3468e2902; no selected source changed",
+  "rootReadNewCheckpointFullAndOriginalFixturePlusExactReconstructedDelta": true,
+  "independentCandidateReviewBlockers": [],
+  "original2657BytesBothGrantBodiesExact": true,
+  "all142PrechangePinsAndNineNativeIdentitiesExact": true,
+  "onlyOwnGrantSourceSuccessor": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+  "originalPreserved": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/original-tsaGrant.test.ts.source.txt",
+    "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/original-tsaGrant.test.ts.source.txt",
+    "bytes": 27505,
+    "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+    "dev": 16777231,
+    "inode": 543658573,
+    "nlink": 1
+  },
+  "originalGitCommits": [
+    "188681b32dc472983404dce19e7833cd76ee7576",
+    "3468e29027c32209a5f794b7ffea3f1565de490e"
+  ],
+  "allOther141ProtectedMustRemainExact": true,
+  "freezeExit": 0,
+  "d15": "none",
+  "hostedWip": 0,
+  "allPrPathsIncludingDependabotNoOverlap": true,
+  "onlyThreeSourcePathsAdmitted": true,
+  "productionPackageGeneratorGuardDeadlineAndQaWritesAdmitted": false,
+  "allHoldsRetained": true
+}

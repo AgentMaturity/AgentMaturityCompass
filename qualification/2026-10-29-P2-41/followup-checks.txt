@@ -1,0 +1,11 @@
+build exit=0
+typecheck exit=0
+typecheck:tests exit=0
+lint exit=0
+tests exit=0
+check:gates exit=0
+check:dead-code exit=0 (after unexporting A4_INTEGRITY_VERDICT; first run flagged it)
+check:duplicates exit=0
+check:counts exit=0
+check:api-ref exit=0
+check:docs-drift exit=0

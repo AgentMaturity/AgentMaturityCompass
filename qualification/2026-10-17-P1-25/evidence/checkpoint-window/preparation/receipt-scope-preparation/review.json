@@ -1,0 +1,112 @@
+{
+  "schema": "p125-checkpoint-active-receipt-prefix-ownership-preparation/1",
+  "at": "2026-10-16T23:31:38.220896+00:00",
+  "blockers": [],
+  "allReadsFinished": true,
+  "requestedDateSpelling": "2026-10-16",
+  "actualActiveDate": "2026-10-17",
+  "dateAuthority": "Current S P1-25 receipt key/date and actual three protected source paths, with exact Git3468 blob comparison. No2026-10-16 packet was guessed, probed or created.",
+  "activePacketRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25",
+  "receiptSemanticSourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "ownMetadataPublicationCommit": "3468e29027c32209a5f794b7ffea3f1565de490e",
+  "prospectiveNewPrefix": "qualification/2026-10-17-P1-25/evidence/checkpoint-window/",
+  "onlyThreeExistingOwnMetadataSuccessorPaths": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "bytes": 24235,
+      "sha256": "e55024763f964239a65fa8b9fb80ff236c26f9ffb21518908b892d195d6ded68"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "bytes": 238970,
+      "sha256": "730c521699fc442a29a761dadaff43bd1a9ae78def93447aa85cd4ca8440622b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "bytes": 350152,
+      "sha256": "308eea402785300a4e2f1cfe7e683ac1af60b9c790181a0584a3600301cbb5e7"
+    }
+  ],
+  "existingMetadataCurrentAndGit3468Exact": true,
+  "scope": {
+    "physicalRoots": 184,
+    "fourPathChecks": 736,
+    "newPrefixAbsentAcrossAll184": true,
+    "targetedStatusesAllEmpty": true,
+    "retainedDistinctHistoryAuthorities": 17,
+    "allRefFullHistoryNewPrefixEmpty": true,
+    "metadataVariantsObservedInRoots": 7,
+    "allExistingOtherPacketVariantsRetainOwnership": true,
+    "largeVariantRowsPrivateOnly": true,
+    "noSourceMetadataOrIndexAllocation": true
+  },
+  "protectedBoundary": {
+    "initialPinsetRows": 142,
+    "soleAlreadyAdmittedOwnGrantSourceSuccessorExplicit": {
+      "expected": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "bytes": 27505,
+        "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+        "dev": 16777231,
+        "inode": 543583997,
+        "nlink": 1
+      },
+      "actual": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "bytes": 2964,
+        "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca"
+      },
+      "exact": false
+    },
+    "other141CurrentlyByteExact": true,
+    "threeCurrentActiveMetadataPinsAreIncludedInThose141": true,
+    "noMetadataSuccessorAdmittedByThisReview": true,
+    "afterSeparateMetadataAdmissionOther138MustRemainExact": true,
+    "held36Exact": true,
+    "native9RegularDistinctSingleLinkBytesAndPhysicalPinsExact": true,
+    "heldR18HeadDirtyRowsAndEmptyIndexExact": true
+  },
+  "sourceSnapshot": {
+    "head": "3468e29027c32209a5f794b7ffea3f1565de490e",
+    "branch": "codex/p1-25-checkpoint-qualification",
+    "status": " M tests/time/tsaGrant.test.ts\n?? tests/time/checkpointWindow.test.ts\n?? tests/time/tsaTestFixture.ts\n",
+    "indexEmpty": true,
+    "snapshotOnlyNoContinuousClaim": true
+  },
+  "currentPacketNumericContextOnly": {
+    "regularFiles": 1118,
+    "entriesIncludingDirectories": 1334,
+    "artifacts": 1117,
+    "commands": 141,
+    "orderedAssemblyPins": 1568
+  },
+  "rawCountFieldClarification": "The raw observation currentPacket.files counted rglob entries including directories; review uses regularFiles separately and grants no full-packet payload audit credit.",
+  "closure": {
+    "gitChildren": 211,
+    "allNaturalExit0": true,
+    "outerInitialSessionId": 11352,
+    "explicitWaitObservedNatural0": true,
+    "fullToolResults": {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-scope-preparation/read-tool-results.json",
+      "bytes": 10159,
+      "sha256": "fe224e60534be0f8121b01ba94283aaac00820ed15d7aa4d7247f1fd651f4a80"
+    },
+    "outputExistenceNotUsedAsClosure": true
+  },
+  "missingReservationBinding": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "noMissingReservationProbeSearchRecreationOrUnknownOldScanUse": true,
+  "allHoldsF37QualityClaudeAndProviderArchiveRetained": true,
+  "noProductHelperCompilerTestNativeOpenSslSqlNetworkOrProcessProbeExecution": true,
+  "sourceIndexQaWrites": false,
+  "nextRootSteps": [
+    "Current exact hosted/all-path/WIP and D15/freeze receipt admission",
+    "Bounded actual runtime/control/quality facts and current packet preservation",
+    "Separate exact three-index successor/evidence-prefix materialization admission"
+  ],
+  "verdict": "No concrete overlap found for the exact active17-date new evidence prefix. Existing own3468 metadata is protected and may receive only separately admitted exact successors; all other work remains owned and unchanged."
+}

@@ -1,0 +1,16 @@
+{
+  "utc": "2026-10-15T08:49:24.713406+00:00",
+  "cwd": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass",
+  "argv": [
+    "git",
+    "diff",
+    "--cached",
+    "--check"
+  ],
+  "exit": 2,
+  "stagedFiles": 193,
+  "allAddedUnderQualification": true,
+  "allStagedBlobsEqualWorkingBytes": true,
+  "stdoutSha256": "ecbc8a00828920c80ad24c0971d736acc1e67054275befd0fed35b38f06b2f26",
+  "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+}

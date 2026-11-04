@@ -1,0 +1,1426 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-14T22:11:58.757998+00:00",
+  "workItem": "P0-24",
+  "measuredSource": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "workspace": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass",
+  "authorizedEdit": {
+    "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts",
+    "bytes": 10628,
+    "sha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712"
+  },
+  "caseInventory": {
+    "classifier": 7,
+    "catalogueCohort": 1,
+    "experimentalMetadata": 12,
+    "actualRubric": 2,
+    "strictIsoPolicyCriterion": 1,
+    "total": 23
+  },
+  "phases": [
+    {
+      "phase": "first",
+      "command": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/first.command.json",
+        "bytes": 2464,
+        "sha256": "9a976192c2f9f0b4129d9cd8cef65d1e914cc4a42cd76c3d6cb299284e2656e7"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/first.raw.json",
+        "bytes": 9997,
+        "sha256": "75a34c4d0189c765fcb6e987465171267d869f9164a23396fc0b74dece821146"
+      },
+      "evidence": "/private/tmp/p0-24-citations-qualification-20261015/first/tmp/p0-24-citations-first-6YxSGB",
+      "exit": 1,
+      "runtime": {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "total": 23,
+      "passed": 22,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "observations": 23,
+      "cases": [
+        {
+          "name": "P0-24 bounded citation corrections workplace or education emotion recognition is prohibited",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections emotion prohibition precedes employment and chatbot tiers",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring and emotion prohibitions both survive",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring precedes employment and chatbot tiers",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false emotion flag leaves the chatbot transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false social flag leaves the interaction transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections empty capabilities produce no prohibition or obligation",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections the complete changed catalogue cohort is present without duplicate IDs",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-qmsr retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-25-21 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-24-10 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-26-2 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-11-7 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-14110 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-13985 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eeoc-ai-ta retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ugesp-1607-4 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-1630-11 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-12112 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections eu-ai-act-prohibited-practices-guidelines retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual HC-1 uses the QMSR citation and resolves its first reference",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual FIN-1 scopes SR 26-2 to traditional models with separate agentic governance",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector",
+          "status": "failed",
+          "assertionMessages": [
+            "AssertionError: expected { \u2026(2) } to deeply equal { invalidAnchors: [], \u2026(1) }\n    at /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts:169:49\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "collectorRuleCounts": {
+        "CIT001": 0,
+        "CIT002": 3,
+        "CIT003": 0,
+        "CIT004": 620,
+        "CIT005": 0
+      },
+      "strictIsoObservation": {
+        "name": "strict ISO A.5 policy criterion",
+        "actual": {
+          "anchors": [
+            {
+              "euAiAct": "Art. 10 \u2014 Data & data governance",
+              "nist": "MAP 2.3 \u2014 data provenance & privacy",
+              "iso": "A.7 \u2014 Data for AI systems",
+              "soc2": "P / C \u2014 Privacy & Confidentiality criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy, robustness & cybersecurity",
+              "nist": "MANAGE 2.2 \u2014 risk treatment controls",
+              "iso": "A.8 \u2014 Operational controls",
+              "soc2": "CC6 \u2014 Logical & physical access controls"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 Internal organization & AI policy",
+              "soc2": "CC1 / CC3 \u2014 Control environment & risk assessment"
+            },
+            {
+              "euAiAct": "Art. 13 \u2014 Transparency & information provision",
+              "nist": "MAP 3.4 \u2014 documentation & transparency",
+              "iso": "A.9 \u2014 Information for interested parties",
+              "soc2": "CC2 \u2014 Communication & information"
+            },
+            {
+              "euAiAct": "Art. 12 \u2014 Record-keeping (automatic logs)",
+              "nist": "MEASURE 2.7 \u2014 monitoring & logging",
+              "iso": "A.6 \u2014 AI system lifecycle & operation",
+              "soc2": "CC7 \u2014 System operations & monitoring"
+            },
+            {
+              "euAiAct": "Art. 14 \u2014 Human oversight",
+              "nist": "MANAGE 4.1 \u2014 human roles & intervention",
+              "iso": "A.6.2 \u2014 AI system operation controls",
+              "soc2": "CC5 \u2014 Control activities"
+            },
+            {
+              "euAiAct": "Art. 10(2)(f) \u2014 bias examination in data",
+              "nist": "MEASURE 2.11 \u2014 fairness & bias evaluation",
+              "iso": "A.6.1 \u2014 responsible-AI objectives",
+              "soc2": "PI \u2014 Processing integrity criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy & robustness",
+              "nist": "MEASURE 2.5 \u2014 validity & reliability",
+              "iso": "A.6.2 \u2014 verification & validation",
+              "soc2": "PI / A \u2014 Processing integrity & availability"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 AI policy",
+              "soc2": "CC3 \u2014 Risk assessment"
+            }
+          ],
+          "invalidAnchors": [
+            {
+              "index": 2,
+              "id": "A.5",
+              "label": "Internal organization & AI policy"
+            },
+            {
+              "index": 8,
+              "id": "A.5",
+              "label": "AI policy"
+            }
+          ],
+          "invalidFindings": [
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[2].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"Internal organization & AI policy\")",
+              "zeroTolerance": false
+            },
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[8].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"AI policy\")",
+              "zeroTolerance": false
+            }
+          ]
+        }
+      },
+      "effects": {
+        "beforeFiles": 0,
+        "afterFiles": 3,
+        "recordedIn": "/private/tmp/p0-24-citations-qualification-20261015/first.command.json"
+      },
+      "executedTestSha256": "4d30cbc37da28f5633edbd22260a8d086ce2983e6cd8556a2b855727e5728c2f"
+    },
+    {
+      "phase": "private-baseline",
+      "command": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/private-baseline.command.json",
+        "bytes": 2731,
+        "sha256": "a23d02a91a50859e9b0d7d0d3ee1c94dfacbbf5f299e3518f1964712fe71173a"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/private-baseline.raw.json",
+        "bytes": 9995,
+        "sha256": "e4fbab164f7411b29c8b5eaf8d8331ba0cad2393759a4e3e6b7387fbd34c7d1b"
+      },
+      "evidence": "/private/tmp/p0-24-citations-qualification-20261015/private-baseline/tmp/p0-24-citations-private-baseline-fUIO62",
+      "exit": 1,
+      "runtime": {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "total": 23,
+      "passed": 22,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "observations": 23,
+      "cases": [
+        {
+          "name": "P0-24 bounded citation corrections workplace or education emotion recognition is prohibited",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections emotion prohibition precedes employment and chatbot tiers",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring and emotion prohibitions both survive",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring precedes employment and chatbot tiers",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false emotion flag leaves the chatbot transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false social flag leaves the interaction transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections empty capabilities produce no prohibition or obligation",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections the complete changed catalogue cohort is present without duplicate IDs",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-qmsr retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-25-21 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-24-10 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-26-2 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-11-7 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-14110 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-13985 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eeoc-ai-ta retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ugesp-1607-4 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-1630-11 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-12112 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections eu-ai-act-prohibited-practices-guidelines retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual HC-1 uses the QMSR citation and resolves its first reference",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual FIN-1 scopes SR 26-2 to traditional models with separate agentic governance",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector",
+          "status": "failed",
+          "assertionMessages": [
+            "AssertionError: expected { \u2026(2) } to deeply equal { invalidAnchors: [], \u2026(1) }\n    at /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts:169:49\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "collectorRuleCounts": {
+        "CIT001": 0,
+        "CIT002": 3,
+        "CIT003": 0,
+        "CIT004": 620,
+        "CIT005": 0
+      },
+      "strictIsoObservation": {
+        "name": "strict ISO A.5 policy criterion",
+        "actual": {
+          "anchors": [
+            {
+              "euAiAct": "Art. 10 \u2014 Data & data governance",
+              "nist": "MAP 2.3 \u2014 data provenance & privacy",
+              "iso": "A.7 \u2014 Data for AI systems",
+              "soc2": "P / C \u2014 Privacy & Confidentiality criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy, robustness & cybersecurity",
+              "nist": "MANAGE 2.2 \u2014 risk treatment controls",
+              "iso": "A.8 \u2014 Operational controls",
+              "soc2": "CC6 \u2014 Logical & physical access controls"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 Internal organization & AI policy",
+              "soc2": "CC1 / CC3 \u2014 Control environment & risk assessment"
+            },
+            {
+              "euAiAct": "Art. 13 \u2014 Transparency & information provision",
+              "nist": "MAP 3.4 \u2014 documentation & transparency",
+              "iso": "A.9 \u2014 Information for interested parties",
+              "soc2": "CC2 \u2014 Communication & information"
+            },
+            {
+              "euAiAct": "Art. 12 \u2014 Record-keeping (automatic logs)",
+              "nist": "MEASURE 2.7 \u2014 monitoring & logging",
+              "iso": "A.6 \u2014 AI system lifecycle & operation",
+              "soc2": "CC7 \u2014 System operations & monitoring"
+            },
+            {
+              "euAiAct": "Art. 14 \u2014 Human oversight",
+              "nist": "MANAGE 4.1 \u2014 human roles & intervention",
+              "iso": "A.6.2 \u2014 AI system operation controls",
+              "soc2": "CC5 \u2014 Control activities"
+            },
+            {
+              "euAiAct": "Art. 10(2)(f) \u2014 bias examination in data",
+              "nist": "MEASURE 2.11 \u2014 fairness & bias evaluation",
+              "iso": "A.6.1 \u2014 responsible-AI objectives",
+              "soc2": "PI \u2014 Processing integrity criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy & robustness",
+              "nist": "MEASURE 2.5 \u2014 validity & reliability",
+              "iso": "A.6.2 \u2014 verification & validation",
+              "soc2": "PI / A \u2014 Processing integrity & availability"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 AI policy",
+              "soc2": "CC3 \u2014 Risk assessment"
+            }
+          ],
+          "invalidAnchors": [
+            {
+              "index": 2,
+              "id": "A.5",
+              "label": "Internal organization & AI policy"
+            },
+            {
+              "index": 8,
+              "id": "A.5",
+              "label": "AI policy"
+            }
+          ],
+          "invalidFindings": [
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[2].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"Internal organization & AI policy\")",
+              "zeroTolerance": false
+            },
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[8].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"AI policy\")",
+              "zeroTolerance": false
+            }
+          ]
+        }
+      },
+      "effects": {
+        "beforeFiles": 0,
+        "afterFiles": 3,
+        "recordedIn": "/private/tmp/p0-24-citations-qualification-20261015/private-baseline.command.json"
+      },
+      "executedTestSha256": "4d30cbc37da28f5633edbd22260a8d086ce2983e6cd8556a2b855727e5728c2f"
+    },
+    {
+      "phase": "private-emotion-moved",
+      "command": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/private-emotion-moved.command.json",
+        "bytes": 2822,
+        "sha256": "2e8977d632f098e5f5cac9cd807a8de3daa173bca0301094902ee2581c8dbb0a"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/private-emotion-moved.raw.json",
+        "bytes": 13887,
+        "sha256": "6e83f1decbabd0a08cc9c831f52abd8a13d2c797138d88271db78caa0d9ddc8e"
+      },
+      "evidence": "/private/tmp/p0-24-citations-qualification-20261015/private-emotion-moved/tmp/p0-24-citations-private-emotion-moved-qmtSyv",
+      "exit": 1,
+      "runtime": {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "total": 23,
+      "passed": 19,
+      "failed": 4,
+      "pending": 0,
+      "todo": 0,
+      "observations": 23,
+      "cases": [
+        {
+          "name": "P0-24 bounded citation corrections workplace or education emotion recognition is prohibited",
+          "status": "failed",
+          "assertionMessages": [
+            "AssertionError: expected 'LIMITED' to be 'UNACCEPTABLE' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts:102:31\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "P0-24 bounded citation corrections emotion prohibition precedes employment and chatbot tiers",
+          "status": "failed",
+          "assertionMessages": [
+            "AssertionError: expected 'HIGH' to be 'UNACCEPTABLE' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts:102:31\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring and emotion prohibitions both survive",
+          "status": "failed",
+          "assertionMessages": [
+            "AssertionError: expected [ 'Art. 5(1)(c)' ] to deeply equal [ 'Art. 5(1)(c)', 'Art. 5(1)(f)' ]\n    at /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts:103:31\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring precedes employment and chatbot tiers",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false emotion flag leaves the chatbot transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false social flag leaves the interaction transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections empty capabilities produce no prohibition or obligation",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections the complete changed catalogue cohort is present without duplicate IDs",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-qmsr retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-25-21 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-24-10 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-26-2 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-11-7 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-14110 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-13985 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eeoc-ai-ta retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ugesp-1607-4 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-1630-11 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-12112 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections eu-ai-act-prohibited-practices-guidelines retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual HC-1 uses the QMSR citation and resolves its first reference",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual FIN-1 scopes SR 26-2 to traditional models with separate agentic governance",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector",
+          "status": "failed",
+          "assertionMessages": [
+            "AssertionError: expected { \u2026(2) } to deeply equal { invalidAnchors: [], \u2026(1) }\n    at /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts:169:49\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "collectorRuleCounts": {
+        "CIT001": 0,
+        "CIT002": 3,
+        "CIT003": 0,
+        "CIT004": 620,
+        "CIT005": 0
+      },
+      "strictIsoObservation": {
+        "name": "strict ISO A.5 policy criterion",
+        "actual": {
+          "anchors": [
+            {
+              "euAiAct": "Art. 10 \u2014 Data & data governance",
+              "nist": "MAP 2.3 \u2014 data provenance & privacy",
+              "iso": "A.7 \u2014 Data for AI systems",
+              "soc2": "P / C \u2014 Privacy & Confidentiality criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy, robustness & cybersecurity",
+              "nist": "MANAGE 2.2 \u2014 risk treatment controls",
+              "iso": "A.8 \u2014 Operational controls",
+              "soc2": "CC6 \u2014 Logical & physical access controls"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 Internal organization & AI policy",
+              "soc2": "CC1 / CC3 \u2014 Control environment & risk assessment"
+            },
+            {
+              "euAiAct": "Art. 13 \u2014 Transparency & information provision",
+              "nist": "MAP 3.4 \u2014 documentation & transparency",
+              "iso": "A.9 \u2014 Information for interested parties",
+              "soc2": "CC2 \u2014 Communication & information"
+            },
+            {
+              "euAiAct": "Art. 12 \u2014 Record-keeping (automatic logs)",
+              "nist": "MEASURE 2.7 \u2014 monitoring & logging",
+              "iso": "A.6 \u2014 AI system lifecycle & operation",
+              "soc2": "CC7 \u2014 System operations & monitoring"
+            },
+            {
+              "euAiAct": "Art. 14 \u2014 Human oversight",
+              "nist": "MANAGE 4.1 \u2014 human roles & intervention",
+              "iso": "A.6.2 \u2014 AI system operation controls",
+              "soc2": "CC5 \u2014 Control activities"
+            },
+            {
+              "euAiAct": "Art. 10(2)(f) \u2014 bias examination in data",
+              "nist": "MEASURE 2.11 \u2014 fairness & bias evaluation",
+              "iso": "A.6.1 \u2014 responsible-AI objectives",
+              "soc2": "PI \u2014 Processing integrity criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy & robustness",
+              "nist": "MEASURE 2.5 \u2014 validity & reliability",
+              "iso": "A.6.2 \u2014 verification & validation",
+              "soc2": "PI / A \u2014 Processing integrity & availability"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 AI policy",
+              "soc2": "CC3 \u2014 Risk assessment"
+            }
+          ],
+          "invalidAnchors": [
+            {
+              "index": 2,
+              "id": "A.5",
+              "label": "Internal organization & AI policy"
+            },
+            {
+              "index": 8,
+              "id": "A.5",
+              "label": "AI policy"
+            }
+          ],
+          "invalidFindings": [
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[2].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"Internal organization & AI policy\")",
+              "zeroTolerance": false
+            },
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[8].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"AI policy\")",
+              "zeroTolerance": false
+            }
+          ]
+        }
+      },
+      "effects": {
+        "beforeFiles": 0,
+        "afterFiles": 3,
+        "recordedIn": "/private/tmp/p0-24-citations-qualification-20261015/private-emotion-moved.command.json"
+      },
+      "executedTestSha256": "4d30cbc37da28f5633edbd22260a8d086ce2983e6cd8556a2b855727e5728c2f"
+    },
+    {
+      "phase": "private-restored",
+      "command": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/private-restored.command.json",
+        "bytes": 2731,
+        "sha256": "b60d704b13c3fc08e18cdd76109a923bad7e054e460818e2627d0b514cb3b130"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/private-restored.raw.json",
+        "bytes": 9996,
+        "sha256": "73370900926fe2b616d2ba1be1a2e4fd1d050dddd4c06e4187ba75cbd3ef7941"
+      },
+      "evidence": "/private/tmp/p0-24-citations-qualification-20261015/private-restored/tmp/p0-24-citations-private-restored-mU20lp",
+      "exit": 1,
+      "runtime": {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "total": 23,
+      "passed": 22,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "observations": 23,
+      "cases": [
+        {
+          "name": "P0-24 bounded citation corrections workplace or education emotion recognition is prohibited",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections emotion prohibition precedes employment and chatbot tiers",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring and emotion prohibitions both survive",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring precedes employment and chatbot tiers",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false emotion flag leaves the chatbot transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false social flag leaves the interaction transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections empty capabilities produce no prohibition or obligation",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections the complete changed catalogue cohort is present without duplicate IDs",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-qmsr retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-25-21 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-24-10 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-26-2 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-11-7 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-14110 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-13985 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eeoc-ai-ta retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ugesp-1607-4 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-1630-11 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-12112 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections eu-ai-act-prohibited-practices-guidelines retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual HC-1 uses the QMSR citation and resolves its first reference",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual FIN-1 scopes SR 26-2 to traditional models with separate agentic governance",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector",
+          "status": "failed",
+          "assertionMessages": [
+            "AssertionError: expected { \u2026(2) } to deeply equal { invalidAnchors: [], \u2026(1) }\n    at /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts:169:49\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "collectorRuleCounts": {
+        "CIT001": 0,
+        "CIT002": 3,
+        "CIT003": 0,
+        "CIT004": 620,
+        "CIT005": 0
+      },
+      "strictIsoObservation": {
+        "name": "strict ISO A.5 policy criterion",
+        "actual": {
+          "anchors": [
+            {
+              "euAiAct": "Art. 10 \u2014 Data & data governance",
+              "nist": "MAP 2.3 \u2014 data provenance & privacy",
+              "iso": "A.7 \u2014 Data for AI systems",
+              "soc2": "P / C \u2014 Privacy & Confidentiality criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy, robustness & cybersecurity",
+              "nist": "MANAGE 2.2 \u2014 risk treatment controls",
+              "iso": "A.8 \u2014 Operational controls",
+              "soc2": "CC6 \u2014 Logical & physical access controls"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 Internal organization & AI policy",
+              "soc2": "CC1 / CC3 \u2014 Control environment & risk assessment"
+            },
+            {
+              "euAiAct": "Art. 13 \u2014 Transparency & information provision",
+              "nist": "MAP 3.4 \u2014 documentation & transparency",
+              "iso": "A.9 \u2014 Information for interested parties",
+              "soc2": "CC2 \u2014 Communication & information"
+            },
+            {
+              "euAiAct": "Art. 12 \u2014 Record-keeping (automatic logs)",
+              "nist": "MEASURE 2.7 \u2014 monitoring & logging",
+              "iso": "A.6 \u2014 AI system lifecycle & operation",
+              "soc2": "CC7 \u2014 System operations & monitoring"
+            },
+            {
+              "euAiAct": "Art. 14 \u2014 Human oversight",
+              "nist": "MANAGE 4.1 \u2014 human roles & intervention",
+              "iso": "A.6.2 \u2014 AI system operation controls",
+              "soc2": "CC5 \u2014 Control activities"
+            },
+            {
+              "euAiAct": "Art. 10(2)(f) \u2014 bias examination in data",
+              "nist": "MEASURE 2.11 \u2014 fairness & bias evaluation",
+              "iso": "A.6.1 \u2014 responsible-AI objectives",
+              "soc2": "PI \u2014 Processing integrity criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy & robustness",
+              "nist": "MEASURE 2.5 \u2014 validity & reliability",
+              "iso": "A.6.2 \u2014 verification & validation",
+              "soc2": "PI / A \u2014 Processing integrity & availability"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 AI policy",
+              "soc2": "CC3 \u2014 Risk assessment"
+            }
+          ],
+          "invalidAnchors": [
+            {
+              "index": 2,
+              "id": "A.5",
+              "label": "Internal organization & AI policy"
+            },
+            {
+              "index": 8,
+              "id": "A.5",
+              "label": "AI policy"
+            }
+          ],
+          "invalidFindings": [
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[2].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"Internal organization & AI policy\")",
+              "zeroTolerance": false
+            },
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[8].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"AI policy\")",
+              "zeroTolerance": false
+            }
+          ]
+        }
+      },
+      "effects": {
+        "beforeFiles": 0,
+        "afterFiles": 3,
+        "recordedIn": "/private/tmp/p0-24-citations-qualification-20261015/private-restored.command.json"
+      },
+      "executedTestSha256": "4d30cbc37da28f5633edbd22260a8d086ce2983e6cd8556a2b855727e5728c2f"
+    },
+    {
+      "phase": "final-typed",
+      "command": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/final-typed.command.json",
+        "bytes": 2572,
+        "sha256": "651fa4cf1fee8f4867d61da71263cdf26aed5434d7762e90a670712264b3e86c"
+      },
+      "raw": {
+        "path": "/private/tmp/p0-24-citations-qualification-20261015/final-typed.raw.json",
+        "bytes": 9996,
+        "sha256": "1a6ce18da6faf6bbd9aa708c3054f14662a3197d23760da14bab174eb64734db"
+      },
+      "evidence": "/private/tmp/p0-24-citations-qualification-20261015/final-typed/tmp/p0-24-citations-final-typed-EcMfBe",
+      "exit": 1,
+      "runtime": {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node"
+      },
+      "executedTestSha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712",
+      "total": 23,
+      "passed": 22,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "observations": 23,
+      "cases": [
+        {
+          "name": "P0-24 bounded citation corrections workplace or education emotion recognition is prohibited",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections emotion prohibition precedes employment and chatbot tiers",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring and emotion prohibitions both survive",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections social scoring precedes employment and chatbot tiers",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false emotion flag leaves the chatbot transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections false social flag leaves the interaction transparency tier",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections empty capabilities produce no prohibition or obligation",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections the complete changed catalogue cohort is present without duplicate IDs",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-qmsr retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-25-21 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-omb-m-24-10 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-26-2 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-sr-11-7 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-14110 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eo-13985 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-eeoc-ai-ta retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ugesp-1607-4 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-1630-11 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections us-ada-12112 retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections eu-ai-act-prohibited-practices-guidelines retains recorded source metadata and the expert-signoff hold",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual HC-1 uses the QMSR citation and resolves its first reference",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections actual FIN-1 scopes SR 26-2 to traditional models with separate agentic governance",
+          "status": "passed",
+          "assertionMessages": []
+        },
+        {
+          "name": "P0-24 bounded citation corrections strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector",
+          "status": "failed",
+          "assertionMessages": [
+            "AssertionError: expected { \u2026(2) } to deeply equal { invalidAnchors: [], \u2026(1) }\n    at /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts:169:49\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "collectorRuleCounts": {
+        "CIT001": 0,
+        "CIT002": 3,
+        "CIT003": 0,
+        "CIT004": 620,
+        "CIT005": 0
+      },
+      "strictIsoObservation": {
+        "name": "strict ISO A.5 policy criterion",
+        "actual": {
+          "anchors": [
+            {
+              "euAiAct": "Art. 10 \u2014 Data & data governance",
+              "nist": "MAP 2.3 \u2014 data provenance & privacy",
+              "iso": "A.7 \u2014 Data for AI systems",
+              "soc2": "P / C \u2014 Privacy & Confidentiality criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy, robustness & cybersecurity",
+              "nist": "MANAGE 2.2 \u2014 risk treatment controls",
+              "iso": "A.8 \u2014 Operational controls",
+              "soc2": "CC6 \u2014 Logical & physical access controls"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 Internal organization & AI policy",
+              "soc2": "CC1 / CC3 \u2014 Control environment & risk assessment"
+            },
+            {
+              "euAiAct": "Art. 13 \u2014 Transparency & information provision",
+              "nist": "MAP 3.4 \u2014 documentation & transparency",
+              "iso": "A.9 \u2014 Information for interested parties",
+              "soc2": "CC2 \u2014 Communication & information"
+            },
+            {
+              "euAiAct": "Art. 12 \u2014 Record-keeping (automatic logs)",
+              "nist": "MEASURE 2.7 \u2014 monitoring & logging",
+              "iso": "A.6 \u2014 AI system lifecycle & operation",
+              "soc2": "CC7 \u2014 System operations & monitoring"
+            },
+            {
+              "euAiAct": "Art. 14 \u2014 Human oversight",
+              "nist": "MANAGE 4.1 \u2014 human roles & intervention",
+              "iso": "A.6.2 \u2014 AI system operation controls",
+              "soc2": "CC5 \u2014 Control activities"
+            },
+            {
+              "euAiAct": "Art. 10(2)(f) \u2014 bias examination in data",
+              "nist": "MEASURE 2.11 \u2014 fairness & bias evaluation",
+              "iso": "A.6.1 \u2014 responsible-AI objectives",
+              "soc2": "PI \u2014 Processing integrity criteria"
+            },
+            {
+              "euAiAct": "Art. 15 \u2014 Accuracy & robustness",
+              "nist": "MEASURE 2.5 \u2014 validity & reliability",
+              "iso": "A.6.2 \u2014 verification & validation",
+              "soc2": "PI / A \u2014 Processing integrity & availability"
+            },
+            {
+              "euAiAct": "Art. 9 \u2014 Risk management system",
+              "nist": "GOVERN 1.1 \u2014 legal and regulatory requirements involving AI are understood, managed, and documented",
+              "iso": "A.5 \u2014 AI policy",
+              "soc2": "CC3 \u2014 Risk assessment"
+            }
+          ],
+          "invalidAnchors": [
+            {
+              "index": 2,
+              "id": "A.5",
+              "label": "Internal organization & AI policy"
+            },
+            {
+              "index": 8,
+              "id": "A.5",
+              "label": "AI policy"
+            }
+          ],
+          "invalidFindings": [
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[2].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"Internal organization & AI policy\")",
+              "zeroTolerance": false
+            },
+            {
+              "rule": "CIT002",
+              "file": "src/domains/industryPackAudit.ts",
+              "location": "anchors[8].iso A.5",
+              "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"AI policy\")",
+              "zeroTolerance": false
+            }
+          ]
+        }
+      },
+      "effects": {
+        "beforeFiles": 0,
+        "afterFiles": 3,
+        "recordedIn": "/private/tmp/p0-24-citations-qualification-20261015/final-typed.command.json"
+      }
+    }
+  ],
+  "causalWitness": {
+    "summary": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/emotion-matrix-summary.json",
+      "bytes": 47324,
+      "sha256": "5f5a56e2659045f8d5862783efec958434429876dd070c8f8f117b2e8280f392"
+    },
+    "privateRoot": "/private/tmp/p0-24-emotion-l0xe9fl2",
+    "baseline": {
+      "numTotalTests": 23,
+      "numPassedTests": 22,
+      "numFailedTests": 1,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "failed": [
+        "P0-24 bounded citation corrections strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector"
+      ]
+    },
+    "mutant": {
+      "numTotalTests": 23,
+      "numPassedTests": 19,
+      "numFailedTests": 4,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "failed": [
+        "P0-24 bounded citation corrections workplace or education emotion recognition is prohibited",
+        "P0-24 bounded citation corrections emotion prohibition precedes employment and chatbot tiers",
+        "P0-24 bounded citation corrections social scoring and emotion prohibitions both survive",
+        "P0-24 bounded citation corrections strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector"
+      ]
+    },
+    "restored": {
+      "numTotalTests": 23,
+      "numPassedTests": 22,
+      "numFailedTests": 1,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "failed": [
+        "P0-24 bounded citation corrections strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector"
+      ]
+    },
+    "compiledLiveFiles": 4529,
+    "privateRegularInputs": 4532,
+    "resolverSymlinks": 1,
+    "completePrivateRestorationMatches": true,
+    "liveCompiledExactMatches": true,
+    "newTestExactMatches": true,
+    "actualMatrixMatches": true,
+    "mutation": "Move one actual emotionRecognition descriptor from unacceptableFlags to limitedRiskFlags with article Art. 50(3), in an owned full compiled closure only",
+    "scope": "Only the three added classifier assertion failures demonstrate sensitivity; the same strict ISO failure remains baseline debt in every phase",
+    "executedTestSha256": "4d30cbc37da28f5633edbd22260a8d086ce2983e6cd8556a2b855727e5728c2f",
+    "newTestExactMatchesScope": "Original test bytes unchanged during original-body matrix; one separately proved type-only edit followed"
+  },
+  "sourcePreservation": {
+    "protectedPins": 54,
+    "before": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/source-before.json",
+      "bytes": 21523,
+      "sha256": "d4ba93f1756e8d3e08498cd350f0c696ad55de05aebfb7b0de1c2e1e5b42e788"
+    },
+    "after": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/source-after.json",
+      "bytes": 21523,
+      "sha256": "d4ba93f1756e8d3e08498cd350f0c696ad55de05aebfb7b0de1c2e1e5b42e788"
+    },
+    "allExpectedBefore": true,
+    "allExpectedAfter": true,
+    "exactBeforeAfter": true,
+    "compiledBefore": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/compiled-live-before.json",
+      "bytes": 1264163,
+      "sha256": "dbe73f1c113113607a8dee13f67d50d0d7e6bd763fe171006f5b3d53bfd14a52"
+    },
+    "compiledAfter": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/compiled-live-after.json",
+      "bytes": 1264163,
+      "sha256": "dbe73f1c113113607a8dee13f67d50d0d7e6bd763fe171006f5b3d53bfd14a52"
+    },
+    "finalTypedBefore": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/source-before-final-typed.json",
+      "bytes": 21523,
+      "sha256": "d4ba93f1756e8d3e08498cd350f0c696ad55de05aebfb7b0de1c2e1e5b42e788"
+    },
+    "finalTypedAfter": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/source-after-final-typed.json",
+      "bytes": 21523,
+      "sha256": "d4ba93f1756e8d3e08498cd350f0c696ad55de05aebfb7b0de1c2e1e5b42e788"
+    },
+    "allExpectedFinalTypedAfter": true
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-24-citations-final-artifact-index-20261015.json",
+    "bytes": 15610,
+    "sha256": "61d5099c71500400e3421e192fa53ddcd0a4fec2d8d7a62927c9005f0a09a988"
+  },
+  "artifactCount": 70,
+  "remainingAcceptance": [
+    "Strict spec criterion remains failed for actual A.5 policy pairs in governance/risk and default anchors; real collector reports both, held zeroTolerance=false is not a waiver.",
+    "No primary official sources were opened; existing dates and official-host syntax do not establish legal currentness, accessibility, or citation truth.",
+    "All twelve changed metadata records retain experimental P0-24 expert-signoff hold. All31 correction-log expert columns remain empty; named legal/subject-matter expert approval and held rows are unresolved.",
+    "Classifier has only the existing scoped emotionRecognition boolean; no medical/safety/context override was added or accepted.",
+    "No full P0-24, CI, Node24, live/model/tool, regulated agent, auth certification, production repair, reservation transfer or release claim."
+  ],
+  "boundaries": {
+    "productionEdits": 0,
+    "oldTestEdits": 0,
+    "sourceRepairApproval": false,
+    "newPermanentFiles": 1,
+    "runtime": "Actual Node22.23.3 only; permanent test has no Node-major refusal",
+    "canonicalWrites": 0,
+    "guards": "Ordinary Vitest config and repo workspace guards preserved; no configuration/baseline/guard edits",
+    "inheritedDebts": "P0-22/P0-23/P0-51/P0-52 active failures and pending narrow Sync/CLI/assurance proposals,47echo, D08 experimental and historical provenance retained",
+    "graph": "Stale existing graph used as navigation then direct current source; no refresh/server"
+  },
+  "readHandoff": "All live-input reads complete. Root may rebuild/aggregate; private evidence retained.",
+  "chronologicalTypeCorrection": {
+    "originalTest": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/original-171-line-test.ts",
+      "bytes": 10652,
+      "sha256": "4d30cbc37da28f5633edbd22260a8d086ce2983e6cd8556a2b855727e5728c2f"
+    },
+    "originalReceipt": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/qualification-original-body.json",
+      "bytes": 55222,
+      "sha256": "02c1f4e04919ba1ea30454e9fc1a6d2482882f19bd56fc3f0a8844728bd512fb"
+    },
+    "originalMarkdown": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/qualification-original-body.md",
+      "bytes": 2399,
+      "sha256": "b184abe02f0e78166dece800a041ced5aa1c8e575322fb0608535a598a58bbf7"
+    },
+    "originalArtifactIndex": {
+      "path": "/private/tmp/p0-24-citations-artifact-index-20261015.json",
+      "bytes": 11720,
+      "sha256": "5d62e1c1d799c1dcd6a1c6742801bdb86ab363de87daabc823d6ef0470b9c8e0"
+    },
+    "original171LineFirstAndMatrixRuntime": "23/22/1;23/22/1\u219223/19/4\u219223/22/1, all zero pending/todo, Node22.23.3",
+    "rootOriginalTypeCheck": {
+      "exit": 2,
+      "scope": "Only newfile line165 TS7006 implicit any in collector findings callback",
+      "log": {
+        "path": "/private/tmp/p0-24-test-types-20261015.log",
+        "bytes": 310,
+        "sha256": "88172a2f3f75329c38ca3473fe450eae89afc438bc5010f01769971ae9435340"
+      }
+    },
+    "exactTypeOnlyDiff": {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015/type-only-annotation.patch",
+      "bytes": 597,
+      "sha256": "a7d0ed8e958accc49c1162673696100d86041e5b4e9ffa177676e769df439fdc"
+    },
+    "replacement": "Findings declaration uses actual CitationFinding[]; no assertion, descriptor, or runtime input changes",
+    "correctedTest": {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts",
+      "bytes": 10628,
+      "sha256": "c184101b8dc302cfaf2980b6b2900cac26bbe9965d2f5ba3dbc68f2468bd0712"
+    },
+    "correctedFinalRuntime": {
+      "total": 23,
+      "passed": 22,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "exit": 1,
+      "soleFailure": "strict ISO A.5 policy labels criterion"
+    },
+    "rootFinalTypeCheck": "Root owns the independent rerun and retains its unique result separately; not inferred here",
+    "causalMatrixScope": "Executed against original4d30 test body, not rerun underc184 typed body; chronological evidence is explicit"
+  }
+}

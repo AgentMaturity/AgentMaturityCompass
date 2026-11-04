@@ -1,0 +1,30 @@
+{
+  "name": "M2-rewrite-original-report",
+  "target": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/migration/legacy/scan.ts",
+  "relative": "src/migration/legacy/scan.ts",
+  "original": {
+    "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/migration/legacy/scan.ts",
+    "bytes": 16329,
+    "sha256": "a857c9dc27a993db83036a2044a5de7da5d1b262d3ac60ec2840e6950d87f272"
+  },
+  "frozen": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/M2-rewrite-original-report.original",
+    "bytes": 16329,
+    "sha256": "a857c9dc27a993db83036a2044a5de7da5d1b262d3ac60ec2840e6950d87f272"
+  },
+  "patch": {
+    "path": "/private/tmp/p1-35-legacy-qualification-20261016/runtime-and-control-review/M2-rewrite-original-report.patch",
+    "bytes": 1603,
+    "sha256": "74560221623a8d0a50f71fc13e5a5deecef28b9aa15263661239e5ccc606a1e8"
+  },
+  "inode": 542900596,
+  "at": "2026-10-16T17:18:54.746800+00:00",
+  "sourceOnly": true,
+  "compiledOutputRebuilt": false,
+  "mutant": {
+    "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/src/migration/legacy/scan.ts",
+    "bytes": 16689,
+    "sha256": "21d2f6b7766df2e416fbda6a13eb504ffc6f798b1a5d475b6822a877674fda7b"
+  },
+  "mutantInode": 542956081
+}

@@ -1,0 +1,587 @@
+{
+  "schema": "p125-observed-run-audit/1",
+  "phase": "p125-m1",
+  "actualExit": 1,
+  "durationMs": 1143,
+  "ownedPgid": 12415,
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "tests": {
+    "numTotalTests": 47,
+    "numPassedTests": 46,
+    "numFailedTests": 1,
+    "numPendingTests": 0
+  },
+  "exactOrderedFileNameOccurrenceStateJoin": true,
+  "uniqueObserverTestIds": 47,
+  "unhandledErrors": [],
+  "taskErrors": [
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a different expected digest for the unchanged genuine signed token",
+      "errors": [
+        {
+          "message": "expected { ok: true, attested: { \u2026(9) } } to match object { ok: false, \u2026(1) }\n(10 matching properties omitted from actual)",
+          "showDiff": true,
+          "expected": "{\n  \"code\": \"TST_IMPRINT_MISMATCH\",\n  \"ok\": false,\n}",
+          "actual": "{\n  \"ok\": true,\n}",
+          "diff": "- Expected\n+ Received\n\n  {\n-   \"code\": \"TST_IMPRINT_MISMATCH\",\n-   \"ok\": false,\n+   \"ok\": true,\n  }",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected { ok: true, attested: { \u2026(9) } } to match object { ok: false, \u2026(1) }\n(10 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts:127:63\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+              "line": 127,
+              "column": 63
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "hooks": [
+    {
+      "kind": "file",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "name": "tests/time/verifyTimestamp.test.ts",
+      "hooks": {
+        "beforeAll": "pass",
+        "afterAll": "pass"
+      }
+    },
+    {
+      "kind": "file",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts",
+      "hooks": {
+        "afterAll": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists a list signed by a pinned root parses, with the spec's signed bytes",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists a list signed by an unpinned root gives TRUST_LIST_SIGNATURE_INVALID",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists a purpose added after signing invalidates the list",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists a signature whose public key does not hash to its key id is refused",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists an expired list gives TRUST_LIST_EXPIRED",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses duplicate key id",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses empty purposes",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses duplicate purposes",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses revokedAt without a reason",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses validTo not after validFrom",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a PEM whose sha256 is not the key id",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an RSA key",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a private key in place of the public key",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a non-canonical (CRLF) PEM",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an unknown entry field",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an unknown list field",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a non-UTC time",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an evidence-authority key without authority",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses a bad list id",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists accepts an evidence-authority key that carries its authority, and a dated revocation with a reason",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists refuses an unknown signature field",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts signed trust lists accepts 4,096 distinct entries and refuses 4,097 on the size limit",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts trust-list files a reordered JSON file still verifies",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts trust-list files refuses a __proto__ field at any level, which a parsed object would otherwise drop",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "test",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "name": "tests/trust/trustList.test.ts trust-list files refuses files over 1 MiB and symlinks",
+      "hooks": {
+        "afterEach": "pass"
+      }
+    },
+    {
+      "kind": "file",
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/verifierReport.test.ts",
+      "name": "tests/trust/verifierReport.test.ts",
+      "hooks": {
+        "afterAll": "pass"
+      }
+    }
+  ],
+  "rows": [
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+      "state": "failed",
+      "failureMessages": [
+        "AssertionError: expected { ok: true, attested: { \u2026(9) } } to match object { ok: false, \u2026(1) }\n(10 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts:127:63\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+      ]
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses the independently located signed-attribute corruption",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses a policy excluded by the correctly pinned real root",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses explicit rejection status before requiring a timestamp token",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses a truncated copy of the genuine token",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "keeps claimed time separate from the genuine attested upper bound",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "keeps an artifact without a timestamp at claimed time",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/time/verifyTimestamp.test.ts",
+      "fullName": "reports a broken supplied token as an artifact integrity error",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists a list signed by a pinned root parses, with the spec's signed bytes",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists a list signed by an unpinned root gives TRUST_LIST_SIGNATURE_INVALID",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists a purpose added after signing invalidates the list",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists a signature whose public key does not hash to its key id is refused",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists an expired list gives TRUST_LIST_EXPIRED",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses duplicate key id",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses empty purposes",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses duplicate purposes",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses revokedAt without a reason",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses validTo not after validFrom",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a PEM whose sha256 is not the key id",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an RSA key",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a private key in place of the public key",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a non-canonical (CRLF) PEM",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an unknown entry field",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an unknown list field",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a non-UTC time",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an evidence-authority key without authority",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses a bad list id",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists accepts an evidence-authority key that carries its authority, and a dated revocation with a reason",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists refuses an unknown signature field",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "signed trust lists accepts 4,096 distinct entries and refuses 4,097 on the size limit",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "trust-list files a reordered JSON file still verifies",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "trust-list files refuses a __proto__ field at any level, which a parsed object would otherwise drop",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/trustList.test.ts",
+      "fullName": "trust-list files refuses files over 1 MiB and symlinks",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 trusts only intact artifacts whose every signature is admitted, and leaves P1-06 dimensions not evaluated",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 is untrusted on integrity errors, refused or missing signatures, and unanchored ledgers",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 records allow flags as overrides and never turns them into trust",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 labels workspace self-trust as a self-check",
+      "state": "passed",
+      "failureMessages": []
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/tests/trust/verifierReport.test.ts",
+      "fullName": "VerifierReportV1 parses the documented example and refuses unknown fields",
+      "state": "passed",
+      "failureMessages": []
+    }
+  ],
+  "publicEvidence": [],
+  "artifacts": [
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-m1/command.json",
+      "bytes": 2803,
+      "sha256": "fad194c3852ee74d57e6777c3b47929f6c7b768a955e3fbdc5bc0f3cf665341d"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-m1/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "9c53ca9d8015ddae6b89168eba64ce20d4b90fd5b7b20f62ad06ab11d3136770"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-m1/raw.json",
+      "bytes": 15447,
+      "sha256": "4a6b5f0fa5cd3ec338fbd21b18f740fedef2ff0de4ca4da9a8e6905905d13669"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-m1/observer.json",
+      "bytes": 22659,
+      "sha256": "c5be1a214ba49f4598683ecec99048b2648925040685d77413ab2a3a84ea8a49"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125-m1/stdout-stderr.log",
+      "bytes": 2851,
+      "sha256": "321cb5f9a0f6e9ce243cab59bc86d574d92f5c458c4621cab03be712477cdb3c"
+    }
+  ],
+  "boundary": "Actual observed scoped run only; canonical, fresh-source, full-suite and mutation credit require separate binding and review."
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "p107-two-unit-candidates-static-independent-review/1",
+  "at": "2026-10-16T17:45:49.416017+00:00",
+  "allCandidateBytesRead": true,
+  "readmeAndDesignRead": true,
+  "all37CandidateInputPinsMatchCurrentSelectedBytes": true,
+  "candidatePins": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/levelCumulative.test.ts",
+      "bytes": 10722,
+      "sha256": "1265e5715bd3ceb3c342c44e3a65681f8d32d74dd962ede9e7f64c8227575c78"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/evidenceEmitterRegistry.test.ts",
+      "bytes": 10448,
+      "sha256": "01ba46f55bf1135306e8e55d9b8c41a4b106ced58aa3a9a5463557fede001061"
+    }
+  ],
+  "blockers": [],
+  "findings": [
+    {
+      "scope": "TypeScript/API fit",
+      "result": "No static type/API blocker found. Calls match current evaluateLevels, levelGates, parseEvidenceEventWith, registry APIs and exported EvidenceEvent/contract vocabulary. Actual compiler execution remains root work."
+    },
+    {
+      "scope": "Synthetic cumulative graph",
+      "result": "Uses canonicalL1/L2 and an explicitly artificial emptyL3 gate, preserving actual map data. Adjacent statuses and contiguous3 positive precede finalgap1 sensitive assertion. Missing/shuffled/duplicate/notEvaluated edges remain fixed bodies."
+    },
+    {
+      "scope": "Canonical positive/negative rows",
+      "result": "Independent literal allowed/denied rows span two timestamps exactly24h apart and two sessions. Positive final2 is the first sensitive assertion. Missing denied/session/day negatives match actual gate requirements; higher statuses stay not_evaluated."
+    },
+    {
+      "scope": "Clock/data identity",
+      "result": "Date.now-derived timestamps remain fresh; no global timers, Date overrides, environment writes or registry-dependent row generation. One supplied event with duplicate tags remains one L1 match; no cross-object event-ID dedup claim."
+    },
+    {
+      "scope": "Provenance/claim boundary",
+      "result": "Parser cases use an explicit local trustList:null reader. Known manual/import/dogfood markers conservatively derive tier/admission; unboundATTESTED never reaches trust loading. Missing/unknown sources intentionally default runtime. Dummy hashes/signatures are unverified parser inputs, never crypto or ledger proof."
+    },
+    {
+      "scope": "Registry/source binding",
+      "result": "Source root derives from materialized import.meta.url and realpath, not borrowed runner cwd. Literal/event vocabulary/required-meta correspondence checks are finite static reads; broadstdout is explicitly not unique-writer authentication. RequiresMeta tests only own-property presence, including undefined."
+    },
+    {
+      "scope": "Fixed identities and M2 masking",
+      "result": "Literal fixed test declarations; mutable registry/map loops are inside bodies. No-seeder/no-synthetic test is separate and precedes literal correspondence. M2 directly reaches seeder rejection; later synthetic assertion in that same body may be masked after the first failure, while a separate literal test may also fail. Actual root classification must preserve that distinction."
+    },
+    {
+      "scope": "Cleanup/privacy",
+      "result": "No owned workspace, file output, native/SQL/network/process call, env mutation, global prototype mutation or cleanup harness is introduced. Object.setPrototypeOf targets one local synthetic metadata object. Console markers contain only finite synthetic observations, with no credentials/env values."
+    },
+    {
+      "scope": "Control fit",
+      "result": "M1 highest-pass sees pass/fail/pass graph. M2 seeder truth has an independent fixed body. M3 denied removal retains fixture row literals and lowers the canonical synthetic two-day positive; actual control outcomes remain unexecuted/uncredited."
+    }
+  ],
+  "limits": [
+    "Review is static; no parser/compiler/test/product/helper/native/SQL/network/probe executed.",
+    "Private candidates require exact materialization at their two proposed checkout paths before relative imports/source URL resolve; they are not runnable from the proposal folder.",
+    "These two suites do not supply a real governed-run fixture, crypto admission, complete audit census, fullreachability/methodology/globalquality/release/fullP1-07 acceptance.",
+    "All production/maps/registry/provenance/oldtests/guards and all held decisions remain untouched."
+  ],
+  "writes": "Only this new private static-review folder; no checkout/index/QA or source/candidate edits."
+}

@@ -1,0 +1,12 @@
+     × persists <AMC home>/state, where anti-rollback marks live, in compose and the Helm chart (P1-08 review M4) 9ms
+     × bypass-v1-restore: the v1 vault stays out of the workspace, and a restored one is refused with or without keyset.json 403ms
+     × bypass-legacy-plant: a deleted vault, key set and purpose keys beside a planted legacy key pair are refused, and nothing is created 1003ms
+     × a trust-config refusal comes before any key-set write 733ms
+     × the owner restores a lost key set explicitly, from the copies AMC home kept 781ms
+     × fresh-home-writer: deleting keyset.json does not reopen the swapped-key attacks 519ms
+     × adopts a key set it never committed visibly: it says so, records it, and refuses a later fork 475ms
+     × the purpose probe throws on an unknown purpose and never serves a no-sign ephemeral key 501ms
+     × a claim expectation without issuerKeyIds is a typed refusal, not a TypeError 2ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 9 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  2 failed (2)
+      Tests  9 failed | 20 passed (29)

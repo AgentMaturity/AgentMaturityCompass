@@ -1,0 +1,480 @@
+{
+  "schemaVersion": 1,
+  "audit": "P0-29 assigned non-final route scope audit",
+  "timestampUtc": "2026-10-14T13:03:13.665936+00:00",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "input": {
+    "path": "/Users/sid/.codex/worktrees/p0-29-qualification/AgentMaturityCompass/docs/program/gap-register-reconciliation.json",
+    "sha256": "2ef11713d5863fb57f18032e1e7c73b1bbc96f6ba5654e7c2def6c539b7c99b0",
+    "unchangedDuringAudit": true
+  },
+  "scope": "Triaged93 non-final rows assigned to22 existing plan keys; deeply checked the strongest5 scope conflicts and G6-08/G6-07 proof consistency. Excluded38 null routes and paused groups. This is not a comprehensive acceptance audit of all93 routes.",
+  "counts": {
+    "assignedNonfinal": 93,
+    "assignedKeys": 22,
+    "materialConflictGroups": 3,
+    "affectedRows": 5
+  },
+  "rowSnapshots": [
+    {
+      "id": "G5-12",
+      "title": "Policy `packsEnabled` object lists **6** packs, never consulted by runner",
+      "location": "src/assurance/assurancePolicySchema.ts:32–38",
+      "status": "open",
+      "reason": "Legacy packsEnabled policy fields remain; no complete toggle wiring/removal claim is established.",
+      "evidence": "src/assurance/assurancePolicySchema.ts:26-50; historical finding plans/amc-gap-register.md:451. Legacy packsEnabled policy fields remain; no complete toggle wiring/removal claim is established.",
+      "successor": {
+        "planKey": "P0-28",
+        "paused": null
+      },
+      "sourceRefs": [
+        "src/assurance/assurancePolicySchema.ts:26-50"
+      ]
+    },
+    {
+      "id": "G6-18",
+      "title": "CLI flags parsed as output paths (`--json`/`--verbose` files) — arg-parse bug gitignored-by-name rather than confirmed fixed",
+      "location": "root `--json`, `--verbose`",
+      "status": "mitigated",
+      "reason": "Flag-named and temp artifacts are absent/ignored; complete current argument-parser and recurrence acceptance is unperformed. No local cleanup was authorized.",
+      "evidence": ".gitignore:110-118 ; main tree 55a5f121d50647c0b87f1f705586cf12e35784a2: absent --json, --verbose, .tmp-a2a-events.json, .tmp-distributed-events.json, .tmp-memory-depth-events.json, .tmp-gap-report.json; historical finding plans/amc-gap-register.md:555. Flag-named and temp artifacts are absent/ignored; complete current argument-parser and recurrence acceptance is unperformed. No local cleanup was authorized.",
+      "successor": {
+        "planKey": "P0-34",
+        "paused": null
+      },
+      "sourceRefs": [
+        ".gitignore:110-118"
+      ]
+    },
+    {
+      "id": "G8-27",
+      "title": "Stray root artifacts, incl. arg-parse-bug filenames",
+      "location": "`.tmp-a2a-events.json`, `.tmp-distributed-events.json`, `.tmp-memory-depth-events.json`, `.tmp-gap-report.json`, `--json`, `--verbose`, `agent-maturity-compass-*.tgz`, `.github/.DS_Store`, `test-results/`",
+      "status": "mitigated",
+      "reason": "Flag-named and temp artifacts are absent/ignored; complete current argument-parser and recurrence acceptance is unperformed. No local cleanup was authorized.",
+      "evidence": ".gitignore:110-118 ; main tree 55a5f121d50647c0b87f1f705586cf12e35784a2: absent --json, --verbose, .tmp-a2a-events.json, .tmp-distributed-events.json, .tmp-memory-depth-events.json, .tmp-gap-report.json; historical finding plans/amc-gap-register.md:687. Flag-named and temp artifacts are absent/ignored; complete current argument-parser and recurrence acceptance is unperformed. No local cleanup was authorized.",
+      "successor": {
+        "planKey": "P0-34",
+        "paused": null
+      },
+      "sourceRefs": [
+        ".gitignore:110-118"
+      ]
+    },
+    {
+      "id": "G3-01",
+      "title": "Three parallel certificate systems",
+      "location": "`src/assurance/certificate.ts` (672L), `src/assurance/assuranceCertificates.ts` (310L), `src/cert/trustCertificate.ts` (456L)",
+      "status": "mitigated",
+      "reason": "Format-aware certificate repair is narrower than consolidation of three issuers; all three source systems remain.",
+      "evidence": "src/assurance/certificate.ts:1-24; src/assurance/assuranceCertificates.ts:1-24; src/cert/trustCertificate.ts:1-24; historical finding plans/amc-gap-register.md:281. Format-aware certificate repair is narrower than consolidation of three issuers; all three source systems remain.",
+      "successor": {
+        "planKey": "P2-29",
+        "paused": null
+      },
+      "sourceRefs": [
+        "src/assurance/certificate.ts:1-24",
+        "src/assurance/assuranceCertificates.ts:1-24",
+        "src/cert/trustCertificate.ts:1-24"
+      ]
+    },
+    {
+      "id": "G3-03",
+      "title": "Two+ red-team engines, all facades",
+      "location": "`src/assurance/assuranceRunner.ts`, `src/redteam/runner.ts`, `src/cli.ts` (`shield red-team`), `src/shield/dynamicAttackGenerator.ts` vs real `src/shield/continuousRedTeam.ts`",
+      "status": "mitigated",
+      "reason": "Real responder work addresses several facades; separate assurance/redteam/shield engines still exist. Wiring is not consolidation.",
+      "evidence": "src/redteam/runner.ts:472-525; src/assurance/assuranceRunner.ts:390-458; historical finding plans/amc-gap-register.md:283. Real responder work addresses several facades; separate assurance/redteam/shield engines still exist. Wiring is not consolidation.",
+      "successor": {
+        "planKey": "P2-29",
+        "paused": null
+      },
+      "sourceRefs": [
+        "src/redteam/runner.ts:472-525",
+        "src/assurance/assuranceRunner.ts:390-458"
+      ]
+    },
+    {
+      "id": "G6-07",
+      "title": "Key-history files are the auditor root-of-trust but are unsigned, mode `0o644`, filesystem-writable; `verifyHexDigestAny` accepts a signature if **any** listed key verifies it",
+      "location": "`.amc/keys/*_history.json`, `src/crypto/keys.ts:26,116`",
+      "status": "open",
+      "reason": "Current source adds signed role-bound admission envelopes and rejects unsigned legacy history (be4261ec). Historical hash-chain-only DONE is superseded. Accepted main also contains the historical P0-09 runtime and mutation evidence in qualification/2026-10-07-P0-09/receipt.json and README.md at cbbd012b5c5291481a72987f865eae8dbd26785f; the prior draft claim that mutations were unperformed is stale. Those scoped historical runs are not current whole-surface qualification. AMC-1525 stays linked to P0-09 for remaining portable verifier and operator acceptance scope; this reconciliation does not declare it Done.",
+      "evidence": "src/crypto/keys.ts:12-26; src/crypto/keys.ts:49-66; src/crypto/keys.ts:127-131; src/crypto/keyHistoryEnvelope.ts:91-107; historical finding plans/amc-gap-register.md:534. Current source adds signed role-bound admission envelopes and rejects unsigned legacy history (be4261ec). Historical hash-chain-only DONE is superseded. Accepted main also contains the historical P0-09 runtime and mutation evidence in qualification/2026-10-07-P0-09/receipt.json and README.md at cbbd012b5c5291481a72987f865eae8dbd26785f; the prior draft claim that mutations were unperformed is stale. Those scoped historical runs are not current whole-surface qualification. AMC-1525 stays linked to P0-09 for remaining portable verifier and operator acceptance scope; this reconciliation does not declare it Done.",
+      "successor": {
+        "planKey": "P0-09",
+        "paused": null
+      },
+      "sourceRefs": [
+        "src/crypto/keys.ts:12-26",
+        "src/crypto/keys.ts:49-66",
+        "src/crypto/keys.ts:127-131",
+        "src/crypto/keyHistoryEnvelope.ts:91-107"
+      ]
+    },
+    {
+      "id": "G6-08",
+      "title": "A single accepted notary / trust-config / signer import **auto-appends** a new public key to the auditor trust set — permanently expanding who can sign as \"auditor\"",
+      "location": "`src/crypto/signing/signer.ts:131`, `signing/signerNotary.ts:112`, `src/trust/trustConfig.ts:367`",
+      "status": "mitigated",
+      "reason": "Notary signing no longer auto-appends; explicit trust configuration saves signed config then admits the key through authenticated history. Explicit admission/revocation acceptance remains.",
+      "evidence": "src/crypto/signing/signer.ts:120-137; src/trust/trustConfig.ts:371-379; src/crypto/keys.ts:49-66; historical finding plans/amc-gap-register.md:535. Notary signing no longer auto-appends; explicit trust configuration saves signed config then admits the key through authenticated history. Explicit admission/revocation acceptance remains.",
+      "successor": {
+        "planKey": "P0-09",
+        "paused": null
+      },
+      "sourceRefs": [
+        "src/crypto/signing/signer.ts:120-137",
+        "src/trust/trustConfig.ts:371-379",
+        "src/crypto/keys.ts:49-66"
+      ]
+    }
+  ],
+  "findings": [
+    {
+      "id": "route-policy-toggles",
+      "rows": [
+        "G5-12"
+      ],
+      "assignedKey": "P0-28",
+      "verdict": "concrete_scope_conflict",
+      "residual": "The six packsEnabled policy toggles are schema/default state without runner consumption; truthfully counting packs does not implement or retire policy toggles.",
+      "issueScope": "P0-28 is the documentation truth reset and explicitly excludes code behavior; its touch scope only allows selected CLI descriptions, count generation, docs and website work.",
+      "specEvidence": [
+        {
+          "key": "P0-28",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-28.md",
+          "sha256": "f74ae4c6cffa7e7d22a8a09670262136d2e62bc20da9c0c0762d7ddac8db127b",
+          "firstLine": 29,
+          "lastLine": 35,
+          "excerpt": "### Scope\n\n**In:** archive 31 files (the 29 plus A-1, A-2); C-1 to C-4; README `amc start`, domain examples and badge text; VALIDITY_FRAMEWORK; the whitepaper; `CERTIFICATION.md`; `docs/SSO_SAML.md`; every \"142\" and \"126-question\" literal; website copy; docs-drift checks; tests. **Out:** code behaviour (P0-15, P0-21 to P0-23; real SAML is P2-07); citations (P0-24); `docs/source-reviews/*`, `docs/content/*`, `docs/internal/*`, `docs/council/*`, `docs/research/*` and `wave4-*` (listed in `docs/READING_ORDER.md` §6, but tests and `gen-counts` read them; propose follow-up P1-54); full rewrites of the 67 STALE guides (propose a follow-up).\n\n### Touch scope\n\nNew `docs/archive/`; the files listed above; `website/docs/docs.js`; `scripts/docs-drift-check.mjs`; `scripts/gen-counts.mjs` (surface lists); test paths only in the 47 tests; description text at `src/cli.ts:9090, 9121, 24355` (net zero lines) and the comment at `src/score/domainPacks.ts:4`; `docs/READING_ORDER.md`, `docs/INDEX.md`; regenerated inventory and API reference."
+        },
+        {
+          "key": "P0-28",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-28.md",
+          "sha256": "f74ae4c6cffa7e7d22a8a09670262136d2e62bc20da9c0c0762d7ddac8db127b",
+          "firstLine": 74,
+          "lastLine": 87,
+          "excerpt": "### Acceptance criteria\n\n- 31 files moved to `docs/archive/` with the banner and an index; none deleted.\n- A-1 to A-3, C-1 to C-4 and the README `amc start` text resolved; the new text matches a recorded run.\n- No \"κ = 1.0\", unrecorded ICC or κ figures, \"confirmed\" independence or past-due study dates remain in VALIDITY_FRAMEWORK or the whitepaper.\n- No badge invitation; `CERTIFICATION.md` says it is not a certification; `docs/SSO_SAML.md` lists only checks the code makes and says standard SAML is not supported until P2-07.\n- Every assurance-pack count is a `gen-counts` marker and `check:counts` passes; no \"126-question\" text in `src`.\n- Docs-drift banned-word and command checks are green; `build:pages` passes; the full suite passes with tests changed only for moved paths.\n- Website copy matches README; nothing describes a feature outside P0-34's 1.2.0 surface list.\n\n### Evidence to attach when closing\n\nPR link, merged SHA, the list of moved files, before and after of the README sections changed, `check:docs-drift` and `check:counts` output, and the recorded `amc up` run.\n"
+        }
+      ],
+      "sourceEvidence": [
+        {
+          "path": "src/assurance/assurancePolicySchema.ts",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "ece4b27f918a80294c86910edc84c07a278283f9",
+          "sha256": "eb71063c0587731ef98d937af87db67dfd80658bd924138b30fcfde3af14b8a4",
+          "firstLine": 26,
+          "lastLine": 49,
+          "excerpt": "    thresholds: z.object({\n      minRiskAssuranceScore: z.number().min(0).max(100),\n      maxCriticalFindings: z.number().int().min(0),\n      maxHighFindings: z.number().int().min(0),\n      failClosedIfBelowThresholds: z.boolean()\n    }),\n    packsEnabled: z.object({\n      injection: z.boolean(),\n      exfiltration: z.boolean(),\n      toolMisuse: z.boolean(),\n      truthfulness: z.boolean(),\n      sandboxBoundary: z.boolean(),\n      notaryAttestation: z.boolean()\n    }),\n    redaction: z.object({\n      storeRawPrompts: z.literal(false),\n      storeRawOutputs: z.literal(false),\n      storeOnlyHashesAndRefs: z.literal(true)\n    }),\n    reporting: z.object({\n      includeRunSummaryInConsole: z.boolean(),\n      dispatchCriticalToIntegrations: z.boolean()\n    })\n  })"
+        }
+      ],
+      "wholeSourceSearch": "git grep packsEnabled on exact main under src returned only assurancePolicySchema.ts:32 and:82; no runner consumption.",
+      "proposal": "Keep P0-28 for docs wording/count claims only. Ask Sid to name an approved implementation/removal successor for the unresolved toggles, or explicitly expand acceptance. Do not silently assign another existing key.",
+      "approvedReassignment": false
+    },
+    {
+      "id": "route-parser-recurrence",
+      "rows": [
+        "G6-18",
+        "G8-27"
+      ],
+      "assignedKey": "P0-34",
+      "verdict": "concrete_scope_conflict",
+      "residual": "The candidate itself says argument-parser and recurrence acceptance remains unperformed. Absence/ignore of --json/--verbose and temporary files does not prove flag parsing is fixed.",
+      "issueScope": "P0-34 prepares version, changelog, hidden surfaces, package contents and publishing workflows; its only CLI registration edit concerns D-12 native-schedule exclusion. No parser fix or recurrence fixture belongs to its listed touch scope/tests/acceptance.",
+      "specEvidence": [
+        {
+          "key": "P0-34",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-34.md",
+          "sha256": "6e1187ae51e5aad14b2cf8cb895032c9e2428597942ebfc7c16e8ea782295655",
+          "firstLine": 26,
+          "lastLine": 32,
+          "excerpt": "### Scope\n\n**In:** version and changelog; release and migration notes; D-12 hide or exclude; tarball review; release-workflow hardening; publishing docs; dry runs. **Out:** tagging, secrets and publishing (P0-38, P0-39); images and the quickstart (P0-35); advisory text (P0-36); claim labels (P0-22, P0-23); the docs truth reset (P0-28); the weekly train (P1-41); SLSA attestations and cosign (P2-15).\n\n### Touch scope\n\n`package.json` (version only if D-12 changes it), `CHANGELOG.md`, `.changeset/*`, new `docs/releases/1.2.0.md`, `docs/PUBLISHING.md`, `docs/RELEASE_RUNBOOK.md`, `docs/SUPPORT_POLICY.md`, `.github/workflows/release.yml` (publish, signing, timeout and environment only; P0-35 owns the image steps), `.github/workflows/npm-publish.yml`, the native-schedule registration site, `scripts/build-pages-site.mjs`, `src/index.ts` (only per D-12), new `scripts/check-release-candidate.mjs` and `scripts/check-pack-contents.mjs`, regenerated `docs/CLI_COMMAND_INVENTORY.md` and counts, tests below."
+        },
+        {
+          "key": "P0-34",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-34.md",
+          "sha256": "6e1187ae51e5aad14b2cf8cb895032c9e2428597942ebfc7c16e8ea782295655",
+          "firstLine": 72,
+          "lastLine": 81,
+          "excerpt": "### Acceptance criteria\n\n- `package.json` is at D-12's version (default 1.2.0), with one matching CHANGELOG heading and no pending changesets; `check-release-candidate.mjs` passes.\n- `docs/releases/1.2.0.md` has every section in step 4 and passes the claim-vocabulary check.\n- D-12's hide or exclude decisions are applied; inventory and counts are regenerated; no F2–F4 entry point exists.\n- Only `release.yml` can publish; it fails loudly without credentials or a signing key and verifies with `--pubkey`; the contract test and its mutation are recorded.\n- `npm publish --dry-run` passes; the tarball listing has no forbidden paths; secret scan and packed install pass.\n- SBOM generated from the real tarball and attached as evidence.\n- Docs updated; full suite, lint, typecheck and the release gate pass.\n"
+        }
+      ],
+      "sourceEvidence": [
+        {
+          "path": ".gitignore",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "05e2a7175599ffb623b1328377f7890c1684e421",
+          "sha256": "c3f0b53b9b7f694035cd1598b887266a5e4da3fb1ef609953f6e559a1a4929f5",
+          "firstLine": 110,
+          "lastLine": 118,
+          "excerpt": "swarm-report.json\nqa/node_modules/\nqa/dist/\nqa/.env\n\n# Stray artifacts that were committed before these rules existed\n.tmp-*\ntest_model.pkl\n"
+        }
+      ],
+      "proposal": "Retain P0-34 only for package/release artifact exclusion. Preserve argument-parser recurrence as separately unowned debt pending an explicit successor or accepted scope extension. No local authored artifact cleanup is proposed.",
+      "approvedReassignment": false
+    },
+    {
+      "id": "route-internal-engine-consolidation",
+      "rows": [
+        "G3-01",
+        "G3-03"
+      ],
+      "assignedKey": "P2-29",
+      "verdict": "partial_surface_route_hides_internal_residual",
+      "residual": "G3-01 still names three issuer implementations; G3-03 says assurance/redteam/shield engines coexist and wiring is not consolidation. CLI aliases/notices do not consolidate those implementations.",
+      "issueScope": "P2-29 owns a deprecation plan, aliases/notices, docs consolidation, signed reviewer independence and optional behavior-preserving CLI extraction. It explicitly defers scoring-system retirement to P1-53 and does not list issuer/red-team engine consolidation in touch scope or acceptance. P1-52 also explicitly excludes fixing dead code/deduplication.",
+      "specEvidence": [
+        {
+          "key": "P2-29",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-29.md",
+          "sha256": "da5f0ce264839bdb5cab3a4e50163c68307b08dcac88fe117972366d4f15205a",
+          "firstLine": 25,
+          "lastLine": 31,
+          "excerpt": "### Scope\n\n**In:** the plan and a machine-readable deprecation list; extending the existing notice registry; batch 1; docs consolidation; the reviewer-independence fix; optional `src/cli.ts` decomposition. **Out:** retiring scoring and mapping systems (P1-53, done first); new command paths (frozen; any need is a named freeze exception); removing commands (a later release, after the notice period); the single execution API (P2-13); starter profiles themselves (P1-40).\n\n### Touch scope\n\n`src/cli/deprecatedCommand.ts`; the registration sites of deprecated commands in `src/cli.ts` and `src/cli-*.ts`; new `scripts/cli-usage-signals.mjs`; new `docs/program/cli-deprecation-plan.md` and `docs/program/cli-deprecations.json`; regenerated `docs/CLI_COMMAND_INVENTORY.md` and counts; `docs/READING_ORDER.md`; `docs/archive/**`; `README.md` (entry points only); `src/audit/reviewerIndependence.ts`; `scripts/line-budgets.json` (lowered only); tests below; changesets."
+        },
+        {
+          "key": "P2-29",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-29.md",
+          "sha256": "da5f0ce264839bdb5cab3a4e50163c68307b08dcac88fe117972366d4f15205a",
+          "firstLine": 43,
+          "lastLine": 49,
+          "excerpt": "3. PR C, docs: after P0-28, move remaining superseded pages to `docs/archive/` with P0-28's banner (move, never delete); rewrite `docs/READING_ORDER.md` around the consolidated set; present P1-40's `amc init --coding` and `amc init --regulated` profiles as the entry points in `README.md`; regenerate counts with `npm run gen-counts`.\n4. PR D, reviewer independence:\n  - add `verifySecondReview(workspace, approval)` returning `{ ok: boolean; reasons: string[] }`. It must resolve `approvalReceiptRef` to a signed approval decision through the approvals module (`verifyApprovalForExecution`, or the decision listing used at `approvalEngine.ts:305-315`), require decision `APPROVED`, a valid signature chain, and a reviewer different from both the requester and the first reviewer;\n  - `rejected` and `escalated` never satisfy the requirement;\n  - `conflictSignaturePresent`: verify the referenced signed evidence, or rename it `conflictCheckReferenced` and stop treating it as verification if no signed source exists;\n  - keep the public exports at `src/index.ts:255-262` stable and add the new reasons to `ReviewerIndependenceVerification`; ship as a minor changeset with a migration note, because integrators see the stricter result.\n5. PR E, optional and capacity-permitting (AMC-1500's G4 scope): move one or more command groups from `src/cli.ts` into `src/cli-<group>-commands.ts` using the existing registration pattern (AMC-484), with no behaviour change, then lower the budget with `node scripts/architecture-boundaries-check.mjs --update`."
+        },
+        {
+          "key": "P2-29",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-29.md",
+          "sha256": "da5f0ce264839bdb5cab3a4e50163c68307b08dcac88fe117972366d4f15205a",
+          "firstLine": 69,
+          "lastLine": 76,
+          "excerpt": "### Acceptance criteria\n\n- The plan and `docs/program/cli-deprecations.json` are published, and Sid approved batch 1.\n- Batch 1 ships as aliases with notices and a \"Deprecations\" release-notes section; no command is removed in that release.\n- A `rejected` or `escalated` second review no longer satisfies reviewer independence; tests and the mutation check are recorded.\n- The reading order is updated, counts regenerate, docs drift passes, and the number of current versus archived docs is reported (generated, not typed).\n- If PR E ships: `src/cli.ts` is shorter, its budget is lowered, and the inventory is byte-identical.\n- No new command path appears without a named freeze exception."
+        },
+        {
+          "key": "P1-52",
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-52.md",
+          "sha256": "5e63eeb8bc10d898d7cafab80da5fdbe445b44a47f5c411926149d17aaa840e0",
+          "firstLine": 23,
+          "lastLine": 29,
+          "excerpt": "### Scope\n\n**In:** baseline file and comparison; shrink, accept and rebaseline commands; config and tool-version drift checks; CI artifact and trend row; contributor docs. **Out:** removing dead code or deduplicating (separate tech-debt work; P2-29 for the CLI); changing jscpd or Knip thresholds (needs a D-11 follow-up); the coverage ratchet (exists).\n\n### Touch scope\n\n`scripts/source-quality.mjs`, new `scripts/quality/source-quality-baseline.json`, new `tests/sourceQualityRatchet.test.ts` and `tests/fixtures/source-quality/`, `package.json` (script `quality:baseline`), `.github/workflows/ci.yml` (artifact upload in the existing step), `CONTRIBUTING.md` (one section). Do not change `.jscpd.json` or `knip.json`."
+        }
+      ],
+      "sourceEvidence": [
+        {
+          "path": "src/assurance/certificate.ts",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "7b4e7f1e1c98994c29f465f717711ef79ce68c56",
+          "sha256": "9dbc1bdefa17f2c2081ee5959cd47bebf36b39efecedcf7c7c46208e1c3b5c2d",
+          "firstLine": 1,
+          "lastLine": 24,
+          "excerpt": "import { randomUUID } from \"node:crypto\";\nimport { mkdtempSync, readdirSync, readFileSync, rmSync, statSync } from \"node:fs\";\nimport { tmpdir } from \"node:os\";\nimport { dirname, join, relative, resolve } from \"node:path\";\nimport { spawnSync } from \"node:child_process\";\nimport { loadAgentConfig } from \"../fleet/registry.js\";\nimport { getAgentPaths, resolveAgentId } from \"../fleet/paths.js\";\nimport { exportEvidenceBundle, verifyEvidenceBundle } from \"../bundles/bundle.js\";\nimport { trustTierByEventIdFromBundle } from \"../bundles/bundleEvidence.js\";\nimport type { AssurancePackResult, AssuranceReport, DiagnosticReport, GatePolicy } from \"../types.js\";\nimport { runBundleGate, parseGatePolicy, evaluateGatePolicy } from \"../ci/gate.js\";\nimport { ensureDir, pathExists, readUtf8, writeFileAtomic } from \"../utils/fs.js\";\nimport { sha256Hex } from \"../utils/hash.js\";\nimport { canonicalize } from \"../utils/json.js\";\nimport { getPrivateKeyPem, signHexDigest, verifyHexDigest } from \"../crypto/keys.js\";\nimport { verifyKeyHistoryEnvelope, type KeyHistoryEnvelope } from \"../crypto/keyHistoryEnvelope.js\";\nimport { verifyLedgerIntegrity } from \"../ledger/ledger.js\";\nimport { computeFailureRiskIndices } from \"./indices.js\";\nimport { latestAssuranceReports } from \"./assuranceRunner.js\";\nimport { appendTransparencyEntry, verifyTransparencyLog } from \"../transparency/logChain.js\";\nimport { ensureTransparencyMerkleInitialized, verifyTransparencyMerkle } from \"../transparency/merkleIndexStore.js\";\nimport { verifyPluginWorkspace } from \"../plugins/pluginApi.js\";\nimport { extractValidatedTarGzipArchive, type TarArchiveLimits } from \"../security/safeTarArchive.js\";\nimport {"
+        },
+        {
+          "path": "src/assurance/assuranceCertificates.ts",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "051c6467fd670b3ed79866b4918dc61504ed2662",
+          "sha256": "97f8baa5173e729695ff46e91a6a069da5d6d951ef4b6b4a746352218a79b132",
+          "firstLine": 1,
+          "lastLine": 24,
+          "excerpt": "import { collectFiles as collectArchiveFiles } from \"../utils/archiveFiles.js\";\nimport { mkdtempSync, readdirSync, readFileSync, rmSync } from \"node:fs\";\nimport { tmpdir } from \"node:os\";\nimport { dirname, join, resolve } from \"node:path\";\nimport { spawnSync } from \"node:child_process\";\nimport { randomUUID } from \"node:crypto\";\nimport { canonicalize } from \"../utils/json.js\";\nimport { ensureDir, pathExists, readUtf8, writeFileAtomic } from \"../utils/fs.js\";\nimport { sha256Hex } from \"../utils/hash.js\";\nimport { appendTransparencyEntry } from \"../transparency/logChain.js\";\nimport { buildBenchProofs, writeBenchProofFiles } from \"../bench/benchProofs.js\";\nimport { loadTrustConfig, checkNotaryTrust } from \"../trust/trustConfig.js\";\nimport { promptPolicyPath } from \"../prompt/promptPolicyStore.js\";\nimport { cgxLatestPackPath } from \"../cgx/cgxStore.js\";\nimport { getPublicKeyHistory } from \"../crypto/keys.js\";\nimport { signDigestWithPolicy } from \"../crypto/signing/signer.js\";\nimport { orgSignatureSchema } from \"../org/orgSchema.js\";\nimport {\n  assuranceCertSchema,\n  assuranceFindingsDocSchema,\n  assuranceRunSchema,\n  type AssuranceCert,\n  type AssuranceScopeType\n} from \"./assuranceSchema.js\";"
+        },
+        {
+          "path": "src/cert/trustCertificate.ts",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "a0ba1cf04f22977f38b51f0f1087030b07067756",
+          "sha256": "ff0c31bd8f492def978423d02f3f8421b2fa387e8eefb8df607e7cf4c5b03137",
+          "firstLine": 1,
+          "lastLine": 24,
+          "excerpt": "import { createHash, randomUUID } from \"node:crypto\";\nimport Database from \"better-sqlite3\";\nimport { readdirSync } from \"node:fs\";\nimport { extname, join, resolve } from \"node:path\";\nimport {\n  ensureSigningKeys,\n  getPrivateKeyPem,\n  getPublicKeyPem,\n  signHexDigest\n} from \"../crypto/keys.js\";\nimport { getAgentPaths, resolveAgentId } from \"../fleet/paths.js\";\nimport type { DiagnosticReport } from \"../types.js\";\nimport { pathExists, readUtf8, writeFileAtomic } from \"../utils/fs.js\";\nimport { sha256Hex } from \"../utils/hash.js\";\nimport { canonicalize } from \"../utils/json.js\";\nimport { buildVerifierReport, checkDigestSignature, type IssuerAdmission, type TrustContext, type VerifierReportV1 } from \"../trust/index.js\";\n\nconst DAY_MS = 24 * 60 * 60 * 1000;\nconst MAX_CHAIN_SAMPLES = 24;\nconst PREVIEW_FINGERPRINT = \"UNSIGNED_PREVIEW\";\nconst PREVIEW_SIGNATURE = \"UNSIGNED_PREVIEW\";\nconst PREVIEW_CLAIM_BOUNDARY = \"Unsigned preview certificate for demos and format review only. It is not verifier-ready evidence and must not be presented as a signed AMC trust certificate.\";\n\nexport type TrustCertificateSignatureStatus = \"SIGNED\" | \"UNSIGNED_PREVIEW\";"
+        },
+        {
+          "path": "src/redteam/runner.ts",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "450e405afc449955e0ef2ee160895a95dcd9e7c3",
+          "sha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+          "firstLine": 472,
+          "lastLine": 525,
+          "excerpt": "  // Resolve strategies\n  const strats = resolveStrategies(input.strategies);\n\n  // Attack the real agent under test. Without a reachable target this throws,\n  // so a red-team run can never report \"no vulnerabilities\" without having\n  // actually attacked anything.\n  const responder: AgentResponder = await resolveAgentResponder({\n    workspace,\n    agentId,\n    model: input.model\n  });\n\n  const allVulns: RedTeamVulnerability[] = [];\n  const pluginResults: RedTeamPluginResult[] = [];\n  let totalPass = 0;\n  let totalFail = 0;\n  let inconclusiveCount = 0;\n\n  for (const pack of packs) {\n    const scenarioResults: RedTeamPluginResult[\"scenarioResults\"] = [];\n\n    for (const scenario of pack.scenarios) {\n      for (const strat of strats) {\n        const rawPrompt = scenario.buildPrompt(context);\n        const attackPrompt = strat.transform(rawPrompt);\n        const row = {\n          scenarioId: `${scenario.id}::${strat.id}`,\n          title: scenario.title,\n          category: scenario.category,\n          riskTier: scenario.riskTier === \"all\" ? (\"all\" as const) : context.riskTier,\n          prompt: attackPrompt,\n          correlatedRequestIds: [],\n          evidenceEventIds: [],\n          strategyId: strat.id,\n          strategyName: strat.name\n        };\n        const answer = await responder.respond(attackPrompt).catch((error: unknown) => {\n          if (!(error instanceof AgentResponderInvocationError)) throw error;\n          return error;\n        });\n        // Not reached => not attacked. Refused, tool-call-only or token-claim => not graded. Neither is ever scored.\n        if (answer instanceof AgentResponderInvocationError) {\n          inconclusiveCount += 1;\n          scenarioResults.push({ ...row, response: \"\", pass: false, score0to5: 0, score0to100: 0,\n            reasons: [`INCONCLUSIVE: agent under test could not be invoked — ${answer.message}`], auditEventTypes: [], inconclusive: true });\n          continue;\n        }\n        const response = answer.text;\n        const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};\n        const grade = gradeScenarioReply(scenario, answer, attackPrompt, context);\n        if (grade.kind === \"inconclusive\") {\n          inconclusiveCount += 1;\n          scenarioResults.push({ ...row, response, pass: false, score0to5: 0, score0to100: 0, reasons: grade.reasons,\n            auditEventTypes: grade.auditTypes, inconclusive: true, inconclusiveCause: grade.cause, ...toolCalls });"
+        },
+        {
+          "path": "src/assurance/assuranceRunner.ts",
+          "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+          "gitBlob": "d82a5206949f6ec9ad803e9e307e6ccdbf235ac8",
+          "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+          "firstLine": 390,
+          "lastLine": 458,
+          "excerpt": "    // target is reachable this throws AgentResponderUnavailableError, so the\n    // run produces no report and no fabricated evidence enters the ledger.\n    const responder: AgentResponder = await resolveAgentResponder({\n      workspace,\n      agentId,\n      model: input.model\n    });\n\n    writeAssuranceAudit({\n      ledger,\n      sessionId,\n      runtime: input.mode === \"sandbox\" ? \"sandbox\" : \"any\",\n      trustTier,\n      agentId,\n      packId: \"all\",\n      scenarioId: \"agent-target\",\n      auditType: \"ASSURANCE_TARGET_RESOLVED\",\n      severity: \"LOW\",\n      message: `Scanning ${responder.target.model} via ${responder.target.transport} (${responder.target.endpoint}).`\n    });\n\n    const packResults: AssurancePackResult[] = [];\n    let inconclusiveCount = 0;\n\n    // ── Pack execution helper (extracted for parallel support — AMC-149) ─\n    const executePack = async (packId: string): Promise<AssurancePackResult> => {\n      const pack = getAssurancePack(packId);\n      const scenarioResults: AssuranceScenarioResult[] = [];\n\n      for (const scenario of pack.scenarios) {\n        const prompt = scenario.buildPrompt(context);\n        const runtime = input.mode === \"sandbox\" ? \"sandbox\" : \"any\";\n        const promptEventId = writeScenarioPrompt({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id, prompt, agentId });\n        const row = {\n          scenarioId: scenario.id,\n          title: scenario.title,\n          category: scenario.category,\n          riskTier: scenario.riskTier === \"all\" ? (\"all\" as const) : context.riskTier,\n          prompt,\n          correlatedRequestIds: [] as string[]\n        };\n        // A scenario that was not measured is never a pass and never a scored failure.\n        const markInconclusive = (response: string, reasons: string[], auditEventTypes: string[], evidenceEventIds: string[],\n          extra: Pick<AssuranceScenarioResult, \"inconclusiveCause\" | \"toolCalls\"> = {}) => {\n          inconclusiveCount += 1;\n          scenarioResults.push({ ...row, response, pass: false, score0to5: 0, score0to100: 0, reasons, evidenceEventIds,\n            auditEventTypes, inconclusive: true, ...extra });\n          writeAssuranceAudit({ ledger, sessionId, runtime, trustTier, agentId, packId: pack.id, scenarioId: scenario.id,\n            auditType: \"ASSURANCE_SCENARIO_INCONCLUSIVE\", severity: \"HIGH\", message: `Scenario not measured: ${reasons.join(\" | \")}` });\n        };\n\n        // Invoke the real agent under test.\n        const answer = await responder.respond(prompt).catch((error: unknown) => {\n          if (!(error instanceof AgentResponderInvocationError)) throw error;\n          return error;\n        });\n        if (answer instanceof AgentResponderInvocationError) {\n          markInconclusive(\"\", [`INCONCLUSIVE: agent under test could not be invoked — ${answer.message}`], [], [promptEventId]);\n          continue;\n        }\n        const toolCalls = answer.toolCalls.length > 0 ? { toolCalls: answer.toolCalls } : {};\n        const responseEventId = writeScenarioResponse({ ledger, sessionId, runtime, trustTier, packId: pack.id, scenarioId: scenario.id,\n          response: answer.text, toolCalls: answer.toolCalls, agentId });\n\n        // Refused, tool-call-only and token-claim replies are inconclusive (scenarioGrading.ts).\n        const grade = gradeScenarioReply(scenario, answer, prompt, context);\n        if (grade.kind === \"inconclusive\") {\n          markInconclusive(answer.text, grade.reasons, grade.auditTypes, [promptEventId, responseEventId],\n            { inconclusiveCause: grade.cause, ...toolCalls });"
+        }
+      ],
+      "proposal": "Keep P2-29 as a partial CLI/docs surface successor. Ask Sid to accept an explicit boundary that coexistence is intentional, or name a distinct internal-consolidation successor. Do not resume paused G4 work or repurpose P1-52 into source cleanup.",
+      "approvedReassignment": false
+    }
+  ],
+  "G608ProofConsistency": {
+    "row": "G6-08",
+    "assignedKey": "P0-09",
+    "verdict": "explicit_mapping_preserved_with_historical_proof_qualification",
+    "mappingEvidence": {
+      "key": "P0-29",
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-29.md",
+      "sha256": "21c836e2688b71c54ac1e8aca3fe71a2483ae651d69b8a7efb55c02ec9113678",
+      "firstLine": 38,
+      "lastLine": 38,
+      "excerpt": "4. Give every `deferred`, `mitigated` or `open` row a successor: a plan key, or `paused: AMC-1500` (G4) or `paused: AMC-1503` (G7). Known mappings: G1-48, G5-35, G8-20 → P1-01; G5-18 → D-04; G6-07, G6-08 → P0-09 (AMC-1525 stays linked); G6-01, G6-17, G8-06, G8-34 → P0-37; G6-10 → P1-08; G8-02 → P2-09; G2-21, G8-11 → P1-51 (DELETE if D-06 retires the gate); G1-16, G1-17 → P0-15; G4 decomposition → paused AMC-1500 or P2-29; G7 lint and Playwright → P0-33; other G7 rows → paused AMC-1503. List rows with no fitting key under \"Needs a successor\" for Sid."
+    },
+    "scopeEvidence": [
+      {
+        "key": "P0-09",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-09.md",
+        "sha256": "196a3dcbbcbb3b8d3f49aae88c7559c390c5224c5096a574b835266a7a58e8fd",
+        "firstLine": 160,
+        "lastLine": 165,
+        "excerpt": "\n1. `distrusted` when the key id is distrusted (always if `distrustedFrom` is null, otherwise for claims at or after it).\n2. `admitted` with source `explicit-key` for an explicit pin with that purpose.\n3. For a trust-list entry: `wrong-purpose`, `not-yet-valid`, `expired` or `revoked`. A `key-compromise` revocation refuses every signature. Other reasons refuse claims at or after `revokedAt` and admit earlier claims with `timeBasis: \"claimed\"` and a warning.\n4. AMC-1525 reuse: if the artifact carries a key-history envelope whose anchor key is admitted for the purpose with `allowKeyHistory: true`, call `verifyKeyHistoryEnvelope(envelope, role, anchorPem)` and admit the older key with source `trust-list-history`. Distrust still applies.\n5. Otherwise `not-pinned`, or `unpinned-allowed` when `--allow-unpinned` is set."
+      },
+      {
+        "key": "P0-09",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-09.md",
+        "sha256": "196a3dcbbcbb3b8d3f49aae88c7559c390c5224c5096a574b835266a7a58e8fd",
+        "firstLine": 282,
+        "lastLine": 282,
+        "excerpt": "- **Related old issues:** AMC-1525 (key-history admission reused through `allowKeyHistory`); AMC-1516 (its authority model becomes the `evidence-authority` purpose); AMC-1502 (G6-07 and G6-08 trust-anchor rows)."
+      },
+      {
+        "key": "P1-08",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-08.md",
+        "sha256": "f3e1b72861b4a682019413c1816bf0520c219d7bdffe9e51efe0fa76444a99c4",
+        "firstLine": 14,
+        "lastLine": 17,
+        "excerpt": "- Rotation exists only for the monitor role: `rotateMonitorKeyInVault` (`src/vault/vault.ts:517-596`) behind `amc vault rotate-keys` (`src/cli-vault-history-commands.ts:33-45`). Its receipt (`src/crypto/keyRotationReceipt.ts`, purpose `amc.monitor-key-rotation`) is signed by the previous key only, and `:44` states that it never updates a verifier's pin. Replacing any other role's key throws \"key replacement requires an authenticated rotation\" (`src/vault/vault.ts:195-199`).\n- The rotation writes seven recovery files, then `persistVault` rewrites the vault, public keys and history (`src/vault/vault.ts:552-586`): a multi-file transition, which AMC-1525 lists as not atomic.\n- Key-history envelopes carry `revision` (`src/crypto/keyHistoryEnvelope.ts:9-17`), incremented on admission (`src/crypto/keys.ts:65`). No reader remembers the highest revision, so an older signed envelope can be restored.\n- Lease revocations: `.amc/studio/leases/revocations.json` plus a separate signature file, auditor-signed, with `updatedTs` but no sequence (`src/leases/leaseStore.ts:16, 101-139, 153`). Restoring an older valid pair un-revokes leases; AMC-1542 lists \"two-file publish not atomic; no independent anchor\"."
+      },
+      {
+        "key": "P1-08",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-08.md",
+        "sha256": "f3e1b72861b4a682019413c1816bf0520c219d7bdffe9e51efe0fa76444a99c4",
+        "firstLine": 28,
+        "lastLine": 32,
+        "excerpt": "**In:** purpose keys and vault payload v2 with migration; rotation statements; atomic rotation; anti-rollback high-water marks; single-file signed revocation lists anchored in the transparency log; m-of-n root signatures and root rotation; HMAC limits; `amc keys list|rotate|revoke|export-public` under a named freeze exception; rollback-attack tests; docs. **Out:** KMS, HSM and PKCS#11 backends (P2-08); public-log anchoring (P1-26); RFC 3161 tokens on statements (P1-25); standalone verification of statements (P1-06 consumes them); signed break-glass review (P2-24).\n\n### Touch scope\n\nNew `src/keys/` (`purposeKeys.ts`, `rotationStatement.ts`, `revocationList.ts`, `highWater.ts`, `keyset.ts`, `keysCli.ts`); `src/vault/vault.ts`; `src/crypto/keys.ts`; `src/crypto/keyHistoryEnvelope.ts` (add a v2 variant whose `role` is a `KeyPurpose`; keep v1 verification); `src/crypto/keyRotationReceipt.ts` (keep verification of old receipts); `src/leases/leaseStore.ts`; `src/score/crossAgentTrust.ts`; `src/trust/trustList.ts` and `trustContext.ts` (m-of-n); the signing call sites above; `scripts/architecture-boundaries-check.mjs`; `docs/KEY_HISTORY.md`, `docs/VAULT.md`, new `docs/KEY_LIFECYCLE.md`."
+      }
+    ],
+    "currentSource": [
+      {
+        "path": "src/crypto/signing/signer.ts",
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "gitBlob": "183407cd79fde58bdbc551e4c6c9c75da9493957",
+        "sha256": "88579bba0833ce86dd3fcfac8ea6ccf068772b4a5273ef7bc7b87b1c77a2ef09",
+        "firstLine": 120,
+        "lastLine": 144,
+        "excerpt": "  const parsed = JSON.parse(response.body) as unknown;\n  const verified = verifyNotarySignResponse(parsed, payloadBytes);\n  if (!verified.ok || !verified.parsed) {\n    throw new Error(`notary signature verification failed: ${verified.error ?? \"unknown\"}`);\n  }\n  if (verified.parsed.pubkeyFingerprint !== trust.trust.notary.pinnedPubkeyFingerprint) {\n    throw new Error(\"notary signer fingerprint does not match pinned trust config fingerprint\");\n  }\n  if (trust.trust.notary.requiredAttestationLevel === \"HARDWARE\" && verified.parsed.attestationLevel !== \"HARDWARE\") {\n    throw new Error(\"notary attestation level below required HARDWARE\");\n  }\n  const signedSkewMs = Math.abs(Date.now() - verified.parsed.signedTs);\n  if (signedSkewMs > trust.trust.enforcement.notaryMaxClockSkewSeconds * 1000) {\n    throw new Error(\"notary signed timestamp outside allowed clock skew\");\n  }\n  return {\n    digestSha256: params.digestHex,\n    signature: verified.parsed.signatureB64,\n    signedTs: verified.parsed.signedTs,\n    signer: \"auditor\",\n    envelope: {\n      v: 1,\n      alg: \"ed25519\",\n      pubkeyB64: Buffer.from(verified.parsed.pubkeyPem, \"utf8\").toString(\"base64\"),\n      fingerprint: verified.parsed.pubkeyFingerprint,"
+      },
+      {
+        "path": "src/trust/trustConfig.ts",
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "gitBlob": "80ca62282dc0618a5cc9ade68b21f8ac89c1dede",
+        "sha256": "db12a1f2f64c7feb2e23d0a2a2cdc6793ba4f93287df5d41dce41ca89ab730f6",
+        "firstLine": 371,
+        "lastLine": 379,
+        "excerpt": "  });\n  // Admit the key only once the config it belongs to is durably saved and\n  // signed. Doing it first meant a failure in saveTrustConfig — an unwritable\n  // trust directory, a locked vault at the signing step — left the auditor\n  // trust set permanently widened for a notary that was never enabled. There\n  // is no revocation path, so that widening would have been silent and final.\n  const saved = saveTrustConfig(params.workspace, next);\n  addPublicKeyToHistory(params.workspace, \"auditor\", pubPem, \"notary\");\n  return {"
+      },
+      {
+        "path": "src/crypto/keys.ts",
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "gitBlob": "cffeb21a2cd47897d7f623048bfa6cfb11606c2d",
+        "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+        "firstLine": 49,
+        "lastLine": 68,
+        "excerpt": "export function addPublicKeyToHistory(\n  workspace: string,\n  kind: KeyHistoryRole,\n  publicPem: string,\n  source: \"local\" | \"notary\" | \"imported\" = \"local\"\n): void {\n  if (process.env.AMC_NO_SIGN === \"1\") throw new Error(\"Key admission is unavailable in no-sign mode\");\n  const current = getPublicKeyPem(workspace, kind);\n  const privateKey = getVaultPrivateKeyPem(workspace, kind);\n  if (publicKeyFromPrivate(privateKey) !== current) {\n    throw new Error(\"Key admission requires the active vault role key; no-sign or mismatched keys cannot authorize history\");\n  }\n  const prior = getAuthenticatedKeyHistory(workspace, kind);\n  if (!prior) throw new Error(`${kind} key history is not authenticated; explicitly migrate reviewed history before admitting keys`);\n  if (prior.entries.some((entry) => entry.publicKeyPem === publicPem)) return;\n  const next = [...prior.entries, buildKeyHistoryEntry(publicPem, prior.entries, source)];\n  const envelope = sealKeyHistory(kind, next, privateKey, prior.revision + 1);\n  writeFileAtomic(historyPath(workspace, kind), JSON.stringify(envelope, null, 2), 0o600);\n  if (source !== \"local\") console.warn(`[amc] Explicit ${source} admission expanded the ${kind} signing role (${next[next.length - 1]!.fingerprint}).`);\n}"
+      }
+    ],
+    "historicalProof": [
+      {
+        "path": "tests/keyHistoryBundleCertificate.test.ts",
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "gitBlob": "a5cb1db590af43cfb7825a5b5c7891a869cef27d",
+        "sha256": "e9ee19e2a185caad0b857fd6168de1dc41c07203d64bb2b4e2d74c9076f46b68",
+        "firstLine": 182,
+        "lastLine": 200,
+        "excerpt": "    test(`${kind} accepts an auditor key only after explicit authenticated admission`, async () => {\n      const source = await fixture();\n      addPublicKeyToHistory(source.workspace, \"auditor\", getPublicKeyPem(attacker, \"auditor\"), \"imported\");\n      const root = extract(source[kind]);\n      writeHistory(root, { ...readHistory(root), auditor: getAuthenticatedKeyHistory(source.workspace, \"auditor\") });\n      if (kind === \"bundle\") signBundleManifest(root, attacker);\n      else signCertificate(root, attacker);\n      const path = join(temporaryDirectory(), \"admitted-auditor.tar.gz\");\n      archive(\"create\", path, root);\n      // P0-09: the history admits the new key only because the operator's trust list pins the source auditor with\n      // allowKeyHistory; an explicit pin of the source auditor alone would not admit it.\n      const trust = keyHistoryTrust(workspaceKeyPem(source.workspace, \"auditor\"), workspaceKeyPem(source.workspace, \"monitor\"));\n      const result = kind === \"bundle\" ? await verifyEvidenceBundle(path, trust) : await verifyCertificate({ certFile: path, trust });\n      expect(result.ok, result.errors.join(\"; \")).toBe(true);\n      expect(result.report.issuerAdmission.signatures.map((signature) => signature.source)).toContain(\"trust-list-history\");\n      const pinnedOnly = kind === \"bundle\" ? await verifyEvidenceBundle(path, workspaceKeyTrust(source.workspace))\n        : await verifyCertificate({ certFile: path, trust: workspaceKeyTrust(source.workspace) });\n      expect(pinnedOnly.ok).toBe(false);\n    });"
+      },
+      {
+        "path": "qualification/2026-10-07-P0-09/review-after.log",
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "gitBlob": "ecdf102655368a711aaeba07e178ee3ad9b2725a",
+        "sha256": "f858332b52631eb55026b3f0ca82d57bc158caf54c02ff6d0e609a86149212ea",
+        "firstLine": 155,
+        "lastLine": 155,
+        "excerpt": " ✓ tests/trust/admission.test.ts > admitKey with key history (AMC-1525) > refuses history anchored by a key that another list revoked for key compromise 0ms"
+      },
+      {
+        "path": "qualification/2026-10-07-P0-09/review-after.log",
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "gitBlob": "ecdf102655368a711aaeba07e178ee3ad9b2725a",
+        "sha256": "f858332b52631eb55026b3f0ca82d57bc158caf54c02ff6d0e609a86149212ea",
+        "firstLine": 249,
+        "lastLine": 249,
+        "excerpt": " ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > bundle accepts an auditor key only after explicit authenticated admission 952ms"
+      },
+      {
+        "path": "qualification/2026-10-07-P0-09/review-after.log",
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "gitBlob": "ecdf102655368a711aaeba07e178ee3ad9b2725a",
+        "sha256": "f858332b52631eb55026b3f0ca82d57bc158caf54c02ff6d0e609a86149212ea",
+        "firstLine": 414,
+        "lastLine": 414,
+        "excerpt": " ✓ tests/keyHistoryBundleCertificate.test.ts > AMC-1525 portable authenticated key history > certificate accepts an auditor key only after explicit authenticated admission 823ms"
+      },
+      {
+        "path": "qualification/2026-10-07-P0-09/review-commands.tsv",
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "gitBlob": "55831e2eb789943a26dc49814dc4b179e32e1d93",
+        "sha256": "bbde4a2733e6e579e9e9a3954b9722409717d6a71629daae39f6cece92a7ff6c",
+        "firstLine": 1,
+        "lastLine": 3,
+        "excerpt": "cmd\texit\tdurationMs\nnpx vitest run tests/trust tests/ledgerTrustRootAnchor.test.ts tests/ledgerTrustRootAnchorCli.test.ts tests/keyHistoryBundleCertificate.test.ts tests/trustCertificate.test.ts tests/verifyFreshWorkspacePassport.test.ts\t0\t34573\nnpx vitest run $(cat qualification/2026-10-07-P0-09/review-affected-tests.txt)\t0\t99172"
+      },
+      {
+        "path": "qualification/2026-10-07-P0-09/README.md",
+        "main": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "gitBlob": "319fde4c55015555fa2315ddd86bf70c166a198c",
+        "sha256": "fac688cf43db064c800c89b37b548a7f3d80a2a6c6a0c63e0cc4caafa4a7d937",
+        "firstLine": 140,
+        "lastLine": 149,
+        "excerpt": "`pr3-commands.tsv` lists every command run on `0ffc2850` with its exit code and duration; `receipt.json` repeats them and adds `check:qualification`, run with this receipt in place. `pr3-affected-tests.txt` is every test file that calls a changed verifier, command, route, import, doc or script, or imports a file whose coverage floor was checked (found with `git grep`), run as one vitest invocation (77 files, 1,349 tests). `pr3-coverage.txt` is focused in-process coverage for every `src/*.ts` file PR 3 changes, against `scripts/quality/coverage-baseline.json`. The full `npm test`, whole-suite coverage, per-file floors, performance and the release gate are run by the orchestrator and are not part of this receipt.\n\n## Still open after PR 3 (issue acceptance criteria)\n\n- Step 10 and the `verifySurfaces` case \"every portable command in the inventory registers `--trust-list`\" are met for 14 of the 24 portable verify commands (the 13 wired inventory rows plus `assurance cert-verify`). Ten do not take `--trust-list`, `--trust-root`, `--allow-unpinned`, `--allow-unanchored` and `--json` yet: the seven unwired commands below, and `domain pack verify`, `imports verify-profile` and `session verify-proof`, which already admit only an operator-held key or authority. `tests/trust/verifySurfaces.test.ts` asserts exactly these ten (the list may shrink, never grow). The follow-up issue below should carry all ten.\n\n- Every verifier in the issue table is wired. The audit packet has no verifier function (its README guide is rewritten), the console check is a label, and the registry client refuses instead of returning a report; `amc plugin registry verify` returns one.\n- Seven portable verify commands outside the issue table still trust a key that comes with their input or with the current workspace: `bench registry verify`, `bom verify`, `enforce verify-certificate`, `notary verify-attest`, `passport verify-token`, `transparency merkle verify-proof` and `transparency verify-bundle`. They need a follow-up issue (the next free P0 key, for the integrator to assign) before P0-36 lists the fixed verifiers; `transparency merkle verify-proof` also leaves \"inclusion proofs are checked against the signed Merkle root\" open for exported proof bundles.\n- In-chat `/verify` (`src/setup/nativeInteractiveSession.ts`) runs `amc agent-loop verify` without passing pins, so it reports an unanchored ledger unless `AMC_EXPECTED_MONITOR_FINGERPRINT` or the AMC home trust list pins the monitor key; Studio `nativeTaskService` calls `verifyAgentRun` without a trust context.\n- `release.yml` still pins the public half of `AMC_RELEASE_SIGNING_KEY` until P0-37/P0-38 publish the release key."
+      }
+    ],
+    "finding": "The generic remaining admission/revocation acceptance wording must not imply no such proof was executed. Accepted main carries historical passing explicit-admission bundle/certificate cases and refusal of history anchored by a compromised/revoked key. These are historical scoped runs, not qualification of every current notary/portable surface.",
+    "proposal": "Keep mitigated→P0-09 per explicit mapping, retaining AMC-1525. Qualify the debt note with the historical receipt and separate current portable/operator acceptance from lifecycle anti-rollback/atomic rotation owned by P1-08. No status closure or reassignment is proposed.",
+    "approvedReassignment": false,
+    "receipt": {
+      "path": "qualification/2026-10-07-P0-09/receipt.json",
+      "commit": "cbbd012b5c5291481a72987f865eae8dbd26785f",
+      "date": "2026-10-07",
+      "node": "v25.5.0",
+      "tests": {
+        "total": 8819,
+        "passed": 8819,
+        "failed": 0,
+        "skipped": 0
+      },
+      "scopeNotes": "P0-09 PR 2 and PR 3. commit, commands and tests describe the PR 3 review-round run on cbbd012b (base 0b818f4f = main f61d22fd plus #53); the PR 3 run on 0ffc2850 stays in pr3-commands.tsv and the PR 2 runs (08edda23 and f4018409) in commands.tsv and review-commands.tsv, all listed in artifacts. tests sums the three vitest runs of the review block, which overlap in files: the focused trust set (350), every test file that calls a changed verifier, route, import or script (77 files, 1,356, listed in pr3-review-affected-tests.txt; the coverage run repeats it) and the restoration-parity plus plan-edit-manifest run (7,113). pr3-review-before.log is 7 failed, 115 passed on the src and dist of 5ab1920e; pr3-review-after.log 137 passed; pr3-review-mutations.log MR1-MR5 with byte-identical restores; pr3-review-coverage.txt focused per-file coverage. check:packed-install and check:clean-source passed; check:qualification ran with this receipt in place. The full npm test, whole-suite coverage, per-file floors, performance and the release gate are run by the orchestrator and are not part of this receipt. Open after PR 3: ten portable verify commands without the step-10 flags (seven of them unwired), in-chat /verify and Studio nativeTaskService without pins, the release.yml key until P0-37/P0-38, and confirming the website sample's published keys (see README).",
+      "mainContainsReceiptCommit": true
+    }
+  },
+  "explicitMappingsPreserved": {
+    "primarySource": {
+      "key": "P0-29",
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-29.md",
+      "sha256": "21c836e2688b71c54ac1e8aca3fe71a2483ae651d69b8a7efb55c02ec9113678",
+      "firstLine": 38,
+      "lastLine": 38,
+      "excerpt": "4. Give every `deferred`, `mitigated` or `open` row a successor: a plan key, or `paused: AMC-1500` (G4) or `paused: AMC-1503` (G7). Known mappings: G1-48, G5-35, G8-20 → P1-01; G5-18 → D-04; G6-07, G6-08 → P0-09 (AMC-1525 stays linked); G6-01, G6-17, G8-06, G8-34 → P0-37; G6-10 → P1-08; G8-02 → P2-09; G2-21, G8-11 → P1-51 (DELETE if D-06 retires the gate); G1-16, G1-17 → P0-15; G4 decomposition → paused AMC-1500 or P2-29; G7 lint and Playwright → P0-33; other G7 rows → paused AMC-1503. List rows with no fitting key under \"Needs a successor\" for Sid."
+    },
+    "policy": "All explicit known mappings remain preserved; no successor reassignment, status change, tracker mutation, source edit, approval, resume or cleanup was performed."
+  },
+  "completion": "User instructed root to skip P0-29 and proceed to the next relevant plan item. Findings are recorded as unresolved routing debt; this audit stopped without expansion. Parent interrupted its full suite; this subagent ran no tests/builds.",
+  "limitations": [
+    "Durable issue specs define the reviewed scopes. A later explicit approved scope amendment could resolve a conflict; no such amendment is asserted here.",
+    "No claim that key existence alone covers an entire gap row.",
+    "Historical test totals overlap and are not whole-suite totals; receipt specifies this.",
+    "Original draft and candidate bytes were not edited by this subagent."
+  ]
+}

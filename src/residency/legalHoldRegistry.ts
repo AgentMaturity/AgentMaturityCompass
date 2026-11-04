@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { chmodSync, closeSync, constants, fstatSync, lstatSync, mkdirSync, openSync, readSync, readdirSync, realpathSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { z } from "zod";
-import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { checkpointRootInWorkspace, ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { ensureSigningKeys, getPublicKeyHistory, verifyHexDigestAny } from "../crypto/keys.js";
 import { artifactSigPath, readAndVerifyArtifactFileSignature, signArtifactBytes, verifyArtifactBytesSignature } from "../lifecycle/artifactSignature.js";
 import { withControlFileLock } from "../lifecycle/controlFileLock.js";
@@ -58,12 +58,15 @@ const legacyTenantSchema = z.strictObject({ tenantId: term, workspaceId: term,
 type Unknown = Extract<HoldVerdict, { verdict: "unknown" }>;
 export class LegalHoldRegistryError extends Error {
   readonly verdict: Unknown;
-  constructor(reason: Unknown["reason"]) {
-    super("Legal hold registry unavailable: " + reason); this.name = "LegalHoldRegistryError";
+  /** `cause` is fixed text with no host path; the verdict keeps only the reason code. */
+  constructor(reason: Unknown["reason"], cause?: string) {
+    super("Legal hold registry unavailable: " + reason + (cause ? ". " + cause : "")); this.name = "LegalHoldRegistryError";
     this.verdict = Object.freeze({ verdict: "unknown", reason });
   }
 }
-function fail(reason: Unknown["reason"]): never { throw new LegalHoldRegistryError(reason); }
+function fail(reason: Unknown["reason"], cause?: string): never { throw new LegalHoldRegistryError(reason, cause); }
+/** P0-57: holds cannot be anchored under a checkpoint root inside the workspace; refused under that name, never as corruption. */
+const checkpointRootRefusal = (): never => fail("control_checkpoint_root_in_workspace", new ControlCheckpointRootInWorkspaceError().message);
 function workspacePath(workspace: string): string {
   if (typeof workspace !== "string" || !workspace.trim()) fail("registry_unreadable");
   try { return realpathSync(resolve(workspace)); } catch { return fail("registry_unreadable"); }
@@ -123,7 +126,9 @@ function legacy<T extends z.infer<typeof legacyTenantSchema> | z.infer<typeof le
   if (!valid) fail("signature_invalid"); return value;
 }
 function mapping(workspace: string): { identity: Identity | null; regulated: boolean } {
-  const active = loadActiveCompiledPolicy(workspace);
+  let active: ReturnType<typeof loadActiveCompiledPolicy>;
+  try { active = loadActiveCompiledPolicy(workspace); }
+  catch (error) { if (error instanceof ControlCheckpointRootInWorkspaceError) checkpointRootRefusal(); throw error; }
   if (active) {
     const registry = loadDestinationRegistrySnapshot(workspace); if (registry.state !== "verified") fail("tenant_unmapped");
     const profile = loadPinnedResidencyProfile(workspace, registry.registry, active.profileSha256);
@@ -160,7 +165,10 @@ function readJournal(workspace: string, recover = false): SignedControlJournalSn
     safeDirectory(workspace, journalPath(workspace));
     return readSignedControlJournal({ workspace, controlKind: "legal-hold-head", journalDir: journalPath(workspace),
       parsePayload: value => anchorSchema.parse(value), recoverPendingPublication: recover });
-  } catch (error) { return fail(error instanceof SignedControlJournalError ? "record_corrupt" : "registry_unreadable"); }
+  } catch (error) {
+    if (error instanceof SignedControlJournalError && checkpointRootInWorkspace(workspace)) return checkpointRootRefusal();
+    return fail(error instanceof SignedControlJournalError ? "record_corrupt" : "registry_unreadable");
+  }
 }
 export interface LegalHoldRegistrySnapshot {
   readonly holds: readonly LegalHoldV1[];

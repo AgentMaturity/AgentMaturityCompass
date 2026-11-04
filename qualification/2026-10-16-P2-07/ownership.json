@@ -1,0 +1,613 @@
+{
+  "initialAdmission": {
+    "at": "2026-10-16T11:17:08.684668+00:00",
+    "sourceHead": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+    "soleActiveItem": "P2-07 independent OIDC verifier qualification",
+    "admittedNewPath": "tests/identity/jwtVerify.test.ts",
+    "ownership": "Narrow disjoint new-test allocation under integrator contract section10; no production/shared/helper/legacy Claude fixture ownership release. Initial exact-path169-tree and hosted13PR/30path observations plus D15 are retained.",
+    "earlyStart": "P2-07 Blocked by none, Dependencies start now, ADR014 permits OIDC independently of SAML review.",
+    "materializationConditional": "Root must read and approve a sealed private test proposal and independent static review before writing the new test. No second implementation task.",
+    "D15": {
+      "phase": "p207-first-scope-d15",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/identity/jwtVerify.test.ts",
+      "exit": 0,
+      "durationMs": 179,
+      "startedUtc": "2026-10-16T11:14:30.182621+00:00",
+      "endedUtc": "2026-10-16T11:14:30.371578+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207-first-scope-d15/stdout-stderr.log",
+      "head": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+      "headAfter": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+      "ownedProcess": {
+        "pid": 41943,
+        "ownedPgid": 41943,
+        "observedPgidAfterLaunch": 41943,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+          "--paths",
+          "tests/identity/jwtVerify.test.ts"
+        ],
+        "startedUtc": "2026-10-16T11:14:30.182621+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "inputs": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+        "bytes": 12727,
+        "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/enforce/egressAllowlist.ts",
+        "bytes": 8093,
+        "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcClient.ts",
+        "bytes": 3790,
+        "sha256": "03c58431ef2607e2aa792d914306b68ddb9ca40059e9800c2da286aeccf091f4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+        "bytes": 5987,
+        "sha256": "0016abef4cff9012c141656dff6b28b2b74c9a36c6e4efe9a5df43d40d18b9d6"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/pendingLoginStore.ts",
+        "bytes": 4955,
+        "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/enterpriseSsoScim.test.ts",
+        "bytes": 32492,
+        "sha256": "8458813ecb3596f66931306d3a7aabd76807d466274d1cdcfc2f1980336a4d1e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/security/api-security.test.ts",
+        "bytes": 21008,
+        "sha256": "4e57d8cfa5e122ddad248e60438c94354b230ade8bc551972b80e91282421c1d"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/security/identityAccountBinding.test.ts",
+        "bytes": 4736,
+        "sha256": "9fa26f1dd0c59eb14c45439e8d8a6fc06c5838d58168af91a2fda67c5c247948"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+        "bytes": 5349,
+        "sha256": "75b5bfcc6511a898a98719bacaa023a328a41927d7284a5463a6a169e612533f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/adr/014-saml-library.md",
+        "bytes": 6310,
+        "sha256": "b696c2cbca13324b68aeb25d6e9654107c20e1a0de25d88b5f372e3b0480414b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/oidc-bounded-token-admission.md",
+        "bytes": 790,
+        "sha256": "895ff7860ea2644dccca8054da057c9b76dea4a37f254fd8aa65d6fa34e05988"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+        "bytes": 636550,
+        "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+        "bytes": 5010,
+        "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/package.json",
+        "bytes": 8631,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-lock.yaml",
+        "bytes": 155432,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tsconfig.tests.json",
+        "bytes": 300,
+        "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+      }
+    ],
+    "preservedWork": "Preserved OIDC a0a0f28e, subsequent merged type repair and Claude adapted fixture bytes remain unchanged. Five dirty historical SCIM files are not imported or changed.",
+    "rootSourceRead": "Root read all jwtVerify.ts, full P2-07 spec, ADR014, existing changeset and actual RSA local-fixture pattern. Graph query first: R has no graph; primary stale graph navigation found relevant nodes, source verified directly. No graph refresh.",
+    "policyGaps": "Existing fixed RS256/PS256/ES256 policy differs from older spec per-provider knobs; this new-test scope does not silently change that policy or close full P2-07. SAML/SCIM/tenants/browser state and source-policy requirements remain explicitly open.",
+    "runtimeAdmission": "Only existing unfiltered baseline and the eventually admitted new file, under unchanged frozen Node22 runner, reporters, guards, 30-second test deadline and closure checks.",
+    "productionEditsAllowed": false,
+    "sharedHelperEditsAllowed": false,
+    "baselineOrFreezeWaiver": false,
+    "F37Skipped": true,
+    "allHeldDecisionsOpen": true,
+    "formalDone": false
+  },
+  "hostedObservation": {
+    "at": "2026-10-16T11:30:59.364614+00:00",
+    "response": {
+      "data": {
+        "repository": {
+          "pullRequests": {
+            "totalCount": 13,
+            "pageInfo": {
+              "hasNextPage": false
+            },
+            "nodes": [
+              {
+                "number": 3,
+                "title": "deps: bump @modelcontextprotocol/sdk from 1.27.1 to 1.29.0",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:22Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 4,
+                "title": "ci: bump actions/upload-artifact from 4 to 7",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:23Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 3,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/ci.yml"
+                    },
+                    {
+                      "path": ".github/workflows/docker-build.yml"
+                    },
+                    {
+                      "path": ".github/workflows/nightly-compatibility-matrix.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 5,
+                "title": "ci: bump actions/deploy-pages from 4 to 5",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:24Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 1,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/pages.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 6,
+                "title": "ci: bump docker/setup-buildx-action from 3 to 4",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:25Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/docker-runner.yml"
+                    },
+                    {
+                      "path": ".github/workflows/release.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 7,
+                "title": "ci: bump azure/setup-helm from 4 to 5",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:26Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/ci.yml"
+                    },
+                    {
+                      "path": ".github/workflows/docker-build.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 8,
+                "title": "ci: bump actions/setup-node from 4 to 6",
+                "isDraft": false,
+                "updatedAt": "2026-05-22T07:31:27Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 6,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": ".github/workflows/amc-score.yml"
+                    },
+                    {
+                      "path": ".github/workflows/ci.yml"
+                    },
+                    {
+                      "path": ".github/workflows/docker-build.yml"
+                    },
+                    {
+                      "path": ".github/workflows/nightly-compatibility-matrix.yml"
+                    },
+                    {
+                      "path": ".github/workflows/npm-publish.yml"
+                    },
+                    {
+                      "path": ".github/workflows/release.yml"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 17,
+                "title": "deps: bump zod from 4.3.6 to 4.4.3",
+                "isDraft": false,
+                "updatedAt": "2026-06-26T16:05:35Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 19,
+                "title": "deps: bump yaml from 2.8.3 to 2.9.0",
+                "isDraft": false,
+                "updatedAt": "2026-06-26T16:05:36Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 20,
+                "title": "deps: bump inquirer from 13.3.2 to 14.0.2",
+                "isDraft": false,
+                "updatedAt": "2026-07-09T20:50:36Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 21,
+                "title": "deps: bump commander from 14.0.3 to 15.0.0",
+                "isDraft": false,
+                "updatedAt": "2026-07-09T20:50:37Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 27,
+                "title": "deps: bump semver from 7.7.4 to 7.8.5",
+                "isDraft": false,
+                "updatedAt": "2026-06-22T06:25:16Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 28,
+                "title": "deps: bump better-sqlite3 from 12.8.0 to 12.11.1",
+                "isDraft": false,
+                "updatedAt": "2026-06-22T06:27:11Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              },
+              {
+                "number": 33,
+                "title": "deps: bump the dev-dependencies group across 1 directory with 3 updates",
+                "isDraft": false,
+                "updatedAt": "2026-07-10T20:35:08Z",
+                "author": {
+                  "__typename": "Bot",
+                  "login": "dependabot"
+                },
+                "files": {
+                  "totalCount": 2,
+                  "pageInfo": {
+                    "hasNextPage": false
+                  },
+                  "nodes": [
+                    {
+                      "path": "package-lock.json"
+                    },
+                    {
+                      "path": "package.json"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "openCount": 13,
+    "excludedDependabotOnly": [
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      17,
+      19,
+      20,
+      21,
+      27,
+      28,
+      33
+    ],
+    "countedWip": [],
+    "allFilePagesRead": true,
+    "totalChangedPaths": 30,
+    "prospectiveExactScope": [
+      "CONTRIBUTING.md",
+      "README.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/content/show-hn-draft.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "qualification/2026-10-16-P2-07",
+      "tests/identity/jwtVerify.test.ts",
+      "website/i18n.js",
+      "website/index.html",
+      "website/lite.html",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "touchConflictsIncludingBots": [],
+    "exclusionOnlyAffectsWip": true
+  },
+  "countOverlayAdmission": {
+    "at": "2026-10-16T11:33:43.272451+00:00",
+    "paths": [
+      "README.md",
+      "CONTRIBUTING.md",
+      "website/index.html",
+      "website/lite.html",
+      "website/i18n.js",
+      "docs/content/show-hn-draft.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "d15": "p207-count-prewrite-d15 actual0, none",
+    "admittedChange": "Generated factual test-file count only:1,676to1,677/1676to1677/encodedonly. The one new file exists; no passing-case count claim.",
+    "sourceQualityOrCoverageOrFreezeBaselineChangeAllowed": false,
+    "originalsPreserved": true
+  },
+  "sourceCommit": {
+    "at": "2026-10-16T11:38:31.782562+00:00",
+    "sourceCommit": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+    "parent": "67c4fc34fc8602fe607e44de8d0eb61b9d89959b",
+    "branch": "codex/p2-07-oidc-qualification",
+    "exit": 0,
+    "durationMs": 146,
+    "paths": [
+      "README.md",
+      "CONTRIBUTING.md",
+      "website/index.html",
+      "website/lite.html",
+      "website/i18n.js",
+      "docs/content/show-hn-draft.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "whitepaper/AMC_WHITEPAPER_v1.md",
+      "tests/identity/jwtVerify.test.ts"
+    ],
+    "clean": true,
+    "productionSourceChanged": false,
+    "ordinaryCommit": true,
+    "qualityFailuresRemainUnwaived": true
+  },
+  "receiptFolderAdmission": {
+    "at": "2026-10-16T11:45:07.716562+00:00",
+    "sourceHead": "2ca678025b26c74d9c7509f1e5d9f3979e2eae90",
+    "prospectiveScope": "qualification/2026-10-16-P2-07",
+    "registries": [
+      {
+        "repo": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "count": 132,
+        "sha256": "ef8e1433ee42135ddadf983122a62efcab80cad086f610f158179000a17c64c4"
+      },
+      {
+        "repo": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+        "count": 31,
+        "sha256": "d93642a6f46aaf101ad9a46b217fce5ea02e6ce544252468fe963d0e3f48f446"
+      },
+      {
+        "repo": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p2-07-scim-patch",
+        "count": 6,
+        "sha256": "27101b4fc56864b27565e577637fc0de107869dae5fd239147ccddd59db9877c"
+      }
+    ],
+    "allRegisteredAndFreshTreesReceiptAbsent": 170,
+    "hosted": "/private/tmp/p2-07-oidc-qualification-20261016/hosted-receipt-scope.json",
+    "D15": "p207-receipt-scope-d15 actual0, none",
+    "conditionalMaterialization": "Root must review private real receipt packet and independent review, then ordinary validation with real dated folder before writing byte-exact packet. No source/config/quality/guard changes.",
+    "formalDone": false
+  },
+  "boundary": "Historical absence and clean source are observations, not release of Claude ownership. The recorded receipt-folder admission is separate from future repository materialization and ordinary validation."
+}

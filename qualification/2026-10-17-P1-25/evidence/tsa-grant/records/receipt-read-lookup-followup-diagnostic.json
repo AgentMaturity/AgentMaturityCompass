@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-16T23:01:47.828274+00:00",
+  "operation": "Read-only rg inventory included two unestablished prospective peer directories",
+  "exit": 2,
+  "cause": "Those prospective directory names did not exist; the exact established receipt directory returned its filenames.",
+  "noMutationOrExecution": true,
+  "correctedBoundary": "Use only returned sealed peer paths for future reads.",
+  "sourceAndControlEvidenceUnaffected": true,
+  "qualificationCredit": false
+}

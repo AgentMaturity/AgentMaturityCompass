@@ -1,0 +1,1644 @@
+{
+  "scope": "Bounded actual P0-19 assurance tool-reply/redaction/scoring/store/v1/verifier and unsigned-local red-team qualification; private causal and unapplied seal-order proposal proof. This does not close whole P0-19, the 47-echo deferral, P0-55, release or G0.",
+  "workspace": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+  "qualifiedSourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "sourceHeadAtReceipt": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+  "gitStatusAtReceipt": [],
+  "ownedTest": {
+    "path": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceRunnerInconclusiveQualification.test.ts",
+    "sha256": "56b9227f46e054c8cd800ebac9bba7d58c567751988a9779c9a3373d9508270b",
+    "lines": 217,
+    "cases": 11,
+    "onlyOwnedRepositoryFile": true,
+    "committedByThisAgent": false
+  },
+  "liveSourcePinsAtReceipt": [
+    {
+      "path": "src/assurance/scenarioGrading.ts",
+      "qualifiedPreflightSha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "liveSha256AtReceipt": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "qualifiedPreflightSha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "liveSha256AtReceipt": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/scorers.ts",
+      "qualifiedPreflightSha256": "46a1c75c36b7c8ba4d3b619eb2aff1d14c4ebc0333251f46f342df82a5a53cea",
+      "liveSha256AtReceipt": "46a1c75c36b7c8ba4d3b619eb2aff1d14c4ebc0333251f46f342df82a5a53cea",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "qualifiedPreflightSha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "liveSha256AtReceipt": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "qualifiedPreflightSha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "liveSha256AtReceipt": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/agentResponder.ts",
+      "qualifiedPreflightSha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "liveSha256AtReceipt": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/assuranceFindings.ts",
+      "qualifiedPreflightSha256": "0521777e1b8946b79729a87b671433687b0aa0d037b184d54560613f1c28879b",
+      "liveSha256AtReceipt": "0521777e1b8946b79729a87b671433687b0aa0d037b184d54560613f1c28879b",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/assuranceSchema.ts",
+      "qualifiedPreflightSha256": "8444586cbf5c3521e4592a9a40baa58394a14edb4405d7bc38d2390ae15baa8f",
+      "liveSha256AtReceipt": "8444586cbf5c3521e4592a9a40baa58394a14edb4405d7bc38d2390ae15baa8f",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/assurancePolicyStore.ts",
+      "qualifiedPreflightSha256": "8fd209dabfd5734f9642893672eba7ffa7dd93a0e557a9b3151a275b58aa2e40",
+      "liveSha256AtReceipt": "8fd209dabfd5734f9642893672eba7ffa7dd93a0e557a9b3151a275b58aa2e40",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "qualifiedPreflightSha256": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "liveSha256AtReceipt": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/redteam/runner.ts",
+      "qualifiedPreflightSha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "liveSha256AtReceipt": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/catalog/evidence/mappingAdapter.ts",
+      "qualifiedPreflightSha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "liveSha256AtReceipt": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "qualifiedPreflightSha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "liveSha256AtReceipt": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/types.ts",
+      "qualifiedPreflightSha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "liveSha256AtReceipt": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/claims/eligibility/exampleMode.ts",
+      "qualifiedPreflightSha256": "a5a8379e6b2eb37d9bb7ab6e59ae1abadb5f6e19a5694fd13667c28b79a0a76f",
+      "liveSha256AtReceipt": "a5a8379e6b2eb37d9bb7ab6e59ae1abadb5f6e19a5694fd13667c28b79a0a76f",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "tests/helpers/fakeAgentServer.ts",
+      "qualifiedPreflightSha256": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+      "liveSha256AtReceipt": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/packs/industryPackManifest.ts",
+      "qualifiedPreflightSha256": "7a0a926bfc0f3dbbc249ecc63a09df97aa764338ae8a57e606f8984a81ee6ca6",
+      "liveSha256AtReceipt": "7a0a926bfc0f3dbbc249ecc63a09df97aa764338ae8a57e606f8984a81ee6ca6",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/packs/index.ts",
+      "qualifiedPreflightSha256": "ef7acc6ac3dd7ba874042fe1d140ed35ce67a723af30716c37f12c19c95ea17b",
+      "liveSha256AtReceipt": "ef7acc6ac3dd7ba874042fe1d140ed35ce67a723af30716c37f12c19c95ea17b",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/cli.ts",
+      "qualifiedPreflightSha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "liveSha256AtReceipt": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "qualifiedPreflightSha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "liveSha256AtReceipt": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "qualifiedPreflightSha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "liveSha256AtReceipt": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "scripts/graphify-navigation.py",
+      "qualifiedPreflightSha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "liveSha256AtReceipt": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "qualifiedPreflightSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "liveSha256AtReceipt": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "qualifiedPreflightSha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "liveSha256AtReceipt": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "qualifiedPreflightSha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "liveSha256AtReceipt": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/utils/json.ts",
+      "qualifiedPreflightSha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "liveSha256AtReceipt": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/utils/hash.ts",
+      "qualifiedPreflightSha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601",
+      "liveSha256AtReceipt": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/ledger/ledgerVerification.ts",
+      "qualifiedPreflightSha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "liveSha256AtReceipt": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/trust/trustContext.ts",
+      "qualifiedPreflightSha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "liveSha256AtReceipt": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "tests/helpers/trustContext.ts",
+      "qualifiedPreflightSha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "liveSha256AtReceipt": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/org/orgSigner.ts",
+      "qualifiedPreflightSha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+      "liveSha256AtReceipt": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "src/assurance/assurancePolicySchema.ts",
+      "qualifiedPreflightSha256": "eb71063c0587731ef98d937af87db67dfd80658bd924138b30fcfde3af14b8a4",
+      "liveSha256AtReceipt": "eb71063c0587731ef98d937af87db67dfd80658bd924138b30fcfde3af14b8a4",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "spec/schemas/v1/evidence-event.schema.json",
+      "qualifiedPreflightSha256": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a",
+      "liveSha256AtReceipt": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a",
+      "equalAtReceipt": true
+    },
+    {
+      "path": "docs/ASSURANCE_LAB.md",
+      "qualifiedPreflightSha256": "60f6caaec74936a7911f63ce82c5c8b26ad4a437abbdbb85f8f97f80029aa857",
+      "liveSha256AtReceipt": "60f6caaec74936a7911f63ce82c5c8b26ad4a437abbdbb85f8f97f80029aa857",
+      "equalAtReceipt": true
+    },
+    {
+      "path": ".changeset/assurance-grading-inconclusive.md",
+      "qualifiedPreflightSha256": "7ec571de1ca47c940e38b31e621a952b6efe05e0604fa46dc9f8d4f3b91d983e",
+      "liveSha256AtReceipt": "7ec571de1ca47c940e38b31e621a952b6efe05e0604fa46dc9f8d4f3b91d983e",
+      "equalAtReceipt": true
+    },
+    {
+      "path": ".changeset/assurance-v1-inconclusive.md",
+      "qualifiedPreflightSha256": "216b42fa0f472d5099dfc95c7f2aceae4de2ae026bd21282a98c8d4bc64cb6c2",
+      "liveSha256AtReceipt": "216b42fa0f472d5099dfc95c7f2aceae4de2ae026bd21282a98c8d4bc64cb6c2",
+      "equalAtReceipt": true
+    }
+  ],
+  "sourceEditsByThisAgent": [],
+  "oldTestEditsByThisAgent": [],
+  "actualNormalPhases": [
+    {
+      "phase": "runner-first",
+      "raw": "/private/tmp/p0-19-runner-first-20261015.json",
+      "total": 11,
+      "passed": 8,
+      "failed": 3,
+      "pending": 0,
+      "todo": 0,
+      "cases": [
+        {
+          "name": "P0-19 actual local runner inconclusive contracts tool-call-only replies are recorded as exact unscored inconclusive scenarios",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+          "status": "failed",
+          "failureMessages": [
+            "SyntaxError: Unexpected token 'A', \"AMC_BLOB_V\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at /Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceRunnerInconclusiveQualification.test.ts:131:19\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts genuine rows, session seal, report and persisted v1 signatures verify under before-captured public keys",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts records artifact validity separately from insufficient measurement and verifies after the producer sealed",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+          "status": "failed",
+          "failureMessages": [
+            "AssertionError: expected 'INVALID' to be 'VALID' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceRunnerInconclusiveQualification.test.ts:165:36\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying pass and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score100 and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score5 and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts real text measurements retain pass/fail counts, plain-text digests and nonempty failure findings",
+          "status": "failed",
+          "failureMessages": [
+            "SyntaxError: Unexpected token 'A', \"AMC_BLOB_V\"... is not valid JSON\n    at JSON.parse (<anonymous>)\n    at /Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceRunnerInconclusiveQualification.test.ts:193:19\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+          ]
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts actual direct red-team tool replies preserve unsigned-local inconclusive parity",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "phase": "runner-payload-corrected",
+      "raw": "/private/tmp/p0-19-runner-payload-corrected-20261015.json",
+      "total": 11,
+      "passed": 10,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "cases": [
+        {
+          "name": "P0-19 actual local runner inconclusive contracts tool-call-only replies are recorded as exact unscored inconclusive scenarios",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts genuine rows, session seal, report and persisted v1 signatures verify under before-captured public keys",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts records artifact validity separately from insufficient measurement and verifies after the producer sealed",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+          "status": "failed",
+          "failureMessages": [
+            "AssertionError: expected 'INVALID' to be 'VALID' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceRunnerInconclusiveQualification.test.ts:167:36\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying pass and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score100 and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score5 and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts real text measurements retain pass/fail counts, plain-text digests and nonempty failure findings",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts actual direct red-team tool replies preserve unsigned-local inconclusive parity",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "phase": "runner-final-current",
+      "raw": "/private/tmp/p0-19-runner-final-current-20261015.json",
+      "total": 11,
+      "passed": 10,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "cases": [
+        {
+          "name": "P0-19 actual local runner inconclusive contracts tool-call-only replies are recorded as exact unscored inconclusive scenarios",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts genuine rows, session seal, report and persisted v1 signatures verify under before-captured public keys",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts records artifact validity separately from insufficient measurement and verifies after the producer sealed",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+          "status": "failed",
+          "failureMessages": [
+            "AssertionError: expected 'INVALID' to be 'VALID' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceRunnerInconclusiveQualification.test.ts:171:36\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying pass and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score100 and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score5 and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts real text measurements retain pass/fail counts, plain-text digests and nonempty failure findings",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts actual direct red-team tool replies preserve unsigned-local inconclusive parity",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "phase": "runner-typed-current",
+      "raw": "/private/tmp/p0-19-runner-typed-current-20261015.json",
+      "total": 11,
+      "passed": 10,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "cases": [
+        {
+          "name": "P0-19 actual local runner inconclusive contracts tool-call-only replies are recorded as exact unscored inconclusive scenarios",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts genuine rows, session seal, report and persisted v1 signatures verify under before-captured public keys",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts records artifact validity separately from insufficient measurement and verifies after the producer sealed",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+          "status": "failed",
+          "failureMessages": [
+            "AssertionError: expected 'INVALID' to be 'VALID' // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/tests/assuranceRunnerInconclusiveQualification.test.ts:172:36\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying pass and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score100 and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score5 and restores exact report bytes",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts real text measurements retain pass/fail counts, plain-text digests and nonempty failure findings",
+          "status": "passed",
+          "failureMessages": []
+        },
+        {
+          "name": "P0-19 actual local runner inconclusive contracts actual direct red-team tool replies preserve unsigned-local inconclusive parity",
+          "status": "passed",
+          "failureMessages": []
+        }
+      ]
+    }
+  ],
+  "firstFailureClassification": {
+    "actualStatusRed": "The genuine measured artifact is INVALID/verificationPassed false although post-seal verifier and crypto are healthy. This strict criterion remains unchanged.",
+    "twoObserverFailures": "The initial payload helper read encrypted AMC_BLOB_V files as plaintext JSON. Those two SyntaxError failures are preserved as test observer mistakes, not app defects or killed mutations.",
+    "readerCorrection": "Only the new payload helper changed to actual loadBlobPlaintext and explicit missing/nonstring path refusal. All behavior assertions remain. The final test records runtime version/executable instead of refusing a future Node24 run.",
+    "typeFailure": "Root candidate typecheck exit2 reported nullable payload_path at lines52/55. The actual error log is retained; explicit narrowing guard fixes this new helper. Root owns the final typecheck outcome."
+  },
+  "actualFinalContract": {
+    "total": 11,
+    "passed": 10,
+    "failed": 1,
+    "pending": 0,
+    "todo": 0,
+    "status": "The current production source remains RED on the genuine measured artifact validity criterion. No expectation was weakened to make INVALID acceptable.",
+    "fixtures": "Three actual independently pre-pinned loopback producers each run 13 injection scenarios. Tool-only has 0 measured pass/fail; measured text has 10 pass/3 fail; measured failure has 0 pass/13 fail. The three workspaces contain 165 genuinely signed rows and three session seals.",
+    "observedBehavior": "All tool-report attribution, redacted canonical digests/counts/non-disclosure, ordinary text digests, HIGH audit, real zero-scoring, genuine rows/session/report/v1 signatures, stored hash/seal/status agreement, later verifiers, v1 insufficient/no-findings, tampered-score refusal/exact byte restoration, measured findings and unsigned-local red-team parity pass.",
+    "statusMeaning": "Artifact VALID/INVALID/UNSIGNED is distinct from measurement MEASURED/INSUFFICIENT_EVIDENCE and v1 score.status. The proposed fix preserves insufficient measurement and measured failures; VALID refers to healthy artifact verification, not positive grading or regulated eligibility.",
+    "trustMeaning": "Actual OBSERVED/OBSERVED_HARDENED request/reply capture is retained. A controlled loopback target, genuine signatures and independent operator pins do not prove a live model, executed tool, independent regulated evidence or a compliance pass."
+  },
+  "privateCompiledCopy": {
+    "root": "/private/tmp/p0-19-private-runner-3yl41gpg",
+    "repo": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+    "head": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+    "compiledInputs": [
+      {
+        "live": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/dist/assurance/assuranceRunner.js",
+        "copy": "/private/tmp/p0-19-private-runner-3yl41gpg/src/assurance/assuranceRunner.js",
+        "sha256": "a0e195ed6eee7c5bea9cedebd89d51a6774dd8ec922f3194ef93617f50f3c0e5",
+        "privateLinks": 1
+      },
+      {
+        "live": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/dist/assurance/evidenceWriters.js",
+        "copy": "/private/tmp/p0-19-private-runner-3yl41gpg/src/assurance/evidenceWriters.js",
+        "sha256": "93a83500a155beaff2102ec7f6f2154ec9223126d16322ff0c5d5c62dfd71c42",
+        "privateLinks": 1
+      },
+      {
+        "live": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/dist/assurance/scenarioGrading.js",
+        "copy": "/private/tmp/p0-19-private-runner-3yl41gpg/src/assurance/scenarioGrading.js",
+        "sha256": "2d13c96bc1a3cccf684276cfac27d5c969d876ba37168c2dad2cd2733ccc8d5d",
+        "privateLinks": 1
+      },
+      {
+        "live": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/dist/redteam/runner.js",
+        "copy": "/private/tmp/p0-19-private-runner-3yl41gpg/src/redteam/runner.js",
+        "sha256": "99d2dddda457dec4d8cb461e50918062b849a80ae1165d962d6855283a70a411",
+        "privateLinks": 1
+      },
+      {
+        "live": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/dist/ledger/ledger.js",
+        "copy": "/private/tmp/p0-19-private-runner-3yl41gpg/src/ledger/ledger.js",
+        "sha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2",
+        "privateLinks": 1
+      },
+      {
+        "live": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/dist/storage/blobs/blobStore.js",
+        "copy": "/private/tmp/p0-19-private-runner-3yl41gpg/src/storage/blobs/blobStore.js",
+        "sha256": "2537ac6ced79b76580315e66c2788717dfa1796ccda532c122130f09bdc453c3",
+        "privateLinks": 1
+      }
+    ],
+    "testCopies": [
+      {
+        "path": "tests/assuranceSessionQualification.test.ts",
+        "ownedSha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+        "privateSha256": "b5187c328592a4d71ae78db53116f168a2bff58d3d645f80930241b1daba7608",
+        "byteEqual": true
+      },
+      {
+        "path": "tests/assuranceRunnerInconclusiveQualification.test.ts",
+        "ownedSha256": "56b9227f46e054c8cd800ebac9bba7d58c567751988a9779c9a3373d9508270b",
+        "privateSha256": "8bdca6af05d5d711dff97140a7ce1767e6ed98083e1d5d460572dfbd023248b6",
+        "byteEqual": false
+      },
+      {
+        "path": "tests/helpers/fakeAgentServer.ts",
+        "ownedSha256": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+        "privateSha256": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+        "byteEqual": true
+      },
+      {
+        "path": "tests/helpers/trustContext.ts",
+        "ownedSha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+        "privateSha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+        "byteEqual": true
+      }
+    ],
+    "adaptation": "The sole private new-test adaptation routes its metadata-only source hash read to the original pinned source root. Every actual behavior assertion and import is unchanged; ../src/*.js resolves copied compiled closure, not live TS. The original 8-case file/helpers are byte-equal.",
+    "adaptationPatchSha256": "36c82036866dce514c89698b5b4b822aaa580bad26bc5cc3e3b314ec636b1b7a",
+    "typeRepair": "Explicit missing/nonstring payload path guard narrows nullable EvidenceEvent field before the unchanged real reader; all11 behavior expectations remain."
+  },
+  "privateCombinedRuns": [
+    {
+      "phase": "baseline",
+      "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/baseline.json",
+      "total": 19,
+      "passed": 18,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "startTime": 1792012544536,
+      "endTime": 1792012550202.7878,
+      "suites": [
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts",
+          "total": 11,
+          "passed": 10
+        },
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceSessionQualification.test.ts",
+          "total": 8,
+          "passed": 8
+        }
+      ],
+      "failedCaseNames": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ]
+    },
+    {
+      "phase": "response-digest-changed",
+      "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-changed.json",
+      "total": 19,
+      "passed": 17,
+      "failed": 2,
+      "pending": 0,
+      "todo": 0,
+      "startTime": 1792012625091,
+      "endTime": 1792012630562.174,
+      "suites": [
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts",
+          "total": 11,
+          "passed": 9
+        },
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceSessionQualification.test.ts",
+          "total": 8,
+          "passed": 8
+        }
+      ],
+      "failedCaseNames": [
+        "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ]
+    },
+    {
+      "phase": "response-digest-restored",
+      "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-restored.json",
+      "total": 19,
+      "passed": 18,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "startTime": 1792012631221,
+      "endTime": 1792012637157.082,
+      "suites": [
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts",
+          "total": 11,
+          "passed": 10
+        },
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceSessionQualification.test.ts",
+          "total": 8,
+          "passed": 8
+        }
+      ],
+      "failedCaseNames": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ]
+    },
+    {
+      "phase": "v1-findings-changed",
+      "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-changed.json",
+      "total": 19,
+      "passed": 17,
+      "failed": 2,
+      "pending": 0,
+      "todo": 0,
+      "startTime": 1792012637805,
+      "endTime": 1792012643349.7595,
+      "suites": [
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts",
+          "total": 11,
+          "passed": 9
+        },
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceSessionQualification.test.ts",
+          "total": 8,
+          "passed": 8
+        }
+      ],
+      "failedCaseNames": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+        "P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings"
+      ]
+    },
+    {
+      "phase": "v1-findings-restored",
+      "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-restored.json",
+      "total": 19,
+      "passed": 18,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "startTime": 1792012643991,
+      "endTime": 1792012649605.592,
+      "suites": [
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts",
+          "total": 11,
+          "passed": 10
+        },
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceSessionQualification.test.ts",
+          "total": 8,
+          "passed": 8
+        }
+      ],
+      "failedCaseNames": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ]
+    },
+    {
+      "phase": "seal-order-proposal-changed",
+      "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed.json",
+      "total": 19,
+      "passed": 19,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "startTime": 1792012650239,
+      "endTime": 1792012655932.6868,
+      "suites": [
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts",
+          "total": 11,
+          "passed": 11
+        },
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceSessionQualification.test.ts",
+          "total": 8,
+          "passed": 8
+        }
+      ],
+      "failedCaseNames": []
+    },
+    {
+      "phase": "seal-order-proposal-restored",
+      "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored.json",
+      "total": 19,
+      "passed": 18,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "startTime": 1792012656593,
+      "endTime": 1792012662061.6106,
+      "suites": [
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts",
+          "total": 11,
+          "passed": 10
+        },
+        {
+          "name": "/private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceSessionQualification.test.ts",
+          "total": 8,
+          "passed": 8
+        }
+      ],
+      "failedCaseNames": [
+        "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers"
+      ]
+    }
+  ],
+  "unchangedOriginalAbortChildWitnesses": [
+    {
+      "phase": "v1-findings-restored",
+      "directory": "/private/tmp/p0-27-session-evidence-GuQqFA",
+      "results": [
+        {
+          "path": "/private/tmp/p0-27-session-evidence-GuQqFA/first-row-fault/result.json",
+          "caseName": "first-row-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-GuQqFA/seal-fault/result.json",
+          "caseName": "seal-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-GuQqFA/seal-helper-identity/result.json",
+          "caseName": "seal-helper-identity",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-GuQqFA/signed-sandbox/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-GuQqFA/signed-supervise/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-GuQqFA/store-guard/result.json",
+          "caseName": "store-guard",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-GuQqFA/unsigned-false/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-GuQqFA/unsigned-true/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        }
+      ]
+    },
+    {
+      "phase": "response-digest-restored",
+      "directory": "/private/tmp/p0-27-session-evidence-crr3GL",
+      "results": [
+        {
+          "path": "/private/tmp/p0-27-session-evidence-crr3GL/first-row-fault/result.json",
+          "caseName": "first-row-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-crr3GL/seal-fault/result.json",
+          "caseName": "seal-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-crr3GL/seal-helper-identity/result.json",
+          "caseName": "seal-helper-identity",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-crr3GL/signed-sandbox/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-crr3GL/signed-supervise/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-crr3GL/store-guard/result.json",
+          "caseName": "store-guard",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-crr3GL/unsigned-false/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-crr3GL/unsigned-true/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        }
+      ]
+    },
+    {
+      "phase": "response-digest-changed",
+      "directory": "/private/tmp/p0-27-session-evidence-ZDjc0i",
+      "results": [
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ZDjc0i/first-row-fault/result.json",
+          "caseName": "first-row-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ZDjc0i/seal-fault/result.json",
+          "caseName": "seal-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ZDjc0i/seal-helper-identity/result.json",
+          "caseName": "seal-helper-identity",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ZDjc0i/signed-sandbox/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ZDjc0i/signed-supervise/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ZDjc0i/store-guard/result.json",
+          "caseName": "store-guard",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ZDjc0i/unsigned-false/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ZDjc0i/unsigned-true/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        }
+      ]
+    },
+    {
+      "phase": "v1-findings-changed",
+      "directory": "/private/tmp/p0-27-session-evidence-ul2dQw",
+      "results": [
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ul2dQw/first-row-fault/result.json",
+          "caseName": "first-row-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ul2dQw/seal-fault/result.json",
+          "caseName": "seal-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ul2dQw/seal-helper-identity/result.json",
+          "caseName": "seal-helper-identity",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ul2dQw/signed-sandbox/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ul2dQw/signed-supervise/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ul2dQw/store-guard/result.json",
+          "caseName": "store-guard",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ul2dQw/unsigned-false/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ul2dQw/unsigned-true/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        }
+      ]
+    },
+    {
+      "phase": "seal-order-proposal-restored",
+      "directory": "/private/tmp/p0-27-session-evidence-JNYZxY",
+      "results": [
+        {
+          "path": "/private/tmp/p0-27-session-evidence-JNYZxY/first-row-fault/result.json",
+          "caseName": "first-row-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-JNYZxY/seal-fault/result.json",
+          "caseName": "seal-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-JNYZxY/seal-helper-identity/result.json",
+          "caseName": "seal-helper-identity",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-JNYZxY/signed-sandbox/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-JNYZxY/signed-supervise/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-JNYZxY/store-guard/result.json",
+          "caseName": "store-guard",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-JNYZxY/unsigned-false/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-JNYZxY/unsigned-true/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        }
+      ]
+    },
+    {
+      "phase": "baseline",
+      "directory": "/private/tmp/p0-27-session-evidence-ggbYhi",
+      "results": [
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ggbYhi/first-row-fault/result.json",
+          "caseName": "first-row-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ggbYhi/seal-fault/result.json",
+          "caseName": "seal-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ggbYhi/seal-helper-identity/result.json",
+          "caseName": "seal-helper-identity",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ggbYhi/signed-sandbox/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ggbYhi/signed-supervise/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ggbYhi/store-guard/result.json",
+          "caseName": "store-guard",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ggbYhi/unsigned-false/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-ggbYhi/unsigned-true/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        }
+      ]
+    },
+    {
+      "phase": "seal-order-proposal-changed",
+      "directory": "/private/tmp/p0-27-session-evidence-Ws7F2y",
+      "results": [
+        {
+          "path": "/private/tmp/p0-27-session-evidence-Ws7F2y/first-row-fault/result.json",
+          "caseName": "first-row-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-Ws7F2y/seal-fault/result.json",
+          "caseName": "seal-fault",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-Ws7F2y/seal-helper-identity/result.json",
+          "caseName": "seal-helper-identity",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-Ws7F2y/signed-sandbox/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-Ws7F2y/signed-supervise/result.json",
+          "caseName": "signed-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-Ws7F2y/store-guard/result.json",
+          "caseName": "store-guard",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-Ws7F2y/unsigned-false/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        },
+        {
+          "path": "/private/tmp/p0-27-session-evidence-Ws7F2y/unsigned-true/result.json",
+          "caseName": "unsigned-abort",
+          "success": true,
+          "node": "v22.23.3",
+          "providerCredentialKeysPresent": []
+        }
+      ]
+    }
+  ],
+  "privateCausalResults": [
+    {
+      "name": "response-digest",
+      "target": "/private/tmp/p0-19-private-runner-3yl41gpg/src/assurance/evidenceWriters.js",
+      "baselineSha256": "93a83500a155beaff2102ec7f6f2154ec9223126d16322ff0c5d5c62dfd71c42",
+      "mutantSha256": "55c875b35b79f2c294df6193ff3d60c9f257a5c23dd51f79f123176efbe42cd8",
+      "patchSha256": "1808057852a6a23d2fe0810da8d4c891a96834b1ebe778101fb59a782784e4f6",
+      "phases": [
+        {
+          "phase": "changed",
+          "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-changed.json",
+          "rawSha256": "422ee95c3f29f547bb744b36545ad43c0462a86d9a0f4600be8d913bb165719e",
+          "exit": 1,
+          "durationMs": 6011,
+          "passed": 17,
+          "failed": 2,
+          "pending": 0,
+          "todo": 0,
+          "failedCases": [
+            {
+              "name": "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+              "failureMessages": [
+                "AssertionError: expected { redacted: true, \u2026(3) } to deeply equal { redacted: true, \u2026(3) }\n    at /private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts:134:32\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+              ]
+            },
+            {
+              "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+              "failureMessages": [
+                "AssertionError: expected 'INVALID' to be 'VALID' // Object.is equality\n    at /private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts:172:36\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+              ]
+            }
+          ],
+          "changedPrivateCompiledFiles": [
+            "src/assurance/evidenceWriters.js"
+          ]
+        },
+        {
+          "phase": "restored",
+          "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/response-digest-restored.json",
+          "rawSha256": "dc5aadae264080a576345b97cfd196b32b6e1f6c1c788846d473756902bb82d0",
+          "exit": 1,
+          "durationMs": 6420,
+          "passed": 18,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "failedCases": [
+            {
+              "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+              "failureMessages": [
+                "AssertionError: expected 'INVALID' to be 'VALID' // Object.is equality\n    at /private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts:172:36\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+              ]
+            }
+          ],
+          "changedPrivateCompiledFiles": []
+        }
+      ],
+      "restoredSha256": "93a83500a155beaff2102ec7f6f2154ec9223126d16322ff0c5d5c62dfd71c42",
+      "exactRestoration": true
+    },
+    {
+      "name": "v1-findings",
+      "target": "/private/tmp/p0-19-private-runner-3yl41gpg/src/assurance/assuranceRunner.js",
+      "baselineSha256": "a0e195ed6eee7c5bea9cedebd89d51a6774dd8ec922f3194ef93617f50f3c0e5",
+      "mutantSha256": "b34b1f863e9524c66b6abfa93031c86279e94e36ac4a16f9605a2ea15d5820a9",
+      "patchSha256": "41268911d0269e0aa1907eeb61de0305a4759c3bb7798381c9a17919df6bde94",
+      "phases": [
+        {
+          "phase": "changed",
+          "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-changed.json",
+          "rawSha256": "cc19bf383bf7d7ad54fdb4dcff933749c44ab5615cbadaff5835faa496b4a1ba",
+          "exit": 1,
+          "durationMs": 6025,
+          "passed": 17,
+          "failed": 2,
+          "pending": 0,
+          "todo": 0,
+          "failedCases": [
+            {
+              "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+              "failureMessages": [
+                "AssertionError: expected 'INVALID' to be 'VALID' // Object.is equality\n    at /private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts:172:36\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+              ]
+            },
+            {
+              "name": "P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings",
+              "failureMessages": [
+                "AssertionError: expected { \u2026(6) } to match object { \u2026(4) }\n(2 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts:178:23\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+              ]
+            }
+          ],
+          "changedPrivateCompiledFiles": [
+            "src/assurance/assuranceRunner.js"
+          ]
+        },
+        {
+          "phase": "restored",
+          "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/v1-findings-restored.json",
+          "rawSha256": "04041cdd5d52de5f16eb116cd4c825e994ad0fe1e7f927d8445eb93fa1f010a0",
+          "exit": 1,
+          "durationMs": 6093,
+          "passed": 18,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "failedCases": [
+            {
+              "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+              "failureMessages": [
+                "AssertionError: expected 'INVALID' to be 'VALID' // Object.is equality\n    at /private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts:172:36\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+              ]
+            }
+          ],
+          "changedPrivateCompiledFiles": []
+        }
+      ],
+      "restoredSha256": "a0e195ed6eee7c5bea9cedebd89d51a6774dd8ec922f3194ef93617f50f3c0e5",
+      "exactRestoration": true
+    },
+    {
+      "name": "seal-order-proposal",
+      "target": "/private/tmp/p0-19-private-runner-3yl41gpg/src/assurance/assuranceRunner.js",
+      "baselineSha256": "a0e195ed6eee7c5bea9cedebd89d51a6774dd8ec922f3194ef93617f50f3c0e5",
+      "mutantSha256": "d5f40969ea83e812a8b9d795bccfd9a5287ee8090788c5ba03fa1394cc98373c",
+      "patchSha256": "02bb573753cf00b17ec0fc5ed552f3287a6cc1fb71bc82d12d36270412b3fcb7",
+      "phases": [
+        {
+          "phase": "changed",
+          "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-changed.json",
+          "rawSha256": "9b9e0ed5e010ad7a195ff69fec2625aaf7b112bf92cb17f881526ffeaf4def1b",
+          "exit": 0,
+          "durationMs": 6169,
+          "passed": 19,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "failedCases": [],
+          "changedPrivateCompiledFiles": [
+            "src/assurance/assuranceRunner.js"
+          ]
+        },
+        {
+          "phase": "restored",
+          "raw": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal-restored.json",
+          "rawSha256": "a9f564beae7b8e4ab8d115260c68355c6e08b918e525d02df8b1ea160a46b0f4",
+          "exit": 1,
+          "durationMs": 5953,
+          "passed": 18,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "failedCases": [
+            {
+              "name": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+              "failureMessages": [
+                "AssertionError: expected 'INVALID' to be 'VALID' // Object.is equality\n    at /private/tmp/p0-19-private-runner-3yl41gpg/tests/assuranceRunnerInconclusiveQualification.test.ts:172:36\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+              ]
+            }
+          ],
+          "changedPrivateCompiledFiles": []
+        }
+      ],
+      "restoredSha256": "a0e195ed6eee7c5bea9cedebd89d51a6774dd8ec922f3194ef93617f50f3c0e5",
+      "exactRestoration": true
+    }
+  ],
+  "all4529PrivateCompiledFilesRestored": true,
+  "causalMeaning": "Digest mutation adds only the real canonical response-digest failure; v1 guard mutation adds only the real persisted findings/count failure. Each yields 17/19 versus18/19 baseline because the unrelated current validity RED remains. Exact restoration returns 18/19; no parser/fixture failures are counted as killed behavior mutations.",
+  "unappliedSealOrderProposal": {
+    "sourcePatch": "/private/tmp/p0-19-proposed-seal-order-repair-20261015.patch",
+    "sourcePatchSha256": "c837b6e8c3a5a84588f10da907818ae4a2ed50db3b2da1fc329761918b2fa6d5",
+    "compiledPatch": "/private/tmp/p0-19-private-runner-3yl41gpg/seal-order-proposal.patch",
+    "compiledPatchSha256": "02bb573753cf00b17ec0fc5ed552f3287a6cc1fb71bc82d12d36270412b3fcb7",
+    "scope": "Only the existing current-session seal statement moves from immediately before persistV1Artifacts to immediately before ordinary verification. No extra seal statement, source/live-dist edit or production ownership transfer occurred. The corresponding source proposal is netzero lines 975 within 976.",
+    "actualResults": "Identical 11 runner assertions plus unchanged 8 original signed/noSign abort, first-row rollback, seal-update failure/error identity and diversion controls give 18/19 baseline,19/19 proposed,18/19 restored, with no pending/todo. All original 8 pass in every phase.",
+    "statusAndConsumptionEvidence": [
+      {
+        "phase": "baseline",
+        "reports": [
+          {
+            "name": "tool-calls",
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+            "rows": 43,
+            "seals": 1,
+            "assuranceCalls": 13,
+            "redteamCalls": 13
+          },
+          {
+            "name": "measured-text",
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "MEASURED",
+            "rows": 56,
+            "seals": 1,
+            "assuranceCalls": 13,
+            "redteamCalls": 0
+          },
+          {
+            "name": "measured-failure",
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "MEASURED",
+            "rows": 66,
+            "seals": 1,
+            "assuranceCalls": 13,
+            "redteamCalls": 0
+          }
+        ],
+        "storedRows": [
+          {
+            "name": "actual-inserted-report-tool-calls",
+            "status": "INVALID",
+            "hash": "673c497448b1025ae99fbd8d32d569b59e059df175771864e77ed4aa4f616068",
+            "seal": "hPRkbsxi3X4Kqr22UpFtxtOeyFnLfL+rki4CfMuhDpThIFpQ8XZTIsoptcvbZX3CVN3DCHBQIRjRnUCoNQSrAQ=="
+          },
+          {
+            "name": "actual-inserted-report-measured-text",
+            "status": "INVALID",
+            "hash": "baedd58adc93bf5f0173038bb291595662e54b95a4e5a8c75ed63cbe64c63bfa",
+            "seal": "cIdREY1uIDgAA7bHNtAwcvoW3O5e2rFGSaAM7T5NwS4vKC8VoqDuhP2/thdFUbAk2XElaemdEh6aU+1fLjlWAQ=="
+          },
+          {
+            "name": "actual-inserted-report-measured-failure",
+            "status": "INVALID",
+            "hash": "ba0f019f5b6482535193bd9546800fa00d178b89b0b232fc5283aec81bd7ee9b",
+            "seal": "G3jj1Pu5xstspJd4me8Schwj6xlpiR5W8i+IrRqpvPCVBVeUSrQ9A7GBZ7R0TfSm1HqwMP0YHTpwX1NBldPVDg=="
+          }
+        ],
+        "laterVerifiers": [
+          {
+            "name": "later-tool-run-verifier",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "name": "later-measured-measured-text",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "name": "later-measured-measured-failure",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "phase": "seal-order-proposal-changed",
+        "reports": [
+          {
+            "name": "tool-calls",
+            "status": "VALID",
+            "verificationPassed": true,
+            "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+            "rows": 43,
+            "seals": 1,
+            "assuranceCalls": 13,
+            "redteamCalls": 13
+          },
+          {
+            "name": "measured-text",
+            "status": "VALID",
+            "verificationPassed": true,
+            "evidenceStatus": "MEASURED",
+            "rows": 56,
+            "seals": 1,
+            "assuranceCalls": 13,
+            "redteamCalls": 0
+          },
+          {
+            "name": "measured-failure",
+            "status": "VALID",
+            "verificationPassed": true,
+            "evidenceStatus": "MEASURED",
+            "rows": 66,
+            "seals": 1,
+            "assuranceCalls": 13,
+            "redteamCalls": 0
+          }
+        ],
+        "storedRows": [
+          {
+            "name": "actual-inserted-report-tool-calls",
+            "status": "VALID",
+            "hash": "abea706c23312bb6f4d583166a4ed852e105ae677f1dffe266f86d175a7db5f5",
+            "seal": "Qvc29+wFcoFFtg+9e61hSZ+pAXT3TSBVzt2FiN3fgXbT2vcl24IO92ZkcCMC5EAtl5XE8f4v1qRcF7udf933Cw=="
+          },
+          {
+            "name": "actual-inserted-report-measured-text",
+            "status": "VALID",
+            "hash": "6e9d6f0b8edabf1ea6993c66156ed7153816ebec149d05682c18b2f4139a3b0e",
+            "seal": "+izS+Jj+2yyny008CbtYREoNcCICkrJxDnqj2W2Ol/TogyhePcXhpqEaTW7KHjyR8S/PIQ+EUDTliMYrr2OsBQ=="
+          },
+          {
+            "name": "actual-inserted-report-measured-failure",
+            "status": "VALID",
+            "hash": "f18ce6d0c9f939abf094434f365c7753b8b760700f3565b8cce19304894c1c1d",
+            "seal": "Turl6XefCDF0i6TbnBhjmoKs6ulbrKFBZH/j2sL7Tn1CxuUKgAYtKhaXmFGP0me0A1y9hHN2qKisczSB00V8Bg=="
+          }
+        ],
+        "laterVerifiers": [
+          {
+            "name": "later-tool-run-verifier",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "name": "later-measured-measured-text",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "name": "later-measured-measured-failure",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      },
+      {
+        "phase": "seal-order-proposal-restored",
+        "reports": [
+          {
+            "name": "tool-calls",
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "INSUFFICIENT_EVIDENCE",
+            "rows": 43,
+            "seals": 1,
+            "assuranceCalls": 13,
+            "redteamCalls": 13
+          },
+          {
+            "name": "measured-text",
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "MEASURED",
+            "rows": 56,
+            "seals": 1,
+            "assuranceCalls": 13,
+            "redteamCalls": 0
+          },
+          {
+            "name": "measured-failure",
+            "status": "INVALID",
+            "verificationPassed": false,
+            "evidenceStatus": "MEASURED",
+            "rows": 66,
+            "seals": 1,
+            "assuranceCalls": 13,
+            "redteamCalls": 0
+          }
+        ],
+        "storedRows": [
+          {
+            "name": "actual-inserted-report-tool-calls",
+            "status": "INVALID",
+            "hash": "534a48303dddc46e718662847f9ccdb76ad28ae0b4a1c37a6f20eb9abf0fa2e8",
+            "seal": "COfOHR09ZuAxNSNCQUV74wxocQGL06HsSOMHBZsDL5Rsn158vvQPlggaOMjS6kQ1T1p/E0982aS7YrIP+rNkBQ=="
+          },
+          {
+            "name": "actual-inserted-report-measured-text",
+            "status": "INVALID",
+            "hash": "88c0acac138225714d4614bf8b461e53cd172b3d67a6ae052f9c96e8c05113ac",
+            "seal": "Tny7I2DW0z9W558rY9QFeEpbm63o8nU92HPTPgI2JDJjYiUv49zpNCRK2scmLlBkcMLSiyzHms9HtXVW6venDg=="
+          },
+          {
+            "name": "actual-inserted-report-measured-failure",
+            "status": "INVALID",
+            "hash": "41a4d7b55d2f1b364cccefb7178c84f46d6204a79f18994c1a634d4eb349bb99",
+            "seal": "80qCJgM6mKzo8iDQnyX5c3MXzhAu2L+s3KsI5CNrj1se96mOycMlO/6ziEfPuOr4D3W4TbLf5VMGWhF0P5N3Dg=="
+          }
+        ],
+        "laterVerifiers": [
+          {
+            "name": "later-tool-run-verifier",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "name": "later-measured-measured-text",
+            "ok": true,
+            "errors": []
+          },
+          {
+            "name": "later-measured-measured-failure",
+            "ok": true,
+            "errors": []
+          }
+        ]
+      }
+    ],
+    "limits": "The proposal was tested against copied compiled modules, not compiled from modified TypeScript. It remains a reviewable unapplied candidate; root owns any source decision, D-15/freeze/static/build/type/consumer qualification and commit. No successful measured unsigned assurance run or authenticated route claim follows from abort isolation and unsigned red-team coverage."
+  },
+  "runtime": "Actual Node 22.23.3 was exercised via the matching wrapper PATH. Version/executable are recorded. The original copied 8-case P0-27 test still has its historical Node22-only parent/child guard, so this 19-case proof covers Node22 only; root will handle that compatibility follow-up separately. Node24 is not claimed tested.",
+  "effects": "Full fixture names/modes/links/byte hashes, source/core/public-key pins, actual signed/unsigned DB rows, failed/tampered states and SQLite effects are retained. Reader and intentional producer effects are not asserted as blanket zero effects. All fresh owned runtime roots and local servers close; private evidence/copies remain.",
+  "preservedDebt": [
+    "P2-27 owns 47 in-scope echo scenarios retained at pending-checks.md:54 and excluded by P0-55. Do not redesign regex validators, count echoes as measured evidence, resume P2-27 or close whole P0-19.",
+    "Paused P2-02/tokenization, held P1-78/native/A4/privacy source, primary/main and Claude trees remain preserved; held pending-main is not imported.",
+    "Current parent mixed CLI/SQLite observations remain retained. Coordination sidecars and other named effects are separate from semantic row isolation and persistent-byte assertions; this pass makes no blanket no-effects or parent runtime acceptance claim.",
+    "P0-27 strict tagged-system exclusion remains RED alongside accepted direct metadata compatibility.",
+    "P0-20 shared output-line/exit70 decision remains pending; helper qualification is not shared-source or authenticated HTTP approval.",
+    "P0-52 narrow alias-history/destination decision remains pending.",
+    "P0-29 successor and P0-22 empty-result skips remain unresolved.",
+    "P0-51 pinned compromised-signer precedence contradictions remain RED.",
+    "P0-55 whole urgent acceptance, authenticated API/Studio, remaining writers/session inventory and release/G0 remain unclosed."
+  ],
+  "notDone": "No production repair, old-test change, build/install/guard/count/floor/archive/CLI/API/Studio/A4/held/paused edit or tracker/Claude message was performed by this agent. Source remains unqualified on the strict validity criterion until root decides and validates an actual repair.",
+  "artifactIndex": {
+    "path": "/private/tmp/p0-19-runner-qualification-artifacts-20261015.json",
+    "sha256": "1d526ec971ab7dbeb76705798ec47e25d91823863c13d0dccc0ecd73d2061aa4",
+    "entries": 424
+  },
+  "receiptInputHashes": {
+    "privateCompiledRestorationManifest": {
+      "path": "/private/tmp/p0-19-private-runner-3yl41gpg/compiled-final-hashes.json",
+      "sha256": "4e6f8d075914ae79888b74d59b9f9c0e1aacca1ffb9475c21931ad38763a68b2"
+    },
+    "finalTypedOwnedTest": "56b9227f46e054c8cd800ebac9bba7d58c567751988a9779c9a3373d9508270b"
+  }
+}

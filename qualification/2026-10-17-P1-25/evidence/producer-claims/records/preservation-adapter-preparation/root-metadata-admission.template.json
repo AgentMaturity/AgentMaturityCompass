@@ -1,0 +1,46 @@
+{
+  "schema": "p125pc-root-actual-source-metadata-admission/1",
+  "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "readyForMetadataSuccessors": false,
+  "originalPacketPinsetPin": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet-pinset.json",
+    "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/original-p125-packet-pinset.json",
+    "bytes": 506921,
+    "sha256": "860123709cfd11075a6983574c4ad8cf62bf1d52cd70747b2066b8b514f01117",
+    "dev": 16777231,
+    "inode": 544001984,
+    "nlink": 1
+  },
+  "publicationExpectationsPin": null,
+  "oldThree": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "bytes": 39139,
+      "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b",
+      "dev": 16777231,
+      "inode": 543134232,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "bytes": 525598,
+      "sha256": "63877e73c81c7888b702d47acf3777279e3002ba26db2a38dfbf0d68e50e51df",
+      "dev": 16777231,
+      "inode": 543134235,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "bytes": 877972,
+      "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0",
+      "dev": 16777231,
+      "inode": 543134234,
+      "nlink": 1
+    }
+  ],
+  "newThree": null,
+  "boundary": "UNREADY. Root must review the actual private packet and separately admit exactly three full physical successor pins matching actual publication expectations and preserving their existing inodes. No future metadata bytes/hash/identity or admission is supplied here."
+}

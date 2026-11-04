@@ -13,8 +13,12 @@
   "leaseIdsRevoked": [
     "lease_example"
   ],
+  "amcSteps": {
+    "restoreReceiptPath": null,
+    "freezeIncidentId": null
+  },
   "receiptSha256": "3333333333333333333333333333333333333333333333333333333333333333",
-  "recordedStatus": "succeeded",
+  "recordedStatus": null,
   "amcCheckStatus": "not_evaluated",
   "recordedByKey": "LOCAL_USER:u-owner",
   "claimKind": "certified",

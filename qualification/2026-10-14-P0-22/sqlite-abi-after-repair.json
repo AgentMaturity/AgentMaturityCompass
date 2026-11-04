@@ -1,0 +1,11 @@
+{
+  "checkedAt": "2026-10-14T15:50:34.180483+00:00",
+  "node": "v22.23.3",
+  "abi": "127",
+  "nativeAddonPath": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+  "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+  "hardLinks": 1,
+  "actualInMemorySelect1": true,
+  "rebuildExit": 0,
+  "postRegistryContractHashStable": true
+}

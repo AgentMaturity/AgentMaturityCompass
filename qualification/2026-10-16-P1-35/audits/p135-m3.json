@@ -1,0 +1,3367 @@
+{
+  "schema": "p135-actual-phase-audit/1",
+  "phase": "p135-m3",
+  "expectedPhysicalCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+  "command": {
+    "phase": "p135-m3",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout tests/migration/legacyRelabel.test.ts tests/assuranceReportProvenance.test.ts tests/assuranceRunnerInconclusiveQualification.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/sourceQuality.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p135-m3.raw.json",
+    "exit": 1,
+    "durationMs": 4775,
+    "startedUtc": "2026-10-16T17:19:42.221169+00:00",
+    "endedUtc": "2026-10-16T17:19:47.006635+00:00",
+    "log": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/stdout-stderr.log",
+    "head": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "headAfter": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "ownedProcess": {
+      "pid": 96849,
+      "ownedPgid": 96849,
+      "observedPgidAfterLaunch": 96849,
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--root",
+        "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+        "tests/migration/legacyRelabel.test.ts",
+        "tests/assuranceReportProvenance.test.ts",
+        "tests/assuranceRunnerInconclusiveQualification.test.ts",
+        "tests/claims/claimAdapters.test.ts",
+        "tests/claims/claimLabels.test.ts",
+        "tests/sourceQuality.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p135-m3.raw.json"
+      ],
+      "startedUtc": "2026-10-16T17:19:42.221169+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH",
+        "AMC_P021_RUNTIME_OBSERVER_PATH"
+      ]
+    },
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observed": true,
+    "artifacts": {
+      "rawProducer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/p135-m3.raw.json",
+        "bytes": 30935,
+        "sha256": "5441fb8a70599979bed22368adbffc355261933121738bdf7a4fbcc4555c2cda"
+      },
+      "rawSnapshot": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/raw.json",
+        "bytes": 30935,
+        "sha256": "5441fb8a70599979bed22368adbffc355261933121738bdf7a4fbcc4555c2cda"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/observer.json",
+        "bytes": 46819,
+        "sha256": "62e52c85017e950b3ef68866090fbe5f8b3e989ac7ab771f64158d5649ec7d16"
+      },
+      "reporter": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "bytes": 2110,
+        "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+      }
+    },
+    "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+  },
+  "ownedProcess": {
+    "pid": 96849,
+    "ownedPgid": 96849,
+    "observedPgidAfterLaunch": 96849,
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "argv": [
+      "/opt/homebrew/opt/node@22/bin/node",
+      "node_modules/vitest/vitest.mjs",
+      "run",
+      "--root",
+      "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "tests/migration/legacyRelabel.test.ts",
+      "tests/assuranceReportProvenance.test.ts",
+      "tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "tests/claims/claimAdapters.test.ts",
+      "tests/claims/claimLabels.test.ts",
+      "tests/sourceQuality.test.ts",
+      "--reporter=default",
+      "--reporter=json",
+      "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+      "--outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p135-m3.raw.json"
+    ],
+    "startedUtc": "2026-10-16T17:19:42.221169+00:00",
+    "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+    "overriddenEnvironmentKeys": [
+      "PATH",
+      "HOME",
+      "GIT_NO_LAZY_FETCH",
+      "AMC_P021_RUNTIME_OBSERVER_PATH"
+    ]
+  },
+  "groupClosure": {
+    "exit": 1,
+    "processDurationMs": 4775,
+    "observations": [
+      {
+        "capturedUtc": "2026-10-16T17:19:46.996478+00:00",
+        "pgid": 96849,
+        "signal": 0,
+        "absentByESRCH": true,
+        "errno": 3
+      }
+    ],
+    "maxPollingSeconds": 5,
+    "pollIntervalSeconds": 0.05,
+    "signalsOtherThanZeroSent": false
+  },
+  "tests": {
+    "numTotalTests": 85,
+    "numPassedTests": 82,
+    "numFailedTests": 3,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "rawSuccess": false,
+  "observerReason": "failed",
+  "actualFiles": [
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "total": 8,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "total": 15,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/sourceQuality.test.ts",
+      "total": 5,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "total": 39,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "total": 8,
+      "status": "passed",
+      "message": ""
+    },
+    {
+      "name": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "total": 10,
+      "status": "failed",
+      "message": ""
+    }
+  ],
+  "rawObserverIdentityAndStateEquality": true,
+  "identityMethod": "Exact actual file plus fullName ordered occurrence; globally unique observer task IDs",
+  "identities": [
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "fullName": "assurance report provenance gate rendered pack claims reflect sealVerified=true without reviewer promotion",
+      "occurrence": 1,
+      "observerId": "505390785_0_0",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "fullName": "assurance report provenance gate rendered pack claims reflect sealVerified=false without reviewer promotion",
+      "occurrence": 1,
+      "observerId": "505390785_0_1",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "fullName": "assurance report provenance gate empty and inconclusive-only assurance reports cannot render a passing claim",
+      "occurrence": 1,
+      "observerId": "505390785_0_2",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "fullName": "assurance report provenance gate a genuine signed report contributes its scores and tier",
+      "occurrence": 1,
+      "observerId": "505390785_0_3",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "fullName": "assurance report provenance gate a fabricated report contributes nothing, whatever it claims",
+      "occurrence": 1,
+      "observerId": "505390785_0_4",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "fullName": "assurance report provenance gate editing one field of a signed report voids the whole report",
+      "occurrence": 1,
+      "observerId": "505390785_0_5",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "fullName": "assurance report provenance gate an unsigned report is not scoreable evidence",
+      "occurrence": 1,
+      "observerId": "505390785_0_6",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "fullName": "assurance report provenance gate a report outside the window is ignored quietly \u2014 absent, not fraudulent",
+      "occurrence": 1,
+      "observerId": "505390785_0_7",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts tool-call-only replies are recorded as exact unscored inconclusive scenarios",
+      "occurrence": 1,
+      "observerId": "-12725287_0_0",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+      "occurrence": 1,
+      "observerId": "-12725287_0_1",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts genuine rows, session seal, report and persisted v1 signatures verify under before-captured public keys",
+      "occurrence": 1,
+      "observerId": "-12725287_0_2",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts records artifact validity separately from insufficient measurement and verifies after the producer sealed",
+      "occurrence": 1,
+      "observerId": "-12725287_0_3",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+      "occurrence": 1,
+      "observerId": "-12725287_0_4",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings",
+      "occurrence": 1,
+      "observerId": "-12725287_0_5",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying pass and restores exact report bytes",
+      "occurrence": 1,
+      "observerId": "-12725287_0_6",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score100 and restores exact report bytes",
+      "occurrence": 1,
+      "observerId": "-12725287_0_7",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score5 and restores exact report bytes",
+      "occurrence": 1,
+      "observerId": "-12725287_0_8",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts real text measurements retain pass/fail counts, plain-text digests and nonempty failure findings",
+      "occurrence": 1,
+      "observerId": "-12725287_0_9",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts actual direct red-team tool replies preserve unsigned-local inconclusive parity",
+      "occurrence": 1,
+      "observerId": "-12725287_0_10",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts a genuine measured failure is a VALID artifact without turning its failed findings into a pass",
+      "occurrence": 1,
+      "observerId": "-12725287_0_11",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts a genuine signed tool-only artifact is VALID while remaining insufficient and unscored",
+      "occurrence": 1,
+      "observerId": "-12725287_0_12",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts a real completion seal-update fault retains the SQLite error without persisting a success report",
+      "occurrence": 1,
+      "observerId": "-12725287_0_13",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": "P0-19 actual local runner inconclusive contracts a real late Markdown-write failure preserves its error and the already-sealed session without abort or reseal",
+      "occurrence": 1,
+      "observerId": "-12725287_0_14",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/sourceQuality.test.ts",
+      "fullName": "real source quality scanners detects an orphaned source file and accepts its reachable counterpart",
+      "occurrence": 1,
+      "observerId": "-1859829661_0_0",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/sourceQuality.test.ts",
+      "fullName": "real source quality scanners keeps the explicitly invoked Playwright config reachable without hiding adjacent orphans",
+      "occurrence": 1,
+      "observerId": "-1859829661_0_1",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/sourceQuality.test.ts",
+      "fullName": "real source quality scanners detects real duplicated code and accepts a single copy",
+      "occurrence": 1,
+      "observerId": "-1859829661_0_2",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/sourceQuality.test.ts",
+      "fullName": "real source quality scanners keeps symbol identity while ignoring shifted line numbers",
+      "occurrence": 1,
+      "observerId": "-1859829661_0_3",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/sourceQuality.test.ts",
+      "fullName": "real source quality scanners refuses missing scan evidence",
+      "occurrence": 1,
+      "observerId": "-1859829661_0_4",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier OBSERVED -> observed",
+      "occurrence": 1,
+      "observerId": "799953315_0_0",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier OBSERVED_HARDENED -> observed",
+      "occurrence": 1,
+      "observerId": "799953315_0_1",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier ATTESTED -> self_reported",
+      "occurrence": 1,
+      "observerId": "799953315_0_2",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier SELF_REPORTED -> self_reported",
+      "occurrence": 1,
+      "observerId": "799953315_0_3",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier OBSERVED -> observed",
+      "occurrence": 2,
+      "observerId": "799953315_0_4",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier ATTESTED -> self_reported",
+      "occurrence": 2,
+      "observerId": "799953315_0_5",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier SELF_REPORTED -> self_reported",
+      "occurrence": 2,
+      "observerId": "799953315_0_6",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier UNVERIFIED -> self_reported",
+      "occurrence": 1,
+      "observerId": "799953315_0_7",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters ClaimTier USER_VERIFIED -> self_reported",
+      "occurrence": 1,
+      "observerId": "799953315_0_8",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters ClaimTier DERIVED -> self_reported",
+      "occurrence": 1,
+      "observerId": "799953315_0_9",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters ClaimTier HYPOTHESIS -> self_reported",
+      "occurrence": 1,
+      "observerId": "799953315_0_10",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters ClaimTier SESSION_LOCAL -> self_reported",
+      "occurrence": 1,
+      "observerId": "799953315_0_11",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters ClaimTier REFERENCE_ONLY -> self_reported",
+      "occurrence": 1,
+      "observerId": "799953315_0_12",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters uppercase status PASS maps as documented",
+      "occurrence": 1,
+      "observerId": "799953315_0_13",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters uppercase status FAIL maps as documented",
+      "occurrence": 1,
+      "observerId": "799953315_0_14",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters uppercase status NOT_EVALUATED maps as documented",
+      "occurrence": 1,
+      "observerId": "799953315_0_15",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters uppercase status SATISFIED maps as documented",
+      "occurrence": 1,
+      "observerId": "799953315_0_16",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters uppercase status PARTIAL maps as documented",
+      "occurrence": 1,
+      "observerId": "799953315_0_17",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters uppercase status MISSING maps as documented",
+      "occurrence": 1,
+      "observerId": "799953315_0_18",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters uppercase status UNKNOWN maps as documented",
+      "occurrence": 1,
+      "observerId": "799953315_0_19",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters uppercase status NOT_EVALUATED maps as documented",
+      "occurrence": 2,
+      "observerId": "799953315_0_20",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters unknown stored status COMPLIANT is not evaluated",
+      "occurrence": 1,
+      "observerId": "799953315_0_21",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters unknown stored status partial is not evaluated",
+      "occurrence": 1,
+      "observerId": "799953315_0_22",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters unknown stored status __proto__ is not evaluated",
+      "occurrence": 1,
+      "observerId": "799953315_0_23",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters unknown stored status constructor is not evaluated",
+      "occurrence": 1,
+      "observerId": "799953315_0_24",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters a valid, claim-ready observed diagnostic keeps its real level",
+      "occurrence": 1,
+      "observerId": "799953315_1_0",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters a LOW TRUST run does not pass and says why",
+      "occurrence": 1,
+      "observerId": "799953315_1_1",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters a self-reported-only run does not pass and says why",
+      "occurrence": 1,
+      "observerId": "799953315_1_2",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters a run with no accepted evidence does not pass and says why",
+      "occurrence": 1,
+      "observerId": "799953315_1_3",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters a run that crossed its trust boundary does not pass and says why",
+      "occurrence": 1,
+      "observerId": "799953315_1_4",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters a run whose evidence chain did not verify does not pass and says why",
+      "occurrence": 1,
+      "observerId": "799953315_1_5",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters a claim-ready run with contradictions does not pass",
+      "occurrence": 1,
+      "observerId": "799953315_1_6",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters an UNSIGNED run is untrusted",
+      "occurrence": 1,
+      "observerId": "799953315_1_7",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters INVALID and UNRELIABLE runs are untrusted",
+      "occurrence": 1,
+      "observerId": "799953315_1_8",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters a diagnostic with no observed coverage is self-reported",
+      "occurrence": 1,
+      "observerId": "799953315_1_9",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters self-assessment answers are capped and never pass a regulated control",
+      "occurrence": 1,
+      "observerId": "799953315_1_10",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters synthetic examples are labelled and carry no level",
+      "occurrence": 1,
+      "observerId": "799953315_1_11",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters path presence is a weak method",
+      "occurrence": 1,
+      "observerId": "799953315_1_12",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "envelope adapters legacy 1.x results are self-reported",
+      "occurrence": 1,
+      "observerId": "799953315_1_13",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "fullName": "renderClaimLabel label per kind",
+      "occurrence": 1,
+      "observerId": "1998873630_0_0",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "fullName": "renderClaimLabel every reason code has one fixed sentence",
+      "occurrence": 1,
+      "observerId": "1998873630_0_1",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "fullName": "renderClaimLabel the five surface formats carry the same words",
+      "occurrence": 1,
+      "observerId": "1998873630_0_2",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "fullName": "renderClaimLabel studio output escapes HTML",
+      "occurrence": 1,
+      "observerId": "1998873630_0_3",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "fullName": "renderClaimLabel the legend explains every kind, dimension and not evaluated in each format",
+      "occurrence": 1,
+      "observerId": "1998873630_0_4",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "fullName": "schemas every envelope round-trips",
+      "occurrence": 1,
+      "observerId": "1998873630_1_0",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "fullName": "schemas unknown keys and invalid kinds are rejected",
+      "occurrence": 1,
+      "observerId": "1998873630_1_1",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "fullName": "schemas the Studio console badge prints the server's label and the same legend (P0-23)",
+      "occurrence": 1,
+      "observerId": "1998873630_1_2",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+      "occurrence": 1,
+      "observerId": "1266807446_0_0",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+      "occurrence": 1,
+      "observerId": "1266807446_0_1",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+      "occurrence": 1,
+      "observerId": "1266807446_0_2",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+      "occurrence": 1,
+      "observerId": "1266807446_0_3",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+      "occurrence": 1,
+      "observerId": "1266807446_0_4",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "occurrence": 1,
+      "observerId": "1266807446_0_5",
+      "rawStatus": "failed",
+      "observerState": "fail"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "occurrence": 1,
+      "observerId": "1266807446_0_6",
+      "rawStatus": "failed",
+      "observerState": "fail"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+      "occurrence": 1,
+      "observerId": "1266807446_0_7",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+      "occurrence": 1,
+      "observerId": "1266807446_1_0",
+      "rawStatus": "failed",
+      "observerState": "fail"
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+      "occurrence": 1,
+      "observerId": "1266807446_1_1",
+      "rawStatus": "passed",
+      "observerState": "pass"
+    }
+  ],
+  "duplicateDisplayNames": [
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier OBSERVED -> observed",
+      "occurrences": 2
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier ATTESTED -> self_reported",
+      "occurrences": 2
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters TrustTier SELF_REPORTED -> self_reported",
+      "occurrences": 2
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "fullName": "tier adapters uppercase status NOT_EVALUATED maps as documented",
+      "occurrences": 2
+    }
+  ],
+  "hooks": [
+    {
+      "id": "505390785",
+      "kind": "file",
+      "name": "tests/assuranceReportProvenance.test.ts",
+      "hook": "afterAll",
+      "state": "pass"
+    },
+    {
+      "id": "505390785_0_0",
+      "kind": "test",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate rendered pack claims reflect sealVerified=true without reviewer promotion",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "505390785_0_1",
+      "kind": "test",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate rendered pack claims reflect sealVerified=false without reviewer promotion",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "505390785_0_2",
+      "kind": "test",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate empty and inconclusive-only assurance reports cannot render a passing claim",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "505390785_0_3",
+      "kind": "test",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate a genuine signed report contributes its scores and tier",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "505390785_0_4",
+      "kind": "test",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate a fabricated report contributes nothing, whatever it claims",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "505390785_0_5",
+      "kind": "test",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate editing one field of a signed report voids the whole report",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "505390785_0_6",
+      "kind": "test",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate an unsigned report is not scoreable evidence",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "505390785_0_7",
+      "kind": "test",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate a report outside the window is ignored quietly \u2014 absent, not fraudulent",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "-12725287",
+      "kind": "file",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "hook": "beforeAll",
+      "state": "pass"
+    },
+    {
+      "id": "-12725287",
+      "kind": "file",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "hook": "afterAll",
+      "state": "pass"
+    },
+    {
+      "id": "-1859829661",
+      "kind": "file",
+      "name": "tests/sourceQuality.test.ts",
+      "hook": "afterAll",
+      "state": "pass"
+    },
+    {
+      "id": "-1859829661_0_0",
+      "kind": "test",
+      "name": "tests/sourceQuality.test.ts real source quality scanners detects an orphaned source file and accepts its reachable counterpart",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "-1859829661_0_1",
+      "kind": "test",
+      "name": "tests/sourceQuality.test.ts real source quality scanners keeps the explicitly invoked Playwright config reachable without hiding adjacent orphans",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "-1859829661_0_2",
+      "kind": "test",
+      "name": "tests/sourceQuality.test.ts real source quality scanners detects real duplicated code and accepts a single copy",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "-1859829661_0_3",
+      "kind": "test",
+      "name": "tests/sourceQuality.test.ts real source quality scanners keeps symbol identity while ignoring shifted line numbers",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "-1859829661_0_4",
+      "kind": "test",
+      "name": "tests/sourceQuality.test.ts real source quality scanners refuses missing scan evidence",
+      "hook": "afterEach",
+      "state": "pass"
+    },
+    {
+      "id": "799953315",
+      "kind": "file",
+      "name": "tests/claims/claimAdapters.test.ts",
+      "hook": "afterAll",
+      "state": "pass"
+    },
+    {
+      "id": "1998873630",
+      "kind": "file",
+      "name": "tests/claims/claimLabels.test.ts",
+      "hook": "afterAll",
+      "state": "pass"
+    },
+    {
+      "id": "1266807446",
+      "kind": "file",
+      "name": "tests/migration/legacyRelabel.test.ts",
+      "hook": "afterAll",
+      "state": "pass"
+    }
+  ],
+  "hooksPassed": 20,
+  "hookStates": {
+    "pass": 20
+  },
+  "unhandledErrors": [],
+  "observerTaskErrors": [
+    {
+      "id": "1266807446_0_5",
+      "kind": "test",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "fullName": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected [ 'R5-no-claim-envelope' ] to deeply equal [ 'R1-assurance-canned-reply', \u2026(1) ]",
+          "actual": "[\n  \"R5-no-claim-envelope\",\n]",
+          "expected": "[\n  \"R1-assurance-canned-reply\",\n  \"R5-no-claim-envelope\",\n]",
+          "showDiff": true,
+          "operator": "deepStrictEqual",
+          "diff": "- Expected\n+ Received\n\n  [\n-   \"R1-assurance-canned-reply\",\n    \"R5-no-claim-envelope\",\n  ]",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected [ 'R5-no-claim-envelope' ] to deeply equal [ 'R1-assurance-canned-reply', \u2026(1) ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:341:57\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:297:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 341,
+              "column": 57
+            },
+            {
+              "method": "owned",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 65,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 297,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1266807446_0_6",
+      "kind": "test",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "fullName": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "stack": "Error: Owned tamper fixture has no positive two-record signed log\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:358:61\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:354:5",
+          "message": "Owned tamper fixture has no positive two-record signed log",
+          "constructor": "Function<Error>",
+          "name": "Error",
+          "toString": "Function<toString>",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 358,
+              "column": 61
+            },
+            {
+              "method": "owned",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 65,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 354,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1266807446_1_0",
+      "kind": "test",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+      "fullName": "P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected undefined to be 'R1-assurance-canned-reply' // Object.is equality",
+          "actual": "undefined",
+          "expected": "\"R1-assurance-canned-reply\"",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected:\n\"R1-assurance-canned-reply\"\n\n+ Received:\nundefined",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be 'R1-assurance-canned-reply' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:439:24\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:409:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 439,
+              "column": 24
+            },
+            {
+              "method": "owned",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 65,
+              "column": 11
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 409,
+              "column": 11
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "failures": [
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "occurrence": 1,
+      "observerId": "1266807446_0_5",
+      "rawStatus": "failed",
+      "observerState": "fail",
+      "failureMessages": [
+        "AssertionError: expected [ 'R5-no-claim-envelope' ] to deeply equal [ 'R1-assurance-canned-reply', \u2026(1) ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:341:57\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:297:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "observerErrors": [
+        {
+          "message": "expected [ 'R5-no-claim-envelope' ] to deeply equal [ 'R1-assurance-canned-reply', \u2026(1) ]",
+          "actual": "[\n  \"R5-no-claim-envelope\",\n]",
+          "expected": "[\n  \"R1-assurance-canned-reply\",\n  \"R5-no-claim-envelope\",\n]",
+          "showDiff": true,
+          "operator": "deepStrictEqual",
+          "diff": "- Expected\n+ Received\n\n  [\n-   \"R1-assurance-canned-reply\",\n    \"R5-no-claim-envelope\",\n  ]",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected [ 'R5-no-claim-envelope' ] to deeply equal [ 'R1-assurance-canned-reply', \u2026(1) ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:341:57\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:297:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 341,
+              "column": 57
+            },
+            {
+              "method": "owned",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 65,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 297,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "occurrence": 1,
+      "observerId": "1266807446_0_6",
+      "rawStatus": "failed",
+      "observerState": "fail",
+      "failureMessages": [
+        "Error: Owned tamper fixture has no positive two-record signed log\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:358:61\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:354:5"
+      ],
+      "observerErrors": [
+        {
+          "stack": "Error: Owned tamper fixture has no positive two-record signed log\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:358:61\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:354:5",
+          "message": "Owned tamper fixture has no positive two-record signed log",
+          "constructor": "Function<Error>",
+          "name": "Error",
+          "toString": "Function<toString>",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 358,
+              "column": 61
+            },
+            {
+              "method": "owned",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 65,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 354,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "fullName": "P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+      "occurrence": 1,
+      "observerId": "1266807446_1_0",
+      "rawStatus": "failed",
+      "observerState": "fail",
+      "failureMessages": [
+        "AssertionError: expected undefined to be 'R1-assurance-canned-reply' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:439:24\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:409:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      ],
+      "observerErrors": [
+        {
+          "message": "expected undefined to be 'R1-assurance-canned-reply' // Object.is equality",
+          "actual": "undefined",
+          "expected": "\"R1-assurance-canned-reply\"",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected:\n\"R1-assurance-canned-reply\"\n\n+ Received:\nundefined",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected undefined to be 'R1-assurance-canned-reply' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:439:24\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:409:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 439,
+              "column": 24
+            },
+            {
+              "method": "owned",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 65,
+              "column": 11
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+              "line": 409,
+              "column": 11
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "publicRecords": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-OvDE6O/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "R2-synthetic-edges",
+      "origin": "synthetic-edge",
+      "genuineHistoricalFixture": false,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-OvDE6O",
+      "observations": {
+        "rows": [
+          {
+            "label": "provenance",
+            "classification": {
+              "rule": "R2-dogfood-seeded",
+              "claimKind": "synthetic_example",
+              "levelCap": null,
+              "original": {
+                "trustTier": "OBSERVED",
+                "level": null,
+                "label": null
+              },
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1
+            }
+          },
+          {
+            "label": "source",
+            "classification": {
+              "rule": "R2-dogfood-seeded",
+              "claimKind": "synthetic_example",
+              "levelCap": null,
+              "original": {
+                "trustTier": "OBSERVED",
+                "level": null,
+                "label": null
+              },
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1
+            }
+          },
+          {
+            "label": "binary",
+            "classification": {
+              "rule": "R2-dogfood-seeded",
+              "claimKind": "synthetic_example",
+              "levelCap": null,
+              "original": {
+                "trustTier": null,
+                "level": null,
+                "label": null
+              },
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1
+            }
+          }
+        ],
+        "currentMarkedNotLegacy": true,
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": false,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": false,
+      "delegatedTarAPIInvoked": false,
+      "signalsSentByFixture": false,
+      "bodyFailed": false,
+      "bodyError": null,
+      "cleanupErrors": [],
+      "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": false,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-hN4eXJ/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "R4-never-promoted",
+      "origin": "synthetic-edge",
+      "genuineHistoricalFixture": false,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-hN4eXJ",
+      "observations": {
+        "found": {
+          "rule": "R4-operator-tier",
+          "claimKind": "self_reported",
+          "levelCap": null,
+          "original": {
+            "trustTier": "ATTESTED",
+            "level": null,
+            "label": null
+          },
+          "noticeId": "AMC-LEGACY-2026-001",
+          "noticeVersion": 1
+        },
+        "observed": [
+          {
+            "trustTier": "OBSERVED",
+            "found": {
+              "rule": "R4-operator-tier",
+              "claimKind": "self_reported",
+              "levelCap": null,
+              "original": {
+                "trustTier": "OBSERVED",
+                "level": null,
+                "label": null
+              },
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1
+            }
+          },
+          {
+            "trustTier": "OBSERVED_HARDENED",
+            "found": {
+              "rule": "R4-operator-tier",
+              "claimKind": "self_reported",
+              "levelCap": null,
+              "original": {
+                "trustTier": "OBSERVED_HARDENED",
+                "level": null,
+                "label": null
+              },
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1
+            }
+          }
+        ],
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": false,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": false,
+      "delegatedTarAPIInvoked": false,
+      "signalsSentByFixture": false,
+      "bodyFailed": false,
+      "bodyError": null,
+      "cleanupErrors": [],
+      "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": false,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-GiWJdg/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "current-envelope-positive",
+      "origin": "synthetic-edge",
+      "genuineHistoricalFixture": false,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-GiWJdg",
+      "observations": {
+        "actualCurrentKind": "observed",
+        "notLegacy": true,
+        "callbacks": 1,
+        "callerEnvelopeRetained": true,
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": false,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": false,
+      "delegatedTarAPIInvoked": false,
+      "signalsSentByFixture": false,
+      "bodyFailed": false,
+      "bodyError": null,
+      "cleanupErrors": [],
+      "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": false,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-mRSX4e/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "postfix-assurance-R5-strict",
+      "origin": "synthetic-edge",
+      "genuineHistoricalFixture": false,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-mRSX4e",
+      "observations": {
+        "found": {
+          "rule": "R5-no-claim-envelope",
+          "claimKind": "self_reported",
+          "levelCap": "L1",
+          "original": {
+            "trustTier": "OBSERVED",
+            "level": null,
+            "label": "HIGH TRUST"
+          },
+          "noticeId": "AMC-LEGACY-2026-001",
+          "noticeVersion": 1
+        },
+        "specificationEdge": "MEASURED without claim envelope remains conservative R5",
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": false,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": false,
+      "delegatedTarAPIInvoked": false,
+      "signalsSentByFixture": false,
+      "bodyFailed": false,
+      "bodyError": null,
+      "cleanupErrors": [],
+      "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": false,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-JaxvIP/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "postfix-assurance-lazy-strict",
+      "origin": "synthetic-edge",
+      "genuineHistoricalFixture": false,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-JaxvIP",
+      "observations": {
+        "currentPositiveKind": "observed",
+        "visibleKind": "self_reported",
+        "callbacks": 0,
+        "legacyNoticePresent": true,
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": false,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": false,
+      "delegatedTarAPIInvoked": false,
+      "signalsSentByFixture": false,
+      "bodyFailed": false,
+      "bodyError": null,
+      "cleanupErrors": [],
+      "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": false,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-CERJcn/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "synthetic-persistent-roundtrip",
+      "origin": "synthetic-edge",
+      "genuineHistoricalFixture": false,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-CERJcn",
+      "observations": {
+        "originalHashes": [
+          {
+            "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+            "bytes": 110,
+            "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+          },
+          {
+            "relative": ".amc/reports/assurance/synthetic-canned.json",
+            "bytes": 101,
+            "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 4096,
+            "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+          }
+        ],
+        "afterDry": [
+          {
+            "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+            "bytes": 110,
+            "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+          },
+          {
+            "relative": ".amc/reports/assurance/synthetic-canned.json",
+            "bytes": 101,
+            "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 4096,
+            "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+          }
+        ],
+        "afterFirst": [
+          {
+            "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+            "bytes": 110,
+            "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+          },
+          {
+            "relative": ".amc/reports/assurance/synthetic-canned.json",
+            "bytes": 101,
+            "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 4096,
+            "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+          }
+        ],
+        "changedOriginals": [],
+        "dryWritesAbsent": true,
+        "receiptTimestampSource": "injected public now callback",
+        "actualLedgerVerificationOK": true,
+        "readOnlyLedgerOpened": true,
+        "readOnlyLedgerClosed": true,
+        "rules": [
+          "R5-no-claim-envelope"
+        ],
+        "assigned": [
+          {
+            "claimKind": "self_reported",
+            "legacy": true,
+            "levelCap": "L1"
+          }
+        ],
+        "integrity": [
+          {
+            "status": "integrityFailed",
+            "trusted": null,
+            "reasons": [
+              "the run seal does not verify against this workspace's auditor keys"
+            ]
+          }
+        ],
+        "signatureValid": true,
+        "attested": {
+          "lines": 1,
+          "head": "39d72cd20f7bf20df50fe7ac8c66c3c59bda89022af02faacf5a437ee2e9e17a"
+        },
+        "eventCount": 0,
+        "originalsDigestMatches": true,
+        "receiptHeadMatches": true,
+        "firstRecordCount": 1,
+        "secondRecordCount": 0,
+        "logUnchangedOnRepeat": true,
+        "priorReceiptCount": 1,
+        "laterReceiptCount": 2,
+        "repeatedLogVerified": true,
+        "afterRepeat": [
+          {
+            "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+            "bytes": 110,
+            "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+          },
+          {
+            "relative": ".amc/reports/assurance/synthetic-canned.json",
+            "bytes": 101,
+            "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 4096,
+            "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+          }
+        ],
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": true,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": false,
+      "delegatedTarAPIInvoked": false,
+      "signalsSentByFixture": false,
+      "bodyFailed": true,
+      "bodyError": {
+        "name": "AssertionError",
+        "message": "expected [ 'R5-no-claim-envelope' ] to deeply equal [ 'R1-assurance-canned-reply', \u2026(1) ]",
+        "stack": "AssertionError: expected [ 'R5-no-claim-envelope' ] to deeply equal [ 'R1-assurance-canned-reply', \u2026(1) ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:341:57\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:297:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      },
+      "cleanupErrors": [],
+      "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": true,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-n9wd0T/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "synthetic-log-tamper",
+      "origin": "synthetic-edge",
+      "genuineHistoricalFixture": false,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-n9wd0T",
+      "observations": {
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": true,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": false,
+      "delegatedTarAPIInvoked": false,
+      "signalsSentByFixture": false,
+      "bodyFailed": true,
+      "bodyError": {
+        "name": "Error",
+        "message": "Owned tamper fixture has no positive two-record signed log",
+        "stack": "Error: Owned tamper fixture has no positive two-record signed log\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:358:61\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:354:5"
+      },
+      "cleanupErrors": [],
+      "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": true,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-Yvg40u/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "synthetic-receipt-signature-tamper",
+      "origin": "synthetic-edge",
+      "genuineHistoricalFixture": false,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-Yvg40u",
+      "observations": {
+        "positiveSignedLogReached": true,
+        "logRefused": true,
+        "failingLine": null,
+        "attestedSignatureRefused": true,
+        "subsequentRelabelRefused": true,
+        "logUnchanged": true,
+        "receiptsUnchanged": true,
+        "originalHashes": [
+          {
+            "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+            "bytes": 110,
+            "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+          },
+          {
+            "relative": ".amc/reports/assurance/synthetic-canned.json",
+            "bytes": 101,
+            "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 4096,
+            "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+          }
+        ],
+        "after": [
+          {
+            "relative": ".amc/runs/synthetic-legacy-diagnostic.json",
+            "bytes": 110,
+            "sha256": "ad887f438e762367a79ceaf44fa2588a0e4bcdffe6befe67673ce161dce841df"
+          },
+          {
+            "relative": ".amc/reports/assurance/synthetic-canned.json",
+            "bytes": 101,
+            "sha256": "870e269aa12eb35f59ed5559bae6c82492555b92a03ff3dcbdb362fc71db1334"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 4096,
+            "sha256": "da63a52bdf62b3fc863995d79f497584be3ba97c1de4c55d1d301afbafab6cfc"
+          }
+        ],
+        "signaturePurposeFieldClaim": false,
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": true,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": false,
+      "delegatedTarAPIInvoked": false,
+      "signalsSentByFixture": false,
+      "bodyFailed": false,
+      "bodyError": null,
+      "cleanupErrors": [],
+      "boundary": "Synthetic source-contract cohort; no genuine tag corpus or historical integrity qualification",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": false,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-H78l8y/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "genuine-classifier-inputs",
+      "origin": "tag-generated-originals",
+      "genuineHistoricalFixture": true,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-H78l8y",
+      "observations": {
+        "genuineHistoricalFixture": true,
+        "encodedFixtureBytes": 773756,
+        "encodedFixtureBefore": [
+          {
+            "relative": "README.md",
+            "bytes": 2870,
+            "sha256": "24e907b0fea78c912cd0c4ca3bf2b239e399612b383f6396ccf93b2002f5452c"
+          },
+          {
+            "relative": "generation.log",
+            "bytes": 3624,
+            "sha256": "c64391454e8cd0319b403c4fe2aae2ecba1094d9e95a58a7b337b50aa3dacd26"
+          },
+          {
+            "relative": "originals.tar.gz",
+            "bytes": 709335,
+            "sha256": "bd08c2bad43869ffce02571a6db9411305df77db7b5a77576ad8065c4655782c"
+          },
+          {
+            "relative": "provenance.json",
+            "bytes": 57927,
+            "sha256": "f75e86e46c943f4d92fb06bd4b3d55a2a081ba91bca62953240c10adb6b9c9c1"
+          }
+        ],
+        "fixtureTarUsed": true,
+        "decodedOriginalsBefore": [
+          {
+            "relative": "diagnostic-report.json",
+            "bytes": 3333257,
+            "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+          },
+          {
+            "relative": "assurance-report.json",
+            "bytes": 26126,
+            "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a"
+          },
+          {
+            "relative": "trust-certificate.json",
+            "bytes": 3118,
+            "sha256": "fe0e9d522b0ae24b2ec8e6819c8a2a5d81e7a58151ddc01f036db5b430284c8d"
+          },
+          {
+            "relative": "passport.amcpass",
+            "bytes": 3675,
+            "sha256": "40075ce877981d07ea045993551058421f8bdbf54b282512e269a09124f6518f"
+          },
+          {
+            "relative": "run.amcbundle",
+            "bytes": 371307,
+            "sha256": "557bce3cf5ebb31e0ac056c4961ccd087abf0503a4f5da7c74ccfcffc1dc61fa"
+          },
+          {
+            "relative": "domain-report.md",
+            "bytes": 29387,
+            "sha256": "7ba8a5f6b5369046c72e82fd8aab240fb5a13c2a0762cb99501d5fa3f8ee97a4"
+          },
+          {
+            "relative": "ledger-observation.json",
+            "bytes": 6067,
+            "sha256": "ab95079658c7eb4e4b8aa6dfc74fe18e09425c9a18d623390ea56ccb726125db"
+          },
+          {
+            "relative": "evidence.sqlite",
+            "bytes": 331776,
+            "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e"
+          }
+        ],
+        "rawOriginalBytes": 4104713,
+        "generationGaps": [
+          {
+            "step": "genuine-L3",
+            "reason": "Actual diagnostic does not have mean level exactly L3; original bytes and seal retained unchanged."
+          },
+          {
+            "step": "diagnostic-certificate",
+            "reason": "Natural exit 1; retained original streams; no success or retry claimed."
+          },
+          {
+            "step": "run.amccert",
+            "reason": "No output file was emitted."
+          }
+        ],
+        "historicalSourceCommit": "ff53902225ff276c55558d5ca17a8fc60b780655",
+        "commandClosures": [
+          {
+            "label": "source-head",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "source-status",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "init",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "operator-import",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "old-source-seed",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "old-source-domain",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "old-source-ledger",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "diagnostic",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "assurance",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "trust-certificate",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "passport-init",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "passport",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "bundle",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "ci-init",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "diagnostic-certificate",
+            "exitCode": 1,
+            "signal": null
+          },
+          {
+            "label": "list-passport.amcpass",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "list-run.amcbundle",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "source-head-final",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "source-status-final",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "pack-originals",
+            "exitCode": 0,
+            "signal": null
+          }
+        ],
+        "assurance": null,
+        "sessionRows": [
+          {
+            "binaryPath": "amc-eval-import",
+            "classification": {
+              "rule": "R4-operator-tier",
+              "claimKind": "self_reported",
+              "levelCap": null,
+              "original": {
+                "trustTier": "OBSERVED",
+                "level": null,
+                "label": null
+              },
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1
+            }
+          },
+          {
+            "binaryPath": "amc-dogfood-agent",
+            "classification": {
+              "rule": "R2-dogfood-seeded",
+              "claimKind": "synthetic_example",
+              "levelCap": null,
+              "original": {
+                "trustTier": "OBSERVED",
+                "level": null,
+                "label": null
+              },
+              "noticeId": "AMC-LEGACY-2026-001",
+              "noticeVersion": 1
+            }
+          }
+        ],
+        "domain": {
+          "rule": "R3-domain-report",
+          "claimKind": "synthetic_example",
+          "levelCap": null,
+          "original": {
+            "trustTier": null,
+            "level": null,
+            "label": "- Certification Readiness: no"
+          },
+          "noticeId": "AMC-LEGACY-2026-001",
+          "noticeVersion": 1
+        },
+        "diagnostic": {
+          "rule": "R5-no-claim-envelope",
+          "claimKind": "self_reported",
+          "levelCap": "L1",
+          "original": {
+            "trustTier": null,
+            "level": "L0",
+            "label": "HIGH TRUST"
+          },
+          "noticeId": "AMC-LEGACY-2026-001",
+          "noticeVersion": 1
+        },
+        "assuranceLazyKind": "observed",
+        "assuranceCurrentFallbackCalls": 1,
+        "diagnosticMeanLevel": 0,
+        "genuineL3Produced": false,
+        "diagnosticMethodologyVersion": "1.1.1",
+        "oldObservationDerivedNotIndependent": true,
+        "trustCertificateUnversioned": true,
+        "diagnosticCertificateEmitted": false,
+        "encodedFixtureAfter": [
+          {
+            "relative": "README.md",
+            "bytes": 2870,
+            "sha256": "24e907b0fea78c912cd0c4ca3bf2b239e399612b383f6396ccf93b2002f5452c"
+          },
+          {
+            "relative": "generation.log",
+            "bytes": 3624,
+            "sha256": "c64391454e8cd0319b403c4fe2aae2ecba1094d9e95a58a7b337b50aa3dacd26"
+          },
+          {
+            "relative": "originals.tar.gz",
+            "bytes": 709335,
+            "sha256": "bd08c2bad43869ffce02571a6db9411305df77db7b5a77576ad8065c4655782c"
+          },
+          {
+            "relative": "provenance.json",
+            "bytes": 57927,
+            "sha256": "f75e86e46c943f4d92fb06bd4b3d55a2a081ba91bca62953240c10adb6b9c9c1"
+          }
+        ],
+        "decodedOriginalsAfter": [
+          {
+            "relative": "diagnostic-report.json",
+            "bytes": 3333257,
+            "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+          },
+          {
+            "relative": "assurance-report.json",
+            "bytes": 26126,
+            "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a"
+          },
+          {
+            "relative": "trust-certificate.json",
+            "bytes": 3118,
+            "sha256": "fe0e9d522b0ae24b2ec8e6819c8a2a5d81e7a58151ddc01f036db5b430284c8d"
+          },
+          {
+            "relative": "passport.amcpass",
+            "bytes": 3675,
+            "sha256": "40075ce877981d07ea045993551058421f8bdbf54b282512e269a09124f6518f"
+          },
+          {
+            "relative": "run.amcbundle",
+            "bytes": 371307,
+            "sha256": "557bce3cf5ebb31e0ac056c4961ccd087abf0503a4f5da7c74ccfcffc1dc61fa"
+          },
+          {
+            "relative": "domain-report.md",
+            "bytes": 29387,
+            "sha256": "7ba8a5f6b5369046c72e82fd8aab240fb5a13c2a0762cb99501d5fa3f8ee97a4"
+          },
+          {
+            "relative": "ledger-observation.json",
+            "bytes": 6067,
+            "sha256": "ab95079658c7eb4e4b8aa6dfc74fe18e09425c9a18d623390ea56ccb726125db"
+          },
+          {
+            "relative": "evidence.sqlite",
+            "bytes": 331776,
+            "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e"
+          }
+        ],
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": false,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": null,
+      "delegatedTarAPIInvoked": true,
+      "signalsSentByFixture": false,
+      "bodyFailed": true,
+      "bodyError": {
+        "name": "AssertionError",
+        "message": "expected undefined to be 'R1-assurance-canned-reply' // Object.is equality",
+        "stack": "AssertionError: expected undefined to be 'R1-assurance-canned-reply' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:439:24\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:65:11)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts:409:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)"
+      },
+      "cleanupErrors": [],
+      "boundary": "Exact tag-generated bytes; imported fixture trust proves only the actual reported integrity result, never historical provenance",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": true,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-oykBVa/public-evidence.json",
+      "schema": "amc-p135-legacy-relabel/1",
+      "label": "genuine-persistent-roundtrip",
+      "origin": "tag-generated-originals",
+      "genuineHistoricalFixture": true,
+      "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout",
+      "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-oykBVa",
+      "observations": {
+        "genuineHistoricalFixture": true,
+        "encodedFixtureBytes": 773756,
+        "encodedFixtureBefore": [
+          {
+            "relative": "README.md",
+            "bytes": 2870,
+            "sha256": "24e907b0fea78c912cd0c4ca3bf2b239e399612b383f6396ccf93b2002f5452c"
+          },
+          {
+            "relative": "generation.log",
+            "bytes": 3624,
+            "sha256": "c64391454e8cd0319b403c4fe2aae2ecba1094d9e95a58a7b337b50aa3dacd26"
+          },
+          {
+            "relative": "originals.tar.gz",
+            "bytes": 709335,
+            "sha256": "bd08c2bad43869ffce02571a6db9411305df77db7b5a77576ad8065c4655782c"
+          },
+          {
+            "relative": "provenance.json",
+            "bytes": 57927,
+            "sha256": "f75e86e46c943f4d92fb06bd4b3d55a2a081ba91bca62953240c10adb6b9c9c1"
+          }
+        ],
+        "fixtureTarUsed": true,
+        "decodedOriginalsBefore": [
+          {
+            "relative": "diagnostic-report.json",
+            "bytes": 3333257,
+            "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+          },
+          {
+            "relative": "assurance-report.json",
+            "bytes": 26126,
+            "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a"
+          },
+          {
+            "relative": "trust-certificate.json",
+            "bytes": 3118,
+            "sha256": "fe0e9d522b0ae24b2ec8e6819c8a2a5d81e7a58151ddc01f036db5b430284c8d"
+          },
+          {
+            "relative": "passport.amcpass",
+            "bytes": 3675,
+            "sha256": "40075ce877981d07ea045993551058421f8bdbf54b282512e269a09124f6518f"
+          },
+          {
+            "relative": "run.amcbundle",
+            "bytes": 371307,
+            "sha256": "557bce3cf5ebb31e0ac056c4961ccd087abf0503a4f5da7c74ccfcffc1dc61fa"
+          },
+          {
+            "relative": "domain-report.md",
+            "bytes": 29387,
+            "sha256": "7ba8a5f6b5369046c72e82fd8aab240fb5a13c2a0762cb99501d5fa3f8ee97a4"
+          },
+          {
+            "relative": "ledger-observation.json",
+            "bytes": 6067,
+            "sha256": "ab95079658c7eb4e4b8aa6dfc74fe18e09425c9a18d623390ea56ccb726125db"
+          },
+          {
+            "relative": "evidence.sqlite",
+            "bytes": 331776,
+            "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e"
+          }
+        ],
+        "rawOriginalBytes": 4104713,
+        "generationGaps": [
+          {
+            "step": "genuine-L3",
+            "reason": "Actual diagnostic does not have mean level exactly L3; original bytes and seal retained unchanged."
+          },
+          {
+            "step": "diagnostic-certificate",
+            "reason": "Natural exit 1; retained original streams; no success or retry claimed."
+          },
+          {
+            "step": "run.amccert",
+            "reason": "No output file was emitted."
+          }
+        ],
+        "historicalSourceCommit": "ff53902225ff276c55558d5ca17a8fc60b780655",
+        "commandClosures": [
+          {
+            "label": "source-head",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "source-status",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "init",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "operator-import",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "old-source-seed",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "old-source-domain",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "old-source-ledger",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "diagnostic",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "assurance",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "trust-certificate",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "passport-init",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "passport",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "bundle",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "ci-init",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "diagnostic-certificate",
+            "exitCode": 1,
+            "signal": null
+          },
+          {
+            "label": "list-passport.amcpass",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "list-run.amcbundle",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "source-head-final",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "source-status-final",
+            "exitCode": 0,
+            "signal": null
+          },
+          {
+            "label": "pack-originals",
+            "exitCode": 0,
+            "signal": null
+          }
+        ],
+        "fixtureTrustEnrollment": {
+          "source": "imported",
+          "oldMonitorId": "61ee1b7a33aa0a87cfbd7c838b1be3f0d63f095d4ebed734d4687150b790d392",
+          "oldAuditorId": "5f24420aaadad3cffe4aa83f98e8b2044c3aadf60300485725fe1eb633bd2142",
+          "currentMonitorId": "7513cdda9ab4127115cebc188fd975806e71f0ecae32eb0d6cffeb6f8910da0e",
+          "monitorHistoryVerified": true,
+          "auditorHistoryVerified": true,
+          "activePublicKeysAndVaultUnchanged": true,
+          "independentHistoricalProvenanceClaim": false
+        },
+        "installedOriginalsBefore": [
+          {
+            "relative": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+            "bytes": 3333257,
+            "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+          },
+          {
+            "relative": ".amc/reports/assurance/genuine-v1-1-1-assurance.json",
+            "bytes": 26126,
+            "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 331776,
+            "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e"
+          }
+        ],
+        "genuineLedgerReadOnlyOpened": true,
+        "genuineLedgerReadOnlyClosed": true,
+        "fixtureTimestampSource": "injected public now callback",
+        "initializedPoolClosedBeforeCopy": true,
+        "actualLedgerVerification": {
+          "ok": true,
+          "errors": [],
+          "chain": {
+            "ok": true,
+            "errors": []
+          },
+          "governance": {
+            "ok": true,
+            "errors": []
+          },
+          "trustRoot": {
+            "anchored": true,
+            "monitorFingerprint": "7513cdda9ab4127115cebc188fd975806e71f0ecae32eb0d6cffeb6f8910da0e",
+            "expectedFingerprint": null,
+            "monitorAdmission": {
+              "signature": "ledger monitor key",
+              "purpose": "ledger-row",
+              "keyId": "7513cdda9ab4127115cebc188fd975806e71f0ecae32eb0d6cffeb6f8910da0e",
+              "status": "admitted",
+              "source": "explicit-key",
+              "listId": null,
+              "timeBasis": null,
+              "detail": null
+            }
+          },
+          "sessions": {
+            "open": [],
+            "released": [],
+            "interrupted": [],
+            "closed": []
+          }
+        },
+        "beforeBundle": {
+          "ok": true,
+          "integrity": {
+            "status": "pass",
+            "errors": []
+          },
+          "issuerStatus": "pass",
+          "anchoring": {
+            "status": "anchored",
+            "detail": "monitor key 61ee1b7a33aa0a87cfbd7c838b1be3f0d63f095d4ebed734d4687150b790d392 admitted for ledger-row (explicit-key)"
+          },
+          "claim": {
+            "rule": "R5-no-claim-envelope",
+            "claimKind": "self_reported",
+            "levelCap": "L1",
+            "original": {
+              "trustTier": null,
+              "level": "L0",
+              "label": "HIGH TRUST"
+            },
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1
+          }
+        },
+        "afterBundle": {
+          "ok": true,
+          "integrity": {
+            "status": "pass",
+            "errors": []
+          },
+          "issuerStatus": "pass",
+          "anchoring": {
+            "status": "anchored",
+            "detail": "monitor key 61ee1b7a33aa0a87cfbd7c838b1be3f0d63f095d4ebed734d4687150b790d392 admitted for ledger-row (explicit-key)"
+          },
+          "claim": {
+            "rule": "R5-no-claim-envelope",
+            "claimKind": "self_reported",
+            "levelCap": "L1",
+            "original": {
+              "trustTier": null,
+              "level": "L0",
+              "label": "HIGH TRUST"
+            },
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1
+          }
+        },
+        "automaticDomainRecords": 0,
+        "explicitDomainRecords": 1,
+        "dryWritesAbsent": true,
+        "afterDry": [
+          {
+            "relative": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+            "bytes": 3333257,
+            "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+          },
+          {
+            "relative": ".amc/reports/assurance/genuine-v1-1-1-assurance.json",
+            "bytes": 26126,
+            "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 331776,
+            "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e"
+          }
+        ],
+        "afterFirst": [
+          {
+            "relative": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+            "bytes": 3333257,
+            "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+          },
+          {
+            "relative": ".amc/reports/assurance/genuine-v1-1-1-assurance.json",
+            "bytes": 26126,
+            "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 331776,
+            "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e"
+          }
+        ],
+        "changedOriginals": [],
+        "records": [
+          {
+            "v": 1,
+            "seq": 1,
+            "prevHash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1,
+            "artifact": {
+              "kind": "ledger_session",
+              "locator": "ledger-session:59afd382-c8fc-4ebc-9392-0d151b76abac",
+              "sha256": "336f31490e7998bd609c287e2f6a4c83a6e2ac30def539f7430147fca1d14ca5"
+            },
+            "original": {
+              "trustTier": "OBSERVED",
+              "level": null,
+              "label": null
+            },
+            "assigned": {
+              "claimKind": "self_reported",
+              "legacy": true,
+              "levelCap": null
+            },
+            "integrity": {
+              "status": "verified",
+              "trusted": true,
+              "reasons": []
+            },
+            "rule": "R4-operator-tier",
+            "recordedAt": "2026-10-16T12:00:00.007Z",
+            "recordedBy": {
+              "tool": "agent-maturity-compass",
+              "version": "1.2.0"
+            }
+          },
+          {
+            "v": 1,
+            "seq": 2,
+            "prevHash": "eb867b93cba91f2bde063eb90cca206b8d88c279fb5bd029f8b39f3bbd9b6094",
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1,
+            "artifact": {
+              "kind": "ledger_session",
+              "locator": "ledger-session:legacy-seeded-maturity-session-1",
+              "sha256": "c39df22c26bf7d9e6021525061a08fa5e1f162d717f08d1bfeec64ca2046d599"
+            },
+            "original": {
+              "trustTier": "OBSERVED",
+              "level": null,
+              "label": null
+            },
+            "assigned": {
+              "claimKind": "synthetic_example",
+              "legacy": true,
+              "levelCap": null
+            },
+            "integrity": {
+              "status": "verified",
+              "trusted": true,
+              "reasons": []
+            },
+            "rule": "R2-dogfood-seeded",
+            "recordedAt": "2026-10-16T12:00:00.007Z",
+            "recordedBy": {
+              "tool": "agent-maturity-compass",
+              "version": "1.2.0"
+            }
+          },
+          {
+            "v": 1,
+            "seq": 3,
+            "prevHash": "8176a6434bf3aec5980c2f6062cae41362eade4d05037507c872713a3d65036a",
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1,
+            "artifact": {
+              "kind": "diagnostic_report",
+              "locator": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+              "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+            },
+            "original": {
+              "trustTier": null,
+              "level": "L0",
+              "label": "HIGH TRUST"
+            },
+            "assigned": {
+              "claimKind": "self_reported",
+              "legacy": true,
+              "levelCap": "L1"
+            },
+            "integrity": {
+              "status": "verified",
+              "trusted": null,
+              "reasons": []
+            },
+            "rule": "R5-no-claim-envelope",
+            "recordedAt": "2026-10-16T12:00:00.007Z",
+            "recordedBy": {
+              "tool": "agent-maturity-compass",
+              "version": "1.2.0"
+            }
+          },
+          {
+            "v": 1,
+            "seq": 4,
+            "prevHash": "2c5cb20afe6df8185740fdbf8c28a0dc6d094a8fb122cb9f3f950c9c622c0956",
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1,
+            "artifact": {
+              "kind": "bundle",
+              "locator": "decoded-originals/run.amcbundle",
+              "sha256": "557bce3cf5ebb31e0ac056c4961ccd087abf0503a4f5da7c74ccfcffc1dc61fa"
+            },
+            "original": {
+              "trustTier": null,
+              "level": "L0",
+              "label": "HIGH TRUST"
+            },
+            "assigned": {
+              "claimKind": "self_reported",
+              "legacy": true,
+              "levelCap": "L1"
+            },
+            "integrity": {
+              "status": "verified",
+              "trusted": true,
+              "reasons": []
+            },
+            "rule": "R5-no-claim-envelope",
+            "recordedAt": "2026-10-16T12:00:00.007Z",
+            "recordedBy": {
+              "tool": "agent-maturity-compass",
+              "version": "1.2.0"
+            }
+          },
+          {
+            "v": 1,
+            "seq": 5,
+            "prevHash": "356758cbfbaaa197ab02dc1d6591e36d0a3125326b848e83510af84bedc94a06",
+            "noticeId": "AMC-LEGACY-2026-001",
+            "noticeVersion": 1,
+            "artifact": {
+              "kind": "domain_report",
+              "locator": "decoded-originals/domain-report.md",
+              "sha256": "7ba8a5f6b5369046c72e82fd8aab240fb5a13c2a0762cb99501d5fa3f8ee97a4"
+            },
+            "original": {
+              "trustTier": null,
+              "level": null,
+              "label": "- Certification Readiness: no"
+            },
+            "assigned": {
+              "claimKind": "synthetic_example",
+              "legacy": true,
+              "levelCap": null
+            },
+            "integrity": {
+              "status": "notChecked",
+              "trusted": null,
+              "reasons": []
+            },
+            "rule": "R3-domain-report",
+            "recordedAt": "2026-10-16T12:00:00.007Z",
+            "recordedBy": {
+              "tool": "agent-maturity-compass",
+              "version": "1.2.0"
+            }
+          }
+        ],
+        "skipped": [
+          {
+            "locator": "decoded-originals/passport.amcpass",
+            "reason": "records no AMC version or claim envelope, so 1.x and 1.2 cannot be told apart; readers print it self-reported"
+          },
+          {
+            "locator": "decoded-originals/trust-certificate.json",
+            "reason": "records no AMC version or claim envelope, so 1.x and 1.2 cannot be told apart; readers print it self-reported"
+          }
+        ],
+        "relabelLogVerified": true,
+        "originalsDigestMatches": true,
+        "receiptSignatureVerified": true,
+        "secondRecordCount": 0,
+        "repeatLogUnchanged": true,
+        "receiptCountBeforeRepeat": 1,
+        "receiptCountAfterRepeat": 2,
+        "repeatedLogVerified": true,
+        "encodedFixtureAfter": [
+          {
+            "relative": "README.md",
+            "bytes": 2870,
+            "sha256": "24e907b0fea78c912cd0c4ca3bf2b239e399612b383f6396ccf93b2002f5452c"
+          },
+          {
+            "relative": "generation.log",
+            "bytes": 3624,
+            "sha256": "c64391454e8cd0319b403c4fe2aae2ecba1094d9e95a58a7b337b50aa3dacd26"
+          },
+          {
+            "relative": "originals.tar.gz",
+            "bytes": 709335,
+            "sha256": "bd08c2bad43869ffce02571a6db9411305df77db7b5a77576ad8065c4655782c"
+          },
+          {
+            "relative": "provenance.json",
+            "bytes": 57927,
+            "sha256": "f75e86e46c943f4d92fb06bd4b3d55a2a081ba91bca62953240c10adb6b9c9c1"
+          }
+        ],
+        "decodedOriginalsAfter": [
+          {
+            "relative": "diagnostic-report.json",
+            "bytes": 3333257,
+            "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+          },
+          {
+            "relative": "assurance-report.json",
+            "bytes": 26126,
+            "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a"
+          },
+          {
+            "relative": "trust-certificate.json",
+            "bytes": 3118,
+            "sha256": "fe0e9d522b0ae24b2ec8e6819c8a2a5d81e7a58151ddc01f036db5b430284c8d"
+          },
+          {
+            "relative": "passport.amcpass",
+            "bytes": 3675,
+            "sha256": "40075ce877981d07ea045993551058421f8bdbf54b282512e269a09124f6518f"
+          },
+          {
+            "relative": "run.amcbundle",
+            "bytes": 371307,
+            "sha256": "557bce3cf5ebb31e0ac056c4961ccd087abf0503a4f5da7c74ccfcffc1dc61fa"
+          },
+          {
+            "relative": "domain-report.md",
+            "bytes": 29387,
+            "sha256": "7ba8a5f6b5369046c72e82fd8aab240fb5a13c2a0762cb99501d5fa3f8ee97a4"
+          },
+          {
+            "relative": "ledger-observation.json",
+            "bytes": 6067,
+            "sha256": "ab95079658c7eb4e4b8aa6dfc74fe18e09425c9a18d623390ea56ccb726125db"
+          },
+          {
+            "relative": "evidence.sqlite",
+            "bytes": 331776,
+            "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e"
+          }
+        ],
+        "installedOriginalsAfter": [
+          {
+            "relative": ".amc/runs/genuine-v1-1-1-diagnostic.json",
+            "bytes": 3333257,
+            "sha256": "1330fa0023da3913469913bbbf40ec8f92827c6763d47712eeb99419a9dce39a"
+          },
+          {
+            "relative": ".amc/reports/assurance/genuine-v1-1-1-assurance.json",
+            "bytes": 26126,
+            "sha256": "208410b987cf58c932b18295a4bb9839d6085b4c90668f15a35077751960880a"
+          },
+          {
+            "relative": ".amc/evidence.sqlite",
+            "bytes": 331776,
+            "sha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e"
+          }
+        ],
+        "ownedLedgerPoolClosed": true
+      },
+      "nativeBefore": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "nativeAfter": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "dev": 16777231,
+        "inode": 542941025,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+      },
+      "lifecycle": {
+        "initialized": true,
+        "vaultLocked": true
+      },
+      "environmentUnchanged": true,
+      "childProcessCreatedByFixture": null,
+      "delegatedTarAPIInvoked": true,
+      "signalsSentByFixture": false,
+      "bodyFailed": false,
+      "bodyError": null,
+      "cleanupErrors": [],
+      "boundary": "Exact tag-generated bytes; imported fixture trust proves only the actual reported integrity result, never historical provenance",
+      "auditFacts": {
+        "nativeBeforeAfterEqual": true,
+        "nativeRechecks": [
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          },
+          {
+            "recorded": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "dev": 16777231,
+              "inode": 542941025,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "current": {
+              "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+              "bytes": 1931552,
+              "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+            },
+            "bytesAndHashMatch": true,
+            "physicalIdentityMatches": true
+          }
+        ],
+        "environmentUnchanged": true,
+        "bodyFailed": false,
+        "cleanupErrorCount": 0,
+        "ownedLedgerPoolClosed": true
+      }
+    }
+  ],
+  "publicExpectedLabels": [
+    "R2-synthetic-edges",
+    "R4-never-promoted",
+    "current-envelope-positive",
+    "genuine-classifier-inputs",
+    "genuine-persistent-roundtrip",
+    "postfix-assurance-R5-strict",
+    "postfix-assurance-lazy-strict",
+    "synthetic-log-tamper",
+    "synthetic-persistent-roundtrip",
+    "synthetic-receipt-signature-tamper"
+  ],
+  "publicMissingLabels": [],
+  "retainedRootOnlyMarkers": [],
+  "pins": [
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/command.json",
+      "bytes": 3054,
+      "sha256": "1f40ca12aab327e4b5d1f44c77201d5b40f9837378d247c2243b3f1d08a32c41"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/owned-process.json",
+      "bytes": 1029,
+      "sha256": "fc3c400d415d02996d8177d1c7655a11d309c8d254f900dff8f2ddbb565fb6c0"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "faf00d8ec56f257ef7510cddd2aaa9716c897c0ca42961cb3e2edf2a4ec72c47"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/raw.json",
+      "bytes": 30935,
+      "sha256": "5441fb8a70599979bed22368adbffc355261933121738bdf7a4fbcc4555c2cda"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/observer.json",
+      "bytes": 46819,
+      "sha256": "62e52c85017e950b3ef68866090fbe5f8b3e989ac7ab771f64158d5649ec7d16"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p135-m3/stdout-stderr.log",
+      "bytes": 8592,
+      "sha256": "b325d029e4d82b53a1e928e3858ac4ffe0edc743fcf3b627e3ae5d7354f779d9"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-OvDE6O/public-evidence.json",
+      "bytes": 2717,
+      "sha256": "8582715fe94656942af8cd04e76d7ad5b2666c9c9188d53915edef70fab72047"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-hN4eXJ/public-evidence.json",
+      "bytes": 2583,
+      "sha256": "56a6bf2beef7af89ffe1f7ca5a1c0407c3eb4f28d8470a7da3d244df43347a1e"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-GiWJdg/public-evidence.json",
+      "bytes": 1604,
+      "sha256": "4d7ec376a1fd2722c34269c8b550843d74772abd35fa25e2ef88743231c9670a"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-mRSX4e/public-evidence.json",
+      "bytes": 1875,
+      "sha256": "70349c059955306aab8661d18640591590e0032aeb493e50b4cdbea00ab4e17c"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-JaxvIP/public-evidence.json",
+      "bytes": 1620,
+      "sha256": "789566597084aa776f5f65b5799f8d52d36ef7c8d377f8fae63ee6ff99533d85"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-CERJcn/public-evidence.json",
+      "bytes": 5759,
+      "sha256": "b205bf972cd3a7f396e3210f368f9be2ed1fa318ff9a0a54fe7f85dfa610293f"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-n9wd0T/public-evidence.json",
+      "bytes": 2171,
+      "sha256": "ec75989625426e140f3a0a76e57161a7edf014fc53cbe2933a137e35c0d342c2"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-Yvg40u/public-evidence.json",
+      "bytes": 2910,
+      "sha256": "fbb1bef93b9d13b68a36c02f9961650d1a4d556e96ff37c6423f12ef5b96526b"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-H78l8y/public-evidence.json",
+      "bytes": 11576,
+      "sha256": "1a458f80463969af33f53e7af52c5b553fd8db3ef5e4113bdd65f5485f3c05fe"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-oykBVa/public-evidence.json",
+      "bytes": 19441,
+      "sha256": "7a69c518a0b409545f6071c53574d8584594cf91f7d174dda7f08ebcf482c55e"
+    }
+  ],
+  "semanticControlDecision": "Root review of actual first failures, causes and masking required",
+  "boundaries": [
+    "One actual cohort; no counts summed across canonical, controls or restorations.",
+    "Body/cleanup/AggregateErrors, hook states and unhandled errors are retained, not asserted clean.",
+    "M2 may deliberately modify original reports and trigger body plus cleanup failures; no predicted counts.",
+    "Full public records preserve gathered observations, which are not assertion credit after a prior failure.",
+    "Selected source tests only; no compiled-mutant or fresh historical generator execution credit.",
+    "Borrowed runner HEAD/cwd do not establish selected checkout source authority.",
+    "Delegated tar APIs do not expose all child PIDs; no universal descendant or OS-isolation claim.",
+    "No cryptographic, native module, SQL, blob/decryption, network or process probe is performed by this auditor.",
+    "Existing assurance regression effects and other unchanged fixtures retain their prior observation limits."
+  ]
+}

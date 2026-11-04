@@ -1,0 +1,35 @@
+{
+  "startedAt": "2026-10-19T08:47:49.558635+00:00",
+  "command": [
+    "npx",
+    "--no-install",
+    "tsx",
+    "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/probe-governance-386a9.ts",
+    "386a9a993a9c0997dbbe8c7b74bad9bf84760c46"
+  ],
+  "expectedExit": 0,
+  "before": {
+    "head": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+    "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14-solo-20261019",
+    "node": "v22.23.3",
+    "statusPorcelain": "",
+    "lockSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914"
+  },
+  "runnerSha256": "752392ba53e39b3b352c4c2fc435264406b083d177f939e43ac23c2b7d9a8cd9",
+  "exit": 0,
+  "durationMs": 2009,
+  "after": {
+    "head": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+    "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14-solo-20261019",
+    "node": "v22.23.3",
+    "statusPorcelain": "",
+    "lockSha256": "f948d569d509e227d68aaeb183f10f403f7f9016a1abbbd5dc75042ded4af914"
+  },
+  "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/case-probe-final-source/raw.log",
+  "rawLogSha256": "98e9b9851ff54ddbdf05b0e36625eb25da9280aafce4ba120f31a8aa5a700016",
+  "rawLogBytes": 333
+}

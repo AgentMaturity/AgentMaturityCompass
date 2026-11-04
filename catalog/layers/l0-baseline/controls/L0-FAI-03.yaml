@@ -1,0 +1,125 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-FAI-03
+version: "0.1.0"
+support: experimental
+layer: 0
+family: fairness
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Proxy screening
+statement: >-
+  Decision inputs are screened for protected-class proxies, and a flagged input is blocked or
+  justified in a signed record.
+riskRationale: >-
+  Inputs such as ZIP code or name can carry protected attributes into a decision that never sees them
+  directly.
+mandatory: true
+applicability:
+  predicate: { fact: useCases, includesAny: [consequential_decision_about_people] }
+  reasons:
+    - Applies only where the profile's use cases include consequential decisions about people (strategy family 9 and P1-33).
+  exclusions:
+    - when:
+        all:
+          - { fact: useCases, includesAny: [reconciliation] }
+          - { not: { fact: useCases, includesAny: [consequential_decision_about_people] } }
+      reason: >-
+        A reconciliation agent that makes no consequential decision about people is out of scope.
+citations:
+  - key: us-ecoa-1002-4-6
+    registerId: us-ecoa-reg-b
+    instrument: Equal Credit Opportunity Act, Regulation B (12 CFR Part 1002)
+    clause: "12 CFR 1002.4 and 1002.6"
+    edition: "12 CFR Part 1002 as amended by CFPB final rule FR Doc 2026-07804 (91 FR 21620)"
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2026-07-21"
+    complianceDueDate: "2026-07-21"
+    dateNote: null
+    url: https://www.federalregister.gov/documents/2026/04/22/2026-07804/equal-credit-opportunity-act-regulation-b
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry us-ecoa-reg-b records the
+        source as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen:
+      all: [{ fact: jurisdictions, includesAny: [US] }, { fact: useCases, includesAny: [credit_decision] }]
+    legalReview: null
+    note: >-
+      Register: disparate treatment and proxies used with discriminatory intent stay prohibited; the
+      federal disparate-impact theory was removed from Regulation B as of 2026-07-21.
+  - key: us-ca-crd-ads
+    registerId: us-ca-crd-ads
+    instrument: California Civil Rights Council FEHA regulations on automated-decision systems
+    clause: "Automated-decision system and proxy provisions (register ref FEHA ADS regs #2); section numbers to be pinned by the legal reviewer"
+    edition: Regulations effective 2025-10-01
+    jurisdiction: US-CA
+    statusType: binding-now
+    superseded: null
+    effectiveDate: "2025-10-01"
+    complianceDueDate: "2025-10-01"
+    dateNote: null
+    url: https://calcivilrights.ca.gov/2025/06/30/civil-rights-council-secures-approval-for-regulations-to-protect-against-employment-discrimination-related-to-artificial-intelligence/
+    retrieval:
+      state: unverified
+      reason: >-
+        Not fetched in P1-14: the task allows no network access. Register entry us-ca-crd-ads records the
+        source as read in its review; fetch and hash this url before expert review (D-08).
+    appliesWhen:
+      all: [{ fact: jurisdictions, includesAny: [US-CA] }, { fact: useCases, includesAny: [employment_decision] }]
+    legalReview: null
+    note: >-
+      Register: ADS use that harms applicants or employees on protected characteristics may violate FEHA;
+      the rules define proxy.
+binding:
+  kind: manual
+  points: []
+  mechanism: >-
+    Each decision input is screened for proxy risk; a flagged input is removed or kept with a signed
+    justification.
+  parameters: []
+  manualDuty:
+    duty: >-
+      Screen inputs on each model or feature change and sign each justification.
+    ownerRole: head_of_qa
+    cadence: on every model or feature change
+    evidenceOfPerformance: The screening report and signed justifications.
+tests:
+  - id: L0-FAI-03-T1
+    type: configuration_check
+    oracle: { kind: signed_config, observes: The signed input list with proxy flags and justifications. }
+    fixtures:
+      positive: [L0-FAI-03/positive/evidence-valid.json]
+      negative:
+        - L0-FAI-03/negative/evidence-contradictory.json
+        - L0-FAI-03/negative/evidence-cross-tenant.json
+        - L0-FAI-03/negative/evidence-empty.json
+        - L0-FAI-03/negative/evidence-replayed.json
+        - L0-FAI-03/negative/evidence-stale.json
+        - L0-FAI-03/negative/evidence-violation.json
+    passCriteria: Every flagged input is blocked or has a signed justification.
+    attempts: 1
+  - id: L0-FAI-03-T2
+    type: document_review
+    oracle: { kind: human_assessor, observes: The screening method and its results. }
+    fixtures:
+      positive: [L0-FAI-03/positive/evidence-valid-t2.json]
+      negative: [L0-FAI-03/negative/evidence-violation-t2.json]
+    passCriteria: The screening covers every input and its method is stated.
+    attempts: 1
+evidence:
+  - id: L0-FAI-03-E1
+    producer: amc.fairness.harness
+    bindingFields: [deploymentId, controlId]
+    freshness: { maxAgeDays: 180 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [model_version, corpus_version]
+owner: { role: head_of_qa }
+clock: null
+levels: [L2]
+crosswalk: []
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

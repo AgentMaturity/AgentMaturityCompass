@@ -1,0 +1,25 @@
+{
+  "schema": "p125w-public-output-root-independent-static-review/1",
+  "at": "2026-10-17T00:29:00.539821+00:00",
+  "blockers": [],
+  "reviewerDidNotAuthorHelper": true,
+  "fullOldAndNewCodeRead": true,
+  "completeDeltaReproduced": true,
+  "sixAcceptedAndOriginalDiagnosticBoundToActualOutcomesAndAudits": true,
+  "singleReplyGuardsRetainedAndBothWindowRequestsHaveOwnNaturalQueryBoundProof": true,
+  "lastReplyObservationUsedOnlyForSecondWindowProof": true,
+  "onlyExactRootPemTsaPemPublicCertificateConversionAndEmittedPublicFiles": true,
+  "noKeySigningRootTraversalPrivateRunOrChildStreamRead": true,
+  "actualCopyCountsNotAssumed": true,
+  "noExecutionAtStaticReview": true,
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/public-output-preparation/prepare-public-output.py.source.txt",
+    "bytes": 9470,
+    "sha256": "3447d186bb9fdf6b26ba63eb934a236c8c799168455e7254e2b61e2b3e76a567"
+  },
+  "authorSeal": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/public-output-preparation/seal.json",
+    "bytes": 1523,
+    "sha256": "119499105f951ec9c9b5cc8a084c767765d6af347b8ac1497dba584a39ea04ac"
+  }
+}

@@ -1,0 +1,405 @@
+{
+  "kind": "Read-only P0-24 new test design; no test authored or executed",
+  "capturedUtc": "2026-10-14T22:02:28.218140+00:00",
+  "sourceRef": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "readOnlyWorkspace": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+  "proposedNewTest": "tests/citationCorrections.test.ts",
+  "currentlyAbsent": true,
+  "preflight": {
+    "path": "/private/tmp/p0-27-compat-next-P0-24-routing-preflight-20261015.json",
+    "sha256": "bef98c15d5bf1887d27616e65bee75b2644fb13977b61b8eff8895b8c2a68756",
+    "bytes": 39367
+  },
+  "ownedWritesOnly": [
+    "/private/tmp/p0-24-new-test-design-20261015.json",
+    "/private/tmp/p0-24-new-test-design-20261015.md"
+  ],
+  "imports": [
+    {
+      "from": "../src/compliance/euAiActClassifier.js",
+      "names": [
+        "classifyEuAiActRisk",
+        "type AgentCapabilities"
+      ],
+      "reason": "The narrow boolean-capability API, distinct from globalRegulatory sector/usecase overload."
+    },
+    {
+      "from": "../src/score/domainPacks.js",
+      "names": [
+        "getDomainPackQuestions"
+      ],
+      "reason": "Actual caller-facing health and wealth questions; HC-1 and FIN-1 are real source records."
+    },
+    {
+      "from": "../src/domains/packs/regulatoryCatalogue.js",
+      "names": [
+        "REGULATORY_CATALOGUE"
+      ],
+      "reason": "Actual combined catalogue exports, not a handwritten surrogate."
+    },
+    {
+      "from": "../src/domains/packs/regulatorySchema.js",
+      "names": [
+        "resolveRegulatoryInstrument",
+        "resolveRegulatoryRefParts"
+      ],
+      "reason": "Actual corrected aliases/record linkage, without rewriting resolver."
+    },
+    {
+      "from": "../src/domains/packs/catalogueHelpers.js",
+      "names": [
+        "P024_NOTE",
+        "P024_READ"
+      ],
+      "reason": "Recorded historical experimental marker/date; do not invent a fresh retrieval."
+    },
+    {
+      "from": "../src/compliance/citations/officialHosts.js",
+      "names": [
+        "isSharedOfficialUrl"
+      ],
+      "reason": "Syntactic source-host metadata check only, not reachability or authoritative accuracy."
+    },
+    {
+      "from": "../src/domains/industryPackAudit.js",
+      "names": [
+        "INDUSTRY_PACK_AUDIT_ANCHORS"
+      ],
+      "reason": "Actual nine emitted anchor sets, including the two A.5 policy labels."
+    },
+    {
+      "from": "../scripts/check-citations.mjs",
+      "names": [
+        "collectFindings"
+      ],
+      "reason": "One actual built-package collector observation after root build readiness, not injected findings."
+    }
+  ],
+  "existingTestsRead": [
+    "tests/euAiActTimeline.test.ts",
+    "tests/domain-packs.test.ts",
+    "tests/citations/lintCitations.test.ts",
+    "tests/citations/checkCitationsCli.test.ts",
+    "tests/compliance/mappingPackRefs.test.ts",
+    "tests/industryPackSchema.test.ts",
+    "tests/industryPackRegulatoryRefresh.test.ts",
+    "tests/industryPackAudit.test.ts"
+  ],
+  "avoidDuplication": [
+    "Do not re-add the thirteen generic linter fixtures, shared-host tests, CLI parser/ratchet fixtures or full mapping-reference loops already covered by original tests.",
+    "Do not duplicate EU_AI_ACT_TIMELINE calendar constants, register-date parity or legal application dates; these remain existing baselines and source metadata.",
+    "Do not call scoreDomainPack, build/sign an audit, create a workspace or claim a regulated pass just to inspect corrected question references."
+  ],
+  "classifierCases": [
+    {
+      "name": "emotion recognition in its declared workplace/education context",
+      "input": {
+        "emotionRecognition": true
+      },
+      "expected": {
+        "riskTier": "UNACCEPTABLE",
+        "articles": [
+          "Art. 5(1)(f)"
+        ],
+        "findingArticle": "Art. 5(1)(f)",
+        "severity": "CRITICAL"
+      }
+    },
+    {
+      "name": "emotion recognition precedes employment and chatbot branches",
+      "input": {
+        "emotionRecognition": true,
+        "employment": true,
+        "chatbot": true
+      },
+      "expected": {
+        "riskTier": "UNACCEPTABLE",
+        "articles": [
+          "Art. 5(1)(f)"
+        ],
+        "excludeArticles": [
+          "Art. 6(2) + Annex III(4)",
+          "Art. 50(1)"
+        ]
+      }
+    },
+    {
+      "name": "social scoring and emotion findings are both preserved",
+      "input": {
+        "socialScoring": true,
+        "emotionRecognition": true
+      },
+      "expected": {
+        "riskTier": "UNACCEPTABLE",
+        "articles": [
+          "Art. 5(1)(c)",
+          "Art. 5(1)(f)"
+        ],
+        "uniqueFindings": 2
+      }
+    },
+    {
+      "name": "social scoring precedes employment and chatbot branches",
+      "input": {
+        "socialScoring": true,
+        "employment": true,
+        "chatbot": true
+      },
+      "expected": {
+        "riskTier": "UNACCEPTABLE",
+        "articles": [
+          "Art. 5(1)(c)"
+        ],
+        "findingTitle": "Social scoring",
+        "excludePublicAuthorityOnlyLabel": true
+      }
+    },
+    {
+      "name": "false emotion flag does not turn chatbot into a prohibition",
+      "input": {
+        "emotionRecognition": false,
+        "chatbot": true
+      },
+      "expected": {
+        "riskTier": "LIMITED",
+        "articles": [
+          "Art. 50(1)"
+        ],
+        "excludeArticles": [
+          "Art. 5(1)(f)"
+        ]
+      }
+    },
+    {
+      "name": "false social flag does not turn human interaction into a prohibition",
+      "input": {
+        "socialScoring": false,
+        "humanInteraction": true
+      },
+      "expected": {
+        "riskTier": "LIMITED",
+        "articles": [
+          "Art. 50(1)"
+        ],
+        "excludeArticles": [
+          "Art. 5(1)(c)"
+        ]
+      }
+    },
+    {
+      "name": "no prohibited or high flags gives actual minimal helper result",
+      "input": {},
+      "expected": {
+        "riskTier": "MINIMAL",
+        "articles": [],
+        "findings": []
+      }
+    }
+  ],
+  "classifierInterpretation": {
+    "sourceContext": "emotionRecognition is typed/documented as inferring emotions in workplace/education. The medical/safety exception appears only in descriptions/help, not a modeled purpose/exception field.",
+    "noInventedInputs": "Use only declared AgentCapabilities keys; do not add a medical-purpose override or silently treat arbitrary emotion recognition as modeled context.",
+    "noLegalApproval": "Assertions exercise current code inputs/articles/precedence, not current law, applicability, real deployment facts or expert approval.",
+    "futureDiagnostics": "Record exact input/result and source pin; exclude only classifiedAt when comparing repeated result stability, never exclude tier/articles/findings. No date mocking or manufactured historical retrieval."
+  },
+  "catalogueCases": {
+    "expectedIds": [
+      "us-qmsr",
+      "us-omb-m-25-21",
+      "us-omb-m-24-10",
+      "us-sr-26-2",
+      "us-sr-11-7",
+      "us-eo-14110",
+      "us-eo-13985",
+      "us-eeoc-ai-ta",
+      "us-ugesp-1607-4",
+      "us-ada-1630-11",
+      "us-ada-12112",
+      "eu-ai-act-prohibited-practices-guidelines"
+    ],
+    "cohortSize": 12,
+    "nonvacuity": "Assert every named ID resolves to exactly one actual REGULATORY_CATALOGUE record before checking it. Do not filter on the desired note and then allow an empty filtered list.",
+    "checks": [
+      "Nonempty citation and aliases; HTTPS URL and actual isSharedOfficialUrl true.",
+      "Recorded retrievedAt is nonempty ISO-shaped metadata; P024_NOTE is present in each actual record note.",
+      "For eleven new/updated records retrieval equals current P024_READ; us-qmsr reuses historical2026-10-03 source metadata because P0-24 added an alias rather than opening it again. Preserve that distinction; no fresh date invented.",
+      "Metadata assertions do not require every optional law-as-data field or a zero global CIT004 count; remaining catalogue migration debt stays explicit.",
+      "Status and supersession of retired OMB/SR records can be recorded as authored metadata; do not label those fields as newly verified current legal facts."
+    ],
+    "doNotAssert": [
+      "That every catalogue instrument is legally true or independently verified.",
+      "That an official-host URL was fetched, remains reachable or is legally sufficient.",
+      "That ISO licensed content, Illinois unverified text or expert holds are corrected."
+    ]
+  },
+  "rubricCases": [
+    {
+      "name": "actual HC-1 correction and catalogue linkage",
+      "lookup": "getDomainPackQuestions(\"health\").filter(q => q.id === \"HC-1\")",
+      "checks": [
+        "Exactly one real question; regulatoryRef contains820.10 and excludes820.30.",
+        "resolveRegulatoryRefParts on actual reference includes us-qmsr for the FDA part.",
+        "Do not score responses or assert medical-device legal applicability."
+      ]
+    },
+    {
+      "name": "actual FIN-1 correction and catalogue linkage",
+      "lookup": "getDomainPackQuestions(\"wealth\").filter(q => q.id === \"FIN-1\")",
+      "checks": [
+        "Exactly one real question; regulatoryRef containsSR26-2 and excludesSR11-7.",
+        "Actual text preserves traditional-model scope and separately governed generative/agentic parts; l5 preserves SR26-2 validation-record wording.",
+        "Actual resolver for the regulatoryRef maps to us-sr-26-2.",
+        "Do not call a financial-pack scorer or infer that SR26-2 applies to an actual system."
+      ]
+    }
+  ],
+  "strictISOCase": {
+    "name": "actual industry audit anchors never pair ISO A.5 with AI policy",
+    "criterion": "The spec no-policy pairing assertion stays strict and normal; no skip, xfail, expected-rejection wrapper, ratchet allowance or source replacement.",
+    "actualInputs": "INDUSTRY_PACK_AUDIT_ANCHORS export, all nine real anchor sets, plus actual collectFindings() from the built same source after root readiness. No source-file regex that could match an absent file or no records.",
+    "nonvacuity": "Assert actual anchor count9, nonempty iso strings and both governance/default records are present before evaluating their id/label pairs. Collect actual findings before the final strict assertions so the emitted CIT002 records remain retained even while the criterion fails.",
+    "semanticObservation": "Parse each actual iso string at the existing display separator into ID and label. Identify A.5/A.5.* policy labels from actual object records and retain their exact array indices/values. This simple semantic assertion is independent of the collector helper so deleting a finding cannot hide the bad emitted data.",
+    "collectorObservation": "Retain actual CIT002 entries from src/domains/industryPackAudit.ts that name the forbidden A.5 policy pair, with file/location/message/zeroTolerance fields. Record other findings and baseline debt separately; do not broaden assertion to all ratcheted catalogue debt.",
+    "strictAssertions": "Forbidden actual source-pair rows must equal[] and forbidden collector findings must equal[]. Both currently have two known source-backed entries, so the single strict case is anticipatedRED until the expert/owner resolves content. No runtime RED is claimed yet.",
+    "knownCurrentRows": [
+      {
+        "sourceLine": 130,
+        "anchor": "A.5 \u2014 Internal organization & AI policy",
+        "role": "governance/risk/policy dimension"
+      },
+      {
+        "sourceLine": 141,
+        "anchor": "A.5 \u2014 AI policy",
+        "role": "default anchor"
+      }
+    ],
+    "expertBoundary": "Row17 requires a licensed ISO expert choice, and the official ISO table remains empty. This test does not invent the replacement clause or edit the reserved audit producer."
+  },
+  "anticipatedScopeCounts": {
+    "classifierDescriptors": 7,
+    "catalogueDescriptors": 12,
+    "rubricDescriptors": 2,
+    "strictISOCase": 1,
+    "possibleCohortPresenceSetupCase": 1,
+    "countsAreDesignOnly": "Expected22or23 registered cases depending whether the cohort presence is a separate test. Root must capture actual registry counts; do not report design arithmetic as executed outcomes."
+  },
+  "privateEmotionMatrixAfterReadiness": {
+    "module": "A separately copied current dist/compliance/euAiActClassifier.js, no runtime imports/dependencies in that classifier body; private byte-equal .mjs wrapper is sufficient. Actual catalogue/rubric/collector inputs stay same unchanged source/build closure.",
+    "observerSeam": "A narrowly guarded optional private classifier-module URL in the NEW test selects that actual compiled copy for causal phases. It never mocks methods or changes live source/dist. Source defaults remain ordinary actual module.",
+    "mutation": "Move only the existing emotionRecognition descriptor from the unacceptable list to the limited-risk list withArt.50(3), reproducing the exact specified regression in valid copied code. Preserve other flags, date constants and helper bodies.",
+    "identicalCorpus": "Same complete registered test corpus/inputs and assertions at baseline/mutant/restored, including the existing strict ISO RED; do not run only a silently permissive slice.",
+    "expectedCausalFailures": "Emotion-only becomesLIMITED, mixed employment/chatbot becomesHIGH, and social+emotion loses the Art.5(1)(f) finding. These are predicted specific additional failures, not actual observed counts. Other controls and ISO base failure should remain.",
+    "qualifiedProof": "After readiness retain exact module/source/build/test hashes, mutation diff and valid import routing; raw baseline/mutant/restored reports/streams and diagnostic objects; all pending/todo counts; restored file bytes/hash. Baseline/restored retain the same known ISO failure rather than calling the whole new file green.",
+    "noKilledSetup": "A syntax/import/native/setup failure is not a behavioral kill. Retain any first observer/setup failure separately and correct only the new test/private observer under scope."
+  },
+  "knownHolds": {
+    "D08AndLog": "All31 expert columns remain empty; no expert/legal-current approval. Rows13\u201315,17,25,29 and named additional confirmations remain reserved.",
+    "P025Debt": "CIT002 baseline3 and CIT004620 are source declarations, not new legal finding counts. No baseline burn-down, host-list or reference-table changes.",
+    "Python": "ATLAS IDs already fixed by3b088c3c7; notes stale, runtime and current primary data verification separate. No Python edit/import/test in this newfile design.",
+    "otherOpen": "47echo/P2-27, P0-19 strict validity and pending seal-order decision, P0-20 shared-line, P0-52 Sync, P0-27 system/mixedSQLite/lifecycle, P0-22/P0-23/P0-51 and full/release debt remain."
+  },
+  "ownershipAndPrerequisites": {
+    "genericReservation": "RESERVATIONS.md1496 is no production transfer. Only future explicitly assigned NEW tests/citationCorrections.test.ts plus private receipts/fixtures may be written.",
+    "currentlyForbidden": "No production, test, old helper, worktree, graph refresh, source/log/catalogue/linter/baseline/archive/guard/dep edit; no test/import/build/install/runtime until root announces fresh P0-24 tree and build readiness.",
+    "rootPrerequisites": "Root closes current P0-27 compatibility canonical review, creates/assigns fresh managed P0-24 source and independently owned dependencies/build. Verify these exact source/export pins still match before authoring/qualification.",
+    "collectorReadiness": "collectFindings() reads built dist and must not be called during source-only design or a concurrent root build."
+  },
+  "sourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/euAiActClassifier.ts",
+      "sha256": "d6c07ba0835c5624fc70d371572da8e6ca3a8c267cf167a0469cf5b5434268a0",
+      "bytes": 24121
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/score/domainPacks.ts",
+      "sha256": "4f01d76961a0db3deed76cb01c7a86d0b6cb1525566b163d42e8adf25832cbaf",
+      "bytes": 38665
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/regulatoryCatalogue.ts",
+      "sha256": "4b93f182cbd8124b0f3883b0396ccff0de81bfc3130b799ff33bf644f877a69c",
+      "bytes": 459
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/regulatorySchema.ts",
+      "sha256": "61aaa47c94a3ba537390e1409de7d117211915d020bf1ca98bd2cf8b43762d61",
+      "bytes": 12723
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/catalogueHelpers.ts",
+      "sha256": "f2f529a2125e7192ced7e96dbd52e698dbac0d5362dbce45668bbb0e211e05dc",
+      "bytes": 2963
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/catalogueUs.ts",
+      "sha256": "feaa6b3c653a4777d3484378287ef1c5ff73cb7f92550dffa103cd5226c4ddb2",
+      "bytes": 17062
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/catalogueEu.ts",
+      "sha256": "55b4e5e86d081811b4f760860045bc15fee33c44cded4648dc224308cbf6c429",
+      "bytes": 22665
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+      "bytes": 26330
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/frameworkIds.ts",
+      "sha256": "a17b09ea9c8c7fa4459ae0cd9efdb8849009fd3638140c11a71f9f93f86b640f",
+      "bytes": 2061
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/lint.ts",
+      "sha256": "35cc58ee94b64c32ad7aa9719dc61134384cd4a3677070c4ae02ab3b88cacf7f",
+      "bytes": 7865
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/scripts/check-citations.mjs",
+      "sha256": "300f7be119ae2289774fdc90ddaafbdd6ee1a1da3a020de1d6dd8ec9743bca6d",
+      "bytes": 14165
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/euAiActTimeline.test.ts",
+      "sha256": "1beba740b5c2ea40dc51ecc821b2cc68064eb1c56411f1e677ff4ba295d71b28",
+      "bytes": 3328
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/domain-packs.test.ts",
+      "sha256": "b95e4be68a8258dde9bcac0f205e7ef5ee502af3c380ed31332db184c025a048",
+      "bytes": 3184
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/citations/lintCitations.test.ts",
+      "sha256": "d8ac693789c976e7cc84fe1ad020c4513f517d51c2188499315e8bc054c426ae",
+      "bytes": 5086
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/citations/checkCitationsCli.test.ts",
+      "sha256": "033144efd88c3c8e0693394dd5d77447d05fa4a178078c0cd54829afe38ff927",
+      "bytes": 5280
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/compliance/mappingPackRefs.test.ts",
+      "sha256": "1be04f21bdce6ea977d83751a29121f595b04bc5fb1286a4a97564c2839ca614",
+      "bytes": 1171
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/industryPackSchema.test.ts",
+      "sha256": "19dae14eea0dc504e2e98863e075a264d75ec967b2677ce3af24698be64fe146",
+      "bytes": 8737
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/industryPackRegulatoryRefresh.test.ts",
+      "sha256": "a870c633ddae97f3dd76c429e49451a203635f6dfee806eb16c14a96371b0c61",
+      "bytes": 3032
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/industryPackAudit.test.ts",
+      "sha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+      "bytes": 7124
+    }
+  ],
+  "readOnlyActions": "Read actual exports/source/original tests and existing preflight. No code imported or executed, no tests/build/dependencies/product runtime or source changes; wrote only this design pair."
+}

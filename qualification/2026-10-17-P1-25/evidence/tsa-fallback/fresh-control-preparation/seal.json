@@ -1,0 +1,98 @@
+{
+  "schema": "p125f-control-preparation-seal/1",
+  "at": "2026-10-16T22:11:03.114523+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/F1-order.patch",
+      "bytes": 483,
+      "sha256": "188026c7a797e261a231e0a1e7a4fc48b166da6e900de1a3c4ac44423d1fd02b",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/F2-no-continue.patch",
+      "bytes": 372,
+      "sha256": "acf155f0784b44bc37b6b86df4457d132519c21e02c363b6b60bb99f5fe67d15",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/F3-unpinned-dispatch.patch",
+      "bytes": 426,
+      "sha256": "ee3c4fa172414abbcc4f6cc9773e6044944a34db61efcc0a6604354676bcc3d3",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/README.md",
+      "bytes": 3486,
+      "sha256": "cd9b68721233e983803748d27ff5f9ab721e87bb62aeae55d36e35d568014b47",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/author-static-review.json",
+      "bytes": 1235,
+      "sha256": "9bf62e4e4b72d2888dc6c347e46d4a7d7c030d09ba5d651ac35f1a000fd8cad3",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/check-preservation.py",
+      "bytes": 1472,
+      "sha256": "894a259f41e243002fcf44f73ee07ed607b39a89bb3e92f3d45cc44bd9bcc7ac",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/check-preservation.py.adaptation.patch",
+      "bytes": 1454,
+      "sha256": "21ca6b925d02cca942fed94671889235467e903ae9d20cfc7a89483cacf95985",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/controls.json",
+      "bytes": 6087,
+      "sha256": "5bae40de4b1b4c0855a09f8f7e5869a7492ae9d045564974958eecd707402c97",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/input-pins.json",
+      "bytes": 49701,
+      "sha256": "2f0b3f9991433998afca4e945059bd7c29f01738e33d5901b6d03dd43e10d775",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/plan.json",
+      "bytes": 7002,
+      "sha256": "d52dfb430f6dfd83419abd170ea34e51335a75acdde0510f0f78f034ad89fb65",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/private-authoring-stop.json",
+      "bytes": 489,
+      "sha256": "f4f8c761d9928ec9c55b585e4367f40e0c0a21b9ec74f297c4a5a33a8bae6a4c",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/source-control.py",
+      "bytes": 15955,
+      "sha256": "d8788251c7481baccea9bd7dba4da5e43fc2649e22393b5542c64d779b6c0ef7",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/source-control.py.adaptation.patch",
+      "bytes": 8309,
+      "sha256": "7ecaf53d00768bcbc287ab4c754c27f148e3100a453c40695c2d8ac0b24e2688",
+      "readScope": "sealed private preparation output"
+    },
+    {
+      "path": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7309,
+      "sha256": "2f8c857afc3e9c7e63919d83cf63529ff6ee9ddd4b6f33f0cfef469da0bb431c",
+      "readScope": "sealed private preparation output"
+    }
+  ],
+  "inputPinCount": 154,
+  "allPinsRehashed": true,
+  "preferred": true,
+  "executedParsedImportedOrCompiled": false,
+  "checkoutIndexQaWrites": false,
+  "sourceCommit": null,
+  "freshRoot": null,
+  "rootActualAdmissionRequired": true
+}

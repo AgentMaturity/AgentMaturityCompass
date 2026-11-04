@@ -1,0 +1,409 @@
+{
+  "schema": "p107-unchanged-baselines-independent-review/1",
+  "at": "2026-10-16T17:48:38.964550+00:00",
+  "allRawObserverAndMergedLogsRead": true,
+  "runtimeExecutedHere": false,
+  "blockers": [],
+  "phases": [
+    {
+      "phase": "p107-unchanged-regressions",
+      "exit": 0,
+      "durationMs": 2963,
+      "ownedPgid": 99240,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "wrapperCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "wrapperHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "tests": {
+        "numTotalTests": 57,
+        "numPassedTests": 57,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "rawSuiteNodes": 22,
+      "actualFiles": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/antiGaming.test.ts",
+          "occurrences": 17,
+          "status": "passed",
+          "message": ""
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/evidenceGatingCorrection.test.ts",
+          "occurrences": 12,
+          "status": "passed",
+          "message": ""
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/liveEvidenceProjection.test.ts",
+          "occurrences": 16,
+          "status": "passed",
+          "message": ""
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/questionBank.test.ts",
+          "occurrences": 3,
+          "status": "passed",
+          "message": ""
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/spineEvidenceProjection.test.ts",
+          "occurrences": 9,
+          "status": "passed",
+          "message": ""
+        }
+      ],
+      "observerNodes": {
+        "file": 5,
+        "suite": 17,
+        "test": 57
+      },
+      "uniqueObserverIds": 79,
+      "uniqueObserverTestIds": 57,
+      "orderedOccurrenceStateJoinExact": true,
+      "duplicateDisplayNames": [],
+      "hookStates": {
+        "pass": 22
+      },
+      "hooks": [
+        {
+          "taskId": "-262439604",
+          "kind": "file",
+          "hook": "afterAll",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_0_0",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_0_1",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_0_2",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_0_3",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_0_4",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_0_5",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_1_0",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_1_1",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_1_2",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_1_3",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_1_4",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_1_5",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_1_6",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_1_7",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_2_0",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_2_1",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-262439604_2_2",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-1351520424",
+          "kind": "file",
+          "hook": "afterAll",
+          "state": "pass"
+        },
+        {
+          "taskId": "-865520851",
+          "kind": "file",
+          "hook": "afterAll",
+          "state": "pass"
+        },
+        {
+          "taskId": "-1092621859",
+          "kind": "file",
+          "hook": "afterAll",
+          "state": "pass"
+        },
+        {
+          "taskId": "554823240",
+          "kind": "file",
+          "hook": "afterAll",
+          "state": "pass"
+        }
+      ],
+      "rawFailures": [],
+      "rawFileMessages": {
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/antiGaming.test.ts": "",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/evidenceGatingCorrection.test.ts": "",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/liveEvidenceProjection.test.ts": "",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/questionBank.test.ts": "",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/spineEvidenceProjection.test.ts": ""
+      },
+      "observerTaskErrors": [],
+      "unhandledErrors": [],
+      "expectedDiagnosticWarnings": [
+        "[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L2).",
+        "[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L4).",
+        "STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level"
+      ],
+      "fullMergedLogRead": true,
+      "lateFailureDiagnostics": [],
+      "newPublicRecords": [],
+      "rootOutcomeMatches": true,
+      "rawSnapshot": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-regressions/raw.json",
+        "bytes": 19928,
+        "sha256": "ba2639884d136f85c5e5b4a0db2b20f76242dc2528100b125d25e79b6738b69a"
+      },
+      "observerSnapshot": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-regressions/observer.json",
+        "bytes": 31097,
+        "sha256": "a3a5e399fb08b7ac8092433bc722b6d9819c22c0e74e4e0955607a67757e74c7"
+      },
+      "mergedLog": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-regressions/stdout-stderr.log",
+        "bytes": 1551,
+        "sha256": "697295cc3c1d61c3db20168b012c99c3cc122e0be082c926939f9a1cf41e8e70"
+      }
+    },
+    {
+      "phase": "p107-unchanged-methodology-diagnostic",
+      "exit": 0,
+      "durationMs": 3163,
+      "ownedPgid": 473,
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "wrapperCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "wrapperHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+      "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+      "tests": {
+        "numTotalTests": 30,
+        "numPassedTests": 30,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "rawSuiteNodes": 11,
+      "actualFiles": [
+        {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/publicMethodology.test.ts",
+          "occurrences": 4,
+          "status": "passed",
+          "message": ""
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/fullDiagnostic.test.ts",
+          "occurrences": 12,
+          "status": "passed",
+          "message": ""
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/quickscoreShare.test.ts",
+          "occurrences": 8,
+          "status": "passed",
+          "message": ""
+        },
+        {
+          "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/traceEvidenceMapper.test.ts",
+          "occurrences": 6,
+          "status": "passed",
+          "message": ""
+        }
+      ],
+      "observerNodes": {
+        "file": 4,
+        "suite": 7,
+        "test": 30
+      },
+      "uniqueObserverIds": 41,
+      "uniqueObserverTestIds": 30,
+      "orderedOccurrenceStateJoinExact": true,
+      "duplicateDisplayNames": [],
+      "hookStates": {
+        "pass": 8
+      },
+      "hooks": [
+        {
+          "taskId": "543349049",
+          "kind": "file",
+          "hook": "afterAll",
+          "state": "pass"
+        },
+        {
+          "taskId": "543349049_0_0",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "543349049_0_1",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "543349049_0_2",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "543349049_1_0",
+          "kind": "test",
+          "hook": "afterEach",
+          "state": "pass"
+        },
+        {
+          "taskId": "-1350613507",
+          "kind": "file",
+          "hook": "afterAll",
+          "state": "pass"
+        },
+        {
+          "taskId": "1553806797",
+          "kind": "file",
+          "hook": "afterAll",
+          "state": "pass"
+        },
+        {
+          "taskId": "-963793456",
+          "kind": "file",
+          "hook": "afterAll",
+          "state": "pass"
+        }
+      ],
+      "rawFailures": [],
+      "rawFileMessages": {
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/publicMethodology.test.ts": "",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/fullDiagnostic.test.ts": "",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/quickscoreShare.test.ts": "",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/traceEvidenceMapper.test.ts": ""
+      },
+      "observerTaskErrors": [],
+      "unhandledErrors": [],
+      "expectedDiagnosticWarnings": [],
+      "fullMergedLogRead": true,
+      "lateFailureDiagnostics": [],
+      "newPublicRecords": [],
+      "rootOutcomeMatches": true,
+      "rawSnapshot": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-methodology-diagnostic/raw.json",
+        "bytes": 9541,
+        "sha256": "4f7464de623a05b6400f761d307d04cb43c19eef0cd2e3d15e1fb16d3a92367d"
+      },
+      "observerSnapshot": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-methodology-diagnostic/observer.json",
+        "bytes": 15319,
+        "sha256": "ac5e9fc937f28247a00f3055c3fcafa1d0351fb9f188cea6c510c890774ec6cb"
+      },
+      "mergedLog": {
+        "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-unchanged-methodology-diagnostic/stdout-stderr.log",
+        "bytes": 613,
+        "sha256": "3d1300888f62b70566b4778a9962ecc745ad3d97ce14cf99656ab9a857e7700f"
+      }
+    }
+  ],
+  "sourceAuthority": {
+    "sourceCommitFromRootAdmission": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+    "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "actualRawFileAndCommandRootMatchS": true,
+    "wrapperRHeadIsDistinct": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "scope": "These are completed unchanged source-regression runs. Current source-file hashes are pinned separately; wrapper HEAD does not claim S authority or a fresh-Q run."
+  },
+  "lifecycleInspection": [
+    {
+      "scope": "57-case regression files",
+      "finding": "Existing tests primarily build synthetic event/projection inputs. antiGaming restores its prior STRICT_EVIDENCE_BINDING and console mocks in afterEach; evidenceGatingCorrection restores its one opt-out edit with finally. The expected3 diagnostic/deprecation warnings match source. No new public fixture record or all-environment snapshot was emitted."
+    },
+    {
+      "scope": "30-case methodology/diagnostic files",
+      "finding": "fullDiagnostic/quickscoreShare/traceEvidenceMapper test survey arithmetic, rendering and synthetic trace-derived answers. Their L3/L4/L5 values are not observed governed-gate maturity. publicMethodology creates a temporary isolated workspace/fleet, calls runDiagnostic with noSign:true, and removes its owned roots in afterEach. Its relevant setup/teardown/run body was inspected; its long manifest/render assertion body is hash-pinned, not reinterpreted as broader source acceptance."
+    },
+    {
+      "scope": "Existing shared setup",
+      "finding": "guardWorkspace creates a temporary guard DB/receipt workspace, conditionally closes its guardDB/ledger pool, deletes that temp root, and restores the two prior guard environment values. The global/per-file repo guards inspect sourceS/.amc via import.meta URL; their passed hooks are finite guard observations, not a full-filesystem invariant. Global snapshot env assignment has no new public restoration attestation."
+    },
+    {
+      "scope": "Unobserved lifecycle limits",
+      "finding": "No new retained public lifecycle records, vault-lock reports, per-workspace pool-close/native identity snapshots, exact full-environment before/after arrays, descendant PID list, cryptographic admission proof or socket inventory was emitted. Passed hooks/natural process closure do not invent these facts. PublicMethodology own-workspace cleanup does not explicitly record vault lock or pool closure. No existing fixture was altered to add instrumentation."
+    }
+  ],
+  "boundaries": [
+    "Counts remain two separate57/57 and30/30 cohorts; no aggregation into new-test, control, governed-run or fullP1-07 acceptance.",
+    "RawTestSuites counts include nested suites and are not actual file counts.",
+    "No product/helper/parser/compiler/test/native/SQL/network command or process probe was executed by this reviewer.",
+    "No source, checkout, index, QA, existing fixture, guard, baseline or quality change.",
+    "HeldP1-01/P1-35 gaps, Claude work, F37skip and all held decisions remain open."
+  ],
+  "preparationNote": "An initial broad source/outcome display was truncated; actual machine JSON was subsequently read fully by the bounded per-phase parser. Lifecycle review is explicitly scoped rather than claiming the entire long methodology assertion body was read."
+}

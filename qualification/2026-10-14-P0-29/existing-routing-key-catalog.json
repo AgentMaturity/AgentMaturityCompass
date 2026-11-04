@@ -1,0 +1,29 @@
+{
+  "source": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+  "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0",
+  "keys": [
+    "D-04",
+    "P0-03",
+    "P0-09",
+    "P0-15",
+    "P0-18",
+    "P0-22",
+    "P0-24",
+    "P0-27",
+    "P0-28",
+    "P0-33",
+    "P0-34",
+    "P0-35",
+    "P0-37",
+    "P1-01",
+    "P1-08",
+    "P1-12",
+    "P1-51",
+    "P2-01",
+    "P2-07",
+    "P2-09",
+    "P2-27",
+    "P2-29"
+  ],
+  "meaning": "Existing draft plan keys occur in the user-supplied frozen plan. Key existence does not establish matching whole-row scope or human routing approval for the 38 unresolved rows."
+}

@@ -1,0 +1,275 @@
+{
+  "sourceHead": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "actualExit": 1,
+  "durationMs": 3398547,
+  "result": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/result.json",
+    "sha256": "ee2060f397c0e7965ab80465e3595918aa3cde86d8f59a158654729133b28229",
+    "bytes": 16934
+  },
+  "rawLog": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/raw.log",
+    "sha256": "b67881ca138b9fef83ef0ce1a6b38c3f960954228286cce303cf2ad0a0cd1940",
+    "bytes": 3309794
+  },
+  "nativeReport": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/report.json",
+    "sha256": "f8317bf7be32208ba0f910d49626cdedd352dc486f52e674484ddf1301a2b3a6",
+    "bytes": 10222698
+  },
+  "nativeAudit": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/native-audit.json",
+    "sha256": "96d696044a86486494fae3e78f1b90437c0a9ef317baaf46d72eb490e4a7c173",
+    "bytes": 591239
+  },
+  "nativeSummary": {
+    "numTotalTests": 28032,
+    "numPassedTests": 28015,
+    "numFailedTests": 10,
+    "numPendingTests": 7,
+    "numTodoTests": 0,
+    "success": false,
+    "numTotalTestSuites": 5563,
+    "numPassedTestSuites": 5555,
+    "numFailedTestSuites": 8,
+    "numPendingTestSuites": 0,
+    "numRuntimeErrorTestSuites": null
+  },
+  "assertionStatuses": {
+    "passed": 28015,
+    "failed": 10,
+    "skipped": 7
+  },
+  "jsonFileEntryCount": 1850,
+  "jsonFileStatuses": {
+    "passed": 1846,
+    "failed": 4
+  },
+  "rawFiles": {
+    "line": " Test Files  4 failed | 1844 passed | 2 skipped (1850)",
+    "total": 1850,
+    "counts": {
+      "failed": 4,
+      "passed": 1844,
+      "skipped": 2
+    }
+  },
+  "rawTests": {
+    "line": "      Tests  10 failed | 28015 passed | 7 skipped (28032)",
+    "total": 28032,
+    "counts": {
+      "failed": 10,
+      "passed": 28015,
+      "skipped": 7
+    }
+  },
+  "rawFileCategoriesMatchJsonStatuses": false,
+  "failedAssertions": [
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/apiRouterResponseParity.test.ts",
+      "suiteIndex": 81,
+      "assertionIndex": 124,
+      "fullName": "unchanged public admission and other owned routes score schema guard and oversized body keep native status",
+      "status": "failed",
+      "durationMs": 21.443500000000313,
+      "failureMessages": [
+        "Error: write ECONNRESET\n    at WriteWrap.onWriteComplete [as oncomplete] (node:internal/stream_base_commons:87:19)"
+      ],
+      "failureDetails": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/publicDocsGraph.test.ts",
+      "suiteIndex": 1323,
+      "assertionIndex": 2,
+      "fullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+      "status": "failed",
+      "durationMs": 73.40104099999999,
+      "failureMessages": [
+        "AssertionError: expected [ { source: 'MCP_SERVER', …(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ],
+      "failureDetails": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts",
+      "suiteIndex": 1790,
+      "assertionIndex": 0,
+      "fullName": "P1-25 real signed ledger checkpoint transitions completes the same signed pending checkpoint with a genuine query-bound token and ledger event",
+      "status": "failed",
+      "durationMs": 26.738083999999958,
+      "failureMessages": [
+        "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:261:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "failureDetails": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts",
+      "suiteIndex": 1790,
+      "assertionIndex": 1,
+      "fullName": "P1-25 real signed ledger checkpoint transitions rejects required time only after the real TSA refusal while preserving the signed pending checkpoint",
+      "status": "failed",
+      "durationMs": 7.32062499999995,
+      "failureMessages": [
+        "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:328:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "failureDetails": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts",
+      "suiteIndex": 1790,
+      "assertionIndex": 2,
+      "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+      "status": "failed",
+      "durationMs": 6.378874999999994,
+      "failureMessages": [
+        "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:365:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "failureDetails": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts",
+      "suiteIndex": 1790,
+      "assertionIndex": 3,
+      "fullName": "P1-25 real signed ledger checkpoint transitions uses the default signed trust home and checkpoints after exactly two new audit events",
+      "status": "failed",
+      "durationMs": 5.8225419999999986,
+      "failureMessages": [
+        "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:500:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "failureDetails": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts",
+      "suiteIndex": 1790,
+      "assertionIndex": 4,
+      "fullName": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+      "status": "failed",
+      "durationMs": 6.451958999999988,
+      "failureMessages": [
+        "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:642:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "failureDetails": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts",
+      "suiteIndex": 1790,
+      "assertionIndex": 5,
+      "fullName": "P1-25 real signed ledger checkpoint transitions widens genuine signed checkpoint windows by nonzero accuracy at inclusive default and zero-tolerance edges",
+      "status": "failed",
+      "durationMs": 6.714959000000022,
+      "failureMessages": [
+        "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/checkpointWindow.test.ts:799:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "failureDetails": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaGrant.test.ts",
+      "suiteIndex": 1793,
+      "assertionIndex": 0,
+      "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+      "status": "failed",
+      "durationMs": 18.018208000000016,
+      "failureMessages": [
+        "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaGrant.test.ts:10:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "failureDetails": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaGrant.test.ts",
+      "suiteIndex": 1793,
+      "assertionIndex": 1,
+      "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+      "status": "failed",
+      "durationMs": 7.241083000000003,
+      "failureMessages": [
+        "AssertionError: expected null not to be null\n    at withGrantFixture (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaTestFixture.ts:289:30)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/time/tsaGrant.test.ts:30:5\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ],
+      "failureDetails": null
+    }
+  ],
+  "nonPassingNonFailedAssertions": [
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "suiteIndex": 1663,
+      "assertionIndex": 0,
+      "fullName": "Claude Code 2.1.296 hook conformance (P1-23) an allowed Read runs in a registered session, the claim reads enforced, and the lifecycle verifies with no mismatch",
+      "status": "skipped",
+      "durationMs": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "suiteIndex": 1663,
+      "assertionIndex": 1,
+      "fullName": "Claude Code 2.1.296 hook conformance (P1-23) a denied Bash command, a Write that needs approval, an MCP tool and a Write to AMC's hook settings have no effect",
+      "status": "skipped",
+      "durationMs": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "suiteIndex": 1663,
+      "assertionIndex": 2,
+      "fullName": "Claude Code 2.1.296 hook conformance (P1-23) a foreign PreToolUse hook in the project settings leaves the session not governed",
+      "status": "skipped",
+      "durationMs": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "suiteIndex": 1663,
+      "assertionIndex": 3,
+      "fullName": "Claude Code 2.1.296 hook conformance (P1-23) UserPromptSubmit admission: an active freeze blocks the prompt before the model sees it",
+      "status": "skipped",
+      "durationMs": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "suiteIndex": 1663,
+      "assertionIndex": 4,
+      "fullName": "Claude Code 2.1.296 hook conformance (P1-23) hook round trip latency: the installed PreToolUse handler spawned against the local Bridge",
+      "status": "skipped",
+      "durationMs": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "suiteIndex": 1663,
+      "assertionIndex": 5,
+      "fullName": "Claude Code 2.1.296 hook conformance (P1-23) every decision receipt and event verifies cold",
+      "status": "skipped",
+      "durationMs": null
+    },
+    {
+      "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-20261019/tests/conformance/claudeCodeHooks.conformance.test.ts",
+      "suiteIndex": 1663,
+      "assertionIndex": 6,
+      "fullName": "Claude Code 2.1.296 hook conformance (P1-23) with the Bridge stopped the tool call is blocked",
+      "status": "skipped",
+      "durationMs": null
+    }
+  ],
+  "suiteOrCollectionErrors": [],
+  "nativeRunErrors": {},
+  "rawRunErrorSignals": [],
+  "rawTimeoutDiagnostics": [],
+  "classification": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/failure-classifications-root-reviewed-v2.json",
+    "sha256": "1b4d0ed83ec7cf58a7bb7f52dc80cf50d286097184a389f2dfb23f9af2661632",
+    "bytes": 110124
+  },
+  "classificationCounts": {
+    "BASELINE_MATCHED": 12,
+    "RECORDED_SKIP_OR_TODO": 7,
+    "BASELINE_MATCHED_ASYNC_DISPATCH_FRAME": 2
+  },
+  "classificationCountsByDescriptorKind": {
+    "assertion": {
+      "BASELINE_MATCHED": 9,
+      "RECORDED_SKIP_OR_TODO": 7,
+      "BASELINE_MATCHED_ASYNC_DISPATCH_FRAME": 1
+    },
+    "suite": {
+      "BASELINE_MATCHED": 3,
+      "BASELINE_MATCHED_ASYNC_DISPATCH_FRAME": 1
+    },
+    "run": {}
+  },
+  "limit": "Complete native file inventory remains in the exact hash-bound external audit; no silent status normalization or baseline promotion."
+}

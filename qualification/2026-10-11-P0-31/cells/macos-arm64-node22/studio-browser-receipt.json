@@ -1,0 +1,457 @@
+{
+  "schemaVersion": "2026-09-08",
+  "startedAt": "2026-10-11T07:31:52.583Z",
+  "sourceCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "artifactSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "artifactPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-rc/rc.tgz",
+  "installedCli": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "node": {
+    "version": "v22.22.0",
+    "platform": "darwin",
+    "arch": "arm64"
+  },
+  "browser": {
+    "engine": "chromium",
+    "version": "151.0.7922.34"
+  },
+  "planned": [
+    "owner-login-and-missing-credential",
+    "rendered-layout-keyboard-and-home-handoff",
+    "selected-agent-committed-task-and-follow-up",
+    "release-reload-explicit-resume",
+    "lost-create-acknowledgement-never-replayed",
+    "unreceived-create-explicit-identical-retry",
+    "unreceived-turn-explicit-identical-retry",
+    "real-pending-approval-link-and-denial",
+    "cancel-actual-turn-waiting-for-approval",
+    "browser-verification-control-reports-actual-verdict",
+    "explicit-closed-task-archive-retains-inspection",
+    "native-write-browser-proof-and-agent-binding",
+    "demo-stub-only-and-approval-refusal"
+  ],
+  "checks": [
+    {
+      "name": "owner-login-and-missing-credential",
+      "status": "passed",
+      "elapsedMs": 949,
+      "details": {
+        "actorMode": "owner cookie",
+        "nondefaultAgent": "browser-agent",
+        "providerInspectedOnly": "openai"
+      }
+    },
+    {
+      "name": "rendered-layout-keyboard-and-home-handoff",
+      "status": "passed",
+      "elapsedMs": 774,
+      "details": {
+        "widths": [
+          1280,
+          390
+        ],
+        "clipboardAgent": "browser-agent"
+      }
+    },
+    {
+      "name": "selected-agent-committed-task-and-follow-up",
+      "status": "passed",
+      "elapsedMs": 2846,
+      "details": {
+        "taskId": "c6090d397166c3b442d79264d27dd7880a019cfaa0b491fdb5ececddbd8d42e6",
+        "sessionId": "5a411eff-0cd6-4aec-b8d7-ea821340901d",
+        "revision": 2,
+        "evidence": "committed; full verification separate"
+      }
+    },
+    {
+      "name": "release-reload-explicit-resume",
+      "status": "passed",
+      "elapsedMs": 2513,
+      "details": {
+        "sessionId": "5a411eff-0cd6-4aec-b8d7-ea821340901d",
+        "reloadMutationCount": 0
+      }
+    },
+    {
+      "name": "lost-create-acknowledgement-never-replayed",
+      "status": "passed",
+      "elapsedMs": 1856,
+      "details": {
+        "taskId": "c093e9a9441ecc2382921f5bef11da00d21c8e079bfad40410835f19830e8f02",
+        "requestId": "4799a971-5887-4136-a730-9fbd83481120",
+        "browserPosts": 1,
+        "acceptedTasks": 1,
+        "editedDraftPreserved": true
+      }
+    },
+    {
+      "name": "unreceived-create-explicit-identical-retry",
+      "status": "passed",
+      "elapsedMs": 3335,
+      "details": {
+        "taskId": "8f073cf21e54c86d31dc3ae0374c312ed508a43dec134cd30b98d9f70449f7c8",
+        "sessionId": "23373877-e7e6-46f0-92e7-93577dab0022",
+        "requestId": "dca9727e-9bff-4d90-8c24-759e8ac8d1fd",
+        "attempts": 3,
+        "requestBodyIdentical": true,
+        "revisedDraftPreserved": true,
+        "firstAttemptReachedServer": false,
+        "refusedRetry": "real CSRF check",
+        "failedRefreshRecoverable": true
+      }
+    },
+    {
+      "name": "unreceived-turn-explicit-identical-retry",
+      "status": "passed",
+      "elapsedMs": 5291,
+      "details": {
+        "taskId": "bc833df631b8ab18c046c343923e64b838e833f0ec77aa7905426de9b7ce098e",
+        "sessionId": "746da18c-4e03-49cf-959d-5cb7165469de",
+        "requestId": "0d03d40f-a946-4b8d-a8b3-8daeec5a51bc",
+        "attempts": 3,
+        "requestBodyIdentical": true,
+        "revisedDraftPreserved": true,
+        "firstAttemptReachedServer": false,
+        "refusedRetry": "real CSRF check",
+        "failedRefreshRecoverable": true
+      }
+    },
+    {
+      "name": "real-pending-approval-link-and-denial",
+      "status": "passed",
+      "elapsedMs": 3720,
+      "details": {
+        "taskId": "0bf804f35e55a958f1191b8d56ce2cb31bf96d0edccdc01852ea4cec5cb5a8a8",
+        "sessionId": "3c8b64dd-e414-40da-a7d8-33c16119b5b6",
+        "approvalRequestId": "apprreq_db81f22c73384928afcfdd7deb27f0e3",
+        "quorum": 2,
+        "decision": "DENY",
+        "note": "Stub requests a synthetic argument shape; no successful coding/editing effect is claimed."
+      }
+    },
+    {
+      "name": "cancel-actual-turn-waiting-for-approval",
+      "status": "passed",
+      "elapsedMs": 2978,
+      "details": {
+        "taskId": "c4827739600e7664d253ce1eeae77b6d04833836a86cc34d361917e470ee35e0",
+        "sessionId": "afb58b0b-3311-4bd0-aa0d-9e2140374d25",
+        "ending": "cancelled"
+      }
+    },
+    {
+      "name": "browser-verification-control-reports-actual-verdict",
+      "status": "passed",
+      "elapsedMs": 316,
+      "details": {
+        "sessionId": "afb58b0b-3311-4bd0-aa0d-9e2140374d25",
+        "verification": "failed",
+        "note": "Checks faithful presentation of the actual verifier result; cold cryptographic acceptance is independently required after shutdown."
+      }
+    },
+    {
+      "name": "explicit-closed-task-archive-retains-inspection",
+      "status": "passed",
+      "elapsedMs": 4812,
+      "details": {
+        "taskId": "d5ec620da6405ffc8619c97fdf401e3325af4380338c322fb7ff18ffc444a20b",
+        "sessionId": "da1b3718-57dc-458f-95c6-0496a2463461",
+        "revision": 1,
+        "signedHistoryRetained": true,
+        "defaultListExcluded": true,
+        "explicitArchivedInspection": true,
+        "reloadMutationCount": 0,
+        "evidenceVerification": "anchored-prefix"
+      }
+    },
+    {
+      "name": "native-write-browser-proof-and-agent-binding",
+      "status": "passed",
+      "elapsedMs": 1,
+      "details": {
+        "nativeRequests": 25,
+        "cookieCsrfPresent": true,
+        "agentId": "browser-agent"
+      }
+    },
+    {
+      "name": "demo-stub-only-and-approval-refusal",
+      "status": "passed",
+      "elapsedMs": 3475,
+      "details": {
+        "taskId": "2f24b4f621c0d2e5a821b2109a5375fb7755f5ad0e682218c25c54482afb7602",
+        "provider": "stub",
+        "tools": "none",
+        "approvalStatus": 403
+      }
+    }
+  ],
+  "notes": [],
+  "requests": [
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "5d0d1545-2e70-49db-af9e-c343b2d9b19e",
+      "expectedRevision": null,
+      "promptSha256": "39e02ea6f1d13347c0da774ea40f3d361dd73ac01704650e66b908d094586b56",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/c6090d397166c3b442d79264d27dd7880a019cfaa0b491fdb5ececddbd8d42e6/turn",
+      "agentId": "browser-agent",
+      "clientRequestId": "9651af27-98ea-4fee-9f3f-2d6346160161",
+      "expectedRevision": 1,
+      "promptSha256": "7e0424a5b1f6facec025c4b745c161b48cd62770c096eec6879343fce6877f2b",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/c6090d397166c3b442d79264d27dd7880a019cfaa0b491fdb5ececddbd8d42e6/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 2,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/c6090d397166c3b442d79264d27dd7880a019cfaa0b491fdb5ececddbd8d42e6/resume",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 2,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/c6090d397166c3b442d79264d27dd7880a019cfaa0b491fdb5ececddbd8d42e6/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 2,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "4799a971-5887-4136-a730-9fbd83481120",
+      "expectedRevision": null,
+      "promptSha256": "c230489105da41ed4e4814890037ae4f3789a5305fea0bca0c11dfa8254f8d81",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/c093e9a9441ecc2382921f5bef11da00d21c8e079bfad40410835f19830e8f02/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "dca9727e-9bff-4d90-8c24-759e8ac8d1fd",
+      "expectedRevision": null,
+      "promptSha256": "b992b98db4524316c7d5241947ddbbfa89989666cccfd69ee139ca73b0116ac5",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "dca9727e-9bff-4d90-8c24-759e8ac8d1fd",
+      "expectedRevision": null,
+      "promptSha256": "b992b98db4524316c7d5241947ddbbfa89989666cccfd69ee139ca73b0116ac5",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "dca9727e-9bff-4d90-8c24-759e8ac8d1fd",
+      "expectedRevision": null,
+      "promptSha256": "b992b98db4524316c7d5241947ddbbfa89989666cccfd69ee139ca73b0116ac5",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/8f073cf21e54c86d31dc3ae0374c312ed508a43dec134cd30b98d9f70449f7c8/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "370f5c74-31c8-4493-82c9-d86b71d8d1d8",
+      "expectedRevision": null,
+      "promptSha256": "a35572c44f9e7d17e856f682df5794e34f0ad6716ac9763e41b233e10c193456",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/bc833df631b8ab18c046c343923e64b838e833f0ec77aa7905426de9b7ce098e/turn",
+      "agentId": "browser-agent",
+      "clientRequestId": "0d03d40f-a946-4b8d-a8b3-8daeec5a51bc",
+      "expectedRevision": 1,
+      "promptSha256": "9149bf21bdf58db5ee4cfa734e39c87919df5ea0dfe3c4ac73599f4fa1f08d20",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/bc833df631b8ab18c046c343923e64b838e833f0ec77aa7905426de9b7ce098e/turn",
+      "agentId": "browser-agent",
+      "clientRequestId": "0d03d40f-a946-4b8d-a8b3-8daeec5a51bc",
+      "expectedRevision": 1,
+      "promptSha256": "9149bf21bdf58db5ee4cfa734e39c87919df5ea0dfe3c4ac73599f4fa1f08d20",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/bc833df631b8ab18c046c343923e64b838e833f0ec77aa7905426de9b7ce098e/turn",
+      "agentId": "browser-agent",
+      "clientRequestId": "0d03d40f-a946-4b8d-a8b3-8daeec5a51bc",
+      "expectedRevision": 1,
+      "promptSha256": "9149bf21bdf58db5ee4cfa734e39c87919df5ea0dfe3c4ac73599f4fa1f08d20",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/bc833df631b8ab18c046c343923e64b838e833f0ec77aa7905426de9b7ce098e/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 2,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "256e0ea4-ef78-4166-be74-29544995bee1",
+      "expectedRevision": null,
+      "promptSha256": "07bab47d88df34305a07440f854bc28b23cfadcd46f9ad07e5c3266af6e9d1b9",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/0bf804f35e55a958f1191b8d56ce2cb31bf96d0edccdc01852ea4cec5cb5a8a8/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "f7543639-0f91-41ba-9788-98ad5c884594",
+      "expectedRevision": null,
+      "promptSha256": "9c97e8b98310e6fa58f33d291a56bf8e042f26a8ddcdcbf8ce29bae40659dac5",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/c4827739600e7664d253ce1eeae77b6d04833836a86cc34d361917e470ee35e0/cancel",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/c4827739600e7664d253ce1eeae77b6d04833836a86cc34d361917e470ee35e0/release",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/c4827739600e7664d253ce1eeae77b6d04833836a86cc34d361917e470ee35e0/verify",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks",
+      "agentId": "browser-agent",
+      "clientRequestId": "57d17d86-f14a-4e94-8f8b-e3a9ae192ded",
+      "expectedRevision": null,
+      "promptSha256": "f5c2140933835013455835e0ff9d7638948438c89a5ff75eaae3667a6da0cb60",
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/d5ec620da6405ffc8619c97fdf401e3325af4380338c322fb7ff18ffc444a20b/verify",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    },
+    {
+      "path": "/api/v1/native-tasks/d5ec620da6405ffc8619c97fdf401e3325af4380338c322fb7ff18ffc444a20b/archive",
+      "agentId": "browser-agent",
+      "clientRequestId": null,
+      "expectedRevision": 1,
+      "promptSha256": null,
+      "intent": "task-workspace-v1",
+      "csrfPresent": true
+    }
+  ],
+  "sessionIds": [
+    "5a411eff-0cd6-4aec-b8d7-ea821340901d",
+    "eecd8872-6afb-48f5-92d5-992f6370f72a",
+    "23373877-e7e6-46f0-92e7-93577dab0022",
+    "746da18c-4e03-49cf-959d-5cb7165469de",
+    "3c8b64dd-e414-40da-a7d8-33c16119b5b6",
+    "afb58b0b-3311-4bd0-aa0d-9e2140374d25",
+    "da1b3718-57dc-458f-95c6-0496a2463461"
+  ],
+  "cleanup": [
+    {
+      "resource": "owned browser",
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "qualification": "browser-slice-passed",
+  "limits": [
+    "Actual browser with installed AMC server; provider is the explicit local deterministic stub.",
+    "No real model coding-quality claim. Workspace stub tool arguments are synthetic; denial/cancellation are the exercised tool behaviors.",
+    "Browser service workers are blocked for deterministic lost-response interception; offline/service-worker behavior is not qualified.",
+    "Cold cryptographic verification must be run separately after orderly Studio shutdown; a live gateway can make whole-workspace verification refuse.",
+    "No HAR/trace or credential values are retained."
+  ],
+  "harness": {
+    "scriptSha256": "ff835c580a58c0d08220abd14aecffebbd1dba2a758fe1aa3890e5b4f09abf0e",
+    "pageModuleSha256": "22ed3520cb14b5bb45b489200e2051e8bc6ecf47b22f8240f20e0550ee720fb3",
+    "playwright": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-rc/src/node_modules/@playwright/test/package.json",
+      "version": "1.62.1"
+    }
+  },
+  "finishedAt": "2026-10-11T07:32:27.892Z",
+  "counts": {
+    "planned": 13,
+    "passed": 13,
+    "failed": 0,
+    "notExercised": 0
+  }
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "controlId": "L1-TECH-01",
+    "framework": "amc-audit-map-v1",
+    "clause": "LOGGING_MONITORING.TRANSPARENCY_SEAL",
+    "relation": "partial",
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement, legal scope or oracle. Mapping is experimental and unreviewed.",
+    "exists": true
+  },
+  {
+    "controlId": "L1-TECH-02",
+    "framework": "amc-audit-map-v1",
+    "clause": "INCIDENT_RESPONSE_PREPAREDNESS.ADVISORIES",
+    "relation": "partial",
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement, legal scope or oracle. Mapping is experimental and unreviewed.",
+    "exists": true
+  },
+  {
+    "controlId": "L1-TECH-03",
+    "framework": "amc-audit-map-v1",
+    "clause": "SECURE_CONFIGURATION.TOOLS_POLICY",
+    "relation": "partial",
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement, legal scope or oracle. Mapping is experimental and unreviewed.",
+    "exists": true
+  },
+  {
+    "controlId": "L1-TECH-04",
+    "framework": "amc-audit-map-v1",
+    "clause": "ACCESS_CONTROL.APPROVALS",
+    "relation": "partial",
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement, legal scope or oracle. Mapping is experimental and unreviewed.",
+    "exists": true
+  },
+  {
+    "controlId": "L1-TECH-05",
+    "framework": "amc-audit-map-v1",
+    "clause": "RISK_ASSURANCE_AND_TESTING.POLICY",
+    "relation": "partial",
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement, legal scope or oracle. Mapping is experimental and unreviewed.",
+    "exists": true
+  },
+  {
+    "controlId": "L1-TECH-06",
+    "framework": "amc-audit-map-v1",
+    "clause": "RISK_ASSURANCE_AND_TESTING.POLICY",
+    "relation": "partial",
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement, legal scope or oracle. Mapping is experimental and unreviewed.",
+    "exists": true
+  },
+  {
+    "controlId": "L1-TECH-07",
+    "framework": "amc-audit-map-v1",
+    "clause": "INCIDENT_RESPONSE_PREPAREDNESS.ADVISORIES",
+    "relation": "partial",
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement, legal scope or oracle. Mapping is experimental and unreviewed.",
+    "exists": true
+  },
+  {
+    "controlId": "L1-TECH-08",
+    "framework": "amc-audit-map-v1",
+    "clause": "RISK_ASSURANCE_AND_TESTING.POLICY",
+    "relation": "partial",
+    "rationale": "The internal audit-map control is related, but does not cover this station-specific requirement, legal scope or oracle. Mapping is experimental and unreviewed.",
+    "exists": true
+  }
+]

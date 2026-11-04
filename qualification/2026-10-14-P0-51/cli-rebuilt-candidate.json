@@ -1,0 +1,233 @@
+{
+  "issue": "P0-51",
+  "kind": "Complete unchanged 84-case rebuilt-candidate actual CLI run with three active REDs",
+  "createdAt": "2026-10-14T18:13:54.226865+00:00",
+  "repo": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass",
+  "head": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46",
+  "sourceState": "Parent-owned production candidate is dirty against 3b08; this is not a final committed-source qualification.",
+  "ownedTest": {
+    "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts",
+    "sha256": "86f45ab5601d53ae0dc274a52a113d7bb2cbdc9451c74c0e68668f46ce8e286f",
+    "lines": 463,
+    "changedDuringRerun": false
+  },
+  "result": {
+    "numTotalTests": 84,
+    "numPassedTests": 81,
+    "numFailedTests": 3,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": false
+  },
+  "rawJson": {
+    "path": "/private/tmp/p0-51-portable-cli-repaired-candidate-20261014.raw.json",
+    "sha256": "ee1b79b6506e6de3a6a909119ad1646472afb9bca40d808a38e4c2880f1174b5"
+  },
+  "actualCommandManifest": {
+    "path": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/commands.json",
+    "sha256": "84b013a130944c0ff846daab7f95eeec0898a33e23587adb451d239881ce6c36",
+    "children": 84,
+    "independentlyCheckedStreamHashes": 168,
+    "fixtureManifest": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/fixture.json",
+    "fixtureSha256": "8a5d818585cfb08d1ea8966fc76c86edf3114f1314fc9d76623f126f23c055c6"
+  },
+  "compiledInputs": {
+    "path": "/private/tmp/p0-51-portable-cli-rebuilt-inputs-20261014.json",
+    "sha256": "c7b6086c412503ed9ca050a0552f0c183483c01ac6e8d72efb771dd1583aa834",
+    "count": 18,
+    "allBytesUnchangedAfterRun": true
+  },
+  "canonicalSuccessPostvalidation": {
+    "path": "/private/tmp/p0-51-canonical-claim-output-20261014.json",
+    "sha256": "d1112abb20a3d8d7e93d78d5443dac48535b2256cce52fde0d87188a8189a197",
+    "rows": 6,
+    "rule": "For the six repaired actual success JSON outputs, production verifier and status schemas parse, report integrity/admission are pass/trusted, claimKind is self_reported, result is not_evaluated, and complete fields match canonical artifact policy and label. This independent observer changed no test expectation."
+  },
+  "journal": [
+    {
+      "name": "portable-cli-expanded-test-types",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 36458,
+      "startedUtc": "2026-10-14T18:04:57.541481+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-expanded-test-types-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "portable-cli-repaired-candidate",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/portableVerifierCliQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-51-portable-cli-repaired-candidate-20261014.raw.json",
+      "exit": 1,
+      "durationMs": 64867,
+      "startedUtc": "2026-10-14T18:11:12.322651+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-repaired-candidate-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    },
+    {
+      "name": "portable-cli-canonical-claim-output",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-51-canonical-claim-output-20261014.mjs /private/tmp/amc-p0-51-portable-cli-PF1gTT/logs",
+      "exit": 0,
+      "durationMs": 302,
+      "startedUtc": "2026-10-14T18:12:49.875183+00:00",
+      "log": "/private/tmp/p0-51-portable-cli-canonical-claim-output-20261014.log",
+      "sourceHead": "3b08f2285a9b276e3aa0fce8f36ed2f6198adb46"
+    }
+  ],
+  "failures": [
+    {
+      "name": "Portable CLI Industry Packs license key-compromise revocation beats a matching explicit license pin and both allow flags",
+      "failureMessages": [
+        "AssertionError: expected +0 to be 1 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:392:42\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "Portable CLI external-evidence profile signed revoked authority refuses even with the independent authority file",
+      "failureMessages": [
+        "AssertionError: expected +0 to be 1 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:430:42\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "name": "Portable CLI detached session proof matching fingerprint cannot bypass operator revoked decision",
+      "failureMessages": [
+        "AssertionError: expected +0 to be 1 // Object.is equality\n    at /Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts:460:42\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "remainingPrecedenceWitnesses": [
+    {
+      "name": "license-revoked-pinned",
+      "expectedExit": 1,
+      "actualExit": 0,
+      "integrity": "pass",
+      "issuerAdmission": {
+        "status": "pass",
+        "signatures": [
+          {
+            "signature": "license signature",
+            "purpose": "artifact-seal",
+            "keyId": "3d6121520e63f34027ba7277a8ad8e7530b05154fc0f62d65014cfa89ae23037",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        ]
+      },
+      "trusted": true,
+      "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/license-revoked-pinned.stdout",
+      "stdoutSha256": "18c079032d7f6d3e4109570dbc471f0d94974816c5634faea91f0701d032bbeb",
+      "stderrPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/license-revoked-pinned.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "imports-revoked",
+      "expectedExit": 1,
+      "actualExit": 0,
+      "integrity": "pass",
+      "issuerAdmission": {
+        "status": "pass",
+        "signatures": [
+          {
+            "signature": "profile signature",
+            "purpose": "evidence-authority",
+            "keyId": "cf68896b9568f5bf018a765dff68d4eb65e02bb7db94f817a86b3367d3773060",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        ]
+      },
+      "trusted": true,
+      "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/imports-revoked.stdout",
+      "stdoutSha256": "d103cab3418e6a3fd9947431469d6ee8832ad034549546ce8e2b8f82972fd821",
+      "stderrPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/imports-revoked.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "session-revoked",
+      "expectedExit": 1,
+      "actualExit": 0,
+      "integrity": "pass",
+      "issuerAdmission": {
+        "status": "pass",
+        "signatures": [
+          {
+            "signature": "signed merkle root",
+            "purpose": "artifact-seal",
+            "keyId": "b1b3325d23468a4bfa3bb82c81507559aa9ba31b6328c3e7a7d92a7c294383b8",
+            "status": "admitted",
+            "source": "explicit-key",
+            "listId": null,
+            "timeBasis": null,
+            "detail": null
+          }
+        ]
+      },
+      "trusted": true,
+      "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/session-revoked.stdout",
+      "stdoutSha256": "38a8ea34abf9bb188ab613ef700d777f4be493f075daac2982d1ee9bc127268a",
+      "stderrPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/session-revoked.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "repairedStrictWitnesses": [
+    {
+      "name": "notary-pinned",
+      "status": 0,
+      "claimKind": "self_reported",
+      "result": "not_evaluated",
+      "stdoutSha256": "66017b5abd18e81a0558dc2d3056d154bd3bb7e524e19dd7352e5390738ab07d"
+    },
+    {
+      "name": "notary-pinned-unused-allows",
+      "status": 0,
+      "claimKind": "self_reported",
+      "result": "not_evaluated",
+      "stdoutSha256": "800a8c38708e22ab319e8069e5d8b6b1a4633d34f0eb9931593b87fcce42debb"
+    },
+    {
+      "name": "notary-listed",
+      "status": 0,
+      "claimKind": "self_reported",
+      "result": "not_evaluated",
+      "stdoutSha256": "13deb90a6ac29ff81bbb8f1810b7b7722ae7b05c0355798763611e4113bfe34e"
+    },
+    {
+      "name": "transparency-pinned",
+      "status": 0,
+      "claimKind": "self_reported",
+      "result": "not_evaluated",
+      "stdoutSha256": "1854c6c75d0251107f3e359b5bc2fd9053fd4885968dd254648218c2af0c9052"
+    },
+    {
+      "name": "transparency-pinned-unused-allows",
+      "status": 0,
+      "claimKind": "self_reported",
+      "result": "not_evaluated",
+      "stdoutSha256": "2a798114ea2acee02a33e8ce140e1fcb9c9afd23decdd58cec1b9a093d7beb0d"
+    },
+    {
+      "name": "transparency-listed",
+      "status": 0,
+      "claimKind": "self_reported",
+      "result": "not_evaluated",
+      "stdoutSha256": "a5f9609fe6b5f9f62621939f22fe79e525c7f56b750a009896226abe7de1d9be"
+    }
+  ],
+  "originalRedReceipt": {
+    "path": "/private/tmp/p0-51-portable-cli-original-dist-20261014.json",
+    "sha256": "bc19b2c08515cec7d8d60f6c759d9af492d796a4d902706702d95f6b795a1b5f"
+  },
+  "reviewReceipt": {
+    "path": "/private/tmp/p0-51-proof-export-independent-review-20261014.json",
+    "sha256": "9550b67d25cbba1dab758f9396191ebc3607bb92873258f816cef6ee54a60fe7"
+  },
+  "limitations": [
+    "Three compromise-revocation refusals remain active and fail. The explicit-pin precedence contradiction requires parent reconciliation of authored requirements; no assertion was changed to green.",
+    "The sibling-owned license signed-list-only and F4 tests, mutation effects and source freezes remain separately evidenced. This CLI observer does not replace them.",
+    "Pins, roots, original references and child isolation are unchanged from the original receipt; no source/test edit, build/install, external transport, model execution, live licensing or historical state cleanup occurred during this rerun.",
+    "No final source commit, broader full/coverage/hosted/release claim is established. P0-22 inherited failures and held/paused scopes remain."
+  ]
+}

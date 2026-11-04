@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-16T18:37:32.427359+00:00",
+  "inputsVerified": 88,
+  "outputsVerified": 10,
+  "unresolvedLiveReservation": true,
+  "sourceAllocated": false,
+  "hostedWip": 0,
+  "hostedConflictsIncludingDependabot": [],
+  "d15": "none",
+  "freeze": {
+    "cliCommandPaths": 1236,
+    "cliInventoryPaths": 1236,
+    "stationPacks": 41,
+    "stationPackQuestions": 632
+  },
+  "scope": "Preparation only. Current reservation delta unavailable; no ownership release inferred."
+}

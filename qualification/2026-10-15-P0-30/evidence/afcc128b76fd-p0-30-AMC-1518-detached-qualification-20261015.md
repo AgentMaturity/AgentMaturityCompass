@@ -1,0 +1,9 @@
+# AMC-1518 bounded harness qualification
+
+The unchanged baseline passed 43/43. Secret-manifest control: [43, 41, 43]; fixture-tamper control: [43, 42, 43]. Counts give baseline, mutant and restored passes. Across 301 repeated executions, 298 passed and 3 failed only in private mutants. First assertion errors and masking evidence are retained in the JSON packet. Seven corpus processes repeat the same registrations 301 times; the historical 55-case corpus and held 76-entry batch were not run.
+
+Actual local fixed Node targets and oracles ran through the original product process path. The private observer retained positive outer/worker activation, every authoritative detached pre-intent, returned PID and close, approved script/env/argv/cwd matching, healthy original post-teardown forwarded worker checkpoint, and actual group absence before restoration. It never force-signals detached target/oracle groups.
+
+Original source tests, assertions, configuration, guards, imports, fixture producers, cleanup and deadlines are unchanged. Spawn and narrow IPC observation changes function identity, timing and I/O; a healthy forwarded checkpoint is not message-delivery or worker exit-code proof. Original cleanup may remove ephemeral roots. Unknown intents, faults or unproven process absence remain fail-closed rather than guard kills.
+
+Local content pins and synthetic adapter observations do not establish an authenticated external comparator, genuine model inference, OS sandbox, universal credential absence or performance superiority. All private source mutations restored exactly and dist was untouched. Current freeze and quality prerequisites remain unwaived. Independent actual review is pending; no installed, full-suite, Node24, coverage, hosted, G0, release or formal Done claim follows.

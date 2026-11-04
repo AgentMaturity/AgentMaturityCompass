@@ -1,0 +1,31 @@
+{
+  "schema": "p112-private-control-helper-static-review/1",
+  "at": "2026-10-16T19:59:03.978639+00:00",
+  "allReadsFinished": true,
+  "candidate": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control.py",
+    "bytes": 5206,
+    "sha256": "61844915b8ce3fedcaa2a28f8a602f60f2f2b24ae557df29a3ced6554c834104"
+  },
+  "blockers": [],
+  "executionByReviewer": false,
+  "checkoutIndexQaWrites": false,
+  "verifiedStaticProperties": [
+    "Only explicitly selected apply/restore and operator1/2/3 are admitted, with active/halt markers checked before action. S/Q HEAD must equal binding source; Q index is empty.",
+    "Exact three-recipe file SHA is fixed. Apply requires clean Q and every bound S/Q byte/hash, exact original source SHA/equality, once-only match and computed expected mutant SHA. Original backup, live patch and action records are exclusively created.",
+    "Each invocation lstat-checks target regular/nlink1, exact resolved path and different inode from S target before its single target write. Action records retain the observed physical facts.",
+    "Restore requires actual phase exit1, total35/nonzero failures, no unhandled/late diagnostics, groupAbsentByESRCH, no nonzero signals and rawObserverOrderedJoin. All reported task errors must be test-kind.",
+    "The required root manual classification names exact phase/source/operator and pins the exact outcome bytes, with rootAllFailuresRead and noHookOrEnvironmentFailure true.",
+    "Restore compares current mutant with actual apply record, backup SHA with sealed original, restores exact S bytes, requires clean Q and rechecks every selected S/Q binding hash.",
+    "The helper performs no automatic restore/retry and writes no compiled/native/guard/wrapper file. Only Q target plus private exclusive evidence files are mutated."
+  ],
+  "boundedRootResponsibilities": [
+    "Before helper execution, root binds actual post-count/post-build/checkpoint S/Q paths and source SHA. Prospective count hashes are not the actual future binding.",
+    "Regular-file checks are pre-write snapshots. target.write_bytes is path-based; this helper provides no atomic O_NOFOLLOW descriptor guarantee or continuous concurrent-isolation proof. Root remains sole writer/runner for the admitted fresh checkout.",
+    "Root classification is an explicit manual record, not semantic interpretation by the helper. Independent actual raw/observer/first-frame/masking review remains necessary.",
+    "The helper checks a clean Q before apply, but does not itself require the previous same-corpus restored GREEN; root serial orchestration and the later chain audit enforce that sequence.",
+    "Native identities, held R/Claude/protected bytes, frozen wrapper/observer and full preservation remain separately bound/read/check facts; only selected source/compiled bytes are checked by this helper."
+  ],
+  "runtimeOrQualificationClaim": false,
+  "wholeIssueBoundary": "Pure helper source controls do not qualify actual activation, lease/approval verification, effective receipts, payment amount limits or destination effects. P1-07 strict-binding closure and all holds/quality checks stay intact."
+}

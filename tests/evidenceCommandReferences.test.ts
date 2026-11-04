@@ -48,8 +48,8 @@ describe("evidence command references", () => {
 
   test("docs describe the current top-level ingest contract", () => {
     const chainArchitecture = readProjectFile("docs/CHAIN_ARCHITECTURE.md");
-    const evidenceChain = readProjectFile("docs/EVIDENCE_CHAIN.md");
-    const uxAudit = readProjectFile("docs/UX_AUDIT_REPORT.md");
+    const evidenceChain = readProjectFile("docs/archive/EVIDENCE_CHAIN.md");
+    const uxAudit = readProjectFile("docs/archive/UX_AUDIT_REPORT.md");
 
     expect(chainArchitecture).toContain("amc ingest ./external-agent-logs/ --type generic_json --agent imported-agent");
     expect(chainArchitecture).not.toContain("amc ingest --source");

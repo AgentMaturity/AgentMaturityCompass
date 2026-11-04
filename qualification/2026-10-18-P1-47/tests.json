@@ -1,0 +1,50 @@
+{
+ "schemaVersion": "p1-47-tests/1",
+ "commit": "cefb97ab5",
+ "total": 215,
+ "passed": 215,
+ "failed": 0,
+ "skipped": 0,
+ "files": [
+  {
+   "file": "tests/benchmarkPilotAnalysis.test.ts",
+   "tests": 10,
+   "passed": 10
+  },
+  {
+   "file": "tests/benchmarkPilotOracles.test.ts",
+   "tests": 87,
+   "passed": 87
+  },
+  {
+   "file": "tests/harnessCodingGateway.test.ts",
+   "tests": 4,
+   "passed": 4
+  },
+  {
+   "file": "tests/harnessCodingOracle.test.ts",
+   "tests": 36,
+   "passed": 36
+  },
+  {
+   "file": "tests/harnessCodingOutputSnapshot.test.ts",
+   "tests": 23,
+   "passed": 23
+  },
+  {
+   "file": "tests/harnessComparison.test.ts",
+   "tests": 43,
+   "passed": 43
+  },
+  {
+   "file": "tests/harnessComparisonOutputOwnership.test.ts",
+   "tests": 12,
+   "passed": 12
+  }
+ ],
+ "redGreen": {
+  "benchmarkPilotOracles.test.ts": "RED: module not found before oracle.mjs existed; RED again for the containment tests (refusal and escape tests failed against the unfixed probe; the escape reproduced a host write). GREEN.",
+  "benchmarkPilotAnalysis.test.ts": "RED: module not found before analyze.mjs existed. GREEN.",
+  "harnessCodingOracle.test.ts": "RED: codingPiContainer.mjs and the seam did not exist; the contract tests moved to the in-process test-only seam. GREEN."
+ }
+}

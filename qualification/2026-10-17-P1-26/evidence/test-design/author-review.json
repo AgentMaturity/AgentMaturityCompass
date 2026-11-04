@@ -1,0 +1,153 @@
+{
+  "schema": "p126-private-candidate-author-review/1",
+  "at": "2026-10-16T20:30:01.242690+00:00",
+  "blockers": [],
+  "disclosure": "This is the candidate author’s full static self-read and finite metadata checks, not an independent peer review.",
+  "fixedTestInventory": [
+    {
+      "id": "P126-OFFLINE-01",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "empty, leaf and node hashes preserve byte domains and child order",
+      "line": 239,
+      "scope": "Literal empty root, empty leaf, independent node preimage, raw-versus-UTF8-hex, leaf/node domains and child order."
+    },
+    {
+      "id": "P126-OFFLINE-02",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "ports eight leaf inputs and all nine known roots from constants.go",
+      "line": 255,
+      "scope": "Exactly eight upstream raw leaf inputs and nine published roots at sizes 0 through 8."
+    },
+    {
+      "id": "P126-OFFLINE-03",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "ports the five exact happy-path inclusion JSON vectors",
+      "line": 266,
+      "scope": "Exactly five inclusion happy-path JSON objects; literal roots/leaves/proofs constrain generators and verifier."
+    },
+    {
+      "id": "P126-OFFLINE-04",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "ports the five exact happy-path consistency JSON vectors",
+      "line": 281,
+      "scope": "Exactly five consistency happy-path JSON objects; literal roots/proofs constrain generators and verifier."
+    },
+    {
+      "id": "P126-OFFLINE-05",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "matches an independent recursive root at every size from 1 through 64",
+      "line": 294,
+      "scope": "Independent naive node:crypto roots for every synthetic 32-byte input prefix, sizes 1 through 64."
+    },
+    {
+      "id": "P126-OFFLINE-06",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "verifies every inclusion index against independent roots for sizes 1 through 64",
+      "line": 300,
+      "scope": "Every index for sizes 1 through 64; 2,080 data rows in one fixed test body."
+    },
+    {
+      "id": "P126-OFFLINE-07",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "verifies every consistency pair through size 64 against independent roots",
+      "line": 310,
+      "scope": "Every oldSize 0 through newSize for newSize 1 through 64; 2,144 data rows in one fixed test body."
+    },
+    {
+      "id": "P126-OFFLINE-08",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "incremental and rebuilt frontiers match independent RFC roots through size 64",
+      "line": 320,
+      "scope": "Incremental/rebuilt RFC frontiers at sizes 0 through 64, compared to independent roots and valid shape."
+    },
+    {
+      "id": "P126-OFFLINE-09",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "refuses the exact size-2 inclusion witness when only declared size changes to 3",
+      "line": 331,
+      "scope": "Positive index0/size2 proof followed by identical leaf/proof/root with declared size3, verifier refusal first."
+    },
+    {
+      "id": "P126-OFFLINE-10",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "rejects malformed, changed, extra, missing and wrong-index inclusion inputs",
+      "line": 340,
+      "scope": "Positive inclusion followed by tampered siblings/leaf/root, extra/missing path, concrete wrong index, malformed hashes and invalid numeric bounds."
+    },
+    {
+      "id": "P126-OFFLINE-11",
+      "target": "tests/transparency/rfc9162.test.ts",
+      "name": "rejects malformed consistency proofs, changed roots, invalid sizes and boundary mismatches",
+      "line": 368,
+      "scope": "Positive consistency followed by tampered siblings/roots, extra/missing path, malformed hashes/numeric bounds, equal-root and empty-extension boundaries; no arbitrary 0/0 canonical-root rule."
+    },
+    {
+      "id": "P126-OFFLINE-12",
+      "target": "tests/transparency/legacyAmbiguity.test.ts",
+      "name": "legacy three/four roots collide while RFC roots differ and both proof APIs remain usable",
+      "line": 11,
+      "scope": "Actual algorithm-aware root/proof helpers demonstrate legacy 3/4 collision, RFC inequality, both valid RFC proofs and cross-tree refusal."
+    },
+    {
+      "id": "P126-OFFLINE-13",
+      "target": "tests/transparency/legacyAmbiguity.test.ts",
+      "name": "RFC entry verification needs index and size and derives sides rather than trusting flags",
+      "line": 37,
+      "scope": "RFC wrapper positive then missing index/size and malformed entry refusal; reverse display flags preserve validity because sides derive from index/size."
+    }
+  ],
+  "dataPort": {
+    "commit": "c39fbf350a405f68571bf4c42a6a518eb0a46a4b",
+    "jsonObjectsExact": 10,
+    "leafByteInputsExact": 8,
+    "knownRootsExact": 9,
+    "capturedSelectedGoAndVectorPinsAndGitBlobHashesVerified": 14,
+    "license": "Apache-2.0 header retained; separate exact full licence path remains root-owned"
+  },
+  "source": {
+    "read": [
+      "rfc9162.ts full",
+      "merkle.ts full",
+      "merkleFrontier.ts full",
+      "relevant upstream constants, generator and proof consumers",
+      "two complete candidate bodies"
+    ],
+    "referenceImplementationCallsProductionHelpers": false,
+    "castsAnyOrMocks": false,
+    "fixedTestBodiesNotRegistryDriven": true,
+    "sourceAndCheckoutWrites": false,
+    "ordinarySourceAdmissionPending": true
+  },
+  "navigation": {
+    "graph": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "mtimeNs": 1788851387313812543,
+    "nodeCount": 36459,
+    "scopedTermMatches": 66,
+    "authority": "Stale September graph is navigation only; exact current source is pinned. Project helper pins graphifyy==0.9.56. No graph CLI, refresh, watcher or server ran."
+  },
+  "execution": {
+    "product": false,
+    "candidate": false,
+    "compiler": false,
+    "tests": false,
+    "helpers": false,
+    "nativeAddon": false,
+    "SQL": false,
+    "network": false,
+    "runtimeFitClaim": false
+  },
+  "controls": "Only static intended direct assertions are mapped; no predicted failure counts or future outcome credit.",
+  "wholeIssueDone": false,
+  "allHeldDecisionsPreserved": true,
+  "remainingLimits": [
+    "Arbitrary alternate-size universal rejection",
+    "Stricter canonical empty-root rejection for arbitrary equal roots at 0/0",
+    "Signed log or signed-root authority",
+    "Migration/default-workspace/persisted state",
+    "C2SP note/checkpoint vectors",
+    "Rekor/SCITT/public submission or offline receipt integration",
+    "RFC3161/full P1-25 dependency acceptance",
+    "Library adoption, release, full issue, full suite, coverage or quality closure"
+  ]
+}

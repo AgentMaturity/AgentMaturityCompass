@@ -4,10 +4,10 @@ import { resolveAgentId } from "../fleet/paths.js";
 import { loadTargetProfile } from "../targets/targetProfile.js";
 import {
   latestRunForAgent,
-  summarizeAssuranceForWindow,
   deriveTrustSummaryFromRun,
   verifyActionPolicySignature
 } from "../governor/actionPolicyEngine.js";
+import { verifiedGovernorAssuranceSummary } from "../assurance/assuranceRunner.js";
 import { predictGovernorPermissions } from "./governorWhatIf.js";
 import { predictBudgetPressure } from "./budgetsWhatIf.js";
 import { predictCiGateOutcome } from "./ciGateWhatIf.js";
@@ -131,7 +131,7 @@ export function simulateTargetWhatIf(params: {
 
   const target = patchedTarget(activeTarget, Object.fromEntries(changes.map((row) => [row.questionId, row.proposedTarget])));
   const trust = deriveTrustSummaryFromRun(params.workspace, agentId, run);
-  const assurance = summarizeAssuranceForWindow(
+  const assurance = verifiedGovernorAssuranceSummary( // sealed reports only (security sweep 2026-10-31)
     params.workspace,
     agentId,
     run?.windowStartTs ?? Date.now() - 14 * 86_400_000,

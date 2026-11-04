@@ -1,0 +1,2515 @@
+{
+  "schemaVersion": 1,
+  "item": "P3-14",
+  "receiptSource": "1aedd197c1821d9c4f750073c33e22431ff62137",
+  "readiness": "DRAFT_HANDOFF_WITH_EXPLICIT_PENDING_DEPENDENCIES",
+  "fullSuite": {
+    "state": "NOT_RUN",
+    "exit": null,
+    "durationMs": null,
+    "tests": null,
+    "reason": "Direct human option2 authorizes this draft with dependent checks pending. Merge the P2-30 landing into this branch, run the final merged HEAD once with maxWorkers2, and post ready v2. No full command has run."
+  },
+  "historicalFormal215": {
+    "sourceHead": "21523daa2e879c6cad5782aab3195f093186c1c6",
+    "intHead": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+    "summary": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/current215-focused/attempt-summary.json",
+      "sha256": "4e9af4c437b91535895a0514b15cf39c675148ab56b9d5bed40668950d49fdb1",
+      "bytes": 28116
+    },
+    "nativeRows": [
+      {
+        "name": "build",
+        "cmd": "npm run -s build",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 91589,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/build.log",
+        "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+        "rawLogBytes": 375
+      },
+      {
+        "name": "focused",
+        "cmd": "npx vitest run --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/focused-report.json tests/catalog/stations/governance tests/catalog/governance tests/catalog/admission tests/catalog/compiler tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/stationTaxonomy.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 65525,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/focused-report.json",
+        "jsonReportSha256": "2defa1f80d12d0e0e3ac39808525c91eb992f91268ba9be0c764f319206c67d3",
+        "jsonReportBytes": 193353,
+        "reportedTests": {
+          "numTotalTests": 430,
+          "numPassedTests": 416,
+          "numFailedTests": 14,
+          "numPendingTests": 0
+        },
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/focused.log",
+        "rawLogSha256": "796be7bc413a24a11551938fb87439ed3a8acdbd498d40c1b4d0cf8dde5f515c",
+        "rawLogBytes": 39828
+      },
+      {
+        "name": "typecheck",
+        "cmd": "npm run -s typecheck",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 68944,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/typecheck.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0
+      },
+      {
+        "name": "typecheck-tests",
+        "cmd": "npm run -s typecheck:tests",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 106760,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/typecheck-tests.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0
+      },
+      {
+        "name": "lint",
+        "cmd": "npm run -s lint",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 6394,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/lint.log",
+        "rawLogSha256": "5d3469c1a4b451052f9a639aee3ce8873200f81c167b482841c2591fe909a3a7",
+        "rawLogBytes": 200
+      },
+      {
+        "name": "counts-before-regeneration",
+        "cmd": "npm run -s check:counts",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1915,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/counts-before-regeneration.log",
+        "rawLogSha256": "4d04f5629abf2732dd824e5c8dac96da8bc7cacad68ee88358c852600f7ac7ea",
+        "rawLogBytes": 1228
+      },
+      {
+        "name": "gen-counts",
+        "cmd": "node scripts/gen-counts.mjs --write",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1218,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": "",
+          "sourceStatusPorcelain": ""
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/gen-counts.log",
+        "rawLogSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d",
+        "rawLogBytes": 20
+      },
+      {
+        "name": "counts",
+        "cmd": "npm run -s check:counts",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1529,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/counts.log",
+        "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+        "rawLogBytes": 81
+      },
+      {
+        "name": "docs-drift",
+        "cmd": "npm run -s check:docs-drift",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1166,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/docs-drift.log",
+        "rawLogSha256": "e710c18256d5eaaaa99c36d0cccdd671b66287f31affedb127a3e41f5ce3f151",
+        "rawLogBytes": 121
+      },
+      {
+        "name": "industry-guides",
+        "cmd": "npm run -s check:industry-guides",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 2163,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/industry-guides.log",
+        "rawLogSha256": "0ae6666461d08b2777daef6a3c6ca61e7e63a78480c3cca689ae9890d43d2349",
+        "rawLogBytes": 1457
+      },
+      {
+        "name": "regulatory-calendar",
+        "cmd": "npm run -s check:regulatory-calendar",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 879,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/regulatory-calendar.log",
+        "rawLogSha256": "2f7b105425603b1c6ead5edb9527eb7fa419d3e4b45c5658c163adabe8f11a26",
+        "rawLogBytes": 129
+      },
+      {
+        "name": "freeze",
+        "cmd": "pnpm check:freeze -- --base-ref int",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 4273,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/freeze.log",
+        "rawLogSha256": "ca08beab009412a7b230d8916659a8f2a8e59af99738ddb488fc5421c5e41a8a",
+        "rawLogBytes": 269
+      },
+      {
+        "name": "architecture-boundaries",
+        "cmd": "npm run -s check:architecture-boundaries",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 4703,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/architecture-boundaries.log",
+        "rawLogSha256": "e18c0616d7ede48fe737689a772bf0460bbd17f417a9f6afe6eb5b0c7e1e1ea4",
+        "rawLogBytes": 100130
+      },
+      {
+        "name": "gates",
+        "cmd": "npm run -s check:gates",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1002,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/gates.log",
+        "rawLogSha256": "f22387e54e88e6c975a51126038c2239583b4f30194eeb584c70338cff3bb96b",
+        "rawLogBytes": 659
+      },
+      {
+        "name": "schemas",
+        "cmd": "npm run -s check:schemas",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1656,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/schemas.log",
+        "rawLogSha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431",
+        "rawLogBytes": 65
+      },
+      {
+        "name": "api-ref",
+        "cmd": "npm run -s check:api-ref",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 776,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/api-ref.log",
+        "rawLogSha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+        "rawLogBytes": 42
+      },
+      {
+        "name": "threat-model",
+        "cmd": "npm run -s check:threat-model",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1000,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/threat-model.log",
+        "rawLogSha256": "e48746594826f49424392e28bb50a8b03e238696d6907a00e969a4d8682a8922",
+        "rawLogBytes": 113
+      },
+      {
+        "name": "citations",
+        "cmd": "npm run -s check:citations",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1235,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/citations.log",
+        "rawLogSha256": "81f675216150883385813ad7802c2768d1c1f0f6b7f1c24356bddc993fef8fdb",
+        "rawLogBytes": 373
+      },
+      {
+        "name": "qualification",
+        "cmd": "npm run -s check:qualification",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 2863,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/qualification.log",
+        "rawLogSha256": "d1b295aa0997800a5b61b3b3f974587b797a2244bba47cd9b0f0cd106009c1b2",
+        "rawLogBytes": 65
+      },
+      {
+        "name": "release-notes",
+        "cmd": "npm run -s release:notes -- --check",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 922,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/release-notes.log",
+        "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "rawLogBytes": 0
+      },
+      {
+        "name": "catalog-admission",
+        "cmd": "npm run -s check:catalog-admission",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 3633,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-admission.log",
+        "rawLogSha256": "7b92555dd3d6b9b94bce8dbc099ae893fbb6a1b7a6420bd32f60b9a8257d90f9",
+        "rawLogBytes": 3296
+      },
+      {
+        "name": "catalog-currency",
+        "cmd": "npm run -s check:catalog-currency",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1404,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-currency.log",
+        "rawLogSha256": "011e2da833c26813722f21e59c0364ee2a0606cd9ddea2a6fc5e7b9818271f3e",
+        "rawLogBytes": 161
+      },
+      {
+        "name": "catalog-changelog",
+        "cmd": "npm run -s check:catalog-changelog -- --base-ref int",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 2000,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-changelog.log",
+        "rawLogSha256": "0f300d5e407de7b2dc0598af9a1d00d1d295684d69dd0113cc4f14601d52ada5",
+        "rawLogBytes": 974
+      },
+      {
+        "name": "catalog-changelog-main",
+        "cmd": "node scripts/check-catalog-changelog.mjs",
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 1295,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-changelog-main.log",
+        "rawLogSha256": "ec555ba931bec2719634a4f0ca0accf0552973a436c9526f3a11400d2ca24e2a",
+        "rawLogBytes": 6734
+      },
+      {
+        "name": "duplicates",
+        "cmd": "npm run -s check:duplicates",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 2064,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/duplicates.log",
+        "rawLogSha256": "42c44c214fa6a90590a4728797b32328f0d958c4a2c875b7ae416493cab6ee93",
+        "rawLogBytes": 193
+      },
+      {
+        "name": "dead-code",
+        "cmd": "npm run -s check:dead-code",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 10931,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/dead-code.log",
+        "rawLogSha256": "48620cd0b9b4ef02f5a5a97d9438114aa5f8d8b1ddb155726b2fe5a4161554f7",
+        "rawLogBytes": 192
+      },
+      {
+        "name": "clean-source",
+        "cmd": "npm run -s check:clean-source",
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "durationMs": 137597,
+        "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "headAfter": "21523daa2e879c6cad5782aab3195f093186c1c6",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "intAfter": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+        "before": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "after": {
+          "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "nodeOnPath": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md",
+          "sourceStatusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md"
+        },
+        "baseRefAtExecution": null,
+        "sourceGuardFailure": null,
+        "jsonReportPath": null,
+        "jsonReportSha256": null,
+        "jsonReportBytes": null,
+        "reportedTests": null,
+        "reportError": null,
+        "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/clean-source.log",
+        "rawLogSha256": "b19f89077f2490952da7000ba41c98be2dd8f5191f6b0848066e9ed83e6d3b26",
+        "rawLogBytes": 791
+      }
+    ],
+    "nativeRowsReference": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/checks/final-results.json",
+      "sha256": "26b775c72225edbb07ac8c6e9199f7275c3f22ff37bd500d0600c6ba21279674",
+      "bytes": 75728
+    },
+    "required25": {
+      "selectionRule": "All rows excluding counts-before-regeneration (initial diagnostic) and gen-counts (regeneration helper); their measured results remain preserved.",
+      "counts": {
+        "total": 25,
+        "pass": 21,
+        "fail": 4
+      },
+      "failureRows": [
+        {
+          "name": "focused",
+          "exitCode": 1,
+          "failureCodes": [],
+          "log": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/focused.log",
+            "sha256": "796be7bc413a24a11551938fb87439ed3a8acdbd498d40c1b4d0cf8dde5f515c",
+            "bytes": 39828,
+            "verified": true
+          },
+          "detail": "14 failed assertions:12baseline reproductions,1own missing guide hook,1direct-user-deferred changelog assertion; all remain failed."
+        },
+        {
+          "name": "industry-guides",
+          "exitCode": 1,
+          "failureCodes": [],
+          "log": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/industry-guides.log",
+            "sha256": "0ae6666461d08b2777daef6a3c6ca61e7e63a78480c3cca689ae9890d43d2349",
+            "bytes": 1457,
+            "verified": true
+          },
+          "detail": "Error: src/domains/domainCliIntegration.ts: writeFileAtomic(params.outputPath not found"
+        },
+        {
+          "name": "catalog-changelog",
+          "exitCode": 1,
+          "failureCodes": [
+            "GOV_CHANGELOG_ENTRY_COUNT"
+          ],
+          "log": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-changelog.log",
+            "sha256": "0f300d5e407de7b2dc0598af9a1d00d1d295684d69dd0113cc4f14601d52ada5",
+            "bytes": 974,
+            "verified": true
+          },
+          "detail": "Int-relative entry count guard failed; this historical attempt has no new own entry appended."
+        },
+        {
+          "name": "catalog-changelog-main",
+          "exitCode": 1,
+          "failureCodes": [
+            "GOV_CHANGELOG_CATALOG_MISMATCH"
+          ],
+          "log": {
+            "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-changelog-main.log",
+            "sha256": "ec555ba931bec2719634a4f0ca0accf0552973a436c9526f3a11400d2ca24e2a",
+            "bytes": 6734,
+            "verified": true
+          },
+          "detail": "Main-relative catalog mismatch guard failed. Observed code is GOV_CHANGELOG_CATALOG_MISMATCH, not GOV_CHANGELOG_ENTRY_COUNT."
+        }
+      ]
+    },
+    "diagnosticAndHelperRows": [
+      {
+        "name": "counts-before-regeneration",
+        "exitCode": 1,
+        "detail": "initial stale published counts; retained as a failure, followed by successful regeneration and counts recheck"
+      },
+      {
+        "name": "gen-counts",
+        "exitCode": 0,
+        "detail": "successful generated-count refresh"
+      }
+    ],
+    "focusedCounts": {
+      "numTotalTests": 430,
+      "numPassedTests": 416,
+      "numFailedTests": 14,
+      "numPendingTests": 0
+    },
+    "focusedReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/focused-report.json",
+      "sha256": "2defa1f80d12d0e0e3ac39808525c91eb992f91268ba9be0c764f319206c67d3",
+      "bytes": 193353
+    },
+    "baselineComparison": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/current215-focused/comparison.json",
+      "sha256": "b7cdffc3d5e615c7abf2fad72fee5f38c5bf3d62451959e252a0c43694ee4106",
+      "bytes": 46744
+    },
+    "baselineSource": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+    "assertionFailureClassification": [
+      {
+        "file": "tests/industryGuides.test.ts",
+        "fullName": "industry deployment guides health.md: every appendix citation still finds its text in the cited file",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/industryGuides.test.ts",
+        "fullName": "industry deployment guides education.md: every appendix citation still finds its text in the cited file",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/industryGuides.test.ts",
+        "fullName": "industry deployment guides environment.md: every appendix citation still finds its text in the cited file",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/industryGuides.test.ts",
+        "fullName": "industry deployment guides mobility.md: every appendix citation still finds its text in the cited file",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/industryGuides.test.ts",
+        "fullName": "industry deployment guides governance.md: every appendix citation still finds its text in the cited file",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/industryGuides.test.ts",
+        "fullName": "industry deployment guides technology.md: every appendix citation still finds its text in the cited file",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/industryGuides.test.ts",
+        "fullName": "industry deployment guides wealth.md: every appendix citation still finds its text in the cited file",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected [ Array(1) ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuides.test.ts:148:22\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2027:60\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/industryGuidesGenerator.test.ts",
+        "fullName": "scripts/gen-industry-guides.mts --check exits 0 on the committed guides",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected '/Users/sid/AgentMaturityCompass-workt\u2026' to be '' // Object.is equality\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuidesGenerator.test.ts:17:27\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected '/Users/sid/AgentMaturityCompass-workt\u2026' to be '' // Object.is equality\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuidesGenerator.test.ts:17:27\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/industryGuidesGenerator.test.ts",
+        "fullName": "scripts/gen-industry-guides.mts --check exits 1 after a one-line edit, naming the edited guide",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected '/Users/sid/AgentMaturityCompass-workt\u2026' to contain 'wealth.md'\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuidesGenerator.test.ts:30:27\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected '/Users/sid/AgentMaturityCompass-workt\u2026' to contain 'wealth.md'\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuidesGenerator.test.ts:30:27\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/industryGuidesGenerator.test.ts",
+        "fullName": "guide citations survive unrelated edits (P1-42 review) adding a line to the top of src/cli.ts leaves every guide unchanged",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "Error: src/domains/domainCliIntegration.ts: writeFileAtomic(params.outputPath not found\n    at locate (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/scripts/gen-industry-guides.mts:43:44)\n    at Cites.ref (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/scripts/gen-industry-guides.mts:50:5)\n    at evidenceSection (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/scripts/gen-industry-guides.mts:128:191)\n    at stationGuide (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/scripts/gen-industry-guides.mts:220:13)\n    at renderAll (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/scripts/gen-industry-guides.mts:295:15)\n    at renderGuides (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/scripts/gen-industry-guides.mts:284:12)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/industryGuidesGenerator.test.ts:38:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "Error: src/domains/domainCliIntegration.ts: writeFileAtomic(params.outputPath not found\n    at locate (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/scripts/gen-industry-guides.mts:43:44)\n    at Cites.ref (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/scripts/gen-industry-guides.mts:50:5)\n    at evidenceSection (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/scripts/gen-industry-guides.mts:128:191)\n    at stationGuide (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/scripts/gen-industry-guides.mts:220:13)\n    at renderAll (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/scripts/gen-industry-guides.mts:295:15)\n    at renderGuides (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/scripts/gen-industry-guides.mts:284:12)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/industryGuidesGenerator.test.ts:38:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/catalog/compiler/cli.test.ts",
+        "fullName": "catalog compiler actual cold CLI with a synthetic disk catalog a signed-tree symlink cannot make its physical output location writable",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected 'TOOLS_CONFIG_UNVERIFIED: .amc/tools.y\u2026' to contain '.amc/** is reserved for signed config\u2026'\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/compiler/cli.test.ts:311:27\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected 'TOOLS_CONFIG_UNVERIFIED: .amc/tools.y\u2026' to contain '.amc/** is reserved for signed config\u2026'\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/catalog/compiler/cli.test.ts:311:27\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/catalog/governance/changelogGuard.test.ts",
+        "fullName": "checkCatalogChangelog (P1-34 step 8) the committed changelog's last entry pins the shipped catalog digest",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected { \u2026(3) } to deeply equal { id: 'amc.catalog', \u2026(2) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/governance/changelogGuard.test.ts:103:49\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "baselineStatus": "passed",
+        "baselineFailureMessages": [],
+        "exactMessagesAfterClonePathNormalization": false,
+        "classification": "direct_user_deferred_changelog_assertion",
+        "basis": "Baseline assertion passed. Current failure remains failed; catalog version/digest rebinding is deferred to landing by direct user instruction as confirmed by the parent task and HANDOVER section 2.14. This is not a baseline reproduction or a pass."
+      },
+      {
+        "file": "tests/catalog/governance/promotion.test.ts",
+        "fullName": "effectiveSupport is the single source of a control's support (P1-34) no other source reads a control's review, provenance, support or legal review outside the reviewed allowlist",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected { 'src/cli.ts': 2, \u2026(14) } to deeply equal { \u2026(13) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/governance/promotion.test.ts:153:19\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "baselineStatus": "failed",
+        "baselineFailureMessages": [
+          "AssertionError: expected { 'src/cli.ts': 2, \u2026(14) } to deeply equal { \u2026(13) }\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/tests/catalog/governance/promotion.test.ts:153:19\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-baseline-8b6690a1/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "exactMessagesAfterClonePathNormalization": true,
+        "classification": "baseline_reproduced",
+        "basis": "Same relative file and exact fullName; complete failureMessages equal after only literal clone-prefix replacement."
+      },
+      {
+        "file": "tests/catalog/stations/governance/overlay.test.ts",
+        "fullName": "Governance experimental overlay (P3-14) includes the owned experimental section in the generated Governance guide",
+        "candidateStatus": "failed",
+        "candidateFailureMessages": [
+          "AssertionError: expected '# Governance / Public Sector station:\u2026' to contain '## Experimental Governance overlay\\n\\\u2026'\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/overlay.test.ts:90:51\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "baselineStatus": "not_measured",
+        "baselineFailureMessages": null,
+        "exactMessagesAfterClonePathNormalization": false,
+        "classification": "own_missing_guide_hook",
+        "basis": "Candidate acceptance assertion fails. The new Governance overlay test does not exist in the requested existing-file baseline run; it is not a baseline failure."
+      }
+    ],
+    "classificationCounts": {
+      "baseline_reproduced": 12,
+      "direct_user_deferred_changelog_assertion": 1,
+      "own_missing_guide_hook": 1
+    },
+    "note": "All failures remain failed. This attempt is historical after the own changelog append; no 1aedd-wide formal check pass count is claimed."
+  },
+  "currentChangelogProbes": {
+    "sourceHead": "1aedd197c1821d9c4f750073c33e22431ff62137",
+    "sourceRecord": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/measured-guards.json",
+      "sha256": "1e97b7204a6af75ce249fc64425c2e696a9bbc4ab60526b99abe30bf69978bf9",
+      "bytes": 3716
+    },
+    "actualCodes": [
+      "GOV_CHANGELOG_ENTRY_DUPLICATE"
+    ],
+    "nativeRecord": {
+      "recordedAt": "2026-10-18T13:26:02.445803+00:00",
+      "source": "1aedd197c1821d9c4f750073c33e22431ff62137",
+      "commands": [
+        {
+          "name": "int",
+          "cmd": [
+            "node",
+            "scripts/check-catalog-changelog.mjs",
+            "--base-ref",
+            "int"
+          ],
+          "exit": 1,
+          "durationMs": 3887,
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "before": {
+            "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+            "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+            "statusPorcelain": ""
+          },
+          "after": {
+            "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+            "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+            "statusPorcelain": ""
+          },
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/int.log",
+          "rawLogSha256": "c4b83b112271634bc04014a6179bf48910e934eddd4e71ff1adcc519baff4702",
+          "rawLogBytes": 98
+        },
+        {
+          "name": "main",
+          "cmd": [
+            "node",
+            "scripts/check-catalog-changelog.mjs"
+          ],
+          "exit": 1,
+          "durationMs": 1792,
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "before": {
+            "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+            "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+            "statusPorcelain": ""
+          },
+          "after": {
+            "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+            "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+            "statusPorcelain": ""
+          },
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/main.log",
+          "rawLogSha256": "c4b83b112271634bc04014a6179bf48910e934eddd4e71ff1adcc519baff4702",
+          "rawLogBytes": 98
+        },
+        {
+          "name": "unit",
+          "cmd": [
+            "npx",
+            "vitest",
+            "run",
+            "tests/catalog/governance/changelogGuard.test.ts",
+            "--maxWorkers=1",
+            "--reporter=dot",
+            "--reporter=json",
+            "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/unit-report.json"
+          ],
+          "exit": 1,
+          "durationMs": 8602,
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+          "before": {
+            "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+            "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+            "statusPorcelain": ""
+          },
+          "after": {
+            "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+            "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+            "statusPorcelain": ""
+          },
+          "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/unit.log",
+          "rawLogSha256": "24b05fa182e899a1b11ff9e33e5474d90062279075db9485c659ebd4770cbf60",
+          "rawLogBytes": 1449
+        }
+      ],
+      "unitReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/unit-report.json",
+        "sha256": "c10115bbd6fc97a924834e45c513d0650c98163c1416488d3aa56ec9aace2e22",
+        "bytes": 4909,
+        "tests": {
+          "numTotalTests": 8,
+          "numPassedTests": 7,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        }
+      },
+      "fullSuite": "NOT_RUN",
+      "note": "Native failures retained; no guard, test, budget, catalog version or inherited entry changed."
+    },
+    "unitFailedAssertions": [
+      {
+        "ancestorTitles": [
+          "checkCatalogChangelog (P1-34 step 8)"
+        ],
+        "fullName": "checkCatalogChangelog (P1-34 step 8) the committed changelog's last entry pins the shipped catalog digest",
+        "status": "failed",
+        "title": "the committed changelog's last entry pins the shipped catalog digest",
+        "duration": 88.48750000000018,
+        "failureMessages": [
+          "AssertionError: expected { ok: false, issues: [ { \u2026(2) } ] } to match object { ok: true }\n(1 matching property omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/governance/changelogGuard.test.ts:101:59\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+        ],
+        "meta": {},
+        "tags": []
+      }
+    ]
+  },
+  "currentAdapter": {
+    "sourceRecord": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/adapter-mutation.json",
+      "sha256": "21fb2d4d0cb57331801c923eb5cc3a2cd5bf96124ac9baa788f958e3588a3956",
+      "bytes": 11070
+    },
+    "nativeRecord": {
+      "sourceHead": "1aedd197c1821d9c4f750073c33e22431ff62137",
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+      "node": "v22.23.3",
+      "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14",
+      "d15": {
+        "command": [
+          "node",
+          "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+          "--paths",
+          "tests/catalog/stations/governance/harness.ts"
+        ],
+        "before": {
+          "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "sourceStatusPorcelain": "",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14"
+        },
+        "after": {
+          "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "sourceStatusPorcelain": "",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14"
+        },
+        "exitCode": 0,
+        "durationMs": 466,
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/d15.log",
+        "logSha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345",
+        "output": "none\n"
+      },
+      "sourcePath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/harness.ts",
+      "compiledTestPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/compiledPolicy.test.ts",
+      "compiledTestSha256": "4b15ae62aab85735bb8945455ef7a9c35d3984e9ffdcdad54b5e511561eb70ba",
+      "originalCopy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/original-harness.ts",
+      "originalSha256": "090ac24fb71a8e77d2db03c81ceea29443c731121e2f70c576455faf48cb3352",
+      "mutatedSha256": "8fdbf2980cd45c4b31d4bc5bbe2a248a37257ecc6216ace4aa9e216531ed1698",
+      "restoredSha256": "090ac24fb71a8e77d2db03c81ceea29443c731121e2f70c576455faf48cb3352",
+      "exactByteRestore": true,
+      "appliedReplacement": {
+        "old": "if (setup.subject.tenantId !== tenantId || setup.subject.workspaceId !== workspaceId\n    || setup.subject.deploymentId !== deploymentId || !agentIds.includes(setup.subject.agentId ?? \"\"))",
+        "new": "if (false)"
+      },
+      "expectedFailure": "refuses a fixture subject outside the actual compiled deployment",
+      "initial": {
+        "before": {
+          "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "sourceStatusPorcelain": "",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14"
+        },
+        "after": {
+          "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "sourceStatusPorcelain": "",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14"
+        },
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/compiledPolicy.test.ts",
+          "--maxWorkers=1",
+          "--reporter=dot",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/initial-green-report.json"
+        ],
+        "defaultBudgetsAndAssertions": true,
+        "startedAt": "2026-10-18T13:27:17.612443+00:00",
+        "durationMs": 4754,
+        "exitCode": 0,
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/initial-green.log",
+        "logSha256": "7df20f0db4f3c7cd22ec51c1288116a8bbdb447223d8d1990e2d302e1dc0759d",
+        "report": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/initial-green-report.json",
+        "reportSha256": "6afd91354d0f96a35a2550164ca1f25a975d800825ad86f11990f118f81d3412",
+        "sourceSha256": "090ac24fb71a8e77d2db03c81ceea29443c731121e2f70c576455faf48cb3352",
+        "compiledTestSha256": "4b15ae62aab85735bb8945455ef7a9c35d3984e9ffdcdad54b5e511561eb70ba",
+        "counts": {
+          "numTotalTests": 75,
+          "numPassedTests": 75,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "failedAssertions": [],
+        "suiteErrors": []
+      },
+      "mutation": {
+        "before": {
+          "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "sourceStatusPorcelain": " M tests/catalog/stations/governance/harness.ts\n",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14"
+        },
+        "after": {
+          "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "sourceStatusPorcelain": " M tests/catalog/stations/governance/harness.ts\n",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14"
+        },
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/compiledPolicy.test.ts",
+          "--maxWorkers=1",
+          "--reporter=dot",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/binding-guard-disabled-report.json"
+        ],
+        "defaultBudgetsAndAssertions": true,
+        "startedAt": "2026-10-18T13:27:22.543356+00:00",
+        "durationMs": 4294,
+        "exitCode": 1,
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/binding-guard-disabled.log",
+        "logSha256": "ef01871e1d53d752aa95d42c0fca94160f97a993fd56cca1048b0aadc991f462",
+        "report": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/binding-guard-disabled-report.json",
+        "reportSha256": "b1b20218e1f051ca00f3f4a7e7049cf980790f1e00fae4215e35b995cbad3bec",
+        "sourceSha256": "8fdbf2980cd45c4b31d4bc5bbe2a248a37257ecc6216ace4aa9e216531ed1698",
+        "compiledTestSha256": "4b15ae62aab85735bb8945455ef7a9c35d3984e9ffdcdad54b5e511561eb70ba",
+        "counts": {
+          "numTotalTests": 75,
+          "numPassedTests": 74,
+          "numFailedTests": 1,
+          "numPendingTests": 0
+        },
+        "failedAssertions": [
+          {
+            "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/compiledPolicy.test.ts",
+            "fullName": "Governance actual compiled policy (P3-14) refuses a fixture subject outside the actual compiled deployment",
+            "failureMessages": [
+              "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/tests/catalog/stations/governance/compiledPolicy.test.ts:58:81\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20"
+            ]
+          }
+        ],
+        "suiteErrors": []
+      },
+      "restored": {
+        "before": {
+          "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "sourceStatusPorcelain": "",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14"
+        },
+        "after": {
+          "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+          "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+          "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+          "sourceStatusPorcelain": "",
+          "node": "v22.23.3",
+          "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14"
+        },
+        "command": [
+          "node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/catalog/stations/governance/compiledPolicy.test.ts",
+          "--maxWorkers=1",
+          "--reporter=dot",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/restored-green-report.json"
+        ],
+        "defaultBudgetsAndAssertions": true,
+        "startedAt": "2026-10-18T13:27:27.064093+00:00",
+        "durationMs": 4175,
+        "exitCode": 0,
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/restored-green.log",
+        "logSha256": "c843f27c0539b72bb2ad3d75a53c6031bdbaac350e4c9bed9581fc8d4b418473",
+        "report": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/restored-green-report.json",
+        "reportSha256": "6974d664b04ae6deb86df67252c70007870f97cb3ed6ee050837deabb163ecbe",
+        "sourceSha256": "090ac24fb71a8e77d2db03c81ceea29443c731121e2f70c576455faf48cb3352",
+        "compiledTestSha256": "4b15ae62aab85735bb8945455ef7a9c35d3984e9ffdcdad54b5e511561eb70ba",
+        "counts": {
+          "numTotalTests": 75,
+          "numPassedTests": 75,
+          "numFailedTests": 0,
+          "numPendingTests": 0
+        },
+        "failedAssertions": [],
+        "suiteErrors": []
+      },
+      "finalState": {
+        "head": "1aedd197c1821d9c4f750073c33e22431ff62137",
+        "int": "8b6690a11a6a2f4ff4a7a435171ec8a00b6b19fb",
+        "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+        "sourceStatusPorcelain": "",
+        "node": "v22.23.3",
+        "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-14"
+      },
+      "limits": "One exact adapter-binding guard mutation; no other product path, test budget, assertion, index, ref or runner was changed. No acceptance waiver or full-suite claim."
+    }
+  },
+  "probeProvenance": {
+    "sourceHead": "21523daa2e879c6cad5782aab3195f093186c1c6",
+    "rawLog": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/catalog-probe.log",
+      "sha256": "901c6b16c6425910665880937698dc1347be8fe34254e756eb5ce9ed557e64ea",
+      "bytes": 333
+    },
+    "probeSource": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/probe-governance.ts",
+      "sha256": "597e01a5f000fb8ba098a8db66678a9033d0a5857c81e49d0798b5f43c082d11",
+      "bytes": 5619
+    },
+    "installedResults": "case-results.json",
+    "installedCommand": "case-command.json"
+  },
+  "receiptCommandProvenance": [
+    {
+      "receiptCommandIndex": 0,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "build",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/build.log",
+      "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290"
+    },
+    {
+      "receiptCommandIndex": 1,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "focused",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/focused.log",
+      "rawLogSha256": "796be7bc413a24a11551938fb87439ed3a8acdbd498d40c1b4d0cf8dde5f515c"
+    },
+    {
+      "receiptCommandIndex": 2,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "typecheck",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/typecheck.log",
+      "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receiptCommandIndex": 3,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "typecheck-tests",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/typecheck-tests.log",
+      "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receiptCommandIndex": 4,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "lint",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/lint.log",
+      "rawLogSha256": "5d3469c1a4b451052f9a639aee3ce8873200f81c167b482841c2591fe909a3a7"
+    },
+    {
+      "receiptCommandIndex": 5,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "counts-before-regeneration",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/counts-before-regeneration.log",
+      "rawLogSha256": "4d04f5629abf2732dd824e5c8dac96da8bc7cacad68ee88358c852600f7ac7ea"
+    },
+    {
+      "receiptCommandIndex": 6,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "gen-counts",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/gen-counts.log",
+      "rawLogSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+    },
+    {
+      "receiptCommandIndex": 7,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "counts",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/counts.log",
+      "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+    },
+    {
+      "receiptCommandIndex": 8,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "docs-drift",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/docs-drift.log",
+      "rawLogSha256": "e710c18256d5eaaaa99c36d0cccdd671b66287f31affedb127a3e41f5ce3f151"
+    },
+    {
+      "receiptCommandIndex": 9,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "industry-guides",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/industry-guides.log",
+      "rawLogSha256": "0ae6666461d08b2777daef6a3c6ca61e7e63a78480c3cca689ae9890d43d2349"
+    },
+    {
+      "receiptCommandIndex": 10,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "regulatory-calendar",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/regulatory-calendar.log",
+      "rawLogSha256": "2f7b105425603b1c6ead5edb9527eb7fa419d3e4b45c5658c163adabe8f11a26"
+    },
+    {
+      "receiptCommandIndex": 11,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "freeze",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/freeze.log",
+      "rawLogSha256": "ca08beab009412a7b230d8916659a8f2a8e59af99738ddb488fc5421c5e41a8a"
+    },
+    {
+      "receiptCommandIndex": 12,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "architecture-boundaries",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/architecture-boundaries.log",
+      "rawLogSha256": "e18c0616d7ede48fe737689a772bf0460bbd17f417a9f6afe6eb5b0c7e1e1ea4"
+    },
+    {
+      "receiptCommandIndex": 13,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "gates",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/gates.log",
+      "rawLogSha256": "f22387e54e88e6c975a51126038c2239583b4f30194eeb584c70338cff3bb96b"
+    },
+    {
+      "receiptCommandIndex": 14,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "schemas",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/schemas.log",
+      "rawLogSha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431"
+    },
+    {
+      "receiptCommandIndex": 15,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "api-ref",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/api-ref.log",
+      "rawLogSha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d"
+    },
+    {
+      "receiptCommandIndex": 16,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "threat-model",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/threat-model.log",
+      "rawLogSha256": "e48746594826f49424392e28bb50a8b03e238696d6907a00e969a4d8682a8922"
+    },
+    {
+      "receiptCommandIndex": 17,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "citations",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/citations.log",
+      "rawLogSha256": "81f675216150883385813ad7802c2768d1c1f0f6b7f1c24356bddc993fef8fdb"
+    },
+    {
+      "receiptCommandIndex": 18,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "qualification",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/qualification.log",
+      "rawLogSha256": "d1b295aa0997800a5b61b3b3f974587b797a2244bba47cd9b0f0cd106009c1b2"
+    },
+    {
+      "receiptCommandIndex": 19,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "release-notes",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/release-notes.log",
+      "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "receiptCommandIndex": 20,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "catalog-admission",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-admission.log",
+      "rawLogSha256": "7b92555dd3d6b9b94bce8dbc099ae893fbb6a1b7a6420bd32f60b9a8257d90f9"
+    },
+    {
+      "receiptCommandIndex": 21,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "catalog-currency",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-currency.log",
+      "rawLogSha256": "011e2da833c26813722f21e59c0364ee2a0606cd9ddea2a6fc5e7b9818271f3e"
+    },
+    {
+      "receiptCommandIndex": 22,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "catalog-changelog",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-changelog.log",
+      "rawLogSha256": "0f300d5e407de7b2dc0598af9a1d00d1d295684d69dd0113cc4f14601d52ada5"
+    },
+    {
+      "receiptCommandIndex": 23,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "catalog-changelog-main",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/catalog-changelog-main.log",
+      "rawLogSha256": "ec555ba931bec2719634a4f0ca0accf0552973a436c9526f3a11400d2ca24e2a"
+    },
+    {
+      "receiptCommandIndex": 24,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "duplicates",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/duplicates.log",
+      "rawLogSha256": "42c44c214fa6a90590a4728797b32328f0d958c4a2c875b7ae416493cab6ee93"
+    },
+    {
+      "receiptCommandIndex": 25,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "dead-code",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/dead-code.log",
+      "rawLogSha256": "48620cd0b9b4ef02f5a5a97d9438114aa5f8d8b1ddb155726b2fe5a4161554f7"
+    },
+    {
+      "receiptCommandIndex": 26,
+      "kind": "historical_formal_check",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "name": "clean-source",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/attempts/21523daa2e879c6cad5782aab3195f093186c1c6/raw/checks/clean-source.log",
+      "rawLogSha256": "b19f89077f2490952da7000ba41c98be2dd8f5191f6b0848066e9ed83e6d3b26"
+    },
+    {
+      "receiptCommandIndex": 27,
+      "kind": "historical_case_probe",
+      "executionSource": "21523daa2e879c6cad5782aab3195f093186c1c6",
+      "record": "case-command.json",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/catalog-probe.log",
+        "sha256": "901c6b16c6425910665880937698dc1347be8fe34254e756eb5ce9ed557e64ea",
+        "bytes": 333
+      }
+    },
+    {
+      "receiptCommandIndex": 28,
+      "kind": "current_changelog_probe",
+      "executionSource": "1aedd197c1821d9c4f750073c33e22431ff62137",
+      "name": "int",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/int.log",
+      "rawLogSha256": "c4b83b112271634bc04014a6179bf48910e934eddd4e71ff1adcc519baff4702"
+    },
+    {
+      "receiptCommandIndex": 29,
+      "kind": "current_changelog_probe",
+      "executionSource": "1aedd197c1821d9c4f750073c33e22431ff62137",
+      "name": "main",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/main.log",
+      "rawLogSha256": "c4b83b112271634bc04014a6179bf48910e934eddd4e71ff1adcc519baff4702"
+    },
+    {
+      "receiptCommandIndex": 30,
+      "kind": "current_changelog_probe",
+      "executionSource": "1aedd197c1821d9c4f750073c33e22431ff62137",
+      "name": "unit",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/changelog-append-215/unit.log",
+      "rawLogSha256": "24b05fa182e899a1b11ff9e33e5474d90062279075db9485c659ebd4770cbf60"
+    },
+    {
+      "receiptCommandIndex": 31,
+      "kind": "current_adapter_initial",
+      "executionSource": "1aedd197c1821d9c4f750073c33e22431ff62137",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/initial-green.log",
+      "rawLogSha256": "7df20f0db4f3c7cd22ec51c1288116a8bbdb447223d8d1990e2d302e1dc0759d",
+      "reportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/initial-green-report.json",
+      "reportSha256": "6afd91354d0f96a35a2550164ca1f25a975d800825ad86f11990f118f81d3412",
+      "sourceStatus": ""
+    },
+    {
+      "receiptCommandIndex": 32,
+      "kind": "current_adapter_mutation",
+      "executionSource": "1aedd197c1821d9c4f750073c33e22431ff62137",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/binding-guard-disabled.log",
+      "rawLogSha256": "ef01871e1d53d752aa95d42c0fca94160f97a993fd56cca1048b0aadc991f462",
+      "reportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/binding-guard-disabled-report.json",
+      "reportSha256": "b1b20218e1f051ca00f3f4a7e7049cf980790f1e00fae4215e35b995cbad3bec",
+      "sourceStatus": " M tests/catalog/stations/governance/harness.ts\n"
+    },
+    {
+      "receiptCommandIndex": 33,
+      "kind": "current_adapter_restored",
+      "executionSource": "1aedd197c1821d9c4f750073c33e22431ff62137",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/restored-green.log",
+      "rawLogSha256": "c843f27c0539b72bb2ad3d75a53c6031bdbaac350e4c9bed9581fc8d4b418473",
+      "reportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/adapter-mutation/20261018T132716430281Z/restored-green-report.json",
+      "reportSha256": "6974d664b04ae6deb86df67252c70007870f97cb3ed6ee050837deabb163ecbe",
+      "sourceStatus": ""
+    },
+    {
+      "receiptCommandIndex": 34,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "shared-binding",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/shared-binding.log",
+        "sha256": "b79b728ae797bc66502d8ef29e253818265ad1e3b531ba77f47ab2c07b571c56",
+        "bytes": 157
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/shared-binding-report.json",
+        "sha256": "e4ae29a6b08f477d1810fc041aea5d54628573864b234ed84b3e59fc43b27e29",
+        "bytes": 48542
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 35,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "utc-precision",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/utc-precision.log",
+        "sha256": "dfc501af59324b63ed2255e2b2646a380de2ab7aae161c90fedd60043218dff1",
+        "bytes": 156
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/utc-precision-report.json",
+        "sha256": "172b6e5fa3eec87d7490fbef4430dd31740a01ce74da34e2a4d6976653241a89",
+        "bytes": 43738
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 36,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "nonblank-fields",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/nonblank-fields.log",
+        "sha256": "11051be814b84f4c28537bcf8c97c2d6d8b81183bf2b66caf351a6fa2f24e1d5",
+        "bytes": 158
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/nonblank-fields-report.json",
+        "sha256": "e457c85f564ce969e39d963cc79175341936ee3e27334844d892ef6f91522864",
+        "bytes": 42514
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 37,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "canonical-endpoint",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canonical-endpoint.log",
+        "sha256": "9dd0c5869abd7578905d73f72f8fd9bec764b5c216e0999dfc89b54e7ff0ef7c",
+        "bytes": 161
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canonical-endpoint-report.json",
+        "sha256": "0bea043aab7855c28e2b5e55da132172802109cf84db95e2d73e2e87c9094162",
+        "bytes": 47238
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 38,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "case-human-record",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-human-record.log",
+        "sha256": "66197cf1da5497b40e2f947aa2c68adac009553eb8d6966ae470209e42bec6e0",
+        "bytes": 160
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-human-record-report.json",
+        "sha256": "dec6ea16e8e944ea0715acdc9246c5588d08fa451981473f1323f3dd3cce99ca",
+        "bytes": 43706
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 39,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "case-notice",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-notice.log",
+        "sha256": "b612a4d06b98003e5e3adb8151a7ea321dc8ce21ed577a48e74490a189dabbce",
+        "bytes": 154
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/case-notice-report.json",
+        "sha256": "94b4d0a495a44786362ebe976ae8c1993ec2369d5e83b0a1f12ea42fc9689fb6",
+        "bytes": 43763
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 40,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "activation-signature",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/activation-signature.log",
+        "sha256": "81b4d5e9abb9d6af60c782a286015937612f7b90d85c4fb5095359a0e24f4179",
+        "bytes": 163
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/activation-signature-report.json",
+        "sha256": "f140194d71d5b90acfdb7a2cc24946189fd9a49ed4beacbf4c4d10bb582e7183",
+        "bytes": 42524
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 41,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "fria-assessor",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-assessor.log",
+        "sha256": "2275d2ef2a8058cce7adb6318e93d1b2eb5983a311b717ffb8d9fbe15ddc645c",
+        "bytes": 156
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-assessor-report.json",
+        "sha256": "792e244c49f25238e795d235b47fe307a1d8eabee58473aa15836fc40dbd5113",
+        "bytes": 42518
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 42,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "fria-authority",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-authority.log",
+        "sha256": "1ca243d0abfadd123d190ecd6da50eec84b514c9b2e91c7131e8303d1c6d77d1",
+        "bytes": 157
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-authority-report.json",
+        "sha256": "9d070eb8f7720dddec1794872a6872c6179ba321af0eaea6b157dd93bf0aa2da",
+        "bytes": 42519
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 43,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "fria-dates-ignored",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-dates-ignored.log",
+        "sha256": "877c5261968c65c1a0c494e552dfa12a0b37e3be4aa3379df829bc321fd6e935",
+        "bytes": 161
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/fria-dates-ignored-report.json",
+        "sha256": "49162a243f704693d6f35977640e8c9b7a3245c3cb84e457b3e94bf73aad730c",
+        "bytes": 43754
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 44,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "canary-observed",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-observed.log",
+        "sha256": "c3b8bcb77b82b39df0af489ee24852492132ecbc865f67d1a5fe577557c1febc",
+        "bytes": 158
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-observed-report.json",
+        "sha256": "2782fc197df8e6dd07c6c85d12c810eb1265ce963a309d57c9ff3fe6b04c92bb",
+        "bytes": 42520
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 45,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "canary-egress",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-egress.log",
+        "sha256": "1608c420d2c1abd501deac28dda9c25397ecbd10f920d70cbdaba9fc1a0fbcc7",
+        "bytes": 156
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/canary-egress-report.json",
+        "sha256": "e5133d24a8dfbc4e0347a24cf4b45d93bf041c04ed97fd2e6e1e632483c3aa44",
+        "bytes": 47410
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 46,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "cui-classification",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-classification.log",
+        "sha256": "3f48c8c5f5d6c2c3fab063b75fb27f15bf7d4064043c448cc9b2b74a6e44aca1",
+        "bytes": 161
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-classification-report.json",
+        "sha256": "f903fe1b3ff0b33a322ef1c3e8ee230175bc9d90917c4f145d84816f836404eb",
+        "bytes": 42528
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 47,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "cui-boundary",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-boundary.log",
+        "sha256": "de1a85a7e4afd0e3ba5c1f97518cbab728d67bdeecbfdf02cc5f4951e1165d56",
+        "bytes": 155
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/cui-boundary-report.json",
+        "sha256": "5999142639b4f3e0683921667695540be7f39dc5bd683a912272f0d1cb9efd87",
+        "bytes": 44986
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 48,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "unknown-citation-accepted",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/unknown-citation-accepted.log",
+        "sha256": "d89aeaaf6fa49f564ef8c28441c4d1db321116090e6905cb2d7a50a3f2f69466",
+        "bytes": 168
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/unknown-citation-accepted-report.json",
+        "sha256": "9674325b8372c3391dc37e9d4034c95185382a974153fb4e9e5165366f638d04",
+        "bytes": 43753
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 49,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "explanation-human",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-human.log",
+        "sha256": "6ddac00fddbf1ce3140ca1f800d6abd452f73bb4dde9df580287b626201d0497",
+        "bytes": 160
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-human-report.json",
+        "sha256": "138ee0f8417f1d07b2c5a99f19842505acfafe70be184057e5c7d5c85a4144d3",
+        "bytes": 42563
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 50,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "explanation-identity",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-identity.log",
+        "sha256": "023cf50980a34b36a9bfcc7b0cb181748b1dac990769aee917464c8d19eccdc2",
+        "bytes": 163
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-identity-report.json",
+        "sha256": "43433943832c8ab73afb8af6c8b9561dd13c556e3a9bfe528ccd8cf3a0a1be02",
+        "bytes": 42510
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 51,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "explanation-reviewer",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-reviewer.log",
+        "sha256": "bc7abcc48ea4cc455829b1561a653965dbb1b62eeac619e32ad32d3726d25b04",
+        "bytes": 163
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-reviewer-report.json",
+        "sha256": "16b4d216039348596813e7a1692d1e6697de8662f396fa0a8ef14b90ba688c88",
+        "bytes": 42553
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 52,
+      "kind": "historical_local_guard_mutation",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "name": "explanation-window",
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-window.log",
+        "sha256": "3034bb04206481992a578835742ba3b14099d2706f4dec4980daab8671168b36",
+        "bytes": 161
+      },
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/explanation-window-report.json",
+        "sha256": "0415d9bacfbbd8fe7274c2b57250d04a036e96e970174411b38a7fe679497139",
+        "bytes": 43758
+      },
+      "sourcePinBasis": "Batch start/end HEAD captured; no per-subprocess whole-repository HEAD sampling. See execution binding."
+    },
+    {
+      "receiptCommandIndex": 53,
+      "kind": "historical_local_guard_restoration",
+      "executionSource": "bf0845bc582202cdd3a071e1e92eaf4541292eff",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/restored-green.log",
+      "rawLogSha256": "6196078134ba1b5db819d311b303d62e6c1cbc8da2ae29dadd44ee0faac9570a",
+      "reportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/oracles/mutations-20261018T125854476555Z/restored-green-report.json",
+      "reportSha256": "8b5ce865f7677d842776ce415023fe7b493974988df20211ec02051f02a6fe55",
+      "sourcePinBasis": "Batch source pin; see execution binding."
+    }
+  ],
+  "historical119": {
+    "sourceHead": "119d145435dde20e0adb7a1cd70435e3bd9d7285",
+    "required25": {
+      "pass": 19,
+      "fail": 6
+    },
+    "focused": {
+      "total": 430,
+      "passed": 414,
+      "failed": 16
+    },
+    "record": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/checks/final-results.json",
+      "sha256": "26e8aa95e181975184df72ae5c352de4cd9cd552cdfba2e7f16fdf1d733dff7c",
+      "bytes": 74274
+    },
+    "note": "Earlier evidence preserved at its original paths; not counted as current qualification."
+  }
+}

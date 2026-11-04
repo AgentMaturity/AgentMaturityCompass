@@ -1,3 +1,4 @@
+import { quantile } from "../experiments/stats.js";
 import { dirname, isAbsolute, join } from "node:path";
 
 import { ensureDir, writeFileAtomic } from "../utils/fs.js";
@@ -140,15 +141,7 @@ function sampleTriangular(range: FairScenarioRange, random: number): number {
 }
 
 function percentile(sorted: number[], pct: number): number {
-  if (sorted.length === 0) return 0;
-  const rank = (pct / 100) * (sorted.length - 1);
-  const lower = Math.floor(rank);
-  const upper = Math.ceil(rank);
-  if (lower === upper) {
-    return sorted[lower] ?? 0;
-  }
-  const weight = rank - lower;
-  return (sorted[lower] ?? 0) * (1 - weight) + (sorted[upper] ?? 0) * weight;
+  return quantile(sorted, pct / 100);
 }
 
 function classifyAppetite(p50: number, p90: number, appetite: number): FairScenarioRiskAppetiteStatus {

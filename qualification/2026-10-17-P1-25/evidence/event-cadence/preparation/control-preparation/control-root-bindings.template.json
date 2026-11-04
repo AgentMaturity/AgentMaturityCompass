@@ -1,0 +1,102 @@
+{
+  "schema": "p125ec-control-root-bindings/1",
+  "readyForControls": false,
+  "sourceParent": "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceCommit": null,
+  "runtimeProtectedInputsPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/runtime-protected-inputs.json",
+    "bytes": 80498,
+    "sha256": "78523e735a11a6aef300a4609d2ee79f45a1b56a0edc1bfd8536bb52b7abb49f",
+    "dev": 16777231,
+    "inode": 543829387,
+    "nlink": 1
+  },
+  "sourceSelectionPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-preparation/source-selection.json",
+    "bytes": 8137,
+    "sha256": "02552fd970f0aff01496e9d954da4f554275a0aec076a461087c156662ce6083",
+    "dev": 16777231,
+    "inode": 543835908,
+    "nlink": 1
+  },
+  "freshSourceBindingPin": null,
+  "observedAuditPin": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+    "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+    "bytes": 2197,
+    "sha256": "1d72bdb7d77cbff0251219cf33884e51c24bff5862cffeb052c1bf24124a58be",
+    "dev": 16777231,
+    "inode": 543829389,
+    "nlink": 1
+  },
+  "sourceOutcomePin": null,
+  "freshOutcomePin": null,
+  "sourceSuccessors": [
+    {
+      "old": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 34549,
+        "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "new": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+        "bytes": 48568,
+        "sha256": "e5a7e326b7adbc2af4fafd65269313a2f49a39e6041862c24ab6ec4bb544e3d7",
+        "dev": 16777231,
+        "inode": 543658576,
+        "nlink": 1
+      },
+      "originalPreservedPin": {
+        "path": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/original-owned-source/checkpointWindow.test.ts.source.txt",
+        "bytes": 34549,
+        "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+        "dev": 16777231,
+        "inode": 543829328,
+        "nlink": 1
+      },
+      "originalGitCommits": [
+        "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+        "8506539fe11a6e3eb7e964c5fcfd88b6c7d9a615"
+      ]
+    }
+  ],
+  "phases": {
+    "source": null,
+    "fresh": null,
+    "mutants": [
+      null,
+      null
+    ],
+    "restorations": [
+      null,
+      null
+    ]
+  },
+  "rootReviewedActualSourceAndFreshOutcomes": false,
+  "rootReviewedActualSourceAndFreshPublicEvidence": false,
+  "noFutureOutcomeHashesAdopted": true,
+  "directActionNaturalClosureBeforeDependentTestsRequired": true,
+  "actualActionRecordsNotFuturePins": {
+    "pattern": "/private/tmp/p1-25-cadence-qualification-20261017/control-action-<apply-or-restore><1-or-2>.json",
+    "createdByRootOnlyAfterActualNaturalReturn": true,
+    "fields": [
+      "argv",
+      "startedUtc",
+      "endedUtc",
+      "exit",
+      "stdout",
+      "stderr"
+    ],
+    "futureActionHashes": null
+  },
+  "boundary": "UNREADY. Known runtime/source-successor/selection pins are current static inputs only. Root must fill actual committed source, post-build fresh binding and reviewed source/fresh outcomes plus actual phase names, then explicitly admit a separate active control-root-bindings.json. No future Q, native, result or action hash is supplied."
+}

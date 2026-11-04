@@ -1,0 +1,7 @@
+---
+"agent-maturity-compass": patch
+---
+
+An automatic summary compaction that a crash or an evidence failure interrupted is now settled when the session resumes (PI-025). Before the summary step, the compactor records a signed `COMPACTION_SUMMARY_PLAN` audit row naming the run the summary replaces and the earlier runs it drops. On resume, `resumeSession` checks every compaction summary step. If its summary receipt was never committed, the summary request and any answer leave the context and nothing else changes, so no turn is lost. If the receipt was committed, the planned drops that did not happen are completed, so the summary is applied once. Each settlement appends signed drop receipts whose reason starts with `recovery:` and a `COMPACTION_RECOVERED` audit row (`rolled-back` or `rolled-forward`), and the resume report states `interruptedCompactions` when there were any. Signed history is never changed.
+
+Measured token counts per turn and per compaction now stay with the session across resume and fork (PXA-12). `sessionTokenCounts` reads them back from the signed rows: per turn, the sum of each field over the steps that reported it, with `measuredSteps` beside `steps`; per compaction, the measured prompt that triggered it and the next request's measured prompt. A fork records the parent's counts at the fork point in a `FORK_TOKEN_COUNTS` audit row, read back as `inherited`. A count that was never measured stays `null`, never 0. `amc session show --json` now includes `tokenCounts`.

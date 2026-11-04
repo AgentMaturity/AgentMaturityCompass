@@ -1,0 +1,246 @@
+{
+  "capturedUtc": "2026-10-16T10:20:06.543536+00:00",
+  "prs": [
+    {
+      "number": 33,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": "package-lock.json"
+          },
+          {
+            "path": "package.json"
+          }
+        ]
+      }
+    },
+    {
+      "number": 28,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": "package-lock.json"
+          },
+          {
+            "path": "package.json"
+          }
+        ]
+      }
+    },
+    {
+      "number": 27,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": "package-lock.json"
+          },
+          {
+            "path": "package.json"
+          }
+        ]
+      }
+    },
+    {
+      "number": 21,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": "package-lock.json"
+          },
+          {
+            "path": "package.json"
+          }
+        ]
+      }
+    },
+    {
+      "number": 20,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": "package-lock.json"
+          },
+          {
+            "path": "package.json"
+          }
+        ]
+      }
+    },
+    {
+      "number": 19,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": "package-lock.json"
+          },
+          {
+            "path": "package.json"
+          }
+        ]
+      }
+    },
+    {
+      "number": 17,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": "package-lock.json"
+          },
+          {
+            "path": "package.json"
+          }
+        ]
+      }
+    },
+    {
+      "number": 8,
+      "files": {
+        "totalCount": 6,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": ".github/workflows/amc-score.yml"
+          },
+          {
+            "path": ".github/workflows/ci.yml"
+          },
+          {
+            "path": ".github/workflows/docker-build.yml"
+          },
+          {
+            "path": ".github/workflows/nightly-compatibility-matrix.yml"
+          },
+          {
+            "path": ".github/workflows/npm-publish.yml"
+          },
+          {
+            "path": ".github/workflows/release.yml"
+          }
+        ]
+      }
+    },
+    {
+      "number": 7,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": ".github/workflows/ci.yml"
+          },
+          {
+            "path": ".github/workflows/docker-build.yml"
+          }
+        ]
+      }
+    },
+    {
+      "number": 6,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": ".github/workflows/docker-runner.yml"
+          },
+          {
+            "path": ".github/workflows/release.yml"
+          }
+        ]
+      }
+    },
+    {
+      "number": 5,
+      "files": {
+        "totalCount": 1,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": ".github/workflows/pages.yml"
+          }
+        ]
+      }
+    },
+    {
+      "number": 4,
+      "files": {
+        "totalCount": 3,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": ".github/workflows/ci.yml"
+          },
+          {
+            "path": ".github/workflows/docker-build.yml"
+          },
+          {
+            "path": ".github/workflows/nightly-compatibility-matrix.yml"
+          }
+        ]
+      }
+    },
+    {
+      "number": 3,
+      "files": {
+        "totalCount": 2,
+        "pageInfo": {
+          "hasNextPage": false
+        },
+        "nodes": [
+          {
+            "path": "package-lock.json"
+          },
+          {
+            "path": "package.json"
+          }
+        ]
+      }
+    }
+  ],
+  "prospectiveScopes": [
+    "qualification/2026-10-16-P1-24",
+    "tests/autoCompaction.test.ts"
+  ],
+  "overlap": [],
+  "allOpenIncluded": true,
+  "dependabotExcludedFromWipOnly": true,
+  "doesNotReleaseOwnership": true
+}

@@ -181,8 +181,8 @@ export type {
 export { projectBishengObservabilityScoreSurface } from "./bishengObservabilityLiveDriftScore.js";
 export type { BishengObservabilityScoreSurface } from "./bishengObservabilityLiveDriftScore.js";
 
-export { generateFrameworkReport, listSupportedFrameworks } from "./crossFrameworkMapping.js";
-export type { FrameworkComplianceReport } from "./crossFrameworkMapping.js";
+export { generateFrameworkReport, listFrameworkCrosswalks, listSupportedFrameworks } from "./crossFrameworkMapping.js";
+export type { FrameworkComplianceReport, FrameworkCrosswalk } from "./crossFrameworkMapping.js";
 
 export { scorePlatformDependency } from "./platformDependency.js";
 export type { PlatformDependencyScore, PlatformDependencyProfile } from "./platformDependency.js";

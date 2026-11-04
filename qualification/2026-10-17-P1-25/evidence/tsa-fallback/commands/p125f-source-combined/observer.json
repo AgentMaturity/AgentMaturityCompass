@@ -1,0 +1,260 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 49481,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaFallback.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/verifyTimestamp.test.ts"
+  ],
+  "testCount": 21,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "356376093",
+      "name": "tests/time/tsaFallback.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaFallback.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "356376093_0",
+      "name": "tests/time/tsaFallback.test.ts P1-25 offline and configured TSA refusal continuation",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356376093_0_0",
+      "name": "tests/time/tsaFallback.test.ts P1-25 offline and configured TSA refusal continuation returns the exact default config and offline result without configured TSAs",
+      "fullName": "P1-25 offline and configured TSA refusal continuation returns the exact default config and offline result without configured TSAs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356376093_0_1",
+      "name": "tests/time/tsaFallback.test.ts P1-25 offline and configured TSA refusal continuation skips an unmatched anchor before the wire beside a matching-anchor refusal",
+      "fullName": "P1-25 offline and configured TSA refusal continuation skips an unmatched anchor before the wire beside a matching-anchor refusal",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356376093_0_2",
+      "name": "tests/time/tsaFallback.test.ts P1-25 offline and configured TSA refusal continuation preserves literal attempt and failure order through finite HTTP, malformed and imprint refusals",
+      "fullName": "P1-25 offline and configured TSA refusal continuation preserves literal attempt and failure order through finite HTTP, malformed and imprint refusals",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "356376093_0_3",
+      "name": "tests/time/tsaFallback.test.ts P1-25 offline and configured TSA refusal continuation continues after the unchanged 10000 ms default abort to a real next-route refusal",
+      "fullName": "P1-25 offline and configured TSA refusal continuation continues after the unchanged 10000 ms default abort to a real next-route refusal",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "353594614",
+      "name": "tests/time/verifyTimestamp.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/verifyTimestamp.test.ts",
+      "state": "pass",
+      "hooks": {
+        "beforeAll": "pass",
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_0",
+      "name": "tests/time/verifyTimestamp.test.ts verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+      "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_1",
+      "name": "tests/time/verifyTimestamp.test.ts verifies the granted response and returns its exact signed CMS token bytes",
+      "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_2",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a different expected digest for the unchanged genuine signed token",
+      "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_3",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a different expected nonce for the unchanged genuine signed token",
+      "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_4",
+      "name": "tests/time/verifyTimestamp.test.ts refuses the independently located signed-attribute corruption",
+      "fullName": "refuses the independently located signed-attribute corruption",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_5",
+      "name": "tests/time/verifyTimestamp.test.ts refuses the genuine token under a different real root with the same permitted policy",
+      "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_6",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a policy excluded by the correctly pinned real root",
+      "fullName": "refuses a policy excluded by the correctly pinned real root",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_7",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a genuinely signed TSA certificate without an EKU extension",
+      "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_8",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+      "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_9",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+      "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_10",
+      "name": "tests/time/verifyTimestamp.test.ts refuses explicit rejection status before requiring a timestamp token",
+      "fullName": "refuses explicit rejection status before requiring a timestamp token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_11",
+      "name": "tests/time/verifyTimestamp.test.ts refuses a truncated copy of the genuine token",
+      "fullName": "refuses a truncated copy of the genuine token",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_12",
+      "name": "tests/time/verifyTimestamp.test.ts refuses 65537 bytes at the token size boundary before DER parsing",
+      "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_13",
+      "name": "tests/time/verifyTimestamp.test.ts keeps claimed time separate from the genuine attested upper bound",
+      "fullName": "keeps claimed time separate from the genuine attested upper bound",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_14",
+      "name": "tests/time/verifyTimestamp.test.ts keeps an artifact without a timestamp at claimed time",
+      "fullName": "keeps an artifact without a timestamp at claimed time",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_15",
+      "name": "tests/time/verifyTimestamp.test.ts reports an untrusted TSA as a warning while the artifact time stays claimed",
+      "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "353594614_16",
+      "name": "tests/time/verifyTimestamp.test.ts reports a broken supplied token as an artifact integrity error",
+      "fullName": "reports a broken supplied token as an artifact integrity error",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

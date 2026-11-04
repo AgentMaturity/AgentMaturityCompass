@@ -1,0 +1,131 @@
+{
+  "sourceCommit": "a66542d969e68115f61eea0a1028b59061110b55",
+  "scope": "External native artifacts are hash references; failed and interrupted historical runs are retained. No missing or old capture qualifies Q3.",
+  "artifacts": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-product-required23-v1/summary.json",
+      "sha256": "a04e57fb373a6517f8ec16dd1ceeda16cce7500163a9749d5f5e02e4f512f5af",
+      "bytes": 129919
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-extra-doc-checks-v1/summary.json",
+      "sha256": "520e5248bb40a81f6f7c9c831518ca5aa2849953ad4c3112ec702398caafdd2f",
+      "bytes": 119901
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-product-focused-v1/summary.json",
+      "sha256": "f7ffdd5dc3a25a3e4979454b93f5f26608342f8279cd479237f57de26a0bf7a2",
+      "bytes": 199003
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-product-focused-v1/report.json",
+      "sha256": "716851301ff3dff18b48f88ca505d323659e3d9c4e4fe9b8bd829ba80c88281d",
+      "bytes": 1887966
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-product-focused-v1/raw.log",
+      "sha256": "ae2a47fc7fdfc3d8df0eba025ca7d49093e4d05436d73e614d278aab876c3d26",
+      "bytes": 892591
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/focused172-exact-int-baseline-classification-h3-v1.json",
+      "sha256": "3148200c95e1d58ff1f0bab2212f6b2757bfd825ec08c4a6dc9f73536a4808f5",
+      "bytes": 27314
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/product-h3-exact-source-scope-manifest-v1.json",
+      "sha256": "3459a9fc6df1af0754e6acc9ee8c669fca29718f1d1f990620670bc9daa918bf",
+      "bytes": 57273
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/native-built-public-doc-assets-h3-v1.json",
+      "sha256": "b4440f52c25588d2dac8ba565938be2a18996b086e9f2963d7b4f5d82730f824",
+      "bytes": 1658
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/native-q2-six-file-reproduction-v1/summary.json",
+      "sha256": "202dd138ef8dcebcc9aea787ef23988c72d37a269d91b027f38a1dbb5909ec7b",
+      "bytes": 119050
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/tests-first-native-red-v1/summary.json",
+      "sha256": "641947e85a8c9e686b386da89e510c8a780a2c2131f1b425b4d4166a0e71793b",
+      "bytes": 118289
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-native-green-v1/summary.json",
+      "sha256": "1e6bffc21c96f74714635fc702e753c6af0018f581d560c2b089abc79c51ff9c",
+      "bytes": 120872
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/native-compatibility-guard-mutations-v1/index.json",
+      "sha256": "04f65c43a28d8cb51c32a600f0f9818a4e2fc038bffec71cbcefdf0a26953ec9",
+      "bytes": 29890
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/post-mutation-native-six-file-green-v1/summary.json",
+      "sha256": "04d82f430bc0ccccfc27ad476f6485306636c426062c21998062de0a2b12f5ac",
+      "bytes": 121001
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/native-compatibility-guard-mutations-independent-review-v1.json",
+      "sha256": "c64c51518f0c749ad1a32c7db87652b00b8a727583128dcc7cd23ecbf2672365",
+      "bytes": 61735
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/bound-full-helper-binding-review-v1.json",
+      "sha256": "a3ff543acef5996d24eb851577bee47a74512f6cf4241a2b575006751ede9df1",
+      "bytes": 2711
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/full-capture-template-v3-independent-review-v1.json",
+      "sha256": "11ba5ded4d3d0cd103136abe5f0b48cc28d130d6f571caf2e5e3ab1a8e381838",
+      "bytes": 9978
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/blockers-static-v1/manifest.json",
+      "sha256": "4af005940b752012f9ab8a222d112160fda101ae72a3d7ab2db30b41a42b98a6",
+      "bytes": 880
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/scenario-basis-static-v1/manifest.json",
+      "sha256": "96409da13f1c9dbd26beab201fa2baa0122cdbc8a1028e652803259f3555acec",
+      "bytes": 1831
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/all-changed-covering-and-consumer-final-paths-v6-manifest.json",
+      "sha256": "26231f59beff8ce3041322ca9eed3770dc9bdf4e34ed3c16a97fb2761809d6a7",
+      "bytes": 1285
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/full-suite/4c06e443b83d87c5f117bee8c413649dc4000f61/result.json",
+      "sha256": "6d4444cc7f3a84a1d54f02122efef7bc4f9e6ddd282ba180ee60b3ce25423389",
+      "bytes": 5200
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/q2-native-baseline-classification-root-v1.json",
+      "sha256": "6ee755ee65ea626d644d8c08adb6a9dafd9f55289348f1912d3d681be1eb5181",
+      "bytes": 73157
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/q2-tsa-full-only-context-classification-v1.json",
+      "sha256": "ef1efe9f90797cf8ab9fe0e0a5db9fecc8275920613c563a128890decb8bf5d7",
+      "bytes": 4908
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/interim-full-e89880-intentional-interruption-v1.json",
+      "sha256": "c0162677887dc52a0a4e111b94026ff798549932958d36039f2c206b2db89419",
+      "bytes": 794
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/compatibility-validation/compatibility-product-commit-v1/summary.json",
+      "sha256": "521548dbd0c60dfd96a9910b5320a6a9a8c2d358c49b432b7a6c60ce35906509",
+      "bytes": 3172
+    }
+  ],
+  "priorQualificationDirectoriesPreserved": [
+    "qualification/2026-10-20-P2-27/",
+    "qualification/2026-10-20-P2-27-landing/"
+  ],
+  "fullQ3Result": null
+}

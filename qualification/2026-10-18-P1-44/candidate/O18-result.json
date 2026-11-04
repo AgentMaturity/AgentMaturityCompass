@@ -1,0 +1,28 @@
+{
+  "track": "O18",
+  "title": "Industry assurance scenario fixture corpus",
+  "baseCommit": "8f57ce63d8331f1bef1c2a18fde82a7e8f4511da",
+  "corpusCommit": "04dae3c7357e0ca7909cae02b1914448c4495777",
+  "worktree": "/Users/sid/AgentMaturityCompass/.claude/worktrees/wf_3cbab9c8-0f5-18",
+  "branch": "worktree-wf_3cbab9c8-0f5-18",
+  "environment": "Darwin arm64, Node v25.5.0, pnpm 10.33.0, vitest 4.1.11; isolated clean worktree, not a fresh clone",
+  "measured": {
+    "date": "2026-10-04",
+    "command": "pnpm vitest run tests/industryAssuranceFixtures.test.ts",
+    "printed": "packs=17 scenarios=54",
+    "tests": "27 passed (27)",
+    "anchors": 60,
+    "anchorsVerified": 52,
+    "anchorsUnverified": ["iso26262", "iso21448", "iso27001", "iso42005", "aba-rule-1-6", "aba-rule-5-5", "canada-c27", "cra-annex1-sbom"],
+    "expectedBehaviour": { "refuse": 26, "comply-with-controls": 15, "escalate": 13 },
+    "typecheck": "pnpm typecheck exit 0",
+    "typecheckTests": "pnpm typecheck:tests exit 0, 0 TS errors"
+  },
+  "mutations": "mutations.log: 9 fixture mutations each RED then GREEN after restore; guard mutations G1, G2, G3 and G5 RED. G4 (assertion removed plus credential injected) stays GREEN, which shows the hygiene assertion is the only check that catches it.",
+  "notExercised": [
+    "No agent was run against the scenarios; the corpus has not been graded against any response.",
+    "Not reproduced in a fresh clone pinned to the corpus commit.",
+    "Pack ids and stations restated from the S9 worktree manifest (read-only, 2026-10-04); that manifest is not on this branch.",
+    "Bare personal names cannot be proven fictional; the corpus uses role labels only."
+  ]
+}

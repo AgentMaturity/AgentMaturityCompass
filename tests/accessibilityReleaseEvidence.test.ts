@@ -59,7 +59,7 @@ describe("accessibility release evidence", () => {
 
   test("docs and audit expose the release-evidence workflow", () => {
     const runbook = readFileSync("docs/runbooks/ACCESSIBILITY_RELEASE_EVIDENCE.md", "utf8");
-    const audit = readFileSync("docs/AUDIT_50_AGENTS_BATCH5.md", "utf8");
+    const audit = readFileSync("docs/archive/AUDIT_50_AGENTS_BATCH5.md", "utf8");
     const pkg = JSON.parse(readFileSync("package.json", "utf8")) as { scripts: Record<string, string> };
 
     expect(pkg.scripts["accessibility:release-evidence"]).toContain("write-accessibility-release-evidence.mjs");

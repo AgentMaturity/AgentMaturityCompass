@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:counts
+> node scripts/gen-counts.mjs --check
+
+Published source counts match the repository; this check does not execute tests.

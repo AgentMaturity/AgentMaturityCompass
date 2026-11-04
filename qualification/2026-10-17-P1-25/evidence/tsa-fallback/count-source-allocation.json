@@ -1,0 +1,24 @@
+{
+  "at": "2026-10-16T22:17:59.108204+00:00",
+  "paths": [
+    "README.md",
+    "CONTRIBUTING.md",
+    "website/index.html",
+    "website/lite.html",
+    "website/i18n.js",
+    "docs/content/show-hn-draft.md",
+    "docs/content/reddit-launch-drafts.md",
+    "docs/internal/competitive-landscape.md",
+    "docs/internal/mirofish-simulation-council.md",
+    "whitepaper/AMC_WHITEPAPER_v1.md"
+  ],
+  "numericSpans": 15,
+  "proposalSha256": "66a680c76e57fc50af5e77cc4fd201ca6a547ee514f2a47092cd276211bbae52",
+  "currentHostedWip0AndAllPathsNoOverlap": true,
+  "freezeExit": 0,
+  "d15": "none",
+  "all128ProtectedExact": true,
+  "allOtherAuthoredBytesMustRemainExact": true,
+  "rawOriginalsRemainPrivate": true,
+  "allHoldsRetained": true
+}

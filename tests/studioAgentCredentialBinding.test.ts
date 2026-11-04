@@ -1,3 +1,4 @@
+import { writeAnchoredRun } from "./helpers/sealedRun.js";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { request as httpRequest } from "node:http";
 import { tmpdir } from "node:os";
@@ -24,6 +25,7 @@ import { startStudioApiServer } from "../src/studio/studioServer.js";
 import { ensureAgentToken } from "../src/studio/studioState.js";
 import type { ToolExecutionResponse, ToolIntentResponse } from "../src/toolhub/toolhubServer.js";
 import type { DiagnosticReport } from "../src/types.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
 // Author-only HTTP regressions for AMC-1546. No execution result is claimed here.
 // Authentication, leases, signatures, ToolHub, approvals, receipts and fs.write are
@@ -51,6 +53,7 @@ async function fixture() {
   const workspace = realpathSync(mkdtempSync(join(tmpdir(), "amc-agent-credential-binding-")));
   roots.push(workspace);
   initWorkspace({ workspacePath: workspace, agentId: A, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   // Workspace initialization does not create fleet agent configurations.
   // Both identities use native signed configs; this fixture never invokes a provider.
   initFleet(workspace, { orgName: "Credential binding fixture" });
@@ -132,11 +135,13 @@ function syntheticGovernorControlInput(f: Fixture, agentId: string): void {
     fixtureKind: "SYNTHETIC_CREDENTIAL_AUTHORIZATION_CONTROL_INPUT_NOT_A_MEASUREMENT",
     agentId, runId: "synthetic-credential-binding-control", ts: now,
     windowStartTs: now - 1000, windowEndTs: now, integrityIndex: 1, trustLabel: "HIGH TRUST",
-    correlationRatio: 0, questionScores: [], evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 }
+    correlationRatio: 0, questionScores: [], evidenceTrustCoverage: { observed: 0, attested: 0, selfReported: 1 },
+    // The governor refuses a sealed run that does not record a passed ledger verification inside the trust boundary.
+    verificationPassed: true, trustBoundaryViolated: false, trustBoundaryMessage: null
   };
   const runsDir = getAgentPaths(f.workspace, agentId).runsDir;
   mkdirSync(runsDir, { recursive: true });
-  writeFileSync(join(runsDir, "synthetic-credential-binding-control.json"), JSON.stringify(report), "utf8");
+  writeAnchoredRun(f.workspace, runsDir, { ...report, runId: report.runId!, windowStartTs: report.windowStartTs!, windowEndTs: report.windowEndTs!, status: "VALID" as const });
 }
 async function approvedWrite(f: Fixture, agentId = B) {
   syntheticGovernorControlInput(f, agentId);

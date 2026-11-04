@@ -1,0 +1,133 @@
+{
+  "reason": "The actual final-source check:counts requested regeneration. Exactly ten generated outputs remain dirty and uncommitted; no implementation input or Never-list rule was changed. Claude regenerates them at landing.",
+  "state": "regenerated_uncommitted_final_full_pending",
+  "recordedAtUtc": "2026-10-18T11:40:16.426043+00:00",
+  "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "integrationBase": "577aa79700479634fa4f16cf44c48192fe57a994",
+  "patchPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/generated-counts-final-b88f0fb93-uncommitted.patch",
+  "patchSha256": "3a694687ad64d3545fb47f49dc71b1bf3d5961bc3ebf0fbf9fa009a50c87c562",
+  "previousStateArchive": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/generated-counts-history/fc8765d3a16c22196a31be0d68126bc3f5b9ab480bcbf3d007261a969d47f0f6.json",
+  "previousStateSha256": "fc8765d3a16c22196a31be0d68126bc3f5b9ab480bcbf3d007261a969d47f0f6",
+  "previousPatchArchive": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/generated-counts-history/80d0e6e259833c3578fe8f6347654e9756fcdf723a3c3247e7b62df2a676c2e3.patch",
+  "previousPatchOriginalPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/generated-counts-final-a7e6be69-uncommitted.patch",
+  "previousPatchSha256": "80d0e6e259833c3578fe8f6347654e9756fcdf723a3c3247e7b62df2a676c2e3",
+  "runtime": {
+    "node": "v22.23.3",
+    "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+    "provenance": "Captured formal-runner startup record; this metadata update does not rerun generation."
+  },
+  "commandResults": [
+    {
+      "name": "counts-before-regeneration",
+      "cmd": "npm run -s check:counts",
+      "exit": 1,
+      "durationMs": 1339,
+      "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts-before-regeneration.log",
+      "rawLogSha256": "51d3d0bdeaec21cfff43bf9c0840f15f1568823ad60e154648b31bc10327dc6a",
+      "rawLogBytes": 1228
+    },
+    {
+      "name": "gen-counts",
+      "cmd": "node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 512,
+      "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/gen-counts.log",
+      "rawLogSha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d",
+      "rawLogBytes": 20
+    },
+    {
+      "name": "counts",
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 617,
+      "head": "b88f0fb934605ba528ad517eef797a5b891ee843",
+      "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/post-governance/counts.log",
+      "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+      "rawLogBytes": 81
+    }
+  ],
+  "paths": [
+    {
+      "path": "CONTRIBUTING.md",
+      "sha256": "db544d2085b6bc7803c24b137e5dff5231b3eb3061ffb716e7caf18a41294fc6",
+      "bytes": 19504,
+      "headSha256": "1e29d75e6d1eea1836b7e9df3b860e5e27b3fde6caed60dfc6642547ca37d4da"
+    },
+    {
+      "path": "README.md",
+      "sha256": "a6fe298b16f03318b06d6fcc61c63ebc0dba7c122a3e88d018fd8269b4cc4fe8",
+      "bytes": 63199,
+      "headSha256": "f66daf46bbd75ec8f2e20c95cd0cdfce940a48deca9de140cd6dec2cec32bb24"
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "sha256": "288c791fba4fcc31ce45a463d8e1a3585d76058fa1a1ce90fe237e65b2978f01",
+      "bytes": 3075,
+      "headSha256": "918152e085c501ca07680f99715ff05c806fb1720af89a152a822f74bd8069a8"
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "sha256": "c8da090837bf8e0536bdf2738997be87227f705f289403ab5deb4349b00ff2ba",
+      "bytes": 1951,
+      "headSha256": "215902ab314ffc4cb39401be1509d6229d8940c481898258e365346d442ecd5c"
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "sha256": "a2e228a374e828bea2b58f743a2601cf77e5ff7c0ef09fb2711af5b3cde6922e",
+      "bytes": 3880,
+      "headSha256": "27e44749decd7c69a9147cbed7fe1778b131e41a4093efe6d7481abeb8a16d7a"
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "sha256": "c7b613f90e3cc318f3186a2227cb22fd6382730c33b21003ed978a2d722b7c32",
+      "bytes": 2489,
+      "headSha256": "5690c4618f66ede3409f39678fdab779b0ad9b7e33783cb470a5a84bd3798b46"
+    },
+    {
+      "path": "website/i18n.js",
+      "sha256": "96891ea2f8fc0b9532d4a9e0fedec8b0b575cf9aaaeb7a3608a78f4862751c9b",
+      "bytes": 44169,
+      "headSha256": "31408bc3e0ce42f400119c94d62b2ab55c8ffabe267699c0364494f642b7901d"
+    },
+    {
+      "path": "website/index.html",
+      "sha256": "6bccb7059cdfd8a214f42efff9de104d8e1d6d94d40c2295275c2aaf0cb65a8c",
+      "bytes": 44277,
+      "headSha256": "2619053ed3a44765791c40363d4b00f114b701547da170610f3e0d073d6d18e8"
+    },
+    {
+      "path": "website/lite.html",
+      "sha256": "b94016aa0925df3d07da5fd98d4390c3ae0216b13911c259e6058f248f05e37a",
+      "bytes": 11197,
+      "headSha256": "51986b1ece09a4e45a9bcc3a1c0303085fac62faccb131aef71336392d7dd6e9"
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "sha256": "42ff0c5e638365939c79df3dea5e5dc8666a6042e9b992ee378b08f1cc0fafb0",
+      "bytes": 108269,
+      "headSha256": "a8a16e4424c4a03ee521335874a713a5fcfd190bab5ec8a7846276e97d388bea"
+    }
+  ],
+  "workingTreeClean": false,
+  "committedImplementationSource": true,
+  "statusPorcelainExcludingQualification": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n",
+  "d15BeforeWrite": {
+    "command": [
+      "node",
+      "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+      "--paths",
+      "qualification/2026-10-18-P2-30/generated-counts-state.json"
+    ],
+    "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "node": "v22.23.3",
+    "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+    "exitCode": 0,
+    "durationMs": 328,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/generated-counts-b88-d15-before.log",
+    "rawLogSha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345"
+  },
+  "neverCommitGeneratedOutputs": true,
+  "note": "Current generation exits1/0/0 and durations1339/512/617ms are copied from the measured formal result rows and their raw hashes verified. No command was re-executed to manufacture these results."
+}

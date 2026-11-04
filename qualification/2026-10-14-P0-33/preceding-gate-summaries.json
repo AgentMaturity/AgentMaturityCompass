@@ -1,0 +1,770 @@
+[
+  {
+    "sourceCommit": "34723d5cfff8b36fd28b38abbc56af5f8e3f6a8b",
+    "rawGateReceiptPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/p0-33-continuation/full-release-gate.json",
+    "rawGateReceiptSha256": "255bfba4ae96ba5395941d7da6b55158c3c7909f6ce399d1eedade158d265471",
+    "status": "failed",
+    "counts": {
+      "executed": 20,
+      "passed": 19,
+      "failed": 1,
+      "skipped": 2,
+      "total": 22
+    },
+    "steps": [
+      {
+        "id": "console-js-syntax",
+        "command": "node --check src/console/assets/app.js",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:02:37.354Z",
+        "endedAt": "2026-10-14T10:02:37.396Z",
+        "remediation": null,
+        "needs": [],
+        "after": [],
+        "allowFailure": false,
+        "durationMs": 42
+      },
+      {
+        "id": "openapi-parse",
+        "command": "node -e import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:02:37.396Z",
+        "endedAt": "2026-10-14T10:02:37.613Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "console-js-syntax"
+        ],
+        "allowFailure": false,
+        "durationMs": 217
+      },
+      {
+        "id": "typecheck",
+        "command": "npm run typecheck",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:02:37.613Z",
+        "endedAt": "2026-10-14T10:03:03.016Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "openapi-parse"
+        ],
+        "allowFailure": false,
+        "durationMs": 25403
+      },
+      {
+        "id": "typecheck-tests",
+        "command": "npm run typecheck:tests",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:03:03.016Z",
+        "endedAt": "2026-10-14T10:03:37.562Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "typecheck"
+        ],
+        "allowFailure": false,
+        "durationMs": 34546
+      },
+      {
+        "id": "build",
+        "command": "npm run build",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:03:37.562Z",
+        "endedAt": "2026-10-14T10:04:08.029Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "typecheck-tests"
+        ],
+        "allowFailure": false,
+        "durationMs": 30467
+      },
+      {
+        "id": "lint",
+        "command": "npm run lint",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:04:08.029Z",
+        "endedAt": "2026-10-14T10:04:10.838Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "build"
+        ],
+        "allowFailure": false,
+        "durationMs": 2809
+      },
+      {
+        "id": "source-duplicates",
+        "command": "npm run check:duplicates",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:04:10.838Z",
+        "endedAt": "2026-10-14T10:04:11.475Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "lint"
+        ],
+        "allowFailure": false,
+        "durationMs": 637
+      },
+      {
+        "id": "source-dead-code",
+        "command": "npm run check:dead-code",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:04:11.475Z",
+        "endedAt": "2026-10-14T10:04:14.337Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "source-duplicates"
+        ],
+        "allowFailure": false,
+        "durationMs": 2862
+      },
+      {
+        "id": "package-lint",
+        "command": "npm run check:package",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:04:14.337Z",
+        "endedAt": "2026-10-14T10:04:18.309Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "source-dead-code"
+        ],
+        "allowFailure": false,
+        "durationMs": 3972
+      },
+      {
+        "id": "citations",
+        "command": "npm run check:citations",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:04:18.310Z",
+        "endedAt": "2026-10-14T10:04:18.624Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "package-lint"
+        ],
+        "allowFailure": false,
+        "durationMs": 314
+      },
+      {
+        "id": "packed-install",
+        "command": "node scripts/packed-install-check.mjs --no-build",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:04:18.624Z",
+        "endedAt": "2026-10-14T10:04:39.983Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "citations"
+        ],
+        "allowFailure": false,
+        "durationMs": 21359
+      },
+      {
+        "id": "gap-0626-adversarial-regression",
+        "command": "npx vitest run tests/gap0626AdversarialRegression.test.ts",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:04:39.983Z",
+        "endedAt": "2026-10-14T10:04:44.610Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "packed-install"
+        ],
+        "allowFailure": false,
+        "durationMs": 4627
+      },
+      {
+        "id": "full-test-suite",
+        "command": "npx vitest run --coverage --exclude tests/performance/** --reporter=dot --reporter=json --outputFile.json=/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-full-test-suite-qyxK9m/results.json",
+        "status": "failed",
+        "startedAt": "2026-10-14T10:04:44.611Z",
+        "endedAt": "2026-10-14T10:29:14.328Z",
+        "remediation": "Fix full-test-suite before release.",
+        "artifact": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-full-test-suite-qyxK9m/results.json",
+          "produced": true,
+          "valid": false,
+          "sha256": "4e94f437d48f92151585db88e8007f92fb7b19ed50803cc149de9432ab0fa824",
+          "counts": {
+            "total": 24355,
+            "passed": 24353,
+            "failed": 2,
+            "pending": 0,
+            "todo": 0,
+            "failedSuites": 4,
+            "pendingSuites": 0,
+            "files": 1687
+          },
+          "temporary": false,
+          "retained": true
+        },
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "gap-0626-adversarial-regression"
+        ],
+        "allowFailure": false,
+        "durationMs": 1469717,
+        "errorTail": "uestion: AMC-1.2, seen at L0).\n\nstderr | tests/newDomainEvidenceCaps.test.ts > new domain runner caps > AMC-VOICE-1 is capped when high-risk workspace lacks llm request/response evidence\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/amcDeclarativeConfig.test.ts > configInit > refuses to overwrite without --force\n\u2717 /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-config-test-HwHisJ/amcconfig.yaml already exists. Use --force to overwrite.\n\nerror: too many arguments for 'set'. Expected 1 argument but got 2.\nstderr | tests/helmChartSecrets.test.ts > helm chart bootstrap secret > schema rejects change-me bootstrap values and accepts the shipped values files\nstrict mode: missing type \"string\" for keyword \"pattern\" at \"#/properties/image/then/properties/digest\" (strictTypes)\n\nstderr | tests/helmChartVersion.test.ts > helm chart version and image pinning > requireDigest without digest refuses (template fail and schema)\nstrict mode: missing type \"string\" for keyword \"pattern\" at \"#/properties/image/then/properties/digest\" (strictTypes)\n\nindustryPacks=17\nstderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend another question's evidence at L0-L2\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L2).\n\nstderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend it at L3+ either, which was already true\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L4).\n\nstderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > cannot be turned off any more (P1-07)\nSTRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level\n\n\n\u23af\u23af\u23af\u23af\u23af\u23af Failed Suites 1 \u23af\u23af\u23af\u23af\u23af\u23af\u23af\n\n FAIL  tests/keys/atomicRotation.test.ts [ tests/keys/atomicRotation.test.ts ]\nError: Hook timed out in 10000ms.\nIf this is a long-running hook, pass a timeout value as the last argument or configure it globally with \"hookTimeout\".\n \u276f tests/setup/guardWorkspace.ts:20:1\n     18| if (!previousAmcHome) process.env.AMC_HOME = join(workspace, \"amc-home\u2026\n     19|\n     20| afterAll(async () => {\n       | ^\n     21|   try {\n     22|     // Do not preload product modules: individual test files must rema\u2026\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[1/3]\u23af\n\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af Failed Tests 2 \u23af\u23af\u23af\u23af\u23af\u23af\u23af\n\n FAIL  tests/dogfoodMaturityEvidence.test.ts > dogfood maturity evidence > labels every seeded event synthetic_example and SELF_REPORTED\nError: Test timed out in 30000ms.\nIf this is a long-running test, pass a timeout value as the last argument or configure it globally with \"testTimeout\".\n \u276f tests/dogfoodMaturityEvidence.test.ts:60:3\n     58|   });\n     59|\n     60|   test(\"labels every seeded event synthetic_example and SELF_REPORTED\"\u2026\n       |   ^\n     61|     process.env.AMC_DEV_DOGFOOD = \"1\";\n     62|     const ws = workspace();\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[2/3]\u23af\n\n FAIL  tests/keys/atomicRotation.test.ts > atomic rotation (P1-08) > every crash inside a rotation's commit refuses to sign and verify until --resume, and resume completes or rolls back\nError: Hook timed out in 10000ms.\nIf this is a long-running hook, pass a timeout value as the last argument or configure it globally with \"hookTimeout\".\n \u276f tests/keys/atomicRotation.test.ts:32:1\n     30| const INCOMPLETE = /key set generation \\d+ is incomplete; run `amc key\u2026\n     31| const roots: string[] = [];\n     32| afterEach(() => {\n       | ^\n     33|   crash.at = 0;\n     34|   for (const root of roots.splice(0)) { lockVault(root); rmSync(root, \u2026\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[3/3]\u23af\n\n"
+      },
+      {
+        "id": "performance-floors",
+        "command": "npx vitest run tests/performance --no-file-parallelism --reporter=dot --reporter=json --outputFile.json=/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-performance-floors-nUi6Xs/results.json",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:29:14.768Z",
+        "endedAt": "2026-10-14T10:29:29.776Z",
+        "remediation": null,
+        "artifact": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-performance-floors-nUi6Xs/results.json",
+          "produced": true,
+          "valid": true,
+          "sha256": "f5e8af0b0d58431d63875eb056229bda1a57650a795b18f48c227ddae3a52c24",
+          "counts": {
+            "total": 5,
+            "passed": 5,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failedSuites": 0,
+            "pendingSuites": 0,
+            "files": 4
+          },
+          "temporary": false,
+          "retained": true
+        },
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "full-test-suite"
+        ],
+        "allowFailure": false,
+        "durationMs": 15008
+      },
+      {
+        "id": "per-file-coverage",
+        "command": null,
+        "status": "skipped",
+        "startedAt": "2026-10-14T10:29:29.777Z",
+        "endedAt": "2026-10-14T10:29:29.777Z",
+        "remediation": "Required gates did not pass: full-test-suite; stale or missing evidence cannot qualify this check.",
+        "needs": [
+          "full-test-suite"
+        ],
+        "after": [
+          "performance-floors"
+        ],
+        "allowFailure": false,
+        "durationMs": 0
+      },
+      {
+        "id": "command-inventory",
+        "command": "node dist/cli.js commands --markdown --out /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-aXNIjZ/CLI_COMMAND_INVENTORY.md",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:29:29.777Z",
+        "endedAt": "2026-10-14T10:29:30.779Z",
+        "remediation": null,
+        "artifact": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-aXNIjZ/CLI_COMMAND_INVENTORY.md",
+          "produced": true,
+          "temporary": true,
+          "retained": false
+        },
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "per-file-coverage"
+        ],
+        "allowFailure": false,
+        "durationMs": 1002
+      },
+      {
+        "id": "architecture-boundaries",
+        "command": "node scripts/architecture-boundaries-check.mjs",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:29:30.779Z",
+        "endedAt": "2026-10-14T10:29:32.345Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "command-inventory"
+        ],
+        "allowFailure": false,
+        "durationMs": 1566
+      },
+      {
+        "id": "docs-drift-public-naming",
+        "command": "npm run check:docs-drift",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:29:32.345Z",
+        "endedAt": "2026-10-14T10:29:32.729Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "architecture-boundaries"
+        ],
+        "allowFailure": false,
+        "durationMs": 384
+      },
+      {
+        "id": "runtime-dependency-audit",
+        "command": "npm run audit:runtime",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:29:32.729Z",
+        "endedAt": "2026-10-14T10:29:33.860Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "docs-drift-public-naming"
+        ],
+        "allowFailure": false,
+        "durationMs": 1131
+      },
+      {
+        "id": "cli-and-domain-smoke",
+        "command": "node dist/cli.js --help && node dist/cli.js domain pack list --json",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:29:33.860Z",
+        "endedAt": "2026-10-14T10:29:35.328Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "runtime-dependency-audit"
+        ],
+        "allowFailure": false,
+        "durationMs": 1468
+      },
+      {
+        "id": "install-persona-qa",
+        "command": "npm run qa:install-personas -- --json --out tmp/persona-install-qa/latest.json",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:29:35.329Z",
+        "endedAt": "2026-10-14T10:31:57.291Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "cli-and-domain-smoke"
+        ],
+        "allowFailure": false,
+        "durationMs": 141962
+      },
+      {
+        "id": "live-deploy-health",
+        "command": null,
+        "status": "skipped",
+        "startedAt": "2026-10-14T10:31:57.291Z",
+        "endedAt": "2026-10-14T10:31:57.291Z",
+        "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health.",
+        "needs": [],
+        "after": [
+          "install-persona-qa"
+        ],
+        "allowFailure": false,
+        "durationMs": 0
+      }
+    ]
+  },
+  {
+    "sourceCommit": "c04d1b892d4307c966ac5b2639af7c8dc925cfac",
+    "rawGateReceiptPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/p0-33-continuation/full-release-gate-final.json",
+    "rawGateReceiptSha256": "00c6bfa3d92fae20b71825a246ffe9c53a98fcc1480bbb0e02f3067a0789b665",
+    "status": "failed",
+    "counts": {
+      "executed": 20,
+      "passed": 19,
+      "failed": 1,
+      "skipped": 2,
+      "total": 22
+    },
+    "steps": [
+      {
+        "id": "console-js-syntax",
+        "command": "node --check src/console/assets/app.js",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:44:24.851Z",
+        "endedAt": "2026-10-14T10:44:24.897Z",
+        "remediation": null,
+        "needs": [],
+        "after": [],
+        "allowFailure": false,
+        "durationMs": 46
+      },
+      {
+        "id": "openapi-parse",
+        "command": "node -e import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:44:24.897Z",
+        "endedAt": "2026-10-14T10:44:25.121Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "console-js-syntax"
+        ],
+        "allowFailure": false,
+        "durationMs": 224
+      },
+      {
+        "id": "typecheck",
+        "command": "npm run typecheck",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:44:25.121Z",
+        "endedAt": "2026-10-14T10:44:51.814Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "openapi-parse"
+        ],
+        "allowFailure": false,
+        "durationMs": 26693
+      },
+      {
+        "id": "typecheck-tests",
+        "command": "npm run typecheck:tests",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:44:51.814Z",
+        "endedAt": "2026-10-14T10:45:28.054Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "typecheck"
+        ],
+        "allowFailure": false,
+        "durationMs": 36240
+      },
+      {
+        "id": "build",
+        "command": "npm run build",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:45:28.054Z",
+        "endedAt": "2026-10-14T10:45:59.554Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "typecheck-tests"
+        ],
+        "allowFailure": false,
+        "durationMs": 31500
+      },
+      {
+        "id": "lint",
+        "command": "npm run lint",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:45:59.554Z",
+        "endedAt": "2026-10-14T10:46:02.444Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "build"
+        ],
+        "allowFailure": false,
+        "durationMs": 2890
+      },
+      {
+        "id": "source-duplicates",
+        "command": "npm run check:duplicates",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:46:02.444Z",
+        "endedAt": "2026-10-14T10:46:03.144Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "lint"
+        ],
+        "allowFailure": false,
+        "durationMs": 700
+      },
+      {
+        "id": "source-dead-code",
+        "command": "npm run check:dead-code",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:46:03.144Z",
+        "endedAt": "2026-10-14T10:46:06.157Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "source-duplicates"
+        ],
+        "allowFailure": false,
+        "durationMs": 3013
+      },
+      {
+        "id": "package-lint",
+        "command": "npm run check:package",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:46:06.157Z",
+        "endedAt": "2026-10-14T10:46:10.157Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "source-dead-code"
+        ],
+        "allowFailure": false,
+        "durationMs": 4000
+      },
+      {
+        "id": "citations",
+        "command": "npm run check:citations",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:46:10.157Z",
+        "endedAt": "2026-10-14T10:46:10.485Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "package-lint"
+        ],
+        "allowFailure": false,
+        "durationMs": 328
+      },
+      {
+        "id": "packed-install",
+        "command": "node scripts/packed-install-check.mjs --no-build",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:46:10.485Z",
+        "endedAt": "2026-10-14T10:46:32.335Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "citations"
+        ],
+        "allowFailure": false,
+        "durationMs": 21850
+      },
+      {
+        "id": "gap-0626-adversarial-regression",
+        "command": "npx vitest run tests/gap0626AdversarialRegression.test.ts",
+        "status": "passed",
+        "startedAt": "2026-10-14T10:46:32.335Z",
+        "endedAt": "2026-10-14T10:46:36.954Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "packed-install"
+        ],
+        "allowFailure": false,
+        "durationMs": 4619
+      },
+      {
+        "id": "full-test-suite",
+        "command": "npx vitest run --coverage --exclude tests/performance/** --reporter=dot --reporter=json --outputFile.json=/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-full-test-suite-3re2TS/results.json",
+        "status": "failed",
+        "startedAt": "2026-10-14T10:46:36.954Z",
+        "endedAt": "2026-10-14T11:11:12.524Z",
+        "remediation": "Fix full-test-suite before release.",
+        "artifact": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-full-test-suite-3re2TS/results.json",
+          "produced": true,
+          "valid": false,
+          "sha256": "b0d00c56a1e25449fa546294166d338d75ce0a27fc57a937301e25094fbb6c61",
+          "counts": {
+            "total": 24355,
+            "passed": 24353,
+            "failed": 2,
+            "pending": 0,
+            "todo": 0,
+            "failedSuites": 4,
+            "pendingSuites": 0,
+            "files": 1687
+          },
+          "temporary": false,
+          "retained": true
+        },
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "gap-0626-adversarial-regression"
+        ],
+        "allowFailure": false,
+        "durationMs": 1475570,
+        "errorTail": "pt through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/notaryComposeIntegration.test.ts > optional Compose notary listener and policy signing > signs the original digest through the actual CLI service and policy producer, retaining auth and payload checks\n[amc] Explicit notary admission expanded the auditor signing role (780c0621ef34eead7caca42057d1c389d5ff6165c02942b841f2d7e1c38c4d99).\n\nstderr | tests/questionScoreExplainability.test.ts > question score explainability receipts > diagnostic reports include question explainability receipts in JSON and markdown\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).\n\nstderr | tests/helmChartSecrets.test.ts > helm chart bootstrap secret > schema rejects change-me bootstrap values and accepts the shipped values files\nstrict mode: missing type \"string\" for keyword \"pattern\" at \"#/properties/image/then/properties/digest\" (strictTypes)\n\nerror: too many arguments for 'set'. Expected 1 argument but got 2.\nstderr | tests/amcDeclarativeConfig.test.ts > configInit > refuses to overwrite without --force\n\u2717 /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-config-test-DXNOV7/amcconfig.yaml already exists. Use --force to overwrite.\n\nstderr | tests/helmChartVersion.test.ts > helm chart version and image pinning > requireDigest without digest refuses (template fail and schema)\nstrict mode: missing type \"string\" for keyword \"pattern\" at \"#/properties/image/then/properties/digest\" (strictTypes)\n\nindustryPacks=17\nstderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend another question's evidence at L0-L2\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L2).\n\nstderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend it at L3+ either, which was already true\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L4).\n\nstderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > cannot be turned off any more (P1-07)\nSTRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level\n\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af Failed Tests 2 \u23af\u23af\u23af\u23af\u23af\u23af\u23af\n\n FAIL  tests/assuranceRunNoSign.test.ts > assurance run --all --no-sign > runs all assurance packs without a vault passphrase and marks the run unsigned\nAssertionError: \u26a0\ufe0f  Running without artifact signing (--no-sign). Results are valid but unsigned.\n\n: expected null to be +0 // Object.is equality\n\n- Expected:\n0\n\n+ Received:\nnull\n\n \u276f tests/assuranceRunNoSign.test.ts:64:71\n     62|\n     63|     const unsigned = runCli(dir, [\"assurance\", \"run\", \"--all\", \"--no-s\u2026\n     64|     expect(unsigned.status, `${unsigned.stdout}\\n${unsigned.stderr}`).\u2026\n       |                                                                       ^\n     65|     expect(unsigned.stdout).toContain(\"Running without artifact signin\u2026\n     66|     expect(unsigned.stdout).toContain(\"Assurance run complete:\");\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[1/2]\u23af\n\n FAIL  tests/releaseSecretScanCoverage.test.ts > release secret scanner content coverage > bounds filesystem entry count independently of content bytes\nError: Hook timed out in 10000ms.\nIf this is a long-running hook, pass a timeout value as the last argument or configure it globally with \"hookTimeout\".\n \u276f tests/releaseSecretScanCoverage.test.ts:43:1\n     41| }\n     42|\n     43| afterEach(() => {\n       | ^\n     44|   for (const root of fixtures.splice(0)) rmSync(root, { recursive: tru\u2026\n     45| });\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[2/2]\u23af\n\n"
+      },
+      {
+        "id": "performance-floors",
+        "command": "npx vitest run tests/performance --no-file-parallelism --reporter=dot --reporter=json --outputFile.json=/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-performance-floors-KujV61/results.json",
+        "status": "passed",
+        "startedAt": "2026-10-14T11:11:12.972Z",
+        "endedAt": "2026-10-14T11:11:28.207Z",
+        "remediation": null,
+        "artifact": {
+          "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-performance-floors-KujV61/results.json",
+          "produced": true,
+          "valid": true,
+          "sha256": "3aa81caedea03084e58a9b0436850692a751a7d5daad59586e23141590a9716f",
+          "counts": {
+            "total": 5,
+            "passed": 5,
+            "failed": 0,
+            "pending": 0,
+            "todo": 0,
+            "failedSuites": 0,
+            "pendingSuites": 0,
+            "files": 4
+          },
+          "temporary": false,
+          "retained": true
+        },
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "full-test-suite"
+        ],
+        "allowFailure": false,
+        "durationMs": 15235
+      },
+      {
+        "id": "per-file-coverage",
+        "command": null,
+        "status": "skipped",
+        "startedAt": "2026-10-14T11:11:28.208Z",
+        "endedAt": "2026-10-14T11:11:28.208Z",
+        "remediation": "Required gates did not pass: full-test-suite; stale or missing evidence cannot qualify this check.",
+        "needs": [
+          "full-test-suite"
+        ],
+        "after": [
+          "performance-floors"
+        ],
+        "allowFailure": false,
+        "durationMs": 0
+      },
+      {
+        "id": "command-inventory",
+        "command": "node dist/cli.js commands --markdown --out /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-zitmdz/CLI_COMMAND_INVENTORY.md",
+        "status": "passed",
+        "startedAt": "2026-10-14T11:11:28.208Z",
+        "endedAt": "2026-10-14T11:11:29.030Z",
+        "remediation": null,
+        "artifact": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-zitmdz/CLI_COMMAND_INVENTORY.md",
+          "produced": true,
+          "temporary": true,
+          "retained": false
+        },
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "per-file-coverage"
+        ],
+        "allowFailure": false,
+        "durationMs": 822
+      },
+      {
+        "id": "architecture-boundaries",
+        "command": "node scripts/architecture-boundaries-check.mjs",
+        "status": "passed",
+        "startedAt": "2026-10-14T11:11:29.031Z",
+        "endedAt": "2026-10-14T11:11:30.618Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "command-inventory"
+        ],
+        "allowFailure": false,
+        "durationMs": 1587
+      },
+      {
+        "id": "docs-drift-public-naming",
+        "command": "npm run check:docs-drift",
+        "status": "passed",
+        "startedAt": "2026-10-14T11:11:30.618Z",
+        "endedAt": "2026-10-14T11:11:30.994Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "architecture-boundaries"
+        ],
+        "allowFailure": false,
+        "durationMs": 376
+      },
+      {
+        "id": "runtime-dependency-audit",
+        "command": "npm run audit:runtime",
+        "status": "passed",
+        "startedAt": "2026-10-14T11:11:30.994Z",
+        "endedAt": "2026-10-14T11:11:32.042Z",
+        "remediation": null,
+        "needs": [],
+        "after": [
+          "docs-drift-public-naming"
+        ],
+        "allowFailure": false,
+        "durationMs": 1048
+      },
+      {
+        "id": "cli-and-domain-smoke",
+        "command": "node dist/cli.js --help && node dist/cli.js domain pack list --json",
+        "status": "passed",
+        "startedAt": "2026-10-14T11:11:32.042Z",
+        "endedAt": "2026-10-14T11:11:33.627Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "runtime-dependency-audit"
+        ],
+        "allowFailure": false,
+        "durationMs": 1585
+      },
+      {
+        "id": "install-persona-qa",
+        "command": "npm run qa:install-personas -- --json --out tmp/persona-install-qa/latest.json",
+        "status": "passed",
+        "startedAt": "2026-10-14T11:11:33.628Z",
+        "endedAt": "2026-10-14T11:13:46.962Z",
+        "remediation": null,
+        "needs": [
+          "build"
+        ],
+        "after": [
+          "cli-and-domain-smoke"
+        ],
+        "allowFailure": false,
+        "durationMs": 133334
+      },
+      {
+        "id": "live-deploy-health",
+        "command": null,
+        "status": "skipped",
+        "startedAt": "2026-10-14T11:13:46.962Z",
+        "endedAt": "2026-10-14T11:13:46.962Z",
+        "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health.",
+        "needs": [],
+        "after": [
+          "install-persona-qa"
+        ],
+        "allowFailure": false,
+        "durationMs": 0
+      }
+    ]
+  }
+]

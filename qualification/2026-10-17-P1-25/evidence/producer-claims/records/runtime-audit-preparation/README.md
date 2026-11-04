@@ -1,0 +1,13 @@
+# Inert producer runtime-auditor preparation
+
+The two `.source.txt` files are unexecuted adaptations of the exact B39 auditors. Root is the sole executor and source writer. The observed adapter changes only its destination and phase prefix to `p125pc-`; the pinned raw/observer/hook/error join, required physical checkout argument and three-file corpus remain unchanged.
+
+The public adapter preserves the four earlier semantic branches and all shared natural-child, explicit-stream-hash, HTTP/socket, ledger-owner, trust, immutable-file, native and exact environment checks. Earlier source assertion locations move by one line because the reviewed fixture adds the conditional timestamp property. Removing only the new producer branch/dispatch and reversing the declared namespace/location edits recovers the exact parent bytes.
+
+The new `CHECKPOINT-PERSISTED-PRODUCER-CLAIMS` branch consumes actual first, stored-row, covered, reader and final facts. A complete body requires two own query/response verification children, matching grant digests and token pins, signed checkpoint/head/link/index facts, actual stored timestamps passed to the reader, genuine bound premises and actual final nonmutation/ledger results. Each grant is associated with its own request and child; shared reply observation proves only the last reply. The first seed hash is absent from public metadata, so exact first-head comparison remains source-assertion/GREEN-cohort evidence. This auditor does not independently verify checkpoint signatures or redo ledger cryptography.
+
+An incomplete body retains only reached stage prefixes and actual booleans/error counts. Requested/stored mismatches are reported as observations without producer acceptance. Missing later rows, second grants, reader results, final checks and masked assertions receive no credit. Root must classify every actual failure and mask. Planned controls and their prospective source locations are not outcomes.
+
+The case deadline remains 30,000 ms and the client default remains 10,000 ms. Resource counts are derived dynamically. Null accuracy and equal-second grants remain valid. The actual preferred 175-row preparation pinset is pinned without adopting future runtime/fresh source, compiled, native, commit or Q results. All holds, freeze/quality requirements, Claude ownership and F37's skip remain intact.
+
+`fields.json` documents the public contract and boundaries. Both complete base deltas, finite input pins and the author's two read-only lookup diagnoses are retained. No parser, import, compiler, product/helper, key, native, SQL, OpenSSL, network, source/index/QA or reservation operation was performed. Root and an independent reviewer must inspect these exact bytes before any adoption or execution.

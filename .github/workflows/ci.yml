@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -34,10 +35,104 @@ jobs:
               core.setFailed("Missing changeset file. Add one with `npm run changeset` or apply `skip-changeset` label.");
             }
 
+  # The instrumented suite outgrew one runner (it hit the 45-minute step limit on 2026-11-03), so it runs in six
+  # shards per Node version. Each shard writes a blob report; build-test merges them and enforces coverage once.
+  test-shard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["22", "24"]
+        shard: [1, 2, 3, 4, 5, 6]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: npm run build
+
+      # tests/executionApiParity.test.ts drives sdk/python/tests/test_parity.py, which imports pytest: the SDK's test
+      # dependency (pyproject's dev extra), installed as the python-sdk job installs it.
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+
+      - name: Install the Python SDK's test dependency
+        run: python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt
+
+      - name: Set up Helm for full test suite
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
+        with:
+          version: "v4.3.0"
+
+      # The L1-EDU-04 accessibility oracle runs Axe in Playwright's headless shell; shards hash files, so every shard
+      # installs it (same lockfile Playwright as e2e-playwright) and AMC_REQUIRE_BROWSER_CHECKER fails a shard without it.
+      - name: Install Chromium headless shell and system dependencies
+        run: npx playwright install --with-deps --only-shell chromium
+
+      # Ubuntu 24.04 restricts unprivileged user namespaces through AppArmor. Load the purpose-built Bubblewrap
+      # profile this repository ships (docs/NATIVE_SANDBOX_UBUNTU.md), then run the product's own readiness probe,
+      # so the confinement suite runs for real and a refusal is named here rather than as failed escape tests.
+      - name: Provision Bubblewrap for the confinement suite
+        shell: bash
+        run: |
+          command -v bwrap >/dev/null || { sudo apt-get update -q && sudo apt-get install -y -q bubblewrap; }
+          bwrap --version
+          sudo install -m 0644 deploy/apparmor/bwrap-userns-restrict /etc/apparmor.d/bwrap-userns-restrict
+          sudo apparmor_parser -r /etc/apparmor.d/bwrap-userns-restrict
+          node --input-type=module -e "const { bwrapHostChecks } = await import('./dist/sandbox/bwrapBackend.js'); const probe = bwrapHostChecks.namespaceLaunch(); console.log(JSON.stringify(probe)); if (!probe.ok) process.exit(1);"
+
+      # Runner log lines are cut at 4,096 bytes for the reason given at build-test's merge step; the full log is uploaded.
+      - name: Test shard
+        timeout-minutes: 45
+        shell: bash
+        env:
+          AMC_COVERAGE_SHARD: "1"
+          AMC_REQUIRE_BROWSER_CHECKER: "1"
+          # The Linux escape suite must run against real Bubblewrap here; a missing prerequisite fails instead of skipping.
+          AMC_REQUIRE_REAL_SANDBOX: "1"
+        run: |
+          mkdir -p tmp/ci-coverage tmp/vitest-blobs
+          npm run test:coverage -- --exclude 'tests/performance/**' --shard=${{ matrix.shard }}/6 --reporter=default --reporter=blob --reporter=hanging-process --outputFile.blob=tmp/vitest-blobs/blob-${{ matrix.shard }}.json 2>&1 | tee tmp/ci-coverage/tests-shard-${{ matrix.shard }}.log | cut -c1-4096
+
+      # Tests must use temp workspaces; a write to a tracked or untracked path fails here.
+      - name: Tests left the checkout clean
+        run: git status --porcelain=v1 --untracked-files=all > /tmp/after-tests.txt; if [ -s /tmp/after-tests.txt ]; then cat /tmp/after-tests.txt; exit 1; fi
+
+      - name: Upload shard report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vitest-shard-node-${{ matrix.node-version }}-${{ matrix.shard }}
+          path: |
+            tmp/vitest-blobs/
+            tmp/ci-coverage/
+          if-no-files-found: ignore
+
   build-test:
+    needs: test-shard
+    # Lint, type checks and the repository checks still run when a shard fails; the merge step then fails.
+    if: ${{ !cancelled() }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     strategy:
+      fail-fast: false
       matrix:
         node-version: ["22", "24"]
     steps:
@@ -73,6 +168,10 @@ jobs:
       - name: No fabricated results
         run: npm run check:no-fabrication
 
+      # P1-41: published release notes never use a banned claim word, even negated (docs/RELEASE_RUNBOOK.md).
+      - name: Release notes claim words
+        run: node scripts/check-release-notes.mjs docs/releases/*.md
+
       # P0-11: every enforcement point, test and owner the channel map cites
       # exists (docs/security/THREAT_MODEL.md).
       - name: Threat model channel map
@@ -85,11 +184,34 @@ jobs:
       - name: Build
         run: npm run build
 
+      # P1-33: each pack's declared support against the ten admission criteria; fails a reviewed or qualified
+      # claim the pack does not meet and a malformed catalog/admission/ report, never an experimental draft.
+      - name: Catalog pack admission
+        run: npm run check:catalog-admission
+
       - name: Published schemas match the enforced schemas (P1-01)
         run: npm run check:schemas
 
+      # P1-30: the Core Spec's level, claim-kind, banned-wording, $id and receipt-state tables match the code, every
+      # spec file carries its licence line and every cited $id is published. (npm alias check:spec: integrator.)
+      - name: Core Spec matches the code (P1-30, check:spec)
+        run: npm run -s check:spec
+
       - name: Regulatory register currency
         run: npm run check:regulatory-currency
+
+      - name: Regulatory calendar matches its sources (P1-42)
+        run: npm run check:regulatory-calendar
+
+      - name: Industry guides match source (P1-42)
+        run: npm run check:industry-guides
+
+      # P1-34: catalog reviews falling due, GOV_REVERIFY_OPEN, and one appended
+      # catalog/CHANGELOG.md entry per catalog digest change (docs/catalog/GOVERNANCE.md).
+      - name: Catalog currency and changelog
+        run: |
+          npm run check:catalog-currency
+          npm run check:catalog-changelog
 
       - name: Citation lint (P0-25)
         run: npm run check:citations
@@ -97,14 +219,25 @@ jobs:
       - name: Published package lint
         run: npm run check:package
 
-      # Report-only until decision D-11 sets the source-quality policy
-      # (1,253 duplicate blocks and 2,339 Knip findings on 2026-10-05);
-      # plan item P1-52 then turns this into a blocking ratchet.
+      # D-11 option A: both checks are a ratchet against
+      # scripts/quality/source-quality-baseline.json (P1-52) and fail only on
+      # new or stale findings, on config/tool drift, or on a baseline entry
+      # missing from the target branch's baseline at the merge-base (only
+      # --accept may add one). P0-33 requires both checks to pass.
       - name: Source duplication and reachability
-        continue-on-error: true
+        env:
+          QUALITY_BASE: origin/${{ github.base_ref || 'main' }}
         run: |
-          npm run check:duplicates
-          npm run check:dead-code
+          npm run check:duplicates -- --base "$QUALITY_BASE"
+          npm run check:dead-code -- --base "$QUALITY_BASE"
+
+      - name: Upload source-quality summary
+        if: ${{ always() && matrix.node-version == '24' }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: source-quality-summary
+          path: tmp/source-quality/
+          if-no-files-found: ignore
 
       - name: Policy fixture regression
         if: matrix.node-version == '24'
@@ -144,13 +277,26 @@ jobs:
       - name: Diagnostic gate reachability
         run: npm run check:gates
 
+      - name: Set up Helm for full test suite
+        uses: azure/setup-helm@9bc31f4ebc9c6b171d7bfbaa5d006ae7abdb4310 # v5
+        with:
+          version: "v4.3.0"
+
+      - name: Download shard reports
+        uses: actions/download-artifact@v8
+        with:
+          pattern: vitest-shard-node-${{ matrix.node-version }}-*
+          path: tmp/shards
+          merge-multiple: true
+
       # Both gates existed as npm scripts that no workflow ran, so docs drift
       # and incident-readiness regressions could merge and ship unchecked.
       # Coverage thresholds were pinned at 0, so the gate could never fail and
       # whole subsystems could lose their tests silently. Now enforced.
-      # One instrumented suite supplies test outcomes and global/per-file coverage.
+      # The six test-shard reports together supply test outcomes and global/per-file coverage; a missing
+      # shard or a failed test fails this step.
       - name: Full suite and coverage thresholds
-        timeout-minutes: 45
+        timeout-minutes: 20
         shell: bash
         # The full output goes to the log artifact; the runner log gets lines cut at
         # 4,096 bytes. A test once teed a 5 MiB single-line answer to stdout, and a
@@ -158,7 +304,8 @@ jobs:
         # log at all (every build-test run from 2026-09-16 to 2026-10-05).
         run: |
           mkdir -p tmp/ci-coverage
-          npm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096
+          test "$(ls tmp/shards/vitest-blobs/blob-*.json | wc -l)" -eq 6
+          npx vitest run --merge-reports tmp/shards/vitest-blobs --coverage --reporter=default --reporter=json --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096
 
       # Throughput floors hold for uninstrumented code with the CPU to itself. Under
       # coverage, with every worker busy, the 500 ev/s control-plane floor measured
@@ -199,8 +346,16 @@ jobs:
       - name: API reference drift
         run: npm run check:api-ref
 
+      # P1-40: the public API snapshot of agent-maturity-compass/sdk/native (docs/sdk/TYPESCRIPT_SDK.md).
+      - name: SDK API snapshot
+        run: npm run check:sdk-api
+
       - name: Changelog page drift
         run: npm run check:changelog-page
+
+      # P1-38: docs/providers/CAPABILITY_MATRIX.md is the rendering of its test evidence.
+      - name: Capability matrix drift
+        run: npm run check:capability-matrix
 
       - name: Vendored kernel integrity
         run: |
@@ -220,6 +375,150 @@ jobs:
       - name: Tests left the checkout clean (end of job)
         if: always()
         run: git status --porcelain=v1 --untracked-files=all > /tmp/after-tests.txt; if [ -s /tmp/after-tests.txt ]; then cat /tmp/after-tests.txt; exit 1; fi
+
+  release-gate:
+    if: github.event_name != 'pull_request'
+    # The full native-test corpus exercises Darwin confinement; Ubuntu matrix jobs remain separate.
+    runs-on: macos-latest
+    timeout-minutes: 180
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      # The gate's full suite includes tests/executionApiParity.test.ts, which runs pytest (as test-shard installs it).
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: "3.12"
+      - name: Install the Python SDK's test dependency
+        run: python3 -m pip install --require-hashes -r sdk/python/requirements-ci.txt
+      - name: Full release gate
+        env:
+          AMC_RELEASE_GATE_LIVE_URL: ${{ vars.AMC_RELEASE_GATE_LIVE_URL }}
+        run: npm run release:gate -- --json --out tmp/release-gate/ci.json
+      - name: Upload release gate receipts
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-gate-receipts
+          path: |
+            tmp/release-gate/
+            coverage/coverage-summary.json
+          if-no-files-found: ignore
+
+  pkcs11-softhsm:
+    # P2-08: the PKCS#11 key provider against a SoftHSM2 token. The token, its PINs and keys are created per run in a
+    # temporary directory; no credentials. pkcs11js compiles natively and stays out of the lockfile and default install.
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install SoftHSM2 and pkcs11js
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y softhsm2
+          module="$(dpkg -L libsofthsm2 softhsm2 2>/dev/null | grep -m1 '/libsofthsm2\.so$' || true)"
+          if [ -z "$module" ]; then echo "libsofthsm2.so not found in the softhsm2 packages"; exit 1; fi
+          echo "AMC_TEST_PKCS11_MODULE=$module" >> "$GITHUB_ENV"
+          npm install --install-links --prefix "$RUNNER_TEMP/pkcs11" --no-save --no-package-lock --no-audit --no-fund "$GITHUB_WORKSPACE/packages/key-provider-pkcs11" pkcs11js@2.1.7
+          echo "NODE_PATH=$RUNNER_TEMP/pkcs11/node_modules" >> "$GITHUB_ENV"
+          NODE_PATH="$RUNNER_TEMP/pkcs11/node_modules" node -e 'if (typeof require("agent-maturity-compass-key-provider-pkcs11").loadPkcs11().PKCS11 !== "function") process.exit(1)'
+      - name: PKCS#11 provider on SoftHSM2
+        run: |
+          npx vitest run tests/keys/pkcs11Softhsm.test.ts --reporter=default --reporter=json --outputFile.json="$RUNNER_TEMP/pkcs11.json"
+          node -e 'const r=require(process.argv[1]); if (r.numPassedTests < 2) { console.error("the SoftHSM2 suite ran " + r.numPassedTests + " passing tests"); process.exit(1); }' "$RUNNER_TEMP/pkcs11.json"
+
+  # P2-13: the Python wrapper as a user installs it. Build the wheel from sdk/python, install it into a fresh virtual
+  # environment, and run sdk/python/tests from outside the checkout (-I) so the installed wheel, not the source tree,
+  # is what is imported; the native tests drive the CLI built from this commit. requires-python >= 3.10.
+  python-sdk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build the CLI the wrapper drives
+        run: pnpm run build
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Build the wheel and install it into a fresh virtual environment
+        run: |
+          python -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/python" -m pip install build pytest
+          "$RUNNER_TEMP/venv/bin/python" -m build --wheel --outdir "$RUNNER_TEMP/dist-py" sdk/python
+          "$RUNNER_TEMP/venv/bin/python" -m pip install "$RUNNER_TEMP"/dist-py/*.whl
+      - name: pytest sdk/python/tests against the installed wheel and the built CLI
+        working-directory: ${{ runner.temp }}
+        env:
+          AMC_BIN: ${{ github.workspace }}/dist/cli.js
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          "$RUNNER_TEMP/venv/bin/python" -I -c "import amc_sdk, sys; assert amc_sdk.__file__.startswith(sys.prefix), amc_sdk.__file__"
+          "$RUNNER_TEMP/venv/bin/python" -I -m pytest -q -p no:cacheprovider -rs "$GITHUB_WORKSPACE/sdk/python/tests"
+
+  e2e-playwright:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Chromium and system dependencies
+        run: npx playwright install --with-deps chromium
+      - name: Playwright suite
+        run: npm run test:e2e -- --reporter=line,html
+      - name: Upload Playwright failure report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
 
   e2e-smoke-local:
     runs-on: ubuntu-latest
@@ -293,25 +592,135 @@ jobs:
       - name: Packed-install check
         run: node scripts/packed-install-check.mjs
 
-  docker-smoke:
+  # P1-06: the standalone verifier is packed once, then installed with no other
+  # dependency and run against the normative fixtures on every supported Node.
+  verifier-pack:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npm run build:verifier
+      - run: mkdir -p tmp/verifier-pack && cd packages/verifier && npm pack --pack-destination ../../tmp/verifier-pack
+      - uses: actions/upload-artifact@v7
+        with:
+          name: verifier-pack
+          path: tmp/verifier-pack/*.tgz
+
+  verifier-conformance:
+    needs: verifier-pack
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ["20", "22", "24"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+      - uses: actions/download-artifact@v8
+        with:
+          name: verifier-pack
+          path: tmp/verifier-pack
+      - name: Install the packed verifier offline into an empty directory
+        run: |
+          mkdir -p "$RUNNER_TEMP/consumer" && cd "$RUNNER_TEMP/consumer"
+          echo '{"name":"consumer","private":true}' > package.json
+          npm install --offline --no-audit --no-fund --ignore-scripts "$GITHUB_WORKSPACE"/tmp/verifier-pack/*.tgz
+      - name: Run the normative fixtures
+        run: node packages/verifier/conformance/run.mjs --cmd "$RUNNER_TEMP/consumer/node_modules/.bin/amc-verify" --out "conformance-results-node${{ matrix.node-version }}.json"
+      # P1-32: the conformance suite's verifier class, packed and installed with
+      # no dependency, against the same packed verifier.
+      - name: Run the conformance suite (verifier class)
+        run: |
+          mkdir -p tmp/conformance-pack && (cd packages/amc-conformance && npm pack --pack-destination ../../tmp/conformance-pack)
+          (cd "$RUNNER_TEMP/consumer" && npm install --offline --no-audit --no-fund --ignore-scripts "$GITHUB_WORKSPACE"/tmp/conformance-pack/*.tgz)
+          "$RUNNER_TEMP/consumer/node_modules/.bin/amc-conformance" run --root "$GITHUB_WORKSPACE" --class verifier \
+            --impl "$RUNNER_TEMP/consumer/node_modules/.bin/amc-verify verify {artifact} {verifierArgs}" \
+            --name amc-verify --impl-version 0.1.0 --out "suite-results-node${{ matrix.node-version }}.json"
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: verifier-conformance-node${{ matrix.node-version }}
+          path: |
+            conformance-results-node${{ matrix.node-version }}.json
+            suite-results-node${{ matrix.node-version }}.json
+
+  # P0-35: every image is built and qualified natively on each published
+  # architecture (GitHub-hosted arm64 Linux runner for public repositories).
+  docker-smoke:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
+      - name: Base images are pinned by digest
+        run: node scripts/check-image-pins.mjs
       - name: Build source image targets
         run: |
           docker build --target studio -t amc-studio:ci .
           docker build --target runner -t amc-runner:ci .
       - name: Qualify installed container runtime
         run: node scripts/container-smoke.mjs --studio-image amc-studio:ci --runner-image amc-runner:ci --out tmp/container-smoke.json
+      - name: Build the quickstart and check its version, user and native SQLite
+        run: |
+          docker build -f docker/Dockerfile.quickstart -t amc-quickstart:ci .
+          expected=$(sed -n 's/^ARG AMC_VERSION=//p' docker/Dockerfile.quickstart)
+          actual=$(docker run --rm amc-quickstart:ci --version)
+          echo "quickstart --version: $actual (pinned $expected)"
+          [ "$actual" = "$expected" ]
+          [ "$(docker run --rm --entrypoint id amc-quickstart:ci -u)" = "10001" ]
+          docker run --rm --entrypoint node amc-quickstart:ci -e 'const r = require("node:module").createRequire("/usr/local/lib/node_modules/agent-maturity-compass/package.json"); new (r("better-sqlite3"))(":memory:").close()'
+      - name: Quickstart refuses a wrong tarball hash
+        run: |
+          mkdir -p tmp
+          if docker build -f docker/Dockerfile.quickstart --build-arg AMC_TGZ_SHA256="$(printf '0%.0s' $(seq 64))" . > tmp/quickstart-wrong-hash.log 2>&1; then
+            echo "quickstart built with a wrong tarball hash"; exit 1
+          fi
+          grep -q '/tmp/amc.tgz: FAILED' tmp/quickstart-wrong-hash.log
+      - name: Record image IDs for this architecture
+        env:
+          AMC_ARCH: ${{ matrix.arch }}
+          AMC_RUNNER: ${{ matrix.runner }}
+        run: |
+          node -e '
+            const { execFileSync } = require("node:child_process");
+            const docker = (...args) => execFileSync("docker", args, { encoding: "utf8" }).trim();
+            const images = {};
+            for (const ref of ["amc-studio:ci", "amc-runner:ci", "amc-quickstart:ci"]) {
+              const [image] = JSON.parse(docker("image", "inspect", ref));
+              if (image.Architecture !== process.env.AMC_ARCH) throw Error(`${ref} is ${image.Architecture}, expected ${process.env.AMC_ARCH}`);
+              images[ref] = { id: image.Id, os: image.Os, architecture: image.Architecture };
+            }
+            const receipt = { arch: process.env.AMC_ARCH, runner: process.env.AMC_RUNNER, docker: docker("version", "--format", "{{.Server.Version}}"),
+              buildx: docker("buildx", "version"), images };
+            require("node:fs").writeFileSync("tmp/image-ids.json", JSON.stringify(receipt, null, 2) + "\n");
+            console.log(JSON.stringify(receipt, null, 2));
+          '
       - name: Upload docker smoke artifact
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: docker-smoke
-          path: tmp/container-smoke.json
+          name: docker-smoke-${{ matrix.arch }}
+          path: |
+            tmp/container-smoke.json
+            tmp/image-ids.json
+            tmp/quickstart-wrong-hash.log
 
   helm-lint-template:
     runs-on: ubuntu-latest

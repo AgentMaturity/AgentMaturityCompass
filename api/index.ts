@@ -3,7 +3,7 @@
  * 
  * Endpoints:
  *   GET  /api/health          — Health check
- *   GET  /api/industry-packs/access — Entitlements and checkout availability
+ *   GET  /api/industry-packs/access — Industry Packs price and checkout availability in this deployment
  *   POST /api/quickscore      — Quick self-assessment score
  *   GET  /api/badge/:agentId  — Labelled placeholder SVG badge
  * 
@@ -12,6 +12,7 @@
  */
 
 import http from 'node:http';
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { readdirSync, realpathSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,7 +23,7 @@ import { listIndustryPacks } from '../src/domains/industryPacks.js';
 import {
   buildIndustryPackCheckoutUrl,
   createIndustryPackLicenseKey,
-  getIndustryPackEntitlement,
+  hostedIndustryPackAccess,
   INDUSTRY_PACKS_MONTHLY_PRICE_USD,
   INDUSTRY_PACKS_PLAN_ID,
   verifyIndustryPackLicenseKey,
@@ -180,7 +181,7 @@ function sendJson(res: http.ServerResponse, status: number, payload: unknown) {
   res.end(JSON.stringify(payload, null, 2));
 }
 
-async function readJsonBody<T>(req: http.IncomingMessage, maxBytes = 1_048_576): Promise<T> {
+async function readRawBody(req: http.IncomingMessage, maxBytes = 1_048_576): Promise<Buffer> {
   const chunks: Buffer[] = [];
   let total = 0;
   for await (const chunk of req) {
@@ -191,8 +192,18 @@ async function readJsonBody<T>(req: http.IncomingMessage, maxBytes = 1_048_576):
     }
     chunks.push(buffer);
   }
-  const raw = Buffer.concat(chunks).toString('utf8').trim();
+  return Buffer.concat(chunks);
+}
+
+async function readJsonBody<T>(req: http.IncomingMessage, maxBytes = 1_048_576): Promise<T> {
+  const raw = (await readRawBody(req, maxBytes)).toString('utf8').trim();
   return (raw ? JSON.parse(raw) : {}) as T;
+}
+
+/** Equal-length digests, so the compare takes the same time whatever was sent and leaks no length. */
+function sameSecret(provided: string, expected: string): boolean {
+  const digest = (value: string) => createHash('sha256').update(value, 'utf8').digest();
+  return timingSafeEqual(digest(provided), digest(expected));
 }
 
 function hasAdminToken(req: http.IncomingMessage): boolean {
@@ -205,7 +216,52 @@ function hasAdminToken(req: http.IncomingMessage): boolean {
     : null;
   const header = req.headers['x-amc-admin-token'];
   const provided = bearer ?? (Array.isArray(header) ? header[0] : header);
-  return provided === expected;
+  return typeof provided === 'string' && sameSecret(provided, expected);
+}
+
+const WEBHOOK_TOLERANCE_SECONDS = 300;
+
+/**
+ * Stripe's documented scheme: `Stripe-Signature: t=<unix>,v1=<hex>`, where v1 is HMAC-SHA256 with the endpoint secret over
+ * `<t>.<raw body bytes>`, and t must be within five minutes of this server's clock. Any v1 entry may match (secret rolls).
+ */
+function verifyStripeSignature(raw: Buffer, header: string | undefined, secret: string, nowSeconds = Math.floor(Date.now() / 1000)): boolean {
+  const parts = (header ?? '').split(',').map(part => part.trim().split('='));
+  const t = parts.find(([key]) => key === 't')?.[1] ?? '';
+  const signatures = parts.filter(([key, value]) => key === 'v1' && /^[0-9a-f]{64}$/.test(value ?? '')).map(([, value]) => value as string);
+  if (!/^\d+$/.test(t) || Math.abs(nowSeconds - Number(t)) > WEBHOOK_TOLERANCE_SECONDS || signatures.length === 0) return false;
+  const expected = createHmac('sha256', secret).update(Buffer.concat([Buffer.from(`${t}.`, 'utf8'), raw])).digest();
+  return signatures.reduce((matched, signature) => timingSafeEqual(Buffer.from(signature, 'hex'), expected) || matched, false);
+}
+
+// ponytail: per-instance memory, so a redelivery to another serverless instance logs the record again; the fulfilment
+// reader dedupes by eventId. A shared store replaces this when fulfilment is automated.
+const recordedWebhookEvents = new Set<string>();
+
+interface PaymentEvent {
+  id?: unknown;
+  type?: unknown;
+  data?: { object?: { payment_status?: unknown; customer?: unknown; subscription?: unknown; client_reference_id?: unknown } };
+}
+
+/**
+ * A verified, paid checkout is recorded once per event id as a fulfilment request. The webhook never issues a licence:
+ * issue stays on the admin path (POST /api/industry-packs/license/issue), and delivery to the buyer is not wired.
+ */
+function recordPaymentEvent(event: PaymentEvent): { received: true; eventId: string; type: string; fulfilment: string; duplicate?: true } {
+  const eventId = typeof event.id === 'string' ? event.id : '';
+  const type = typeof event.type === 'string' ? event.type : '';
+  const session = event.data?.object ?? {};
+  const paid = type === 'checkout.session.completed' && session.payment_status === 'paid';
+  const result = { received: true as const, eventId, type, fulfilment: paid ? 'licence_issue_pending_admin' : 'ignored' };
+  if (recordedWebhookEvents.has(eventId)) return { ...result, duplicate: true };
+  recordedWebhookEvents.add(eventId);
+  if (paid) {
+    const text = (value: unknown) => (typeof value === 'string' ? value : null);
+    console.info(JSON.stringify({ event: 'industry_packs_paid_checkout', eventId, planId: INDUSTRY_PACKS_PLAN_ID,
+      customerId: text(session.customer), subscriptionId: text(session.subscription), clientReferenceId: text(session.client_reference_id) }));
+  }
+  return result;
 }
 
 let compiledModuleCount: number | null | undefined;
@@ -261,45 +317,37 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
   }
 
   if (path === '/api/industry-packs/access' && method === 'GET') {
-    let checkoutUrl: string | null = null;
-    try {
-      checkoutUrl = buildIndustryPackCheckoutUrl({
-        successUrl: parsedUrl.searchParams.get('successUrl') ?? undefined,
-        cancelUrl: parsedUrl.searchParams.get('cancelUrl') ?? undefined,
-        customerEmail: parsedUrl.searchParams.get('email') ?? undefined,
-        clientReferenceId: parsedUrl.searchParams.get('reference') ?? undefined,
-      });
-    } catch {
-      // Entitlements remain readable when checkout has not been configured.
-    }
-    sendJson(res, 200, {
-      entitlement: getIndustryPackEntitlement(process.cwd()),
-      checkoutUrl,
-      checkoutAvailable: checkoutUrl !== null,
-    });
+    sendJson(res, 200, hostedIndustryPackAccess());
     return;
   }
 
   if (path === '/api/industry-packs/checkout' && method === 'POST') {
+    const access = hostedIndustryPackAccess();
+    if (!access.checkoutAvailable) {
+      sendJson(res, 503, { error: 'checkout_not_available', ...access });
+      return;
+    }
+    let data: CheckoutRequest;
     try {
-      const data = await readJsonBody<CheckoutRequest>(req);
-      sendJson(res, 200, {
-        planId: INDUSTRY_PACKS_PLAN_ID,
-        priceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD,
-        checkoutUrl: buildIndustryPackCheckoutUrl({
-          successUrl: data.successUrl,
-          cancelUrl: data.cancelUrl,
-          customerEmail: data.customerEmail,
-          clientReferenceId: data.clientReferenceId,
-        }),
-      });
+      data = await readJsonBody<CheckoutRequest>(req);
     } catch {
       sendJson(res, 400, { error: 'Invalid JSON body' });
+      return;
     }
+    sendJson(res, 200, {
+      planId: INDUSTRY_PACKS_PLAN_ID,
+      priceUsdMonthly: INDUSTRY_PACKS_MONTHLY_PRICE_USD,
+      checkoutUrl: buildIndustryPackCheckoutUrl({
+        successUrl: data.successUrl,
+        cancelUrl: data.cancelUrl,
+        customerEmail: data.customerEmail,
+        clientReferenceId: data.clientReferenceId,
+      }),
+    });
     return;
   }
 
-  if ((path === '/api/industry-packs/license/issue' || path === '/api/industry-packs/webhook') && method === 'POST') {
+  if (path === '/api/industry-packs/license/issue' && method === 'POST') {
     if (!hasAdminToken(req)) {
       sendJson(res, 401, { error: 'admin token required' });
       return;
@@ -321,9 +369,42 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
     } catch (e) {
       sendJson(res, 503, {
         error: e instanceof Error ? e.message : 'license issue failed',
-        requiredEnv: ['AMC_INDUSTRY_PACKS_LICENSE_SECRET', 'AMC_INDUSTRY_PACKS_ADMIN_TOKEN'],
+        requiredEnv: ['AMC_INDUSTRY_PACKS_LICENSE_PRIVATE_KEY', 'AMC_INDUSTRY_PACKS_ADMIN_TOKEN'],
       });
     }
+    return;
+  }
+
+  if (path === '/api/industry-packs/webhook' && method === 'POST') {
+    const secret = process.env.AMC_INDUSTRY_PACKS_WEBHOOK_SECRET;
+    if (!secret) {
+      sendJson(res, 503, { error: 'payment webhook is not configured in this deployment' });
+      return;
+    }
+    let raw: Buffer;
+    try {
+      raw = await readRawBody(req);
+    } catch {
+      sendJson(res, 413, { error: 'payload too large' });
+      return;
+    }
+    const header = req.headers['stripe-signature'];
+    if (!verifyStripeSignature(raw, Array.isArray(header) ? header[0] : header, secret)) {
+      sendJson(res, 400, { error: 'invalid or stale Stripe-Signature' });
+      return;
+    }
+    let event: PaymentEvent;
+    try {
+      event = JSON.parse(raw.toString('utf8')) as PaymentEvent;
+    } catch {
+      sendJson(res, 400, { error: 'Invalid JSON body' });
+      return;
+    }
+    if (!event || typeof event.id !== 'string' || !event.id) {
+      sendJson(res, 400, { error: 'event id is required' });
+      return;
+    }
+    sendJson(res, 200, recordPaymentEvent(event));
     return;
   }
 
@@ -381,10 +462,11 @@ async function handleRequest(req: http.IncomingMessage, res: http.ServerResponse
       version: amcVersion,
       endpoints: {
         'GET /api/health': 'Health check',
-        'GET /api/industry-packs/access': 'Industry Packs entitlement and checkout metadata',
-        'POST /api/industry-packs/checkout': 'Create an Industry Packs checkout handoff URL',
-        'POST /api/industry-packs/license/verify': 'Verify an Industry Packs license key',
-        'POST /api/industry-packs/license/issue': 'Issue a signed Industry Packs license key for a paid customer',
+        'GET /api/industry-packs/access': 'Industry Packs price and whether checkout is available in this deployment',
+        'POST /api/industry-packs/checkout': 'Create an Industry Packs checkout handoff URL (503 when checkout is not available)',
+        'POST /api/industry-packs/license/verify': 'Verify an Industry Packs license key against this server\'s issuing key',
+        'POST /api/industry-packs/license/issue': 'Admin only: issue a signed Industry Packs license key for a paid customer',
+        'POST /api/industry-packs/webhook': 'Payment provider webhook (Stripe-Signature); records a paid checkout for admin issue',
         'POST /api/quickscore': 'Quick self-assessment score',
         'GET /api/badge/:agentId': 'SVG badge for agent score',
       },

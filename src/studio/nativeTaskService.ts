@@ -1,12 +1,14 @@
 import { assertNativeTaskValidationPin, inspectNativeTaskValidation, nativeTaskValidationView } from "./nativeTaskValidation.js";
 import { assertNativeTaskData, assertNativeTaskInputCapability, dispatchNativeTaskInput, nativeTaskInputCapabilities,
-  nativeTaskStartSchema, nativeTaskTurnSchema, prepareNativeTaskInput, type PreparedNativeTaskInput, NATIVE_TASK_MAX_PARTS_BYTES } from "./nativeTaskInput.js";
+  nativeTaskForkSchema, nativeTaskStartSchema, nativeTaskTurnSchema, prepareNativeTaskInput, type PreparedNativeTaskInput, NATIVE_TASK_MAX_PARTS_BYTES } from "./nativeTaskInput.js";
 import { encodeNativeOrderedInput } from "../attachments/nativeOrderedInput.js";
 import { encodeNativeAudioInput } from "../attachments/nativeAudioInput.js";
 import { sessionSpillCap } from "../session/sessionPayloadCap.js";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { AMCNativeClient, type AMCNativeSession, type AMCNativeTurn } from "../sdk/nativeAgentClient.js";
+import { AMCNativeClient, AMCNativeRefusedError, type AMCNativeSession, type AMCNativeTurn } from "../sdk/nativeAgentClient.js";
+import { nativeFailureGuidance } from "../agent/nativeFailureGuidance.js";
+import { SessionHistoryRefused } from "../session/sessionHistoryReader.js";
 import { LocalCredentialsService } from "../credentials/localCredentialsService.js";
 import { resolveCredentialsPaths } from "../credentials/credentialsPaths.js";
 import { credentialRef } from "../credentials/credentialRef.js";
@@ -15,19 +17,27 @@ import { checkToolsetReadiness } from "../agent/agentToolset.js";
 import { selectSupportedNativeTools } from "../agent/nativeToolCapabilities.js";
 import { loadApprovalPolicy, verifyApprovalPolicySignature } from "../approvals/approvalPolicyEngine.js";
 import { verifyBudgetsConfigSignature } from "../budgets/budgets.js";
-import { verifyAgentRun } from "../agent/runReport.js";
+import { verifyNativeTaskEvidence } from "./nativeTaskVerdict.js";
 import { loadTrustContext } from "../trust/trustContext.js";
 import { inspectRuntimeFirewallPolicy } from "../runtime/firewall.js";
-import { loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
+import { ControlCheckpointRootInWorkspaceError, loadActiveCompiledPolicy } from "../catalog/compiler/activate.js";
 import { planRequiresAgentLease } from "../tools/guards/compiledPolicyGuard.js";
 import { isActionClass } from "../governor/actionCatalog.js";
-import { issueLeaseToken } from "../leases/leaseSigner.js";
+import { issueSessionLease } from "../leases/delegatedLease.js";
+import { delegationChainView } from "../agent/delegationChain.js";
+import { loadWorkloadTrustConfig } from "../identity/workload/workloadTrust.js";
+import { LeasePrincipalRefused } from "../leases/leasePrincipal.js";
 import { revokeLease, revokedLeaseIdSet } from "../leases/leaseStore.js";
 import { workspaceIdFromDirectory } from "../workspaces/workspaceId.js";
-import { NATIVE_TASK_LEASE_ENV } from "../acp/acpRuntimeContracts.js";
+import { NATIVE_TASK_INITIATOR_ENV, NATIVE_TASK_SYSTEM_PROMPT_ENV } from "../acp/acpRuntimeContracts.js";
+import { loadNativeTaskContext } from "./nativeTaskContext.js";
+import { regulatedLeaseProfile } from "../leases/regulatedProfile.js";
 import { NativeTaskDescriptors, nativeTaskId, taskBodyHash, type NativeTaskDescriptor } from "./nativeTaskDescriptors.js";
-import { readNativeTaskProjection, type NativeTaskProjection } from "./nativeTaskProjection.js";
+import { readAcpSessionUpdatePage } from "../acp/acpSessionUpdatePage.js";
+import { readNativeTaskProjection, projectNativeTaskUpdate, type NativeTaskProjection } from "./nativeTaskProjection.js";
 import { inspectJsonlSessionRecovery } from "../session/jsonlContinuation.js";
+import { deriveExecutionStatus } from "../execution/executionContract.js";
+import { sessionReceipts } from "../execution/executionStatus.js";
 import { NativeTaskServiceError, type NativeTaskActor, type NativeTaskConfiguration, type NativeTaskLimits,
   type NativeTaskService, type NativeTaskState, type NativeTaskView } from "./nativeTaskTypes.js";
 
@@ -40,20 +50,34 @@ const CREDENTIALED = ["openai", "openai-responses", "anthropic", "deepseek", "ge
 type CredentialedProvider = typeof CREDENTIALED[number];
 const credentialed = (provider: NativeTaskDescriptor["provider"]): provider is CredentialedProvider => (CREDENTIALED as readonly string[]).includes(provider);
 const SWEEP_MS = 10_000;
+/** P0-62: how long reads may keep meeting a moving store (CHANGED) before Studio fails closed and names that cause. */
+const SETTLE_MS = 30_000;
+const MOVING = "Committed history was changing while it was read, so no authenticated snapshot is shown yet. Nothing was concluded from a partial read; refresh in a moment.";
+const UNSETTLED = "Committed history kept changing while it was read, for 30 s, so no authenticated snapshot could be taken. Nothing was concluded from a partial read; refresh once writers are quiet.";
 const reasonOf = (error: unknown): string => error instanceof Error ? error.message : String(error);
+/** AMC's own budget refused the turn's next model request, as the runtime's ACP error data names it (P0-59). */
+const BUDGET_GUIDANCE = nativeFailureGuidance("AMC_NATIVE_BUDGET_REFUSED");
+const budgetRefused = (error: unknown): boolean => error instanceof AMCNativeRefusedError
+  && ((error.data as { failureCodes?: unknown } | undefined)?.failureCodes as unknown[] | undefined)?.includes(BUDGET_GUIDANCE.code) === true;
 interface Entry {
   descriptor: NativeTaskDescriptor; state: NativeTaskState; error: string | null;
   client?: AMCNativeClient; session?: AMCNativeSession; turn?: AMCNativeTurn; work?: Promise<void>;
   preparation?: Promise<void>; runtimeStartedAt: number;
   /** P1-67: the lease this process minted for its runtime, until it is revoked (another process may record a newer one). */
   leaseId?: string;
+  /** P2-25: the delegation chain that lease binds, for the session detail; absent for a v1 lease. */
+  delegationChainDigest?: string;
   startupCancelled: boolean; startupAbort: AbortController;
   validationPriorTurn?: number | null;
   projection?: NativeTaskProjection; projectionError?: string; projectionAt: number; touchedAt: number;
+  /** P0-62: when reads began to be refused because another writer moved the store during the read (CHANGED). */
+  changedSince?: number;
   verificationStoreHead?: string;
-  verification: NativeTaskView["verification"]; finishing?: Promise<void>;
+  verification: NativeTaskView["verification"]; verificationScope?: NativeTaskView["verificationScope"]; finishing?: Promise<void>;
   /** Process closure is distinct from a successful signed session handover. */
   processCleanupConfirmed?: boolean;
+  /** P2-13: verified receipt states read with the projection, and whether a start or fork was refused before any session. */
+  receipts?: ReturnType<typeof sessionReceipts>; admissionRefused?: boolean;
 }
 export interface NativeTaskServiceOptions {
   readonly workspace: string;
@@ -183,37 +207,72 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
    * lifetime). The token goes to the child alone. prepare records the id, and revokes the previous runtime's lease, only
    * once this runtime holds the session's writer claim, so a refused resume never touches another process's runtime.
    */
-  function runtimeLease(entry: Entry, scope: NativeTaskConfiguration["scope"]): ReturnType<typeof issueLeaseToken> | null {
+  function runtimeLease(entry: Entry, scope: NativeTaskConfiguration["scope"]): ReturnType<typeof issueSessionLease> | null {
     const d = entry.descriptor;
     if (d.tools !== "workspace") return null;
     let plan: ReturnType<typeof loadActiveCompiledPolicy>;
     try { plan = loadActiveCompiledPolicy(workspace); }
-    catch (error) { throw new NativeTaskServiceError("POLICY_UNVERIFIED", 409, `The active compiled policy cannot be verified (${reasonOf(error)}). Nothing was started. Restore .amc/control-plan/ from backup, or recompile and reactivate.`); }
+    catch (error) {
+      if (error instanceof ControlCheckpointRootInWorkspaceError) throw new NativeTaskServiceError(error.code, 409, `${error.message} Nothing was started.`);
+      throw new NativeTaskServiceError("POLICY_UNVERIFIED", 409, `The active compiled policy cannot be verified (${reasonOf(error)}). Nothing was started. Restore .amc/control-plan/ from backup, or recompile and reactivate.`);
+    }
     if (!planRequiresAgentLease(plan)) return null;
     if (scope.digest !== d.toolsDigest) throw new NativeTaskServiceError("SCOPE_CHANGED", 409,
       "The signed workspace tool scope changed. Review the current scope and create a new task; this task cannot silently adopt new grants.");
-    let lease: ReturnType<typeof issueLeaseToken>;
+    let lease: ReturnType<typeof issueSessionLease>;
     try {
-      lease = issueLeaseToken({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
+      // P1-78: the lease names the task's Studio user when they are an active users.yaml user; none refuses here.
+      // P2-25: that user roots the signed delegation chain the lease binds (lease v2).
+      lease = issueSessionLease({ workspace, workspaceId: workspaceIdFromDirectory(workspace), agentId: d.agentId, workOrderId: d.taskId,
+        principalKey: d.principalId.startsWith("session:") ? d.principalId.slice("session:".length) : null,
         ttlMs: LIMITS.lifetimeMs, scopes: ["toolhub:execute"], executeActionClasses: [...new Set(scope.tools.map(t => t.actionClass).filter(isActionClass))],
         routeAllowlist: ["/native-task"], modelAllowlist: [d.model ?? d.provider], maxTokensPerMinute: d.maxTokens, maxRequestsPerMinute: d.maxSteps, maxCostUsdPerDay: null });
     } catch (error) {
+      if (error instanceof LeasePrincipalRefused) throw new NativeTaskServiceError("PRINCIPAL_UNRESOLVED", 409, `${error.message}. Nothing was started. Sign in as an active workspace user.`);
       throw new NativeTaskServiceError("LEASE_UNAVAILABLE", 409, `The active compiled plan requires an agent lease for this runtime, and none could be minted (${reasonOf(error)}). Nothing was started.`);
     }
     entry.leaseId = lease.payload.leaseId; // From here stop() revokes it.
+    entry.delegationChainDigest = lease.chain?.digest;
     return lease;
   }
-  function refresh(entry: Entry): void {
-    if (!entry.descriptor.sessionId || Date.now() - entry.projectionAt < 250) return;
+  /**
+   * Read the session's authenticated projection; true only for a fresh, complete read. CHANGED (another writer appended
+   * while this read ran) is not unauthenticated evidence (P0-62): the last authenticated snapshot stays for display
+   * until SETTLE_MS of continuous change, which fails closed with that cause. Every other refusal fails closed at once.
+   * Decisions (dispatch, a turn's outcome, verification, resume) use only fresh reads.
+   */
+  function refresh(entry: Entry): boolean {
+    if (!entry.descriptor.sessionId || Date.now() - entry.projectionAt < 250) return entry.projection !== undefined;
     try {
       entry.projection = readNativeTaskProjection(workspace, entry.descriptor.sessionId, entry.descriptor.agentId);
-      entry.projectionError = undefined;
-      if (entry.verificationStoreHead !== entry.projection.storeHeadEventHash) entry.verification = "not-verified";
+      entry.receipts = sessionReceipts(workspace, entry.descriptor.sessionId);
+      entry.projectionError = undefined; entry.changedSince = undefined;
+      // A later read never softens a failed verdict; it only withdraws a positive one whose head moved.
+      if (entry.verification !== "failed" && entry.verificationStoreHead !== entry.projection.storeHeadEventHash) entry.verification = "not-verified";
       entry.projectionAt = Date.now();
-    } catch {
-      entry.projection = undefined;
-      entry.verification = "not-verified"; entry.verificationStoreHead = undefined;
-      entry.projectionError = "Committed native evidence could not be authenticated or exceeded the display bound. No transcript or approval is shown. Restore the original evidence and refresh; no alternate history was substituted.";
+      return true;
+    } catch (error) {
+      const moving = error instanceof SessionHistoryRefused && error.code === "CHANGED";
+      entry.changedSince = moving ? entry.changedSince ?? Date.now() : undefined;
+      if (entry.verification !== "failed") entry.verification = "not-verified";
+      entry.verificationStoreHead = undefined;
+      if (moving && Date.now() - entry.changedSince! < SETTLE_MS) {
+        if (!entry.projection) entry.projectionError = MOVING;
+        return false;
+      }
+      entry.projection = undefined; entry.receipts = undefined;
+      entry.projectionError = moving ? UNSETTLED : "Committed native evidence could not be authenticated or exceeded the display bound. No transcript or approval is shown. Restore the original evidence and refresh; no alternate history was substituted.";
+      return false;
+    }
+  }
+  /** A fresh read that waits, with bounded backoff, for a moving store to settle (P0-62); false when none was taken. */
+  async function settledRefresh(entry: Entry): Promise<boolean> {
+    const deadline = Date.now() + SETTLE_MS;
+    for (let delay = 25; ; delay = Math.min(delay * 2, 1_000)) {
+      entry.projectionAt = 0;
+      if (refresh(entry)) return true;
+      if (entry.changedSince === undefined || Date.now() + delay > deadline) return false;
+      await new Promise(done => setTimeout(done, delay));
     }
   }
   function reconcileClosedClient(entry: Entry): void {
@@ -231,6 +290,16 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     // Keep the signed descriptor, pendingTurn and every submission untouched.
     // Only resume() may rebuild the fixed native approval/validation controller.
   }
+  /** P2-25: the runtime lease's chain as it verifies now; an unreadable trust config or revocation list reads as refused. */
+  function delegationView(entry: Entry): NativeTaskView["delegation"] {
+    if (entry.delegationChainDigest === undefined) return null;
+    try {
+      return delegationChainView(workspace, entry.delegationChainDigest,
+        { declaredServices: loadWorkloadTrustConfig(workspace)?.services ?? [], revokedIds: revokedLeaseIdSet(workspace) });
+    } catch (error) {
+      return { chainDigest: entry.delegationChainDigest, status: "refused", reason: reasonOf(error), links: [] };
+    }
+  }
   function view(entry: Entry, retainProjection = false): NativeTaskView {
     reconcileClosedClient(entry);
     refresh(entry);
@@ -247,22 +316,31 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     const validation = nativeTaskValidationView(d.validation, p?.validation,
         !!d.validation && d.pendingTurn && (entry.state === "starting" || (["running", "cancel-requested"].includes(entry.state) && (p?.validation.turn ?? null) === entry.validationPriorTurn)),
         d.pendingTurn && (!entry.client || (p?.validation.turn ?? null) === entry.validationPriorTurn));
+    const running = ["running", "cancel-requested"].includes(entry.state) || (entry.state === "starting" && d.pendingTurn);
+    // P2-13: each phase from its own source; Studio's verdict feeds only evidence-verification.
+    const execution = d.sessionId ? deriveExecutionStatus({ sessionId: d.sessionId, admission: "admitted",
+      turn: running ? "running" : p ? p.ending : "unreadable", receiptStates: p ? entry.receipts?.states ?? null : null,
+      recheckFailures: entry.receipts?.recheckFailures ?? [],
+      verified: entry.verification === "not-verified" ? null : entry.verification !== "failed" })
+      : entry.admissionRefused ? deriveExecutionStatus({ sessionId: "", admission: "refused", turn: null, receiptStates: [], verified: null }) : null;
     const result: NativeTaskView = { taskId: d.taskId, sessionId: d.sessionId, agentId: d.agentId, provider: d.provider, model: d.model, tools: d.tools, toolsDigest: d.toolsDigest,
       maxSteps: d.maxSteps, maxTokens: d.maxTokens, revision: d.revision, clientRequestId: d.submissions[0]!.clientRequestId,
       lastClientRequestId: d.submissions[d.submissions.length - 1]!.clientRequestId, state: !entry.client && p?.closed ? "closed" : entry.state,
       createdAt: d.createdAt, updatedAt: d.updatedAt, archived: d.archivedAt !== undefined, turnEndReason: p?.ending ?? null, error: entry.projectionError ?? entry.error,
       validationSelection: d.validation ?? null,
-      validation, validationOutputs: (p?.validationOutputs ?? []).filter(output => validation.checks.some(check => check.outputEventId === output.outputEventId && check.id === output.checkId)),
-      verification: entry.verification, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
+      validation, plans: p?.plans ?? [], usage: p?.usage, validationOutputs: (p?.validationOutputs ?? []).filter(output => validation.checks.some(check => check.outputEventId === output.outputEventId && check.id === output.checkId)),
+      verification: entry.verification, verificationScope: entry.verification === "externally-anchored" || entry.verification === "anchored-prefix" ? entry.verificationScope ?? null : null, approvals: p?.approvals ?? [], approvalError: p?.approvalError ?? null,
       nextCursor: p?.nextCursor ?? 0, firstCursor: p?.firstCursor ?? 1, droppedEvents: p?.droppedEvents ?? 0,
       history, resumeBlockedReason, recovery: recovery ? { eligible: recovery.eligible, state: recovery.state, message: recovery.message } : null,
-      canResume: !!d.sessionId && !!p && (p.history.backend === "sqlite" || recovery?.eligible === true) && !d.closed && !p.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying" };
+      canResume: !!d.sessionId && !!p && (p.history.backend === "sqlite" || recovery?.eligible === true) && !d.closed && !p.closed && !entry.client && entry.state !== "starting" && entry.state !== "verifying",
+      execution, delegation: delegationView(entry) };
     // Released task history is reconstructed on demand, not retained for every descriptor in memory.
     if (!entry.client && !retainProjection) { entry.projection = undefined; entry.projectionAt = 0; }
     return result;
   }
   function childEnvironment(provider: NativeTaskDescriptor["provider"]): NodeJS.ProcessEnv {
-    // SDK merges env by default: explicitly erase every ambient key before the fixed allowlist.
+    // Erase every ambient key before the fixed allowlist: this is also the credential store's environment, and an
+    // inheritEnv SDK launch would otherwise merge them back.
     const env: NodeJS.ProcessEnv = Object.fromEntries(Object.keys(process.env).map(key => [key, undefined]));
     const permitted = ["HOME", "USERPROFILE", "SystemRoot", "WINDIR", "PATH", "TMPDIR", "TEMP", "TMP", "LANG", "LC_ALL",
       "AMC_VAULT_PASSPHRASE", "AMC_VAULT_PASSPHRASE_FILE", "AMC_EXPECTED_MONITOR_FINGERPRINT", "AMC_CONTROL_CHECKPOINT_DIR"];
@@ -313,7 +391,8 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         validation: inspectNativeTaskValidation(validationConfig, actor.demo),
         boundary: "Provider access is not pre-tested. Stub records a canned local demonstration, not a model answer. Limits apply per native turn; existing signed budgets govern aggregate spending. No custom origins, commands, MCP mounts or grants can be supplied by the browser." };
   }
-  async function prepare(actor: NativeTaskActor, entry: Entry, resume: boolean, input?: PreparedNativeTaskInput): Promise<void> {
+  async function prepare(actor: NativeTaskActor, entry: Entry, mode: "new" | "resume" | { readonly forkFrom: string }, input?: PreparedNativeTaskInput): Promise<void> {
+    const resume = mode === "resume";
     const d = entry.descriptor;
     assertToolPin(d);
     const config = await configuration(actor);
@@ -324,8 +403,13 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     const previousLeases = new Set([d.leaseId, entry.leaseId].filter((id): id is string => id !== undefined));
     // The lifetime clock starts no later than the lease, so the sweeper stops the runtime before the lease expires.
     entry.runtimeStartedAt = Date.now();
+    // P2-37: the agent's signed prompt pack and A4 context plugin; an unverified one refuses here in a regulated workspace.
+    const agentContext = loadNativeTaskContext({ workspace, agentId: d.agentId, provider: d.provider, regulated: regulatedLeaseProfile(workspace).regulated });
     const lease = runtimeLease(entry, config.scope);
-    entry.client = await AMCNativeClient.start({ workspace, command, env: { ...childEnvironment(d.provider), ...(lease ? { [NATIVE_TASK_LEASE_ENV]: lease.token } : {}) }, provider: d.provider,
+    entry.client = await AMCNativeClient.start({ workspace, command, ...(lease ? { leaseToken: lease.token } : {}), env: { ...childEnvironment(d.provider),
+      ...(agentContext.systemPrompt === null ? {} : { [NATIVE_TASK_SYSTEM_PROMPT_ENV]: agentContext.systemPrompt }),
+      // P1-78: the task's Studio principal raises its runtime's approvals (`LOCAL_USER:<id>`, `WORKSPACE_ROUTER:<id>`, or the admin token).
+      [NATIVE_TASK_INITIATOR_ENV]: d.principalId.startsWith("session:") ? d.principalId.slice("session:".length) : d.principalId }, provider: d.provider,
       ...(d.model === null ? {} : { model: d.model }), agentId: d.agentId, tools: d.tools,
       ...(credentialed(d.provider) ? { credential: REFS[d.provider] } : {}),
       ...(d.tools === "workspace" ? { approveTools: "WRITE_HIGH", approveRisk: "high" as const } : {}),
@@ -338,7 +422,7 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     if (input) assertNativeTaskInputCapability(entry.client.capabilities, input);
     const abortSetup = () => { void entry.client?.close(); };
     entry.startupAbort.signal.addEventListener("abort", abortSetup, { once: true });
-    try { entry.session = resume ? await entry.client.resumeSession(d.sessionId!) : await entry.client.newSession(); }
+    try { entry.session = resume ? await entry.client.resumeSession(d.sessionId!) : typeof mode === "object" ? await entry.client.forkSession(mode.forkFrom) : await entry.client.newSession(); }
     finally { entry.startupAbort.signal.removeEventListener("abort", abortSetup); }
     if (!resume || lease) persist(entry, { ...(resume ? {} : { sessionId: entry.session.sessionId }), ...(lease ? { leaseId: lease.payload.leaseId } : {}) });
     // P1-67: this runtime now holds the writer claim, so the previous one is gone; its lease must not stay live.
@@ -370,10 +454,21 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     })();
     return entry.finishing;
   }
-  function dispatch(entry: Entry, input: PreparedNativeTaskInput): void {
+  async function dispatch(entry: Entry, input: PreparedNativeTaskInput): Promise<void> {
     if (!entry.session) throw new NativeTaskServiceError("NOT_ACTIVE", 409, "Explicitly resume the released native session before submitting a new turn.");
-    entry.projectionAt = 0; refresh(entry);
-    if (!entry.projection) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, "The native session did not authenticate before dispatch. No provider request was submitted.");
+    const prior = entry.state, session = entry.session, revision = entry.descriptor.revision;
+    entry.state = "running"; // holds off another admission while the history settles
+    const fresh = await settledRefresh(entry);
+    // Compare-and-set: dispatch only if nothing released, cancelled or replaced this task while its history settled.
+    if (entry.finishing || entry.startupCancelled || shuttingDown || entry.state !== "running" || entry.session !== session
+      || entry.descriptor.revision !== revision) {
+      throw new NativeTaskServiceError("TASK_CHANGED", 409, "The task was released, cancelled or changed while its history settled. This turn was not dispatched.");
+    }
+    if (!fresh || !entry.projection) {
+      entry.state = prior;
+      throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, entry.changedSince === undefined
+        ? "The native session did not authenticate before dispatch. No provider request was submitted." : `${UNSETTLED} No provider request was submitted.`);
+    }
     const precedingEndingId = entry.projection.endingId;
     entry.validationPriorTurn = entry.projection.validation.turn;
     entry.state = "running"; entry.error = null; entry.verification = "not-verified"; entry.touchedAt = Date.now();
@@ -382,14 +477,23 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
     const turn = entry.turn;
     entry.work = (async () => {
       try {
+        // The turn result is the runtime's completion signal; judge it only from a read taken while the store holds still.
         await turn.result;
-        entry.projectionAt = 0; refresh(entry);
-        const reason = entry.projection?.ending;
-        if (!reason || entry.projection?.endingId === precedingEndingId) throw new Error("No new authenticated turn ending");
+        if (!await settledRefresh(entry) && entry.changedSince !== undefined) throw new NativeTaskServiceError("EVIDENCE_UNSETTLED", 409, UNSETTLED);
+        // The outcome comes from that one authenticated snapshot, and is recorded only through the descriptor's
+        // compare-and-set on the revision it was decided for (persist throws TASK_CHANGED otherwise).
+        const snapshot = entry.projection, reason = snapshot?.ending;
+        if (!snapshot || !reason || snapshot.endingId === precedingEndingId) throw new Error("No new authenticated turn ending");
+        if (entry.descriptor.revision !== revision) throw new NativeTaskServiceError("TASK_CHANGED", 409, "The task changed while its turn settled; no outcome was recorded from it.");
+        persist(entry, { pendingTurn: false });
         entry.state = reason === "error" || reason === "interrupted" ? "failed" : "idle";
         entry.error = reason === "error" || reason === "interrupted" ? `The signed native turn ended with ${reason}; no successful task is claimed.` : null;
-        persist(entry, { pendingTurn: false });
-      } catch { entry.state = "failed"; entry.error = "The native turn did not complete cleanly. Inspect committed evidence; no automatic retry was sent."; }
+      } catch (error) {
+        entry.state = "failed";
+        entry.error = budgetRefused(error) ? `${BUDGET_GUIDANCE.summary} No provider request was sent for it. ${BUDGET_GUIDANCE.nextAction}`
+          : error instanceof NativeTaskServiceError ? error.message
+          : "The native turn did not complete cleanly. Inspect committed evidence; no automatic retry was sent.";
+      }
       finally { entry.turn = undefined; entry.touchedAt = Date.now(); entry.work = undefined; entry.projectionAt = 0; }
     })();
   }
@@ -447,19 +551,45 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       const entry = remember(d);
       if (!admitted) return view(entry);
       entry.state = "starting";
-      try { entry.preparation = prepare(actor, entry, false, preparedInput!); await entry.preparation;
-        if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); dispatch(entry, preparedInput!); }
-      catch (error) { entry.error = error instanceof NativeTaskServiceError ? error.message : "Native startup did not finish. No model request was automatically retried; inspect setup and task status."; await stop(entry); entry.state = "failed"; }
+      try { entry.preparation = prepare(actor, entry, "new", preparedInput!); await entry.preparation;
+        if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); await dispatch(entry, preparedInput!); }
+      catch (error) { entry.error = error instanceof NativeTaskServiceError ? error.message : "Native startup did not finish. No model request was automatically retried; inspect setup and task status.";
+        entry.admissionRefused = error instanceof NativeTaskServiceError && !entry.descriptor.sessionId; await stop(entry); entry.state = "failed"; }
       finally { entry.preparation = undefined; }
       return view(entry);
     },
     poll(actor, taskId, cursor = 0) {
-      if (!Number.isSafeInteger(cursor) || cursor < 0) throw new NativeTaskServiceError("CURSOR_INVALID", 400, "Choose a nonnegative event cursor.");
-      const entry = owned(actor, taskId), task = view(entry, true);
-      if (task.history.status !== "unavailable" && cursor > task.nextCursor) throw new NativeTaskServiceError("CURSOR_AHEAD", 409, "The event cursor is ahead of authenticated history. Refresh from cursor zero.");
-      const events = entry.projection?.events.filter(e => e.cursor > cursor) ?? [];
+      // A cursor is a position reference only. Re-authenticate the descriptor's owner for every page/reconnect.
+      const entry = owned(actor, taskId);
+      if (typeof cursor === "object" && cursor !== null && !Array.isArray(cursor)) {
+        const task = view(entry, true), sessionId = entry.descriptor.sessionId;
+        if (!sessionId) return { task, events: [], truncated: false };
+        try {
+          const { updates, ...page } = readAcpSessionUpdatePage({ workspace, sessionId, agentId: actor.agentId,
+            consumerId: actor.principalId, ...(cursor.cursor === undefined ? {} : { cursor: cursor.cursor }),
+            ...(cursor.limit === undefined ? {} : { limit: cursor.limit }) });
+          if (task.history.status !== "authenticated") throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
+            "Committed task state could not be authenticated. No partial event page was returned.");
+          const events = updates.flatMap(item => { const event = projectNativeTaskUpdate(item.update, item.seq); return event ? [event] : []; });
+          const response = { task, events, truncated: false, page };
+          if (Buffer.byteLength(JSON.stringify({ ok: true, data: response }), "utf8") > LIMITS.maxEventBytes) {
+            throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409, "Native task state exceeds the page response bound. No partial event page or shortened task state was returned.");
+          }
+          return response;
+        } catch (error) {
+          if (error instanceof NativeTaskServiceError) throw error;
+          if (error instanceof SessionHistoryRefused && error.code === "INVALID_INPUT") throw new NativeTaskServiceError("CURSOR_INVALID", 400,
+            "The native history page selection is invalid. Refresh from the original task before reconnecting.");
+          throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
+            "Committed task evidence or its cursor could not be authenticated. No partial event page was returned.");
+        } finally { if (!entry.client) { entry.projection = undefined; entry.projectionAt = 0; } }
+      }
+      if (!Number.isSafeInteger(cursor) || (cursor as number) < 0) throw new NativeTaskServiceError("CURSOR_INVALID", 400, "Choose a nonnegative event cursor.");
+      const task = view(entry, true);
+      if (task.history.status !== "unavailable" && (cursor as number) > task.nextCursor) throw new NativeTaskServiceError("CURSOR_AHEAD", 409, "The event cursor is ahead of authenticated history. Refresh from cursor zero.");
+      const events = entry.projection?.events.filter(e => e.cursor > (cursor as number)) ?? [];
       if (!entry.client) { entry.projection = undefined; entry.projectionAt = 0; }
-      return { task, events, truncated: task.history.status === "unavailable" || task.droppedEvents > 0 || cursor + 1 < task.firstCursor };
+      return { task, events, truncated: task.history.status === "unavailable" || task.droppedEvents > 0 || (cursor as number) + 1 < task.firstCursor };
     },
     async turn(actor, taskId, input) {
       const entry = owned(actor, taskId);
@@ -489,11 +619,11 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
           submissions: [...d.submissions, { clientRequestId: input.clientRequestId, bodyHash, revision: d.revision + 1 }] };
         descriptors.write(entry.descriptor); admitted = true;
       });
-      if (admitted) dispatch(entry, preparedInput!);
+      if (admitted) await dispatch(entry, preparedInput!);
       return view(entry);
     },
     cancel(actor, taskId, expectedRevision) { const entry = control(actor, taskId, expectedRevision);
-      if (entry.preparation || entry.state === "starting") { entry.startupCancelled = true; void stop(entry); }
+      if (entry.preparation || entry.state === "starting" || (entry.state === "running" && !entry.turn)) { entry.startupCancelled = true; void stop(entry); }
       else if (entry.turn) { entry.state = "cancel-requested"; entry.turn.cancel(); }
       return view(entry); },
     async release(actor, taskId, expectedRevision) { const entry = control(actor, taskId, expectedRevision);
@@ -506,15 +636,15 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       if (!entry.descriptor.sessionId || entry.descriptor.closed) throw new NativeTaskServiceError(
         entry.descriptor.archivedAt !== undefined ? "TASK_ARCHIVED" : "NOT_RESUMABLE", 409,
         entry.descriptor.archivedAt !== undefined ? "Archived tasks retain their evidence and cannot be resumed. Create a new task." : "This task has no resumable recorded native session.");
-      entry.projectionAt = 0; refresh(entry);
-      if (!entry.projection) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
+      entry.projectionAt = 0;
+      if (!refresh(entry) || !entry.projection) throw new NativeTaskServiceError("EVIDENCE_UNAVAILABLE", 409,
         "Resume requires authenticated original session history. Restore it and refresh; no replacement session was created.");
       if (entry.projection.history.backend === "jsonl") {
         const recovery = inspectJsonlSessionRecovery({ workspace, sessionId: entry.descriptor.sessionId, agentId: entry.descriptor.agentId });
         if (!recovery.eligible) throw new NativeTaskServiceError("RECOVERY_REFUSED", 409, recovery.message);
       }
       capacity(); entry.state = "starting"; entry.startupCancelled = false; entry.startupAbort = new AbortController();
-      try { entry.preparation = prepare(actor, entry, true); await entry.preparation;
+      try { entry.preparation = prepare(actor, entry, "resume"); await entry.preparation;
         if (shuttingDown || entry.finishing || entry.startupCancelled) throw new Error("Studio is stopping"); persist(entry, { pendingTurn: false }); }
       catch (error) {
         // A named refusal keeps its reason; stop() then appends any lease it could not revoke.
@@ -523,6 +653,50 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
         await stop(entry); entry.state = "failed";
       }
       finally { entry.preparation = undefined; }
+      return view(entry);
+    },
+    /**
+     * fork (P2-13): a new owned task whose session's signed open row names this task's verified session. It keeps the
+     * parent's pinned provider, model, tools digest, checks and limits (equal grants, re-checked at start), with its own
+     * runtime lease and limits; no model context is inherited. A parent that does not verify is refused NATIVE_FORK_<reason>.
+     */
+    async fork(actor, taskId, input) {
+      assertNativeTaskData(input);
+      const parsed = nativeTaskForkSchema.safeParse(input);
+      if (!parsed.success) throw new NativeTaskServiceError("INPUT_INVALID", 400, "Invalid native task fork.");
+      const parent = control(actor, taskId, parsed.data.expectedRevision).descriptor;
+      const parentSession = parent.sessionId;
+      if (!parentSession) throw new NativeTaskServiceError("NO_SESSION", 409, "No native session was recorded to fork.");
+      const { clientRequestId } = parsed.data, childId = nativeTaskId(actor.principalId, clientRequestId), bodyHash = taskBodyHash({ fork: taskId, ...parsed.data });
+      let admitted = false;
+      const d = descriptors.lock(() => {
+        assertUniqueSubmission(actor, childId, clientRequestId);
+        const existing = descriptors.read(childId);
+        if (existing) { assertOwner(actor, existing); if (existing.submissions[0]!.bodyHash !== bodyHash) throw new NativeTaskServiceError("REQUEST_CONFLICT", 409, "That request ID already names a different task."); return existing; }
+        capacity();
+        if (descriptors.list().length >= 256) throw new NativeTaskServiceError("TASK_HISTORY_LIMIT", 409, "This workspace has 256 current tasks. Close and explicitly archive a reviewed task before creating more tasks.");
+        const now = Date.now();
+        const descriptor: NativeTaskDescriptor = { kind: parent.kind, taskId: childId, principalId: parent.principalId, agentId: parent.agentId, demo: parent.demo,
+          sessionId: null, provider: parent.provider, model: parent.model, tools: parent.tools, toolsDigest: parent.toolsDigest,
+          ...(parent.validation ? { validation: parent.validation } : {}), maxSteps: parent.maxSteps, maxTokens: parent.maxTokens,
+          createdAt: now, updatedAt: now, revision: 1, pendingTurn: false, closed: false, forkedFrom: { taskId, sessionId: parentSession },
+          submissions: [{ clientRequestId, bodyHash, revision: 1 }] };
+        descriptors.write(descriptor); admitted = true; return descriptor;
+      });
+      const entry = remember(d);
+      if (!admitted) return view(entry);
+      entry.state = "starting";
+      let refusal: string | undefined;
+      try { entry.preparation = prepare(actor, entry, { forkFrom: parentSession }); await entry.preparation; }
+      catch (error) {
+        const reason = error instanceof AMCNativeRefusedError ? (error.data as { reason?: unknown } | undefined)?.reason : undefined;
+        refusal = typeof reason === "string" && /^[A-Z_]{1,64}$/.test(reason) ? reason : undefined;
+        entry.error = error instanceof NativeTaskServiceError ? error.message : refusal ? `The parent session was refused for forking (${refusal}); nothing was forked.`
+          : "Native fork did not finish. No model request was sent; inspect setup and task status.";
+        entry.admissionRefused = error instanceof NativeTaskServiceError || refusal !== undefined;
+        await stop(entry); entry.state = "failed";
+      } finally { entry.preparation = undefined; }
+      if (refusal) throw new NativeTaskServiceError(`FORK_${refusal}`, 409, entry.error!);
       return view(entry);
     },
     archive(actor, taskId, expectedRevision) {
@@ -560,22 +734,24 @@ export function createNativeTaskService(options: NativeTaskServiceOptions): Nati
       entry.state = "verifying";
       try {
         if (entry.client) { await entry.client.close(); entry.client = undefined; entry.session = undefined;
-          entry.projectionAt = 0; refresh(entry); if (entry.projection?.closed) persist(entry, { closed: true }); }
-        entry.projectionAt = 0; refresh(entry);
-        const verificationHead = entry.projection?.storeHeadEventHash;
+          entry.projectionAt = 0; if (refresh(entry) && entry.projection?.closed) persist(entry, { closed: true }); }
+        entry.projectionAt = 0;
+        const verificationHead = refresh(entry) ? entry.projection?.storeHeadEventHash : undefined;
         // P0-51: the operator's trust (the AMC home trust list, AMC_EXPECTED_MONITOR_FINGERPRINT in Studio's environment)
         // decides, as `amc agent-loop verify` does; with it, report.ok also needs the monitor key admitted.
         const trust = loadTrustContext({ env: environment, ...(options.credentialsHome ? { amcHome: options.credentialsHome } : {}) });
-        const report = await verifyAgentRun(workspace, entry.descriptor.sessionId, trust);
-        entry.projectionAt = 0; refresh(entry);
-        const sameHead = verificationHead !== undefined && verificationHead === entry.projection?.storeHeadEventHash;
-        entry.verification = !report.ok ? "failed" : !sameHead ? "not-verified" : "externally-anchored";
+        // P0-14: Studio's own gateway session stays open while it serves. The verdict may name it as unfinalized, as a
+        // separate "anchored-prefix" state; any throw or unexpected result is "failed" (nativeTaskVerdict.ts).
+        const verdict = await verifyNativeTaskEvidence(workspace, entry.descriptor.sessionId, trust);
+        entry.projectionAt = 0;
+        const sameHead = refresh(entry) && verificationHead !== undefined && verificationHead === entry.projection?.storeHeadEventHash;
+        const passed = verdict.verification !== "failed";
+        // The verdict and finalization come from the verifier's one read; it counts only if the authenticated store head
+        // was the same before and after that read. A writer appending meanwhile makes it fail, never pass (P0-62).
+        entry.verification = !passed || !sameHead ? "failed" : verdict.verification;
         entry.verificationStoreHead = sameHead ? verificationHead : undefined;
-        const monitor = report.trustRoot.monitorAdmission;
-        entry.error = report.ok ? null : report.integrityOk
-          ? `UNTRUSTED: the recorded evidence is internally consistent, but the operator's trust list and AMC_EXPECTED_MONITOR_FINGERPRINT do not admit its monitor key (${monitor?.status ?? "not-pinned"}${monitor?.keyId ? ` ${monitor.keyId}` : ""}), so authorship is not verified. No verified result is claimed.`
-          : "Cold native verification refused this evidence. Other live workspace sessions can also prevent complete-ledger verification; inspect the ledger before making claims.";
-        if (report.ok && !sameHead) entry.error = "Recorded history changed during verification. Refresh and explicitly verify the current snapshot; the earlier verdict is not current.";
+        entry.verificationScope = verdict.scope;
+        entry.error = passed && !sameHead ? "Recorded history changed during verification. Refresh and explicitly verify the current snapshot; the earlier verdict is not current." : verdict.error;
       } catch { entry.verification = "failed"; entry.error = "Cold native verification did not complete. No verified result is claimed."; }
       finally { entry.state = entry.descriptor.closed ? "closed" : "released"; entry.projectionAt = 0; retireLease(entry); }
       return view(entry);

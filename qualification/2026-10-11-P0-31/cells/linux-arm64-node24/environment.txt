@@ -1,0 +1,11 @@
+Linux 53c2c5654df1 6.8.0-117-generic #117-Ubuntu SMP PREEMPT_DYNAMIC Thu May  7 17:26:37 UTC 2026 aarch64 GNU/Linux
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+node v24.21.0 npm 11.19.0
+Python 3.11.2
+kernel.apparmor_restrict_unprivileged_userns=1
+bubblewrap 0.8.0
+ff5add553bea12a45c18ebe6c67d3ed637052b869a1ca2fc5d74a6a2e8c5cce6  /usr/bin/bwrap
+root 755
+Version: 0.8.0-2+deb12u1
+756bd6977dce19f4ef781bdb492c38d6777964f7

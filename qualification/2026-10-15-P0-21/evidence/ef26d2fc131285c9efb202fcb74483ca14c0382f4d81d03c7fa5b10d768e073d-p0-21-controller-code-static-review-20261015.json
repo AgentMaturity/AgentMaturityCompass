@@ -1,0 +1,227 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-21",
+  "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+  "productionAnchor": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "scope": "Frozen v1 controller/proposal/reporter code only; unfinished setup/index metadata was not read.",
+  "state": "BLOCKED_BEFORE_RUNTIME",
+  "blockingFindings": 1,
+  "findings": [
+    {
+      "id": "F1",
+      "priority": "P1",
+      "file": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+      "line": 20,
+      "endLine": 22,
+      "title": "Known post-reporter close failures can pass completion gates",
+      "detail": "LATE omits the installed Vitest messages 'error during close', 'close timed out' and 'Tests closed successfully but something prevents...'. Installed cli-api.CnMVyzaz.js14021 logs rejected project/pool/onClose results without setting failure there;14035\u201340 prints close-timeout/hanging messages before process.exit() with the existing code. Raw37 and run-end reporter can therefore be green or expected-mutant failures, normal0/1 exit and ESRCH can occur, and this classifier can still clear ACTIVE236 and permit restoration287 after a known incomplete framework close.",
+      "required": "Preserve v1 and add the exact known post-exit close/global-teardown banner gate in a separate revision before runtime. This source review ran no reproduction.",
+      "installedSource": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js",
+        "bytes": 498779,
+        "sha256": "a236001d048380e2c67d05423fc9ea3f26b07ee019ba8d6e622082f29d49102e"
+      }
+    },
+    {
+      "id": "F2",
+      "priority": "P2",
+      "file": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+      "line": 306,
+      "title": "Halted receipt can misstate restoration history",
+      "detail": "The catch-all always writes restorationAttempted:false. If normal restoration287 already ran and the restored phase or final preservation later fails, this statement is false. The handler itself correctly performs no restoration.",
+      "required": "Use a narrower truthful automaticRestorationOnException:false field or retain actual stage/restoration state in a separate revision."
+    }
+  ],
+  "robustnessRecommendations": [
+    {
+      "file": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+      "line": 197,
+      "detail": "Match parent scheduling with --maxWorkers=1 and --no-file-parallelism. This avoids unnecessary six-file concurrency while keeping original config/tests/assertions intact."
+    },
+    {
+      "file": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+      "line": 225,
+      "detail": "The immediate one-shot ESRCH probe is fail-closed but can falsely block on ordinary residual framework exit/reaping. A bounded signal-zero-only poll, for example5seconds/50ms, can record actual ESRCH without retrying a phase or signalling any process."
+    }
+  ],
+  "staticChecks": {
+    "sixRecipes": "All6 baseline source hashes, exact-once anchor counts and calculated proposed candidate SHA256 values match. C6 is exactly2 replacements in one TS file and is representative historical size behavior, not an exact old file.",
+    "routing": "Original source-mode37 test paths and original config/guards/imports/assertions/deadlines remain. No dist edit, compiler, import adapter, product fix or new test is introduced.",
+    "release": "Each control requires its exact START_P021_CAUSAL_<id> token and hashes binding setup/controller/proposal/source/compiled/preservation/reporter/index plus parent/copy roots. Its exclusive started marker prevents repeat execution in this namespace. Correct final frozenOwnInputs/case identities/preservation/index contents remain to be verified after author seals setup.",
+    "process": "Popen starts a new session. Actual PID/observed PGID and reporter PID/cwd are bound;90-second timeout records uncertainty and leaves ACTIVE/HALTED with no signal, wait retry, cleanup or restoration. Only group signal0 probes are used; no actual termination signal is present. Normal completion requires ESRCH before restoration or another phase.",
+    "state": "ACTIVE exclusively covers each runtime phase and is cleared only after group/classifier/input observations. Started markers and pristine source checks block repeated controls or next runtime after an inter-phase interruption leaves a mutant. This is not arbitrary crash recovery or a power-loss durability guarantee.",
+    "classifiers": "Fixed37 unique file/title memberships, raw/observer status/count matching, zero task hooks/non-body errors/unhandled/pending, AssertionError-only failed bodies and normal0/1 semantics are checked. Full raw/error records are retained and verdict says awaiting root attribution. Message-substring matching does not itself verify exact raw-stack multiplicity or original assertion frames; manual actual review remains required. A survivor is retained as survivor and receives a restored baseline, not a forced kill.",
+    "preservation": "Code compares complete private source+compiled membership, root expected files/dist membership, frozen own/external pins, borrowed link target and native bytes/device/inode/nlink/mode. The underlying dependency/cache universe is not fully independent or universally immutable.",
+    "environment": "The frozen literal has7 keys: PATH,HOME,TMPDIR,NODE_ENV,NO_COLOR,GIT_NO_LAZY_FETCH,AMC_P021_RUNTIME_OBSERVER_PATH. It does not inherit os.environ. This is an allowlist, not OS or universal network isolation.",
+    "scopeBoundary": "The physical12474-file construction is author-reported, not approved by this code-only review. Borrowed node_modules is an actual symlink to this P021 parent's dependencies, not an independent install. Setup/index and immutable-input coverage are unfinished and unread."
+  },
+  "audit": {
+    "errors": [],
+    "pins": [
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller.py",
+        "bytes": 18783,
+        "sha256": "df22405c146c82099182f19e4f3aa8b9200103ed2b518cdf8842c430776158c8"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/proposal.json",
+        "bytes": 11790,
+        "sha256": "fa4c77f0bbcbb976cd8d7a505eae72db7689888f145154b9c1af76900e0645d2"
+      },
+      {
+        "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/observer-reporter.mjs",
+        "bytes": 2110,
+        "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js",
+        "bytes": 498779,
+        "sha256": "a236001d048380e2c67d05423fc9ea3f26b07ee019ba8d6e622082f29d49102e"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/vitest/dist/chunks/index.UpGiHP7g.js",
+        "bytes": 151531,
+        "sha256": "cdafaf8e508042dddba72f8c7bbae84e2836ddb6b06c7026520c35d91af4e798"
+      }
+    ],
+    "recipes": [
+      {
+        "id": "P021-C1-likert-origin",
+        "file": "src/score/units.ts",
+        "anchorCounts": [
+          1
+        ],
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/score/units.ts",
+          "bytes": 2022,
+          "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+        },
+        "calculatedCandidateSha256": "e4fb73bd8410125725a5b298fbab9773e074c6f32e1c9e911c91faf66b8dbe0d",
+        "matchesProposed": true
+      },
+      {
+        "id": "P021-C2-L2-threshold",
+        "file": "src/score/units.ts",
+        "anchorCounts": [
+          1
+        ],
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/score/units.ts",
+          "bytes": 2022,
+          "sha256": "0e2fa59eae8d7703f698704429b76dcaed67f94b3c939917c8b482da6a80d5df"
+        },
+        "calculatedCandidateSha256": "f9d6017207c3e4c8f883180540892e6696457db2421e5256edf7d875ee632487",
+        "matchesProposed": true
+      },
+      {
+        "id": "P021-C3-numeric-self-eligible-cap",
+        "file": "src/claims/eligibility/evaluate.ts",
+        "anchorCounts": [
+          1
+        ],
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+          "bytes": 5777,
+          "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0"
+        },
+        "calculatedCandidateSha256": "2ab6f7120d00f5d618cd77a4565a3a6f9bbbe55a437072232d8d41e2aa0a24a3",
+        "matchesProposed": true
+      },
+      {
+        "id": "P021-C4-base-L3-self-tier",
+        "file": "src/diagnostic/questionBank.ts",
+        "anchorCounts": [
+          1
+        ],
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+          "bytes": 287500,
+          "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+        },
+        "calculatedCandidateSha256": "ada378cfbe2e0cf483b71c6426b2842a1900e871164c98aaf745b1d0aefdce23",
+        "matchesProposed": true
+      },
+      {
+        "id": "P021-C5-default-gate-self-tier",
+        "file": "src/diagnostic/gates.ts",
+        "anchorCounts": [
+          1
+        ],
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+          "bytes": 9684,
+          "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+        },
+        "calculatedCandidateSha256": "cdd692d54b24b7ac47726e7b578809ea01b097bf355b3ca3d1a3015a3159521c",
+        "matchesProposed": true
+      },
+      {
+        "id": "P021-C6-representative-raw-size",
+        "file": "src/domains/domainAssessmentEngine.ts",
+        "anchorCounts": [
+          1,
+          1
+        ],
+        "baseline": {
+          "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/domains/domainAssessmentEngine.ts",
+          "bytes": 8075,
+          "sha256": "191a628a588bdcf40fcf9897df53d06946164ffbfd227df5e6aaebb58fa10c57"
+        },
+        "calculatedCandidateSha256": "2f10cdaae2d42b94aa9b350151f2075d81f0d10daa0de851a1a9f921918f79c3",
+        "matchesProposed": true
+      }
+    ],
+    "dependencyLink": {
+      "path": "/private/tmp/p0-21-causal-qualification-20261015/closure/node_modules",
+      "target": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules",
+      "resolved": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules",
+      "isSymlink": true
+    },
+    "borrowedNative": {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538645305,
+      "nlink": 1,
+      "mode": "0o755"
+    }
+  },
+  "limits": [
+    "No runtime, import, parser, compiler, native loading, source mutation, process enumeration/signal, Git or network occurred.",
+    "No v2/v3 or partial setup/index metadata was read for this v1 scope. This report must remain immutable when a separate revision is reviewed.",
+    "OBSERVED positiveL2, current evidence maps/provenance, audit schema/3 and trust/signature/other guards remain as reviewed in the separate recipe report.",
+    "Root's literal certification-word acceptance gap remains unresolved; these recipes cannot waive wording, held quality, fullsuite, Node24, installed/hosted, release or formal Done dependencies."
+  ],
+  "operations": {
+    "staticTextJSONHashStatReads": true,
+    "partialMetadataReads": 0,
+    "runtimeOrImportsOrParsers": 0,
+    "sourceOrProducerWrites": 0,
+    "writes": "Only this new v1 code-review pair."
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "capturedUtc": "2026-10-15T05:08:51.366522+00:00",
+  "allReadsFinishedUtc": "2026-10-15T05:08:51.366522+00:00"
+}

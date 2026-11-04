@@ -326,8 +326,9 @@ describe("built-in probes", () => {
   test("secret exposure probe passes with clean audit", () => {
     registerBuiltInProbes();
     const secretProbe = listRegisteredProbes().find((p) => p.probeId === "mc-secret-exposure")!;
-    const ctx = makeContext({ auditCounts: {} });
-    const result = secretProbe.evaluate(ctx);
+    // Clean = audit telemetry present with no exposure; an empty window is not evaluated (WP37).
+    expect(secretProbe.evaluate(makeContext({ auditCounts: {} })).status).toBe("SKIP");
+    const result = secretProbe.evaluate(makeContext({ auditCounts: { TOOL_CALLED: 3 } }));
     expect(result.status).toBe("PASS");
   });
 });
@@ -449,10 +450,20 @@ describe("markdown rendering", () => {
 // Health score
 // ---------------------------------------------------------------------------
 describe("health score", () => {
-  test("returns 100 with no executions", () => {
+  test("is not measured with no executions (AXE-27)", () => {
     const health = computeCanaryHealthScore();
-    expect(health.score).toBe(100);
+    expect(health.score).toBeNull();
     expect(health.probeCount).toBe(0);
+  });
+
+  test("is not measured when every probe skipped, warned or errored", () => {
+    for (const status of ["SKIP", "WARN", "ERROR"] as const) {
+      registerProbe({ ...makePassingProbe(`p-${status}`), evaluate: () => ({ status, reason: "no telemetry", latencyMs: 1, evidenceRefs: [] }) });
+    }
+    runAllProbes(makeContext());
+    const health = computeCanaryHealthScore();
+    expect(health.score).toBeNull();
+    expect(health.probeCount).toBe(3);
   });
 
   test("returns high score with all passing", () => {
@@ -492,7 +503,8 @@ describe("health score", () => {
     const highHealth = computeCanaryHealthScore();
 
     // CRITICAL failure should produce lower score
-    expect(critHealth.score).toBeLessThanOrEqual(highHealth.score);
+    expect(highHealth.score).not.toBeNull();
+    expect(critHealth.score).toBeLessThanOrEqual(highHealth.score!);
     expect(critHealth.criticalFailCount).toBe(1);
   });
 });

@@ -1,0 +1,115 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-15",
+  "date": "2026-10-17",
+  "commit": "12f61f0afa44d480273fdbe5d19a6737872059df",
+  "branch": "codex/p1-28-qualification",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/domainExampleMode.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p015-output-fence-red.raw.json",
+      "exit": 1,
+      "durationMs": 25489
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/domainExampleMode.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p015-output-fence-case-alias-red.raw.json",
+      "exit": 1,
+      "durationMs": 27586
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run build",
+      "exit": 0,
+      "durationMs": 34313
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/noFabricatedDomainResults.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/domainExampleMode.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/industryTrustModelsNoBenchmarks.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/pathScorersNotEvaluated.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/domain-registry.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/compiler/outputPath.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/operatingProfiles.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p015-output-fence-green.raw.json",
+      "exit": 0,
+      "durationMs": 31214
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck",
+      "exit": 0,
+      "durationMs": 27826
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 36877
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 2905
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1899
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 325
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 481
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1200
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 2940
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 596
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 37785
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/noFabricatedDomainResults.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/domainExampleMode.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/industryTrustModelsNoBenchmarks.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/pathScorersNotEvaluated.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/domain-registry.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/compiler/outputPath.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/operatingProfiles.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p015-bound-output-fence-green.raw.json",
+      "exit": 0,
+      "durationMs": 29255
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:clean-source -- --keep",
+      "exit": 0,
+      "durationMs": 60494
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-TcprMj/checkout /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-TcprMj/checkout/tests/noFabricatedDomainResults.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-TcprMj/checkout/tests/domainExampleMode.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-TcprMj/checkout/tests/industryTrustModelsNoBenchmarks.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-TcprMj/checkout/tests/pathScorersNotEvaluated.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-TcprMj/checkout/tests/domain-registry.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-TcprMj/checkout/tests/catalog/compiler/outputPath.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-TcprMj/checkout/tests/operatingProfiles.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p015-fresh-output-fence-green.raw.json",
+      "exit": 0,
+      "durationMs": 31267
+    }
+  ],
+  "tests": {
+    "total": 87,
+    "passed": 87,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "4bef68f6463661549769b0cc2081c70e15183dd2cd995d4ee6400dbddb08f3bc"
+    },
+    {
+      "path": "audit.json",
+      "sha256": "868ab9e952d2607ba4d9edb2ce0564ca2d5c92623885576ae370b0251179bfbb"
+    }
+  ],
+  "notes": "Bounded output-boundary qualification only. Expected pre-fix RED:29 cases23pass/6fail and30 cases23pass/7fail. Final checkout-bound and fresh cohorts each87pass; repeated populations are not summed. Precommit checks ran against exact admitted working bytes later committed as12f61; the fresh cohort ran on that committed revision. Seven ordinary quality checks passed; dead-code2710 and duplicates1268 remain RED/unwaived. Original parent25207cases/19fail/child1/H70 is preserved, with no new whole-suite result or subtraction. All human/ownership holds, F37 and Claude work remain. Same-path point-in-time filesystem guard, no concurrent-writer guarantee or full installed dependency closure. No complete P0-15/plan/CI/merge/release claim. Original29/30RED and earlier mixed87 provenance/reach limits are retained in audit.json. Historical PR67 reports older RED/restored controls and a gateway-demo ledger-label follow-up; that follow-up’s current closure is not established by this output-only slice. Five saved historical metadata references plus the fresh admission’s own audit pin are supplementary to, not retroactive members of, the15408 declared input rows."
+}

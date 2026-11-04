@@ -3,16 +3,23 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, test, vi } from "vitest";
 import { agentToolset } from "../src/agent/agentToolset.js";
+import { bashTool } from "../src/tools/builtin/bashTool.js";
+import { searchTools } from "../src/tools/builtin/searchTools.js";
+import { toolSearchTool } from "../src/tools/builtin/toolSearchTool.js";
 import { DEFAULT_AGENT_LOOP_CONFIG } from "../src/agent/loopTypes.js";
 import { DEFAULT_RETRY_RUNTIME } from "../src/agent/requestRetry.js";
 import { runStep, type LoopLlm } from "../src/agent/stepRunner.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 import { SessionService } from "../src/session/sessionService.js";
+import { extractSpillRef } from "../src/session/spill/spillTypes.js";
 import { extractEnvelope } from "../src/session/sessionTypes.js";
 import { defaultToolsConfig, type ToolDefinition } from "../src/toolhub/toolsSchema.js";
 import { initToolsConfig, loadVerifiedToolsConfigSnapshot, toolsConfigPath, toolsConfigSigPath } from "../src/toolhub/toolhubValidators.js";
-import { initWorkspace } from "../src/workspace.js";
+import { PATH_ARGUMENTS } from "../src/toolhub/toolArgumentRoles.js";
+import { canonicalize } from "../src/utils/json.js";
+import { sha256Hex } from "../src/utils/hash.js";
+import { initWorkspaceWithoutActionPolicy } from "./helpers/actionPolicyFixtures.js";
 
 // AUTHORED UNEXECUTED: source regressions, not installed or provider acceptance.
 const cleanups: Array<() => void> = [];
@@ -21,15 +28,15 @@ const refusal = /signed workspace tool policy changed or cannot be verified/;
 const read: ToolDefinition = { name: "fs.read", actionClass: "READ_ONLY", allow: { paths: ["./workspace/**"] } };
 const write: ToolDefinition = { name: "fs.write", actionClass: "WRITE_LOW", allow: { paths: ["./workspace/**"] } };
 
-function fixture(options: { pinned?: boolean; code?: boolean; extension?: boolean } = {}) {
+function fixture(options: { pinned?: boolean; code?: boolean; extension?: boolean; grants?: ToolDefinition[] } = {}) {
   const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-pinned-tool-schemas-")));
   cleanups.push(() => rmSync(root, { recursive: true, force: true }));
   const workspace = join(root, "project"); mkdirSync(workspace);
   vi.stubEnv("AMC_VAULT_PASSPHRASE", "synthetic-pinned-schema-fixture-only");
   vi.stubEnv("AMC_CONTROL_CHECKPOINT_DIR", join(root, "control-checkpoints"));
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  initWorkspaceWithoutActionPolicy({ workspacePath: workspace, trustBoundaryMode: "isolated" }); // AXR-02 "not configured": never had an Action Policy; this file is not about it.
   initBudgets(workspace, "default"); writeRuntimeFirewallPolicy({ workspace, mode: "observe" });
-  const config = defaultToolsConfig(); config.tools.allowedTools = [read];
+  const config = defaultToolsConfig(); config.tools.allowedTools = [read, ...(options.grants ?? [])];
   // A signed legacy permissive default cannot override the explicit native pin.
   config.tools.denyByDefault = false;
   const extension: ToolDefinition = { name: "reviewed_extension", actionClass: "READ_ONLY" };
@@ -52,7 +59,7 @@ function fixture(options: { pinned?: boolean; code?: boolean; extension?: boolea
   cleanups.push(() => tools.close());
   if (options.extension) tools.registry.define({ name: extension.name, actionClass: extension.actionClass,
     description: "Explicit synthetic extension; no remote transport is started",
-    parameters: { type: "object", properties: {} }, body: () => ({ output: "extension fixture" }) });
+    parameters: { type: "object", properties: {} }, body: () => ({ ok: true, output: "extension fixture" }) });
   const prepare = vi.fn((_spec: Parameters<LoopLlm["prepare"]>[0]) => { throw new Error("Unexpected model preparation in refusal fixture"); });
   const step = (signal = new AbortController().signal) => runStep({ session, tools: tools.seam, llm: { prepare },
     route: { providerId: "schema-fixture", model: "schema-fixture", params: {} }, systemPromptEventId,
@@ -132,4 +139,163 @@ test("an already cancelled native step remains cancelled before schema admission
   const controller = new AbortController(); const reason = new Error("fixture caller cancellation"); controller.abort(reason);
   await expect(f.step(controller.signal)).rejects.toBe(reason);
   expect(f.prepare).not.toHaveBeenCalled();
+});
+
+// P1-36 re-review pin. The signed policy digest (`expectedToolsDigest`) covers grants (name, action class, paths), not
+// schema bytes; each request commits the bytes it offered in its own `request/tools` row, and verification rebuilds an
+// old session from those recorded bytes. Changing a native fs schema therefore changes every new request's
+// `toolSchemaSha256` without touching any policy pin, so this digest makes that change a reviewed test change.
+// P1-36: fs.read gained `offset`/`limit`; fs.edit gained `replaceAll` and `edits`, and `required` is now `["path"]`.
+// WP33 (PXA-22): fs.read `maxBytes` states the body's bounds (minimum 1, maximum 10,000,000), now enforced before approval.
+// WP34a: fs.read now documents regular-file admission and UTF-8-safe bounded output; arguments remain unchanged.
+const FS_TOOL_SCHEMAS_SHA256 = "e4afe883083c1c347c9ce9ffb00be4fe6c701a6f642d32b3a6290457dd047bc3";
+const edit: ToolDefinition = { name: "fs.edit", actionClass: "WRITE_LOW", allow: { paths: ["./workspace/**"] } };
+
+test("the offered fs tool schemas are pinned by digest and keep one top-level path argument (P1-36)", () => {
+  const f = fixture({ grants: [write, edit] });
+  const offered = f.tools.seam.schemas()!.filter(schema => schema.name.startsWith("fs.")).sort((a, b) => a.name.localeCompare(b.name));
+  expect(offered.map(schema => schema.name)).toEqual(["fs.edit", "fs.read", "fs.write"]);
+  for (const { parameters } of offered) {
+    expect(Object.keys(parameters).filter(key => ["oneOf", "anyOf", "allOf"].includes(key))).toEqual([]);
+    expect(parameters.required).toContain("path");
+    expect(Object.keys(parameters.properties as object).filter(key => (PATH_ARGUMENTS as readonly string[]).includes(key))).toEqual(["path"]);
+  }
+  expect(sha256Hex(canonicalize(offered))).toBe(FS_TOOL_SCHEMAS_SHA256);
+});
+
+test("signed path globs still deny line-range reads and multi-edits outside the grant (P1-36)", async () => {
+  const f = fixture({ grants: [edit] });
+  writeFileSync(join(f.workspace, "outside.txt"), "a\n");
+  expect(await f.call("fs.read", { path: "workspace/review.txt", limit: 1 }))
+    .toMatchObject({ outcome: "OK", content: "     1\tpinned read-only fixture\n[amc: lines 1-1 of 1]" });
+  expect(await f.call("fs.edit", { path: "workspace/review.txt", edits: [{ find: "pinned", replace: "Pinned" }] })).toMatchObject({ outcome: "OK" });
+  expect(readFileSync(join(f.workspace, "workspace", "review.txt"), "utf8")).toBe("Pinned read-only fixture");
+  const deniedRead = await f.call("fs.read", { path: "outside.txt", offset: 1 });
+  const deniedEdit = await f.call("fs.edit", { path: "outside.txt", edits: [{ find: "a", replace: "b" }] });
+  expect([deniedRead.outcome, deniedEdit.outcome]).toEqual(["DENIED", "DENIED"]);
+  expect(String(deniedEdit.content)).toContain("not in allowlist");
+  expect(readFileSync(join(f.workspace, "outside.txt"), "utf8")).toBe("a\n");
+});
+
+// WP34a uses the same canonical-schema review process as the fs pin above.
+const SPILL_READ_TOOL_SCHEMA_SHA256 = "ef96e1c0bd8cea81d5ae476c6d8853ad22241d3e4c2b3920d5d2ba411f9a4137";
+const spillRead: ToolDefinition = { name: "session.spill_read", actionClass: "READ_ONLY" };
+
+test("the signed native spill reader schema is pinned and reads only its own session locators", async () => {
+  const f = fixture({ grants: [spillRead] });
+  const offered = f.tools.seam.schemas()!.filter(schema => schema.name === "session.spill_read");
+  expect(offered).toHaveLength(1);
+  expect(sha256Hex(canonicalize(offered))).toBe(SPILL_READ_TOOL_SCHEMA_SHA256);
+  f.session.recordToolCall({ toolCallId: "long-log", toolName: "grep", args: "{}", dispatch: "native", parentToken: null });
+  const spilled = f.session.recordToolResult({ toolCallId: "long-log", outcome: "OK", exitCode: null, timedOut: false,
+    denied: false, content: "FIRST-LINE\n" + "log detail\n".repeat(5_000) + "FINAL-LINE\n" });
+  const locator = extractSpillRef(f.session.readEvents().find(event => event.id === spilled.eventId)!.meta_json)!.locator;
+  expect(locator).toBeTypeOf("string");
+  const read = await f.call("session.spill_read", { locator, offset: 0, limit: 11 });
+  expect(read.outcome).toBe("OK");
+  expect(JSON.parse(String(read.content))).toMatchObject({ content: "FIRST-LINE\n", encoding: "utf8", sessionIds: [f.session.sessionId] });
+  const other = new SessionService(f.workspace);
+  cleanups.push(() => other.disposeWithoutClosing());
+  other.open({ agentId: "default", harnessVersion: "spill-boundary-fixture", compositionDigest: "fixture", policyDigest: f.pin });
+  other.startTurn({ trigger: "user" }); other.startStep();
+  other.recordToolCall({ toolCallId: "foreign-log", toolName: "grep", args: "{}", dispatch: "native", parentToken: null });
+  const foreign = other.recordToolResult({ toolCallId: "foreign-log", outcome: "OK", exitCode: null, timedOut: false,
+    denied: false, content: "foreign private log\n".repeat(5_000) });
+  const foreignLocator = extractSpillRef(other.readEvents().find(event => event.id === foreign.eventId)!.meta_json)!.locator;
+  expect(foreignLocator).toBeTypeOf("string");
+  const refused = await f.call("session.spill_read", { locator: foreignLocator, limit: 10 });
+  expect(refused.outcome).toBe("ERROR");
+  expect(String(refused.content)).toContain("current session");
+  expect(String(refused.content)).not.toContain("foreign private log");
+});
+
+test("a native session without a signed spill reader grant cannot invoke it", async () => {
+  const f = fixture();
+  expect(f.names()).not.toContain("session.spill_read");
+  expect((await f.call("session.spill_read", { locator: "amc-spill:invalid" })).outcome).toBe("DENIED");
+});
+
+// WP34b follows the canonical-schema review process above. The fs schema digest is unchanged.
+// Review optional bash workdir/description and search path through one explicit digest change.
+const BASH_SEARCH_TOOL_SCHEMAS_SHA256 = "f82eccbf1763c16bcf3652d24f7950cddef0043fa66ab9ea395903104784168c";
+test("the bash and search schemas pin the reviewed WP34b arguments", () => {
+  const offered = [bashTool(), ...searchTools()].map(({ name, description, parameters }) => ({ name, description, parameters }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  expect(offered.map(schema => schema.name)).toEqual(["bash", "glob", "grep"]);
+  expect(sha256Hex(canonicalize(offered))).toBe(BASH_SEARCH_TOOL_SCHEMAS_SHA256);
+});
+
+// WP13b follows the canonical-schema review process above. Review the new explicit name/digest activation operation;
+// discovery remains separate, READ_ONLY, and bounded. Both operations are pinned with their exact description and schema.
+const TOOL_SEARCH_SCHEMA_SHA256 = "dc3d1d6289cbf3bee2f274c45c9e1bdd2f31b3c3308417779e65ef14268ce789";
+test("the tool_search schema pins separate bounded discovery and digest-bound activation operations", () => {
+  const tool = toolSearchTool({ catalog: () => [] });
+  expect(tool.actionClass).toBe("READ_ONLY");
+  const { name, description, parameters } = tool;
+  expect(parameters).toMatchObject({ type: "object", additionalProperties: false, properties: {
+    query: { type: "string", minLength: 1, maxLength: 1000, pattern: "\\S" },
+    limit: { type: "integer", minimum: 1, maximum: 20, default: 5 }
+  } });
+  expect(Object.keys(parameters!.properties as object).sort()).toEqual(["activate", "limit", "query"]);
+  expect(parameters!.properties).toMatchObject({ activate: { type: "object", additionalProperties: false,
+    required: ["name", "schemaDigestSha256"], properties: { name: { type: "string", minLength: 1, maxLength: 256 },
+      schemaDigestSha256: { type: "string", pattern: "^[a-f0-9]{64}$" } } } });
+  expect(parameters!.oneOf).toHaveLength(2);
+  expect(sha256Hex(canonicalize({ name, description, parameters }))).toBe(TOOL_SEARCH_SCHEMA_SHA256);
+});
+
+const discoveryGrant: ToolDefinition = { name: "tool_search", actionClass: "READ_ONLY" };
+test("native discovery returns signed capabilities while a permissive default cannot disclose ungranted built-ins", async () => {
+  const f = fixture({ grants: [discoveryGrant] });
+  expect(f.names()).toEqual(["fs.read", "tool_search"]);
+  const found = await f.call("tool_search", { query: "read" });
+  expect(found.outcome).toBe("OK");
+  const schemas = JSON.parse(String(found.content)).tools as Array<{ name: string; schemaDigestSha256: string; parameters: object }>;
+  const offeredRead = f.tools.seam.schemas()!.find(schema => schema.name === "fs.read")!;
+  expect(schemas).toContainEqual({ ...offeredRead, schemaDigestSha256: sha256Hex(canonicalize(offeredRead.parameters)) });
+  const writes = await f.call("tool_search", { query: "write" });
+  expect(writes.outcome).toBe("OK");
+  expect(JSON.parse(String(writes.content)).tools.map((schema: { name: string }) => schema.name)).not.toContain("fs.write");
+});
+
+test.each(["step end", "global denial", "scope denial"] as const)("native deferred discovery loses metadata after %s", async change => {
+  const f = fixture({ grants: [discoveryGrant], extension: true });
+  const body = vi.fn(() => ({ ok: true, output: "extension body must not run during discovery" }));
+  const parameters = { type: "object", properties: { needleArg: { type: "string" } }, additionalProperties: false };
+  f.tools.registry.define({ name: "reviewed_extension", actionClass: "READ_ONLY", description: "Conditional needlecatalog fixture",
+    parameters, exposure: "deferred", available: () => true, body }, "default");
+  const search = () => f.call("tool_search", { query: "needlecatalog" });
+  expect(JSON.parse(String((await search()).content)).tools).toEqual([]);
+  const dispose = await f.tools.registry.prepareStep({ agentId: "default", turn: 1, step: 1, signal: new AbortController().signal });
+  try {
+    expect(f.names()).not.toContain("reviewed_extension");
+    const found = await search(); expect(found.outcome).toBe("OK");
+    expect(JSON.parse(String(found.content)).tools).toEqual([{ name: "reviewed_extension", description: "Conditional needlecatalog fixture",
+      parameters, schemaDigestSha256: sha256Hex(canonicalize(parameters)) }]);
+    if (change === "step end") dispose();
+    else f.tools.registry.restrict({ deny: new Set(["reviewed_extension"]) }, change === "scope denial" ? "default" : undefined);
+    const revoked = await search(); expect(revoked.outcome).toBe("OK");
+    expect(JSON.parse(String(revoked.content)).tools).toEqual([]);
+    expect(body).not.toHaveBeenCalled();
+  } finally { dispose(); }
+});
+
+test.each(["changed pin", "invalid signature"] as const)("native discovery discloses no metadata after %s", async change => {
+  const f = fixture({ grants: [discoveryGrant] });
+  expect((await f.call("tool_search", { query: "read" })).outcome).toBe("OK");
+  if (change === "changed pin") { f.config.tools.allowedTools.push(write); initToolsConfig(f.workspace, f.config); }
+  else writeFileSync(toolsConfigSigPath(f.workspace), "{}");
+  const result = await f.call("tool_search", { query: "read" });
+  expect(result.outcome).toBe("DENIED");
+  expect(String(result.content)).not.toContain('"parameters"');
+  expect(String(result.content)).not.toContain('"schemaDigestSha256"');
+});
+
+test("native discovery excludes a signed extension whose live action class no longer matches", async () => {
+  const f = fixture({ grants: [discoveryGrant], extension: true });
+  f.tools.registry.define({ name: "reviewed_extension", actionClass: "WRITE_LOW", description: "Mismatchneedle fixture",
+    parameters: { type: "object", properties: {} }, body: () => ({ ok: true, output: "must not run" }) }, "default");
+  const result = await f.call("tool_search", { query: "mismatchneedle" });
+  expect(result.outcome).toBe("OK");
+  expect(JSON.parse(String(result.content)).tools).toEqual([]);
 });

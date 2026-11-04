@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-15T04:26:18.545693+00:00",
+  "scope": "Static review of unexecuted canonical builder; no builder/product execution, code parser, source or canonical writes.",
+  "builder": {
+    "path": "/private/tmp/p0-30-build-canonical-packet-20261015.py",
+    "bytes": 15205,
+    "sha256": "f9b96717160de4dc82f04becbf3fb6081535abed06461b4117db241b2af20acc"
+  },
+  "findings": [],
+  "resolvedFinding": {
+    "issue": "Copied outcomes counting inherited harness43 excluded without distinguishing original S7 versus new separately measured lane.",
+    "resolution": "Final builder changes only copied canonical counting text to retain original S7 exclusion and add separate reviewed43 registrations/42 titles/301 repeated executions. Frozen outline unchanged."
+  },
+  "checks": {
+    "receiptSchema": "Required fields align with current receipt.schema.json; tests:null is permitted and avoids fabricated overlap totals. Nonzero commands explained by notes; exits integer/durations nonnegative number filtered.",
+    "evidenceCopying": "Current selected126 inputs yield121 eligible content-addressed bodies, four oversize indices retained privately, builder source body excluded by literal private-key marker filter. No actual destination basename+content collision found. Originals remain unchanged; no closure/native/key body selection.",
+    "size": "Current four command shards estimated243009,224513,233648,100642 bytes. Final builder checks every generated file <=1048576 and private-key marker absent; validator still required after actual build.",
+    "commands": "Current20 journals contain349 distinct full-record identities; schema commands omit incomplete/null-exit records while retaining originals in snapshot shards. Repeated commands are not unique tests or all OS subprocesses. Counts are point-in-time, not a new run.",
+    "boundaries": "Final1518 root outcome now exists/allBoundedReviewsComplete true;43/41/43 and43/42/43,301 executions/242 launches/42 titles are bounded and independently reviewed. Measured source anchor is58e91dcef111bf02f773dcbfd1921d428cf75e34; no batch/main/fullsuite/installed1537/coverage/Node24/hosted/G0/Done approval.",
+    "sourceWording": "README now limits unchanged compiled bytes to managed ROOT and explicitly preserves M11/private mutation/supplement histories. Required duplicate1269/dead2751 unwaived.",
+    "recipeSummaries": "Bounded top-level excerpts retain full copied packet pointers as authority, including packets whose control shape is not summarized. Not a full held --batch/runner inventory."
+  },
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-root-bounded-outcome-20261015.json",
+      "bytes": 4737,
+      "sha256": "72f49e80f2a8a0231faf4895d8d41d5d6c0ec32c8913e0b45af2cfb93f5664ca"
+    }
+  ],
+  "limits": [
+    "No builder, Git, product, test, build, module import, AST/syntax parser, ordinary validator or canonical output was executed. Current Q absent.",
+    "No complete latest-index transitive rehash/behavior audit; actual builder must perform its asserted pin checks and final ordinary validator/review.",
+    "Initial guessed check-qualification.mjs path was absent; package.json identifies check-qualification-receipts.mjs, which was read. Final1518 root outcome was initially pending and later supplied; no missing input was treated as pass."
+  ],
+  "allStaticReadsFinished": true
+}

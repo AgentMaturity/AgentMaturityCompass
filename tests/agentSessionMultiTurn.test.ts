@@ -1,4 +1,6 @@
-import { mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import YAML from "yaml";
+import { budgetsPath, loadBudgetsConfig, signBudgetsConfig } from "../src/budgets/budgets.js";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -8,6 +10,7 @@ import { LlmRuntime } from "../src/llm/adapter/llmRuntime.js";
 import { credentialRef } from "../src/credentials/credentialRef.js";
 import { openLedger } from "../src/ledger/ledger.js";
 import { initWorkspace } from "../src/workspace.js";
+import { initProcessorRegistry } from "../src/dataflow/processorRegistry.js";
 import type { EvidenceEvent } from "../src/types.js";
 import {
   SESSION_ENVELOPE_META_KEY,
@@ -212,6 +215,35 @@ describe("what a session refuses", () => {
     session.close();
     const closes = typesOf(eventsFor(dir, session.sessionId)).filter((t) => t === "session/close");
     expect(closes).toHaveLength(1);
+  });
+});
+
+describe("a prompt AMC's own budget refused (P0-59)", () => {
+  it("names the budget refusal on the failed result instead of only the turn ending", async () => {
+    const dir = workspace();
+    const config = loadBudgetsConfig(dir); config.budgets.perAgent.default!.daily.maxLlmRequests = 1;
+    writeFileSync(budgetsPath(dir), YAML.stringify(config)); signBudgetsConfig(dir);
+    const session = sessionWith(dir, ["first", "second"]);
+    expect(await session.prompt("one")).toMatchObject({ ok: true });
+    const refused = await session.prompt("two");
+    expect(refused).toMatchObject({ ok: false, failureCodes: ["AMC_NATIVE_BUDGET_REFUSED"] });
+    expect(refused.ok ? "" : refused.reason).toMatch(/ended error/);
+  });
+});
+
+describe("a prompt protected-data admission refused (P2-02)", () => {
+  it("names the refusal's code, reason, processor and purpose on the failed result", async () => {
+    const dir = workspace();
+    // The signed run purpose allows PHI, so every request needs a BAA route; the bound processor holds only a DPA.
+    initProcessorRegistry(dir, { schemaVersion: "amc.dataflow-processors/v1", experimental: true, runPurpose: "support",
+      processors: [{ processorId: "proc-general", legalName: "Fixture General Processor",
+        contracts: [{ kind: "DPA", reference: "DPA-GENERAL-1", effective: "2026-01-01", expires: null, dataClasses: ["phi", "pii"] }] }],
+      purposes: [{ purposeId: "support", allowedDataClasses: ["phi", "pii"], allowedTools: ["model.request"], allowedProcessors: ["proc-general"] }],
+      bindings: [{ providerId: LOOP_PROVIDER, baseUrl: "https://api.anthropic.invalid", processorId: "proc-general", purposeId: "support" }] });
+    const session = sessionWith(dir, ["never sent"]);
+    const refused = await session.prompt("one");
+    expect(refused).toMatchObject({ ok: false, failureCodes: ["DATA_FLOW_REFUSED"],
+      dataFlow: { reason: "baa_required", processorId: "proc-general", purposeId: "support" } });
   });
 });
 

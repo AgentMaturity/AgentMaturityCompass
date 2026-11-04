@@ -1,0 +1,11 @@
+RED: npx vitest run tests/runPrincipalLease.test.ts on 257283711 (int) plus the new test file only, Node 22, local macOS arm64, not CI
+     × amc agent-loop run mints a lease naming the OS user's users.yaml user, and the ledger rows carry it 10730ms
+     × amc agent-loop run refuses PRINCIPAL_UNRESOLVED before any session row or lease when the OS user is not active 9368ms
+     × an ACP session (the SDK native client's runtime) mints the lease at session/new and binds it to every call 15192ms
+     × an ACP session/new is refused PRINCIPAL_UNRESOLVED, coded, before any session row or lease 8948ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+AssertionError: one lease for the run: expected "vi.fn()" to be called 1 times, but got 0 times
+AssertionError: promise resolved "{ …(15) }" instead of rejecting
+AssertionError: one lease for the run: expected "vi.fn()" to be called 1 times, but got 0 times
+AssertionError: expected 'bda77561-b6a0-44c7-80fd-26fa44f0e2fd' to be undefined
+      Tests  4 failed | 1 passed (5)

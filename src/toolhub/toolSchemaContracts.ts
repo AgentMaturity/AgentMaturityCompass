@@ -1,5 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { resolve } from "node:path";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { captureConfigSignatureAuthority } from "../config/configSignaturePair.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
 import { validateSchema, type SchemaDefinition, type SchemaValidation } from "../enforce/schemaGate.js";
 import type { ActionClass, RiskTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -184,7 +189,7 @@ function verifyContractSignature(workspace: string, contract: SignedToolSchemaCo
   if (digest !== contract.contractDigestSha256) {
     return false;
   }
-  return verifyHexDigestAny(digest, contract.contractSignature, getPublicKeyHistory(workspace, "auditor"));
+  return verifyCurrentPurposeCredentialSignature(workspace, "config-signature", Buffer.from(digest, "hex"), Buffer.from(contract.contractSignature, "base64"));
 }
 
 function validateSideEffects(input: {
@@ -343,7 +348,7 @@ export function createSignedToolSchemaContract(input: {
   return {
     ...payload,
     contractDigestSha256: digest,
-    contractSignature: signHexDigest(digest, getPrivateKeyPem(input.workspace, "auditor")),
+    contractSignature: signHexDigest(digest, getSigningKey(input.workspace, "config-signature")),
     signer: "auditor",
     signedTs: Date.now()
   };

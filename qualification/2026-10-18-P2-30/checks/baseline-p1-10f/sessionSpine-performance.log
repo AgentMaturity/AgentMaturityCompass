@@ -1,0 +1,28 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline
+
+ ❯ tests/performance/sessionSpine.performance.test.ts (2 tests | 1 failed) 48458ms
+     × blob-backed content events sustain the floor and do not degrade super-linearly 34011ms
+     ✓ control-plane events (no blob) sustain the floor and do not degrade super-linearly  14299ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/performance/sessionSpine.performance.test.ts > session spine throughput > blob-backed content events sustain the floor and do not degrade super-linearly
+AssertionError: content throughput 60 ev/s: expected 60.08354466677053 to be greater than 150
+ ❯ tests/performance/sessionSpine.performance.test.ts:86:78
+     84|     // Floor: comfortably below the ~640 ev/s measured, so CI variance…
+     85|     // make it flaky, but far above a streaming turn's ~50-100 ev/s.
+     86|     expect(totalPerSec, `content throughput ${totalPerSec.toFixed(0)} …
+       |                                                                              ^
+     87|
+     88|     // No unbounded growth: with the O(n) blob-index fix, the second h…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  15:28:08
+   Duration  58.88s (transform 8.32s, setup 65ms, import 10.15s, tests 48.46s, environment 0ms)
+
+JSON report written to /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/sessionSpine-performance-report.json

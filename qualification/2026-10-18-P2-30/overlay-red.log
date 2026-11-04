@@ -1,0 +1,79 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/overlay.test.ts (3 tests | 3 failed) 459ms
+     × loads eight experimental, unreviewed controls through the unchanged catalog contract 448ms
+     × disposes each actual Technology question once, allowing only the six pending restoration ids 3ms
+     × keeps promotion absent and expert and partner decisions visibly pending 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/overlay.test.ts > Technology experimental catalog overlay (P2-30) > loads eight experimental, unreviewed controls through the unchanged catalog contract
+AssertionError: expected undefined to match object { support: 'experimental', …(2) }
+
+- Expected:
+{
+  "layer": 1,
+  "stations": [
+    "technology",
+  ],
+  "support": "experimental",
+}
+
++ Received:
+undefined
+
+ ❯ tests/catalog/stations/technology/overlay.test.ts:19:18
+     17|     expect(validateCatalog(catalog).errors).toEqual([]);
+     18|     const pack = catalog.packs.get("overlay.technology")?.manifest;
+     19|     expect(pack).toMatchObject({ support: "experimental", stations: ["…
+       |                  ^
+     20|     expect(pack?.controls.slice().sort()).toEqual(ids);
+     21|     for (const id of ids) {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/catalog/stations/technology/overlay.test.ts > Technology experimental catalog overlay (P2-30) > disposes each actual Technology question once, allowing only the six pending restoration ids
+AssertionError: docs/catalog/technology/dispositions.json: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/catalog/stations/technology/overlay.test.ts:40:36
+     38|   it("disposes each actual Technology question once, allowing only the…
+     39|     const path = "docs/catalog/technology/dispositions.json";
+     40|     expect(existsSync(path), path).toBe(true);
+       |                                    ^
+     41|     const data = JSON.parse(read(path)) as { station: string; domain: …
+     42|     expect(data.station).toBe("technology");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/catalog/stations/technology/overlay.test.ts > Technology experimental catalog overlay (P2-30) > keeps promotion absent and expert and partner decisions visibly pending
+AssertionError: docs/catalog/technology/README.md: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ tests/catalog/stations/technology/overlay.test.ts:58:36
+     56|   it("keeps promotion absent and expert and partner decisions visibly …
+     57|     const path = "docs/catalog/technology/README.md";
+     58|     expect(existsSync(path), path).toBe(true);
+       |                                    ^
+     59|     const text = read(path);
+     60|     expect(text).toContain("none");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed (3)
+   Start at  10:01:49
+   Duration  1.69s (transform 716ms, setup 42ms, import 929ms, tests 459ms, environment 0ms)
+

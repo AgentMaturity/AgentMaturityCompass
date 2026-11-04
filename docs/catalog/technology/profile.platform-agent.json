@@ -1,0 +1,83 @@
+{
+  "profileVersion": 1,
+  "profileId": "platform-agent",
+  "deployment": {
+    "tenantId": "tenant-technology-fixture",
+    "workspaceId": "workspace-technology-fixture",
+    "deploymentId": "platform-agent-fixture",
+    "agentIds": [
+      "platform-agent-fixture"
+    ]
+  },
+  "primaryStation": {
+    "value": "technology",
+    "provenance": "asserted",
+    "source": "synthetic fixture: P2-30 experimental platform-agent scope, not a legal applicability decision",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "technology"
+    ],
+    "provenance": "asserted",
+    "source": "synthetic fixture: P2-30 experimental platform-agent scope, not a legal applicability decision",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "technology.platforms-data"
+    ],
+    "provenance": "asserted",
+    "source": "synthetic fixture: P2-30 experimental platform-agent scope, not a legal applicability decision",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US",
+      "US-CA",
+      "EU"
+    ],
+    "provenance": "asserted",
+    "source": "synthetic fixture: P2-30 experimental platform-agent scope, not a legal applicability decision",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "synthetic fixture: P2-30 experimental platform-agent scope, not a legal applicability decision",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "synthetic fixture: P2-30 experimental platform-agent scope, not a legal applicability decision",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "synthetic fixture: P2-30 experimental platform-agent scope, not a legal applicability decision",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "publishes_synthetic_content",
+      "consequential_decision_about_people"
+    ],
+    "provenance": "asserted",
+    "source": "synthetic fixture: P2-30 experimental platform-agent scope, not a legal applicability decision",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "synthetic fixture: P2-30 experimental platform-agent scope, not a legal applicability decision",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

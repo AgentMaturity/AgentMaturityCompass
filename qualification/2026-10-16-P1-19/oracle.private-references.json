@@ -1,0 +1,1393 @@
+{
+  "schema": "p119-oracle-private-references/1",
+  "selectedSourceToCopyPins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/command.json",
+      "bytes": 2938,
+      "sha256": "89145ea407724cd59442e924efcc13fd328712c53d3bcba4e07c8d1510ed41b6",
+      "target": "oracle-command-missing-positive-v3.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/owned-process.json",
+      "bytes": 900,
+      "sha256": "cf420f1607ddd7d0bf0843eef81937efe19b578ab0a95a08206f12c23f548d2e",
+      "target": "oracle-process-missing-positive-v3.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "6dd04bbb76f46770e4bc34ad9a5491828da1cc842dbfc8cc52a89ffc0b106826",
+      "target": "oracle-group-missing-positive-v3.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/raw.json",
+      "bytes": 5161,
+      "sha256": "d7624fdce5f8db92ce22a71e4b5fd111629b17e1ed8476d9671e4f4cc4194e9c",
+      "target": "oracle-raw-missing-positive-v3.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/observer.json",
+      "bytes": 8722,
+      "sha256": "a03cd32777c6dea8f5f193b57ed79481bd9c46f2db652393099edd81aa5ead4d",
+      "target": "oracle-observer-missing-positive-v3.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/command.json",
+      "bytes": 2786,
+      "sha256": "b502f7bda089cc3966dba866708aa205989587f21f58fa71db353cfb1dde4b85",
+      "target": "oracle-command-v2-tests-v4-initial.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/owned-process.json",
+      "bytes": 820,
+      "sha256": "ae16cfa701b761a7eaec4cd156842bea16688485139ed2ee78dbefb467a27be0",
+      "target": "oracle-process-v2-tests-v4-initial.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "dce336a0bd17ba1bae09e7cf55c88cbc4ffd527b416d6e78ffcf74a87394cf0a",
+      "target": "oracle-group-v2-tests-v4-initial.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/raw.json",
+      "bytes": 10219,
+      "sha256": "fb59655cfac82613cbfbbdedaf12fd30ed442bf8e59d109f764c505cb3a2cc93",
+      "target": "oracle-raw-v2-tests-v4-initial.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/observer.json",
+      "bytes": 20987,
+      "sha256": "1231f47e723cbdac903e3f63a30ee089d6c633d3b58af07c8b41313dfbc383bc",
+      "target": "oracle-observer-v2-tests-v4-initial.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-tests-v4-typecheck/command.json",
+      "bytes": 1337,
+      "sha256": "c8192ed88dc5351aee05ad30c97cdf8125e8a77423d5ed637b9b0dd30dd98385",
+      "target": "oracle-command-tests-v4-typecheck.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-tests-v4-typecheck/owned-process.json",
+      "bytes": 485,
+      "sha256": "66421110c997efad4b39341f1c27a85b2ab7a7ade6ac699bdb01105239712a76",
+      "target": "oracle-process-tests-v4-typecheck.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-tests-v4-typecheck/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "661754ede55ce24cbe47a300f7f2f85e6c84d2931f77a2a49fe455c91ec2ae4c",
+      "target": "oracle-group-tests-v4-typecheck.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/command.json",
+      "bytes": 2882,
+      "sha256": "133037c1c942ca2aab04db225283be163843245ccbf900e31c184be68763a361",
+      "target": "oracle-command-v4-positive.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/owned-process.json",
+      "bytes": 892,
+      "sha256": "796bf51af3158cf0b6c483f64d68ff63267ab14977e23aed1247011edf21e4bb",
+      "target": "oracle-process-v4-positive.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "3cd02b7594bf853357aee209c7c8222fd0b6921161877286a4ba68468070f827",
+      "target": "oracle-group-v4-positive.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/raw.json",
+      "bytes": 4794,
+      "sha256": "7aa8a0a6b885d51f2c98cc5360aa8a9e5d2cdd6f23dbb8c9144ca8842b47ebcb",
+      "target": "oracle-raw-v4-positive.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/observer.json",
+      "bytes": 6486,
+      "sha256": "9f4f6f88886582872ac6cba363ab1df301d0939121c203117bc534e8244ad3f0",
+      "target": "oracle-observer-v4-positive.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/command.json",
+      "bytes": 2692,
+      "sha256": "0e61615e1bf20676af4fbfeffd9552d291ffa7ceb11ef65cc4ebfc80bb9c7f40",
+      "target": "oracle-command-v4-all.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/owned-process.json",
+      "bytes": 807,
+      "sha256": "b18573ad73fb98676b2195315ee087a574ff1139c0c6fa28ddf5aaeb92d49505",
+      "target": "oracle-process-v4-all.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "67f00e60bdef1a101b7c3f9f684786b35fee958350bc3cee3236c1cff985072f",
+      "target": "oracle-group-v4-all.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/raw.json",
+      "bytes": 5041,
+      "sha256": "c371c63275f24e01ed89218cf994a1dae60a30dd449e227539c8ba5e4b502392",
+      "target": "oracle-raw-v4-all.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/observer.json",
+      "bytes": 6504,
+      "sha256": "3741aa933153a06f73080f7e6859592c36e093b79c58cb0f85c9db97816767f8",
+      "target": "oracle-observer-v4-all.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-before/command.json",
+      "bytes": 1253,
+      "sha256": "3e30998596cf2e8a46f880f13f63413ce7f939755203edaac1fb5ae5572c912b",
+      "target": "oracle-command-counts-before.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-before/owned-process.json",
+      "bytes": 446,
+      "sha256": "51ac7eac4e85db4b3fa130d2609212c193e1666e6f6d80a3ed32ba7177a47abf",
+      "target": "oracle-process-counts-before.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-before/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "d1dc593d2ef8842b1555539c7713dd726533f9abbaeb3f80d986df962cf00b27",
+      "target": "oracle-group-counts-before.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-generate/command.json",
+      "bytes": 1257,
+      "sha256": "60354e1528f8d45bab9a1d63ea88bbe91c0d658e56db7cf19ff12501f6908003",
+      "target": "oracle-command-counts-generate.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-generate/owned-process.json",
+      "bytes": 446,
+      "sha256": "2b634d0c5afc0a5d2537f5ac42b1e0de43876be3acc523e980094db6f949383f",
+      "target": "oracle-process-counts-generate.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-generate/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "633b4f070b5023b0788f5d11396d3ca728fd70dcf170379ab7146b5da2afd377",
+      "target": "oracle-group-counts-generate.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-lint/command.json",
+      "bytes": 1132,
+      "sha256": "ffe998c22e08a377ed615b23e843149b99b53d18361f7d265222dae7ce31d03c",
+      "target": "oracle-command-lint.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-lint/owned-process.json",
+      "bytes": 394,
+      "sha256": "8bb5193271208a0f48e7bc69921fa93ede9c78cc45ddb2db42d0fdc7bf317b18",
+      "target": "oracle-process-lint.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-lint/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "23c189455cef3b5f2fd201f4dd1b283581497cc13178a7febbd183e940d2f5c7",
+      "target": "oracle-group-lint.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-freeze/command.json",
+      "bytes": 1225,
+      "sha256": "a0860ef97eb22771750b1afe13324a7931a05475d3c9f8c927db5e237c72a3f4",
+      "target": "oracle-command-freeze.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-freeze/owned-process.json",
+      "bytes": 437,
+      "sha256": "33762d769f0090b4798158d25763f67ef1d017b4e08f87b97b86e42668b3d7d9",
+      "target": "oracle-process-freeze.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-freeze/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "f61ddd4b52271abbb53445a502439a4aa205be5754fca42a77140ca5d9a3a669",
+      "target": "oracle-group-freeze.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-final/command.json",
+      "bytes": 1251,
+      "sha256": "6a63b2245d6084797c79f8d9a5b25d2f28af3cc1f073f89413cf1a1ff2a5d3ab",
+      "target": "oracle-command-counts-final.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-final/owned-process.json",
+      "bytes": 446,
+      "sha256": "ba59598e9423b3922974083997592520c451317d98445763cbfbb882a49bf27c",
+      "target": "oracle-process-counts-final.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-final/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "8844f8be852d0ad6ea3d1040caadb9fcb9e9691ae1b5b17ed067bddaa80f5035",
+      "target": "oracle-group-counts-final.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-docs/command.json",
+      "bytes": 1228,
+      "sha256": "ab18b81b5cf417cd86921129e5772938a93310be11abe2e62c511772a73e4322",
+      "target": "oracle-command-docs.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-docs/owned-process.json",
+      "bytes": 441,
+      "sha256": "93f50eba82c4db7a3f4fcf21f49304e6c12bc529f93514b85c86cd3ce2ae19d8",
+      "target": "oracle-process-docs.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-docs/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "20b446ffd42b74fe3ff3db7adc9f5d7309686c61375d0b9dd7ac77d7b7d0ab85",
+      "target": "oracle-group-docs.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-architecture/command.json",
+      "bytes": 1271,
+      "sha256": "dab94b93f950b7d5443f8b073a683f0a9f4ead1f1114ad94583fe5f91d557bbe",
+      "target": "oracle-command-architecture.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-architecture/owned-process.json",
+      "bytes": 454,
+      "sha256": "dcc8b4457698ccf67a08ea45bd9fb159309c5043e8fe8589d87f2c392b44fc24",
+      "target": "oracle-process-architecture.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-architecture/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "4c0ca8cef494887e8817b98a07400fa6dbbf17e39bae959189996037f63297fa",
+      "target": "oracle-group-architecture.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-duplicates/command.json",
+      "bytes": 1261,
+      "sha256": "1a5fd5d9b1ff862839bf4ad07a681799c092cd21a7067cec37b32ddabe4c7356",
+      "target": "oracle-command-duplicates.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-duplicates/owned-process.json",
+      "bytes": 453,
+      "sha256": "d5f78976f1981b4c1a9e09a16ff1ad8488fd53c8474b40d6fa6815caf0dc0686",
+      "target": "oracle-process-duplicates.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-duplicates/owned-group-after-exit.json",
+      "bytes": 259,
+      "sha256": "572d9576a02e749d29ece8f3a030886e1feee8f547f84b267c256960f4570b6d",
+      "target": "oracle-group-duplicates.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-deadcode/command.json",
+      "bytes": 1256,
+      "sha256": "c1576a12aebf325716ab837599aa9f52868dfa87187b109fbcc7dbd3d6ca66c9",
+      "target": "oracle-command-deadcode.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-deadcode/owned-process.json",
+      "bytes": 452,
+      "sha256": "f8a0f9e7909c6906495b06194db45e9d9e7ef1f6f0d09f2382c41b762e3b0dc6",
+      "target": "oracle-process-deadcode.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-deadcode/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "2019352bc74071d6b6b826a8bd6d4d9517f6cb67e541f3306ee5d953ebbc979b",
+      "target": "oracle-group-deadcode.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-clean-source/command.json",
+      "bytes": 1267,
+      "sha256": "49fa755f5d7606815b2fdb762c1b87360cd0e67740b3e4010a1f9f08a398fcfe",
+      "target": "oracle-command-clean-source.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-clean-source/owned-process.json",
+      "bytes": 453,
+      "sha256": "40212157afa6431a804013bd8f3c90b699bd6448657c3bc22d6be0f2d49f1fc1",
+      "target": "oracle-process-clean-source.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-clean-source/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "16163af23b55583358431d7ca793fb1dd292bf672cde241741ed2eed831b9224",
+      "target": "oracle-group-clean-source.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-fresh/command.json",
+      "bytes": 3123,
+      "sha256": "80f1fadf7841397e1a0d969eafc89db2ee88d6eef5ca2a62b8b623f259944413",
+      "target": "oracle-command-fresh.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-fresh/owned-process.json",
+      "bytes": 1031,
+      "sha256": "073f3c7156911d38349e80426ca886b4c5a85a6683484705e92405e3b12abab9",
+      "target": "oracle-process-fresh.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-fresh/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "94495285ab7651befb1fd36eef7e024024f1b1cb8522a684877d49e0ead59098",
+      "target": "oracle-group-fresh.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-fresh/raw.json",
+      "bytes": 5059,
+      "sha256": "ebf749148ca790d1a366155c43349783fec134f8b669ea328e7f9575287f3c6b",
+      "target": "oracle-raw-fresh.json"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-fresh/observer.json",
+      "bytes": 6544,
+      "sha256": "3207b1ccc87e3f2645a538f81b7d0be7cb54d9c26603a3160d97427c3f11f6a6",
+      "target": "oracle-observer-fresh.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/actual-missing-oracle-red.json",
+      "bytes": 6719,
+      "sha256": "a4ea0dfbafda9e805afa8418dd8c1681d8bcd32df3702d2cc8c7bf31a850256c",
+      "target": "oracle-meta-actual-missing-oracle-red.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/counts-generation-review.json",
+      "bytes": 3285,
+      "sha256": "7359bcd6afc7bb7af0f444414da319a7b63355e63363dd434c383ebec7e21690",
+      "target": "oracle-meta-counts-generation-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/counts-input-pins.json",
+      "bytes": 2944,
+      "sha256": "fbac5069ca056427402779a9e20dda7b115d2927f19b5ffac7dac835b8a18a68",
+      "target": "oracle-meta-counts-input-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/counts-review-first-refusal.json",
+      "bytes": 315,
+      "sha256": "02df8206fafa207c42661901891b94d54068cd5d90ade09bbbf3774d9f44918c",
+      "target": "oracle-meta-counts-review-first-refusal.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/exact-source-staging.json",
+      "bytes": 1052,
+      "sha256": "aad0ece6f9ee54793d16c86400fb35c93d672ecfa04387c11caa47e5ef3d3509",
+      "target": "oracle-meta-exact-source-staging.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/finance-docs-oracle-update.json",
+      "bytes": 1322,
+      "sha256": "8acabeae011d2f9c4a03540082dee912c3f06af750de819232af52bf30a8aeb5",
+      "target": "oracle-meta-finance-docs-oracle-update.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/fresh-clone-before-oracle.json",
+      "bytes": 3924,
+      "sha256": "3446acb346eb540fcc0db211bef676182663dec2e555c72905a91c3820b609cd",
+      "target": "oracle-meta-fresh-clone-before-oracle.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/fresh-oracle-complete-checkpoint.json",
+      "bytes": 1571,
+      "sha256": "2b14dd4011437eeae604fa13c6f89e25dafbd4f31f04dca8625546318940bc30",
+      "target": "oracle-meta-fresh-oracle-complete-checkpoint.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/fresh-oracle-root-review.json",
+      "bytes": 644,
+      "sha256": "29d118ae9728a58714d22e0b343dc7facb8f6e6298b9f80a54a64444d1f230e1",
+      "target": "oracle-meta-fresh-oracle-root-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/interface-admission.json",
+      "bytes": 2562,
+      "sha256": "c37e2cd57f679c3b51b8b3705e6572e58fd9c514b488f2fe3b8c86bd1fe0bbbb",
+      "target": "oracle-meta-interface-admission.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/live-wip-before-oracle-commit.json",
+      "bytes": 5930,
+      "sha256": "7c22671a6b2178c8fb211227a20c08d11142e8b484e4f0ef46e04ba5560748c1",
+      "target": "oracle-meta-live-wip-before-oracle-commit.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/post-compaction-static-checkpoint.json",
+      "bytes": 12518,
+      "sha256": "f17eaedfa8ee494a401f7ab0bbe7430f3d5043de95936354ece8f35ab7fef174",
+      "target": "oracle-meta-post-compaction-static-checkpoint.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/prospective-admission.json",
+      "bytes": 13650,
+      "sha256": "95a22373de7c604b2e3f21a78cff54117a3def9eb1084420a27e6c02a54e823c",
+      "target": "oracle-meta-prospective-admission.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/root-empty-wal-diagnosis.json",
+      "bytes": 3870,
+      "sha256": "1a6f9dada0deea88e01074046ac5345b91766fa81a3a923a14441170cfb96231",
+      "target": "oracle-meta-root-empty-wal-diagnosis.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-candidate-manifest.json",
+      "bytes": 3195,
+      "sha256": "5fce9632191843d2b5823a365ca6c2bb36204ec6bd7815ab587b4b6d583de734",
+      "target": "oracle-meta-source-candidate-manifest.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-commit-result.json",
+      "bytes": 765,
+      "sha256": "958f68684e2ddf12a0588eebcb84395980e1a485145c3f42d17e13b7b4caeb68",
+      "target": "oracle-meta-source-commit-result.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-v2-root-static-review.json",
+      "bytes": 1956,
+      "sha256": "3e07951e35287dcdd0bf7004ba72d737d9a9cd6597edba95e826f7a5d0eb6fe5",
+      "target": "oracle-meta-source-v2-root-static-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-v2-tests-v4-application.json",
+      "bytes": 1942,
+      "sha256": "cb949585ef59bf56f3ef3d502dbba6cb281600527cf4b59b8b02c412382e04c7",
+      "target": "oracle-meta-source-v2-tests-v4-application.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-v4-application.json",
+      "bytes": 1424,
+      "sha256": "cc720b8686ffc1c900945be558882a6d6496b5b4a197e90b4ea1e743bdd43854",
+      "target": "oracle-meta-source-v4-application.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-v3-application.json",
+      "bytes": 953,
+      "sha256": "a99cfcd91fe9f2e2f2bca65d3ef2ca5aa538119cca30c6be43a9e6c38715f05d",
+      "target": "oracle-meta-tests-v3-application.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-v4-typecheck-result.json",
+      "bytes": 563,
+      "sha256": "534cc8e9ab2b156b138d2201964fb0269d5f8fe2c91484ae8484bc182cb306e7",
+      "target": "oracle-meta-tests-v4-typecheck-result.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/corrected-oracle-audit/README.md",
+      "bytes": 2610,
+      "sha256": "da44bb3f905178f7c6dc0f1c524ba5f9e51748f25376f925746916ccffcc3bae",
+      "target": "oracle-corrected-oracle-audit-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/corrected-oracle-audit/pins.json",
+      "bytes": 5537,
+      "sha256": "f2f32c327aa0d65c7a3a666c52f7e10241ad461f9768b91b5aac0522c888433c",
+      "target": "oracle-corrected-oracle-audit-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/corrected-oracle-audit/review.json",
+      "bytes": 176680,
+      "sha256": "180b8e20ab75925e26d3de5fc1ebba330d109d9068052b57e8812259d20bed27",
+      "target": "oracle-corrected-oracle-audit-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/fresh-oracle-audit/README.md",
+      "bytes": 2258,
+      "sha256": "485267006a7b72517f7d2a651ba225868f65113869e5a3d42ba3625a30101f66",
+      "target": "oracle-fresh-oracle-audit-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/fresh-oracle-audit/pins.json",
+      "bytes": 17637,
+      "sha256": "da8006fa3d2d3b6a8a85816f072930a9c19acab7af3409ef8a3ab4d8b6c063d3",
+      "target": "oracle-fresh-oracle-audit-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/fresh-oracle-audit/review.json",
+      "bytes": 243757,
+      "sha256": "eadebbac70f07a4b588518b1af8b19245ac6a581b8a45c0af978e4cf400d7647",
+      "target": "oracle-fresh-oracle-audit-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/initial-oracle-run-audit/README.md",
+      "bytes": 2422,
+      "sha256": "44643db2e056559dcadd368def36306c903e79c41d39a83cd86a5d5455c400d6",
+      "target": "oracle-initial-oracle-run-audit-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/initial-oracle-run-audit/audit.json",
+      "bytes": 34191,
+      "sha256": "e494401a9514cf8f4cee5883878f679b1d1591c786f351cf7b80e4d61f0583ee",
+      "target": "oracle-initial-oracle-run-audit-audit.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/initial-oracle-run-audit/input-pins.json",
+      "bytes": 26929,
+      "sha256": "da1fa77a2a790499f5ae629a87d1c9e019e2dc7f51bc44f375da97d7b76a11fc",
+      "target": "oracle-initial-oracle-run-audit-input-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/initial-oracle-runtime-peer-review/README.md",
+      "bytes": 2524,
+      "sha256": "887692bb9ad5899ccd2193cc2387623b5bafb0cbcc63e7ce3436df5cf43c385c",
+      "target": "oracle-initial-oracle-runtime-peer-review-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/initial-oracle-runtime-peer-review/pins.json",
+      "bytes": 2603,
+      "sha256": "c54e964086355bad55dacb2296c45d8972740e30973c28f0d5cd27f05fd9fbe1",
+      "target": "oracle-initial-oracle-runtime-peer-review-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/initial-oracle-runtime-peer-review/review.json",
+      "bytes": 86071,
+      "sha256": "4fc12e33961394eb7dccf88a140942994289832efe9aee4d5ab6fc8ce055b574",
+      "target": "oracle-initial-oracle-runtime-peer-review-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/missing-oracle-audit/README.md",
+      "bytes": 3163,
+      "sha256": "deb3cc949723a939b1bc06c18e36338bccbe7630e39c9d2a6c4a503a24977da4",
+      "target": "oracle-missing-oracle-audit-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/missing-oracle-audit/pins.json",
+      "bytes": 18467,
+      "sha256": "a069c9e8c5ee5d188e808592c982adde64d6add81f81208c45eeff2cc49fa9a9",
+      "target": "oracle-missing-oracle-audit-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/missing-oracle-audit/review.json",
+      "bytes": 37050,
+      "sha256": "7a13a9435a1f9ee414fd5448f09920951dd0358fc04a6d8502a0a0e324320de0",
+      "target": "oracle-missing-oracle-audit-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-audit/README.md",
+      "bytes": 2379,
+      "sha256": "ce8af54ae3b0e1344589c9739a9a0b9890aec23f7fc3c448099ccb4e72c736e9",
+      "target": "oracle-security-peer-audit-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-audit/pins.json",
+      "bytes": 6346,
+      "sha256": "6ca189df8c837600e938a92a0081aca4b69564d91c663c92d5e33900b91d39fa",
+      "target": "oracle-security-peer-audit-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-audit/review.json",
+      "bytes": 15398,
+      "sha256": "4c335c07288ad7df93573e9cff7cb5c7252cc14e5b68b4ad5b53afba15b532e2",
+      "target": "oracle-security-peer-audit-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v2-audit/README.md",
+      "bytes": 2272,
+      "sha256": "f6a2199b2cd75678f97a35705d4973f10f910283b01788f0e3f5872b86daf575",
+      "target": "oracle-security-peer-v2-audit-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v2-audit/pins.json",
+      "bytes": 4412,
+      "sha256": "ccf9ae93883a4a36e890199980bae374896498b11821adcc8efd9b42000b16ee",
+      "target": "oracle-security-peer-v2-audit-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v2-audit/review.json",
+      "bytes": 9651,
+      "sha256": "6911176ec93dccdbe1919f0a076128d07a6c745b992da73ec2d3a1df1d196ecb",
+      "target": "oracle-security-peer-v2-audit-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v4-audit/README.md",
+      "bytes": 1501,
+      "sha256": "6b8f3d1973cd3ea59bda02b456830b8dd77becd7e2fff45259f392b56aa23d10",
+      "target": "oracle-security-peer-v4-audit-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v4-audit/pins.json",
+      "bytes": 3802,
+      "sha256": "b3db72c3ce2ccd34a803586c7ab8056f8567d5d607efb5696f97b6be11155574",
+      "target": "oracle-security-peer-v4-audit-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-v4-audit/review.json",
+      "bytes": 7889,
+      "sha256": "60dd394903aa3eaa5ab67e6aba4c6014ca329918afd1bd659d9d37dfbadfa7af",
+      "target": "oracle-security-peer-v4-audit-review.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/qualification-layout-readonly/README.md",
+      "bytes": 2077,
+      "sha256": "239cc5c1576da30e6bbf8bb4ef06a069e0dc0d33c2314b5781a0babc575369a5",
+      "target": "oracle-qualification-layout-readonly-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/qualification-layout-readonly/design.json",
+      "bytes": 4414,
+      "sha256": "9759843c7b5db0bf1e88f5cc1e867645822b7a60808142cfd28fd2516261ef4d",
+      "target": "oracle-qualification-layout-readonly-design.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/README.md",
+      "bytes": 7816,
+      "sha256": "2c34bfc3071cb5e1e759972cd18b79c95dc52d3382ead22d66a25711557dfad0",
+      "target": "oracle-source-v1-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/pins.json",
+      "bytes": 2678,
+      "sha256": "84fa955db720f7c25bd0673a0d212afff7eb0bd559bdf2008214ad0bc403ddad",
+      "target": "oracle-source-v1-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/README.md",
+      "bytes": 4143,
+      "sha256": "ab176ba89f174f87c573350c7c5acad1bdd2930c070b9bab8b5be606ff9d15f8",
+      "target": "oracle-source-v2-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/pins.json",
+      "bytes": 2977,
+      "sha256": "5fc00563fc4cfcf4e69231041b02c0455c5cf970bbf154551a451b9074e7d28e",
+      "target": "oracle-source-v2-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/README.md",
+      "bytes": 2502,
+      "sha256": "a6f4f36395167c987a394dc7670982541c88f7d88eab9cf67a61345fbc8b45af",
+      "target": "oracle-source-v3-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/pins.json",
+      "bytes": 3963,
+      "sha256": "6f496508b1656109eef942426c18b85758bab69ab23f07435cf0427eb3dc1788",
+      "target": "oracle-source-v3-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/README.md",
+      "bytes": 2670,
+      "sha256": "269d2bb4badae2c4cf4c650938b98f9301682da79a9475bf760e181f9f1e6e11",
+      "target": "oracle-source-v4-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/pins.json",
+      "bytes": 2500,
+      "sha256": "662d6c0c21ca0bbf6613f215e390aee03e3155c510c0132fac16d4ce8e622b36",
+      "target": "oracle-source-v4-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/interface-proposal.json",
+      "bytes": 7286,
+      "sha256": "009727dbbcd6f2196b96a0122a3c7fc89094da6401adbc3965ffcca5e99520ce",
+      "target": "oracle-source-interface-proposal.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/interface-clarification.json",
+      "bytes": 1367,
+      "sha256": "9fc44bcbeb75f6d078979a7cced7e34bd3e8d7f6a2369e5a60a0b778a0128ae0",
+      "target": "oracle-source-interface-clarification.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4-peer-review/README.md",
+      "bytes": 1810,
+      "sha256": "7d8e8d25ac5ae635d4ce40bb9a427314e9db214670311a22f2bdba135178b372",
+      "target": "oracle-tests-v4-peer-README.md"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4-peer-review/pins.json",
+      "bytes": 4164,
+      "sha256": "ee51c1a43eb9c7c55f889233c75edb52389d4015a0b2cdf724167ffc70d26749",
+      "target": "oracle-tests-v4-peer-pins.json"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4-peer-review/review.json",
+      "bytes": 8743,
+      "sha256": "cea350afb3bfceb88e442c284c02992acf79c228ae6b17ab65dce8a7d35a6998",
+      "target": "oracle-tests-v4-peer-review.json"
+    }
+  ],
+  "privateOnly": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/stdout-stderr.log",
+      "bytes": 22584,
+      "sha256": "0a5e3912c3c99311d65a064b4d57b01b00cf3850fc0d66a016b4107ee9395d11"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-missing-positive-v3.producer.json",
+      "bytes": 5161,
+      "sha256": "d7624fdce5f8db92ce22a71e4b5fd111629b17e1ed8476d9671e4f4cc4194e9c"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v2-tests-v4-initial/stdout-stderr.log",
+      "bytes": 276235,
+      "sha256": "ff395adf08d0be9d897f26a18829c05b41c601efdc440c3f16ac8c5690646555"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v2-tests-v4-initial.producer.json",
+      "bytes": 10219,
+      "sha256": "fb59655cfac82613cbfbbdedaf12fd30ed442bf8e59d109f764c505cb3a2cc93"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-tests-v4-typecheck/stdout-stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-positive/stdout-stderr.log",
+      "bytes": 28234,
+      "sha256": "c013011b8896212229bd66a9bd793adc606c7957b113e7ed790cf4fdd0a6c913"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-positive.producer.json",
+      "bytes": 4794,
+      "sha256": "7aa8a0a6b885d51f2c98cc5360aa8a9e5d2cdd6f23dbb8c9144ca8842b47ebcb"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-v4-all/stdout-stderr.log",
+      "bytes": 319468,
+      "sha256": "aa7eb1bb57a8cfe661005627d76cc027f95c7c09e234daa313dc10394f9c7bcc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-v4-all.producer.json",
+      "bytes": 5041,
+      "sha256": "c371c63275f24e01ed89218cf994a1dae60a30dd449e227539c8ba5e4b502392"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-before/stdout-stderr.log",
+      "bytes": 1228,
+      "sha256": "1e75e4a06006e6eb1c8388a15465fb74bfdef8538d9f5be45962be67e041ffcd"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-generate/stdout-stderr.log",
+      "bytes": 20,
+      "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-lint/stdout-stderr.log",
+      "bytes": 443,
+      "sha256": "d08987d08f71a61edb2971955d0b863717bb9862df09fb5e1d629ddec3d48dec"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-freeze/stdout-stderr.log",
+      "bytes": 116,
+      "sha256": "bf2c6aa2a9a9bc0f0d1679f94040946347d7e819a28bc7e33bc7235806bb6253"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-counts-final/stdout-stderr.log",
+      "bytes": 81,
+      "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-docs/stdout-stderr.log",
+      "bytes": 45,
+      "sha256": "5407ecd8d6d4e86e27cada4e5cfb641626af7a5f0c2e7c6ac879cd34ecbd8d92"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-architecture/stdout-stderr.log",
+      "bytes": 95563,
+      "sha256": "c2d57b00d67df0fba869ba197d74f690ff00c1e2720d4ecc27300a4276cb3c51"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-duplicates/stdout-stderr.log",
+      "bytes": 1844,
+      "sha256": "1e533c61c0976a56b4ba6363da60d2a930e9d92b0706673d2566a83e81f7b385"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-deadcode/stdout-stderr.log",
+      "bytes": 962,
+      "sha256": "eb41cf1ed90c5360e529fa3ca4f20d8d197967be6dcd653bdd5401099d17b3dc"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-clean-source/stdout-stderr.log",
+      "bytes": 852,
+      "sha256": "1be0b8feadf179bcbfae7202ded84eb502194737da15c7450e396499887151ea"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-fresh/stdout-stderr.log",
+      "bytes": 320147,
+      "sha256": "0b0723d65a3d4e0d88cfa14dd16d62ccafb17c980345cbe2fe11cf478675aeea"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-fresh.producer.json",
+      "bytes": 5059,
+      "sha256": "ebf749148ca790d1a366155c43349783fec134f8b669ea328e7f9575287f3c6b"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 27458,
+      "sha256": "3a988d22647c9be6499b8df5c08fc3dde1d0281f1b1da4bda71c3f41e21b04f7"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19409,
+      "sha256": "f238a3dddc0f9aa5079ef1c8c859a5620948272fafefca5ca3081462a1d0eded"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 28475,
+      "sha256": "4df67b11e019797c5b485bc91ed428d7f8c3f38b9da3f3cad08ba7c8a9e6526b"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19441,
+      "sha256": "90a24dd18f8695efb2bdcee5ece5605c507690d3fe940edb3e7a4911e3eb43a8"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29506,
+      "sha256": "d7c2bf58e7cac21e36bf12117c237e840903d1aa0316a44b15f9a9671e31c921"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v3/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 20151,
+      "sha256": "3b1ba99969949ebf2bcde9a25718216f362993272527f0828121b667d730c021"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29832,
+      "sha256": "92b25937b06aef01367007961944d479cf6febad3e8b3da5d52094d8741ae869"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v4/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 21328,
+      "sha256": "cd745ddae7cce98a5285be95d4cce815f542d3c9f218e976be5c374d3b5f858f"
+    }
+  ],
+  "original52Inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/server.mjs",
+      "bytes": 27740,
+      "sha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/txlog.mjs",
+      "bytes": 6696,
+      "sha256": "45b8bf0624ebfb3fb1a7cfb8291cc3835205763ffd865a7d32fb6e469d360140"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/faults.mjs",
+      "bytes": 2864,
+      "sha256": "7aad83275985054c5c1fd6173f02a7dd5a86b8a1d5a470adde73dd7390d5290b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentArgs.ts",
+      "bytes": 1865,
+      "sha256": "73f37d1a65ff5100aa66e7e9c729b84bc6f977fc59fff18490b9e0ee63dc15fa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentAdapter.ts",
+      "bytes": 7838,
+      "sha256": "f6bf640a995cfcfb7f2aa3edb5cb16460ba129621caa3e4a4d44f4a26be4ee4e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentServiceClient.ts",
+      "bytes": 11998,
+      "sha256": "6c95c1d07fc6a6965733180c53a964c7a11c4e1d840e0670c1bc31d9a8b1ccd7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/receiptStates.ts",
+      "bytes": 7612,
+      "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+      "bytes": 4176,
+      "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/normalizeArguments.ts",
+      "bytes": 6300,
+      "sha256": "4efdbc0db4e4926c87509754e94867b1eafd45b13a2d14dca9a79749dbe81908"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionCliCommands.ts",
+      "bytes": 3337,
+      "sha256": "5e15ae02eb3168ea11a46df76fdaac3ebc966185240a77bd7815bfd0c97d609d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 32498,
+      "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolTypes.ts",
+      "bytes": 7901,
+      "sha256": "e8b2c56d487a091506369fcf6d11db91fe1030957494bfc7d5bb04058f75077a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerSchema.ts",
+      "bytes": 22470,
+      "sha256": "8375975c42861af68a69ba33e367f8f03a9b691155a9e974152916da90c0df25"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/eventHash.ts",
+      "bytes": 1726,
+      "sha256": "da31a26164e9fee0752619a67e7f78790082d5a1c14cf95e72f716192b6ca06a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/sessionVerification.ts",
+      "bytes": 3048,
+      "sha256": "b231357057916a626c440d5f11462bbe8004994602024b93f47f75744abf2f7f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/receipts/receipt.ts",
+      "bytes": 5409,
+      "sha256": "fa24ce3e706cdbfce461dcf553a35d54389a1cc831135eebe9d109f352508d67"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-session-commands.ts",
+      "bytes": 17552,
+      "sha256": "c640189b30cecb2539e59cb2f088d3a4a8277f3431cc2a145c88706694e015ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-trust-flags.ts",
+      "bytes": 6277,
+      "sha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-evidence-store-commands.ts",
+      "bytes": 7392,
+      "sha256": "43549b82cec61a77333fb3889238ad8d896c3e09290dcb5b6589114c9d152559"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalChainStore.ts",
+      "bytes": 26341,
+      "sha256": "72f14a9fe4a01375ab20a4129f05a7ef8c2ccd6959cdc2777a87f429d7f443ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalQuorum.ts",
+      "bytes": 4388,
+      "sha256": "0f2c806ee6bb748f209f649b1c19092ec93bfe75b349c8a0aa381a90549e62a8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalEngine.ts",
+      "bytes": 21065,
+      "sha256": "a2257cea092960d8815e6608e4d2cd416cba5d429eabb6e3a1147d7902e91b06"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/governor/actionPolicyEngine.ts",
+      "bytes": 34205,
+      "sha256": "95448aec3b9d3b9abbe675a1a6f9922b069818a44b4e1876d3a4751724eeef2d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/budgets/budgets.ts",
+      "bytes": 10695,
+      "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/receipt.ts",
+      "bytes": 2606,
+      "sha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceId.ts",
+      "bytes": 1151,
+      "sha256": "507c07573b42279d672230063af0af48e356603c336598b4d3d462f8279ea016"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/schemas/v1/authorization-record.schema.json",
+      "bytes": 14589,
+      "sha256": "93c50b8e80c49a8d831f990c6899be765be1f66066df3673797a01f730f5e36f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/schemas/v1/receipt.schema.json",
+      "bytes": 11129,
+      "sha256": "858bb4712a4edb484538c82fdf6dcb58b3dae4364c9e519f33524cdd6cec52c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/cases.json",
+      "bytes": 52804,
+      "sha256": "f955827ca996c2adaad3b4c31faf895375a13644b4c616d7cdeb302d6ef55999"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/seed.json",
+      "bytes": 4718,
+      "sha256": "1b52e98459eeb6cfa4dcc0501c6409cc4fa6c38a070df2558b6b9c43a443d50e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/evidence/exporter.ts",
+      "bytes": 17632,
+      "sha256": "3f99c5f37339a2640ef27654d9249a3bec546f0b9172bd405fa47b6a8cea9021"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/evidence/auditPacket.ts",
+      "bytes": 8432,
+      "sha256": "7880cbd53abbb153cf541e0387ccbf8341bd31903122907b032f33b0edd8565c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/bundles/bundle.ts",
+      "bytes": 42233,
+      "sha256": "a28de38c02c4c748de0c81c925b655b274ce287b72db9e834823b41375d78894"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/harness-comparison/nativeOracle.mjs",
+      "bytes": 18098,
+      "sha256": "e91a3bded2fd7a04e9660d350830cc04b74dc82587a68f3107ab55b07a226cf6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/HARNESS_COMPARISON.md",
+      "bytes": 20955,
+      "sha256": "1ba0b836ecaeac644804af3bfb79c858a228d69dbbb801ba0c871460042fec4e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+      "bytes": 8551,
+      "sha256": "1fe44a2e01c5ea8ea02199ff404312617117dd02f1621af5c1e09fbf7ebb9ab5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-19.md",
+      "bytes": 28238,
+      "sha256": "25846731b701a4d0b44c1a22d9be0957005b463b15203db629cfb7e5fc00d0b9"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/audit.json",
+      "bytes": 6965,
+      "sha256": "8bbef814aba6bc0957f7e692a979ec948a39583b77e6f678d443790544618652"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/audit.json",
+      "bytes": 6868,
+      "sha256": "74b64e674945860bb5df30e7a5f265853f199a88c83283cd6b33ece91947717a"
+    }
+  ],
+  "current52Inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/server.mjs",
+      "bytes": 27740,
+      "sha256": "f3e493bcfb1507bb5c324e773776795c90318183856123080e7f828aec0c8be0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/txlog.mjs",
+      "bytes": 6696,
+      "sha256": "45b8bf0624ebfb3fb1a7cfb8291cc3835205763ffd865a7d32fb6e469d360140"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/service/faults.mjs",
+      "bytes": 2864,
+      "sha256": "7aad83275985054c5c1fd6173f02a7dd5a86b8a1d5a470adde73dd7390d5290b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentArgs.ts",
+      "bytes": 1865,
+      "sha256": "73f37d1a65ff5100aa66e7e9c729b84bc6f977fc59fff18490b9e0ee63dc15fa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentAdapter.ts",
+      "bytes": 7838,
+      "sha256": "f6bf640a995cfcfb7f2aa3edb5cb16460ba129621caa3e4a4d44f4a26be4ee4e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/lighthouse/finance/paymentServiceClient.ts",
+      "bytes": 11998,
+      "sha256": "6c95c1d07fc6a6965733180c53a964c7a11c4e1d840e0670c1bc31d9a8b1ccd7"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/receiptStates.ts",
+      "bytes": 7612,
+      "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+      "bytes": 4176,
+      "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/normalizeArguments.ts",
+      "bytes": 6300,
+      "sha256": "4efdbc0db4e4926c87509754e94867b1eafd45b13a2d14dca9a79749dbe81908"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionCliCommands.ts",
+      "bytes": 3337,
+      "sha256": "5e15ae02eb3168ea11a46df76fdaac3ebc966185240a77bd7815bfd0c97d609d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 32498,
+      "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolTypes.ts",
+      "bytes": 7901,
+      "sha256": "e8b2c56d487a091506369fcf6d11db91fe1030957494bfc7d5bb04058f75077a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerSchema.ts",
+      "bytes": 22470,
+      "sha256": "8375975c42861af68a69ba33e367f8f03a9b691155a9e974152916da90c0df25"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/eventHash.ts",
+      "bytes": 1726,
+      "sha256": "da31a26164e9fee0752619a67e7f78790082d5a1c14cf95e72f716192b6ca06a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/sessionVerification.ts",
+      "bytes": 3048,
+      "sha256": "b231357057916a626c440d5f11462bbe8004994602024b93f47f75744abf2f7f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/receipts/receipt.ts",
+      "bytes": 5409,
+      "sha256": "fa24ce3e706cdbfce461dcf553a35d54389a1cc831135eebe9d109f352508d67"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-session-commands.ts",
+      "bytes": 17552,
+      "sha256": "c640189b30cecb2539e59cb2f088d3a4a8277f3431cc2a145c88706694e015ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-trust-flags.ts",
+      "bytes": 6277,
+      "sha256": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-evidence-store-commands.ts",
+      "bytes": 7392,
+      "sha256": "43549b82cec61a77333fb3889238ad8d896c3e09290dcb5b6589114c9d152559"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalChainStore.ts",
+      "bytes": 26341,
+      "sha256": "72f14a9fe4a01375ab20a4129f05a7ef8c2ccd6959cdc2777a87f429d7f443ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalQuorum.ts",
+      "bytes": 4388,
+      "sha256": "0f2c806ee6bb748f209f649b1c19092ec93bfe75b349c8a0aa381a90549e62a8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalEngine.ts",
+      "bytes": 21065,
+      "sha256": "a2257cea092960d8815e6608e4d2cd416cba5d429eabb6e3a1147d7902e91b06"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/governor/actionPolicyEngine.ts",
+      "bytes": 34205,
+      "sha256": "95448aec3b9d3b9abbe675a1a6f9922b069818a44b4e1876d3a4751724eeef2d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/budgets/budgets.ts",
+      "bytes": 10695,
+      "sha256": "bae506f230b0511759f795cb0099f9b8d3fdb77aa42789e70658e4f84d15243c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/receipt.ts",
+      "bytes": 2606,
+      "sha256": "16c5ecce46d99e465923c7cde3eea81defc3375ccd417877b34ba4073e722e20"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceId.ts",
+      "bytes": 1151,
+      "sha256": "507c07573b42279d672230063af0af48e356603c336598b4d3d462f8279ea016"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/schemas/v1/authorization-record.schema.json",
+      "bytes": 14589,
+      "sha256": "93c50b8e80c49a8d831f990c6899be765be1f66066df3673797a01f730f5e36f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/schemas/v1/receipt.schema.json",
+      "bytes": 11129,
+      "sha256": "858bb4712a4edb484538c82fdf6dcb58b3dae4364c9e519f33524cdd6cec52c6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/cases.json",
+      "bytes": 52804,
+      "sha256": "f955827ca996c2adaad3b4c31faf895375a13644b4c616d7cdeb302d6ef55999"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/spec/fixtures/v1/lighthouse-finance/seed.json",
+      "bytes": 4718,
+      "sha256": "1b52e98459eeb6cfa4dcc0501c6409cc4fa6c38a070df2558b6b9c43a443d50e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/evidence/exporter.ts",
+      "bytes": 17632,
+      "sha256": "3f99c5f37339a2640ef27654d9249a3bec546f0b9172bd405fa47b6a8cea9021"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/evidence/auditPacket.ts",
+      "bytes": 8432,
+      "sha256": "7880cbd53abbb153cf541e0387ccbf8341bd31903122907b032f33b0edd8565c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/bundles/bundle.ts",
+      "bytes": 42233,
+      "sha256": "a28de38c02c4c748de0c81c925b655b274ce287b72db9e834823b41375d78894"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/harness-comparison/nativeOracle.mjs",
+      "bytes": 18098,
+      "sha256": "e91a3bded2fd7a04e9660d350830cc04b74dc82587a68f3107ab55b07a226cf6"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/HARNESS_COMPARISON.md",
+      "bytes": 20955,
+      "sha256": "1ba0b836ecaeac644804af3bfb79c858a228d69dbbb801ba0c871460042fec4e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+      "bytes": 11481,
+      "sha256": "37e41257bae8be1e8ec1177dc8e3083f36d3eaf44af1a75645dafc2a206d893c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-19.md",
+      "bytes": 28238,
+      "sha256": "25846731b701a4d0b44c1a22d9be0957005b463b15203db629cfb7e5fc00d0b9"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/original-service-audit/audit.json",
+      "bytes": 6965,
+      "sha256": "8bbef814aba6bc0957f7e692a979ec948a39583b77e6f678d443790544618652"
+    },
+    {
+      "path": "/private/tmp/p1-19-finance-qualification-20261016/followup-service-audit/audit.json",
+      "bytes": 6868,
+      "sha256": "74b64e674945860bb5df30e7a5f265853f199a88c83283cd6b33ece91947717a"
+    }
+  ],
+  "excludedBodies": [
+    "stdout streams",
+    "private keys",
+    "tokens",
+    "raw signed configuration",
+    "fixture trees",
+    "source closures",
+    "native binaries"
+  ]
+}

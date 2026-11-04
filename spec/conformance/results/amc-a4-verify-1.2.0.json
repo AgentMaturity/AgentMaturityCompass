@@ -1,0 +1,74 @@
+{
+  "suiteVersion": "1.0.0",
+  "specVersion": "1.0",
+  "class": "a4-record",
+  "fixtureSetDigest": "7b08fccb696725d241928e407814df99f6c2f0a5fa985a1260896b01880f2408",
+  "implementation": {
+    "name": "amc a4 verify",
+    "version": "1.2.0",
+    "vendor": null,
+    "repository": "https://github.com/AgentMaturity/AgentMaturityCompass",
+    "language": "TypeScript"
+  },
+  "environment": {
+    "os": "darwin 25.6.0",
+    "runtime": "node v22.23.3"
+  },
+  "runAt": "2026-10-28T08:04:39.845Z",
+  "cases": [
+    {
+      "id": "A4R-001",
+      "normative": true,
+      "durationMs": 3304,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "A4R-002",
+      "normative": true,
+      "durationMs": 3529,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "A4R-003",
+      "normative": true,
+      "durationMs": 3661,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "A4R-004",
+      "normative": true,
+      "durationMs": 3487,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "A4R-005",
+      "normative": true,
+      "durationMs": 2383,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "A4R-006",
+      "normative": true,
+      "durationMs": 2476,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "A4R-007",
+      "normative": true,
+      "durationMs": 3214,
+      "outcome": "pass",
+      "diff": null
+    }
+  ],
+  "summary": {
+    "normativePassed": 7,
+    "normativeTotal": 7
+  },
+  "conformant": true
+}

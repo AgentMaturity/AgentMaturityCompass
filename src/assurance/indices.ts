@@ -1,10 +1,10 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import type { AssurancePackResult, DiagnosticReport } from "../types.js";
-import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import { loadRunReport } from "../diagnostic/runner.js";
+import { resolveAgentId } from "../fleet/paths.js";
+import { listTrustedRuns, scanTrustedRuns } from "../governor/runTrust.js";
 import { latestAssuranceByPack } from "./assuranceRunner.js";
-import { readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { writeFileAtomic } from "../utils/fs.js";
 
 export interface FailureRiskIndex {
   id:
@@ -185,8 +185,9 @@ function computeAutonomyPreservation(params: {
     }
   ];
 
+  // The three metrics above are always constructed, so this denominator cannot be zero.
   const autonomyPreservationIndex = Number(
-    (metrics.reduce((sum, metric) => sum + metric.score0to100, 0) / Math.max(1, metrics.length)).toFixed(2)
+    (metrics.reduce((sum, metric) => sum + metric.score0to100, 0) / metrics.length).toFixed(2)
   );
 
   const alerts: AutonomyPreservationAlert[] = [];
@@ -315,7 +316,11 @@ export function runIndicesForAgent(params: {
   outputPath?: string;
 }): FailureRiskReport {
   const agentId = resolveAgentId(params.workspace, params.agentId);
-  const run = loadRunReport(params.workspace, params.runId, agentId);
+  // Indices are a scoring output: only a trusted run feeds them (WP37) — sealed for this agent and recorded in the ledger.
+  const run = scanTrustedRuns(params.workspace, agentId).runs.find((row) => row.runId === params.runId);
+  if (!run) {
+    throw new Error(`Run ${params.runId} is not a trusted run for ${agentId}: failure-risk indices need a run sealed for this agent, stored as ${params.runId}.json and recorded in the ledger.`);
+  }
   const assuranceByPack = latestAssuranceByPack({
     workspace: params.workspace,
     agentId,
@@ -347,23 +352,8 @@ export function runFleetIndices(params: {
     ? readdirSync(agentsDir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name)
     : ["default"];
   for (const agentId of agentIds) {
-    const paths = getAgentPaths(params.workspace, agentId);
-    if (!existsSync(paths.runsDir)) {
-      continue;
-    }
-    const runFiles = readdirSync(paths.runsDir)
-      .filter((file) => file.endsWith(".json"))
-      .sort((a, b) => a.localeCompare(b));
-    let latest: DiagnosticReport | null = null;
-    for (const file of runFiles) {
-      const run = JSON.parse(readUtf8(join(paths.runsDir, file))) as DiagnosticReport;
-      if (run.ts < params.windowStartTs || run.ts > params.windowEndTs) {
-        continue;
-      }
-      if (!latest || run.ts > latest.ts) {
-        latest = run;
-      }
-    }
+    const latest = listTrustedRuns(params.workspace, agentId)
+      .find((run) => run.ts >= params.windowStartTs && run.ts <= params.windowEndTs) ?? null;
     if (!latest) {
       continue;
     }

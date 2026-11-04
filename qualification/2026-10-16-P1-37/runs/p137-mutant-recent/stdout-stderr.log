@@ -1,0 +1,126 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout
+
+stderr | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > uses the exact threshold at 8000 measured prompt tokens
+[amc-p137-retained] {"workspace":"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-l1FLXA","home":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-home-f3HgSD","surviving":{"workspace":true,"home":true},"cleanupErrors":[]}
+
+stderr | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > prunes only old results at 8500, protects the recent two before counts and records the next measured effect
+[amc-p137-retained] {"workspace":"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-jTyPTP","home":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-home-zCicFI","surviving":{"workspace":true,"home":true},"cleanupErrors":[]}
+
+ ✓ tests/surfaceCompaction.test.ts (6 tests) 1503ms
+     ✓ shrinks the projection  313ms
+stderr | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact
+[amc-p137-retained] {"workspace":"/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-JBiibZ","home":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-home-PvZRj0","surviving":{"workspace":true,"home":true},"cleanupErrors":[]}
+
+ ✓ tests/surfaceHistoryCompaction.test.ts (14 tests) 3392ms
+     ✓ measures current authenticated bytes, preserves the origin and reconstructs both cutoffs  319ms
+stdout | tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence
+[amc-p137-public-evidence] {"path":"/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-OTJr7F/public-evidence.json","bytes":48514,"sha256":"531fa0853f77911ac881dc5bb61c680c0c154bec88e82d7d3df2e6eeab364644"}
+
+ ❯ tests/autoCompaction.test.ts (31 tests | 3 failed) 5953ms
+     ✓ uses the exact threshold at 7000 measured prompt tokens  466ms
+     ✓ uses the exact threshold at 7999 measured prompt tokens  366ms
+     × uses the exact threshold at 8000 measured prompt tokens 304ms
+     × prunes only old results at 8500, protects the recent two before counts and records the next measured effect 307ms
+     × orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact 310ms
+     ✓ retains the actual encrypted spill object and measures the signed preview rather than full-output tokens  453ms
+     ✓ does not compact with unset and reports unmeasured usage only when enabled  327ms
+     ✓ does not compact with null and reports unmeasured usage only when enabled  335ms
+     ✓ refuses a successful provider finish without usage before the integrated compactor hook 246ms
+     ✓ reports null usage without edits at the public AutoCompactor class boundary over a genuine signed step end 232ms
+     ✓ caps successful compaction boundaries at three in one turn and resets the count on the next turn  713ms
+     ✓ uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence  1611ms
+     ✓ replays a genuine manual v1 receipt and reconstructs a later real request 275ms
+     ✓ requires a trigger on an otherwise complete synthetic v2 structural negative 0ms
+     ✓ fills literal defaults and freezes the declared policy 0ms
+     ✓ refuses zero window instead of silently changing policy 0ms
+     ✓ refuses negative window instead of silently changing policy 0ms
+     ✓ refuses unsafe window instead of silently changing policy 0ms
+     ✓ refuses low threshold instead of silently changing policy 0ms
+     ✓ refuses high threshold instead of silently changing policy 0ms
+     ✓ refuses NaN threshold instead of silently changing policy 0ms
+     ✓ refuses zero recent steps instead of silently changing policy 0ms
+     ✓ refuses fractional recent steps instead of silently changing policy 0ms
+     ✓ refuses excessive recent steps instead of silently changing policy 0ms
+     ✓ refuses zero prune size instead of silently changing policy 0ms
+     ✓ refuses excessive prune size instead of silently changing policy 0ms
+     ✓ refuses zero per-turn limit instead of silently changing policy 0ms
+     ✓ refuses excessive per-turn limit instead of silently changing policy 0ms
+     ✓ refuses non-boolean summary instead of silently changing policy 0ms
+     ✓ threads CLI options without ignoring flags that lack a context window 0ms
+     ✓ uses disjoint input/cache counts, not output counts or payload-byte estimates 0ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > uses the exact threshold at 8000 measured prompt tokens
+AssertionError: expected [ { …(20) }, { …(20) }, { …(20) } ] to have a length of 1 but got 3
+
+- Expected
++ Received
+
+- 1
++ 3
+
+ ❯ tests/autoCompaction.test.ts:267:33
+    265|       await turn(f, "Keep this user input verbatim.");
+    266|       const rows = f.h.events(), old = toolResult(rows, "old");
+    267|       expect(compactRows(rows)).toHaveLength(prompt < 8000 ? 0 : 1);
+       |                                 ^
+    268|       if (prompt >= 8000) {
+    269|         const receipt = compactionReceipt(compactRows(rows)[0]!);
+ ❯ withFixture tests/autoCompaction.test.ts:98:5
+ ❯ tests/autoCompaction.test.ts:264:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > prunes only old results at 8500, protects the recent two before counts and records the next measured effect
+AssertionError: expected '4516236f-60e2-4586-a21f-c91ed4958c5c' to be '9e1b3099-0dd4-4c4d-b174-750fce8f643a' // Object.is equality
+
+Expected: "9e1b3099-0dd4-4c4d-b174-750fce8f643a"
+Received: "4516236f-60e2-4586-a21f-c91ed4958c5c"
+
+ ❯ tests/autoCompaction.test.ts:286:36
+    284|       for (const id of ["recent-1", "recent-2"]) {
+    285|         const original = toolResult(rows, id), live = toolSource(rows,…
+    286|         expect(live.sourceEventId).toBe(original.id);
+       |                                    ^
+    287|         expect(live.part.sha256).toBe(original.payload_sha256);
+    288|         expect(payload(f.h, original).toString("utf8")).toBe(threeOutp…
+ ❯ withFixture tests/autoCompaction.test.ts:98:5
+ ❯ tests/autoCompaction.test.ts:280:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/autoCompaction.test.ts > automatic compaction: synthetic provider usage, real signed loop evidence > orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact
+AssertionError: expected [ …(5) ] to deeply equal [ …(3) ]
+
+- Expected
++ Received
+
+  [
++   "a7476652-e904-466a-9640-ac3306223bb1",
++   "10a04899-08ba-4315-82b1-1db65540b448",
+    "b2a37dde-dba4-4a30-81f9-7eca04872ced",
+    "7bfb3476-c66f-4af3-81fa-e5060d4a1157",
+    "8450e087-9ab1-44ed-81b0-17601dc62bab",
+  ]
+
+ ❯ tests/autoCompaction.test.ts:323:10
+    321|       const rows = f.h.events(), originalOrder = ["a", "b", "c", "smal…
+    322|       expect(compactRows(rows).map(row => compactionReceipt(row).sourc…
+    323|         .toEqual(["b", "c", "a"].map(id => toolResult(rows, id).id));
+       |          ^
+    324|       expect(foldSurfaceEntries(rows).filter(entry => entry.part.kind …
+    325|         .toEqual(originalOrder.map(row => row.id));
+ ❯ withFixture tests/autoCompaction.test.ts:98:5
+ ❯ tests/autoCompaction.test.ts:317:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  3 failed | 48 passed (51)
+   Start at  16:30:46
+   Duration  8.64s (transform 5.35s, setup 69ms, import 7.42s, tests 10.85s, environment 0ms)
+
+JSON report written to /private/tmp/p1-37-post-typecheck-20261016/p137-mutant-recent.raw.json

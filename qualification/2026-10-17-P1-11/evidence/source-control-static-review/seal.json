@@ -1,0 +1,21 @@
+{
+  "schema": "private-static-review-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-control-static-review/review.json",
+      "bytes": 1750,
+      "sha256": "74ec9c2b29b66ff0110c93ebcba51b45766584aee761d4676f64e0142d47d20f"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-control-static-review/README.md",
+      "bytes": 411,
+      "sha256": "225d42676167ce78ea650b1b28e3aed2ca1ec4e7f902c45346b750db8b101a96"
+    },
+    {
+      "path": "/private/tmp/p1-11-decisive-qualification-20261017/source-control-static-review/input-pins.json",
+      "bytes": 879,
+      "sha256": "4def05be6aabcc7e85c3326c232e8297ddf2aece5affe73ceb58002a42ea7e2c"
+    }
+  ],
+  "allReadsFinished": true
+}

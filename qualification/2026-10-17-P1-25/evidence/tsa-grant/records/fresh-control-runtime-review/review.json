@@ -1,0 +1,3375 @@
+{
+  "schema": "p125g-independent-actual-fresh-control-runtime-review/1",
+  "at": "2026-10-16T23:02:09.410890+00:00",
+  "sourceCommit": "188681b32dc472983404dce19e7833cd76ee7576",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout",
+  "borrowedRunnerRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "borrowedRunnerHead": "bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+  "blockers": [],
+  "actualSixPhaseChain": [
+    {
+      "phase": "p125g-source-combined",
+      "total": 19,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "exit": 0,
+      "durationMs": 1927,
+      "ownedPgid": 55880
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "total": 19,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "exit": 0,
+      "durationMs": 2659,
+      "ownedPgid": 58457
+    },
+    {
+      "phase": "p125g-m1",
+      "total": 19,
+      "passed": 17,
+      "failed": 2,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "exit": 1,
+      "durationMs": 1841,
+      "ownedPgid": 58517
+    },
+    {
+      "phase": "p125g-restore1",
+      "total": 19,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "exit": 0,
+      "durationMs": 1682,
+      "ownedPgid": 58630
+    },
+    {
+      "phase": "p125g-m2",
+      "total": 19,
+      "passed": 17,
+      "failed": 2,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "exit": 1,
+      "durationMs": 1911,
+      "ownedPgid": 58699
+    },
+    {
+      "phase": "p125g-restore2",
+      "total": 19,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "exit": 0,
+      "durationMs": 1884,
+      "ownedPgid": 58760
+    }
+  ],
+  "identity": {
+    "sameOrderedUnique19AcrossSourceAndFiveFreshRuns": true,
+    "sameTwoFileCorpus": true,
+    "sourceTestBytesUnchanged9f9": true,
+    "allRawProducerSnapshotObserverPinsExact": true,
+    "allOriginalRawFailureMessagesAndObserverErrorsRetained": true
+  },
+  "phaseEvidence": [
+    {
+      "phase": "p125g-source-combined",
+      "total": 19,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "hooks": [
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "allTaskErrors": [],
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicCaseFacts": [
+        {
+          "phase": "p125g-source-combined",
+          "caseId": "FIRST-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-3Yi4eZ/public-evidence.json",
+            "bytes": 12992,
+            "sha256": "fb97ac2eb4d1a822cf337cf0142bd75ce6291eae7cf254d7307c11e3bc8b5373"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/good-first"
+          ],
+          "returnedResult": {
+            "failures": [],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-first",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "11112060644cc58f9c61c6d2ed3e077ed2e2119839bfb8703147b73f2c126557",
+              "genTime": "2026-10-16T22:47:30.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "1a34c09994345dac8e98cde9b3def9a74a92d50d0d0bd69e9799b0a779e30f28",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-first",
+            "querySha256": "5073a3d1498f6b3834248671598e90b70b1fc362bd97f1054a8b23a009671e59",
+            "responseSha256": "ee65d41f31a100b9e727a88934330c1f586775efa9391eedc66284e2ff42e270",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": false,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 1,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 55889,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 55890,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1210,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "6c54e2040a63f64a2814e2f1808cf5a58e0757055a16dd97cecec6ba0e6592c7"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 55891,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1725,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "28911bec2d57dfdb7bbeab635de75153faa89912413c367f69b4047116947fb4"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 55892,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 55893,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 55894,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "3e848ecd7dd4cd26a73d37cd8aa311250eab996bce6f132eaeacf65b12bb6e68"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        },
+        {
+          "phase": "p125g-source-combined",
+          "caseId": "HTTP500-THEN-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-C1Xpe3/public-evidence.json",
+            "bytes": 13547,
+            "sha256": "10b2deec9636d49bce10c4c2b1b600e8d8d21e87b13198efc30888d81f743167"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/http-first",
+            "/good-second"
+          ],
+          "returnedResult": {
+            "failures": [
+              "http-first: HTTP 500"
+            ],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-second",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "8ad122b89695df2393834fdc38860481959dd7b6686f52b4056eaba0df43870d",
+              "genTime": "2026-10-16T22:47:31.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "536a424fbff61b0d4cfba80eab8dd04d1d43a538267d3b474126d9aad115d390",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-second",
+            "querySha256": "f358126e49e55de9bad9fa028ccc91f02f2d56ead9cf174c69dedf4938aed6c8",
+            "responseSha256": "b94117e12cb466f0f9235beb3fe05d8f610f2ca4c9c0be45eecd29ad2faac86e",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": false,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 2,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 55895,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 55896,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 2575,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "bbb5c55cbbae100bdec6165d00a9734a95909a2d9a10fbe7560d27e5a4afdd8a"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 55897,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1462,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "73b037cc2c068f60978b65b533adb97f37dab0a15ec1356b54e5743b297c7abc"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 55898,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 55899,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 55900,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "0b3360b4499f2d01eb7d632b961a3cc1fb043b97079a4c262ef22aaba2dac5a8"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        }
+      ],
+      "command": {
+        "phase": "p125g-source-combined",
+        "exit": 0,
+        "durationMs": 1927,
+        "startedUtc": "2026-10-16T22:47:29.208553+00:00",
+        "endedUtc": "2026-10-16T22:47:31.150061+00:00",
+        "ownedPgid": 55880,
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false
+      }
+    },
+    {
+      "phase": "p125g-fresh-canonical",
+      "total": 19,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "hooks": [
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "allTaskErrors": [],
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicCaseFacts": [
+        {
+          "phase": "p125g-fresh-canonical",
+          "caseId": "FIRST-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-z10JWp/public-evidence.json",
+            "bytes": 13005,
+            "sha256": "6e68a440d774d9133b51ebcc2a26636798b202af913ad739384994e017827f31"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/good-first"
+          ],
+          "returnedResult": {
+            "failures": [],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-first",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "658c0e0c387143abd86df6035fb7c5b2c9b35eb1c53463125189cacd2768f3a3",
+              "genTime": "2026-10-16T22:57:54.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "ab55ce6cdf097859c596c2a49b83460fed2d267370304fa30b53d91e890dde37",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-first",
+            "querySha256": "c60e19b442a194bd34de6130aa99653f66181a0ce1b68e438116d1016bf16b6d",
+            "responseSha256": "8e50fb10adc46e523eede879128d1c00acf0e981624e1113c18854573fa936b4",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": false,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 1,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58460,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58461,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1056,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "b6c88a52c56d9b45b046ed17c88546db43dab5d3cbf3cfb3574321b629d67a6c"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58462,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 2512,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "d16aee6f8a3dc23c1a1b452015bf01b9cf4156d2dad68566df65a687f4826805"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58463,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58464,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58465,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "37526b04a652f6cc23f305981cae0b9fd0585400395b093f70c24c65e50a8b20"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        },
+        {
+          "phase": "p125g-fresh-canonical",
+          "caseId": "HTTP500-THEN-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-J1hYpF/public-evidence.json",
+            "bytes": 13563,
+            "sha256": "f00cb3856a2ff3bc1d3f4c7fb3f6ea8ea8b5350aa22e79aa7741c9d7aaaf1896"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/http-first",
+            "/good-second"
+          ],
+          "returnedResult": {
+            "failures": [
+              "http-first: HTTP 500"
+            ],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-second",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "1bea16546b12aff1985e4a3749d74e49b4d26b97ff30cf9e0642ff6457c53b70",
+              "genTime": "2026-10-16T22:57:54.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "e64365a15ea9ac12639cdc0bef86d141e8667af1c75b9bf34d89d1ac49c060f5",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-second",
+            "querySha256": "074585636f01902dbd0b187876daf545ecdcf62217a8ee9b30b52eeb09ea71b9",
+            "responseSha256": "33946b9182305192a181601719f707294416f43d551b5b56cda0c6a580f05522",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": false,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 2,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58466,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58467,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1396,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "96c06c92b8867f0137f6be4c256c2fd4a9e1814729bc0fa4e258df0d90bcdd8e"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58468,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 990,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "1b36ea3a02353e393bbe74d1e780f5ae5442f6405bd1b8f56189663e5e84c270"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58469,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58470,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58471,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "d92631d22f285bc2c52ac67294f93ff80e664128d000f385fb270cacbacb8575"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        }
+      ],
+      "command": {
+        "phase": "p125g-fresh-canonical",
+        "exit": 0,
+        "durationMs": 2659,
+        "startedUtc": "2026-10-16T22:57:52.086991+00:00",
+        "endedUtc": "2026-10-16T22:57:54.759800+00:00",
+        "ownedPgid": 58457,
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false
+      }
+    },
+    {
+      "phase": "p125g-m1",
+      "total": 19,
+      "passed": 17,
+      "failed": 2,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "hooks": [
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected [ '/unused-last', '/good-first' ] to deeply equal [ '/good-first' ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:403:61\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:396:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": [
+            {
+              "message": "expected [ '/unused-last', '/good-first' ] to deeply equal [ '/good-first' ]",
+              "actual": "[\n  \"/unused-last\",\n  \"/good-first\",\n]",
+              "expected": "[\n  \"/good-first\",\n]",
+              "showDiff": true,
+              "operator": "deepStrictEqual",
+              "diff": "- Expected\n+ Received\n\n  [\n+   \"/unused-last\",\n    \"/good-first\",\n  ]",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected [ '/unused-last', '/good-first' ] to deeply equal [ '/good-first' ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:403:61\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:396:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 403,
+                  "column": 61
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 309,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 396,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected [ '/unused-last', '/good-second' ] to deeply equal [ '/http-first', '/good-second' ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:424:61\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:416:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": [
+            {
+              "message": "expected [ '/unused-last', '/good-second' ] to deeply equal [ '/http-first', '/good-second' ]",
+              "actual": "[\n  \"/unused-last\",\n  \"/good-second\",\n]",
+              "expected": "[\n  \"/http-first\",\n  \"/good-second\",\n]",
+              "showDiff": true,
+              "operator": "deepStrictEqual",
+              "diff": "- Expected\n+ Received\n\n  [\n-   \"/http-first\",\n+   \"/unused-last\",\n    \"/good-second\",\n  ]",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected [ '/unused-last', '/good-second' ] to deeply equal [ '/http-first', '/good-second' ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:424:61\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:416:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 424,
+                  "column": 61
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 309,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 416,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "allTaskErrors": [
+        {
+          "kind": "test",
+          "name": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "errors": [
+            {
+              "message": "expected [ '/unused-last', '/good-first' ] to deeply equal [ '/good-first' ]",
+              "actual": "[\n  \"/unused-last\",\n  \"/good-first\",\n]",
+              "expected": "[\n  \"/good-first\",\n]",
+              "showDiff": true,
+              "operator": "deepStrictEqual",
+              "diff": "- Expected\n+ Received\n\n  [\n+   \"/unused-last\",\n    \"/good-first\",\n  ]",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected [ '/unused-last', '/good-first' ] to deeply equal [ '/good-first' ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:403:61\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:396:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 403,
+                  "column": 61
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 309,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 396,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "test",
+          "name": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "errors": [
+            {
+              "message": "expected [ '/unused-last', '/good-second' ] to deeply equal [ '/http-first', '/good-second' ]",
+              "actual": "[\n  \"/unused-last\",\n  \"/good-second\",\n]",
+              "expected": "[\n  \"/http-first\",\n  \"/good-second\",\n]",
+              "showDiff": true,
+              "operator": "deepStrictEqual",
+              "diff": "- Expected\n+ Received\n\n  [\n-   \"/http-first\",\n+   \"/unused-last\",\n    \"/good-second\",\n  ]",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected [ '/unused-last', '/good-second' ] to deeply equal [ '/http-first', '/good-second' ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:424:61\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:416:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 424,
+                  "column": 61
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 309,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 416,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicCaseFacts": [
+        {
+          "phase": "p125g-m1",
+          "caseId": "FIRST-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-jkDCRf/public-evidence.json",
+            "bytes": 13549,
+            "sha256": "c4b3189cc318c9ab95c1f2dc9e7864e1cd658d77ce2e8d3297687464feb9eaa6"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/unused-last",
+            "/good-first"
+          ],
+          "returnedResult": {
+            "failures": [
+              "unused-last: HTTP 500"
+            ],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-first",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "0becc47205e1f439ab8b8aeb664531d3891daae32e770c44fad918560251f4f7",
+              "genTime": "2026-10-16T22:58:12.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "ebe0f41078acd14e92e07722b3d4b08ab9b4a344d8f1ede05713b04735e138f7",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-first",
+            "querySha256": "804cea5b926822458c04e5526dd194f26f3de3e07b025de5fa228e59bcd906b2",
+            "responseSha256": "803df082bc045dff2cb4a5b611affa90254c5069c393e179977e70a19aef127b",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": true,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 2,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58520,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58521,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1741,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "b4894ef67d712ca9e6c0f4f9bedf7f5fd0910f90348a573677101b567edc89c1"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58522,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1738,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "4e9595befd91ccbb2742e8a52961ab225aadbace6c62c1ca015779b5b90d1cfb"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58523,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58525,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58526,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "849dea92de366984cfa0529864645f191077204ca75db16e303e24c9e516e290"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        },
+        {
+          "phase": "p125g-m1",
+          "caseId": "HTTP500-THEN-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-yqSi6Y/public-evidence.json",
+            "bytes": 13565,
+            "sha256": "2b88848da2342fda8a5dffdfadab10dac45d0de93b0904ff36179ccaba160d39"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/unused-last",
+            "/good-second"
+          ],
+          "returnedResult": {
+            "failures": [
+              "unused-last: HTTP 500"
+            ],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-second",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "5b4c2115e080ff85776227ba330d7db1c18e7d1d159761b7bee0fc9c6b7efcf4",
+              "genTime": "2026-10-16T22:58:12.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "dcab315d461577cdc9af04fc4b00a1f2d003ecdb42ddbb5119f6cd58ca48fd9b",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-second",
+            "querySha256": "90d2023d02d9ed44f45cd72994b13ed3b8017dce1997fe52c14289b18faf0f04",
+            "responseSha256": "0f69f61fc6422e0d7fbb9a7079a84016af76b24597ba8eebd47ee8501f91e075",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": true,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 2,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58527,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58528,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1718,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "8b915a2f44af483607b8d7797b304b4cfa30fedec86106fe5602ef3f17e561b2"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58529,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1310,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "972924e8d142f60b1e2fce03253a2ecfab29723c11397c3056bd2f3ec11e1db0"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58530,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58531,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58532,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "915f4e60f7db75d776d461a62e45a35ac7453da72e9766689420f72605287971"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        }
+      ],
+      "command": {
+        "phase": "p125g-m1",
+        "exit": 1,
+        "durationMs": 1841,
+        "startedUtc": "2026-10-16T22:58:11.062527+00:00",
+        "endedUtc": "2026-10-16T22:58:12.917113+00:00",
+        "ownedPgid": 58517,
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false
+      }
+    },
+    {
+      "phase": "p125g-restore1",
+      "total": 19,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "hooks": [
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "allTaskErrors": [],
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicCaseFacts": [
+        {
+          "phase": "p125g-restore1",
+          "caseId": "FIRST-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-4TwkWb/public-evidence.json",
+            "bytes": 13001,
+            "sha256": "53de86ffd2782fd7c6016fffaf53f3c086e91ee273ba063711d99a1fa9d70056"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/good-first"
+          ],
+          "returnedResult": {
+            "failures": [],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-first",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "f0582bf86e8412ce03e183ee8d6c29e3d1bf4a3283bd07c2ef86e204bc2c472e",
+              "genTime": "2026-10-16T22:58:41.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "ea7c27944aa6a72868eb8bf66713c0748252cf39cde35ec6bd8fb5d34a4041d9",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-first",
+            "querySha256": "2c5e7aa953a6204e843d022584540de33b4de880cbcd987d01d52819bf9fbb94",
+            "responseSha256": "08b9f6d13a0ee76d49778d811a70d8ab82135fc518b5055a77b8df8210519ef7",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": false,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 1,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58635,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58636,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 668,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "388f6d015b7de1abf133f2ac21ba066eedbf0c0aa96f3f0ae9da2135d9367f72"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58637,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 647,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "085813068186fbda2d5b6b6037b0e503d60ee43145c5c3e80a975e9eea487438"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58638,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58639,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58640,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "306236e683f5928f18f12d61b88d213d9ae01de5c4d7ef14076bfef0f8a550b3"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        },
+        {
+          "phase": "p125g-restore1",
+          "caseId": "HTTP500-THEN-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-x8O30t/public-evidence.json",
+            "bytes": 13559,
+            "sha256": "93162685e1315415ec4dac5b5223f2a89a8e31053c82964bc71451b07d66ed74"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/http-first",
+            "/good-second"
+          ],
+          "returnedResult": {
+            "failures": [
+              "http-first: HTTP 500"
+            ],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-second",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "9fe81c82042fdcb9ed2736c3d8bf827435271ad7615f6eb0965cc09699af0ea8",
+              "genTime": "2026-10-16T22:58:41.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "56a64ed3d00519a4b9564f48eae0a4072121aa917bc05da955d60bd47dff9636",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-second",
+            "querySha256": "ff0f1bd8fa3c44fb41169e382476d105e055c146b558eb00ad7f7e2694cbb238",
+            "responseSha256": "4ea5d379e69f03695aeecef9ac350a0f6763ef8f3cde2c0aa48a0b16b151a9bb",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": false,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 2,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58641,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58642,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 523,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "33254ea3d16f290d9cc0baa9bdccf152dbf1a414d42f5a43d0ff17c5b882b1e0"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58643,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1266,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "1015878203e78b448c48d816ef40c5151858643fd2bb4df7ac8e44569e4497b8"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58644,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58645,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58646,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "bf25b6708b9a530c084651345dfe2bd2de5daadc20c092f48cc3128ef2d7fd33"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        }
+      ],
+      "command": {
+        "phase": "p125g-restore1",
+        "exit": 0,
+        "durationMs": 1682,
+        "startedUtc": "2026-10-16T22:58:39.595589+00:00",
+        "endedUtc": "2026-10-16T22:58:41.291068+00:00",
+        "ownedPgid": 58630,
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false
+      }
+    },
+    {
+      "phase": "p125g-m2",
+      "total": 19,
+      "passed": 17,
+      "failed": 2,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "hooks": [
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected null not to be null\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:406:32\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:396:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": [
+            {
+              "message": "expected null not to be null",
+              "actual": "null",
+              "expected": "null",
+              "showDiff": true,
+              "operator": "notStrictEqual",
+              "diff": "",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected null not to be null\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:406:32\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:396:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 406,
+                  "column": 32
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 309,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 396,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "fail",
+          "rawFailureMessages": [
+            "AssertionError: expected null not to be null\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:426:32\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:416:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": [
+            {
+              "message": "expected null not to be null",
+              "actual": "null",
+              "expected": "null",
+              "showDiff": true,
+              "operator": "notStrictEqual",
+              "diff": "",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected null not to be null\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:426:32\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:416:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 426,
+                  "column": 32
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 309,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 416,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "allTaskErrors": [
+        {
+          "kind": "test",
+          "name": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "errors": [
+            {
+              "message": "expected null not to be null",
+              "actual": "null",
+              "expected": "null",
+              "showDiff": true,
+              "operator": "notStrictEqual",
+              "diff": "",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected null not to be null\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:406:32\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:396:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 406,
+                  "column": 32
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 309,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 396,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "kind": "test",
+          "name": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "errors": [
+            {
+              "message": "expected null not to be null",
+              "actual": "null",
+              "expected": "null",
+              "showDiff": true,
+              "operator": "notStrictEqual",
+              "diff": "",
+              "name": "AssertionError",
+              "ok": false,
+              "stack": "AssertionError: expected null not to be null\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:426:32\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:309:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts:416:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+              "stacks": [
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 426,
+                  "column": 32
+                },
+                {
+                  "method": "withGrantFixture",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 309,
+                  "column": 5
+                },
+                {
+                  "method": "",
+                  "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/tests/time/tsaGrant.test.ts",
+                  "line": 416,
+                  "column": 5
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicCaseFacts": [
+        {
+          "phase": "p125g-m2",
+          "caseId": "FIRST-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oRRdRf/public-evidence.json",
+            "bytes": 12441,
+            "sha256": "801922e1e940b84bdb43f43976c8f0f305c8b054c21d63a42fa36b3718a83663"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/good-first"
+          ],
+          "returnedResult": {
+            "failures": [],
+            "grantPresent": false,
+            "grant": null
+          },
+          "replyObservation": {
+            "path": "/good-first",
+            "querySha256": "0a5e605925b9412b2c3d319fb982ac5292b5b13a139d08833b6dce6a5e9d9608",
+            "responseSha256": "3a240a9b90ec7a3ea0db33e9ae45ce62c6d16b5c586452d5ab5411a08d0169be",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": true,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 1,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58703,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58704,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1983,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "cb608aa0d3c22b318fa1fd5f0f89a199ce4e3fed59f5d944addea029b4c42a7e"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58705,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 771,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "95198a4d4bca38f10127bacc265e0557757c2fa0f2dfc954abeff3dcb8a8b040"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58706,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58707,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58708,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "188cd9c8e1bab2d918925071857fb2a4b6e6966dd259910be1f745f989cf80a4"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        },
+        {
+          "phase": "p125g-m2",
+          "caseId": "HTTP500-THEN-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-qJuPJc/public-evidence.json",
+            "bytes": 13001,
+            "sha256": "1555f5c76ad7b9a121e8846c8dce228713057cc1b4e42301163d99853ed3b96f"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/http-first",
+            "/good-second"
+          ],
+          "returnedResult": {
+            "failures": [
+              "http-first: HTTP 500"
+            ],
+            "grantPresent": false,
+            "grant": null
+          },
+          "replyObservation": {
+            "path": "/good-second",
+            "querySha256": "06bec3d50377c043ccb38daeac7b585b45fcc3f5aa8b2cfeddb88ca60586497f",
+            "responseSha256": "b4332d5f72d68f9dc61a31f1efe73ab486e29e22d20d948ee98749a5218f7df8",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": true,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 2,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58709,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58710,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1514,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "1c9d5176ed4d75512e3a5cc2a264bdd35a29ea9122c5d1534f41b7c46ec54d07"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58711,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 770,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "77d7d12f2c0609ae500c7ba4f4b1ad1d874557d002120bbc9361ee765d54af0e"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58712,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58713,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58714,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "40e8c363159819a48d5f1944e50c8e925bcadebb3b32f6463f2f95c2cb285f1e"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        }
+      ],
+      "command": {
+        "phase": "p125g-m2",
+        "exit": 1,
+        "durationMs": 1911,
+        "startedUtc": "2026-10-16T22:58:54.187024+00:00",
+        "endedUtc": "2026-10-16T22:58:56.112694+00:00",
+        "ownedPgid": 58699,
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false
+      }
+    },
+    {
+      "phase": "p125g-restore2",
+      "total": 19,
+      "passed": 19,
+      "failed": 0,
+      "skipped": 0,
+      "hookTaskEntries": 2,
+      "individualHookValues": 3,
+      "hooks": [
+        {
+          "id": "-1799767685",
+          "kind": "file",
+          "name": "tests/time/tsaGrant.test.ts",
+          "hooks": {
+            "afterAll": "pass"
+          }
+        },
+        {
+          "id": "353594614",
+          "kind": "file",
+          "name": "tests/time/verifyTimestamp.test.ts",
+          "hooks": {
+            "beforeAll": "pass",
+            "afterAll": "pass"
+          }
+        }
+      ],
+      "joins": [
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants accepts the genuine first grant and never dispatches the later TSA",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/tsaGrant.test.ts",
+          "fullName": "P1-25 optional OpenSSL genuine fresh-query timestamp grants preserves the finite first refusal then accepts the genuine second grant",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "-1799767685_0_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the genuine raw CMS timestamp against its digest nonce and pinned test root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_0",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "verifies the granted response and returns its exact signed CMS token bytes",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_1",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected digest for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_2",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a different expected nonce for the unchanged genuine signed token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_3",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the independently located signed-attribute corruption",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_4",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses the genuine token under a different real root with the same permitted policy",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_5",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a policy excluded by the correctly pinned real root",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_6",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate without an EKU extension",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_7",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate with noncritical timestamping EKU",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_8",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a genuinely signed TSA certificate expired at the fixed signed genTime",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_9",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses explicit rejection status before requiring a timestamp token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_10",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses a truncated copy of the genuine token",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_11",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "refuses 65537 bytes at the token size boundary before DER parsing",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_12",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps claimed time separate from the genuine attested upper bound",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_13",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "keeps an artifact without a timestamp at claimed time",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_14",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports an untrusted TSA as a warning while the artifact time stays claimed",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_15",
+          "observerErrors": []
+        },
+        {
+          "path": "tests/time/verifyTimestamp.test.ts",
+          "fullName": "reports a broken supplied token as an artifact integrity error",
+          "occurrence": 1,
+          "state": "pass",
+          "rawFailureMessages": [],
+          "observerId": "353594614_16",
+          "observerErrors": []
+        }
+      ],
+      "allTaskErrors": [],
+      "unhandledErrors": [],
+      "lateDiagnostics": [],
+      "publicCaseFacts": [
+        {
+          "phase": "p125g-restore2",
+          "caseId": "FIRST-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-AQJubs/public-evidence.json",
+            "bytes": 13006,
+            "sha256": "43798d053b50162a6e49a8a68020c0e01350ad616e4285985e51f378a65cafd6"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/good-first"
+          ],
+          "returnedResult": {
+            "failures": [],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-first",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "ddd398509f6887d286073aa0a5674f13f0d5f8fbb6ff5454b96f0c0a5f9d592c",
+              "genTime": "2026-10-16T22:59:18.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "349a9558973e7395df5f546899f6ffb9a3bc9dfb7584b9aa8f95bcf97a834748",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-first",
+            "querySha256": "23f8cf03f307824caaa6b9781a71ba55b619019f6c4931433e5c9960d7a581bc",
+            "responseSha256": "87e69abac6bf84a14e193bc6513edfb7ed52a05cb7fa8618b174ab3edb503e6a",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": false,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 1,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58771,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58773,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 1378,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "d3a79e3dd91ac7fc3c12a6256eb54ff1cffaf03c3e2854c52423cf172d53d96d"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58774,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 782,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "1f3e43ddfe5cee8946d1b950c217299909f9aca2a77f17d677cfea1e9f780d64"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58775,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58776,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58777,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "7fded86acc63bc2bf169741ee468681f2d86d4cd36e8a6507d8df07fae2b3197"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        },
+        {
+          "phase": "p125g-restore2",
+          "caseId": "HTTP500-THEN-GRANT",
+          "publicRecordPin": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-oqaJ34/public-evidence.json",
+            "bytes": 13562,
+            "sha256": "40fce9a15c4c12df4c7e30f32dc50c6a391f1e5579adf1887005fc4573f8a3f3"
+          },
+          "fileEqualsFullOuterLifecycleJson": true,
+          "routes": [
+            "/http-first",
+            "/good-second"
+          ],
+          "returnedResult": {
+            "failures": [
+              "http-first: HTTP 500"
+            ],
+            "grantPresent": true,
+            "grant": {
+              "tsa": "good-second",
+              "tokenDerBytes": 2298,
+              "tokenDerSha256": "08a472e8a49caada5f0f285a60906f55e5b35a234b6edec92385f5133a4de469",
+              "genTime": "2026-10-16T22:59:19.000Z",
+              "anchorId": "amc-p125-grant-test-root",
+              "signerCertSha256": "94fc3f679cfe837f99c3ff08e91b988aaa811e67bd47f80f7ea53771d41651bf",
+              "policyOid": "1.2.3.4.1",
+              "messageImprint": {
+                "hashAlgorithm": "sha256",
+                "digest": "120b6f44b47e45269e817abd59e3b5b033eabea1e61da0c06e93f7dea7a679ec"
+              },
+              "revocationChecked": false
+            }
+          },
+          "replyObservation": {
+            "path": "/good-second",
+            "querySha256": "4fcebd43eaf484c1b22c763da67f50d8e47ac74321a7eecc1b83643e8dd1853b",
+            "responseSha256": "1834a0e1ae1873e112a92d4275604966b38104539bfe990b7272b473178cb2fb",
+            "queryBoundOpenSslVerified": true,
+            "amcVerified": true,
+            "refusalCode": null
+          },
+          "bodyFailed": false,
+          "ownedErrors": [],
+          "cleanupErrorCount": 0,
+          "socketCount": 2,
+          "allHttpTerminalsClosed": true,
+          "allSixChildNaturalExitCloseZeroNoSignalNoError": true,
+          "children": [
+            {
+              "id": "tool-version",
+              "pid": 58778,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 63,
+              "stderrBytes": 0,
+              "stdoutSha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29",
+              "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+            },
+            {
+              "id": "create-root",
+              "pid": 58779,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 2169,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "5f71c9934bc9fbc740f16c097050f344890834824e56fb9fa82f817e108fc840"
+            },
+            {
+              "id": "create-tsa-csr",
+              "pid": 58780,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 2674,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "6605a189a0734587009d0b1a70c2fe3acf875389af1a8fbc145a8b39435f7095"
+            },
+            {
+              "id": "issue-tsa",
+              "pid": 58781,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 80,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+            },
+            {
+              "id": "sign-captured-query",
+              "pid": 58782,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 0,
+              "stderrBytes": 354,
+              "stdoutSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+              "stderrSha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+            },
+            {
+              "id": "verify-query-bound-reply",
+              "pid": 58783,
+              "exitCode": 0,
+              "closeCode": 0,
+              "exitSignal": null,
+              "closeSignal": null,
+              "stdoutBytes": 17,
+              "stderrBytes": 120,
+              "stdoutSha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+              "stderrSha256": "be80eb74a73636d34cb07d478fd897594b337b211cac03bdfd31aa4958c872f9"
+            }
+          ],
+          "privateChildStreamsOrKeysOpenedByThisAudit": false
+        }
+      ],
+      "command": {
+        "phase": "p125g-restore2",
+        "exit": 0,
+        "durationMs": 1884,
+        "startedUtc": "2026-10-16T22:59:17.243827+00:00",
+        "endedUtc": "2026-10-16T22:59:19.141519+00:00",
+        "ownedPgid": 58760,
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false
+      }
+    }
+  ],
+  "operations": [
+    {
+      "operator": "ORDER",
+      "number": 1,
+      "originalPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-original.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "applyPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-apply.json",
+        "bytes": 2785,
+        "sha256": "261aab193410b38fa23928551dfe3a0defd7c3cf37907b137b398b9d63aa1df0"
+      },
+      "manualClassificationPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-classification.json",
+        "bytes": 1439,
+        "sha256": "e9a9c81cff4a36fcde7594f03926a4d827e0f1508ef201a7e09cfc9830e0fd88"
+      },
+      "restorePin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m1-restore.json",
+        "bytes": 3591,
+        "sha256": "3d04b8707545965efb90e513ed33569567fcd7e0fb11db4e70ef25ba3578c811"
+      },
+      "livePatchPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m1.patch",
+        "bytes": 624,
+        "sha256": "c62b9a4a7d71807af886c065889b1448cc9b6167711bcb0f21806a7c96fbdd22"
+      },
+      "livePatchExactlyReconstructsSingleAdmittedHunk": true,
+      "targetInodeStableAcrossApplyAndRestore": true,
+      "manualClassificationBeforeExplicitRestore": true,
+      "firstSensitiveFrames": [
+        403,
+        424
+      ],
+      "masking": [
+        "Failure at403 masks expected empty failures, nonnull grant and identity/token checks406-410.",
+        "Failure at424 masks expected http-first: HTTP500, nonnull grant and identity/token checks426-430."
+      ],
+      "actualFailed": 2,
+      "restoredGreen": 19,
+      "sourceOnlyNoCompiledNativeOrGuardMutation": true
+    },
+    {
+      "operator": "DROP-VALID-GRANT",
+      "number": 2,
+      "originalPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m2-original.ts",
+        "bytes": 10927,
+        "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+      },
+      "applyPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m2-apply.json",
+        "bytes": 2796,
+        "sha256": "72230766032b246375a4c502182fbcb6325c98d40d4f4028e9cd2600a58f749f"
+      },
+      "manualClassificationPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m2-classification.json",
+        "bytes": 1444,
+        "sha256": "bfc4bb60a379db4a2d9da5a3390ca9ecfe8a2ac2d071f42f7a0ea4f07e75cb90"
+      },
+      "restorePin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m2-restore.json",
+        "bytes": 3602,
+        "sha256": "cb253b32779b4a298f5348f25e7452db7cac891e91143b80e0921e3d8f39f3a1"
+      },
+      "livePatchPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/m2.patch",
+        "bytes": 1017,
+        "sha256": "88dc42851df1155f12c35a0b61b15ce688ca12d0b52bf569bd339b7198db58a5"
+      },
+      "livePatchExactlyReconstructsSingleAdmittedHunk": true,
+      "targetInodeStableAcrossApplyAndRestore": true,
+      "manualClassificationBeforeExplicitRestore": true,
+      "firstSensitiveFrames": [
+        406,
+        426
+      ],
+      "masking": [
+        "Nonnull failure406 masks conditional safeguard and TSA/attestation/token equality408-410.",
+        "Nonnull failure426 masks conditional safeguard and TSA/attestation/token equality428-430.",
+        "Earlier fixture/oracle/route/failure assertions precede nonnull assertions and all passed in these actual control bodies."
+      ],
+      "actualFailed": 2,
+      "restoredGreen": 19,
+      "sourceOnlyNoCompiledNativeOrGuardMutation": true
+    }
+  ],
+  "helper": {
+    "actualCommandPin": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125g-clean-source/command.json",
+      "bytes": 1486,
+      "sha256": "11f1ee66a1497ac61adad6cfa6040c904712361403582ee7e505a1426c596849"
+    },
+    "actualNaturalExit": 0,
+    "durationMs": 48466,
+    "actualPostBuildCloneInstallNativeResumeSmoke": true,
+    "vitestCredit": false
+  },
+  "preservation": {
+    "selectedPathsEachRoot": 73,
+    "selectedPhysicalFiles": 146,
+    "compiledPairsIncludedAmongSelected": 8,
+    "protectedByteInputs": 135,
+    "nativePhysicalPins": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 542501039,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 539175547,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543125595,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543200130,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543305423,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543396326,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543499352,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543570530,
+        "nlink": 1
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "dev": 16777231,
+        "inode": 543644499,
+        "nlink": 1
+      }
+    ],
+    "currentSourceFreshCleanAndIndexesEmpty": true,
+    "heldR18StatusHeadIndexExact": true,
+    "beforeAfterM1FinalSnapshotPins": [
+      {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/preservation-before-controls.json",
+        "bytes": 1645,
+        "sha256": "48f68e043f284e4f48610e8ce0442d9eb92795903d33ba4c462b0e10443f0935"
+      },
+      {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/preservation-after-m1.json",
+        "bytes": 1638,
+        "sha256": "64ec9c2d7b6e3a1c75ab2e3ec7a9c7c75588ce506498a333f3e196fd32ed52d3"
+      },
+      {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/preservation-final.json",
+        "bytes": 1635,
+        "sha256": "5c438b52ca8a8539b7c05d0625bc25a03f5c8fdee1dbdc6af460d133b6c1dd92"
+      }
+    ],
+    "compiledSourcePairsRestoredExact": true,
+    "compiledRuntimeSensitivityCredit": false,
+    "currentMarkerProbeNotPerformed": true,
+    "noContinuousIsolationClaim": true
+  },
+  "manualAndPhysicalProtocol": {
+    "sealedReviewedGuardHelperAdopted": true,
+    "allFourActiveHaltedMarkerGuardsPreserved": true,
+    "exclusivePreparedOriginalAndLivePatchRecordsPresent": true,
+    "regularSingleLinkDistinctAndNoFollowGuardsPreserved": true,
+    "oneSourceOnlyOperatorAtATime": true,
+    "allFailuresFirstFramesAndMasksRead": true,
+    "manualHashBoundClassificationBeforeEachExplicitRestore": true,
+    "same19GreenRestore1BeforeSecondOperator": true,
+    "same19GreenRestore2AndFinalPreservation": true
+  },
+  "lifecycle": {
+    "recordsExplicitOutcomeAllowlistOnly": 12,
+    "childrenRecordedNaturalZeroWithNullSignals": 72,
+    "httpSocketsRecordedClosed": 19,
+    "allRecordedRequestResponseTerminalsClosed": true,
+    "cleanupErrors": 0,
+    "controlBodyFailedFlagsAreExpectedAssertionFailures": true,
+    "allQueryBoundOpenSslAndAmcPositiveBeforeSensitiveAssertions": true,
+    "actualSelectedOpenSslVersion": "4.0.3",
+    "signerOptionalConfigStderrDiagnosticsRetained": true,
+    "all12SignerStderrSizeAndHashMatchSourceDiagnosticObservation": true,
+    "privateChildStreamBytesNotReadOrIndependentlyRehashedHere": true,
+    "generatedKeysPrivateRunAndSigningSiblingFilesNotOpened": true,
+    "retainedRootsAndInheritedOuterEnvironmentNoUniversalIsolation": true,
+    "publicRecordPrecedesFinalLogWriteErrorHandling": true
+  },
+  "retainedReadOnlyLookupDiagnostic": {
+    "at": "2026-10-16T22:58:23.264165+00:00",
+    "operation": "Read-only m1 tail lookup after printing all task errors/source frames/live patch",
+    "error": "KeyError: 'log'",
+    "cause": "Outcome command is a compact command view; actual log path is in frozen command.json.",
+    "sourceControlStateUnchanged": true,
+    "correctedRead": "Actual frozen command record log read in full now.",
+    "noRetrySignalRestoreOrQualificationCreditFromFailedRead": true,
+    "controlsMayContinueAfterActualFailureClassification": true
+  },
+  "quality": {
+    "duplicates": 1268,
+    "deadCode": 2719,
+    "globalStatus": "RED",
+    "waived": false,
+    "noNewQualityExecutionByThisAudit": true
+  },
+  "futureMetadataWholeIssueReleaseOrPublicTsaClaim": false,
+  "boundaries": [
+    "Actual controls are source-only Q changes and are now exactly restored. Compiled selected bytes are preservation evidence, not control runtime sensitivity.",
+    "OpenSSL optional-field diagnostics remain explicit; passing tests do not mean empty child stderr.",
+    "Only exact outcome-listed public JSON files were opened inside retained signing roots; no signing siblings, private keys, private-run or child streams were read.",
+    "No runtime/helper/native/SQL/network/probes, source/index/QA mutation or reservation search occurred in this review.",
+    "Fresh canonical19 is the cohort size; source and repeated restores are not added to produce a larger coverage claim.",
+    "Metadata publication, whole P1-25, full suite, release and complete plan remain unclaimed; all holds and F37 skip remain."
+  ]
+}

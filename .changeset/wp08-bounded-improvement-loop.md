@@ -1,0 +1,9 @@
+---
+"agent-maturity-compass": patch
+---
+
+`runImprovementLoop` (exported from the package) runs a bounded improvement loop over an existing experiment. For each proposal, an editor works on a fresh copy of the parent configuration in a temporary directory outside the workspace. The loop harvests the edited file before it removes the directory, and refuses a symbolic or hard link. The loop writes the candidate itself and never signs it with the auditor key. It then executes the candidate against the pinned baseline over the held-out cases of an experiment the loop creates for itself, so the operator's experiment definition is never rewritten. Only the loop, holding the candidate digest from its signed journal, can admit such a candidate to a trial. `amc experiment set-candidate` and `amc experiment gate` refuse it, so promotion still needs an operator-signed candidate. The bound report goes through the experiment gate. A round keeps its parent unless a passing candidate has a strictly higher measured uplift and a unique top. The unchanged baseline therefore stays eligible, and the loop never promotes anything. The loop stops at its width, depth and execution budget, or on cancellation. An identical candidate reuses its measured probe.
+
+Every edit, probe and selection is recorded as a signed audit row in the owning session, keyed by the digest of its inputs. A rerun with the same loop id reuses verified completed stages. A stage that started but never completed is never replayed, and its execution reservation still counts against the budget. A rerun with different inputs is refused. The editor route must name its provider and model together and set effort, step, wall, token and spend limits.
+
+`writeFixerRcaReport` accepts optional `contrasts`, which are passing sibling runs of a failure class. Each proposal now records its evidence class: contrast, repeated failure or single failure. Contrast proposals are listed first.

@@ -1,0 +1,595 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 10463,
+  "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domain-assessment.test.ts",
+    "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domain-packs.test.ts",
+    "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/mcpComplianceSafety.test.ts",
+    "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreCrossFrameworkMapping.test.ts"
+  ],
+  "testCount": 48,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1851453290",
+      "name": "tests/domain-assessment.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domain-assessment.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1851453290_0",
+      "name": "tests/domain-assessment.test.ts domain assessment engine",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1851453290_0_0",
+      "name": "tests/domain-assessment.test.ts domain assessment engine computes composite score with 60/40 weighting",
+      "fullName": "domain assessment engine computes composite score with 60/40 weighting",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1851453290_0_1",
+      "name": "tests/domain-assessment.test.ts domain assessment engine identifies compliance gaps when controls are weak",
+      "fullName": "domain assessment engine identifies compliance gaps when controls are weak",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1851453290_0_2",
+      "name": "tests/domain-assessment.test.ts domain assessment engine reaches L5 with no gaps for high-maturity answers",
+      "fullName": "domain assessment engine reaches L5 with no gaps for high-maturity answers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "834100940",
+      "name": "tests/domain-packs.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domain-packs.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "834100940_0",
+      "name": "tests/domain-packs.test.ts domain packs",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "834100940_0_0",
+      "name": "tests/domain-packs.test.ts domain packs exactly 7 domain packs registered",
+      "fullName": "domain packs exactly 7 domain packs registered",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "834100940_0_1",
+      "name": "tests/domain-packs.test.ts domain packs health pack contains extended questions (HC-7, HC-8, HC-9)",
+      "fullName": "domain packs health pack contains extended questions (HC-7, HC-8, HC-9)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "834100940_0_2",
+      "name": "tests/domain-packs.test.ts domain packs wealth pack absorbs financial questions (FIN-1 through FIN-8)",
+      "fullName": "domain packs wealth pack absorbs financial questions (FIN-1 through FIN-8)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "834100940_0_3",
+      "name": "tests/domain-packs.test.ts domain packs mobility pack absorbs safety-critical questions (SC-1 through SC-8)",
+      "fullName": "domain packs mobility pack absorbs safety-critical questions (SC-1 through SC-8)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "834100940_0_4",
+      "name": "tests/domain-packs.test.ts domain packs education, environment, governance, technology each expose 6 questions",
+      "fullName": "domain packs education, environment, governance, technology each expose 6 questions",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "834100940_0_5",
+      "name": "tests/domain-packs.test.ts domain packs pack scoring reflects maturity without a certification field",
+      "fullName": "domain packs pack scoring reflects maturity without a certification field",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "834100940_0_6",
+      "name": "tests/domain-packs.test.ts domain packs mid answers score 50% and land on L2 of the one level table",
+      "fullName": "domain packs mid answers score 50% and land on L2 of the one level table",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "834100940_0_7",
+      "name": "tests/domain-packs.test.ts domain packs an answer outside 1-5 is refused, not clamped",
+      "fullName": "domain packs an answer outside 1-5 is refused, not clamped",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-2120778746",
+      "name": "tests/mcpComplianceSafety.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/mcpComplianceSafety.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-2120778746_0",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_0",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring scores full compliance with strong MCP safety posture",
+      "fullName": "mcp compliance scoring scores full compliance with strong MCP safety posture",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_1",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring flags missing tool output validation",
+      "fullName": "mcp compliance scoring flags missing tool output validation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_2",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring penalizes unverified MCP servers",
+      "fullName": "mcp compliance scoring penalizes unverified MCP servers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_3",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring detects prompt injection patterns in MCP payloads",
+      "fullName": "mcp compliance scoring detects prompt injection patterns in MCP payloads",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_4",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring raises high warning when injection is observed but not blocked",
+      "fullName": "mcp compliance scoring raises high warning when injection is observed but not blocked",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_5",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring does not raise high warning when injection defenses are active",
+      "fullName": "mcp compliance scoring does not raise high warning when injection defenses are active",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_6",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring penalizes permission scope enforcement gaps",
+      "fullName": "mcp compliance scoring penalizes permission scope enforcement gaps",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_7",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring penalizes weak MCP supply-chain governance",
+      "fullName": "mcp compliance scoring penalizes weak MCP supply-chain governance",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_8",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring penalizes weak MCP Security Bench NRP and taxonomy coverage",
+      "fullName": "mcp compliance scoring penalizes weak MCP Security Bench NRP and taxonomy coverage",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_9",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring returns minimal when only MCP core checks pass",
+      "fullName": "mcp compliance scoring returns minimal when only MCP core checks pass",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_10",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring returns non-compliant when MCP protocol support is missing",
+      "fullName": "mcp compliance scoring returns non-compliant when MCP protocol support is missing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_0_11",
+      "name": "tests/mcpComplianceSafety.test.ts mcp compliance scoring guide includes MCP safety pillars",
+      "fullName": "mcp compliance scoring guide includes MCP safety pillars",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-2120778746_1",
+      "name": "tests/mcpComplianceSafety.test.ts mcp diagnostics and packs",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_1_0",
+      "name": "tests/mcpComplianceSafety.test.ts mcp diagnostics and packs question bank includes AMC-MCP and supply-chain integrity controls",
+      "fullName": "mcp diagnostics and packs question bank includes AMC-MCP and supply-chain integrity controls",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_1_1",
+      "name": "tests/mcpComplianceSafety.test.ts mcp diagnostics and packs core policy packs expose mcp-safety",
+      "fullName": "mcp diagnostics and packs core policy packs expose mcp-safety",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-2120778746_1_2",
+      "name": "tests/mcpComplianceSafety.test.ts mcp diagnostics and packs assurance policy pack registry exposes mcp-safety",
+      "fullName": "mcp diagnostics and packs assurance policy pack registry exposes mcp-safety",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1829360633",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreCrossFrameworkMapping.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1829360633_0",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_0",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping listSupportedFrameworks returns all expected framework entries",
+      "fullName": "score crossFrameworkMapping listSupportedFrameworks returns all expected framework entries",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_1",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping framework metadata includes non-zero control counts and descriptions",
+      "fullName": "score crossFrameworkMapping framework metadata includes non-zero control counts and descriptions",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_2",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping SOC2 framework has article-level controls and zero coverage with no evidence",
+      "fullName": "score crossFrameworkMapping SOC2 framework has article-level controls and zero coverage with no evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_3",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping GDPR framework has article-level controls and zero coverage with no evidence",
+      "fullName": "score crossFrameworkMapping GDPR framework has article-level controls and zero coverage with no evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_4",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping GDPR Article 5 accountability is represented and coverable",
+      "fullName": "score crossFrameworkMapping GDPR Article 5 accountability is represented and coverable",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_5",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping MITRE ATLAS has technique-level controls and zero coverage with no evidence",
+      "fullName": "score crossFrameworkMapping MITRE ATLAS has technique-level controls and zero coverage with no evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_6",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping OWASP API Top 10 has all 10 controls and zero coverage with no evidence",
+      "fullName": "score crossFrameworkMapping OWASP API Top 10 has all 10 controls and zero coverage with no evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_7",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping MITRE ATLAS coverage via prompt injection question",
+      "fullName": "score crossFrameworkMapping MITRE ATLAS coverage via prompt injection question",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_8",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping OWASP API coverage via security question",
+      "fullName": "score crossFrameworkMapping OWASP API coverage via security question",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_9",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping NIST report with no evidence has zero coverage and all controls as gaps",
+      "fullName": "score crossFrameworkMapping NIST report with no evidence has zero coverage and all controls as gaps",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_10",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping NIST coverage can be satisfied by AMC question IDs",
+      "fullName": "score crossFrameworkMapping NIST coverage can be satisfied by AMC question IDs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_11",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping NIST coverage can also be satisfied by active modules",
+      "fullName": "score crossFrameworkMapping NIST coverage can also be satisfied by active modules",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_12",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping NIST non-automatable controls are placed in manualControls",
+      "fullName": "score crossFrameworkMapping NIST non-automatable controls are placed in manualControls",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_13",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping coveragePercent uses rounded integer percent",
+      "fullName": "score crossFrameworkMapping coveragePercent uses rounded integer percent",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_14",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping NIST coverage target is met when coverage threshold is fully met",
+      "fullName": "score crossFrameworkMapping NIST coverage target is met when coverage threshold is fully met",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_15",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping NIST coverage target stays unmet for low coverage",
+      "fullName": "score crossFrameworkMapping NIST coverage target stays unmet for low coverage",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_16",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping EU AI Act manual controls include EU-61 when AMC-2.11 is covered",
+      "fullName": "score crossFrameworkMapping EU AI Act manual controls include EU-61 when AMC-2.11 is covered",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_17",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping ISO 42001 manual controls include ISO-8.4 when AMC-2.12 is covered",
+      "fullName": "score crossFrameworkMapping ISO 42001 manual controls include ISO-8.4 when AMC-2.12 is covered",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_18",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping gap control entries include both control id and control name",
+      "fullName": "score crossFrameworkMapping gap control entries include both control id and control name",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_19",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping auditArtifacts are populated for every framework report",
+      "fullName": "score crossFrameworkMapping auditArtifacts are populated for every framework report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_20",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping duplicate QIDs in input do not duplicate control IDs in output",
+      "fullName": "score crossFrameworkMapping duplicate QIDs in input do not duplicate control IDs in output",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1829360633_0_21",
+      "name": "tests/scoreCrossFrameworkMapping.test.ts score crossFrameworkMapping control coverage uses OR logic between QIDs and modules",
+      "fullName": "score crossFrameworkMapping control coverage uses OR logic between QIDs and modules",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

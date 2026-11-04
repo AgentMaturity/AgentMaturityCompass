@@ -1,0 +1,30 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts (121 tests | 1 failed | 120 skipped) 16ms
+     × rejects malformed marking availability, presence and signer protocol values 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > rejects malformed marking availability, presence and signer protocol values
+AssertionError: publishReceiptsAvailable: expected 'allow' to be 'not_evaluated' // Object.is equality
+
+Expected: "not_evaluated"
+Received: "allow"
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:153:36
+    151|       const input = { ...spec.input, [field]: "false" as unknown as bo…
+    152|       const result = runTechnologyOracle({ ...spec, input });
+    153|       expect(result.result, field).toBe("not_evaluated");
+       |                                    ^
+    154|       expect(result.receipts, field).toEqual([]);
+    155|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 120 skipped (121)
+   Start at  10:06:21
+   Duration  4.79s (transform 3.20s, setup 89ms, import 4.46s, tests 16ms, environment 0ms)
+

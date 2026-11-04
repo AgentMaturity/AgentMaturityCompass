@@ -1,0 +1,35 @@
+{
+  "id": "amc.fixture.baseline",
+  "version": "0.1.0",
+  "compilerCompat": "^1.2.0",
+  "publisher": "Synthetic compiler qualification fixture only",
+  "maintainers": [
+    {
+      "name": "synthetic-fixture-maintainer",
+      "role": "test-fixture"
+    }
+  ],
+  "licence": "MIT",
+  "layer": 0,
+  "title": "Synthetic baseline compiler fixture",
+  "stations": [
+    "education",
+    "environment",
+    "health",
+    "wealth",
+    "technology",
+    "mobility",
+    "governance"
+  ],
+  "jurisdictions": [],
+  "support": "experimental",
+  "controls": [
+    "L0-FIX-01"
+  ],
+  "stewardship": {
+    "partner": null,
+    "updatePlan": null,
+    "triageTargetDays": null,
+    "coverageDoc": null
+  }
+}

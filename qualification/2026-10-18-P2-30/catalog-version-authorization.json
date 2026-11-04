@@ -1,0 +1,15 @@
+{
+  "source": "Direct user instruction and RESERVATIONS.md section 7fccbbfa \u2192 Codex: catalog version bump authorized (2026-10-18)",
+  "appliedSource": "b37f2630b74084282abccb777f41f275813e4103",
+  "scope": [
+    "catalog/catalog.yaml version 0.1.0 \u2192 0.1.1",
+    "Only the own appended catalog/CHANGELOG.md entry version/digest"
+  ],
+  "catalogVersion": "0.1.1",
+  "catalogDigest": "sha256:8626c07e015cd4f1ca10dc0b65129a6b623d55148443bfe802815f2f84ec6b52",
+  "packAndControlVersions": "0.1.0",
+  "intChangelogPrefixPreservedExactly": true,
+  "governanceGuardUnchanged": true,
+  "futurePolicy": "Each later overlay bumps the catalog patch once from int when merged, with one own appended entry. Claude re-bumps at landing if integration version moved; never edit a landed existing entry.",
+  "qualificationPolicy": "Latest instruction requires one full suite on final source with measured totals and baseline-only failures; supersedes the earlier full-suite-pending instruction."
+}

@@ -1,0 +1,7 @@
+{
+  "stdout": "{\n  \"ok\": true,\n  \"errors\": [],\n  \"chain\": {\n    \"ok\": true,\n    \"errors\": []\n  },\n  \"governance\": {\n    \"ok\": true,\n    \"errors\": []\n  },\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"96e1e277362d64f7d85d4be3d4b103761368cefec0e9144533ca86885999740a\",\n    \"expectedFingerprint\": \"96e1e277362d64f7d85d4be3d4b103761368cefec0e9144533ca86885999740a\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"96e1e277362d64f7d85d4be3d4b103761368cefec0e9144533ca86885999740a\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  },\n  \"sessions\": {\n    \"open\": [],\n    \"released\": [],\n    \"interrupted\": [],\n    \"closed\": [\n      \"852613c9-7e96-4068-a034-4a809699bbf4\"\n    ]\n  },\n  \"claimKind\": \"self_reported\",\n  \"statusDimensions\": {\n    \"applicability\": {\n      \"state\": \"applicable\"\n    },\n    \"evidence\": \"incomplete\",\n    \"result\": \"not_evaluated\",\n    \"enforcement\": {\n      \"state\": \"none\"\n    },\n    \"review\": \"pending\"\n  },\n  \"claimLabel\": \"Claim: Self-reported · Result: not evaluated · Evidence: incomplete · Enforcement: none · Review: pending · Applicability: applicable\"\n}\n",
+  "stderr": "",
+  "exitCode": 0,
+  "signal": null,
+  "errorCode": null
+}

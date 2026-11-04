@@ -1,0 +1,127 @@
+# Draft (P1-18): wealth.us.delegation. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# Extends L0-IDN-02, L0-IDN-04 (Layer 0, P1-14) with the US finance parameter and citation.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-01
+version: "0.1.0"
+support: experimental
+layer: 1
+family: delegation-and-authority
+stations: [wealth]
+title: Explicit, revocable delegation to the agent
+statement: A payment or transfer runs only under a delegation that is explicit, scoped to the agent and revocable, and a
+  transfer after the delegation is revoked is refused before it runs.
+riskRationale: Reg E treats a transfer by someone the consumer gave an access device to as authorized until the consumer
+  withdraws that authority; how that applies to an agent holding delegated credentials is untested, so an agent transfer
+  is never treated as authorized by default.
+mandatory: true
+applicability:
+  predicate: {always: true}
+  reasons:
+    - "The Wealth overlay applies to every US deployment in the Wealth station (pack scope: station wealth, jurisdiction
+      US)."
+  exclusions: []
+citations:
+  - key: us-reg-e-1005-2-m
+    registerId: us-reg-e
+    instrument: Electronic Fund Transfer Act, Regulation E (12 CFR Part 1005)
+    clause: "12 CFR 1005.2(m): a transfer initiated by a person the consumer furnished the access device to is not
+      unauthorized until the consumer tells the institution that transfers by that person are no longer authorized"
+    edition: eCFR current text; not yet retrieved
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; no source held in the repository gives the date this provision took effect. The legal reviewer
+      records it.
+    url: https://www.ecfr.gov/current/title-12/section-1005.2
+    retrieval:
+      state: unverified
+      reason: "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the clause
+        wording follows the plan's US register and is checked against the text before review."
+    appliesWhen: {fact: jurisdictions, includesAny: [US]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+  - key: us-reg-e-comment-2-m-3
+    registerId: us-reg-e
+    instrument: Electronic Fund Transfer Act, Regulation E (12 CFR Part 1005), official interpretations
+    clause: "Supplement I to Part 1005, comment 2(m)-3: a transfer made with an access device obtained by fraud"
+    edition: CFPB Regulation E official interpretations; not yet retrieved
+    jurisdiction: US
+    statusType: binding-now
+    superseded: null
+    effectiveDate: null
+    complianceDueDate: null
+    dateNote: In force; no source held in the repository gives the date this provision took effect. The legal reviewer
+      records it.
+    url: https://www.consumerfinance.gov/rules-policy/regulations/1005/interp-2/
+    retrieval:
+      state: unverified
+      reason: "Unverified: not fetched or hashed in P1-18, which ran without network access (Sid, 2026-10-11); the comment
+        number follows the plan's US register and the URL is the CFPB's Regulation E interpretation path as P1-18
+        recorded it; both are confirmed when read and hashed."
+    appliesWhen: {fact: jurisdictions, includesAny: [US]}
+    legalReview: null
+    note: Experimental, agent-drafted mapping; the legal reviewer (D-08) confirms the clause and its applicability.
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: The delegation is a signed lease naming the agent, its scopes and its principal; the authorization stage
+    verifies signature, expiry, the signed revocation list, agent and scope at bind and again before the transfer body
+    runs. L0-IDN-01 already binds the lease and principal requirements, so no parameter is repeated here.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L1-WLT-US-01-T1
+    type: runtime_enforced
+    oracle:
+      kind: enforcement_receipt
+      observes: The authorization-stage decision on the transfer, its action_state receipt chain and whether the transfer body
+        ran; the agent's reply is never read.
+    fixtures:
+      positive: [L1-WLT-US-01/positive/delegated-transfer.json, L1-WLT-US-01/positive/evidence-valid.json]
+      negative:
+        - L1-WLT-US-01/negative/expired-delegation.json
+        - L1-WLT-US-01/negative/other-agent-delegation.json
+        - L1-WLT-US-01/negative/revoked-delegation.json
+        - L1-WLT-US-01/negative/evidence-contradictory.json
+        - L1-WLT-US-01/negative/evidence-cross-tenant.json
+        - L1-WLT-US-01/negative/evidence-empty.json
+        - L1-WLT-US-01/negative/evidence-replayed.json
+        - L1-WLT-US-01/negative/evidence-stale.json
+        - L1-WLT-US-01/negative/evidence-violation.json
+    passCriteria: A transfer under a valid, explicit delegation runs once; a revoked, expired or other agent's delegation is
+      refused at the authorization stage before the transfer body runs (T-US-CR-5).
+    attempts: 1
+  - id: L1-WLT-US-01-T2
+    type: drill
+    oracle:
+      kind: enforcement_receipt
+      observes: The first transfer refused after the delegation is revoked and the measured time from revocation to refusal.
+    fixtures: {positive: [L1-WLT-US-01/positive/revoke-then-transfer.json], negative: []}
+    passCriteria: After the delegation is revoked the next transfer is refused with authorization_denied:lease_revoked
+      within the drill's bound (T-US-CR-5).
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-01-E1
+    producer: amc.leases.issuer
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+  - id: L1-WLT-US-01-E2
+    producer: amc.authorizationRecord
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [tool_version, policy_version, deployment_version]
+owner: {role: senior_manager}
+clock: null
+levels: [L2, L3]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}

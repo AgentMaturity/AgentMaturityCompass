@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:api-ref /Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass
+> node scripts/gen-api-ref.cjs --check
+
+docs/API_REFERENCE.md matches the source.

@@ -1,0 +1,9 @@
+# Preferred V2 bounded-window receipt skeleton
+
+The preferred helper is `v2/assemble-extension.py.source.txt`; its template, report and seal are adjacent. `v2/v1-to-v2.patch.txt` contains the complete two-line correction to preserved, unadopted V1. The full B37-to-B38 structural/privacy/diagnostic description and complete predecessor delta remain in the parent directory. No version was imported, parsed, compiled or executed.
+
+V2 restores the exact actual adopted B38 source-control helper SHA25673203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32 after root identified V1's insufficient generic hash-shape check. It also projects the selected diagnostic-command pin's right side to path/bytes/SHA256, preserving V4's exact comparison when physical metadata is present. Both changes tighten guards; no actual evidence, phase, outcome, mask or preservation record changes.
+
+The template adds only the V2 helper/delta hash-only pins, the actual adopted support pin and boundary prose. It remains ready:false. Root still supplies the reviewed actual accepted-chain/peer/whole-issue/public inventory/cutoff/environment/prose fields and separate metadata admission. The original overlapping M1 diagnostic, preserved old binding and actual helper-closure chronology remain mandatory; no diagnostic sensitivity is accepted. All1481 prior payloads,173 ordered commands and2188 ordered pins remain protected by the unchanged checks.
+
+All privacy, explicit public allowlist, literal-marker refusal before lossless encoding, inert code/compiled-helper exclusion,1MiB limit, active151/ten-plus-fresh native protection and later ordinary publication/index/default-whitespace/export requirements remain. Root's earlier36941/36920 read sampled unsealed construction; all seven final V1 declared outputs were exact before V2 was authored. No source, index, QA or signing-root/private-stream reads or writes occurred.

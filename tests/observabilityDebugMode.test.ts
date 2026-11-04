@@ -12,10 +12,10 @@ import { initWorkspace } from "../src/workspace.js";
 
 const roots: string[] = [];
 
-function newWorkspace(): string {
+function newWorkspace(witnessing?: false): string {
   const workspace = mkdtempSync(join(tmpdir(), "amc-observability-debug-test-"));
   roots.push(workspace);
-  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated", witnessing });
   return workspace;
 }
 
@@ -155,6 +155,28 @@ describe("observability debug mode", () => {
     await streamPromise;
     expect(seen).toContain("ev-stream-1");
     expect(seen).not.toContain("ev-stream-other");
+  });
+
+  test("follows a ledger with no evidence rows from its first event", async () => {
+    // witnessing: false leaves evidence_events empty (no WITNESSING_ENABLED row), so there is no history and no last row.
+    const workspace = newWorkspace(false);
+    expect(listEvidenceDebugEvents({ workspace, agentId: "agent-empty", limit: 10 })).toEqual([]);
+    const seen: string[] = [];
+    const streamPromise = streamEvidenceDebugEvents({
+      workspace,
+      agentId: "agent-empty",
+      follow: true,
+      includeHistorical: true,
+      pollIntervalMs: 10,
+      maxFollowIterations: 25,
+      onEvent: (event) => {
+        seen.push(event.id);
+      }
+    });
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 30));
+    appendEvent({ workspace, id: "ev-first", ts: Date.now(), eventType: "audit", meta: { agentId: "agent-empty" } });
+    await streamPromise;
+    expect(seen).toEqual(["ev-first"]);
   });
 
   test("emits anomaly callbacks for trust regressions in streamed history", async () => {

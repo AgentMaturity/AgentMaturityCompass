@@ -1,0 +1,88 @@
+{
+  "profileVersion": 1,
+  "profileId": "mobility-port-operations",
+  "deployment": {
+    "tenantId": "mobility-fixture-tenant",
+    "workspaceId": "mobility-fixture-workspace",
+    "deploymentId": "mobility-port-operations-fixture",
+    "agentIds": [
+      "mobility-fixture-agent"
+    ]
+  },
+  "primaryStation": {
+    "value": "mobility",
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "stations": {
+    "value": [
+      "mobility"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "domains": {
+    "value": [
+      "mobility.ports-logistics-cities"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "jurisdictions": {
+    "value": [
+      "US",
+      "EU"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "roles": {
+    "value": [
+      "deployer"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "entityTypes": {
+    "value": [
+      "port_facility_operator",
+      "freight_logistics_operator"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "riskClass": {
+    "value": null,
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "useCases": {
+    "value": [
+      "cold_chain_release",
+      "port_access"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "dataClasses": {
+    "value": [
+      "shipment_condition_records",
+      "port_access_records"
+    ],
+    "provenance": "asserted",
+    "source": "docs/catalog/mobility/README.md#asserted-fixture-profiles",
+    "reviewedBy": null
+  },
+  "euRoleRecord": null,
+  "art63Record": null,
+  "operatingProfile": null,
+  "exceptions": []
+}

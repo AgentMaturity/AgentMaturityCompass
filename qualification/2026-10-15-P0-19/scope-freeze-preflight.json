@@ -1,0 +1,574 @@
+{
+  "kind": "P0-19 source-only scope and freeze qualification preflight. No new test file, runtime, server, build, install, live dist read or production edit was performed.",
+  "capturedUtc": "2026-10-14T20:58:59.723610+00:00",
+  "workspace": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+  "sourceHead": "8c16a9044ddea43923e3ed49bc36a9aada485855",
+  "branchObserved": "codex/p0-19-current-qualification",
+  "gitStatusObserved": "",
+  "acceptedSource": "The managed tree is clean at 8c16a9044ddea43923e3ed49bc36a9aada485855. All 25 previously inspected source/config/helper inputs match the verified routing pins. Parent will assign/branch and announce readiness after canonical P0-27 closure; this report is preparation only.",
+  "priorRoutingReceipt": {
+    "path": "/private/tmp/p0-27-next-routing-preflight-20261015.json",
+    "sha256": "aef1d2aa863c787cfa4ee8665995ead6bb4efe27e9f2315d686c365bb22b22a5"
+  },
+  "planAndReservationPins": [
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+      "matchesPreviousPin": true
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+      "matchesPreviousPin": true
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-19.md",
+      "sha256": "6cdeabe21d7f1512dbf5919e554daedeb8182e9457b894db473582d8131d404b",
+      "matchesPreviousPin": true
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-55.md",
+      "sha256": "d77a082bd93e1dd71c16063854c1be74d574a0d9b73ecffdbc890bf31783398d",
+      "matchesPreviousPin": true
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-27.md",
+      "sha256": "dcfab371fdb076e688ab79d1ea9e471c16e68088f46ea1cde4c240283067a889",
+      "matchesPreviousPin": true
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0",
+      "matchesPreviousPin": true
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "matchesPreviousPin": true
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+      "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870",
+      "matchesPreviousPin": true
+    }
+  ],
+  "sourcePins": [
+    {
+      "path": "src/assurance/scenarioGrading.ts",
+      "sha256": "552aa7235f50a5f835d4d33259c500a997e3a8e05664dca633b77ee1917c4af0",
+      "lines": 93,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "sha256": "df359ee58e875b298804e643c0c5905c6cac4c35e68ee8af9d575f87acca424f",
+      "lines": 343,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/scorers.ts",
+      "sha256": "46a1c75c36b7c8ba4d3b619eb2aff1d14c4ebc0333251f46f342df82a5a53cea",
+      "lines": 54,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "sha256": "50bc232fa9f6eaeee5d52745854cd1d4658481492c7024b102ab515cd2197766",
+      "lines": 975,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "sha256": "49b8dd03393dd801303c176859b3f5a8f1900f1fe3692912d1a8d2c6673f6c7b",
+      "lines": 288,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/agentResponder.ts",
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807",
+      "lines": 597,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/assuranceFindings.ts",
+      "sha256": "0521777e1b8946b79729a87b671433687b0aa0d037b184d54560613f1c28879b",
+      "lines": 68,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/assuranceSchema.ts",
+      "sha256": "8444586cbf5c3521e4592a9a40baa58394a14edb4405d7bc38d2390ae15baa8f",
+      "lines": 247,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/assurancePolicyStore.ts",
+      "sha256": "8fd209dabfd5734f9642893672eba7ffa7dd93a0e557a9b3151a275b58aa2e40",
+      "lines": 302,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "sha256": "c4d54b585ff8cd232983357a7dcbaa6a6b2cef850ed6aa436804ea37c8a29fc9",
+      "lines": 75,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/redteam/runner.ts",
+      "sha256": "f6b0ab0b426ccbf3a7b5fa102c1f6997ff606e08fe9ebf51fe851afb0118ed9a",
+      "lines": 649,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/catalog/evidence/mappingAdapter.ts",
+      "sha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd",
+      "lines": 219,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9",
+      "lines": 356,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/types.ts",
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af",
+      "lines": 3694,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/claims/eligibility/exampleMode.ts",
+      "sha256": "a5a8379e6b2eb37d9bb7ab6e59ae1abadb5f6e19a5694fd13667c28b79a0a76f",
+      "lines": 92,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "tests/helpers/fakeAgentServer.ts",
+      "sha256": "d0d3d34258748a87358d7c144b70c6292ee5290551959ec36424d7e82c1c6d58",
+      "lines": 180,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/packs/industryPackManifest.ts",
+      "sha256": "7a0a926bfc0f3dbbc249ecc63a09df97aa764338ae8a57e606f8984a81ee6ca6",
+      "lines": 471,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/assurance/packs/index.ts",
+      "sha256": "ef7acc6ac3dd7ba874042fe1d140ed35ce67a723af30716c37f12c19c95ea17b",
+      "lines": 351,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "lines": 24430,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/cli/resultCommandRegistry.ts",
+      "sha256": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+      "lines": 314,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/repl/replParser.ts",
+      "sha256": "58109e8e8aa5eb706ba19a617571bdb9c6da572a5378f9c4533fd7008c77b805",
+      "lines": 520,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "scripts/graphify-navigation.py",
+      "sha256": "80676c94070c35cdd1b41cfbbc6855ceca19abf4db0157b4dba8140d2171553a",
+      "lines": 369,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "lines": 32,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "lines": 66,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "lines": 405,
+      "matchesPreviousRoutingPin": true
+    },
+    {
+      "path": "src/utils/json.ts",
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "lines": 19
+    },
+    {
+      "path": "src/utils/hash.ts",
+      "sha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601",
+      "lines": 9
+    },
+    {
+      "path": "src/ledger/ledgerVerification.ts",
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e",
+      "lines": 755
+    },
+    {
+      "path": "src/trust/trustContext.ts",
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "lines": 129
+    },
+    {
+      "path": "tests/helpers/trustContext.ts",
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "lines": 77
+    },
+    {
+      "path": "src/org/orgSigner.ts",
+      "sha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+      "lines": 144
+    },
+    {
+      "path": "src/assurance/assurancePolicySchema.ts",
+      "sha256": "eb71063c0587731ef98d937af87db67dfd80658bd924138b30fcfde3af14b8a4",
+      "lines": 101
+    },
+    {
+      "path": "spec/schemas/v1/evidence-event.schema.json",
+      "sha256": "b3f2e333528cde2e54a3e3d68e8f0691da122b688dab396d175d46aa5460100a",
+      "lines": 216
+    },
+    {
+      "path": "docs/ASSURANCE_LAB.md",
+      "sha256": "60f6caaec74936a7911f63ce82c5c8b26ad4a437abbdbb85f8f97f80029aa857",
+      "lines": 189
+    },
+    {
+      "path": ".changeset/assurance-grading-inconclusive.md",
+      "sha256": "7ec571de1ca47c940e38b31e621a952b6efe05e0604fa46dc9f8d4f3b91d983e",
+      "lines": 11
+    },
+    {
+      "path": ".changeset/assurance-v1-inconclusive.md",
+      "sha256": "216b42fa0f472d5099dfc95c7f2aceae4de2ae026bd21282a98c8d4bc64cb6c2",
+      "lines": 5
+    }
+  ],
+  "existingTestHashes": [
+    {
+      "path": "tests/assuranceLab.test.ts",
+      "sha256": "1be062745968429e010387a4929d963c6eef923b9d8343055faee1c30fe628f6"
+    },
+    {
+      "path": "tests/assuranceAgentResponder.test.ts",
+      "sha256": "4e2aaba81d0e12e63fa571902e63770511a0cef24892d858765f5dd679e24b30"
+    },
+    {
+      "path": "tests/regulatoryAssurancePacks.test.ts",
+      "sha256": "b5601b3e44b127b677bdf351b78cd74c359c157726a6cf8ae91f04fc09d97853"
+    },
+    {
+      "path": "tests/assurance/industryPackFailClosed.test.ts",
+      "sha256": "0fe16ae6c7727ea1aa381c35a4611b6d814098800c4212b4565009cb41798b32"
+    },
+    {
+      "path": "tests/compliance/complianceFailClosed.test.ts",
+      "sha256": "0f503d86bb822b93308a46144f8a107cf08e7084982e4f9d8dfcb91fbdf64297"
+    },
+    {
+      "path": "tests/redteam.test.ts",
+      "sha256": "dc060dd4394fbac18421f8d57cfd7b0599aaee11aa40e519743581f3a2e70237"
+    },
+    {
+      "path": "tests/validators.test.ts",
+      "sha256": "290c6970177de5d1414a36371e8447a388d5d2d94c4516441b39b836b092bca7"
+    },
+    {
+      "path": "tests/assuranceScenarioContextParity.test.ts",
+      "sha256": "0c2220eb87d67d239523f5cb4db805c3cb9c49cce586c02fc95757fbbc8535da"
+    },
+    {
+      "path": "tests/assurance/inMemoryStorePersistence.test.ts",
+      "sha256": "732cb3236df44a0b3aded8f2756a27be71bfa38f9c77c7a7d93966f6e2e016ac"
+    }
+  ],
+  "acceptedAncestry": {
+    "P0-13": {
+      "commit": "dc444dc6ba5bf7c43d2eaf2e48fbe79cb420ebfd",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-17": {
+      "commit": "121644a4bf3519daaabaaa79fb825cd1d24e002c",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-25": {
+      "commit": "b4ca425cc12c48b83477ab260a06454f5874bc73",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-19_original": {
+      "commit": "3aa75a1196417570f9199980c290dad36a55dea3",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-19_v1_followup": {
+      "commit": "da093617408162ac38a3a01a52bf9e4209fca292",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    },
+    "P0-55_followups": {
+      "commit": "5d4740de268e513bfa63e6fecb3cd3fa1cb2a48b",
+      "ancestorOfCurrent": true,
+      "ancestorOfMain": true
+    }
+  },
+  "verifiedExistingD15": [
+    {
+      "path": "src/assurance/assurancePolicyStore.ts",
+      "issue": "P0-15",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-15/src/assurance/assurancePolicyStore.ts.landed",
+      "sha256": "c7f4d42dd9d01f9d873a763684949b58926bd0b6d61feca351496ccfae2c4228",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/assurance/assuranceStore.ts",
+      "issue": "P0-09",
+      "baseCommit": "9b9058705e9c67af9d82d87aeacb1e2cb78b8ac1",
+      "archivePath": "unused-code/plan-edits/P0-09/src/assurance/assuranceStore.ts.landed",
+      "sha256": "8b6aff7d3c7f9936881a7989e08d7d938151c2c30f9b871be80b6e9c924839b0",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "issue": "P0-19",
+      "baseCommit": "201c76b659d8afe2c556e951764d401cec60e6a5",
+      "archivePath": "unused-code/plan-edits/P0-19/src/assurance/validators.ts.landed",
+      "sha256": "4df07f2532ae2547cb195abd083e8e2fb6ba403b0b478af50298a0322d562293",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/compliance/complianceEngine.ts",
+      "issue": "P0-17",
+      "baseCommit": "6b899a60c7ba3b605fed78e9257901e84b93c871",
+      "archivePath": "unused-code/plan-edits/P0-17/src/compliance/complianceEngine.ts.landed",
+      "sha256": "ba998601991b6b5841c198b439b7f36bf13780a46beb08094f2336bcb2c43ad8",
+      "archiveAndBaseBytesVerified": true
+    },
+    {
+      "path": "src/types.ts",
+      "issue": "P0-44",
+      "baseCommit": "c64a87641297be160f5901ed4d9c0634b341fef8",
+      "archivePath": "unused-code/plan-edits/P0-44/src/types.ts.landed",
+      "sha256": "61ca2bd7d2394b3ef1d38666868c50f43698f642d84291e511baf9b603e11645",
+      "archiveAndBaseBytesVerified": true
+    }
+  ],
+  "lineLimits": [
+    {
+      "path": "src/assurance/assuranceRunner.ts",
+      "lines": 975,
+      "limit": 976,
+      "remaining": 1,
+      "productionClearance": false
+    },
+    {
+      "path": "src/assurance/evidenceWriters.ts",
+      "lines": 288,
+      "limit": 800,
+      "remaining": 512,
+      "productionClearance": false
+    },
+    {
+      "path": "src/assurance/scenarioGrading.ts",
+      "lines": 93,
+      "limit": 800,
+      "remaining": 707,
+      "productionClearance": false
+    },
+    {
+      "path": "src/assurance/validators.ts",
+      "lines": 343,
+      "limit": 800,
+      "remaining": 457,
+      "productionClearance": false
+    },
+    {
+      "path": "src/cli.ts",
+      "lines": 24430,
+      "limit": 24431,
+      "remaining": 1,
+      "productionClearance": false
+    },
+    {
+      "path": "src/redteam/runner.ts",
+      "lines": 649,
+      "limit": 800,
+      "remaining": 151,
+      "productionClearance": false
+    }
+  ],
+  "graph": {
+    "copy": "/private/tmp/p0-52-graph-navigation-w8xr443v",
+    "nodes": 36459,
+    "originalGraphMtime": "2026-09-08 12:39:47 IST",
+    "bytes": 45692207,
+    "reviewedVersion": "0.9.56",
+    "installedVersion": "0.9.74",
+    "queryLogs": [
+      {
+        "path": "/private/tmp/p0-27-next-routing-graph-query-20261015.log",
+        "sha256": "6dcc5bba360ede194c25b1a9ae8a6486c9a4541852afa77718d5b256d2860a88"
+      },
+      {
+        "path": "/private/tmp/p0-27-next-routing-grader-graph-query-20261015.log",
+        "sha256": "3d326bd3a15423520328c2457a42ffffc9ed02dc698446bd9a4f569141d1849e"
+      },
+      {
+        "path": "/private/tmp/p0-27-next-routing-validator-graph-query-20261015.log",
+        "sha256": "e3da69a9c6afcfcaa8e57e9693709d65ca190b78992a2dc7ac0862a92ec7dfc0"
+      }
+    ],
+    "limits": "The broad query found 83 nodes and displayed 58; a filename query matched documentation only. The refined baseRefusalChecks/validateInjectionResponse/validateExfiltrationResponse query found 40 and displayed 36 relevant nodes. The stale graph is navigation only; direct source establishes current behavior. No refresh/watch/server was used.",
+    "use": "The existing private scoped queries and verified current routing source pins are reused; the old graph remains navigation only. No graph refresh or next runtime was performed."
+  },
+  "authorization": {
+    "root": "Only the two private preflight documents are currently owned. No new test/source/runtime until root canonical closure/build-ready notice.",
+    "plannedPureAgent": "Only new tests/assuranceGradingQualification.test.ts after explicit assignment.",
+    "plannedRunnerAgent": "Only new tests/assuranceRunnerInconclusiveQualification.test.ts after explicit assignment.",
+    "plannedRoot": "Optional current mappingAdapter/regulatory eligibility controls, existing baselines, actual CLI if needed, install/build/type/static/freeze and final bounded receipt.",
+    "protected": "All production and original tests, shared CLI/registry/REPL, ledger, API/Studio/A4/privacy/native composition, frozen archives/manifest, guard/floor/budget files and held/paused work stay unchanged. No echo47, reimplemented grader, generic scoring or claims redesign."
+  },
+  "statusAndMethods": {
+    "gradeUnion": "A graded ScenarioGrade has validation and score0to100/score0to5 plus gradingMethod. An inconclusive ScenarioGrade has cause/reasons/auditTypes and no score fields; actual runner materialization assigns zero/pass false. Do not require imaginary zero fields on the pure inconclusive union.",
+    "dispatchOrder": "validateToolCalls first yields structured; otherwise nonempty toolCalls yields tool_calls_ungraded even with text; otherwise token-claim yields token_claim; otherwise actual text validator missing/synthetic audit types yield ungradable_evidence; remaining outcomes use measured 70-20n partial credit.",
+    "methodCaps": "scenarioGradingMethod uses structured when a callback exists, otherwise the declared method/default keyword. packGradingMethod takes the weakest token-claim < keyword < structured < executed; empty packs remain keyword. Only structured/executed methods are regulatedEligible. Eligibility describes method, not trust, applicability, evidence sufficiency or a positive result.",
+    "actualBuiltIns": "Source search found no actual built-in validateToolCalls callback or structured/executed declaration. A finite pure callback descriptor exercises dispatch as a test fixture only; no executed/live pack is invented.",
+    "reportStatus": "AssuranceReport.status is artifact validity VALID/INVALID/UNSIGNED; report.evidenceStatus is MEASURED/INSUFFICIENT_EVIDENCE. Persisted v1 run.score.status is PASS/FAIL/INSUFFICIENT_EVIDENCE/ERROR, with score.pass false for insufficient evidence. A sealed artifact is not a measured pass.",
+    "gradingFields": "Graded rows carry gradingMethod; inconclusive rows carry inconclusive/inconclusiveCause and retain toolCalls when present, with no responseTransport/gradingMethod falsely attributed. Pack results carry their weakest method and regulatedEligible.",
+    "trustTier": "The actual producer sets OBSERVED, or OBSERVED_HARDENED for sandbox plus deny-default proxy; the direct responder also says OBSERVED because AMC captures the request/reply. Do not assert the earlier manual-seeder SELF_REPORTED convention for this real loopback producer. Controlled local fixture provenance remains explicit and is not independent regulated evidence."
+  },
+  "redactionContract": {
+    "source": "src/assurance/evidenceWriters.ts:91\u201398,127\u2013157; src/assurance/agentResponder.ts:58,228; src/types.ts:3444.",
+    "serverInput": "Existing fakeAgentServer option takes {name,arguments}; its OpenAI JSON puts name under function.name and arguments as JSON.",
+    "parsedCall": "Actual AgentToolCall and report use {toolName,arguments}; a pure actual-grader fixture must use toolName, not name.",
+    "ledgerPayload": "Redacted JSON {redacted:true,reason:\"assurance policy: storeOnlyHashesAndRefs\",sha256,bytes}. The hash/byte count cover canonical {text,toolCalls} when calls exist. Raw text/tool arguments are absent from ledger payload; meta.toolCallCount retains count. With no calls, the hash/bytes cover the original plain text.",
+    "assertions": [
+      "Hash the known harmless endpoint response with the existing canonicalize/sha256Hex helpers and compare exact ledger sha256/bytes.",
+      "Verify redacted true, exact policy reason and toolCallCount; ensure the harmless marker/path/raw toolName/text do not appear in stored payload.",
+      "Compare the actual report parsed toolCalls and scenario/session/run references separately.",
+      "Do not demand raw calls in ledger, change privacy/redaction, or claim the entire report/v1 trace contract redacts or hashes calls the same way."
+    ],
+    "traceLimit": "The existing v1 trace outputHash hashes scenario.response text. This preflight does not redesign that trace contract or promote the trace into executed-tool evidence."
+  },
+  "independentPinPlan": {
+    "fixture": "Fresh owned root, isolated initWorkspace, sibling HOME and AMC_HOME; scoped env restored after each fixture. Never user/home/current ledger. No globalCWD change.",
+    "beforeArtifacts": "Read monitor and auditor public PEMs immediately after initialization and before responder calls/rows/reports. Save public PEMs and fingerprints only. Deriving a pin from later artifact-carried keys is prohibited.",
+    "monitor": "Actual verifyLedgerIntegrity receives expectedMonitorFingerprint and a real loadTrustContext expectMonitor where supported. Since runAssurance/verifyAssuranceRun internally load default trust, scoped AMC_EXPECTED_MONITOR_FINGERPRINT must already hold the independently captured monitor pin before calling them. No allowUnpinned/allowUnanchored bypass.",
+    "auditor": "Verify actual artifact signatures/seals under captured auditor PEM or a genuine operator signed-list fixture for artifact-seal. Separate crypto integrity, issuer admission and controlled local provenance.",
+    "schema": "Read current typed result/report/v1 schema and validate actual persisted artifacts with existing loaders/schema. Do not substitute historical schema1 or invent fields absent on inconclusive rows."
+  },
+  "pureQualification": {
+    "file": "tests/assuranceGradingQualification.test.ts",
+    "actualParams": "Use actual getAssurancePack scenarios/buildPrompt and existing context. Empty/whitespace and existing EXAMPLE_ASSURANCE_REPLY exercise gradeIndustryEvidence; harmless calls use {toolName:\"read_owned_fixture\",arguments:{path:\"fixture.txt\"}}.",
+    "positiveControls": [
+      "Actual text-only passing refusal/alternative response to a real injection scenario is graded keyword and has score 100/5, not inconclusive.",
+      "A real measured failure remains graded with its existing partial-credit score; a sufficiently reasoned measured failure may legitimately score 0 while still counting as a measured fail.",
+      "A finite validateToolCalls descriptor returns a genuine ValidationResult for benign calls; actual grader dispatches to it and returns structured, while a callback failure remains a graded failure. This is a callback branch fixture."
+    ],
+    "negativeContracts": [
+      "Missing/canned real industry replies are ungradable_evidence without score properties.",
+      "Tool-only and mixed prose/calls to actual text scenarios are tool_calls_ungraded; apparently passing prose next to a call cannot pass.",
+      "Token-claim real scenarios remain token_claim.",
+      "Actual repeated-secret, policy-alone and refusal-plus-leak helper behavior is deterministic and existing original regressions remain."
+    ],
+    "aggregateContracts": "Use actual scoring/aggregate/pack-method helpers. Inconclusive rows never enter pass/fail/mean; all-inconclusive score 0 is absence of measurement. Preserve measured zero failure distinction, empty pack default, pairwise weakest method and false eligibility for keyword/token-claim. No generic methodology rewrite."
+  },
+  "runnerQualification": {
+    "file": "tests/assuranceRunnerInconclusiveQualification.test.ts",
+    "endpoint": "Reuse existing startFakeAgentServer({toolCalls:()=>[{name:\"read_owned_fixture\",arguments:{path:\"fixture.txt\"}}]}) on loopback; the actual responder parser and producer are not mocked. Existing helper supplies content:null for calls. Pure tests cover mixed prose; do not edit the helper just to duplicate that case.",
+    "assuranceParams": {
+      "agentId": "default",
+      "packIds": [
+        "injection"
+      ],
+      "mode": "sandbox",
+      "window": "1d",
+      "noSign": false
+    },
+    "redteamParams": {
+      "agentId": "default",
+      "plugins": [
+        "injection"
+      ],
+      "strategies": [
+        "direct"
+      ],
+      "noSign": true
+    },
+    "inconclusiveControls": [
+      "Use actual nonempty pack scenario IDs/counts and exact observed endpoint calls; no vacuous array or all-pack expansion.",
+      "Every response is tool_calls_ungraded, pass false and both scores 0; measured pack pass/fail counts 0 and overall score0; evidenceStatus insufficient.",
+      "Each scenario has exact prompt/response evidence IDs, matching run/session/agent/pack/scenario attribution; actual HIGH ASSURANCE_SCENARIO_INCONCLUSIVE audit is recorded.",
+      "Report toolName/arguments and redacted canonical digest/meta agree; genuine row signatures and session/run seal verify under the captured pins.",
+      "Later verifyAssuranceRun accepts the genuine zero-score inconclusive report without determinism errors; a copied fixture report carrying pass/nonzero scores is refused with its specific error, preserving additional hash/DB/admission failures honestly.",
+      "Load actual v1 run/findings through current loaders: inconclusive flags persist, score.status insufficient, pass false, findings empty and all findingCounts 0. Do not accept missing files or constructor-only fields as success."
+    ],
+    "positiveControls": [
+      "A separate real text-only measured passing/failed response preserves measured counts and produces genuine success/failure behavior without forcing keyword regulated eligibility.",
+      "At least one measured-failure v1 control still produces a finding, so an always-empty findings implementation cannot pass.",
+      "Actual injection/direct red-team tool replies remain unsigned-local, inconclusive and excluded from pass/fail/vulnerability counts; returned calls are not executed tools."
+    ],
+    "effects": "Retain exact names/byte hashes/links and semantic main/unsigned DB rows before/after each phase, including any WAL/SHM, initialization, cache/header effects. Distinguish deliberate producer writes and reader effects; do not assert blanket no effects. Close owned handles and bound all local server/child lifetimes."
+  },
+  "sourceOnlyConcern": {
+    "status": "Unexecuted source observation, not a qualified runtime RED or repair authorization.",
+    "paths": [
+      "src/assurance/assuranceRunner.ts:569\u2013612,631",
+      "src/ledger/ledgerVerification.ts:464\u2013470"
+    ],
+    "observation": "runAssurance computes verificationPassed/artifact status while its non-agent session is still unsealed and seals later. The ordinary strict verifier requires that seal. Retain the actual resulting status separately from evidenceStatus and the later verifier result; do not force VALID or conceal a failure. Root decides any bounded reproduction/repair after actual evidence."
+  },
+  "rootOptionalCompliance": "Reuse genuine sealed current compliance fixtures and mappingAdapter.ts:136 for keyword/token-claim/older missing eligibility fields. Preserve current applicability/evidence semantics and existing baselines. Claim label/source upgrades or arbitrary report metadata are not introduced here.",
+  "privateCausalPlan": {
+    "state": "No mutation/build/runtime now. After readiness, use separately copied existing compiled modules with dependency/public-input hashes; never mutate production source or live dist.",
+    "pureRoutes": [
+      "Remove only ungradable branch, expecting missing/canned measured-score assertions to fail.",
+      "Disable nonempty-tool-call check only, expecting tool-only/mixed text controls to fail.",
+      "Restore only the global flag on a secret regex, expecting the real repeated-call assertion to fail."
+    ],
+    "runnerRoutes": [
+      "Use a copied existing producer/adapter module for an exact tool-call discard or inconclusive-to-findings mutation if specifically assigned; retain meaningful stored/digest/v1 assertions and preserve all other controls."
+    ],
+    "protocol": "Identical baseline/mutant/restored observer assertions, exact private diff and restore, actual counts/exits/raw JSON/streams, explicit Node22 executable+PATH and scoped dependency resolution. A parser/import/fixture failure is not a killed behavioral mutation. Root coordinates any compiled input snapshot/build boundary."
+  },
+  "freeze": {
+    "active": true,
+    "P019InAllowedExceptions": false,
+    "baselineSha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "rule": "No new CLI path/inventory, shared registration, guard/floor/budget change, archive re-registration or restoration-test weakening. Line headroom is not ownership permission. All current source stays unchanged."
+  },
+  "preservedDebt": [
+    "P2-27 owns 47 in-scope echo scenarios retained at pending-checks.md:54 and excluded by P0-55. Do not redesign regex validators, count echoes as measured evidence, resume P2-27 or close whole P0-19.",
+    "Paused P2-02/tokenization, held P1-78/native/A4/privacy source, primary/main and Claude trees remain preserved; held pending-main is not imported.",
+    "Current parent mixed CLI/SQLite observations remain retained. Coordination sidecars and other named effects are separate from semantic row isolation and persistent-byte assertions; this pass makes no blanket no-effects or parent runtime acceptance claim.",
+    "P0-27 strict tagged-system exclusion remains RED alongside accepted direct metadata compatibility.",
+    "P0-20 shared output-line/exit70 decision remains pending; helper qualification is not shared-source or authenticated HTTP approval.",
+    "P0-52 narrow alias-history/destination decision remains pending.",
+    "P0-29 successor and P0-22 empty-result skips remain unresolved.",
+    "P0-51 pinned compromised-signer precedence contradictions remain RED.",
+    "P0-55 whole urgent acceptance, authenticated API/Studio, remaining writers/session inventory and release/G0 remain unclosed."
+  ],
+  "limits": [
+    "The 47 echo deferral and approval-theater frozen prompt gap remain in P2-27; current coverage cannot close P0-19 whole echo acceptance.",
+    "P0-27 canonical/final receipt and build readiness remain root prerequisites. Existing 72/71/1 normal qualification does not waive its strict system-row contract.",
+    "No authenticated HTTP, external provider/model, live entitlement, executed tool, full suite, Node24, release or G0 outcome is inferred from this source-only preflight."
+  ]
+}

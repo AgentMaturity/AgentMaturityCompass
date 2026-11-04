@@ -17,10 +17,10 @@ import {
   evaluateProviderHookControl,
   verifyProviderHookControlResult,
 } from "../src/bridge/hookControl.js";
+import { listApprovalRequests } from "../src/approvals/approvalChainStore.js";
 import { questionBank } from "../src/diagnostic/questionBank.js";
 import { checkExec } from "../src/enforce/execGuard.js";
 import { parseShellCommandPlan } from "../src/enforce/shellCommandPlan.js";
-import { getAgentPaths } from "../src/fleet/paths.js";
 import {
   defaultActionPolicy,
   initActionPolicy,
@@ -29,6 +29,10 @@ import { openLedger } from "../src/ledger/ledger.js";
 import { toolsConfigPath } from "../src/toolhub/toolhubValidators.js";
 import type { DiagnosticReport } from "../src/types.js";
 import { initWorkspace } from "../src/workspace.js";
+import { claudeWorkspace, controlRequest, decide, recorded } from "./helpers/claudeCodeHookFixtures.js";
+import { removeFixtureWorkspaces } from "./helpers/piHookFixtures.js";
+import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
+import { writeSealedRun } from "./helpers/actionPolicyFixtures.js";
 
 const roots: string[] = [];
 
@@ -37,6 +41,7 @@ function newWorkspace(): string {
   roots.push(workspace);
   process.env.AMC_VAULT_PASSPHRASE = "amc-1483-compound-command-test";
   initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  writeRuntimeFirewallPolicy({ workspace: workspace, mode: "observe" }); // AXR-01: ToolHub and hook control apply the runtime firewall as the native pipeline does; unsigned, it blocks every call.
   return workspace;
 }
 
@@ -80,9 +85,7 @@ function installObservedRun(workspace: string, agentId: string): void {
     runSealSig: "fixture",
     reportJsonSha256: "fixture",
   };
-  const paths = getAgentPaths(workspace, agentId);
-  mkdirSync(paths.runsDir, { recursive: true });
-  writeFileSync(join(paths.runsDir, `${report.runId}.json`), JSON.stringify(report, null, 2));
+  writeSealedRun(workspace, report); // the governor reads only sealed, ledger-anchored runs
 }
 
 function permitAllActions(workspace: string): void {
@@ -124,24 +127,18 @@ function prepareControlledWorkspace(input?: { deployApprovals?: number; writeHig
   return { workspace, agentId };
 }
 
+/** A Gemini CLI shell request. Claude Code's Bash runs only in its pure form, with no compound review (P1-23). */
 function providerInput(
-  provider: "claude-code" | "gemini-cli",
+  _provider: "gemini-cli",
   command: string,
   actionId: string,
 ): string {
-  return JSON.stringify(provider === "claude-code"
-    ? {
-        hook_event_name: "PreToolUse",
-        tool_name: "Bash",
-        tool_use_id: actionId,
-        tool_input: { command },
-      }
-    : {
-        hook_event_name: "BeforeTool",
-        tool_name: "run_shell_command",
-        tool_call_id: actionId,
-        tool_input: { command },
-      });
+  return JSON.stringify({
+    hook_event_name: "BeforeTool",
+    tool_name: "run_shell_command",
+    tool_call_id: actionId,
+    tool_input: { command },
+  });
 }
 
 afterEach(() => {
@@ -233,9 +230,9 @@ describe("AMC-1483 compound-command blast radius", () => {
     const result = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput: providerInput(
-        "claude-code",
+        "gemini-cli",
         "node -v > result.txt",
         "toolu_amc_1483_invalid_plan",
       ),
@@ -262,20 +259,21 @@ describe("AMC-1483 compound-command blast radius", () => {
     });
   });
 
-  test("preserves existing git action classes and asks on the decisive deploy step", () => {
+  test("preserves git action classes and raises signed approval for the decisive deploy step", () => {
     const { workspace, agentId } = prepareControlledWorkspace({ deployApprovals: 1 });
-    const rawInput = providerInput("claude-code", "git status && git push origin main", "toolu_amc_1483_deploy");
+    const rawInput = providerInput("gemini-cli", "git status && git push origin main", "toolu_amc_1483_deploy");
     const result = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput,
     });
+    // The policy review still asks; the provider is denied with an AMC request until its signed grant is consumed.
     expect(result).toMatchObject({
       canonicalToolName: null,
-      requestedDecision: "ask",
-      decision: "ask",
-      effectiveOutcome: "ask",
+      requestedDecision: "deny",
+      decision: "deny",
+      effectiveOutcome: "deny",
       providerMapping: "native",
     });
     expect(result.commandBlastRadius).toMatchObject({
@@ -307,13 +305,17 @@ describe("AMC-1483 compound-command blast radius", () => {
         outcome: "ask",
       }),
     ]);
+    const approval = listApprovalRequests({ workspace, agentId });
+    expect(approval).toHaveLength(1);
+    expect(approval[0]).toMatchObject({ toolName: "git.push", actionClass: "DEPLOY", requiredApprovals: 1 });
+    expect(result.reason).toContain(approval[0]!.approvalRequestId);
     expect(result.reason).toContain("2 steps");
     expect(result.reason).toContain("DEPLOY");
     expect(result.reason).toContain("step 2");
   });
 
-  test("uses the most restrictive hidden-step outcome for Claude and Gemini", () => {
-    for (const provider of ["claude-code", "gemini-cli"] as const) {
+  test("uses the most restrictive hidden-step outcome for Gemini", () => {
+    for (const provider of ["gemini-cli"] as const) {
       const { workspace, agentId } = prepareControlledWorkspace();
       const rawInput = providerInput(provider, "node -v && rm -rf /", `amc_1483_hidden_${provider}`);
       const result = evaluateProviderHookControl({
@@ -337,8 +339,8 @@ describe("AMC-1483 compound-command blast radius", () => {
         outcome: "steer",
         reasonCode: "TOOL_ARGUMENTS_REJECTED",
       });
-      expect(result.effectiveOutcome).toBe(provider === "claude-code" ? "steer" : "deny");
-      expect(result.providerMapping).toBe(provider === "claude-code" ? "corrective_deny" : "fail_closed_deny");
+      expect(result.effectiveOutcome).toBe("deny");
+      expect(result.providerMapping).toBe("fail_closed_deny");
     }
   });
 
@@ -347,9 +349,9 @@ describe("AMC-1483 compound-command blast radius", () => {
     const externalResult = evaluateProviderHookControl({
       workspace: external.workspace,
       authenticatedAgentId: external.agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput: providerInput(
-        "claude-code",
+        "gemini-cli",
         "git -C /tmp push origin main",
         "toolu_amc_1483_git_context",
       ),
@@ -366,14 +368,16 @@ describe("AMC-1483 compound-command blast radius", () => {
     const aliasResult = evaluateProviderHookControl({
       workspace: alias.workspace,
       authenticatedAgentId: alias.agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput: providerInput(
-        "claude-code",
+        "gemini-cli",
         "git release-production",
         "toolu_amc_1483_git_alias",
       ),
     });
-    expect(aliasResult.requestedDecision).toBe("ask");
+    expect(aliasResult.requestedDecision).toBe("deny");
+    expect(aliasResult.reason).toContain("AMC approval pending:");
+    expect(listApprovalRequests({ workspace: alias.workspace, agentId: alias.agentId })).toHaveLength(1);
     expect(aliasResult.commandBlastRadius?.steps[0]).toMatchObject({
       canonicalToolName: "git.push",
       actionClass: "DEPLOY",
@@ -385,17 +389,17 @@ describe("AMC-1483 compound-command blast radius", () => {
   test("binds a privacy-safe review to signed evidence and verifies replay/tamper behavior", () => {
     const { workspace, agentId } = prepareControlledWorkspace({ deployApprovals: 1 });
     const command = `node -e "console.log('TOP_SECRET_1483')" && git push origin private-main`;
-    const rawInput = providerInput("claude-code", command, "toolu_amc_1483_private");
+    const rawInput = providerInput("gemini-cli", command, "toolu_amc_1483_private");
     const first = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput,
     });
     const replay = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput,
     });
 
@@ -404,7 +408,7 @@ describe("AMC-1483 compound-command blast radius", () => {
     expect(verifyProviderHookControlResult({
       workspace,
       authenticatedAgentId: agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput,
       result: first,
     })).toEqual({ ok: true, error: null });
@@ -427,7 +431,7 @@ describe("AMC-1483 compound-command blast radius", () => {
     expect(verifyProviderHookControlResult({
       workspace,
       authenticatedAgentId: agentId,
-      provider: "claude-code",
+      provider: "gemini-cli",
       rawInput,
       result: tampered,
     })).toMatchObject({ ok: false });
@@ -439,8 +443,8 @@ describe("AMC-1483 compound-command blast radius", () => {
     const result = evaluateProviderHookControl({
       workspace,
       authenticatedAgentId: agentId,
-      provider: "claude-code",
-      rawInput: providerInput("claude-code", "node -v && git status", "toolu_amc_1483_untrusted"),
+      provider: "gemini-cli",
+      rawInput: providerInput("gemini-cli", "node -v && git status", "toolu_amc_1483_untrusted"),
     });
 
     expect(result.requestedDecision).toBe("deny");
@@ -453,6 +457,15 @@ describe("AMC-1483 compound-command blast radius", () => {
       aggregateOutcome: "deny",
       reasonCodes: expect.arrayContaining(["SIGNED_AUTHORITY_UNTRUSTED"]),
     });
+  });
+
+  test("denies a Claude Code compound command before any review: AMC cannot prove what it runs (P1-23)", () => {
+    const workspace = claudeWorkspace();
+    const call = { ...recorded("PreToolUse-bash", workspace), tool_input: { command: "node -v && rm -rf /" }, tool_use_id: "toolu_amc_1483_claude" };
+    const result = decide(workspace, controlRequest(call));
+    expect(result).toMatchObject({ decision: "deny", commandBlastRadius: null });
+    expect(result.reason).toContain("only in its pure form");
+    removeFixtureWorkspaces();
   });
 
   test("publishes the bounded existing-surface contract without a second route", () => {

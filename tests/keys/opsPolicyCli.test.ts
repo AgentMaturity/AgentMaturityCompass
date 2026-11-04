@@ -1,0 +1,37 @@
+import { verify } from "node:crypto";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+import { afterEach, expect, test, vi } from "vitest";
+import { initWorkspace } from "../../src/workspace.js";
+import { getSigningPublicKeyPem } from "../../src/keys/signingKeys.js";
+import { opsPolicyPath, opsPolicySigPath, verifyOpsPolicySignature } from "../../src/ops/policy.js";
+import { sha256Hex } from "../../src/utils/hash.js";
+import { lockVault } from "../../src/vault/vault.js";
+import { spawnOwnedNode } from "../helpers/ownedNodeGroup.js";
+
+const PASS = "owned-ops-cli-passphrase", roots: Array<{ root: string; workspace: string }> = [];
+afterEach(() => { for (const f of roots.splice(0)) { lockVault(f.workspace); rmSync(f.root, { recursive: true, force: true }); } vi.unstubAllEnvs(); });
+test.skipIf(process.platform === "win32").each(["init", "sign"] as const)("actual ops %s CLI uses the async config-purpose producer with legacy bytes", async command => {
+  const root = mkdtempSync(join(tmpdir(), "amc-ops-cli-")), workspace = join(root, "workspace"); roots.push({ root, workspace });
+  vi.stubEnv("AMC_HOME", join(root, "home")); vi.stubEnv("AMC_VAULT_PASSPHRASE", PASS); vi.stubEnv("AMC_NO_SIGN", "0"); vi.stubEnv("AMC_SESSION_STORE", "sqlite"); vi.stubEnv("AMC_EXPECTED_MONITOR_FINGERPRINT", undefined);
+  initWorkspace({ workspacePath: workspace, trustBoundaryMode: "isolated" });
+  const bodyPath = opsPolicyPath(workspace), body = Buffer.from(readFileSync(bodyPath, "utf8") + (command === "sign" ? "\n# exact edited CLI bytes\n" : "")); writeFileSync(bodyPath, body);
+  const cli = pathToFileURL(resolve("dist/cli.js")).href, actual = pathToFileURL(resolve("dist/ops/policy.js")).href;
+  const purpose = pathToFileURL(resolve("dist/keys/purposeProviders.js")).href, file = pathToFileURL(resolve("dist/keys/providers/file.js")).href, bridge = pathToFileURL(resolve("dist/keys/providerBridge.js")).href;
+  const wrapper = join(root, "policy.mjs"), provider = join(root, "file.mjs"), deny = join(root, "bridge.mjs"), loader = join(root, "loader.mjs"), calls = join(root, "sign-calls.jsonl"), bin = join(root, "bin"); mkdirSync(bin); writeFileSync(calls, "");
+  writeFileSync(wrapper, `export * from ${JSON.stringify(actual)}; export function initOpsPolicy(){throw new Error("owned ops CLI denies sync producer");} export function signOpsPolicy(){throw new Error("owned ops CLI denies sync producer");}\n`);
+  writeFileSync(provider, `import {appendFileSync} from "node:fs";import {fileKeyProvider as real} from ${JSON.stringify(file)};export function fileKeyProvider(workspace){const provider=real(workspace);return {...provider,async sign(ref,bytes){const answer=await provider.sign(ref,bytes);appendFileSync(process.env.P208_OPS_CALLS,JSON.stringify({ref,bytes:Buffer.from(bytes).toString("hex")})+"\\n");return answer;}};}\n`);
+  writeFileSync(deny, 'export function callProviderSync(){throw new Error("owned ops CLI denies sync bridge");}export const answerBridgeRequest=callProviderSync;\n');
+  writeFileSync(loader, `export async function resolve(specifier,context,next){if(["@aws-sdk/","@google-cloud/","@azure/","pkcs11js","agent-maturity-compass-key-provider-pkcs11"].some(prefix=>specifier.startsWith(prefix)))throw new Error("owned ops CLI denies real SDK/native imports");const found=await next(specifier,context);if(found.url===${JSON.stringify(bridge)})return {url:${JSON.stringify(pathToFileURL(deny).href)},shortCircuit:true};if(context.parentURL===${JSON.stringify(cli)}&&found.url===${JSON.stringify(actual)})return {url:${JSON.stringify(pathToFileURL(wrapper).href)},shortCircuit:true};if(context.parentURL===${JSON.stringify(purpose)}&&found.url===${JSON.stringify(file)})return {url:${JSON.stringify(pathToFileURL(provider).href)},shortCircuit:true};return found;}\n`);
+  const env = { ...process.env, PATH: bin, NO_COLOR: "1", NODE_OPTIONS: "--experimental-loader=" + pathToFileURL(loader).href, P208_OPS_CALLS: calls };
+  const control = spawnOwnedNode(["--input-type=module", "-e", `import {initOpsPolicy} from ${JSON.stringify(pathToFileURL(wrapper).href)};initOpsPolicy();`], { cwd: workspace, env });
+  const denied = await control.wait(30_000); expect(denied.code).not.toBe(0); expect(denied.stderr).toContain("denies sync producer");
+  const child = spawnOwnedNode([resolve("dist/cli.js"), "ops", command], { cwd: workspace, env });
+  const result = await child.wait(30_000); expect(result.code, result.stderr).toBe(0); expect(result.signal).toBeNull(); expect(result.error).toBeUndefined(); expect(result.stdout).toContain(command === "init" ? "Ops policy created:" : "Ops policy signed:");
+  if (command === "sign") expect(readFileSync(bodyPath)).toEqual(body);
+  const bytes = readFileSync(bodyPath), signed = JSON.parse(readFileSync(opsPolicySigPath(workspace), "utf8")), digest = sha256Hex(bytes);
+  expect(signed.digestSha256).toBe(digest); expect(verify(null, Buffer.from(digest, "hex"), getSigningPublicKeyPem(workspace, "config-signature"), Buffer.from(signed.signature, "base64"))).toBe(true); expect(verifyOpsPolicySignature(workspace).valid).toBe(true);
+  expect(readFileSync(calls, "utf8").trim().split("\n").filter(Boolean).map(line => JSON.parse(line))).toEqual([{ ref: { provider: "file", id: "config-signature" }, bytes: digest }]);
+}, 60_000);

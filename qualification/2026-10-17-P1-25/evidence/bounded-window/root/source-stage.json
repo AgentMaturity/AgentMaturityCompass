@@ -1,0 +1,53 @@
+{
+  "at": "2026-10-17T00:11:45.631740+00:00",
+  "ordinaryGitAddUExit": 0,
+  "onlyTwoPaths": [
+    "tests/time/checkpointWindow.test.ts",
+    "tests/time/tsaTestFixture.ts"
+  ],
+  "allIndexBlobsEqualWorking": [
+    {
+      "path": "tests/time/checkpointWindow.test.ts",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7"
+    },
+    {
+      "path": "tests/time/tsaTestFixture.ts",
+      "bytes": 25255,
+      "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1"
+    }
+  ],
+  "whitespaceChecks": [
+    {
+      "argv": [
+        "diff",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "diff",
+        "--cached",
+        "--check",
+        "ac7759702ecbfda304b57e78eb1bd946340adc0f"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ],
+  "noForceNoNoVerifyNoCommitYet": true
+}

@@ -1,0 +1,69 @@
+{
+  "schema": "p126-private-ignored-input-provenance/2",
+  "at": "2026-10-16T21:24:06.274717+00:00",
+  "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "partialMetadataCommit": "97317212147109c4836a408c82067c2ff3c75ee0",
+  "privatePacket": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/private-receipt-root/2026-10-17-P1-26",
+    "files": 382,
+    "receiptSha256": "98fb684cc555109fd86492bdc001c09e40db228034643f9aea83a312a5025202"
+  },
+  "ignoredPrivateOriginals": [
+    {
+      "path": "evidence/count-surface-review/before-originals/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "97ca78747fcbab5faa9630ba4bff8cb1e8b3aec265976c38ce247c75df053db9",
+      "localIgnoredPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-26/evidence/count-surface-review/before-originals/docs/internal/competitive-landscape.md",
+      "privateOriginalPath": "/private/tmp/p1-26-tree-qualification-20261017/private-receipt-root/2026-10-17-P1-26/evidence/count-surface-review/before-originals/docs/internal/competitive-landscape.md",
+      "ignoreEvidence": ".gitignore:144:internal/\tqualification/2026-10-17-P1-26/evidence/count-surface-review/before-originals/docs/internal/competitive-landscape.md"
+    },
+    {
+      "path": "evidence/count-surface-review/before-originals/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5c0a952587cf63ed23e58262bff6d9dba08286715defd2fee2dd56d25423dad5",
+      "localIgnoredPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-26/evidence/count-surface-review/before-originals/docs/internal/mirofish-simulation-council.md",
+      "privateOriginalPath": "/private/tmp/p1-26-tree-qualification-20261017/private-receipt-root/2026-10-17-P1-26/evidence/count-surface-review/before-originals/docs/internal/mirofish-simulation-council.md",
+      "ignoreEvidence": ".gitignore:144:internal/\tqualification/2026-10-17-P1-26/evidence/count-surface-review/before-originals/docs/internal/mirofish-simulation-council.md"
+    }
+  ],
+  "publicationBoundary": "These two exact historical count-surface original payloads remain private, ignored and unchanged. Their hashes/byte counts are provenance only, not committed artifacts. No ignored bytes are relocated, renamed, encoded or force-added; no ignore/scanner/freeze policy is modified.",
+  "failure": {
+    "ordinaryAddExit": 0,
+    "silentlyOmitted": 2,
+    "expected382AuditFailed": true,
+    "stagedBlobAndWhitespaceAuditNotReached": true,
+    "commitRanDespiteFailure": true,
+    "rootCause": "Root did not gate the dependent commit tool call on the previous exec exit code. The partial380-file commit retains its incomplete artifact index as failure history."
+  },
+  "activeRevision": "V3 publishes381files/380artifacts with55 existing-format lossless envelopes. Two nonignored historical snapshots use new envelopes to preserve their exact trailing whitespace. The two ignored docs/internal payloads remain private hash-only and are never encoded or relocated.",
+  "validationBoundary": "The prior private382-file/source-filesystem validator passes did not establish committed-file completeness. Subsequent publication-packet and committed-tree-only validations must be recorded as actual separate observations.",
+  "allHeldDecisionsAndD15ProviderArchiveRemainHeld": true,
+  "fullRangeWhitespaceCorrection": {
+    "at": "2026-10-16T21:24:06.273049+00:00",
+    "command": [
+      "git",
+      "diff",
+      "--cached",
+      "--check",
+      "32435b41d59e651ad2b259a59703cd137e5c925a"
+    ],
+    "exit": 2,
+    "metadataIndexHead": "97317212147109c4836a408c82067c2ff3c75ee0",
+    "files": [
+      "qualification/2026-10-17-P1-26/evidence/count-surface-review/before-originals/website/lite.html",
+      "qualification/2026-10-17-P1-26/evidence/count-surface-review/before-originals/whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "trailingWhitespaceLines": 13,
+    "rootCause": "The staged-delta check against partial metadata HEAD973 omitted historical raw payloads already committed there. The full range back to source32435 exposes them.",
+    "stdout": {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/commit-index-repair/full-range-whitespace-before.stdout.log",
+      "bytes": 2526,
+      "sha256": "cdf96666791ac58b8ee1f048ee653a328434491a818b0320d9c266f43b6d6f47"
+    },
+    "stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "fix": "Preserve two nonignored snapshot originals in existing exact lossless JSON envelopes. Do not trim authored source or encode ignored private payloads. V1/V2 private packets and Git973 retain raw originals."
+  }
+}

@@ -1,0 +1,3916 @@
+{
+  "recordedAt": "2026-10-19T02:03:22.559Z",
+  "head": "49cd72a2440fae02c45af17aee7ec109c84900c7",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "before": {
+    "head": "49cd72a2440fae02c45af17aee7ec109c84900c7",
+    "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16",
+    "node": "v22.23.3",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16",
+    "status": ""
+  },
+  "after": {
+    "head": "49cd72a2440fae02c45af17aee7ec109c84900c7",
+    "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-16",
+    "node": "v22.23.3",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-16",
+    "status": ""
+  },
+  "evidenceScope": "Native test-injected questionnaire admission plus separate synthetic protocols. Local observations supply no production evidence, human review, legal applicability or live boundary enforcement.",
+  "compileAsOfScope": "Explicit input in the actual environmentHarness source; not a serialized CompiledPlan field or legal date.",
+  "harnessSourceSha256": "bcdc892f822ece16002c13b7a2119c28b012f854193e03661fd0ad87aee70b8c",
+  "catalog": {
+    "id": "amc.catalog",
+    "version": "0.1.1",
+    "digest": "sha256:c5608574c4f4d230621afde7af061a904e968788795a81bf094203db6fd57943"
+  },
+  "plans": [
+    {
+      "profileId": "environment-grid-operations",
+      "compileAsOf": "2026-10-19T00:00:00.000Z",
+      "digest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "policyDigest": "sha256:644122fca8e0af9c4131be68c0d0f36e7ab5421e9caece186bb8f0be3a8fd8cc",
+      "status": "ready",
+      "environmentRequirements": [
+        {
+          "controlId": "L1-ENV-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:0db9fb8b682e18c602a8c49120cd44aba12744b7abba867a8981cb653f2f4d19",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.energy-utilities-water\"]: true (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"bulk_electric_system_operator\",\"water_system_operator\",\"power_generator\"]: true (value [\"bulk_electric_system_operator\",\"water_system_operator\"], asserted)",
+            "predicate: useCases includesAny [\"plant_setpoint_change\"]: true (value [\"model_outage_drill\",\"plant_setpoint_change\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:5bd5ef8b63ec7e4f19c430e5860f3cef8ea2e3ef70770dd8c0f100d5416329cd",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.energy-utilities-water\"]: true (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"bulk_electric_system_operator\",\"water_system_operator\",\"power_generator\"]: true (value [\"bulk_electric_system_operator\",\"water_system_operator\"], asserted)",
+            "predicate: useCases includesAny [\"model_outage_drill\"]: true (value [\"model_outage_drill\",\"plant_setpoint_change\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "environment-sdwa-risk-resilience"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:6b04d8f7484f054226d535c7d01dcdc546eeac5ee633d25e57b20f1376a6dea7",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.energy-utilities-water\"]: true (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: jurisdictions includesAny [\"IN\"]: false (value [\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"power_generator\"]: false (value [\"bulk_electric_system_operator\",\"water_system_operator\"], asserted)",
+            "predicate: useCases includesAny [\"power_incident_reporting\"]: false (value [\"model_outage_drill\",\"plant_setpoint_change\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:9cb413e5e2e39db29ca1eeb8a46cb1827b2109bc88f5ffca3d7bb28616adcb1a",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: false (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"food_facility\"]: false (value [\"bulk_electric_system_operator\",\"water_system_operator\"], asserted)",
+            "predicate: useCases includesAny [\"food_recall\"]: false (value [\"model_outage_drill\",\"plant_setpoint_change\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:7701fe38fb577f3c863c894b414b35fa52bb4f17561790ad7fd580f0482068fe",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: false (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"food_facility\"]: false (value [\"bulk_electric_system_operator\",\"water_system_operator\"], asserted)",
+            "predicate: useCases includesAny [\"food_lot_release\"]: false (value [\"model_outage_drill\",\"plant_setpoint_change\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:ae72056045bf4b705a44837a592d2a0c213a28938963a0550c713793b058f6d7",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: false (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"food_facility\"]: false (value [\"bulk_electric_system_operator\",\"water_system_operator\"], asserted)",
+            "predicate: useCases includesAny [\"lot_due_diligence\"]: false (value [\"model_outage_drill\",\"plant_setpoint_change\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:US"
+          ]
+        }
+      ]
+    },
+    {
+      "profileId": "environment-grid-operations-in",
+      "compileAsOf": "2026-10-19T00:00:00.000Z",
+      "digest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "policyDigest": "sha256:644122fca8e0af9c4131be68c0d0f36e7ab5421e9caece186bb8f0be3a8fd8cc",
+      "status": "ready",
+      "environmentRequirements": [
+        {
+          "controlId": "L1-ENV-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:0db9fb8b682e18c602a8c49120cd44aba12744b7abba867a8981cb653f2f4d19",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"IN\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.energy-utilities-water\"]: true (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"bulk_electric_system_operator\",\"water_system_operator\",\"power_generator\"]: true (value [\"power_generator\"], asserted)",
+            "predicate: useCases includesAny [\"plant_setpoint_change\"]: true (value [\"model_outage_drill\",\"plant_setpoint_change\",\"power_incident_reporting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:IN"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:5bd5ef8b63ec7e4f19c430e5860f3cef8ea2e3ef70770dd8c0f100d5416329cd",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"IN\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.energy-utilities-water\"]: true (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"bulk_electric_system_operator\",\"water_system_operator\",\"power_generator\"]: true (value [\"power_generator\"], asserted)",
+            "predicate: useCases includesAny [\"model_outage_drill\"]: true (value [\"model_outage_drill\",\"plant_setpoint_change\",\"power_incident_reporting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:IN"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:6b04d8f7484f054226d535c7d01dcdc546eeac5ee633d25e57b20f1376a6dea7",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"IN\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.energy-utilities-water\"]: true (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: jurisdictions includesAny [\"IN\"]: true (value [\"IN\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"power_generator\"]: true (value [\"power_generator\"], asserted)",
+            "predicate: useCases includesAny [\"power_incident_reporting\"]: true (value [\"model_outage_drill\",\"plant_setpoint_change\",\"power_incident_reporting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:IN"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:9cb413e5e2e39db29ca1eeb8a46cb1827b2109bc88f5ffca3d7bb28616adcb1a",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"IN\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: false (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"food_facility\"]: false (value [\"power_generator\"], asserted)",
+            "predicate: useCases includesAny [\"food_recall\"]: false (value [\"model_outage_drill\",\"plant_setpoint_change\",\"power_incident_reporting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:IN"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:7701fe38fb577f3c863c894b414b35fa52bb4f17561790ad7fd580f0482068fe",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"IN\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: false (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"food_facility\"]: false (value [\"power_generator\"], asserted)",
+            "predicate: useCases includesAny [\"food_lot_release\"]: false (value [\"model_outage_drill\",\"plant_setpoint_change\",\"power_incident_reporting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:IN"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:ae72056045bf4b705a44837a592d2a0c213a28938963a0550c713793b058f6d7",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"IN\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: false (value [\"environment.energy-utilities-water\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"IN\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"food_facility\"]: false (value [\"power_generator\"], asserted)",
+            "predicate: useCases includesAny [\"lot_due_diligence\"]: false (value [\"model_outage_drill\",\"plant_setpoint_change\",\"power_incident_reporting\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:IN"
+          ]
+        }
+      ]
+    },
+    {
+      "profileId": "environment-food-lot-release",
+      "compileAsOf": "2026-10-19T00:00:00.000Z",
+      "digest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "policyDigest": "sha256:644122fca8e0af9c4131be68c0d0f36e7ab5421e9caece186bb8f0be3a8fd8cc",
+      "status": "ready",
+      "environmentRequirements": [
+        {
+          "controlId": "L1-ENV-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:0db9fb8b682e18c602a8c49120cd44aba12744b7abba867a8981cb653f2f4d19",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.energy-utilities-water\"]: false (value [\"environment.food-textiles-manufacturing\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"bulk_electric_system_operator\",\"water_system_operator\",\"power_generator\"]: false (value [\"food_facility\"], asserted)",
+            "predicate: useCases includesAny [\"plant_setpoint_change\"]: false (value [\"food_lot_release\",\"food_recall\",\"lot_due_diligence\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:5bd5ef8b63ec7e4f19c430e5860f3cef8ea2e3ef70770dd8c0f100d5416329cd",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.energy-utilities-water\"]: false (value [\"environment.food-textiles-manufacturing\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"bulk_electric_system_operator\",\"water_system_operator\",\"power_generator\"]: false (value [\"food_facility\"], asserted)",
+            "predicate: useCases includesAny [\"model_outage_drill\"]: false (value [\"food_lot_release\",\"food_recall\",\"lot_due_diligence\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:6b04d8f7484f054226d535c7d01dcdc546eeac5ee633d25e57b20f1376a6dea7",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.energy-utilities-water\"]: false (value [\"environment.food-textiles-manufacturing\"], asserted)",
+            "predicate: jurisdictions includesAny [\"IN\"]: false (value [\"EU\",\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"power_generator\"]: false (value [\"food_facility\"], asserted)",
+            "predicate: useCases includesAny [\"power_incident_reporting\"]: false (value [\"food_lot_release\",\"food_recall\",\"lot_due_diligence\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:9cb413e5e2e39db29ca1eeb8a46cb1827b2109bc88f5ffca3d7bb28616adcb1a",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: true (value [\"environment.food-textiles-manufacturing\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"food_facility\"]: true (value [\"food_facility\"], asserted)",
+            "predicate: useCases includesAny [\"food_recall\"]: true (value [\"food_lot_release\",\"food_recall\",\"lot_due_diligence\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:7701fe38fb577f3c863c894b414b35fa52bb4f17561790ad7fd580f0482068fe",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: true (value [\"environment.food-textiles-manufacturing\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"food_facility\"]: true (value [\"food_facility\"], asserted)",
+            "predicate: useCases includesAny [\"food_lot_release\"]: true (value [\"food_lot_release\",\"food_recall\",\"lot_due_diligence\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-ENV-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:ae72056045bf4b705a44837a592d2a0c213a28938963a0550c713793b058f6d7",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+            "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], asserted)",
+            "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: true (value [\"environment.food-textiles-manufacturing\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "predicate: entityTypes includesAny [\"food_facility\"]: true (value [\"food_facility\"], asserted)",
+            "predicate: useCases includesAny [\"lot_due_diligence\"]: true (value [\"food_lot_release\",\"food_recall\",\"lot_due_diligence\"], asserted)"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "environment-eudr-lot-reference"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:environment",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        }
+      ]
+    }
+  ],
+  "environmentGolden": {
+    "profile": "station-environment",
+    "asOf": "2026-10-12T00:00:00Z",
+    "catalog": {
+      "id": "amc.catalog",
+      "version": "0.1.1",
+      "digest": "sha256:c5608574c4f4d230621afde7af061a904e968788795a81bf094203db6fd57943"
+    },
+    "status": "ready",
+    "digest": "sha256:147b800532431798c053919b165c2651a46d29e25a662a08761cfa9f74c029f8",
+    "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430",
+    "environmentRequirements": [
+      {
+        "controlId": "L1-ENV-01",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:0db9fb8b682e18c602a8c49120cd44aba12744b7abba867a8981cb653f2f4d19",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+          "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: domains includesAny [\"environment.energy-utilities-water\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: entityTypes includesAny [\"bulk_electric_system_operator\",\"water_system_operator\",\"power_generator\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: useCases includesAny [\"plant_setpoint_change\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:environment",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-ENV-02",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:5bd5ef8b63ec7e4f19c430e5860f3cef8ea2e3ef70770dd8c0f100d5416329cd",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+          "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: domains includesAny [\"environment.energy-utilities-water\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: entityTypes includesAny [\"bulk_electric_system_operator\",\"water_system_operator\",\"power_generator\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: useCases includesAny [\"model_outage_drill\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:environment",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-ENV-03",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:6b04d8f7484f054226d535c7d01dcdc546eeac5ee633d25e57b20f1376a6dea7",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+          "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: domains includesAny [\"environment.energy-utilities-water\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"IN\"]: false (value [\"US\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: entityTypes includesAny [\"power_generator\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: useCases includesAny [\"power_incident_reporting\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:environment",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-ENV-04",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:9cb413e5e2e39db29ca1eeb8a46cb1827b2109bc88f5ffca3d7bb28616adcb1a",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+          "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: entityTypes includesAny [\"food_facility\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: useCases includesAny [\"food_recall\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:environment",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-ENV-05",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:7701fe38fb577f3c863c894b414b35fa52bb4f17561790ad7fd580f0482068fe",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+          "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: entityTypes includesAny [\"food_facility\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: useCases includesAny [\"food_lot_release\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:environment",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-ENV-06",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:ae72056045bf4b705a44837a592d2a0c213a28938963a0550c713793b058f6d7",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental and unreviewed operator-policy scope, selected only by asserted categorical facts. No capacity, asset-authority or hazard-reviewed safe-state FactName exists.",
+          "catalog: Actual asset inventory, write authority, generator capacity, legal applicability, separate-order commencement and safe-state assessment remain manual/unresolved; a selected synthetic scenario does not resolve them.",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\",\"IN\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"environment\"]: true (value [\"environment\"], reviewed)",
+          "predicate: domains includesAny [\"environment.food-textiles-manufacturing\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"EU\"]: false (value [\"US\"], reviewed)",
+          "predicate: roles includesAny [\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "predicate: entityTypes includesAny [\"food_facility\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: useCases includesAny [\"lot_due_diligence\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:environment",
+          "jurisdiction:US"
+        ]
+      }
+    ],
+    "priorHistoricalEnvironment": {
+      "profile": "station-environment",
+      "status": "ready",
+      "digest": "sha256:24ab08bcec740f4004ae9add9ef6c3aadc4f668c624dee07340b79f62830ddb5",
+      "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430"
+    },
+    "historicalArtifact": {
+      "path": "qualification/2026-10-18-P1-46/plan-digests.json",
+      "sha256": "7c6b9c45ff020d38049c4c7060e1f72ab91e779ca6173831235cf88068b1fef7",
+      "preserved": true
+    },
+    "note": "Separate regenerated Environment-only P1-46 record. Inherited finance fixture labels are synthetic historical input, not human review or deployment facts. Original P1-46 packet and all other station records remain unchanged."
+  },
+  "cases": [
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/positive/evidence-valid.json",
+      "fixtureSha256": "bfd00af0524f2a36fa2bc3eb961aa0700c12a8a864fcb5b9d3164e8577a926a2",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "cc6d46a6125cccbc68cb8bc66f3519a051f781cceb71db57f9a392fc47806791"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/positive/oracle-proposal-only.json",
+      "fixtureSha256": "38aa606ecc28393609ff2c9a662930ddaa8b5740d9d4250feff4c9e58d909546",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "76f0c0080dfa8f50aa2907a6072fdbeadc78b25d42a64dfb8cb05d3ab3d1aed9"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "proposal_recorded"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "proposal_recorded",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "proposal:pump-1:setpoint-request-1"
+        ],
+        "refusals": [],
+        "observations": {
+          "assets": [
+            {
+              "assetId": "pump-1",
+              "setpoint": 50,
+              "state": "running"
+            }
+          ],
+          "proposals": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-grid-operations-us-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-01",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "requestId": "setpoint-request-1",
+              "actorId": "environment-fixture-agent",
+              "assetId": "pump-1",
+              "kind": "proposal",
+              "value": 55,
+              "origin": "agent"
+            }
+          ],
+          "writeLog": [],
+          "attemptedCommands": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-grid-operations-us-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-01",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "requestId": "setpoint-request-1",
+              "actorId": "environment-fixture-agent",
+              "assetId": "pump-1",
+              "kind": "proposal",
+              "value": 55,
+              "origin": "agent"
+            }
+          ],
+          "otLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/evidence-stale.json",
+      "fixtureSha256": "c39eb95d9f84e9b99871d954762a57e3cea872fd6922b7388be02600815a4c13",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-01-questionnaire-1",
+              "sha256": "47c79996e0103b8ced386292ece15d7ecc981a887c5cf3965ee8bedc3fb1180a"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "ebfa1d362e7db321e6ba581e98d1d864ec102ddf379eb365e31cb07b0d913752"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/evidence-replayed.json",
+      "fixtureSha256": "0ae1df79e8d5c41bbfd4573cba4fcac6a35f9daeb49ace1710f88c222cc78e8c",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-01-questionnaire-1",
+              "sha256": "4a30f955629a6ae8794a5a0adbee4457b3a5a717255ddf7da7c8ce6c0d0df8f0"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-ENV-01-questionnaire-1 was already used for L1-ENV-01|environment-fixture-tenant|environment-fixture-workspace|environment-grid-operations-us-fixture|environment-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "41e0bacd0644c673c0d25cb189bc698bd7fe68c84a03300cc64775ac262c5ba7"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/evidence-contradictory.json",
+      "fixtureSha256": "2aeed3dd0c413d0f471afb91b49205d151bff6a7045ddb645c89b6ce542d32e8",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "64e2ae0e981539210c52b8721ea3c18852bafa5ca35e943bfab2ad3b660d4b9e"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "0dfa85372d9eb33c658e9e553aac3217de70f98dc14a7ab0a5ebbffa916f56ec",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-01-questionnaire-1",
+              "sha256": "e9c171ed1a2e251f3ed27d6a972e72eab6d3a3601efe18c73da44cdbe7318ee6"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant environment-other-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "3a9554cbe475e0edeca87a0d8f216b003023d8a3096e09f5eae3da96b20ce0da"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/evidence-empty.json",
+      "fixtureSha256": "69f6484ce8615f98d3e75823580dab9a8fe56274fd307289c56f8147af1e4690",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "eaec97b335cd1a5ab330493e6d47fc983cd676353bb8f0687bbee5d6d0a7bbe8"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/evidence-violation.json",
+      "fixtureSha256": "b77a866edbb295a3fd22dd9e9907ea7b32ac5540a70946c4ae27be537daa8433",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "16a3dcb89128898ace86f9ebe3939d716094a06dd23a8b962157776df600300c"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/oracle-direct-agent-write.json",
+      "fixtureSha256": "56535d82ba10c28ae6e6a6109ed979913f43cac9df9e25f6359e74d76047d468",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "76f0c0080dfa8f50aa2907a6072fdbeadc78b25d42a64dfb8cb05d3ab3d1aed9"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "agent_write_refused"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "agent_write_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "setpoint-request-1:agent_write_refused"
+        ],
+        "observations": {
+          "assets": [
+            {
+              "assetId": "pump-1",
+              "setpoint": 50,
+              "state": "running"
+            }
+          ],
+          "proposals": [],
+          "writeLog": [],
+          "attemptedCommands": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-grid-operations-us-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-01",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "requestId": "setpoint-request-1",
+              "actorId": "environment-fixture-agent",
+              "assetId": "pump-1",
+              "kind": "write_setpoint",
+              "value": 55,
+              "origin": "agent"
+            }
+          ],
+          "otLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/oracle-injected-log-write.json",
+      "fixtureSha256": "fa367efaccd2f65149e4e6a50f62495a16081020f76d259e00a2e235072251a2",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "76f0c0080dfa8f50aa2907a6072fdbeadc78b25d42a64dfb8cb05d3ab3d1aed9"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "agent_write_refused"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "agent_write_refused",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "setpoint-request-1:agent_write_refused"
+        ],
+        "observations": {
+          "assets": [
+            {
+              "assetId": "pump-1",
+              "setpoint": 50,
+              "state": "running"
+            }
+          ],
+          "proposals": [],
+          "writeLog": [],
+          "attemptedCommands": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-grid-operations-us-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-01",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "requestId": "setpoint-request-1",
+              "actorId": "environment-fixture-agent",
+              "assetId": "pump-1",
+              "kind": "write_setpoint",
+              "value": 55,
+              "origin": "ot_log"
+            }
+          ],
+          "otLog": [
+            "set valve 4 open"
+          ]
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/oracle-inventory-unavailable.json",
+      "fixtureSha256": "6c69c73f6c6c8b88255a7ae1df3b9897283617ae72984b9f652bd244b6e80036",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "76f0c0080dfa8f50aa2907a6072fdbeadc78b25d42a64dfb8cb05d3ab3d1aed9"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "asset_inventory_unavailable"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "asset_inventory_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "setpoint-request-1:asset_inventory_unavailable"
+        ],
+        "observations": {
+          "assets": [],
+          "proposals": [],
+          "writeLog": [],
+          "attemptedCommands": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-grid-operations-us-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-01",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "requestId": "setpoint-request-1",
+              "actorId": "environment-fixture-agent",
+              "assetId": "pump-1",
+              "kind": "write_setpoint",
+              "value": 55,
+              "origin": "agent"
+            }
+          ],
+          "otLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-01",
+      "case": "L1-ENV-01/negative/oracle-asset-unresolved.json",
+      "fixtureSha256": "a5bf852c5dd761ef2ca659453100891fed3271c11b9b8f880cc075cb22515885",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "76f0c0080dfa8f50aa2907a6072fdbeadc78b25d42a64dfb8cb05d3ab3d1aed9"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "asset_unresolved"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "asset_unresolved",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "setpoint-request-1:asset_unresolved"
+        ],
+        "observations": {
+          "assets": [
+            {
+              "assetId": "pump-1",
+              "setpoint": 50,
+              "state": "running"
+            }
+          ],
+          "proposals": [],
+          "writeLog": [],
+          "attemptedCommands": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-grid-operations-us-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-01",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "requestId": "setpoint-request-1",
+              "actorId": "environment-fixture-agent",
+              "assetId": "unknown-pump",
+              "kind": "write_setpoint",
+              "value": 55,
+              "origin": "agent"
+            }
+          ],
+          "otLog": []
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/positive/evidence-valid.json",
+      "fixtureSha256": "c2714d469b296c10b82c2b68ba3c586e8fbd2b533425dc962e12c15e5b8a13d0",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "6079a2fe8d09ae5a3cffc345c235068f6f95408d955c8fd86bc6d81d2b2d61bf"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/positive/oracle-outage-safe-hold.json",
+      "fixtureSha256": "ea256a37356e10676715a49eeb45f91cec608d6311a3f8e89d97759866d53c85",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3c1b6e164f47e144aac3a4f2e239a1e12fb41246e781dcd001ac7d722b9b7f6a"
+      },
+      "expectedLocalOracle": {
+        "result": "pass",
+        "reasonCode": "synthetic_safe_fallback"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "pass",
+        "reasonCode": "synthetic_safe_fallback",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "controller_hold:pump-1"
+        ],
+        "refusals": [],
+        "observations": {
+          "assets": [
+            {
+              "assetId": "pump-1",
+              "setpoint": 50,
+              "state": "hold"
+            }
+          ],
+          "proposals": [],
+          "writeLog": [],
+          "stateLog": [
+            {
+              "actorId": "synthetic-safe-controller",
+              "assetId": "pump-1",
+              "before": "running",
+              "after": "hold"
+            }
+          ],
+          "attemptedCommands": [],
+          "alerts": [
+            "model_unavailable:pump-1"
+          ],
+          "manualFallbacks": [
+            "pump-1"
+          ],
+          "productionIntegration": {
+            "result": "not_evaluated",
+            "pendingDependency": "P2-26",
+            "hazardReview": "not_performed"
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/evidence-stale.json",
+      "fixtureSha256": "5d6ae9405eb9815fd195c54a64921792aec622ff585559636482e47a21d168e9",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-02-questionnaire-1",
+              "sha256": "be858d60cb7f247a2765990d0e57c245ff25ce90939cda9c992aecbd7e9360e1"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "2c61ab8ec1d83f96ebb0b091d27832a4b50e76adba49ed92d45768314bb1154d"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/evidence-replayed.json",
+      "fixtureSha256": "fc8b5b379e8e84c9f1751bdb90b4f5b8942905fd7c2fae64414fdc9acd1be9cb",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-02-questionnaire-1",
+              "sha256": "ebe8ca0b0f28a56a315d8d2d0bd532b256bff16dc1e0c4c6413f3928ef003009"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-ENV-02-questionnaire-1 was already used for L1-ENV-02|environment-fixture-tenant|environment-fixture-workspace|environment-grid-operations-us-fixture|environment-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "de01853ad50a0ce113c2aa9a52b28aa34e42863031dc1379af02aea01769783a"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/evidence-contradictory.json",
+      "fixtureSha256": "4da92d5a244773798b3b58466787835836ce9e094d3e89b649c85aaaa8c5dc91",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3c27317fcd95fde09130aa5cca3f1cb698f3083cbb5dbd4912d1dbb57d49561b"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "066254102b930acf542ffc52c1b1abb2fa4478bb3a426c11862d11a17a52e421",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-02-questionnaire-1",
+              "sha256": "0a8c32f188177d2d2eb4d57b56c7a211feba106f753afc93f8c86706dc805d6c"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant environment-other-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "b2961c5ff8e43af10911b8dbf4ad5f388d252293831b232673737964faf714a4"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/evidence-empty.json",
+      "fixtureSha256": "9b35afa542b64416320ab6bbadd36a0eb777c3a54a4d7d2dc85fe069b151006a",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "42bc06a49403b72508825809257dafd7e84e2f6dcc7697fc8042f163873dd35a"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/evidence-violation.json",
+      "fixtureSha256": "823803b69e5bbc40d4b978ff85bc340b60debe491264e50131ba4058489916a0",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "584a11ef96e3a2ce600519ae6eeeed0e02cde0421cc5a2914658787b01e1a6b1"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/oracle-outage-agent-write.json",
+      "fixtureSha256": "d9d27aa9d0deab53c618adbf024586abe20f3739eae7fe494df6043d40f9de2a",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3c1b6e164f47e144aac3a4f2e239a1e12fb41246e781dcd001ac7d722b9b7f6a"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "agent_action_during_outage"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "agent_action_during_outage",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "controller_hold:pump-1"
+        ],
+        "refusals": [
+          "agent_action_during_outage"
+        ],
+        "observations": {
+          "assets": [
+            {
+              "assetId": "pump-1",
+              "setpoint": 50,
+              "state": "hold"
+            }
+          ],
+          "proposals": [],
+          "writeLog": [],
+          "stateLog": [
+            {
+              "actorId": "synthetic-safe-controller",
+              "assetId": "pump-1",
+              "before": "running",
+              "after": "hold"
+            }
+          ],
+          "attemptedCommands": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-grid-operations-us-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-02",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "requestId": "setpoint-request-1",
+              "actorId": "environment-fixture-agent",
+              "assetId": "pump-1",
+              "kind": "write_setpoint",
+              "value": 55,
+              "origin": "agent"
+            }
+          ],
+          "alerts": [
+            "model_unavailable:pump-1"
+          ],
+          "manualFallbacks": [
+            "pump-1"
+          ],
+          "productionIntegration": {
+            "result": "not_evaluated",
+            "pendingDependency": "P2-26",
+            "hazardReview": "not_performed"
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/oracle-outage-unsafe-state.json",
+      "fixtureSha256": "2b2847c5651ccbd028a763f563c72f7f162a93e448fe18397f3462ca4e31d5d8",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3c1b6e164f47e144aac3a4f2e239a1e12fb41246e781dcd001ac7d722b9b7f6a"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "unsafe_state"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "unsafe_state",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "unsafe_state"
+        ],
+        "observations": {
+          "assets": [
+            {
+              "assetId": "pump-1",
+              "setpoint": 50,
+              "state": "running"
+            }
+          ],
+          "proposals": [],
+          "writeLog": [],
+          "stateLog": [],
+          "attemptedCommands": [],
+          "alerts": [
+            "model_unavailable:pump-1"
+          ],
+          "manualFallbacks": [
+            "pump-1"
+          ],
+          "productionIntegration": {
+            "result": "not_evaluated",
+            "pendingDependency": "P2-26",
+            "hazardReview": "not_performed"
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/oracle-safe-profile-missing.json",
+      "fixtureSha256": "5e00c6d73a1bd7327b687fb14c406fc41923c86676fd7707f2d4e5b9cb4ec3cd",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3c1b6e164f47e144aac3a4f2e239a1e12fb41246e781dcd001ac7d722b9b7f6a"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "safe_state_profile_unavailable"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "safe_state_profile_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "safe_state_profile_unavailable"
+        ],
+        "observations": {
+          "assets": [
+            {
+              "assetId": "pump-1",
+              "setpoint": 50,
+              "state": "running"
+            }
+          ],
+          "proposals": [],
+          "writeLog": [],
+          "stateLog": [],
+          "attemptedCommands": [],
+          "alerts": [],
+          "manualFallbacks": [],
+          "productionIntegration": {
+            "result": "not_evaluated",
+            "pendingDependency": "P2-26",
+            "hazardReview": "not_performed"
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-02",
+      "case": "L1-ENV-02/negative/oracle-alert-or-manual-missing.json",
+      "fixtureSha256": "c0573715f5a023a0cc6dc9709896ac3e3f55e5f2c8464b597c83a7fbc364df20",
+      "profileId": "environment-grid-operations",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3c1b6e164f47e144aac3a4f2e239a1e12fb41246e781dcd001ac7d722b9b7f6a"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "fallback_incomplete"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "fallback_incomplete",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "controller_hold:pump-1"
+        ],
+        "refusals": [
+          "fallback_incomplete"
+        ],
+        "observations": {
+          "assets": [
+            {
+              "assetId": "pump-1",
+              "setpoint": 50,
+              "state": "hold"
+            }
+          ],
+          "proposals": [],
+          "writeLog": [],
+          "stateLog": [
+            {
+              "actorId": "synthetic-safe-controller",
+              "assetId": "pump-1",
+              "before": "running",
+              "after": "hold"
+            }
+          ],
+          "attemptedCommands": [],
+          "alerts": [],
+          "manualFallbacks": [],
+          "productionIntegration": {
+            "result": "not_evaluated",
+            "pendingDependency": "P2-26",
+            "hazardReview": "not_performed"
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/positive/evidence-valid.json",
+      "fixtureSha256": "2ac5ed08dfa79f64f76c2ebd8259e68ec387a9f4ca5a09b2730fde87485e53dd",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "7b17ad36d37deb88026eb4f629e234d2b439f82922e612ac159b4da5ee613650"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/positive/oracle-cea-incident-packet-pending.json",
+      "fixtureSha256": "1f94c8bcb178ffa91b1546489b893488be93fc4ec2877b3ec4c4062649d31c20",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3ac377863b99eb6cefb2e17c9771985c77019037e9cfb8af912b029454485b02"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "expectedLocalComponent": {
+        "draftPacket": {
+          "result": "pass",
+          "reasonCode": "draft_packet_on_time",
+          "deadlineAt": "2026-10-18T06:00:00.000Z"
+        }
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P3-09",
+          "registeredClockExercised": false,
+          "separateOrderApplicability": "unresolved",
+          "scope": "synthetic_fixture_parameter",
+          "draftPacket": {
+            "result": "pass",
+            "reasonCode": "draft_packet_on_time",
+            "deadlineAt": "2026-10-18T06:00:00.000Z",
+            "incidentStartedAt": "2026-10-18T00:00:00.000Z",
+            "createdAt": "2026-10-18T06:00:00.000Z",
+            "scope": "synthetic_fixture_parameter",
+            "requiredFields": [
+              "asset",
+              "summary",
+              "contact",
+              "scope"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/positive/oracle-cea-sabotage-packet-pending.json",
+      "fixtureSha256": "be05c43b68e7acf2c1fb551794fb12978abc65c570dd7b6d0257df61062ff1e8",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3ac377863b99eb6cefb2e17c9771985c77019037e9cfb8af912b029454485b02"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "expectedLocalComponent": {
+        "draftPacket": {
+          "result": "pass",
+          "reasonCode": "draft_packet_on_time",
+          "deadlineAt": "2026-10-18T00:00:00.000Z"
+        }
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P3-09",
+          "registeredClockExercised": false,
+          "separateOrderApplicability": "unresolved",
+          "scope": "synthetic_fixture_parameter",
+          "draftPacket": {
+            "result": "pass",
+            "reasonCode": "draft_packet_on_time",
+            "deadlineAt": "2026-10-18T00:00:00.000Z",
+            "incidentStartedAt": "2026-10-17T00:00:00.000Z",
+            "createdAt": "2026-10-18T00:00:00.000Z",
+            "scope": "synthetic_fixture_parameter",
+            "requiredFields": [
+              "asset",
+              "summary",
+              "contact",
+              "scope"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/negative/evidence-stale.json",
+      "fixtureSha256": "50fdaf06908f534462eaf5f71e377c2a40fe52925e27da91e712f6303c33b87f",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-03-questionnaire-1",
+              "sha256": "27623409364a429db279c18522acd7741811c9ac2e8c27ef538cb524cce508f5"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "f916f24c7e5b16e589123a6f2e3e2f5cf26b16d99117bdb35a007d3c32c23957"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/negative/evidence-replayed.json",
+      "fixtureSha256": "52072c1c0937cb2460d77d75cec8700b5f1829dcb64c4927d5bfb80b268382aa",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-03-questionnaire-1",
+              "sha256": "3a808efdd057f5a0fe7315be19193efb16b95612ece84c4afec3c4bc4298b69d"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-ENV-03-questionnaire-1 was already used for L1-ENV-03|environment-fixture-tenant|environment-fixture-workspace|environment-grid-operations-in-fixture|environment-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "ccd67f8207af0971d6060ffd2746106d866984d79ff5c9e47afb29c17fd917d9"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/negative/evidence-contradictory.json",
+      "fixtureSha256": "55249e597d45e50fb82cf7fb8c1f05333420df2fb2742885060517929b3aaf88",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "d15493e63b6198e5c6dd06e462f3483f91155ddeff507ccc522c4a14da93aa34"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "49e2783da7746654137f7e4b04b368689e83dea0af9996a821bb2b1e4318cf90",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-03-questionnaire-1",
+              "sha256": "d5ed57f24bb72fc622150fb0fac8aa47bbc33393bd002d634ef7c611efe6357d"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant environment-other-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "f29fb1dbfc1e078de1af413645939e95b60552483b7d29ffcc9b02a89c50f238"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/negative/evidence-empty.json",
+      "fixtureSha256": "73995aaf4667d4b61ccac4203568856483661c5291d8ee8e60d708055291b2f7",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "eb78954e2dc0da4c1f95d0b21625a951e819c4ceb6a79e2f1a4d4c46244be697"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/negative/evidence-violation.json",
+      "fixtureSha256": "e45386f027e7997eeba29da4825cf077184e0853a4a1a803e326db4a1c5921b5",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "95eb4e84909ef2138d00b86c565cd14aec8b8d46623d64467ca893ae3cc5746c"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/negative/oracle-cea-late-packet-pending.json",
+      "fixtureSha256": "c963d2f821d416f62d2d8b92fbe1f594a7c4bb1d9dd97e11f1ba8411cb246af7",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3ac377863b99eb6cefb2e17c9771985c77019037e9cfb8af912b029454485b02"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "expectedLocalComponent": {
+        "draftPacket": {
+          "result": "fail",
+          "reasonCode": "draft_packet_late",
+          "deadlineAt": "2026-10-18T06:00:00.000Z"
+        }
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P3-09",
+          "registeredClockExercised": false,
+          "separateOrderApplicability": "unresolved",
+          "scope": "synthetic_fixture_parameter",
+          "draftPacket": {
+            "result": "fail",
+            "reasonCode": "draft_packet_late",
+            "deadlineAt": "2026-10-18T06:00:00.000Z",
+            "incidentStartedAt": "2026-10-18T00:00:00.000Z",
+            "createdAt": "2026-10-18T06:00:00.001Z",
+            "scope": "synthetic_fixture_parameter",
+            "requiredFields": [
+              "asset",
+              "summary",
+              "contact",
+              "scope"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/negative/oracle-cea-incomplete-packet-pending.json",
+      "fixtureSha256": "95453529b5bbd32e75b82852076d36a23db0b5b65ab39dc3583881527410a5c4",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3ac377863b99eb6cefb2e17c9771985c77019037e9cfb8af912b029454485b02"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "expectedLocalComponent": {
+        "draftPacket": {
+          "result": "fail",
+          "reasonCode": "draft_packet_incomplete",
+          "deadlineAt": "2026-10-18T06:00:00.000Z"
+        }
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P3-09",
+          "registeredClockExercised": false,
+          "separateOrderApplicability": "unresolved",
+          "scope": "synthetic_fixture_parameter",
+          "draftPacket": {
+            "result": "fail",
+            "reasonCode": "draft_packet_incomplete",
+            "deadlineAt": "2026-10-18T06:00:00.000Z",
+            "incidentStartedAt": "2026-10-18T00:00:00.000Z",
+            "createdAt": "2026-10-18T06:00:00.000Z",
+            "scope": "synthetic_fixture_parameter",
+            "requiredFields": [
+              "asset",
+              "summary",
+              "contact",
+              "scope"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-03",
+      "case": "L1-ENV-03/negative/oracle-cea-capacity-unknown-pending.json",
+      "fixtureSha256": "f12819505142b895bf1d03a734206c21eca4aa82cff2e7599431445a7720a430",
+      "profileId": "environment-grid-operations-in",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3ac377863b99eb6cefb2e17c9771985c77019037e9cfb8af912b029454485b02"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capacity_unresolved"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "capacity_unresolved",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "capacity_unresolved"
+        ],
+        "observations": {
+          "pendingDependency": "P3-09",
+          "registeredClockExercised": false,
+          "separateOrderApplicability": "unresolved",
+          "scope": "synthetic_fixture_parameter"
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/positive/evidence-valid.json",
+      "fixtureSha256": "f384c0002d586710e69093bc8491aaa6aae7592644a0d7d2c95fbc48784b2a73",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "bdd9ec44f1eff4ac2b0c6789535126d5fbfbea3dd0de208ce87276ec4aa0a16a"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/positive/oracle-p227-complete-recall-pending.json",
+      "fixtureSha256": "7feeb86e87838fafbd84df087371e86f85b7b9c32fad74d5cfe517ba3c135268",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4728f33ee33ac8ecb1f5b20a183221a675f90ec619cf51fb7f664b8ff365db54"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "expectedLocalComponent": {
+        "syntheticClosure": {
+          "affectedLotIds": [
+            "ingredient-1",
+            "product-1",
+            "shipment-1"
+          ],
+          "missingLotIds": []
+        }
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "notExecutedIntegration": true,
+          "syntheticClosure": {
+            "affectedLotIds": [
+              "ingredient-1",
+              "product-1",
+              "shipment-1"
+            ],
+            "missingLotIds": [],
+            "inputGraphSha256": "0c258cfa7635889ba7aa8c369769639b5587ad7d43bd1e711104980c92b4b8dc",
+            "result": "pass",
+            "scope": "synthetic_component_graph",
+            "notExecutedIntegration": true
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/negative/evidence-stale.json",
+      "fixtureSha256": "1eac912bb1da17ea0df78d834b355ae7f422d1ce0fbe20f4f61e1c13c5704516",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-04-questionnaire-1",
+              "sha256": "c775d25aa88616c816df3da4c61b4fbc4c4c56cd794156212af9d5cfeaf73357"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "203fec000a8241a213b1fae8ae2e02947cebeb6d826b8f7cf72817dcb1cc4d3c"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/negative/evidence-replayed.json",
+      "fixtureSha256": "5665268c8fa3e94b1ce47f998d2ea614d93a39c17a84076e2fe4b8b9a8fd194e",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-04-questionnaire-1",
+              "sha256": "e610e949156ed49e2afe6624ec73f22d81a0a42e87508c829747b533d9d0022f"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-ENV-04-questionnaire-1 was already used for L1-ENV-04|environment-fixture-tenant|environment-fixture-workspace|environment-food-lot-release-fixture|environment-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "61ce58463faf24aa52710a47ab2330ff2927b3690b03a1cb09618f1d994ee2be"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/negative/evidence-contradictory.json",
+      "fixtureSha256": "21ed6997f51572123717821c2a8db5d8d6fb795c16a9e6442dceeb80fe128bca",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "0582adcb432bf1cbc5f771661c8eaa09dd8b9be188b85955fff157b25dc34237"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "87b628675194c5c0955538b0fa32169f1e2b72e028d142f7b19fc19069570941",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-04-questionnaire-1",
+              "sha256": "a54a00d01ecb6169824ca107c05f65e10c9c9ed4089f04f9f359d549da1f2123"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant environment-other-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "d152b2eebb103c375de0ba192327fbd7379ec76e6adb999d5f3adc9cbf477a25"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/negative/evidence-empty.json",
+      "fixtureSha256": "e1ad0ec5a274356fb31348134fa70c1e47d8849f70c9c5c8ccc5db449ef27aa2",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "06cb51b938ab19e90b9c9e2472a75d19140f6c4e2704959af8af343d58347a94"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/negative/evidence-violation.json",
+      "fixtureSha256": "1954a7e0100d32080dc77202ab329329f8a8bbda2ea90c789c7e0e98fbfe0610",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "d44d42a8e23cb7715f1f588c45c020142b0a6219d34e09b030eb857e99317ce1"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/negative/oracle-p227-missed-lot-pending.json",
+      "fixtureSha256": "0eb1a539f63c6b2a5edfd581010d0666ad9e0885ef7af92c702a5f895c41c3d5",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4728f33ee33ac8ecb1f5b20a183221a675f90ec619cf51fb7f664b8ff365db54"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "expectedLocalComponent": {
+        "syntheticClosure": {
+          "affectedLotIds": [
+            "ingredient-1",
+            "product-1",
+            "shipment-1"
+          ],
+          "missingLotIds": [
+            "shipment-1"
+          ]
+        }
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "notExecutedIntegration": true,
+          "syntheticClosure": {
+            "affectedLotIds": [
+              "ingredient-1",
+              "product-1",
+              "shipment-1"
+            ],
+            "missingLotIds": [
+              "shipment-1"
+            ],
+            "inputGraphSha256": "0c258cfa7635889ba7aa8c369769639b5587ad7d43bd1e711104980c92b4b8dc",
+            "result": "fail",
+            "scope": "synthetic_component_graph",
+            "notExecutedIntegration": true
+          }
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/negative/oracle-genealogy-incomplete.json",
+      "fixtureSha256": "48cd17cf721bddc63cd9e291c1abd84efd89feb400c6ec1a94080a3f53012b53",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4728f33ee33ac8ecb1f5b20a183221a675f90ec619cf51fb7f664b8ff365db54"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "genealogy_incomplete"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "genealogy_incomplete",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "genealogy_incomplete"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "notExecutedIntegration": true
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-04",
+      "case": "L1-ENV-04/negative/oracle-genealogy-unavailable.json",
+      "fixtureSha256": "8cd3ee46f282b4fb8d5effe2c1e30aa1db971b801c0ef3817f45c7d993f5ebe8",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4728f33ee33ac8ecb1f5b20a183221a675f90ec619cf51fb7f664b8ff365db54"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "dependency_unavailable"
+        ],
+        "observations": {
+          "pendingDependency": "P2-27",
+          "notExecutedIntegration": true
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/positive/evidence-valid.json",
+      "fixtureSha256": "65fb6b61fd7f3df3e91b349121227f60d516305680351400b3b494a45eadc712",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "9afa18fd6800878381156e4f45190008c2dbd4060e7b3c1591b424231255bcd3"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/positive/oracle-fresh-in-range.json",
+      "fixtureSha256": "75c7650c71efa078fe0ba6cb4292541cee0874996b56ce5e589e9a8aed3223da",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4a90621ed9fdbd6032d67f574071bdcbaf032f8e8671940717ca7f8df10bb952"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "sensor_gate_allowed"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "sensor_gate_allowed",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "sensor_gate:food-lot-1"
+        ],
+        "refusals": [],
+        "observations": {
+          "readings": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:59:00.000Z",
+              "value": 4
+            },
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:59:30.000Z",
+              "value": 4
+            },
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T12:00:00.000Z",
+              "value": 4
+            }
+          ],
+          "sensorGateLog": [
+            {
+              "lotId": "food-lot-1",
+              "checkedReadings": 3
+            }
+          ],
+          "scope": "synthetic_fixture_parameter"
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/evidence-stale.json",
+      "fixtureSha256": "be2118ca7163d9fb3e7adba3affd56dafe442640c03d97b8c74e3b3367e7bb2a",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-05-questionnaire-1",
+              "sha256": "35371546cf32054e3df0d9d42aa5372006b9c7e076eb1862f2ce9e364edd0ed7"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "6815adae79cc8fb4106e0670d8e9a438ed9d84e0a103729c3c0616d89cc2a73d"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/evidence-replayed.json",
+      "fixtureSha256": "0a160cd90c6ae12e34ef7f9f47f7ec60804e45bbf3837e87434e8eee92304ecf",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-05-questionnaire-1",
+              "sha256": "2064b458c8861738a053d945101f1a354317ba7778a0a40c35b64b06e27a3b01"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-ENV-05-questionnaire-1 was already used for L1-ENV-05|environment-fixture-tenant|environment-fixture-workspace|environment-food-lot-release-fixture|environment-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "1e6f97c3e476fcc1ae0e2f38817be0b18531f5333da5359f80ac2b765c6b8188"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/evidence-contradictory.json",
+      "fixtureSha256": "627b878931227fa23bb7db9f7a0f2872154b1b5ccb96b603f73f8ceb5d07a668",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3df30161def66b676dafdebaa97f1675b816b70856ea3f4924ca86bfa92f7313"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "6163d9980ef2c378260aa7d623d4a8cd202092fdc8b53cb1d750229c0ea05e3a",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-05-questionnaire-1",
+              "sha256": "e5e3270d92ab8997e5beeaa9ea43a1199b92aa193b0c15c9b245171893679ea7"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant environment-other-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "c1cac3170f8c2be70d8a27f30567898764e48eb0060223dfb2143ee8fd0d8415"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/evidence-empty.json",
+      "fixtureSha256": "078581fc042aef85a20454a3885f4ad2ecba5b4eef88f7665557e2ffdda0a84c",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "28093310b4fc508bc440d79082334113875fbf35b1cfa510dbaf25eb322d885a"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/evidence-violation.json",
+      "fixtureSha256": "5fb1bca3cce587ed994d29a6e805dc47e979d06477910ca2178acce8316a3c88",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "b9da00f08415fbe7bdcb0ba50934b1841d1e812aae545ed6694c48e9bfc44444"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/oracle-reading-out-of-range.json",
+      "fixtureSha256": "b7b3ef9c57cbaa3cb45e0d1185c9e92d40f37b4b17b3ee0a0975a5bc5a305b1d",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4a90621ed9fdbd6032d67f574071bdcbaf032f8e8671940717ca7f8df10bb952"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "reading_out_of_range"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "reading_out_of_range",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "reading_out_of_range"
+        ],
+        "observations": {
+          "readings": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:59:00.000Z",
+              "value": 4
+            },
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:59:30.000Z",
+              "value": 9
+            },
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T12:00:00.000Z",
+              "value": 4
+            }
+          ],
+          "sensorGateLog": [],
+          "scope": "synthetic_fixture_parameter"
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/oracle-stale-reading.json",
+      "fixtureSha256": "6f86b7ec3ff759bb1d86d7590807a2e312bbfae7deb5ab792f5270e99e9d9c9e",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4a90621ed9fdbd6032d67f574071bdcbaf032f8e8671940717ca7f8df10bb952"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "stale_reading"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "stale_reading",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "stale_reading"
+        ],
+        "observations": {
+          "readings": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:57:00.000Z",
+              "value": 4
+            },
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:57:30.000Z",
+              "value": 4
+            },
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:58:00.000Z",
+              "value": 4
+            }
+          ],
+          "sensorGateLog": [],
+          "scope": "synthetic_fixture_parameter"
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/oracle-reading-gap.json",
+      "fixtureSha256": "25fc677eb9043aa78ad575b18e2e8708e0127926948debdb4e127fa03d4cb56b",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4a90621ed9fdbd6032d67f574071bdcbaf032f8e8671940717ca7f8df10bb952"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "reading_gap"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "reading_gap",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "reading_gap"
+        ],
+        "observations": {
+          "readings": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:59:00.000Z",
+              "value": 4
+            },
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T12:00:00.000Z",
+              "value": 4
+            }
+          ],
+          "sensorGateLog": [],
+          "scope": "synthetic_fixture_parameter"
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-05",
+      "case": "L1-ENV-05/negative/oracle-feed-unavailable.json",
+      "fixtureSha256": "ad38d552933f22b80099148ae59b8393665d753379556ea4f3085b81f1ae49fc",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "4a90621ed9fdbd6032d67f574071bdcbaf032f8e8671940717ca7f8df10bb952"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "sensor_feed_unavailable"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "sensor_feed_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "sensor_feed_unavailable"
+        ],
+        "observations": {
+          "readings": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:59:00.000Z",
+              "value": 4
+            },
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T11:59:30.000Z",
+              "value": 4
+            },
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-05",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "lotId": "food-lot-1",
+              "sensorId": "temperature-1",
+              "unit": "C",
+              "recordedAt": "2026-10-18T12:00:00.000Z",
+              "value": 4
+            }
+          ],
+          "sensorGateLog": [],
+          "scope": "synthetic_fixture_parameter"
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/positive/evidence-valid.json",
+      "fixtureSha256": "61111bd1e67ad9a8a63d9d850366dee474b235933ac7c9444909588e67157e23",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c34ebdabeabe49371a137f03b03b28e768e4bc71152cb9dc94c7107d49cfb531"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/positive/oracle-statement-same-lot.json",
+      "fixtureSha256": "ab6fb37fbb775714b351697f1a00881a112f4023238dc31065981af5dcc2af1f",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "cb3bc106c26b4c1b8888e9a3aa65391c72335995abd490ad6f1059e2c238c6d7"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "statement_bound_to_lot"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "statement_bound_to_lot",
+        "claimKind": "synthetic_example",
+        "effects": [
+          "statement_gate:food-lot-1"
+        ],
+        "refusals": [],
+        "observations": {
+          "statementGateLog": [
+            {
+              "lotId": "food-lot-1",
+              "commodityId": "synthetic-cocoa",
+              "statementRef": "synthetic-statement-1"
+            }
+          ],
+          "registry": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-06",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "statementRef": "synthetic-statement-1",
+              "lotId": "food-lot-1",
+              "commodityId": "synthetic-cocoa"
+            }
+          ],
+          "coverage": "synthetic_fixture_policy"
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/negative/evidence-stale.json",
+      "fixtureSha256": "029edc9fbfeba1db416eaabb6a789d35aa86c9507f0b3d70e59c610735ef1eb8",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-06-questionnaire-1",
+              "sha256": "80b44ce70820416ef4d040927a91880ba92f2e16be8ad7923339867d9da78944"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T12:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "1db78fb297c5c06dd979a2b102707d7d8be4bbfe0e06e624cbfc8886b3df5cf3"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/negative/evidence-replayed.json",
+      "fixtureSha256": "e671e4b885467029f85950f8a17756d56f29691ea351b3494d6b845025c8a2a5",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-06-questionnaire-1",
+              "sha256": "b08f58811371c9a039711c53acea36f8bf8f509cb0756048749c9f6589fa65fb"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-ENV-06-questionnaire-1 was already used for L1-ENV-06|environment-fixture-tenant|environment-fixture-workspace|environment-food-lot-release-fixture|environment-fixture-agent|-|2025-01-01T00:00:00.000Z|2025-12-31T23:59:59.000Z"
+          }
+        ],
+        "digest": "3ecd75e1c5e30ed5a9c8e055b5e9c692276fb782790eded803f2266ca8c1eed0"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/negative/evidence-contradictory.json",
+      "fixtureSha256": "45df6aaf547ff01ec0ea8b56a593687bea3c318d6ca87e3940913d39b6853c6e",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "801772456dee7aac15972233b743294a4d81e916f6de5687cce782195c88c5d5"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "c5667b17aa63a1de916fda3d77d2fadf81630d5f269fb83cfa6d8c2b502a64ff",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-ENV-06-questionnaire-1",
+              "sha256": "1b43d6ff3543598941d3b7d97320236eb93d6c5dacf8d79663152e7d6c703b6e"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant environment-other-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "5e1ea4109e5236408cce1c6964ea2fd518158f27e61f7072a500ace18c6b366a"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/negative/evidence-empty.json",
+      "fixtureSha256": "a4762904b082c40ca083d2307c015fd86dc472b31a8e0b00827c5ec36cc1f48c",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "e47a071039c7c549b0534ea8820500c2cd5a3b24b2e12c23969aa3e2a91aaf39"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/negative/evidence-violation.json",
+      "fixtureSha256": "d4b09228838127677a4944d5ab6d0c632732d1ae70ec1204f2fb0c6b90d9f4db",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "e005365f59d766565ac960033270ac8f36a919023b0026a499f561a18ec37a42"
+      },
+      "expectedLocalOracle": null,
+      "expectedLocalComponent": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/negative/oracle-statement-missing.json",
+      "fixtureSha256": "0454445af6083f55b0fe0e3f6e1c2500070d7035dbff2c2ba4fe0158a3b46fbb",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "cb3bc106c26b4c1b8888e9a3aa65391c72335995abd490ad6f1059e2c238c6d7"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "statement_missing"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "statement_missing",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "statement_missing"
+        ],
+        "observations": {
+          "statementGateLog": [],
+          "registry": [],
+          "coverage": "synthetic_fixture_policy"
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/negative/oracle-statement-other-lot.json",
+      "fixtureSha256": "951c83992541343b6e10b83bd00ceb2c2d8e2b02abaa2389803a22b5ac05fea2",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "cb3bc106c26b4c1b8888e9a3aa65391c72335995abd490ad6f1059e2c238c6d7"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "statement_mismatch"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "statement_mismatch",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "statement_mismatch"
+        ],
+        "observations": {
+          "statementGateLog": [],
+          "registry": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-06",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "statementRef": "synthetic-statement-1",
+              "lotId": "food-lot-2",
+              "commodityId": "synthetic-cocoa"
+            }
+          ],
+          "coverage": "synthetic_fixture_policy"
+        }
+      }
+    },
+    {
+      "controlId": "L1-ENV-06",
+      "case": "L1-ENV-06/negative/oracle-statement-register-unavailable.json",
+      "fixtureSha256": "77c846294e11ee8b8dae23843dbcd5e2f5a92e59ac6bb9504c83ac25e3e786d2",
+      "profileId": "environment-food-lot-release",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "cb3bc106c26b4c1b8888e9a3aa65391c72335995abd490ad6f1059e2c238c6d7"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "statement_register_unavailable"
+      },
+      "expectedLocalComponent": null,
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "statement_register_unavailable",
+        "claimKind": "synthetic_example",
+        "effects": [],
+        "refusals": [
+          "statement_register_unavailable"
+        ],
+        "observations": {
+          "statementGateLog": [],
+          "registry": [
+            {
+              "binding": {
+                "tenantId": "environment-fixture-tenant",
+                "workspaceId": "environment-fixture-workspace",
+                "deploymentId": "environment-food-lot-release-fixture",
+                "agentId": "environment-fixture-agent",
+                "controlId": "L1-ENV-06",
+                "controlVersion": "0.1.0",
+                "planDigest": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+              },
+              "statementRef": "synthetic-statement-1",
+              "lotId": "food-lot-1",
+              "commodityId": "synthetic-cocoa"
+            }
+          ],
+          "coverage": "synthetic_fixture_policy"
+        }
+      }
+    }
+  ],
+  "production": [
+    {
+      "profileId": "environment-grid-operations",
+      "controlId": "L1-ENV-01",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "76f0c0080dfa8f50aa2907a6072fdbeadc78b25d42a64dfb8cb05d3ab3d1aed9"
+    },
+    {
+      "profileId": "environment-grid-operations",
+      "controlId": "L1-ENV-02",
+      "planDigest": "sha256:da85366a50735e823dde44b1c3ffe5e7ee33bc7a23de36d6a9c6b08f01ae364f",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "3c1b6e164f47e144aac3a4f2e239a1e12fb41246e781dcd001ac7d722b9b7f6a"
+    },
+    {
+      "profileId": "environment-grid-operations-in",
+      "controlId": "L1-ENV-01",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "2e819920a7ea17ea784439c74a91c436329e687dd219261c626f9eb7caaa07e7"
+    },
+    {
+      "profileId": "environment-grid-operations-in",
+      "controlId": "L1-ENV-02",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "143fdc65246492fc335ff7b55124e0c3844db36d275ee750cd15c1edbdb6308f"
+    },
+    {
+      "profileId": "environment-grid-operations-in",
+      "controlId": "L1-ENV-03",
+      "planDigest": "sha256:33e15b91aa30c8fc14f3203c84a0bcf6cf49f1fb3c78a13711f7eeba889b3050",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "3ac377863b99eb6cefb2e17c9771985c77019037e9cfb8af912b029454485b02"
+    },
+    {
+      "profileId": "environment-food-lot-release",
+      "controlId": "L1-ENV-04",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "4728f33ee33ac8ecb1f5b20a183221a675f90ec619cf51fb7f664b8ff365db54"
+    },
+    {
+      "profileId": "environment-food-lot-release",
+      "controlId": "L1-ENV-05",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "4a90621ed9fdbd6032d67f574071bdcbaf032f8e8671940717ca7f8df10bb952"
+    },
+    {
+      "profileId": "environment-food-lot-release",
+      "controlId": "L1-ENV-06",
+      "planDigest": "sha256:629c027e3176f3719bedb8f107726368291681db72d625c79251a2392f3ec997",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "cb3bc106c26b4c1b8888e9a3aa65391c72335995abd490ad6f1059e2c238c6d7"
+    }
+  ]
+}

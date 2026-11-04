@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-33",
+  "date": "2026-10-14",
+  "commit": "8fb531d52dcdb9a1ca090540e02b77ca7c2f0f42",
+  "branch": "codex/p0-33-current-qualification",
+  "node": "v22.23.3; followup focused checks also v24.21.0",
+  "pnpm": "10.33.0",
+  "os": "Darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "pnpm run release:gate -- --json --out tmp/p0-33-continuation/full-release-gate-8fb531d52.json",
+      "exit": 1,
+      "durationMs": 1792264
+    },
+    {
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 689
+    },
+    {
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 431
+    },
+    {
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2060
+    },
+    {
+      "cmd": "pnpm run check:freeze",
+      "exit": 1,
+      "durationMs": 1405
+    }
+  ],
+  "tests": {
+    "total": 24360,
+    "passed": 24360,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "D-03-health-skip-decision.json",
+      "sha256": "7d9ae74e43c62a42ea7968a342fb934e18e5c694287c710a5abc37fc6d6a429a"
+    },
+    {
+      "path": "README.md",
+      "sha256": "e18feeee90dae2e36af27418fa0bfe234008126dd89790f88d08a0f564b45e21"
+    },
+    {
+      "path": "check-architecture-boundaries-final.log",
+      "sha256": "0493b3396332354da68051888e0914a0af27649a70378b27b8d64d1ac1ed1564"
+    },
+    {
+      "path": "check-counts-final.log",
+      "sha256": "655e055cb122fb058143872c2f3417b7b642383b7e5d0de5e9febfdd01c5a870"
+    },
+    {
+      "path": "check-docs-drift-final.log",
+      "sha256": "51ef0d4f16e7dda7f5d286dd6e752a4d1acae440dc307c7e7c5edfee179a0a9a"
+    },
+    {
+      "path": "check-freeze-final.log",
+      "sha256": "ff1c3a84a4abfd718d29f8b299c5fdaa2a09fa0b9a35c134b4afe8fc5bc53235"
+    },
+    {
+      "path": "checks-summary.json",
+      "sha256": "40529a9f3c9771c63e4ca43592c1fd7d5609627c4c48dafe0a94199f152fbe4d"
+    },
+    {
+      "path": "clean-source.log",
+      "sha256": "09d43b63c45a2943dc87eab49d4c64d28cfcf4b7ce6f4c9e883cba931c1b1959"
+    },
+    {
+      "path": "coverage-debt.json",
+      "sha256": "f37165ad54bce8b03e1f9187119311c146637669e7fc55182091fea12c11ca16"
+    },
+    {
+      "path": "coverage-summary-8fb531d52.json",
+      "sha256": "dbcec47b186bc3d005f23e15df718698d3bc5ee6443892fa1b51cb7b07e8919d"
+    },
+    {
+      "path": "dead-code.log",
+      "sha256": "73cb0713c2fded2d59196c946c4c2c375b1a016940e304ca4c74c6ffcdf7a4d8"
+    },
+    {
+      "path": "duplicates.log",
+      "sha256": "34af1e1ebed560a71e4abb4b8b0a0301d9799c7d37154840e6839621a34c1655"
+    },
+    {
+      "path": "followup-checks.json",
+      "sha256": "b2ae50d4a3ccf09817e110b1d1c9d401806e59b6157f762bab4c8acbc783ad3f"
+    },
+    {
+      "path": "freeze-acceptance-audit-80271061cfd8.md",
+      "sha256": "e0a75e7a71b1242339db30db270e0b1d024e6417e7a38d2bf2653a48f205f41f"
+    },
+    {
+      "path": "freeze.log",
+      "sha256": "2e86d09cbe72712e59cdc89d0af623f086769a71c4f15ba634e37b9efac620bb"
+    },
+    {
+      "path": "full-gate-8fb531d52-summary.json",
+      "sha256": "69c13dc815143ee5c7c72081f66e3b937671cbe8bf6d85e3729dee0b0a68c8f3"
+    },
+    {
+      "path": "main-ci-observation.json",
+      "sha256": "1f99153012212777d3dadd43d9ad9682b8fb1ab82532808e709e849022ec3d3d"
+    },
+    {
+      "path": "main-failure-candidate-comparison.json",
+      "sha256": "4db0ce4d259c2e50af489aab66dc162ef145e2cc10400d372945b76010fd5170"
+    },
+    {
+      "path": "preceding-gate-summaries.json",
+      "sha256": "892aeb4bbae69f4f909c4c1256d7c312a5430ec2e51d1e0cbe53a5d79ebf74e3"
+    },
+    {
+      "path": "preceding-readme-e3c173766.md",
+      "sha256": "48a58252f146a8f384255ad0874d261686c8c2ae40f161f0c708f3875bff6ed7"
+    },
+    {
+      "path": "preceding-receipt-e3c173766.json",
+      "sha256": "3c9a4d167113fe89fdf88012a65a7ceaec2295ad3dfe2af8821b28993557eeb8"
+    },
+    {
+      "path": "receipt-validation.log",
+      "sha256": "212f1f073fac816aef4f37d25d99ddcc6b444e65ef62a2ca9446a9b54e39f77e"
+    },
+    {
+      "path": "required-mutation-observations.json",
+      "sha256": "296b6d3bc1c69a205c1b6a988aa55ecc51827d218289f33c38587aeea10ce59e"
+    },
+    {
+      "path": "zero-pending-profile-audit-12a604291e77.md",
+      "sha256": "ed469bdb7c553c0f99a733808febde98d54fa0e7f761f762bb41d64a6fab2efc"
+    },
+    {
+      "path": "zero-pending-profile-correction-7ae9f2f8fd1b.md",
+      "sha256": "6f23124ea67b7333d09620e30ac0acc4cadab543101c8422250121e66ff4ceae"
+    }
+  ],
+  "notes": "Blocked, not Done. Counts are assertions, not suite success: one cleanup hook failed; measured functions72.89%<75%, independent per-file diagnostic880violations/289files. Actual full gate exit1 at8fb; per-file step dependency-skipped. Atdfe063a6dab076804cae00a362c57655d2e3dcfb, cleanup/report/approved health omission followup has50focused checks each onNode22/24, no full rerun. Freeze exit1 remains actualmain P1-65base refusal; do not self-authorize. D-03written health skip untilP2-06 directly approved14Oct. Three green main pushes/fresh merged-source proof absent. Mutations intentionallyexit1 with filtered cases; preceding failures remain in companions. Earlier receipt/code observations are historical snapshots. AMC-483 remains open under these acceptance blockers."
+}

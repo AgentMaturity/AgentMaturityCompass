@@ -1,0 +1,50 @@
+[
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "applyVerifyRepair moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "applyVerifyRepair puts moved files back when a rename fails part way"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "applyVerifyRepair refuses before any move when signing fails"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "applyVerifyRepair refuses under an active hold and names it"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "applyVerifyRepair refuses when a planned file changed after the plan"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "applyVerifyRepair refuses when the hold check itself throws"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "applyVerifyRepair refuses when the legal hold state is unknown, and moves nothing"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "applyVerifyRepair refuses when the monitor key does not match the expected fingerprint"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "planVerifyRepair counts a missing blob and keeps the ledger in plan mode"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "planVerifyRepair counts a tampered blob and plans to archive the ledger, the blobs, the index and its signature"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "planVerifyRepair leaves evidence alone when only a signed config failed"
+  },
+  {
+    "file": "tests/verifyRepair.test.ts",
+    "fullName": "planVerifyRepair plans nothing for a healthy store and apply moves nothing"
+  }
+]

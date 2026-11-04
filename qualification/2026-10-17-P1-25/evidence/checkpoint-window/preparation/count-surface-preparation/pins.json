@@ -1,0 +1,309 @@
+{
+  "schema": "p125-checkpoint-private-count-proposal-pins/1",
+  "at": "2026-10-16T23:28:45.135771+00:00",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/protected-inputs.json",
+      "bytes": 68779,
+      "sha256": "de322b4c2df60ad80c736987f24a0b6aa7f46413cacbd7cc7a0573fa1854b8ca"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/branch-adoption.json",
+      "bytes": 631,
+      "sha256": "f408f477ec8db5593212e14f04488b2d94a66eec4ed26e4471ada5083630aa2e"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-scope-review/review.json",
+      "bytes": 5643,
+      "sha256": "4d4f8679f600fc3520f8c4b0c55139338e3c778c873a237fedec38658a007ce7"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-scope-review/seal.json",
+      "bytes": 2323,
+      "sha256": "014446da3a781f31c41645b4d7b9200c7d6d578bc59264f6e78e0d3e8427c5bf"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-scope-review/observations.json",
+      "bytes": 1099438,
+      "sha256": "596e26972f3bab7ac58805f712834eba26beea8dac05e1ac76eea9febdc6b81a"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/next-checkpoint-scope-review/history-authorities.json",
+      "bytes": 5532,
+      "sha256": "f8a37ef8668963d6a8673c33a0222d4011415fa14ecd9127c2057bb7b25ff41f"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/proposed-admission-v3.json",
+      "bytes": 21007,
+      "sha256": "61605cf3a30deb76d77ce510f490b82f284735b8665057bba7c18378482cce47"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/review-v3.json",
+      "bytes": 2547,
+      "sha256": "72706fe7304cbd9860decd26dc1d49228dd167077dcf20c590733e8bd5a1b011"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/seal-v3.json",
+      "bytes": 1688,
+      "sha256": "b9db9fb191669cba255e86f447422bd9cdfa3832933acae3ec602b90f614d52c"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/count-surface-review/closed-read-observations.json",
+      "bytes": 3325962,
+      "sha256": "f64caecb76f1e6d60c868a95522346a469d04369cc4432c5daa84f3f1060d25e"
+    },
+    {
+      "path": "/private/tmp/p1-25-grant-qualification-20261017/generated-counts-actual.json",
+      "bytes": 8551,
+      "sha256": "79b8bd781156cfc64c1f6424c692eab6a4075951ff26597ba09c894b0ed76be3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+    }
+  ],
+  "tenCurrentSourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "3fae755d626825e532af828157829450ef124062df279c7c822ad9d8a7ee3e5f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "34bf446c16cfdee4812eb5622cf153baad344fce179befb98c2f606a27a9a08b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "557d3c7bf5b151e9bcb2c321295fd21e4494703b4c198c47c9bacad329de8871"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "43bcc499c40ec937ae58eb841559bfdee59c529eda0253263f07f34acd760e4e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "bd55631b79e23f5ec9b25d48e00b072c1ff464f7bc9c43affb8e914c747325f1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "46407030cf8d7fb764fa5135c57409bfdd5827913f795ad4e2ede7c1acad53f3"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "8080c44268913f9c1ee5aab995686ebb50d1cfcbc3cdd518536d12cb0a4f59ce"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "39038febb8a7f72c514582397df294fd57c2dd113d2811940f9dafd541c0d992"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "8bd704d810761009e5b9a0a2649743ddc73509dcb316675dea06fdc3ef0d0a35"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "86c7c720a78b1450af3ef7a15c2c7c9ee16b1f46576d479fe8732fc42b44fe35"
+    }
+  ],
+  "twentyClaudeRVariants": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/README.md",
+      "bytes": 62243,
+      "sha256": "0910c215e07741fbb32b4752f1c215f3e1d19a5dee7dfc57bc14bf3420e9159d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+      "bytes": 59828,
+      "sha256": "c98011ad0705131dd25e177526fbc319c245e264511098278af366ef0fa2e4c6"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/CONTRIBUTING.md",
+      "bytes": 19504,
+      "sha256": "7a0a6aab4e90b94bf2442229cda181e52264ea0acb21ce9a9bc965927daf1174"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "a817d07bd625ead95a0bfdf41e12cc8d3f95f6e67b364555da1b7ca49561155b"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/index.html",
+      "bytes": 44023,
+      "sha256": "285d6a2105bb73375ecfff6e7f1f97a818f34bc0b304506092666f883e8521e8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+      "bytes": 43520,
+      "sha256": "0ba594cb3596def6823a57a7dc8154c6220e197c525e833ee9f8dee299db2886"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/lite.html",
+      "bytes": 11197,
+      "sha256": "990616966fc7419c8c70aa99384f46ad93a0e48c376fb758279776320c2babbc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+      "bytes": 11197,
+      "sha256": "abbafaf85e349a46bbd50981a28ee8e6e174f0c9d50eeac94ae8023fdc7154e5"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "bef816e6b82f9be94abf597d4787bd4a66e441a2a19a985999fac59c2a783bef"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+      "bytes": 44169,
+      "sha256": "5d84d23da19c1d2bbeb125b7ae229e3658a70dacfd49e94ff037d23c819006dc"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "f78e4a2f89289588f6505cfc238feabdaabcb3966502a89946e6b1e26b6819b2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "01ff38f30497000d9f6de81b300f878e2bbb1266096f5f453c0585af96e4993f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "e3cae816274d07d4746c18bcbef7da203c333338b2d117a4e07c90f799ead010"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "1f602ebcb718c77b0a51418b423f18f14b4bf127516717ac59012df508d410c4"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "65f3be7f143513b0d0e9f860b5fca395e5bf3e32bf62020eebf900a270bc1a7b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "96f6d68b97f1672774b7fbc1e72f65d065bc0d72a26773954a8436c5a6eeb13f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5afea81c8279023750c20ef6fdd9c5015dd15ee0f2023989127b0db9233feb30"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "508f14a2e92fe79a5510820a7341ad2cc26ef75a8809ce22b392f015f67f6778"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 108101,
+      "sha256": "0ac4f3ecaf64118437c54c0f40a5982ce1606c3f1a66dda3bcaf41fbe5e8e202"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "6c37880867226216d2b6cf9d2b84472a190668854dc28d1f10e77577594bea25"
+    }
+  ],
+  "nineNativePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 542501039,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-obXeMv/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543125595,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543200130,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-1g2Zan/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543305423,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543396326,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-H0dbS9/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543499352,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-4QumGS/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543570530,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-ADqtbL/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "dev": 16777231,
+      "inode": 543644499,
+      "nlink": 1
+    }
+  ],
+  "initial142ProtectionVia": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/protected-inputs.json",
+    "bytes": 68779,
+    "sha256": "de322b4c2df60ad80c736987f24a0b6aa7f46413cacbd7cc7a0573fa1854b8ca"
+  },
+  "rawOriginalsAndLargeObservationsPrivateOnly": true
+}

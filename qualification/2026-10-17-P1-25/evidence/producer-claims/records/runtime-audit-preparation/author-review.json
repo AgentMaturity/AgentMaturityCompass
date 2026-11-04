@@ -1,0 +1,51 @@
+{
+  "schema": "p125pc-inert-runtime-auditor-author-review/1",
+  "at": "2026-10-17T01:47:19.976582+00:00",
+  "blockers": [],
+  "preparedOnly": true,
+  "preferredCandidate": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+    "bytes": 61752,
+    "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a"
+  },
+  "parentObserved": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-observed.py",
+    "bytes": 2197,
+    "sha256": "1d72bdb7d77cbff0251219cf33884e51c24bff5862cffeb052c1bf24124a58be"
+  },
+  "parentPublic": {
+    "path": "/private/tmp/p1-25-cadence-qualification-20261017/audit-public.py",
+    "bytes": 27508,
+    "sha256": "dc346333754ba26c06233ba94719b271645513ecb12856c3a14dd5c1bb27f0eb"
+  },
+  "actualPreparationPinsetOnly": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+    "bytes": 88277,
+    "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac"
+  },
+  "observedChangesOnlyDirectoryAndPhasePrefix": true,
+  "publicReverseExactAfterRemovingOnlyNewBranchDispatchAndDeclaredNamespaceLocationEdits": true,
+  "allFourPriorSemanticBranchesAndCommonGuardsPreserved": true,
+  "completeDeltasReproducedExactlyWithoutParsingOrExecutingCode": true,
+  "partialStoredTsMismatchRetainedAndNoLaterCredit": true,
+  "firstCoveredFinalLedgerBooleansAndErrorCountsReadFromActualPublicRows": true,
+  "twoIndependentQueryChildProofsAndConditionalSignerEquality": true,
+  "actualCounterLoopsAndNativeEnvironmentCleanupStreamGuardsUnchanged": true,
+  "sourceAssertionLocations": {
+    "expect(actualMiddle.time.basis).toBe(\"attested-window\");": 475,
+    "expect(one.result).toEqual({ ran: false, anchors: [] });": 583,
+    "expect(two.result).toEqual({ ran: true, anchors: [] });": 598,
+    "expect(backdatedStored.ts).toBe(backdatedTs);": 698,
+    "expect(postdatedStored.ts).toBe(postdatedTs);": 707,
+    "expect(backdatedTime.findings).toEqual([\"BACKDATED_CLAIM\"]);": 782,
+    "expect(postdatedTime.findings).toEqual([\"POSTDATED_CLAIM\"]);": 783
+  },
+  "noRuntimeOutcomeFreshRootCommitHashOrResourceCountAdopted": true,
+  "sourceFileAllocationRootOnly": true,
+  "noImportParseCompileHelperProductOpenSslNativeSqlNetworkKeyStreamReservationSourceIndexQaOrPriorArtifactWrites": true,
+  "staticLimits": [
+    "No syntax/compiler/runtime fit claim: root and an independent reviewer must read exact inert code before adoption.",
+    "The read-only lookup diagnoses are preserved with no qualification credit.",
+    "Prospective controls may stop at stored backdate698 or postdate707. No failure count, result, future action, source commit, Q or restoration hash is predicted."
+  ]
+}

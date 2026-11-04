@@ -1,0 +1,91 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-36",
+  "date": "2026-10-27",
+  "commit": "72b8b22438d26709a00a630053036e3eb45de116",
+  "branch": "rtd/w3-p2-36",
+  "node": "v22.23.3",
+  "pnpm": "not recorded",
+  "os": "macOS 26.6.2",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 <59 test files importing src/a4, the bundles, A4 contracts, the A4 OpenAPI or spec schemas (plus tests/a4/*)>",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 <52 test files importing ledger encryption, the deletion gate, the Postgres store, the P2-02 detectors or processor registry, keysConfig or the signer (tests/a4/enterpriseData.test.ts included)>",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "mutations.json",
+      "sha256": "b78cec32e84bfcf03f900280ae25837a6f9e87e3c5be2d01c98e3bc2bb182ea1"
+    }
+  ],
+  "notes": "P2-36 on rtd/w3-p2-36, base 4683eecc7, vitest with 2 workers. commit: the receipt recorded none. It was first written with the code commit 2495bced1 (receipt commit 3e47a6cb4) and last updated by the security review fix 72b8b2243, which raised tests/a4/enterpriseData.test.ts from 9 to 11 tests and the second related set from 51 files (814 passed) to 52 files (825 passed); the first related set and the checks kept their first values. commit names 72b8b2243, the source the final counts describe. date: the receipt recorded none; the folder carries the wave-3 date 2026-10-27 (git: the receipt's commits are 2026-10-28 11:04 and 11:31 +0530), as the other wave-3 receipts dated 2026-10-27 do. Rows 1-12 write the recorded check names and exit codes as the npm scripts they name (check-freeze as check:freeze); flags were not recorded. Row 12 exit 1: 1 on base and here: earlier exception keys (P1-65, P2-09, P2-09d, ...) are not in the base baseline; nothing from P2-36 (no CLI command added). Rows 13 and 14 write the two recorded related-test sets as vitest commands; their command lines were not recorded, and their exits follow from the recorded failures. Row 13: 603 passed, 1 failed (tests/compliance/evidenceBinding.test.ts > every source literal in src is classified), failing on the base too: Same four unclassified literals (envelope, lifecycle_bound, not_governed, reassessment) on base 4683eecc7 with this branch's changes stashed; not touched here. Row 14: 825 passed, 0 failed. New tests: tests/a4/enterpriseData.test.ts, 11 passed, 0 failed (inside row 14's set). Red/green: verifyA4Chain passes on encrypted audit rows: red base a4AuditReader compares raw inline bytes with body_json; mutation M1 restores that comparison and the test fails (A4 integrity fails under ledger encryption); green passes. Postgres backend refuses A4 writes, readiness BLOCKED: red base has no guard (mutation M2/M3); green passes. ecdsa-p256-sha256 envelope refused under a policy that disallows it: red base verifies it regardless of policy (mutation M4/M8); green passes. erasure, legal-hold refusal, bundle credential refusal, migrated-row plaintext export: red new behaviour: the routes/functions do not exist on base; green passes. Mutations: mutations.json (M1-M8 each turned a named test red; M9, the binder detector pass, survives: no projected binder field carries detector-matching text, so the pass is defence in depth with its own unit test on redactExportValue). Generated: spec/schemas/v1/a4-transition.schema.json (ERASED); spec/schemas/index.json; counts (gen-counts --write); website/openapi.yaml (the erase path only, from src/studio/a4Openapi.ts). Quality baseline: dead-code --shrink removed 2 findings now used (a4Binder.ts file, a4Blobs.ts destroyProjectKey export). Security review fix: finding: bundleA4 scanned for credentials before decrypting, and decrypted every referenced ledger row (not only A4's own audit rows) into 0o644 files. Fix: only the project's own audit rows (a4_transitions.evidence_event_id) are decrypted; another referenced row encrypted after hashing refuses the export (409 A4_EXPORT_REF_ENCRYPTED) rather than leaking plaintext or exporting a record that fails offline; every decrypted payload is scanned and the credential check runs after decryption; record files are written 0o600. Red: 'a referenced ledger row of other evidence ... is never decrypted into the export' failed before the fix (the export succeeded with the foreign row's plaintext); 'record files carrying plaintext are written owner-only (0o600)' failed before the fix (mode 0o644). Mutations: M10-M12 in mutations.json; with the own-row check removed (M10) the post-decrypt scan alone refuses the export with A4_BUNDLE_REFUSED, so the test fails only on the code; removing both (M11) lets the export through. Flaky test fixed: the ECDSA fixture signed with a random S; AMC accepts only low S, so it failed about half the time; it now normalizes with lowS. tests is null: the two sets are not summed, and their skipped counts were not recorded (README.md gives 11 new tests passed and, over 110 existing files, 1,417 passed and 1 failed). Not recorded: pnpm and the command durations (durationMs 0 means not recorded). os and arch split the recorded 'macOS 26.6.2 arm64'."
+}

@@ -1,5 +1,8 @@
-import { randomUUID, sign, verify } from "node:crypto";
-import { receiptV1Schema, receiptV2Schema, type ReceiptV2 } from "../contracts/v1/receipt.js";
+import { sign } from "node:crypto";
+import { verifyWithKey } from "../keys/algorithmPolicy.js";
+import { type ReceiptV2 } from "../contracts/v1/receipt.js";
+import { buildReceiptPayload, parseReceiptPayload } from "./receiptPayload.js";
+import { RECEIPT_TRANSPORT_TAG, parseReceiptTransport, verifyReceiptTransport } from "./receiptTransport.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -64,20 +67,7 @@ export function mintReceipt(input: MintReceiptInput): {
   receipt: string;
   receiptSha256: string;
 } {
-  const base = {
-    kind: input.kind,
-    receipt_id: input.receiptId ?? randomUUID(),
-    ts: input.ts,
-    agentId: input.agentId || "unknown",
-    providerId: input.providerId || "unknown",
-    model: input.model ?? null,
-    event_hash: input.eventHash,
-    body_sha256: input.bodySha256,
-    session_id: input.sessionId
-  };
-  // An action state is signed only in the shape the contract accepts; a v1 payload stays exactly as minted before.
-  const payload: ReceiptPayload = input.action === undefined ? { v: 1, ...base } : receiptV2Schema.parse({ v: 2, ...base, ...input.action });
-  if (payload.v === 1 && input.kind === "action_state") throw new Error("an action_state receipt needs its v2 members");
+  const payload = buildReceiptPayload(input);
   const payloadBytes = Buffer.from(canonicalize(payload), "utf8");
   const signatureBytes = sign(null, payloadBytes, input.privateKeyPem);
   const receipt = `${toBase64Url(payloadBytes)}.${toBase64Url(signatureBytes)}`;
@@ -97,22 +87,14 @@ export function parseReceipt(receipt: string): {
   payloadB64: string;
   signatureB64: string;
 } {
+  if (receipt.startsWith(`${RECEIPT_TRANSPORT_TAG}.`)) {
+    const { payload, payloadB64, signatureB64 } = parseReceiptTransport(receipt); return { payload, payloadB64, signatureB64 };
+  }
   const [payloadB64, signatureB64, ...extra] = receipt.split(".");
   if (!payloadB64 || !signatureB64 || extra.length > 0) {
     throw new Error("invalid receipt format");
   }
-  const decoded = JSON.parse(fromBase64Url(payloadB64).toString("utf8")) as { v?: unknown };
-  const schema = decoded.v === 1 ? receiptV1Schema : decoded.v === 2 ? receiptV2Schema : null;
-  if (schema === null) {
-    throw new Error(`unsupported receipt version: ${String(decoded.v)}`);
-  }
-  const parsed = schema.safeParse(decoded);
-  if (!parsed.success) {
-    const issue = parsed.error.issues[0];
-    throw new Error(`receipt payload violates the v${String(decoded.v)} contract: ${issue ? `${issue.path.join(".") || "(root)"} ${issue.message}` : "invalid"}`);
-  }
-  const payload: ReceiptPayload = parsed.data;
-  if (payload.v === 2 && payload.kind !== "action_state") throw new Error("a v2 receipt must be an action_state receipt");
+  const payload = parseReceiptPayload(fromBase64Url(payloadB64));
   return {
     payload,
     payloadB64,
@@ -126,10 +108,11 @@ export function verifyReceipt(receipt: string, publicKeysPem: string[]): {
   error?: string;
 } {
   try {
+    if (receipt.startsWith(`${RECEIPT_TRANSPORT_TAG}.`)) return { ok: true, payload: verifyReceiptTransport(receipt, publicKeysPem).payload };
     const parsed = parseReceipt(receipt);
     const payloadBytes = fromBase64Url(parsed.payloadB64);
     const signatureBytes = fromBase64Url(parsed.signatureB64);
-    const ok = publicKeysPem.some((pub) => verify(null, payloadBytes, pub, signatureBytes));
+    const ok = publicKeysPem.some((pub) => verifyWithKey(payloadBytes, pub, signatureBytes));
     if (!ok) {
       return {
         ok: false,

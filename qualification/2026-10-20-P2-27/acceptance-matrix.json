@@ -1,0 +1,340 @@
+{
+  "v": 3,
+  "status": "frozen_preparation_after_product_checks_full_Q_pending",
+  "allAcceptanceComplete": false,
+  "criteria": [
+    {
+      "id": "AC1",
+      "specLines": "123",
+      "criterion": "Six conversion families pass positive fixtures and fail unsafe keyword-negative fixtures.",
+      "status": "current_product_scoped_software_tests_passed_native_claims_remain_experimental_NE",
+      "evidence": [
+        "src/assurance/executed/catalogCases.ts",
+        "tests/assurance/executed/catalogCases.test.ts",
+        "tests/assurance/executed/harness.test.ts",
+        "tests/assurance/executed/semantic.test.ts"
+      ],
+      "limits": "40 fresh-effect declaration cases are software fixtures, not real-model measurements. Clinical negative writers are test-only. Native public smoke exercises only two FERPA legacy routes plus the separate ENV recall aspect."
+    },
+    {
+      "id": "AC2",
+      "specLines": "124",
+      "criterion": "All18 regulated packs execute or document specific NE; no reply-text grading.",
+      "status": "current_product_scoped_software_tests_passed_native_claims_remain_experimental_NE",
+      "evidence": [
+        "src/assurance/executed/registry.ts",
+        "src/assurance/executed/packExecution.ts",
+        "tests/assurance/executed/packRetirement.test.ts",
+        "docs/assurance/EXECUTED_TESTS.md"
+      ],
+      "limits": "119 identities preserved;8 seeded adapters,111 explicit unavailable routes. No claim that all119 have implemented adapters."
+    },
+    {
+      "id": "AC3",
+      "specLines": "125",
+      "criterion": "Regulated tasks contain no expected answer/grading-format hints.",
+      "status": "current_product_scoped_software_tests_passed_native_claims_remain_experimental_NE",
+      "evidence": [
+        "src/assurance/executed/routes.ts",
+        "tests/assurance/executed/packRetirement.test.ts"
+      ],
+      "limits": "Source scan and actual compiled fixture task tests need final-source runtime/check receipt; no live score claim."
+    },
+    {
+      "id": "AC4",
+      "specLines": "126",
+      "criterion": "Empty or missing execution cannot yield a pass.",
+      "status": "current_product_scoped_software_tests_passed_native_claims_remain_experimental_NE",
+      "evidence": [
+        "src/assurance/executed/compiledExecution.ts",
+        "tests/assurance/executed/runnerBoundary.test.ts",
+        "tests/assurance/executed/runnerReplay.test.ts",
+        "src/assurance/cliPresentation.ts"
+      ],
+      "limits": "Unsupported/missing-scope rows resolve no target and stay NE; malformed selections may explicitly refuse. No default positive outcome is created. Installed CLI/SARIF display now explicitly distinguishes inconclusive NE from measured failure; no score/result promotion."
+    },
+    {
+      "id": "AC5",
+      "specLines": "127",
+      "criterion": "Adversarial ASR per task over25attempts with intervals.",
+      "status": "local_diagnostics_implemented_production_ASR_not_measured",
+      "evidence": [
+        "src/assurance/executed/harness.ts",
+        "tests/assurance/executed/harness.test.ts",
+        "src/assurance/report.ts"
+      ],
+      "limits": "Local fixture rate/Wilson require all25 conclusive attempts;24+1NE is unavailable. Native production attackSuccessRate remainsnull and external observer unavailable; full production-ASR criterion is not met."
+    },
+    {
+      "id": "AC6",
+      "specLines": "128",
+      "criterion": "Judged results require valid calibration and calibration table is published.",
+      "status": "native_authority_complete_private_export_and_pending_table_installed_actual_models_and_publication_pending",
+      "evidence": [
+        "src/assurance/judges/calibrationAuthority.ts",
+        "src/assurance/judges/regulatedJudgeRuntime.ts",
+        "tests/assurance/executed/calibrationAuthority.test.ts",
+        "scripts/gen-judge-calibration.mts",
+        "docs/assurance/JUDGE_CALIBRATION.md",
+        "src/assurance/judges/calibrationAuthority.ts:runOperatorCalibration",
+        "scripts/gen-judge-calibration.mts:renderNativeCalibrationReviewDraft"
+      ],
+      "limits": "Native private report/orchestration is source-installed and parent reports actual focused71/71 including CLI/private path. Its authentic private snapshot includes all required stats and never trusts serialized record metadata. No real human-labelled calibration/model qualification exists. Public generator still writes pending-only status; actual measured public release requires Sid approval plus reviewed generator/docs/site work."
+    },
+    {
+      "id": "AC7",
+      "specLines": "129",
+      "criterion": "Converted scenarios appear as experimental control tests and feed P1-11.",
+      "status": "current_product_scoped_software_tests_passed_native_claims_remain_experimental_NE",
+      "evidence": [
+        "src/assurance/executed/controlResults.ts",
+        "src/assurance/executed/evaluationSnapshot.ts",
+        "src/assurance/executed/reportValidation.ts",
+        "tests/assurance/executed/runnerReplay.test.ts",
+        "tests/catalog/l0/evidenceFixtures.test.ts",
+        "catalog/fixtures/L1-HLT-01/negative/evidence-synthetic-no-observed-tier.json",
+        "catalog/fixtures/L1-MOB-07/negative/evidence-synthetic-no-observed-tier.json",
+        "catalog/fixtures/L1-WLT-01/negative/evidence-synthetic-no-observed-tier.json"
+      ],
+      "limits": "All11 linked controls remainexperimental. Existing8 production evidence contracts are preserved; actual synthetic captures reject producer_not_admitted. Three new optional drills retain unverified synthetic producers. Three separate ordinary evidence-harness negative unit fixtures explicitly test null-tier producer_unverified\u2192NE/noadmission/none/pending, without increasing the40 effect-case declarations. Native P1-11 use is implemented; no production pass or reviewed control coverage is claimed."
+    },
+    {
+      "id": "AC8",
+      "specLines": "130",
+      "criterion": "Mutation checks recorded; full suite and checks green.",
+      "status": "23_checks_passed_focused4483P1baselineF_full_Q_pending",
+      "evidence": [
+        "parent-owned qualification logs and exact restoration receipts",
+        "baseline-public-docs-graph-v1/summary.json"
+      ],
+      "limits": "Current H:23/23 required checks exit0;149files4484tests/4483passed/1failed/0skipped. Complete baseline failure arrays match after only clone-root normalization. Mutation sets stay separate. Final metadata-Q full suite is pending."
+    },
+    {
+      "id": "HANDOVER-ONE-COMMAND",
+      "specLines": "HANDOVER6.2:91",
+      "criterion": "Live model calibration/ASR paths built to run from one command without pretending unavailable measurements.",
+      "status": "guarded_seeded_execution_cli_and_native_private_calibration_one_call_installed_real_inputs_pending",
+      "evidence": [
+        "src/assurance/executed/cliOptions.ts",
+        "src/cli.ts",
+        "src/assurance/judges/calibrationAuthority.ts:runOperatorCalibration",
+        "docs/assurance/EXECUTED_TESTS.md",
+        "executed-operator-calibration-report-proposal-v2/README.md"
+      ],
+      "limits": "Guarded agent-scoped CLI now supports --executed-attempts1|25 and --station-questions with exact unique IDs; default remains25. Calibration is one native API operation invoked by standard Node with separate human-reviewed trusted operator composition, not a product calibration CLI or JSON authority importer. Actual D08context/model inputs are missing, and productionASR/externalobserver is still unavailable."
+    }
+  ],
+  "humanOnlyAndOperatorInputs": [
+    {
+      "id": "HUMAN-LABELS",
+      "kind": "human_only",
+      "pending": "Two distinct rostered humans label the complete exact synthetic gold bytes; no AI labels or copied fixture identities."
+    },
+    {
+      "id": "HUMAN-ADJUDICATION",
+      "kind": "human_only_conditional",
+      "pending": "A distinct adjudicator resolves actual label disagreements against both exact label files; current contract requires null adjudication when there is no disagreement."
+    },
+    {
+      "id": "EXPERT-POLICY",
+      "kind": "human_only",
+      "pending": "A named independent domain expert supplies signed minimum gold-set size, FPR/FNR tolerances, validity/expiry and domain credentials. Numeric shape limits are not expert approval."
+    },
+    {
+      "id": "FIXTURE-REALISM",
+      "kind": "human_only_review",
+      "pending": "Experts review clinical trial, FERPA, cold-chain and other fixture realism and configured authority facts before results are cited. No legal deadline, MARPOL limit or exception authority is guessed."
+    },
+    {
+      "id": "TRUSTED-OPERATOR-COMPOSITION",
+      "kind": "human_operator_input_and_review",
+      "pending": "Actual D-08 identities/credentials and source-author provenance plus independently selected exact binding must be composed in trusted code. Native default roster is empty; arbitrary bundle/CLI JSON cannot replace it."
+    },
+    {
+      "id": "MODEL-QUALIFICATION",
+      "kind": "human_authorization_and_external_resources",
+      "pending": "Authorize actual native pinned model calls/cost and provide credentials through supported runtime mechanisms. No credential presence or real-model measurement is inferred from software fixtures."
+    },
+    {
+      "id": "SID-PUBLICATION",
+      "kind": "human_only_approval",
+      "pending": "Sid explicitly approves actual measured judge rates for publication. Private output and cryptographic integrity do not grant that approval."
+    }
+  ],
+  "agentOrMixedRemainingWork": [
+    {
+      "id": "ADAPTERS-111",
+      "kind": "agent_implementable_future_work",
+      "scopeDecision": "Spec step6 permits specific documented NE when a fixture is absent. Those111 routes remain unimplemented; this is not a human-only blocker or evidence that all scenarios are converted."
+    },
+    {
+      "id": "PRIVATE-MEASURED-EXPORT",
+      "kind": "implemented_agent_code_final_qualification_pending",
+      "proposal": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-operator-calibration-report-proposal-v2/manifest.json",
+      "status": "Source-installed existing-capability private orchestration/report and optional generator private export. Parent reports actual RED39:35P/4F followed by scoped native/private/CLI GREEN71/71. No actual real-model calibration or public publication is claimed. Native docs insertion is installed and source-pinned; no actual model/human/publication claim."
+    },
+    {
+      "id": "MEASURED-PUBLIC-DOCS",
+      "kind": "mixed_agent_release_work_and_human_approval",
+      "status": "Current public generator rejects all measured rows. Even after private export, real measured publication requires Sid approval and a reviewed generator/docs/site release compatible with authentic output; it is not solely waiting for human labels."
+    },
+    {
+      "id": "PRODUCTION-ASR-OBSERVER",
+      "kind": "technical_upstream_capture_gap_and_authorization_boundary",
+      "status": "P1-48 independent attack adapters/external observer are unavailable. Current harness intentionally keeps production ASR null even with25 local conclusive attempts. No attack payload implementation or production measurement is authorized/inferred here."
+    },
+    {
+      "id": "CLI-OPTIONS",
+      "kind": "implemented_agent_code_final_qualification_pending",
+      "status": "Source-installed --executed-attempts1|25 and --station-questions guards on the real assurance command, including agent-only scope, no demo mixing, exact unique IDs, question-only selection and rerun preservation. Parent reports focused71/71; no productionASR claim. NE/SARIF presentation is installed and separate from native result storage; ordinary unregulated measured outcomes remain unchanged."
+    },
+    {
+      "id": "FINAL-SOURCE-QUALIFICATION",
+      "kind": "agent_runtime_and_evidence_pending",
+      "status": "Product H checks completed as recorded. Final Q full suite, every nonpass classification, native receipt validation and handoff remain pending."
+    }
+  ],
+  "finalQualification": {
+    "productHead": "b2b512513eba8799b9050dbe13d178bfe448acef",
+    "handoffHead": null,
+    "required23": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/product-head-b2b512-required23-v1/summary.json",
+      "sha256": "e1ace46efccfb08ffd2adeaf3a886455a3cb6a3cc0c191b482c77faac6c22120",
+      "bytes": 108913
+    },
+    "focused149": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/product-head-b2b512-focused149-v1/summary.json",
+      "sha256": "a3b506df79341e8fbaeab296b4fdb66f2e59053bda4bd16f9e55b113d7b7fb1c",
+      "bytes": 165446
+    },
+    "restored39": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/post-cli-mutations-restoration-green-v1/summary.json",
+      "sha256": "08a83815523a12acfbed07932c80e1cdc691d0e279832cceffd9ec46dff1ef6c",
+      "bytes": 99590
+    },
+    "extraDocs": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/product-head-b2b512-extra-doc-checks-v1/summary.json",
+      "sha256": "a1a8cb500dcaf23436559f67fb0f4245db1bc9e7bcbd0416cd38080a8fe65302",
+      "bytes": 99477
+    },
+    "catalogVersion": "0.1.6",
+    "catalogDigest": "sha256:0344050d488e78da1cb4cc0b5b8810df4f493e438cb3b14fd5a9db2589149fb7",
+    "fullSuite": "pending on Q; see full-suite-protocol.json",
+    "productionModelRuns": 0,
+    "productionAttackSuccessRate": null
+  },
+  "supersedes": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/executed-final-receipt-design-v2/acceptance-matrix.json",
+  "fixtureClassSeparation": {
+    "effectCaseDeclarations": 40,
+    "nativeAdmissionNegatives": [
+      {
+        "controlId": "L1-HLT-01",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/catalog/fixtures/L1-HLT-01/negative/evidence-synthetic-no-observed-tier.json",
+        "bytes": 1957,
+        "sha256": "dca3ed06832eafa017a9c75387fe61cb825a92053beaa05a0a88718e894c6f36",
+        "kind": "ordinary_native_P111_admission_unit_fixture",
+        "effectCaseDeclaration": false,
+        "actualLedgerCapture": false,
+        "expected": {
+          "result": "not_evaluated",
+          "reason": "producer_unverified",
+          "admitted": [],
+          "claimKind": "self_reported",
+          "review": "pending",
+          "enforcement": "none"
+        },
+        "suppliedUnitProvenance": "verified producer identity with null derived trust tier; not an actual authenticated runtime capture"
+      },
+      {
+        "controlId": "L1-MOB-07",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/catalog/fixtures/L1-MOB-07/negative/evidence-synthetic-no-observed-tier.json",
+        "bytes": 1957,
+        "sha256": "a78245da56c22393aca79d8967d35ce497c3b7b6080836191bfd0dfef130b426",
+        "kind": "ordinary_native_P111_admission_unit_fixture",
+        "effectCaseDeclaration": false,
+        "actualLedgerCapture": false,
+        "expected": {
+          "result": "not_evaluated",
+          "reason": "producer_unverified",
+          "admitted": [],
+          "claimKind": "self_reported",
+          "review": "pending",
+          "enforcement": "none"
+        },
+        "suppliedUnitProvenance": "verified producer identity with null derived trust tier; not an actual authenticated runtime capture"
+      },
+      {
+        "controlId": "L1-WLT-01",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/catalog/fixtures/L1-WLT-01/negative/evidence-synthetic-no-observed-tier.json",
+        "bytes": 1957,
+        "sha256": "2f2522faf2bee8b531338e75468d547403f74203f65c09c6bb413727838a5adb",
+        "kind": "ordinary_native_P111_admission_unit_fixture",
+        "effectCaseDeclaration": false,
+        "actualLedgerCapture": false,
+        "expected": {
+          "result": "not_evaluated",
+          "reason": "producer_unverified",
+          "admitted": [],
+          "claimKind": "self_reported",
+          "review": "pending",
+          "enforcement": "none"
+        },
+        "suppliedUnitProvenance": "verified producer identity with null derived trust tier; not an actual authenticated runtime capture"
+      }
+    ],
+    "not43EffectCases": true
+  },
+  "baselinePublicDocsFailure": {
+    "summary": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/summary.json",
+      "bytes": 2510,
+      "sha256": "c112d79eeaec4e9d03205041e8b01c6115365fa58160b32b00d0d8cf6e72cb08"
+    },
+    "baselineHead": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/publicDocsGraph.test.ts",
+      "--maxWorkers=1",
+      "--reporter=verbose",
+      "--reporter=json",
+      "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/report.json"
+    ],
+    "exit": 1,
+    "totals": {
+      "numTotalTests": 6,
+      "numPassedTests": 5,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "sourceStatusAfterAsRecorded": "",
+    "artifacts": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/raw.log",
+        "bytes": 1951,
+        "sha256": "145619f0a64200474e2ff9774a27107ed30ebe0e61a30e930091ddb9e2ffa2ad"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/report.json",
+        "bytes": 3971,
+        "sha256": "aad80b2235e9dec484d93c3813a50414d0b8560cd49bad82974ad321043ab1a8"
+      }
+    ],
+    "exactEdge": {
+      "source": "MCP_SERVER",
+      "target": "MCP_INDUSTRY_PACKS",
+      "href": "MCP_INDUSTRY_PACKS.md",
+      "currentSourceLine": 237,
+      "currentSource": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/docs/MCP_SERVER.md",
+        "bytes": 19875,
+        "sha256": "0e34f376e9e8355e2c663b8b323c09adacc0db18ddf3d7bf18f3410787bf4c44"
+      }
+    },
+    "classification": "Exact public-docs edge failure independently reproduced by parent on clean8d884d3ea986f707059a0dc3184dcebae21d2a7b baseline; not a new P2-27 assertion failure. No claim that all other failures are baseline-only.",
+    "reviewerBoundary": "Static inspection/hash verification of parent-owned E artifacts only; child did not inspect clone/Git or execute the baseline."
+  },
+  "productHead": "b2b512513eba8799b9050dbe13d178bfe448acef"
+}

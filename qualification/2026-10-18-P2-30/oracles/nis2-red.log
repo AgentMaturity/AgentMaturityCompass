@@ -1,0 +1,40 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts (122 tests | 1 failed | 121 skipped) 17ms
+     × executes the supporting NIS2 warning drill with positive, negative and missing-evidence cases 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > executes the supporting NIS2 warning drill with positive, negative and missing-evidence cases
+AssertionError: expected [] to deeply equal [ …(6) ]
+
+- Expected
++ Received
+
+- [
+-   "L1-TECH-07/negative/oracle-nis2-incomplete.json",
+-   "L1-TECH-07/negative/oracle-nis2-late.json",
+-   "L1-TECH-07/negative/oracle-nis2-no-awareness.json",
+-   "L1-TECH-07/negative/oracle-nis2-no-clock.json",
+-   "L1-TECH-07/positive/oracle-nis2-at-deadline.json",
+-   "L1-TECH-07/positive/oracle-nis2-on-time.json",
+- ]
++ []
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:38:59
+     36|   it("executes the supporting NIS2 warning drill with positive, negati…
+     37|     const fixtures = oracleCases.filter((fixture) => fixture.control.i…
+     38|     expect(fixtures.map((fixture) => fixture.ref).sort()).toEqual([
+       |                                                           ^
+     39|       "L1-TECH-07/positive/oracle-nis2-on-time.json",
+     40|       "L1-TECH-07/positive/oracle-nis2-at-deadline.json",
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 121 skipped (122)
+   Start at  14:58:30
+   Duration  7.66s (transform 5.54s, setup 91ms, import 7.17s, tests 17ms, environment 0ms)
+

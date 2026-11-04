@@ -1,0 +1,14 @@
+{
+  "operator": "tenant-comparison",
+  "sourceBefore": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7",
+  "mutant": "f343a310f028958440516ac3a85e7ac98d02dc1fa839545d26726a955dae21e9",
+  "patchSha256": "b05f883f03b867d8ebea85acaa734fde38a9513e488119f5cb2da3ec455713f4",
+  "patchCapturedFromLiveMutant": true,
+  "at": "2026-10-16T19:33:14.699048+00:00",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/src/catalog/evidence/admission.ts",
+  "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+  "mode": "apply",
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false
+}

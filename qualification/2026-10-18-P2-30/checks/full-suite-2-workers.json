@@ -1,0 +1,10 @@
+{
+  "name": "full-suite-2-workers",
+  "cmd": "npm test -- --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers-report.json",
+  "exit": 1,
+  "durationMs": 7735694,
+  "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers.log",
+  "rawLogSha256": "f420499a79dcaf951951d0cac7bb338d0ec377951a2d0da61df05e80016d45bb",
+  "rawLogBytes": 190278,
+  "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-2-workers-report.json"
+}

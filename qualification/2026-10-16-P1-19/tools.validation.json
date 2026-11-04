@@ -1,0 +1,205 @@
+{
+  "schema": "p119-finance-tools-validation/1",
+  "capturedUtc": "2026-10-15T23:44:49.440654+00:00",
+  "sourceCommit": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+  "canonicalTests": {
+    "total": 32,
+    "passed": 32,
+    "failed": 0,
+    "skipped": 0
+  },
+  "alternateReceipt": "tools.receipt.json",
+  "autoDiscoveredByNormalValidator": false,
+  "prevalidatedFiles": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.receipt.json",
+      "bytes": 9902,
+      "sha256": "895bfe68ffab030629412a4cf468b9e2baa6b9c0b54d19dc48bfb400fb7e6887"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.README.md",
+      "bytes": 5088,
+      "sha256": "811cf60587f96fff97df930152d1f89b7af422038fd001e2f13813a0a1479896"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.audit-summary.json",
+      "bytes": 6051,
+      "sha256": "d6f648492b1b1303b89780aafeb72099e95c12e3b67f0f046733f18c20531eed"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.command-records.json",
+      "bytes": 58900,
+      "sha256": "278485288a2b9aa23e9584812ee3e62a01eff76df941af64c61be0d5c812a1f1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.evidence.json",
+      "bytes": 4956,
+      "sha256": "3329edacb0c6ae227b8e1b9c97d19ae83ec6058a540734d35b05490d04511426"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.fresh.observer.json",
+      "bytes": 17874,
+      "sha256": "f72021905af5ab1c453758626417e2cc14ebb2c9abdb8e27e7786151fa389f75"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.fresh.raw.json",
+      "bytes": 13624,
+      "sha256": "f07a38f8d56e8bf0ddeaa7d6553ba74d253fe92afd99a9d12bed554b95024852"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.private-references.json",
+      "bytes": 69297,
+      "sha256": "03b93a8424870c4a49b90eb83f765e1b19d4be18d23e58ee7e7f3eccbb39a065"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.repair-history.json",
+      "bytes": 3226,
+      "sha256": "48f6834567dc2fdbf21a2e8ce590906492b48b7926eea17242e9038135929e4b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.source-candidate.json",
+      "bytes": 17125,
+      "sha256": "2a2000349a4d2d3c1496ef3cfffba47d68566e28d88b25d383ff71e0a7fb021d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/2026-10-16-P1-19/tools.v1-failed.raw.json",
+      "bytes": 14243,
+      "sha256": "383e84379cf9c7fe9e8f59bfe4abde6a5222a17bfd99e0265f7b60600548e3d9"
+    }
+  ],
+  "mirrorApplication": {
+    "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-mirror-application.json",
+    "bytes": 3445,
+    "sha256": "c1d1d88a632aa86b2393373afce1ac14cc425eac429e1d7d23f8c1b04ac7c1e8"
+  },
+  "postMaterializationPreservation": {
+    "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-post-materialization-preservation.json",
+    "bytes": 3255,
+    "sha256": "061f8fac0bb0a00365efe608c1edc4c3c865ed9a72034cd3977fd90e9be5a30d"
+  },
+  "prior129Inventory": {
+    "path": "/private/tmp/p1-19-finance-tools-implementation-20261016/qualification-layout-design/preserved-existing-files.json",
+    "bytes": 34933,
+    "sha256": "7024ad6e6ea2f2f7895a91aa7dc98fce90c427cdabf7691d02013f0296bff6c9"
+  },
+  "validator": {
+    "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/check-qualification-receipts.mjs",
+    "bytes": 6764,
+    "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+  },
+  "schemaInput": {
+    "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/qualification/receipt.schema.json",
+    "bytes": 2315,
+    "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+  },
+  "actualClosedValidationsBeforeThisSidecar": [
+    {
+      "command": {
+        "phase": "p119-finance-tools-receipt-mirror",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-qualification-receipts.mjs --root /private/tmp/p1-19-finance-tools-implementation-20261016/tools-receipt-mirror",
+        "exit": 0,
+        "durationMs": 125,
+        "startedUtc": "2026-10-15T23:44:32.294523+00:00",
+        "endedUtc": "2026-10-15T23:44:32.433917+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-receipt-mirror/stdout-stderr.log",
+        "head": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+        "headAfter": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+        "ownedProcess": {
+          "pid": 13621,
+          "ownedPgid": 13621,
+          "observedPgidAfterLaunch": 13621,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/check-qualification-receipts.mjs",
+            "--root",
+            "/private/tmp/p1-19-finance-tools-implementation-20261016/tools-receipt-mirror"
+          ],
+          "startedUtc": "2026-10-15T23:44:32.294523+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-receipt-mirror/command.json",
+        "bytes": 1465,
+        "sha256": "c950f4c9f58e8c7a441d18c02ca30fcbff18e88d5fe5ff00bc89ac2d2c39bd6a"
+      },
+      "stdoutStderrPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-receipt-mirror/stdout-stderr.log",
+        "bytes": 128,
+        "sha256": "1a210c7eafb71265f1e82c0d30899969d6d5a7bb06ee8dab986655056f2bf4ba"
+      },
+      "actualOutput": "Qualification receipts valid: 1 receipt(s) under /private/tmp/p1-19-finance-tools-implementation-20261016/tools-receipt-mirror.\n"
+    },
+    {
+      "command": {
+        "phase": "p119-finance-tools-receipt-root",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-qualification-receipts.mjs",
+        "exit": 0,
+        "durationMs": 300,
+        "startedUtc": "2026-10-15T23:44:35.260452+00:00",
+        "endedUtc": "2026-10-15T23:44:35.575588+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-receipt-root/stdout-stderr.log",
+        "head": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+        "headAfter": "12ec56c514e1a8d165f9cfee7e57f8a673122edf",
+        "ownedProcess": {
+          "pid": 13632,
+          "ownedPgid": 13632,
+          "observedPgidAfterLaunch": 13632,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/check-qualification-receipts.mjs"
+          ],
+          "startedUtc": "2026-10-15T23:44:35.260452+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "commandPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-receipt-root/command.json",
+        "bytes": 1285,
+        "sha256": "c74e5aba90067323a896610b45523650753d81c6ecaeea10db5d1aa31dbd0606"
+      },
+      "stdoutStderrPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-finance-tools-receipt-root/stdout-stderr.log",
+        "bytes": 65,
+        "sha256": "002e8f327246df31050531af72c426a10f84ceb3c38bcc2bdbd6ac902738d6be"
+      },
+      "actualOutput": "Qualification receipts valid: 18 receipt(s) under qualification.\n"
+    }
+  ],
+  "validationScope": "The canonical private mirror schema-validates this exact alternate receipt and its ten artifacts. The pre-sidecar whole-root command checks all regular files and18 auto-discovered receipts; it does not independently discover tools.receipt.json.",
+  "sidecarOutsideReceiptArtifactList": true,
+  "finalWholeRootScanState": "Pending after this exclusive sidecar write; its actual result will be recorded privately to avoid a self or future hash cycle.",
+  "formalP119Acceptance": false,
+  "quality": {
+    "duplicates": 1268,
+    "deadcode": 2734,
+    "newOwnedReachabilityFindings": 2,
+    "waived": false
+  }
+}

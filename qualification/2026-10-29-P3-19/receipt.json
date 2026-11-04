@@ -1,0 +1,114 @@
+{
+  "schemaVersion": 1,
+  "key": "P3-19",
+  "date": "2026-10-29",
+  "commit": "fe71fdfe5be80f034d162f924d7510602e6d1080",
+  "branch": "rtd/w6-p3-19",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 59641
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 45234
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 91572
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 4048
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 425
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 4795
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1299
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 860
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 219
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 470
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 781
+    },
+    {
+      "cmd": "npm run -s check:no-fabrication",
+      "exit": 0,
+      "durationMs": 2750
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 1,
+      "durationMs": 2652
+    },
+    {
+      "cmd": "node scripts/gen-procurement-clauses.mjs --check",
+      "exit": 0,
+      "durationMs": 92
+    },
+    {
+      "cmd": "npm run -s build:pages",
+      "exit": 0,
+      "durationMs": 371
+    },
+    {
+      "cmd": "npx vitest run --maxWorkers=2 <15 test files listed in checks.txt>",
+      "exit": 0,
+      "durationMs": 57705
+    }
+  ],
+  "tests": {
+    "total": 113,
+    "passed": 113,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks.txt",
+      "sha256": "ab18bdf4b450677a94885e5813426e9f5a59e56dbaae9fb40a304db04c39c9d0"
+    },
+    {
+      "path": "SOURCES.md",
+      "sha256": "a261ad5c22c25d092ed970dec515904aef5b30c391316a07347c30093ac38497"
+    },
+    {
+      "path": "COUNSEL_REVIEW.md",
+      "sha256": "46c6f01f5219f3df93da4c6249c870450fddf8a3bd44e2818d2492c9ea295b42"
+    }
+  ],
+  "notes": "Draft clause library: 12 experimental clauses, none counsel-reviewed (Needs-Expert, D-08; record in COUNSEL_REVIEW.md). Sources re-verified 2026-10-29 at OMB, the Publications Office and RBI (SOURCES.md). check:freeze fails identically on base cafe5751f (other items' exception keys not yet in allowedExceptionKeys); P3-19 adds no CLI command. Not published externally."
+}

@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "state": "Unexecuted controller preparation only",
+  "preparedUtc": "2026-10-15T05:56:42.546776+00:00",
+  "allPreparationReadsFinished": true,
+  "controller": {
+    "path": "/private/tmp/p0-45-causal-controller-prepared-20261015.py",
+    "bytes": 22514,
+    "sha256": "9479a7a7186ce97e740dad14fda9c0244f3f3173d8d41a30b659de8e5e40e192"
+  },
+  "reusedController": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/driver/controller-v3.py",
+    "bytes": 19822,
+    "sha256": "b43db98145e32451f5552ec56cd9a407bda1118bc1fb10cd07f8ae5ae863ed68"
+  },
+  "exactCausalPlan": {
+    "path": "/private/tmp/p0-45-causal-readonly-plan-20261015.json",
+    "bytes": 28546,
+    "sha256": "b67310ddfde9a75c550cb563386caa43967530e6412561888d176ae66ae8bab4"
+  },
+  "source": {
+    "expectedHead": "2024f25c79973987b44a4a1298488d55ee0d6227",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "basis": "Read existing worktree Git pointer/HEAD/ref as text. No Git command or source/dist scan occurred during root build.",
+    "parentRoot": "/Users/sid/.codex/worktrees/p0-45-qualification/AgentMaturityCompass",
+    "futureBase": "/private/tmp/p0-45-causal-qualification-20261015",
+    "futureCopy": "/private/tmp/p0-45-causal-qualification-20261015/closure"
+  },
+  "changes": [
+    "Lane root/base and START_P045_CAUSAL token; source2024f25c and production58 bindings.",
+    "CASE_COUNT12 replaces every P02137 counter/identity/classification expectation. Corpus is exactly tests/verifyRepair.test.ts.",
+    "Future setup.json/setup-index.json replace earlier lane version-specific paths. Manifest lengths bind dynamically to measured trackedCopied/compiledCopied/totalPhysicalCopied; no manifest or identity pin is fabricated. Root currently expects8205tracked+4529compiled, to be measured/sealed later.",
+    "Future normalized proposal retains P021 file/baselineSha256/proposedMutantSha256 contract; exact IDs, anchors, target baseline hashes and protected rollback anchor are checked against the immutable two-control P045 plan.",
+    "Outer wait420seconds replaces90, without terminating signals or automatic restoration. Original test/config/helper30s and unrelated CLI60s deadlines are unchanged.",
+    "The frozen reporter is reused byte-for-byte through a later explicit copy, retaining legacy AMC_P021_RUNTIME_OBSERVER_PATH. Seven-key causal environment policy is unchanged."
+  ],
+  "preserved": [
+    "Known close/global-teardown/unhandled/hook banners.",
+    "Raw/observer file/title identity agreement, structured body AssertionError matching, pending/todo rejection and actual normal exit0/1 classification.",
+    "Hash-bound exact per-control root release, exclusive phase/result artifacts and one run per control.",
+    "Popen owned session, bounded5s/50ms signal0 polling and positiveESRCH; no terminating signal, retry or universal detached-descendant claim.",
+    "Persistent ACTIVE/HALTED on uncertainty; no exception-driven source restoration.",
+    "Full parent/private source and compiled maps, borrowed resolver/native/helper/immutable-input checks; no.git in copy.",
+    "Exact original source restoration only after known normal mutant completion; no compiler/dist/import/test/assertion/config/guard/cleanup changes."
+  ],
+  "futureSetupContract": {
+    "files": [
+      "setup.json",
+      "setup-index.json",
+      "proposal.json",
+      "inputs/source-manifest.json",
+      "inputs/compiled-manifest.json",
+      "inputs/preservation.json",
+      "inputs/case-identities.json",
+      "driver/observer-reporter.mjs"
+    ],
+    "setupFields": [
+      "parentSource",
+      "productionSource",
+      "parentRoot",
+      "closureRoot",
+      "trackedCopied",
+      "compiledCopied",
+      "totalPhysicalCopied",
+      "originalCoreCases",
+      "frozenOwnInputs",
+      "noMutantWritten",
+      "testExecutionPerformed"
+    ],
+    "normalizedProposal": {
+      "causalPlan": "Exact path/bytes/sha256 pin of the immutable readonly plan.",
+      "corpus": [
+        "tests/verifyRepair.test.ts"
+      ],
+      "staticExpectedCases": 12,
+      "recipes": "Same ordered two plan recipes. Map target\u2192file and targetPin.sha256\u2192baselineSha256; copy anchors and optional protectedAnchor exactly. Compute proposedMutantSha256 from actual future baseline bytes using the exact-once anchors during separately authorized setup, then bind proposal hash in the root release. Do not invent or copy hypothesis outcomes."
+    },
+    "release": "Same eight hash bindings and setup/controller/index/root/copy/control path fields as the reviewed P021 contract, now actual future P045 files. Authorization token START_P045_CAUSAL_<control-id>. No release has been created here.",
+    "futurePathsAndPins": "Current controller preparation contains only known source/plan pins. Root must first confirm actual12/5/4/10 original baselines before authorizing copy/setup/release. Any change to measured candidate/source/recipe contract needs explicit re-review."
+  },
+  "limits": [
+    "No controller import, parser/syntax compilation, product runtime/test/build/install, copy/setup/manifests/identity/release creation or mutation occurred.",
+    "The ROOT build is active; no current compiled/native/dependency/closure body was read or touched here.",
+    "C1 may fail shared refusal helper before state assertions. C2 can preserve byte invariants while bypassing the forward-rename fault spy. Actual raw outcomes and masking must be retained; no kills or lost bytes are predicted as facts.",
+    "Source-only controls repeat original12; original CLI5, separation4 and readonly10 remain separate unchanged baseline contexts. No31-case causal aggregation.",
+    "Formal acceptance, historical-red requirement, JSONL/live-writer/crash/late-signing gaps, full suite/Node24/hosted/release/Done, source-quality debt and all holds remain unwaived."
+  ],
+  "writes": "Only the new prepared controller and this new JSON/Markdown change-note pair. No earlier v1/v2/script/evidence overwrite."
+}

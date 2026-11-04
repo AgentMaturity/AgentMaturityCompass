@@ -1,0 +1,95 @@
+{
+  "schema": "p139-independent-compiler-closure-and-narrow-repair-review/1",
+  "createdAt": "2026-10-16T15:50:24.250379+00:00",
+  "blockers": [],
+  "actualFailure": {
+    "phase": "p139-tests-typecheck-final",
+    "diagnostic": "tests/mcp/mcpOauth.test.ts(629,13): error TS2322: Type string is not assignable to type oauth2.",
+    "childExit": 2,
+    "rootRecordedWrapperExit": 70,
+    "processDurationMs": 37828,
+    "ownedPidAndPgid": 80402,
+    "originalOwnedGroupRecordSaysESRCH": true,
+    "rootCertificateFreshPidAndPgidBothZeroSignalESRCH": true,
+    "reviewerPerformedProbes": false,
+    "signalsOtherThanZeroSent": false,
+    "oldActiveAndHaltedRetained": true,
+    "commandJsonAbsentBecauseWrapperDidNotFinalize": true,
+    "classification": "Compiler failure remains failed evidence. Positive natural closure closes the process uncertainty; it does not make exit2 pass."
+  },
+  "typingRepair": {
+    "solePath": "tests/mcp/mcpOauth.test.ts",
+    "before": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/mcp/mcpOauth.test.ts",
+      "bytes": 60903,
+      "sha256": "211dc2917d286fc9e91870881a66a91abfe26b684686adeeeb550f3ab25a67fb"
+    },
+    "patch": {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/compiler-closure-review/oauth-config-literal.patch",
+      "bytes": 1074,
+      "sha256": "36cd5ad93e5cb75584ccfe0db6ee281a65190ea0e917e46b1d99c44851a8473a"
+    },
+    "proposedAfter": {
+      "bytes": 60936,
+      "sha256": "98ab5573a1eac3ac37d89172773372abc783c6c342d697905c7e8e0a3688c47d"
+    },
+    "originalExactText": "  const config: NativeMcpConfiguration = { ...base, server: { ...base.server,\n    auth: { kind: \"oauth2\", clientId: \"synthetic-client\", scopes: [\"operator\", \"read\"] } } };\n",
+    "replacementExactText": "  const auth: NativeMcpOAuthConfig = { kind: \"oauth2\", clientId: \"synthetic-client\", scopes: [\"operator\", \"read\"] };\n  const config: NativeMcpConfiguration = { ...base, server: { ...base.server, auth } };\n",
+    "reason": "NativeMcpConfiguration.server is a stdio/HTTP union; the nested spread construction widens the OAuth discriminant to string. The already imported NativeMcpOAuthConfig requires kind literal oauth2. A separately annotated auth object gives that literal its intended public type before the same server spread.",
+    "assertionsCastsImportsAndRuntimeValuesChanged": false,
+    "typeAssertionOrSuppressionAdded": false,
+    "outsideExactTwoLineHelperReplacementByteIdentical": true,
+    "unexecuted": true,
+    "compileFitClaim": false,
+    "requiredNext": "Root alone may admit/apply the exact test-only patch, then run ordinary full tests compiler and applicable regression in the separately reviewed namespace. No prior runtime green excuses the compiler failure."
+  },
+  "closureAndWrapperReview": {
+    "certificate": {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/compiler-natural-closure.json",
+      "bytes": 2717,
+      "sha256": "b59e89e7adc1d89bae1522bae6e8cc106c7c196374a49d35bbf7c4c1403e88f1"
+    },
+    "newWrapper": {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 14874,
+      "sha256": "abbda23f645d38e643133ebbb4a9b19dc4f9bad5cab20d098c02449c6d3885e6"
+    },
+    "exactDelta": {
+      "path": "/private/tmp/p1-39-mcp-qualification-20261016/post-typecheck-wrapper.patch",
+      "bytes": 2487,
+      "sha256": "caedc55381ff5098567b72449686c6ed4526d3896da7fb2d3b6f202fd83460aa"
+    },
+    "oldWrapper": {
+      "path": "/private/tmp/p1-37-qualification-20261016/post-typecheck-run-prepared.py",
+      "bytes": 13593,
+      "sha256": "db4eedc8a92405a19fd1368e1a77ecaba713d668cb55456af81cbdb0c2832d01"
+    },
+    "allPriorAndCurrentCertificateEvidencePinsVerified": 23,
+    "newWrapperExactOldBytesExcept": [
+      "BASE relocation",
+      "JOURNAL relocation",
+      "one pinned P1-39 closure prerequisite block"
+    ],
+    "certificateCurrentSourceAtClosurePinsVerified": true,
+    "historicalSourceAtClosureNotForcedBack": true,
+    "oldCertificatesAndMarkersStillPinned": true,
+    "acceptanceStillNaturalZeroOrOneOnly": true,
+    "newCompilerExit2WouldHaltAgain": true,
+    "activeHaltedExclusivePhaseAndOwnedGroupChecksUnchanged": true,
+    "ownedProbeUsesSignalZeroOnlyAndFiveSecondPostExitWindowUnchanged": true,
+    "observationReporterAndProducerRulesUnchanged": true,
+    "nodeHomeEnvironmentAndNoIsolationClaimUnchanged": true,
+    "noDeadlineSignalRetryRestorationOrCleanupRelaxation": true,
+    "newNamespacePreparedByReviewer": false,
+    "newNamespaceExistedAtRead": false,
+    "reviewLimit": "Certificate fresh probes are root-created actual records; this static reviewer does not probe or execute the wrapper. The pinned certificate and its original artifacts are immutable prerequisites, not a retroactive successful command or a permission to clear old markers."
+  },
+  "preservation": {
+    "noCheckoutIndexSourceOrTestWrites": true,
+    "privateFilesOnly": true,
+    "noRuntimeHelperCodeParserCompilerTestNativeSqlNetworkOrProcessProbeExecution": true,
+    "oldNamespacesUntouched": true,
+    "ClaudeHeldWorkFreezeQualityAndDeadlinesPreserved": true
+  },
+  "boundary": "Static independent audit plus private patch/report/pin/seal only. No production or test execution, corrected compiler result, completeP1-39 or whole-plan result is claimed."
+}

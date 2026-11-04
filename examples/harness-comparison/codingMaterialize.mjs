@@ -2,7 +2,7 @@
 // Preparation only. It pins real installed CLI closures and neutral tasks; it
 // neither installs a harness nor launches an inference server or comparison.
 import { existsSync, lstatSync, mkdirSync, readdirSync, readFileSync, realpathSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { dependencyRoot, filePin } from "./nativeCommon.mjs";
 import { VERSION, loopbackOrigin, readJson } from "./codingCommon.mjs";
@@ -15,8 +15,15 @@ const configPath = realpathSync(resolve(args[1])), config = readJson(configPath)
 const exactKeys = (value, allowed) => {
   if (!value || typeof value !== "object" || Array.isArray(value) || Object.keys(value).some(key => !allowed.includes(key))) throw new Error("Configuration contains an unsupported field; credentials and arbitrary environment values must not be copied into comparison inputs");
 };
-exactKeys(config, ["baseURL", "model", "modelIdentity", "repetitions", "timeoutMs", "maxTokens", "maxOutputTokens", "maxRequests", "contextWindow", "temperature", "targets"]);
+exactKeys(config, ["baseURL", "model", "modelIdentity", "repetitions", "timeoutMs", "maxTokens", "maxOutputTokens", "maxRequests", "contextWindow", "temperature", "targets", "containment"]);
 exactKeys(config.modelIdentity, ["runtimeSha256", "weightsSha256", "auditReference"]);
+// The oracle runs model-written code, and the Pi binding runs Pi, only in containers on this runtime and image.
+exactKeys(config.containment, ["cli", "host", "image", "hostGateway", "mountableRoot"]);
+const { containment } = config;
+if (!isAbsolute(containment.cli) || !/^unix:\/\/\/\S+$/.test(containment.host) || !/^(sha256:[a-f0-9]{64}|[^\s@]+@sha256:[a-f0-9]{64})$/.test(containment.image)
+  || !/^\d{1,3}(\.\d{1,3}){3}$/.test(containment.hostGateway) || !isAbsolute(containment.mountableRoot)) {
+  throw new Error("Declare the container runtime: an absolute docker CLI, a unix:/// socket, an image pinned by digest, the host gateway address and the mountable root");
+}
 if (existsSync(out)) throw new Error("Output directory must be new; retained evidence is never overwritten");
 if (!["darwin", "linux"].includes(process.platform)) throw new Error("This coding corpus currently supports POSIX process-group cleanup only");
 if (!Array.isArray(config.targets) || config.targets.length !== 3 || new Set(config.targets.map(target => target.id)).size !== 3 || config.targets.some(target => !["amc", "dsh", "pi"].includes(target.id))) throw new Error("Bind exactly one actual installed AMC, DSH and Pi target");
@@ -72,19 +79,23 @@ const cases = readJson(join(directory, "codingCases.json"));
 if (!Array.isArray(cases) || cases.length !== 3 || new Set(cases.map(task => task.id)).size !== 3) throw new Error("Expected the three neutral coding tasks");
 mkdirSync(out, { mode: 0o700 });
 const write = (name, value) => {
-  const path = join(out, name); writeFileSync(path, typeof value === "string" ? value : JSON.stringify(value, null, 2) + "\n", { mode: 0o600, flag: "wx" }); return filePin(path);
+  const path = join(out, name); mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+  writeFileSync(path, typeof value === "string" ? value : JSON.stringify(value, null, 2) + "\n", { mode: 0o600, flag: "wx" }); return filePin(path);
 };
-const helpers = ["codingAdapter.mjs", "codingOracle.mjs", "codingCommon.mjs", "codingGateway.mjs", "nativeCommon.mjs"];
+// Same relative layout as the source tree: the oracle and adapter import the contained runner from ./pilot/.
+const helpers = ["codingAdapter.mjs", "codingOracle.mjs", "codingCommon.mjs", "codingGateway.mjs", "nativeCommon.mjs", "codingPiContainer.mjs",
+  "pilot/oracles/containedProbe.mjs", "pilot/oracles/codingProbe.mjs", "pilot/container.mjs", "pilot/container/entry.mjs"];
 const helperPins = helpers.map(name => write(name, readFileSync(join(directory, name), "utf8")));
 const configPin = write("reviewed-config.json", config);
-const oracle = { executable: node, inputs: [helperPins[1]], args: ["{{input:0}}", "{{workspace}}", "{{fixture}}"] };
+const containmentPin = write("containment.json", { docker: containment });
+const oracle = { executable: node, inputs: [helperPins[1], helperPins[6], helperPins[7], containmentPin], args: ["{{input:0}}", "{{workspace}}", "{{fixture}}", "{{input:3}}"] };
 const tasks = cases.map(task => ({ id: task.id, laneId: "local-coding", scenario: "success", description: task.description, fixture: write(`${task.id}.json`, task), oracle }));
 const targets = inventories.map(({ target, inventory }) => {
   const inventoryPin = write(`${target.id}-installed-inventory.json`, inventory);
-  const inputs = [...helperPins, inventoryPin, configPin];
+  const inputs = [...helperPins, inventoryPin, configPin, containmentPin];
   return { id: target.id, label: `${packages[target.id]} ${inventory.version}`, source: { ...target.source, retrievedAt: new Date().toISOString() },
     artifact: filePin(inventory.cli), bindings: tasks.map(task => ({ taskId: task.id, unavailableReason: null, supportsBoundedLiveExecution: true,
-      command: { executable: node, inputs, args: ["{{input:0}}", "{{artifact}}", "{{workspace}}", "{{fixture}}", "{{context}}", "{{input:5}}"] } })) };
+      command: { executable: node, inputs, args: ["{{input:0}}", "{{artifact}}", "{{workspace}}", "{{fixture}}", "{{context}}", `{{input:${helpers.length}}}`, `{{input:${helpers.length + 2}}}`] } })) };
 });
 const manifest = { schemaVersion: VERSION, id: "native-three-harness-local-coding", description: "Matched three-task coding study using actual standalone AMC, DSH and Pi CLIs and an independent file-output oracle. No superiority, broad benchmark or serving-identity attestation is inferred.",
   environment: { platform: process.platform, arch: process.arch, nodeVersion: process.version, description: "Same materialization host and Node executable. Per-trial private HOME. Installed closures pinned. OS libraries, model serving and hardware state require separate receipts.", variables: { PATH: `${dirname(process.execPath)}:/usr/bin:/bin` } },
@@ -93,7 +104,7 @@ const manifest = { schemaVersion: VERSION, id: "native-three-harness-local-codin
     settings: { baseURL, modelKind: "local-inference", modelIdentity: { runtimeSha256: config.modelIdentity.runtimeSha256, weightsSha256: config.modelIdentity.weightsSha256 }, modelAuditReference: config.modelIdentity.auditReference, temperature: config.temperature, maxOutputTokens, maxRequests, contextWindow,
       streamPolicy: "bounded buffered forwarding with usage requested", resourceLimits: "serial requests; deadline and output/request caps; observed total tokens checked after each response", tools: "workspace read/write/edit/search; per-target actual tool schemas retained by request hashes",
       endpointIdentity: "operator-declared; successful HTTP alone does not attest local weights or distinguish a scripted backend" },
-    permissions: { read: ["Pinned runtime, fixture and helpers", "Disposable trial repository"], write: ["Disposable trial repository and private harness state"], network: [baseURL], sandbox: "Trusted coding fixtures and adapter-owned loopback forwarder; no OS confinement claim. Model-generated code is evaluated in a bounded import-free VM child. Other direct harness traffic is not machine-wide blocked.", enforcement: "adapter-responsibility" },
+    permissions: { read: ["Pinned runtime, fixture and helpers", "Disposable trial repository"], write: ["Disposable trial repository and private harness state"], network: [baseURL], sandbox: "Model-generated code is evaluated only in the pinned container (no network, read-only, nobody user, no mounts); the oracle refuses without it. Pi runs only in a container whose network reaches only the loopback forwarder. AMC and DSH run on the host; no OS confinement is claimed for them beyond their own.", enforcement: "adapter-responsibility" },
     budgets: { timeoutMs, maxTokens, maxCostUsd: null }, requiredSecretEnv: [] }], tasks, targets };
 const manifestPin = write("codingManifest.json", manifest);
 write("codingMaterialization.json", { schemaVersion: VERSION, state: "materialized-not-executed", manifest: manifestPin, config: configPin,

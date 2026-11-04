@@ -5,6 +5,8 @@ import { readFileSync } from "node:fs";
 import type { LlmRouteConfig, ProviderDescription } from "./llm/adapter/adapterRegistry.js";
 import type { LlmAdapter } from "./llm/adapter/adapterTypes.js";
 import { snapshotCapabilities } from "./llm/adapter/providerCapabilities.js";
+import { lookupProviderCatalog } from "./llm/providerCatalog.js";
+import { listModelMetadata, type ModelMetadataSnapshot } from "./llm/modelCatalog.js";
 import { anthropicAdapter } from "./llm/providers/anthropicAdapter.js";
 import { openaiAdapter } from "./llm/providers/openaiAdapter.js";
 import { openaiResponsesAdapter } from "./llm/providers/openaiResponsesAdapter.js";
@@ -23,12 +25,17 @@ import { compactionFromFlags } from "./agent/compaction/promptPressure.js";
 import { liveNativeFailureGuidance, renderNativeFailureGuidance } from "./agent/nativeFailureGuidance.js";
 import { isActionClass } from "./governor/actionCatalog.js";
 import type { ActionClass } from "./types.js";
+import type { LiveTextPreviewEvent } from "./llm/adapter/liveTextPreview.js";
+import type { ComposedTurnHandle } from "./kernel/agentLoopRunner.js";
 import type { ApprovalAnswerer, ApprovalRiskTier } from "./approvals/seam/approvalSeamTypes.js";
 import {
   createApprovalExceptionAnswerer,
   describeApprovalException,
   parseApprovalExceptionNote
 } from "./approvals/seam/devProfileException.js";
+import { loadActiveCompiledPolicy } from "./catalog/compiler/activate.js";
+import { DEFAULT_MAX_ACTIVE_CHILDREN } from "./agent/subagentSpawn.js";
+import { createScopedExceptionAnswerer } from "./governor/scopedExceptions.js";
 
 /** The side-effecting edges, injectable so the wiring itself is testable. */
 export interface AgentLoopCliIo {
@@ -43,13 +50,15 @@ export interface RunOptions {
   audioInput?: string;
   validationConfig?: string;
   validationConfigSha256?: string;
+  validationRepair?: string;
   validate?: string[];
   extension?: string[];
   extensionPin?: string[];
-  mcpConfig?: string;
-  mcpConfigSha256?: string;
+  mcpConfig?: string[];
+  mcpConfigSha256?: string[];
   delegate?: boolean;
   maxDelegationDepth?: string;
+  maxActiveChildren?: string;
   delegateScope?: string;
   /** False is the explicit operator --no-delegate-stop reset, never a model argument. */
   delegateStop?: string[] | false;
@@ -69,6 +78,7 @@ export interface RunOptions {
   contextWindow?: string;
   compactThreshold?: string;
   autoSummary?: boolean;
+  autoCompact?: boolean;
   tools?: string;
   toolMode?: string;
   unsafeUnconfinedShell?: boolean;
@@ -79,12 +89,21 @@ export interface RunOptions {
   session?: string;
   forkFrom?: string;
   keepOpen?: boolean;
+  /** P2-12: claim a lapsed remote or unresponsive writer of `--session`; the reason is recorded in the claim row. */
+  takeoverExpiredWriter?: string;
   steerAfter?: string;
   persona?: string;
+  missionContext?: boolean;
+  listSkills?: boolean | string;
   approveTools?: string;
   approveRisk?: string;
   approvalException?: string;
   interactiveApprovals?: boolean;
+  interactiveAskUser?: boolean;
+  webSearchSearxng?: string;
+  /** AXR-20: issued agent lease file, verified before use and never logged. */
+  leaseFile?: string;
+  goalRounds?: string;
   json?: boolean;
   stream?: boolean;
 }
@@ -125,10 +144,14 @@ export interface ApprovalGateChoice {
  * somebody typed. The banner is printed to stderr because an exception nobody
  * sees is a default; the durable record is the signed `approval/answer` row,
  * which names the exception on every call it grants.
+ *
+ * P2-24: in a regulated profile (an active compiled plan, or one that cannot be verified) that unsigned note is
+ * refused; `--approval-exception` then names a signed scoped exception for the plan's approval control instead.
  */
 export function approvalGateFor(
   io: AgentLoopCliIo,
-  opts: RunOptions
+  opts: RunOptions,
+  scope: { readonly workspace: string; readonly agentId: string }
 ): ApprovalGateChoice | null | undefined {
   if (opts.approveTools === undefined) {
     if (opts.approvalException !== undefined) {
@@ -156,7 +179,18 @@ export function approvalGateFor(
     return null;
   }
   const answerers: ApprovalAnswerer[] = [];
-  if (opts.approvalException !== undefined) {
+  const regulated = opts.approvalException === undefined ? null : regulatedApprovalControls(scope.workspace, actionClass);
+  if (opts.approvalException !== undefined && regulated !== null) {
+    try {
+      const answerer = createScopedExceptionAnswerer({ ...scope, exceptionId: opts.approvalException, approvalControls: regulated });
+      answerers.push(answerer);
+      io.error(chalk.yellow(`SCOPED APPROVAL EXCEPTION ACTIVE — ${answerer.name}`));
+    } catch (error: unknown) {
+      io.error(chalk.red(error instanceof Error ? error.message : String(error)));
+      io.fail();
+      return null;
+    }
+  } else if (opts.approvalException !== undefined) {
     try {
       const note = parseApprovalExceptionNote(
         JSON.parse(readFileSync(opts.approvalException, "utf8")) as unknown
@@ -182,6 +216,24 @@ export function approvalGateFor(
   return { actionClass, riskTier: riskTier as ApprovalRiskTier, answerers };
 }
 
+/**
+ * The active plan's approval controls for `actionClass`, each with the version the plan runs, or null outside a
+ * regulated profile. A plan that cannot be verified counts as regulated with no approval control, so no exception can
+ * relax it; so does a control id the plan names without a version.
+ */
+function regulatedApprovalControls(workspace: string, actionClass: ActionClass): readonly { controlId: string; controlVersion: string }[] | null {
+  try {
+    const plan = loadActiveCompiledPolicy(workspace);
+    if (plan === null) return null;
+    return (plan.runtimePolicy.approvals[actionClass]?.controlIds ?? []).flatMap((controlId) => {
+      const control = plan.controls.find((row) => row.controlId === controlId);
+      return control === undefined ? [] : [{ controlId, controlVersion: control.controlVersion }];
+    });
+  } catch {
+    return [];
+  }
+}
+
 /** Parse a positive-integer option, or report the flag that was wrong. */
 export function integerOption(io: AgentLoopCliIo, flag: string, raw: string | undefined, fallback: number): number | null {
   if (raw === undefined) return fallback;
@@ -194,9 +246,22 @@ export function integerOption(io: AgentLoopCliIo, flag: string, raw: string | un
   return value;
 }
 
-/** Automatic compaction from the run flags; undefined when off, null after a reported error. */
-export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary">): CompactionConfig | undefined | null {
-  try { return compactionFromFlags(options); }
+/** Parse the root cap and refuse explicit configuration when no child capability is offered. */
+export function activeChildLimitOption(io: AgentLoopCliIo, raw: string | undefined, enabled: boolean): number | null {
+  if (raw !== undefined && raw.trim() === "") {
+    io.error(chalk.red("--max-active-children must be a non-negative integer")); io.fail(); return null;
+  }
+  const limit = integerOption(io, "--max-active-children", raw, DEFAULT_MAX_ACTIVE_CHILDREN);
+  if (limit !== null && raw !== undefined && !enabled) {
+    io.error(chalk.red("--max-active-children requires --delegate and --tools workspace, or an enabled signed preset.")); io.fail(); return null;
+  }
+  return limit;
+}
+
+/** Explicit compaction settings; undefined leaves reviewed route defaults to the driver, null reports an error. */
+export function compactionOption(io: AgentLoopCliIo, options: Pick<RunOptions, "contextWindow" | "compactThreshold" | "autoSummary" | "autoCompact">,
+  preset?: Partial<CompactionConfig>, route?: { readonly providerId: string; readonly model: string }): Partial<CompactionConfig> | undefined | null {
+  try { return compactionFromFlags(options, preset, route); }
   catch (error) {
     io.error(chalk.red(error instanceof Error ? error.message : "Automatic compaction options were refused."));
     io.fail();
@@ -209,6 +274,8 @@ export function paramsFor(providerId: string, maxTokens: number, options: Pick<R
   if (providerId !== "deepseek" && (options.thinking !== undefined || options.reasoningEffort !== undefined)) {
     throw new Error("--thinking and --reasoning-effort on this surface require --provider deepseek; unused options are not ignored.");
   }
+  // P1-38: pi-ai encoders own stream and stream_options; only the output bound is passed.
+  if (providerId.startsWith(PI_AI_ROUTE_PREFIX)) return { max_tokens: maxTokens };
   switch (providerId) {
     case "ollama":
       // The native contract validates the bound and maps it to options.num_predict.
@@ -234,24 +301,6 @@ export function paramsFor(providerId: string, maxTokens: number, options: Pick<R
       return { max_tokens: maxTokens, stream: true };
   }
 }
-
-const DEFAULT_BASE_URLS: Readonly<Record<string, string>> = Object.freeze({
-  "gemini-audio": "https://generativelanguage.googleapis.com",
-  gemini: "https://generativelanguage.googleapis.com",
-  deepseek: "https://api.deepseek.com",
-  anthropic: "https://api.anthropic.com",
-  openai: "https://api.openai.com",
-  "openai-responses": "https://api.openai.com"
-});
-
-const DEFAULT_CREDENTIAL_REFS: Readonly<Record<string, string>> = Object.freeze({
-  "gemini-audio": "GEMINI_API_KEY",
-  gemini: "GEMINI_API_KEY",
-  deepseek: "DEEPSEEK_API_KEY",
-  anthropic: "ANTHROPIC_API_KEY",
-  openai: "OPENAI_API_KEY",
-  "openai-responses": "OPENAI_API_KEY"
-});
 
 /** One inventory for executable CLI/ACP selection and local adapter discovery.
  * Gateway templates are deliberately not native adapters. Looking up entries in
@@ -297,10 +346,15 @@ export function nativeRouteFor(
       // retained for an operator-configured authenticated origin, never guessed.
       ...(options.credential === undefined ? {} : { credentialRef: credentialRef(options.credential) }) });
   }
-  const baseUrl = options.baseUrl ?? DEFAULT_BASE_URLS[providerId];
-  if (baseUrl === undefined) throw new Error(`--base-url is required for provider ${providerId}`);
+  const defaults = lookupProviderCatalog(providerId);
+  const baseUrl = options.baseUrl ?? defaults?.defaultBaseUrl;
+  if (baseUrl === undefined || baseUrl === null) throw new Error(`--base-url is required for provider ${providerId}`);
+  // The default credential goes only to the provider's own origin, as model enumeration rules (modelEnumeration.ts).
+  const ownOrigin = defaults?.defaultBaseUrl != null && new URL(baseUrl).origin === new URL(defaults.defaultBaseUrl).origin;
+  const credential = options.credential ?? (ownOrigin ? defaults?.defaultCredentialRef : undefined);
+  if (credential === undefined || credential === null) throw new Error(`--credential is required for provider ${providerId}`);
   return { providerId, adapter, baseUrl,
-    credentialRef: credentialRef(options.credential ?? DEFAULT_CREDENTIAL_REFS[providerId] ?? "AMC_LLM_API_KEY"),
+    credentialRef: credentialRef(credential),
     models: [model] };
 }
 
@@ -327,6 +381,8 @@ export interface NativeProviderDescription extends Omit<ProviderDescription, "mo
   /** Discovery only, not a route allowlist: null means models were not enumerated. */
   readonly models: readonly string[] | null;
   readonly modelSelection: "explicit-required" | "fixed-synthetic";
+  /** Reviewed catalog assertions, not a model probe or route allowlist. */
+  readonly reviewedCatalog?: readonly ModelMetadataSnapshot[];
 }
 
 /** Snapshot the same adapter contracts the route registry captures. Real model
@@ -342,6 +398,7 @@ export function discoverNativeProviders(providerId?: string) {
       encoderId: adapter.encoderId, encoderVersion: adapter.encoderVersion,
       models: id === STUB_PROVIDER_ID ? Object.freeze([STUB_PROVIDER_MODEL]) : null,
       modelSelection: id === STUB_PROVIDER_ID ? "fixed-synthetic" as const : "explicit-required" as const,
+      reviewedCatalog: adapter.capabilities === undefined ? Object.freeze([]) : listModelMetadata(id, adapter.capabilities.protocol),
       capabilities: snapshotCapabilities(adapter.capabilities)
     })));
   return Object.freeze({ schemaVersion: 1 as const, scope: "bundled-native-adapters" as const,
@@ -403,8 +460,31 @@ export function registerNativeProviderCommands(program: Command, io: AgentLoopCl
   const help = "\nNative provider routes: " + NATIVE_ADAPTERS.map(entry => entry.providerId).join(", ")
     + ".\nUse amc agent-loop providers --json for adapter contracts, not model availability. "
     + "Ollama requires an explicit model and defaults to its native local origin without a credential.";
-  agentLoop.commands.find(command => command.name() === "run")?.addHelpText("after", help);
+  agentLoop.commands.find(command => command.name() === "run")?.addHelpText("after", help + PI_AI_ROUTES_HELP);
   acp.addHelpText("after", help);
+}
+
+/** P1-38. Kept literal so selecting a native route never loads the pi-ai modules; a test pins it to piAiRouteIds(). */
+const PI_AI_ROUTE_PREFIX = "pi-ai:";
+export const PI_AI_ROUTES_HELP = "\nThird-party library routes (agent-loop run only): pi-ai:groq, pi-ai:huggingface, pi-ai:together. "
+  + "Requests are built by @earendil-works/pi-ai@1.3.0, an optional peer pinned to a reviewed version and not installed with AMC; "
+  + "native routes stay the default. See docs/providers/CAPABILITY_MATRIX.md.";
+
+/**
+ * A pi-ai route and the encoder registry its runtime must use; undefined for any other provider, null after a refusal
+ * was reported. The pi modules, and the optional peer they load, are imported only here and only for a pi route.
+ */
+export async function piAiRouteSelection(io: AgentLoopCliIo, providerId: string, options: Pick<RunOptions, "baseUrl" | "credential">,
+  model: string | undefined): Promise<Awaited<ReturnType<typeof import("./llm/providers/piAi/piAiAdapter.js").piAiRouteFor>> | null | undefined> {
+  if (!providerId.startsWith(PI_AI_ROUTE_PREFIX)) return undefined;
+  try {
+    const { piAiRouteFor } = await import("./llm/providers/piAi/piAiAdapter.js");
+    return await piAiRouteFor(providerId, options, model);
+  } catch (error) {
+    io.error(chalk.red(error instanceof Error ? error.message : "pi-ai route selection failed."));
+    io.fail();
+    return null;
+  }
 }
 
 /** Build the route the operator asked for, or explain why it cannot be built. */
@@ -454,4 +534,42 @@ export function renderNotification(notification: LoopNotification): string | nul
       // follows, and echoing them here would bury the two lines that matter.
       return null;
   }
+}
+
+/** `--stream`: the provisional live reply on stderr; the recorded settlement remains the outcome. */
+export function liveTextPreviewPrinter(): (event: LiveTextPreviewEvent) => void {
+  let previewRequest: string | null = null;
+  return event => {
+    if (event.kind === "text") {
+      if (previewRequest !== event.headerEventId) {
+        process.stderr.write(`\nLive reply · session ${event.sessionId} · provisional until recorded settlement\n`);
+        previewRequest = event.headerEventId;
+      }
+      process.stderr.write(event.text);
+    } else if (previewRequest !== null) {
+      process.stderr.write(event.truncated ? "\n[Live preview truncated; read the recorded result for the outcome.]\n"
+        : "\n[Live preview ended; read the recorded result for the outcome.]\n");
+      previewRequest = null;
+    }
+  };
+}
+
+/**
+ * Ctrl-C is the operator's stop button and SIGTERM a parent stop: each produces the same signed cancellation
+ * `--cancel-after` does, not a killed process whose turn a later recovery has to close as `interrupted`.
+ * @returns the disposer that removes both listeners.
+ */
+export function armTurnSignals(handle: ComposedTurnHandle, io: AgentLoopCliIo): () => void {
+  const onSigint = (): void => {
+    io.error(chalk.yellow("\ncancelling the turn (cause: user)…"));
+    handle.cancel({ kind: "user" });
+  };
+  const onSigterm = (): void => {
+    io.error(chalk.yellow("\ncancelling the turn (signal: SIGTERM)…"));
+    handle.cancel({ kind: "parent" }, { by: "signal:SIGTERM" });
+    void handle.shutdown();
+  };
+  process.on("SIGINT", onSigint);
+  process.on("SIGTERM", onSigterm);
+  return () => { process.removeListener("SIGINT", onSigint); process.removeListener("SIGTERM", onSigterm); };
 }

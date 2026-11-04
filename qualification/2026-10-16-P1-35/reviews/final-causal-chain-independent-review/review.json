@@ -1,0 +1,288 @@
+{
+  "schema": "p135-actual-causal-chain-independent-review/1",
+  "allReadsFinished": true,
+  "blockers": [],
+  "recommendation": "Ready for bounded qualification metadata only; preserve all open acceptance gaps and held decisions.",
+  "sourceCommit": "88e0dbdef8871f119325d289757ad1de38b88a1a",
+  "method": "Full JSON deserialization and exact source-copy/identity/error comparisons; complete seven outer logs and finite semantic projections read; retained bytes rehashed. No helper/product execution.",
+  "phases": [
+    {
+      "phase": "p135-fresh-canonical",
+      "exit": 0,
+      "durationMs": 5976,
+      "pid": 95709,
+      "passed": 85,
+      "failed": 0,
+      "total": 85,
+      "hooksPassed": 20,
+      "publicRecords": 10,
+      "bodyFailures": [],
+      "cleanupErrors": 0,
+      "firstFrames": []
+    },
+    {
+      "phase": "p135-m1",
+      "exit": 1,
+      "durationMs": 4775,
+      "pid": 96009,
+      "passed": 84,
+      "failed": 1,
+      "total": 85,
+      "hooksPassed": 20,
+      "publicRecords": 10,
+      "bodyFailures": [
+        "R4-never-promoted"
+      ],
+      "cleanupErrors": 0,
+      "firstFrames": [
+        {
+          "name": "P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+          "frames": [
+            "legacyRelabel.test.ts:254:58",
+            "legacyRelabel.test.ts:65:11"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "p135-m1-restored",
+      "exit": 0,
+      "durationMs": 4796,
+      "pid": 96235,
+      "passed": 85,
+      "failed": 0,
+      "total": 85,
+      "hooksPassed": 20,
+      "publicRecords": 10,
+      "bodyFailures": [],
+      "cleanupErrors": 0,
+      "firstFrames": []
+    },
+    {
+      "phase": "p135-m2",
+      "exit": 1,
+      "durationMs": 4734,
+      "pid": 96410,
+      "passed": 81,
+      "failed": 4,
+      "total": 85,
+      "hooksPassed": 20,
+      "publicRecords": 10,
+      "bodyFailures": [
+        "synthetic-persistent-roundtrip",
+        "synthetic-log-tamper",
+        "synthetic-receipt-signature-tamper",
+        "genuine-persistent-roundtrip"
+      ],
+      "cleanupErrors": 1,
+      "firstFrames": [
+        {
+          "name": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+          "frames": [
+            "legacyRelabel.test.ts:308:32",
+            "legacyRelabel.test.ts:65:5"
+          ]
+        },
+        {
+          "name": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+          "frames": [
+            "legacyRelabel.test.ts:374:56",
+            "legacyRelabel.test.ts:65:5"
+          ]
+        },
+        {
+          "name": "P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+          "frames": [
+            "legacyRelabel.test.ts:402:56",
+            "legacyRelabel.test.ts:65:5"
+          ]
+        },
+        {
+          "name": "P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+          "frames": [
+            "legacyRelabel.test.ts:511:32",
+            "legacyRelabel.test.ts:65:5"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "p135-m2-restored",
+      "exit": 0,
+      "durationMs": 4829,
+      "pid": 96629,
+      "passed": 85,
+      "failed": 0,
+      "total": 85,
+      "hooksPassed": 20,
+      "publicRecords": 10,
+      "bodyFailures": [],
+      "cleanupErrors": 0,
+      "firstFrames": []
+    },
+    {
+      "phase": "p135-m3",
+      "exit": 1,
+      "durationMs": 4775,
+      "pid": 96849,
+      "passed": 82,
+      "failed": 3,
+      "total": 85,
+      "hooksPassed": 20,
+      "publicRecords": 10,
+      "bodyFailures": [
+        "synthetic-persistent-roundtrip",
+        "synthetic-log-tamper",
+        "genuine-classifier-inputs"
+      ],
+      "cleanupErrors": 0,
+      "firstFrames": [
+        {
+          "name": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+          "frames": [
+            "legacyRelabel.test.ts:341:57",
+            "legacyRelabel.test.ts:65:5"
+          ]
+        },
+        {
+          "name": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+          "frames": [
+            "legacyRelabel.test.ts:358:61",
+            "legacyRelabel.test.ts:65:5"
+          ]
+        },
+        {
+          "name": "P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+          "frames": [
+            "legacyRelabel.test.ts:439:24",
+            "legacyRelabel.test.ts:65:11"
+          ]
+        }
+      ]
+    },
+    {
+      "phase": "p135-m3-restored",
+      "exit": 0,
+      "durationMs": 4816,
+      "pid": 97031,
+      "passed": 85,
+      "failed": 0,
+      "total": 85,
+      "hooksPassed": 20,
+      "publicRecords": 10,
+      "bodyFailures": [],
+      "cleanupErrors": 0,
+      "firstFrames": []
+    }
+  ],
+  "countsAreRepeatedSame85NotSummed": true,
+  "identity": {
+    "orderedOccurrences": 85,
+    "uniqueObserverTestIds": 85,
+    "uniqueFileDisplayNames": 81,
+    "sameAcrossAllSeven": true,
+    "duplicateDisplayNames": 4,
+    "publicSourceCopiesCompared": 70,
+    "rawObserverAllFailureMessagesAndNestedErrorsEqualOriginals": true
+  },
+  "controls": [
+    {
+      "operator": "M1-promote-attested-legacy",
+      "actualPassed": 84,
+      "actualFailed": 1,
+      "directFirstFrame": "legacyRelabel.test.ts:254:58",
+      "observed": "ATTESTED R4 was promoted to observed",
+      "masked": "rule/kind at255, original tier256 and secondary OBSERVED/HARDENED assertions257-258",
+      "explicitCapAssertionAtThisWitness": false,
+      "restoredPassed": 85
+    },
+    {
+      "operator": "M2-rewrite-original-report",
+      "actualPassed": 81,
+      "actualFailed": 4,
+      "directFirstFrames": [
+        "308:32 synthetic originals",
+        "511:32 genuine installed originals"
+      ],
+      "additionalFinalPreservationFrames": [
+        "374:56 log tamper",
+        "402:56 receipt signature tamper"
+      ],
+      "priorTamperRefusalAssertionsReached": true,
+      "expectedAdditionalCleanup": {
+        "count": 1,
+        "frame": "475:59",
+        "message": "Owned installed historical originals changed"
+      },
+      "bodyPlusCleanupPreservedAsAggregate": true,
+      "masked": "Synthetic later checks after308; genuine signature/idempotence/ledger acceptance assertions after511. No later assertion credit from pre-gathered observations.",
+      "encodedAndDecodedCorpusUnchanged": true,
+      "mutatedFixtureLocalDiagnosticRetained": true,
+      "restoredPassed": 85
+    },
+    {
+      "operator": "M3-remove-canned-R1",
+      "actualPassed": 82,
+      "actualFailed": 3,
+      "directFirstFrames": [
+        "341:57 persisted synthetic R1 missing",
+        "439:24 genuine assurance R1 missing"
+      ],
+      "prerequisiteFailure": {
+        "frame": "358:61",
+        "message": "Owned tamper fixture has no positive two-record signed log",
+        "downstreamTamperAssertionsCredited": false
+      },
+      "passingReceiptSignatureTamperCase": true,
+      "genuinePersistencePassIsNotDirectR1PresenceWitness": true,
+      "masked": "Synthetic checks after341 and genuine classifier checks after439; log edit/refusal sequence after358 never reached.",
+      "restoredPassed": 85
+    }
+  ],
+  "closures": {
+    "eachPhaseNaturalExit0or1": true,
+    "eachOwnedGroupRecordedESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "eachHooksPassEntries": 20,
+    "eachPublicRecords": 10,
+    "observerUnhandledErrors": 0,
+    "onlyM2CleanupErrorCount": 1,
+    "allEnvironmentVaultPoolAndNativeFactsIntact": true
+  },
+  "finitePreservation": {
+    "concretePathPinCount": 359,
+    "pathAliasesAreNotDistinctPhysicalFileClaims": true,
+    "bindingRows": 37,
+    "nonDistRows": 35,
+    "compiledJsRows": 2,
+    "bothSAndQByteChecks": 74,
+    "distinctRegularNativeIdentitiesWithNlink1": 3,
+    "QNativeInode": 542941025,
+    "savedOriginalsPatchPinsAndAppliedRestoredStateRecordsMatch": true,
+    "finalRestoredByteHashesExact": true,
+    "historicalRestoredRerunPendingClosedByFollowingActualGreen": true,
+    "encodedDecodedRehashRows": 168,
+    "rootFinalPreservationCounters": {
+      "priorProduction": 444,
+      "heldRProtected": 26,
+      "ClaudeFiniteInputs": 10
+    },
+    "rootCounterRowsNotInventedOrIndependentlyExpanded": true,
+    "peerFiniteReadHashStatReview": "Sibling pending_scope_audit independently found no mismatch in binding/native/restore checks; no execution or writes."
+  },
+  "openGaps": [
+    "Genuine old diagnostic remains meanL0; genuineL3 not produced.",
+    "Old default run.amccert not emitted; prior refusal evidence retained.",
+    "Unversioned passport and trust certificate remain explicit conservative skips.",
+    "Separate current-certificate verifier remains RED; no payload validator or storage-policy weakening.",
+    "Existing quality findings and all held/user decisions remain unwaived; no full P135/global-suite/release/plan completion."
+  ],
+  "preflightBoundary": "p135-M1 uppercase request returned wrapper70 before product launch or marker creation; no product failure/control credit inferred.",
+  "limits": [
+    "Source-only mutation controls; selected compiled JS bytes stayed canonical and no mutant was compiled.",
+    "No old assurance R-cwd source-hash projection promoted to Q authority.",
+    "Imported owned trust verifies only reported fixture integrity, not independent historical provenance.",
+    "No cryptographic reexecution, blob/decryption trace, universal child closure or OS isolation proof."
+  ],
+  "writes": "Private review files only; no product/helper/runtime/compiler/native/SQL/network/Git/probe execution or checkout/index/QA writes."
+}

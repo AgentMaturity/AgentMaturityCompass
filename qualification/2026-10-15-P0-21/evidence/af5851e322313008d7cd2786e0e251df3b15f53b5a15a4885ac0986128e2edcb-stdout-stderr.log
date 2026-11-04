@@ -1,0 +1,66 @@
+
+ RUN  v4.1.11 /private/tmp/p0-21-causal-qualification-20261015/closure
+
+ ✓ tests/transparencyReport.test.ts (15 tests) 38ms
+ ✓ tests/noCertificationFromSelfAssessment.test.ts (7 tests) 2448ms
+     ✓ MCP sector-pack and trust-score text say self-assessment and evidence standing  2408ms
+ ✓ tests/selfReportedLevelCap.test.ts (5 tests) 18ms
+ ✓ tests/logisticsIndustryPack.test.ts (2 tests) 6ms
+ ❯ tests/scoreUnits.test.ts (4 tests | 1 failed) 7ms
+     ✓ a Likert answer is an integer 1-5 and nothing else 1ms
+     ✓ percent, level and fraction reject values outside their range 0ms
+     × conversions are explicit 2ms
+     ✓ percentToLevel is the one level table: L2 starts at 30 0ms
+ ❯ tests/domainAssessmentUnits.test.ts (4 tests | 1 failed) 14ms
+     ✓ a raw 6 in domainQuestionScores throws instead of scoring 6% 1ms
+     ✓ a percentage passed as a Likert answer throws 0ms
+     ✓ a base level of 7 throws 0ms
+     × valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent 9ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/domainAssessmentUnits.test.ts > domain engine takes typed units (P0-21) > valid units convert explicitly: base levels via levelToPercent, answers via likertToPercent
+AssertionError: expected 60 to be 50 // Object.is equality
+
+- Expected
++ Received
+
+- 50
++ 60
+
+ ❯ tests/domainAssessmentUnits.test.ts:37:32
+     35|     const result = assessDomain(input(3, 3));
+     36|     expect(result.baseScore).toBe(60); // L3 -> 60%
+     37|     expect(result.domainScore).toBe(50); // Likert 3 -> 50%
+       |                                ^
+     38|     expect(result.compositeScore).toBe(56);
+     39|     expect(result.level).toBe("L3"); // the one level table: 55 <= 56 …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/scoreUnits.test.ts > typed score units (P0-21) > conversions are explicit
+AssertionError: expected 20 to be +0 // Object.is equality
+
+- Expected
++ Received
+
+- 0
++ 20
+
+ ❯ tests/scoreUnits.test.ts:36:40
+     34|   test("conversions are explicit", () => {
+     35|     expect(likertToPercent(likert(5))).toBe(100);
+     36|     expect(likertToPercent(likert(1))).toBe(0);
+       |                                        ^
+     37|     expect(likertToPercent(likert(3))).toBe(50);
+     38|     expect(levelToPercent(level(4))).toBe(80);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  2 failed | 4 passed (6)
+      Tests  2 failed | 35 passed (37)
+   Start at  10:45:31
+   Duration  3.78s (transform 2.19s, setup 74ms, import 616ms, tests 2.53s, environment 0ms)
+
+JSON report written to /private/tmp/p0-21-causal-qualification-20261015/phases/P021-C1-likert-origin--mutant/raw.json

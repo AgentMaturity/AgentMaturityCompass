@@ -1,0 +1,63 @@
+{
+  "schema": "p126-extra-license-path-scope-review/1",
+  "at": "2026-10-16T20:24:28.374449+00:00",
+  "recommendation": "The narrow additional licence-file path has no concrete overlap in the reused 180-root inventory. Root may include it in a later explicit candidate admission; this review does not copy it or mutate the prior scope seal.",
+  "blockersForExtraPath": [],
+  "extraPath": "tests/transparency/LICENSE.transparency-dev-merkle",
+  "proposedBytes": {
+    "upstreamRepository": "https://github.com/transparency-dev/merkle",
+    "upstreamCommit": "c39fbf350a405f68571bf4c42a6a518eb0a46a4b",
+    "upstreamPath": "LICENSE",
+    "localSourcePin": {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/upstream-vector-research/LICENSE",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "computedGitBlobSha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+    "matchesPinnedInventoryBlob": true,
+    "sourceOfNetworkVerification": "Root retained GitHub API research; this task performed only local byte/hash comparison.",
+    "futureHeader": "The actual candidate must retain Google copyright and exact commit/path provenance as root requested. No candidate header is reviewed or claimed here."
+  },
+  "ownership": {
+    "inventoryReused": {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/observations.json",
+      "bytes": 1418515,
+      "sha256": "15f4241395764f37cf624e6ada468eb3581aebc8e865015580f626c6999822a7"
+    },
+    "physicalRoots": 180,
+    "pathAbsenceChecks": 180,
+    "allAbsentIncludingDanglingSymlinkCheck": true,
+    "allParentTransparencyDirectoriesAbsent": true,
+    "targetStatuses": {
+      "exit0": 180,
+      "emptyStdout": 180,
+      "retainedWarningCount": 180,
+      "exactWarning": "warning: could not open directory 'tests/transparency/': No such file or directory\n",
+      "interpretation": "The warning names the independently observed absent parent directory. Every status exited0 and reported no target entry; warnings remain intact and are not suppressed or recast as source failure. Empty stderr is not claimed."
+    },
+    "emptyTargetHistories": 13,
+    "allHistoryCommandsExit0Empty": true,
+    "registryAndOtherSourceRescans": false,
+    "previousHeldPinEvidenceReused": "The sealed B33 scope-review still carries the36 held pins; this narrow addition does not claim to rehash or release them.",
+    "ownershipReleaseInferred": false
+  },
+  "sourceBinding": {
+    "headStable": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+    "branch": "codex/p1-26-tree-qualification",
+    "existingMitLicense": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/LICENSE",
+      "bytes": 1079,
+      "sha256": "0c8b5b095c5c1af4ca5e8596d2aa8592fedcce5ccf05bdbe9047c69579b0fe81"
+    },
+    "existingMitLicenseProtected": true,
+    "previousScopeSealUnmodified": true
+  },
+  "boundaries": {
+    "scope": "Only the proposed new tests/transparency/LICENSE.transparency-dev-merkle addition. Existing repository MIT LICENSE, all production/tests/docs/config/guards/baselines, old scope seal, R overlays and Claude variants remain untouched.",
+    "dependencies": "This is copying a pinned upstream licence alongside ported test-vector provenance, not adopting an installed/runtime dependency. The pending library-adoption decision remains held. No advisory/support/legal-compliance or full conformance conclusion is made.",
+    "priorHolds": "Full P1-25 integration/dependency gaps, permanent public-entry written-approval boundary, F37 skip and every existing held decision remain open. No network/public submission is made.",
+    "reservations": "Reuse the exact missing-live-reservation limitation from B33 scope-review without re-probe/search/recreation/append or Claude messaging."
+  },
+  "rootOwnedNext": "Root decides whether to admit the extra path with the actual reviewed vector candidate and performs current hosted/WIP, D15, freeze, exact materialization and qualification. No new gate or approval for the offline path is invented.",
+  "executionBoundary": "Read-only exact-path filesystem/Git status/history and local hashes, plus private metadata writes only. No full inventory/source rescan, product/test/compiler/native/SQL/network, source/index/checkout or previous seal mutation."
+}

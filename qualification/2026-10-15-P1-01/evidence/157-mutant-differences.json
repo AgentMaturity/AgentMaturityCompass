@@ -1,0 +1,6 @@
+[
+  "src/contracts/v1/receipt.ts",
+  "dist/contracts/index.d.ts",
+  "dist/contracts/v1/receipt.d.ts",
+  "dist/contracts/v1/receipt.js"
+]

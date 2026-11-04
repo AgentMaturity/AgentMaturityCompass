@@ -1,0 +1,10 @@
+{
+  "id": "CR-6",
+  "scenario": "Telemetry outage",
+  "status": "not_run",
+  "reason": "no scraper or OTLP endpoint is deployed by this harness, so an outage cannot be staged yet",
+  "blockedBy": [
+    "P2-06 follow-up"
+  ],
+  "durationMs": 0
+}

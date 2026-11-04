@@ -1,0 +1,31 @@
+{
+  "schema": "p126-initial-scope180-seal/1",
+  "at": "2026-10-16T20:22:24.155493+00:00",
+  "review": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/review.json",
+    "bytes": 6265,
+    "sha256": "b4906bfb3ad054f35abe48cfa21bdedc34be5b3b3eac420d3fa0f72465600214"
+  },
+  "readme": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/README.md",
+    "bytes": 2808,
+    "sha256": "8e618f4e785ddd0b82939553b58365fdbb828a615323ee964c23272b9c6aa700"
+  },
+  "pins": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/pins.json",
+    "bytes": 15755,
+    "sha256": "2b28c7db43685c99bcab05f0e8dde4bc6ee70f1290925206a932cb3bc9800936"
+  },
+  "pendingEntry": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/pending-reservation-entry.md",
+    "bytes": 1218,
+    "sha256": "6347e3a14caab958282c6e6ddd7f5dd34ce7978bec3d4aac1fa8e9a58eb273ae"
+  },
+  "observations": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/scope-review/observations.json",
+    "bytes": 1418515,
+    "sha256": "15f4241395764f37cf624e6ada468eb3581aebc8e865015580f626c6999822a7"
+  },
+  "blockersForProposedScope": [],
+  "allocationOrExecutionClaim": false
+}

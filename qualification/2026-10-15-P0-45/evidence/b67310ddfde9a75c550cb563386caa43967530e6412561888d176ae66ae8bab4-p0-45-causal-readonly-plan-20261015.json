@@ -1,0 +1,385 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-45",
+  "preparedUtc": "2026-10-15T05:48:31.825698+00:00",
+  "state": "Unexecuted causal proposal only",
+  "allReadsFinished": true,
+  "source": {
+    "rootRead": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+    "observedHead": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "earlierReadinessAnchor": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "productionCodeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "meaning": "Exact current guard/test/build bytes are pinned. Qualification-only HEAD changes do not create new behavior evidence."
+  },
+  "spec": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-45.md",
+    "bytes": 16932,
+    "sha256": "0eac6a814d32339c3b8db9f506db7db1c79644158bb2197d33f4919bd028a7dd"
+  },
+  "priorReadiness": {
+    "path": "/private/tmp/p0-45-readonly-readiness-20261015.json",
+    "bytes": 46780,
+    "sha256": "4b2742a95afa6f06d8c3b680fe7264df0c6548e1784e76d41a03f3d0cd86c8c0"
+  },
+  "requestedScope": {
+    "distinctSourceControls": 2,
+    "historicalExactRevert": false,
+    "targetFiles": [
+      "src/ledger/verifyRepair.ts"
+    ],
+    "allowedFutureScope": "Only if root later releases: new independently owned complete private source copy, current exact source guards as data, normal source-mode Vitest, unchanged original core12, and complete preservation/lifecycle evidence.",
+    "notAuthorizedNow": [
+      "Runtime or collection",
+      "Product or wrapper import/parser",
+      "Driver/controller authoring",
+      "Private closure/lane/setup creation",
+      "Mutation application",
+      "Compiler/build/install",
+      "Original source/test/helper/config/guard/deadline edits",
+      "Shared CLI/held registry edits",
+      "Repairs, Git mutations, PR/merge, trackers or Claude messages"
+    ]
+  },
+  "recipes": [
+    {
+      "id": "P045-C1-fail-closed-hold-admission",
+      "title": "Remove unknown and active legal-hold refusals as one current admission control",
+      "target": "src/ledger/verifyRepair.ts",
+      "targetPin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+        "bytes": 11157,
+        "sha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb"
+      },
+      "mode": "Proposed private source-mode only; no compiled edit or compiler.",
+      "anchors": [
+        {
+          "find": "  if (hold.state === \"unknown\") throw new RepairRefused(`legal hold state unknown: ${hold.reason}`);",
+          "replace": "",
+          "occurrences": 1,
+          "line": 180
+        },
+        {
+          "find": "  if (hold.state === \"active\") throw new RepairRefused(`legal hold active: ${hold.holdIds.join(\", \")}`);",
+          "replace": "",
+          "occurrences": 1,
+          "line": 181
+        }
+      ],
+      "oneDistinctControl": "Both adjacent hold-state refusals are removed together. The callback invocation, exception-to-unknown normalization, checkedAt, plan/action/trust-root/digest/signing guards and move/receipt logic remain unchanged.",
+      "unchangedCorpus": [
+        "tests/verifyRepair.test.ts"
+      ],
+      "staticDefinitions": 12,
+      "hypothesisOnly": {
+        "baseline": "All12 must first pass in the assigned real baseline; no pass is asserted here.",
+        "mutant": "Likely3 original hold cases fail and9 pass because apply can return without throwing. This is not a measured result.",
+        "restored": "Same12 criteria must return green, with all source/compiled bytes and lifecycle preservation checked."
+      },
+      "directObservers": [
+        {
+          "name": "refuses when the legal hold state is unknown, and moves nothing",
+          "caseLine": 201,
+          "callLines": [
+            203,
+            205
+          ],
+          "firstExpectedFailure": "Shared expectRefused at tests/verifyRepair.test.ts:99 expects caught to be RepairRefused; if apply returns, caught remains undefined.",
+          "maskedLater": [
+            "Exact unknown reason at shared helper:100",
+            "Snapshot equality:206",
+            "No quarantine:207",
+            "Every byte reachable:208"
+          ]
+        },
+        {
+          "name": "refuses when the hold check itself throws",
+          "caseLine": 211,
+          "callLines": [
+            213,
+            215
+          ],
+          "firstExpectedFailure": "Shared expectRefused:99. The real catch still maps thrown register offline to unknown; only its refusal is removed.",
+          "maskedLater": [
+            "Exact unknown reason at shared helper:100",
+            "Snapshot equality:216"
+          ]
+        },
+        {
+          "name": "refuses under an active hold and names it",
+          "caseLine": 219,
+          "callLines": [
+            221,
+            223
+          ],
+          "firstExpectedFailure": "Shared expectRefused:99 if archive succeeds instead of refusing.",
+          "maskedLater": [
+            "Hold-id message at helper:100",
+            "Snapshot equality:224",
+            "No quarantine:225"
+          ]
+        }
+      ],
+      "meaning": "Potential fail-closed admission sensitivity under injected legalHolds callbacks and a stub signer. Source permits proceeding after callback unknown/active when both refusals are removed; original case bodies may stop before all state assertions. The returned receipt uses literal legalHold.state none at source:208, but these original failed cases do not independently retain/assert that receipt.",
+      "notEstablished": [
+        "Actual signed registry active/unknown behavior",
+        "A built CLI hold bypass from a TS-only mutation",
+        "Every post-failure filesystem/receipt fact unless separately retained before cleanup",
+        "Deletion or irrecoverable byte loss",
+        "Independent trusted-time or issuer proof"
+      ],
+      "frames": [
+        {
+          "file": "src/ledger/verifyRepair.ts",
+          "firstLine": 173,
+          "lastLine": 190,
+          "text": "  let hold: HoldState;\n  try {\n    hold = deps.legalHolds();\n  } catch (error) {\n    hold = { state: \"unknown\", reason: errorText(error) };\n  }\n  const checkedAt = now().toISOString();\n  if (hold.state === \"unknown\") throw new RepairRefused(`legal hold state unknown: ${hold.reason}`);\n  if (hold.state === \"active\") throw new RepairRefused(`legal hold active: ${hold.holdIds.join(\", \")}`);\n  for (const file of plan.files) {\n    const current = fs.existsSync(join(workspace, file.path)) ? hashFile(workspace, file.path).sha256 : null;\n    if (current !== file.sha256) throw new RepairRefused(`evidence changed since the plan: ${file.path}`);\n  }\n  const planJson = `${JSON.stringify(plan, null, 2)}\\n`;\n  try {\n    deps.sign(sha256Hex(planJson));\n  } catch (error) {\n    throw new RepairRefused(`cannot sign a repair receipt: ${errorText(error)}`);",
+          "filePin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+            "bytes": 11157,
+            "sha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb"
+          }
+        },
+        {
+          "file": "tests/verifyRepair.test.ts",
+          "firstLine": 92,
+          "lastLine": 101,
+          "text": "function expectRefused(run: () => unknown, message: RegExp): void {\n  let caught: unknown;\n  try {\n    run();\n  } catch (error) {\n    caught = error;\n  }\n  expect(caught).toBeInstanceOf(RepairRefused);\n  expect((caught as Error).message).toMatch(message);\n}",
+          "filePin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+            "bytes": 13875,
+            "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+          }
+        },
+        {
+          "file": "tests/verifyRepair.test.ts",
+          "firstLine": 201,
+          "lastLine": 226,
+          "text": "  it(\"refuses when the legal hold state is unknown, and moves nothing\", () => {\n    const { workspace, plan, before } = tampered();\n    expectRefused(() => applyVerifyRepair(workspace, plan, {\n      legalHolds: () => ({ state: \"unknown\", reason: \"hold register unreadable\" }), sign: stubSign\n    }), /legal hold state unknown: hold register unreadable/);\n    expect(snapshot(workspace)).toEqual(before);\n    expect(quarantineExists(workspace)).toBe(false);\n    expectEveryByteReachable(workspace, before);\n  });\n\n  it(\"refuses when the hold check itself throws\", () => {\n    const { workspace, plan, before } = tampered();\n    expectRefused(() => applyVerifyRepair(workspace, plan, {\n      legalHolds: () => { throw new Error(\"register offline\"); }, sign: stubSign\n    }), /legal hold state unknown: register offline/);\n    expect(snapshot(workspace)).toEqual(before);\n  });\n\n  it(\"refuses under an active hold and names it\", () => {\n    const { workspace, plan, before } = tampered();\n    expectRefused(() => applyVerifyRepair(workspace, plan, {\n      legalHolds: () => ({ state: \"active\", holdIds: [\"hold-litigation-7\"] }), sign: stubSign\n    }), /hold-litigation-7/);\n    expect(snapshot(workspace)).toEqual(before);\n    expect(quarantineExists(workspace)).toBe(false);\n  });",
+          "filePin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+            "bytes": 13875,
+            "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+          }
+        }
+      ]
+    },
+    {
+      "id": "P045-C2-forward-copy-then-unlink",
+      "title": "Replace only the single forward quarantine rename with faithful copy plus unlink",
+      "target": "src/ledger/verifyRepair.ts",
+      "targetPin": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+        "bytes": 11157,
+        "sha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb"
+      },
+      "mode": "Proposed private source-mode only; no compiled edit or compiler.",
+      "anchors": [
+        {
+          "find": "      fs.renameSync(join(workspace, file.path), target);",
+          "replace": "      fs.copyFileSync(join(workspace, file.path), target);\n      fs.unlinkSync(join(workspace, file.path));",
+          "occurrences": 1,
+          "line": 149
+        }
+      ],
+      "protectedAnchor": {
+        "find": "      fs.renameSync(join(workspace, row.to), join(workspace, row.from));",
+        "occurrences": 1,
+        "line": 124,
+        "meaning": "Rollback rename must remain byte-identical. Receipt atomic-write helper and every guard stay unchanged."
+      },
+      "unchangedCorpus": [
+        "tests/verifyRepair.test.ts"
+      ],
+      "staticDefinitions": 12,
+      "hypothesisOnly": {
+        "baseline": "All12 must first pass; no runtime was done here.",
+        "mutant": "Byte-reachability positive tests may pass a faithful copy+unlink. The rename-fault test likely fails because its forward rename spy is not reached. A likely12/11/1 is a hypothesis, not a kill or measured byte loss.",
+        "restored": "Same12 original cases must pass after exact source restoration."
+      },
+      "directObservers": [
+        {
+          "name": "puts moved files back when a rename fails part way",
+          "caseLine": 257,
+          "faultSpyLines": [
+            260,
+            267
+          ],
+          "firstExpectedFailure": "Shared expectRefused:99, reached from:268, if no EXDEV is injected and apply returns successfully.",
+          "maskedLater": [
+            "EXDEV reason at shared helper:100",
+            "intoQuarantine===3 at:270",
+            "Snapshot equality at:271",
+            "No quarantine at:272",
+            "Every byte reachable at:273"
+          ]
+        }
+      ],
+      "whySpyIsBypassed": "The spy throws only on the third rename from outside quarantine to a quarantine path. Forward copyFileSync/unlinkSync do not call it. Receipt temp-file renames originate inside quarantine and fail that outside-quarantine predicate; rollback rename only executes after a forward error. No EXDEV is guaranteed by this mutant.",
+      "byteInvariant": "expectEveryByteReachable:78-84 accepts an original path or its receipt-named quarantine path and compares SHA256 only. Positive apply:178-198 verifies originals absent, destination SHA256, receipt membership, report hash and two stub signer calls. A completed faithful copy+unlink can satisfy these byte checks.",
+      "meaning": "If the rename-fault case alone detects the mutant, report call-path/fault-injection sensitivity and a changed repair mechanism. Do not call it an observed lost-byte kill, proof of copy-delete crash danger, or complete satisfaction of the spec invariant mutation criterion.",
+      "notEstablished": [
+        "Atomicity across copy/unlink or multi-file move",
+        "Loss on crash, interrupted copy, unlink failure or active writer/WAL race",
+        "Copy destination permission/inode/mode equivalence",
+        "Rollback-after-copy-failure correctness",
+        "Full CLI mutation propagation with dist unchanged"
+      ],
+      "frames": [
+        {
+          "file": "src/ledger/verifyRepair.ts",
+          "firstLine": 119,
+          "lastLine": 155,
+          "text": "/** Puts moved files back, newest first. A file that cannot go back is named, never dropped. */\nfunction rollBack(workspace: string, quarantineDir: string, moved: RepairReceipt[\"moved\"]): void {\n  const stuck: string[] = [];\n  for (const row of [...moved].reverse()) {\n    try {\n      fs.renameSync(join(workspace, row.to), join(workspace, row.from));\n    } catch (error) {\n      stuck.push(`${row.to} (${errorText(error)})`);\n    }\n  }\n  if (stuck.length > 0) {\n    throw new Error(`repair aborted and could not put back: ${stuck.join(\", \")}; the files are intact at those paths`);\n  }\n  // Every file is back, so the intent record describes nothing: remove it and the empty folders.\n  try {\n    fs.unlinkSync(join(quarantineDir, \"repair-plan.json\"));\n    removeEmptyDirs(quarantineDir);\n    fs.rmdirSync(dirname(quarantineDir));\n  } catch {\n    // A leftover empty folder or plan is reported by the archived-store note; it holds no evidence.\n  }\n}\n\nfunction moveIntoQuarantine(workspace: string, quarantineDir: string, files: StoreFile[]): RepairReceipt[\"moved\"] {\n  const moved: RepairReceipt[\"moved\"] = [];\n  for (const file of files) {\n    // .amc/blobs/x.blob -> .amc/quarantine/<id>/blobs/x.blob; the SQLite files come first and move together.\n    const target = join(quarantineDir, relative(\".amc\", file.path));\n    try {\n      fs.mkdirSync(dirname(target), { recursive: true });\n      fs.renameSync(join(workspace, file.path), target);\n    } catch (error) {\n      rollBack(workspace, quarantineDir, moved);\n      throw new RepairRefused(`could not move ${file.path}: ${errorText(error)}; every moved file was put back`);\n    }\n    moved.push({ from: file.path, to: posix(relative(workspace, target)), bytes: file.bytes, sha256: file.sha256 });\n  }",
+          "filePin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+            "bytes": 11157,
+            "sha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb"
+          }
+        },
+        {
+          "file": "tests/verifyRepair.test.ts",
+          "firstLine": 77,
+          "lastLine": 101,
+          "text": "/** Each pre-repair file is byte-identical at its original path or at the quarantine path the receipt names. */\nfunction expectEveryByteReachable(workspace: string, before: Record<string, string>, receipt?: RepairReceipt): void {\n  const movedTo = new Map((receipt?.moved ?? []).map((row) => [row.from, row.to]));\n  for (const [path, sha] of Object.entries(before)) {\n    const at = existsSync(join(workspace, path)) ? path : movedTo.get(path);\n    expect(at, `${path} is neither in place nor in the receipt`).toBeDefined();\n    expect(sha256Hex(readFileSync(join(workspace, at!))), `${path} bytes at ${at}`).toBe(sha);\n  }\n}\n\nconst noHolds = (): HoldState => ({ state: \"none\" });\nconst stubSign = (digestHex: string): SignedDigest =>\n  ({ digestSha256: digestHex, signature: `stub:${digestHex}`, signedTs: 1, signer: \"auditor\" });\nconst FIXED_NOW = () => new Date(\"2026-10-07T12:34:56.789Z\");\n\nfunction expectRefused(run: () => unknown, message: RegExp): void {\n  let caught: unknown;\n  try {\n    run();\n  } catch (error) {\n    caught = error;\n  }\n  expect(caught).toBeInstanceOf(RepairRefused);\n  expect((caught as Error).message).toMatch(message);\n}",
+          "filePin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+            "bytes": 13875,
+            "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+          }
+        },
+        {
+          "file": "tests/verifyRepair.test.ts",
+          "firstLine": 172,
+          "lastLine": 198,
+          "text": "  it(\"moves every planned file into quarantine with its original SHA-256 and leaves .amc/reports alone\", () => {\n    const { workspace, plan, before } = tampered();\n    const signed: string[] = [];\n    const { quarantineDir, receipt } = applyVerifyRepair(workspace, plan, {\n      legalHolds: noHolds, sign: (digest) => { signed.push(digest); return stubSign(digest); }, now: FIXED_NOW\n    });\n    expect(quarantineDir).toMatch(/[\\\\/]\\.amc[\\\\/]quarantine[\\\\/]20261007T123456Z-[0-9a-f]{8}$/);\n    expect(receipt.type).toBe(\"amc.verify-repair\");\n    expect(receipt.legalHold.state).toBe(\"none\");\n    expect(receipt.untouched).toContain(\".amc/reports\");\n    expect(receipt.moved.map((row) => row.from).sort()).toEqual(plan.files.map((file) => file.path).sort());\n    for (const row of receipt.moved) {\n      expect(existsSync(join(workspace, row.from)), row.from).toBe(false);\n      expect(row.to.startsWith(\".amc/quarantine/\")).toBe(true);\n      expect(sha256Hex(readFileSync(join(workspace, row.to)))).toBe(before[row.from]);\n      expect(row.sha256).toBe(before[row.from]);\n    }\n    expectEveryByteReachable(workspace, before, receipt);\n    expect(readFileSync(join(workspace, \".amc\", REPORT), \"utf8\")).toContain(\"never touch\");\n    expect(snapshot(workspace)[`.amc/${REPORT}`]).toBe(before[`.amc/${REPORT}`]);\n    // The receipt on disk is the one returned, and its signature covers its exact bytes.\n    const receiptBytes = readFileSync(join(quarantineDir, \"repair-receipt.json\"));\n    expect(JSON.parse(receiptBytes.toString(\"utf8\"))).toEqual(receipt);\n    const sig = JSON.parse(readFileSync(join(quarantineDir, \"repair-receipt.json.sig\"), \"utf8\")) as SignedDigest;\n    expect(sig.digestSha256).toBe(sha256Hex(receiptBytes));\n    expect(signed).toHaveLength(2);\n    expect(existsSync(join(quarantineDir, \"repair-plan.json\"))).toBe(true);",
+          "filePin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+            "bytes": 13875,
+            "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+          }
+        },
+        {
+          "file": "tests/verifyRepair.test.ts",
+          "firstLine": 257,
+          "lastLine": 274,
+          "text": "  it(\"puts moved files back when a rename fails part way\", () => {\n    const { workspace, plan, before } = tampered();\n    expect(plan.files.length).toBeGreaterThanOrEqual(3);\n    const realRename = fs.renameSync;\n    let intoQuarantine = 0;\n    vi.spyOn(fs, \"renameSync\").mockImplementation((from, to) => {\n      if (/[\\\\/]quarantine[\\\\/]/.test(String(to)) && !/[\\\\/]quarantine[\\\\/]/.test(String(from)) && ++intoQuarantine === 3) {\n        throw Object.assign(new Error(\"EXDEV: cross-device link not permitted\"), { code: \"EXDEV\" });\n      }\n      realRename(from, to);\n    });\n    expectRefused(() => applyVerifyRepair(workspace, plan, { legalHolds: noHolds, sign: stubSign }), /EXDEV/);\n    vi.restoreAllMocks();\n    expect(intoQuarantine).toBe(3);\n    expect(snapshot(workspace)).toEqual(before);\n    expect(quarantineExists(workspace)).toBe(false);\n    expectEveryByteReachable(workspace, before);\n  });",
+          "filePin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+            "bytes": 13875,
+            "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+          }
+        },
+        {
+          "file": "src/utils/fs.ts",
+          "firstLine": 9,
+          "lastLine": 23,
+          "text": "export function writeFileAtomic(path: string, data: string | Buffer, mode?: number): void {\n  const dir = dirname(path);\n  ensureDir(dir);\n  const tmp = join(dir, `.${randomBytes(6).toString(\"hex\")}.tmp`);\n  try {\n    writeFileSync(tmp, data, \"utf8\");\n    if (mode !== undefined) {\n      chmodSync(tmp, mode);\n    }\n    renameSync(tmp, path);\n  } catch (err) {\n    try { unlinkSync(tmp); } catch { /* ignore cleanup */ }\n    throw err;\n  }\n}",
+          "filePin": {
+            "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/utils/fs.ts",
+            "bytes": 1006,
+            "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4"
+          }
+        }
+      ]
+    }
+  ],
+  "sourceVersusBuiltBoundary": {
+    "core12": "tests/verifyRepair.test.ts imports src/ledger/verifyRepair.js via normal Vitest TS resolution. It uses actual owned workspace, encrypted blob writer/verifier and snapshots, injected holds, stub SignedDigest signer, and a plain-object fs mock used to spy renameSync. Writers and pools close before repair; the fixture is not an active-writer race.",
+    "builtCLI5": "tests/verifyRepairCli.test.ts initializes in the source parent but spawns process.execPath dist/cli.js with inherited env, per-call AMC_HOME, vault passphrase, non-TTY pipe and unchanged60s child timeout. It verifies real local REPAIR_RECEIPT signature and one altered-byte refusal, not independently pinned external authority.",
+    "distRule": "Leave all4529 compiled files unchanged in source-mode causal controls. The original5 CLI tests run unmutated built code, so their pass cannot be attributed as sensitivity to either TS mutant. Any later compiled witness needs separate exact-scope review; none is proposed or executed here.",
+    "companions": "Original ledgerVerifySeparation4 and ledgerVerificationReadOnly10 remain separate fresh baseline contexts. The latter has original cold Node/tsx source-verifier children; these are not additional repair-core cases.",
+    "noCombinedClaim": "Root plans four actual fresh baselines12/5/4/10. Their outcomes and actual registrations have not been read or assumed here. Causal phases would repeat only core12, not31 new unique definitions."
+  },
+  "futureMeasurementRules": [
+    "Wait until root confirms actual fresh baseline12/5/4/10 and explicitly releases exact controls; hypotheses never substitute for raw registrations/statuses.",
+    "Use the same original12 cases, fixtures, generator inputs, cleanup, normal guards/config and30s deadlines for every baseline/mutant/restored phase. Fresh random keys/workspaces mean same corpus, not same physical keys across phases.",
+    "Each mutant differs only in the named private target TS file; C1 has exactly two removed anchors and C2 one replaced forward call. Do not change rollback, tests, mocks, imports, dependency/native state or compiled outputs.",
+    "Retain exact first AssertionError/name/line and complete raw/observer/stream/process metadata. Source/readiness predicts shared line99 masking; actual errors supersede that prediction.",
+    "A process1, setup/import/native error, hook/late close, timeout, pending case or uncertain child group is not a guard kill. Stop and retain uncertainty rather than auto-retrying/restoring while a process may still run.",
+    "After known normal exit and owned-group absence, restore source exactly and verify complete source/dist/native/borrowed helper/plan/reservation/prior evidence pins. No universal detached-process, OS/network or all-cache isolation claim.",
+    "C2 sensitivity alone does not close the spec request that byte-reachability invariants fail under copy-delete. Preserve any byte-invariant survival/coverage gap and do not add destructive corruption merely to force a kill.",
+    "No baseline/floor/allowlist/freeze weakening. Formal acceptance, original historical-red requirement, live writer/crash/late-signing/JSONL repair gaps, full suite/Node24/coverage/hosted/release/Done and all prior held decisions remain open unless separately evidenced."
+  ],
+  "directPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/ledger/verifyRepair.ts",
+      "bytes": 11157,
+      "sha256": "5ba4d59b5293e5e498d3cec3d58635133c75bc8d31db518a0d6b49d65f9164bb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/dist/ledger/verifyRepair.js",
+      "bytes": 9833,
+      "sha256": "1f1b870fe18fbb61800c4a0334a375b5c860f1e5beabc3ba1b31a3cdfd040e80"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepair.test.ts",
+      "bytes": 13875,
+      "sha256": "3e0c3b58eeb2f77ec05216c5f316020a0aff88a989ff9e811f1b809005689540"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/verifyRepairCli.test.ts",
+      "bytes": 8093,
+      "sha256": "4491c817f7910b54a53eeede711577c04d5de86423966f076161865c590642fd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerifySeparation.test.ts",
+      "bytes": 4311,
+      "sha256": "9f4bd6c1e007f9cc0539b4dd9725d69a704d589e19bc7d0eb0b023052db0114f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/ledgerVerificationReadOnly.test.ts",
+      "bytes": 9057,
+      "sha256": "4190737d0e35f10c8bd909294017071933156d90d9ebcb79189973ea52521d96"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/cli-verify-repair.ts",
+      "bytes": 5880,
+      "sha256": "20e5b6082fe37009c29faf2b6d87eeb7564d0e18aced9d3b8e5989f468c25af4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/src/utils/fs.ts",
+      "bytes": 1006,
+      "sha256": "e83f9f76ed73987babd3ef62aaf5281dd0d3a9ac5f55075f283c3fb123fa02e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    }
+  ],
+  "noExecution": {
+    "testsCollectedOrRun": false,
+    "targetImported": false,
+    "controllerAuthored": false,
+    "copyOrSetupCreated": false,
+    "mutantWritten": false,
+    "compilerOrBuildRun": false,
+    "sourceEdited": false,
+    "writes": "Only this NEW private JSON/Markdown pair."
+  }
+}

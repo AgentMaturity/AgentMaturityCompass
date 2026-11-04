@@ -1,0 +1,130 @@
+{
+  "schema": "p125-client-request-transport-static-matrix/1",
+  "sourcePin": {
+    "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+    "bytes": 10927,
+    "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387",
+    "readScope": "full source/metadata read"
+  },
+  "prospectiveTarget": "tests/time/tsaClient.test.ts",
+  "families": [
+    {
+      "id": "DER-01",
+      "api": "buildTimestampRequest(digestHex)",
+      "positive": "Generate real random nonce bytes; parse actual returned DER with existing parseDer/children/expectTag/oid/uintHex, and independently compare fixed TLV byte fragments.",
+      "checks": [
+        "One SEQUENCE with exactly version,imprint,nonce,certReq elements. VersionINTEGER content01.",
+        "SHA256 OID2.16.840.1.101.3.4.2.1 encoded0609608648016503040201 plus DER NULL0500; imprint OCTETSTRING is exact32raw digest bytes.",
+        "nonceHex is16lowercasehex with high magnitude bit set. Actual nonce INTEGER uses positive minimal9byte encoding00||8noncebytes and uintHex equals nonceHex.",
+        "Final certReq BOOLEAN TLV exactly0101ff; no reqPolicy element."
+      ],
+      "limit": "One or several observed nonces do not prove entropy, unpredictability or collision freedom; do not assert random inequality or mock randomBytes."
+    },
+    {
+      "id": "DER-02",
+      "api": "buildTimestampRequest(digestHex,validPolicy)",
+      "positive": "Use small literal valid policy1.2.3.4.1.",
+      "checks": [
+        "Exactly one policy OID inserted between imprint and nonce; remaining required fields/nonce relation/certReq preserved.",
+        "Assert literal OID bytes06042a030401 or decoded1.2.3.4.1, with independent fixed-byte comparison."
+      ],
+      "limit": "Do not invent a direct-build malformedreqPolicy refusal; the public builder accepts astring and the separate config schema is not this cohort."
+    },
+    {
+      "id": "DER-03",
+      "api": "buildTimestampRequest",
+      "positive": "Adjacent valid lowercase64hex request constructs.",
+      "checks": [
+        "Reject empty/nonhex/uppercase/63/65character digests with the actual fixed error before returning bytes."
+      ],
+      "limit": "Typed string inputs only; no any/casts/runtime monkeypatch objects."
+    },
+    {
+      "id": "HTTP-01",
+      "api": "postTimestampQuery(url,body,undefined,workspace)",
+      "positive": "Real HTTP server bound to exact127.0.0.1 and ephemeral port returns finite synthetic binary bytes under200/application-timestamp-reply.",
+      "checks": [
+        "Exactly one received POST; exact path+query, Hostconfigured literal/port, Content-Typeapplication/timestamp-query, Acceptapplication/timestamp-reply, Content-Length and exact real request DER body.",
+        "Returned Buffer exactly matches synthetic public response bytes. Observe all fixture-owned request/response/socket terminals."
+      ],
+      "limit": "Raw bytes deliberately have no claimed CMS/TSA/AttestedTime meaning. No requestTimestamp grant is called or invented."
+    },
+    {
+      "id": "HTTP-02",
+      "api": "postTimestampQuery",
+      "positive": "Use200 with Application/Timestamp-Reply ; charset=binary and the same finite body.",
+      "checks": [
+        "Case-folding/parameter stripping still accepts exact reply bytes."
+      ],
+      "limit": "This normalizes a Content-Type media type; it does not relax signature or content verification."
+    },
+    {
+      "id": "HTTP-03",
+      "api": "postTimestampQuery",
+      "positive": "Adjacent credential-free exactIPpositive.",
+      "checks": [
+        "URL with synthetic username/password rejects the fixed configured-URL credential error; no fixture request counter increments.",
+        "Never use a real credential or publish userinfo-bearing URLs/error operands; report only refusal/count booleans."
+      ],
+      "limit": "Unchanged scopedegress also rejects credential destinations; this test does not establish that the first credential guard is the only barrier."
+    },
+    {
+      "id": "HTTP-04",
+      "api": "postTimestampQuery",
+      "positive": "Adjacent200replypositive.",
+      "checks": [
+        "Finite201/500 status rows reject exactHTTPstatus messages. A wrongstatus+wrongMIMErow may record status-before-type precedence; do not count rows as extra test bodies."
+      ],
+      "limit": "All fixture responses end naturally; no real remote service availability claim."
+    },
+    {
+      "id": "HTTP-05",
+      "api": "postTimestampQuery",
+      "positive": "Adjacent raw-bytepositive.",
+      "checks": [
+        "A302Location targeting another path on the same owned literalIPserver rejects redirect(HTTP302)refused.",
+        "One source-route request and zero target-route requests; no external Location URL."
+      ],
+      "limit": "No universal redirect/destination policy proof; this is the concrete real client response path."
+    },
+    {
+      "id": "HTTP-06",
+      "api": "postTimestampQuery",
+      "positive": "Correct200/MIMEpositive first.",
+      "checks": [
+        "Same finite body with200/text-plain rejects exact content-type refusal. First meaningful control assertion is promise rejection, then independent counts/lifecycle facts."
+      ],
+      "limit": "Transport type admission only; never invoke token verifier to explain this refusal."
+    },
+    {
+      "id": "HTTP-07",
+      "api": "postTimestampQuery",
+      "positive": "Exactly65536public bytes under200/correctMIME are returned intact.",
+      "checks": [
+        "65537bytes reject replyexceeds65536bytes. Keep response finite, accurate Content-Length and endpoint-body byte record.",
+        "Oversize may cause expected peer abort/response-close before finish; retain those actual terminal facts and separate unexpected errors."
+      ],
+      "limit": "A64KiBcap is transport size behavior, not total process memory/streaming/DER security proof."
+    },
+    {
+      "id": "HTTP-08",
+      "api": "postTimestampQuery(url,body,undefined,workspace)",
+      "positive": "Previously qualified finite positive uses the same public default path.",
+      "checks": [
+        "A separately isolated fixture accepts the request but deliberately never sends response headers/body; real defaultAbortSignal.timeout(10000) must reject.",
+        "Keep client10000ms and Vitest30000ms defaults; no fakeclock/sleep race/shortened timeoutMs/deadline extension. Capture actual abort category/duration and peer closure, not a predicted elapsed result."
+      ],
+      "limit": "The timer is created after checkedAddress; exactIPskipsDNS. This does not prove a10second bound for DNS resolution, complete fallback or all outer operations. Actual timeout/finally closure must be observed before credit."
+    }
+  ],
+  "familyCount": 11,
+  "fixedTestInventoryAuthored": false,
+  "countsAreRuntimeResults": false,
+  "initialAllocation": false,
+  "existingDefaultDeadlines": {
+    "clientMs": 10000,
+    "vitestMs": 30000
+  },
+  "noMocks": true,
+  "existingVerifier17Unchanged": true
+}

@@ -1,0 +1,77 @@
+{
+  "schema": "p107-observed-run-audit/1",
+  "phase": "p107-runtime-v3",
+  "actualExit": 0,
+  "durationMs": 3413,
+  "ownedPgid": 3873,
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "tests": {
+    "numTotalTests": 1,
+    "numPassedTests": 1,
+    "numFailedTests": 0,
+    "numPendingTests": 0
+  },
+  "exactOrderedFileNameOccurrenceStateJoin": true,
+  "uniqueObserverTestIds": 1,
+  "unhandledErrors": [],
+  "taskErrors": [],
+  "hooks": [
+    {
+      "kind": "file",
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "name": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "hooks": {
+        "afterAll": "pass"
+      }
+    }
+  ],
+  "rows": [
+    {
+      "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "fullName": "binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates",
+      "state": "passed",
+      "failureMessages": []
+    }
+  ],
+  "publicEvidence": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-zg2Dbv/public-evidence.json",
+      "bytes": 29024,
+      "sha256": "67a33986b5fe6c905638d550f968c9d89ddce99d0ed01d0d47a798f5f0de80df",
+      "bodyFailed": false,
+      "cleanupErrors": [],
+      "environmentRestored": true,
+      "vaultLocked": true,
+      "poolClosed": true
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/command.json",
+      "bytes": 2713,
+      "sha256": "79ecb2b456cb3541127c9bc7d30b1345705f01f9d1c5810db0471ac37559fe37"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "1404a7d82e1acfb0eb3a4f16dd0ea14e310ce4c5149b3a886f32ca96e11e4e68"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/raw.json",
+      "bytes": 1051,
+      "sha256": "d0b93601a176d66987df7ae274ba9bab7da6f947c165e927afbcaa505a341139"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/observer.json",
+      "bytes": 1396,
+      "sha256": "52f3624c99caabcd91e780d43edc7fb193dabd68d645fe75d499d5788ce04e10"
+    },
+    {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p107-runtime-v3/stdout-stderr.log",
+      "bytes": 816,
+      "sha256": "afa6ec6608903038e67dc12abab2c5258457da8dc77dd741af394b78cd96574a"
+    }
+  ],
+  "boundary": "Actual observed scoped run only; canonical, fresh-source, full-suite and mutation credit require separate binding and review."
+}

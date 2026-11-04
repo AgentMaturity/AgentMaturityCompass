@@ -45,7 +45,7 @@
     <section class="playground-intro" aria-labelledby="playground-title">
       <p class="eyebrow">Local browser lab</p>
       <h1 id="playground-title" data-i18n="playgroundTitle">AMC Playground</h1>
-      <p class="subtitle">Score an AI agent with 15 guided questions, test 33 adversarial scenarios, and browse a curated browser preview from AMC's full 142-pack CLI catalog. No account or install required.</p>
+      <p class="subtitle">Score an AI agent with 15 guided questions, test 33 adversarial scenarios, and browse a curated browser preview from AMC's full CLI catalog of <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs. No account or install required.</p>
     </section>
 
     <section class="live-demo-panel" aria-labelledby="live-demo-title">
@@ -116,7 +116,7 @@
 
     <div class="tab-panel" id="panel-packs" role="tabpanel" aria-labelledby="tab-packs">
       <p class="dim-desc pack-summary">
-        Browse a curated preview from AMC's full 142-pack CLI catalog. These summaries help you find the right test lane; run the CLI pack to produce evidence.
+        Browse a curated preview from AMC's full CLI catalog of <!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs. These summaries help you find the right test lane; run the CLI pack to produce evidence.
       </p>
       <label class="sr-only" for="packSearch">Search assurance-pack previews</label>
       <input type="search" class="pack-search" id="packSearch" aria-label="Search assurance-pack previews" placeholder="Search previews by risk, regulation, or pack name" oninput="filterPacks()">
@@ -1005,7 +1005,7 @@ document.getElementById('questions').addEventListener('keydown', function(e) {
 /* Tour */
 const TOUR_STEPS = [
   { target: '#playground-title', title: 'Welcome to AMC Playground', body: 'Your one-stop tool for understanding AI agent maturity. Three modes: assess, test, and explore.' },
-  { target: '.tab-bar', title: 'Three Ways to Explore', body: 'Assessment scores your agent on 15 questions. Scenario Lab tests adversarial responses. Assurance Packs previews a curated part of the full 142-pack CLI catalog.' },
+  { target: '.tab-bar', title: 'Three Ways to Explore', body: 'Assessment scores your agent on 15 questions. Scenario Lab tests adversarial responses. Assurance Packs previews a curated part of the full CLI assurance pack catalog.' },
   { target: '#scorePanel', title: 'Real-Time Radar', body: 'As you rate your agent, the radar chart and scores update instantly across 5 dimensions.' },
   { target: '.dim-section', title: 'Rate Each Dimension', body: 'Click L1-L5 for each question. L1 = basic, L5 = industry-leading maturity.' },
   { target: '#actionButtons', title: 'Share Your Score', body: 'Export as JSON, copy a GitHub badge, or share a text summary. All client-side, no data sent anywhere.' },

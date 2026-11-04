@@ -1,0 +1,63 @@
+{
+  "issue": "P0-27",
+  "sourceDuringRun": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "capturedUtc": "2026-10-14T20:43:36.021655+00:00",
+  "scope": "Only new tests/budgetIntegrityQualification.test.ts plus private evidence. Actual source runtime and native diagnostics, local canned injected wire transport; no live provider/model, source mutation or full release claim.",
+  "test": {
+    "path": "/Users/sid/.codex/worktrees/p0-27-qualification/AgentMaturityCompass/tests/budgetIntegrityQualification.test.ts",
+    "sha256": "1e3eae62d2c49bccafd36f9ae0a6a3e442cfa57c27f8be217a08b1c1f55dfff8",
+    "bytes": 10458,
+    "cases": 6
+  },
+  "command": {
+    "name": "budget-integrity-first",
+    "cmd": "env AMC_P0_27_BUDGET_EVIDENCE_DIR=/private/tmp/p0-27-budget-first-evidence-20261015 npx vitest run tests/budgetIntegrityQualification.test.ts --reporter=json --outputFile=/private/tmp/p0-27-budget-integrity-first-20261015.json",
+    "exit": 0,
+    "durationMs": 4441,
+    "startedUtc": "2026-10-14T20:30:10.943696+00:00",
+    "log": "/private/tmp/p0-27-budget-integrity-first-20261015.log",
+    "sourceHead": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4"
+  },
+  "raw": {
+    "path": "/private/tmp/p0-27-budget-integrity-first-20261015.json",
+    "sha256": "585b3483818e35d128c4cf5f8841c3418057a641da4c8b0289a0e00bfd99b50d",
+    "bytes": 3287
+  },
+  "effects": {
+    "path": "/private/tmp/p0-27-budget-first-evidence-20261015/budget-observations.json",
+    "sha256": "50997481b4263d2f8dd1e090612b161e9445532159bba7f240be7f9aaeaccd20",
+    "bytes": 19641,
+    "observations": 16
+  },
+  "counts": {
+    "numTotalTests": 6,
+    "numPassedTests": 6,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": true
+  },
+  "protectedSourceAndOldTestPins": {
+    "src/budgets/nativeBudgetUsage.ts": "45f561f1116d0f55f98439508a573b0a586ed060b3c6948d86b1240a50d5e980",
+    "src/llm/adapter/llmRuntime.ts": "6ffc6892a8ed3e94ac931fe7472a6268ddaad9f665fd365e68972b2e6edebf1c",
+    "src/agent/nativeFailureGuidance.ts": "e797ef59196351467b5fd8e41e0ce2fc81936e19ffda50f6afef4a0c05f0b01b",
+    "src/ledger/ledger.ts": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+    "src/ledger/ledgerSchema.ts": "8375975c42861af68a69ba33e367f8f03a9b691155a9e974152916da90c0df25",
+    "src/crypto/keys.ts": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+    "src/session/sessionService.ts": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28",
+    "tests/nativeBudgets.test.ts": "62f8aa98b6dd62d0b699107a7794ff906245e964d8d954963dae49bafdbb64c0",
+    "tests/helpers/llmStubUpstream.ts": "6d50b22b356de4447ead7826c55af66e0d68d2f581eeafd121a1a84f7fa6bc00",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+  },
+  "behaviors": [
+    "Genuine independently recorded monitor key precedes signed/sealed row; reader admits it and actual runtime reaches injected wire transport.",
+    "Literal unsigned signature, bad signature and hash faults name actual first offending row; reader throws typed BudgetEvidenceIntegrityError; actual runtime refuses before transport and emits both live/stored AMC_EVIDENCE_INTEGRITY rather thanQUOTA.",
+    "Actual sealed-session signature fault names session and literalunsigned; typedintegrity refusal remains.",
+    "Actual provider quota wire response reaches transport and preservesQUOTA in live/stored diagnostics."
+  ],
+  "faultBoundary": "Faults modify only disposable owned SQLite rows after genuine positive checks. Actual immutability-trigger SQL is captured, dropped only to inject damage in the owned fixture, then restored exactly immediately; no repository/real customer guard is disabled. Full before/after semantic rows retained.",
+  "limits": "Six registered Node22 cases,0pending/todo; no classifier-mutation claim, no actualCLI claim in these cases. Root separate coldCLI9-control evidence covers native-after-abort/unsigned, export/firewall and actual integrity diagnostics. Earlier warm-parent SQLite observation and strict tagged-system conflict stayopen."
+}

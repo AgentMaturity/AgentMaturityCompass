@@ -1,5 +1,7 @@
+import { sha256Hex } from "../utils/hash.js";
+import type { AcceptedWork } from "./workAcceptance.js";
 import { verifyLeaseToken } from "../leases/leaseVerifier.js";
-import { loadLeaseRevocations, verifyLeaseRevocationsSignature } from "../leases/leaseStore.js";
+import { readRevokedLeaseIds } from "../leases/leaseStore.js";
 import type { Ledger } from "../ledger/ledger.js";
 import { NdjsonFramer } from "./ndjsonFraming.js";
 import { parseWireObject } from "./wireJson.js";
@@ -48,6 +50,8 @@ export interface WireDispatcherInit {
   readonly intakeSessionId: string;
   readonly monitorPublicKeys: readonly string[];
   readonly workspaceId?: string;
+  /** Owner callback only. Token stays in memory and is re-verified before native execution. */
+  readonly onAccepted?: (accepted: AcceptedWork, leaseToken: string) => void;
 }
 
 export interface DispatchResult {
@@ -167,6 +171,11 @@ function answer(init: WireDispatcherInit, bytes: Buffer, ordinal: number): Buffe
     intakeSessionId: init.intakeSessionId,
     // Straight from the verified payload. Nothing the peer wrote reaches this.
     agentId: lease.payload.agentId,
+    authority: { leaseId: lease.payload.leaseId, tokenSha256: sha256Hex(request.lease) },
+    ...(init.onAccepted === undefined ? {} : { onAccepted: (accepted: AcceptedWork) => {
+      // Receipt delivery survives a consumer scheduling error. The accepted item stays visibly unconsumed.
+      try { init.onAccepted?.(accepted, request.lease); } catch { /* no native claim implies no execution */ }
+    } }),
     monitorPublicKeys: init.monitorPublicKeys
   };
 
@@ -192,19 +201,12 @@ function reply(id: WireId, error: { code: WireErrorCode; message: string }): Buf
 /**
  * The revoked lease ids, or null when the list cannot be trusted.
  *
- * `revokedLeaseIdSet` (../leases/leaseStore.ts) returns an EMPTY SET when the
- * signature does not verify, which reads as "nothing is revoked" -- so tampering
- * with that one file un-revokes every lease ever revoked. That is a fail-OPEN
- * answer to a security question, and this surface will not inherit it. Here an
- * unverifiable list is a refusal: null means no lease is accepted at all, which
- * is loud, safe, and fixable by re-signing.
+ * An unverifiable list (missing, tampered, unsigned or unparseable) is a
+ * refusal here: null means no lease is accepted at all, which is loud, safe and
+ * fixable with `amc lease resign-revocations`. `revokedLeaseIdSet`
+ * (../leases/leaseStore.ts) fails closed the same way: it throws.
  */
 function revokedLeaseIds(workspace: string): Set<string> | null {
-  const signature = verifyLeaseRevocationsSignature(workspace);
-  if (!signature.valid) return null;
-  try {
-    return new Set(loadLeaseRevocations(workspace).revocations.map((row) => row.leaseId));
-  } catch {
-    return null;
-  }
+  const read = readRevokedLeaseIds(workspace);
+  return read.ok ? read.ids : null;
 }

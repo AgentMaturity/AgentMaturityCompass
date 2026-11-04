@@ -1,0 +1,8 @@
+{
+  "at": "2026-10-16T22:27:03.585638+00:00",
+  "kind": "read-only-path-lookup",
+  "command": "cat B34/whole-issue-gaps.json B35/receipt-extension-preparation/manifest-template.json",
+  "exit": 1,
+  "diagnosis": "The first actual prior gaps file was fully read. The second guessed filename was absent. No helper, source, index, product or QA write occurred. Future receipt filenames are selected from actual inventory.",
+  "readmission": "Read-only preparation continues; all later source/commit admissions still require actual exact checks."
+}

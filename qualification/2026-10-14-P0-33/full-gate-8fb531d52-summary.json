@@ -1,0 +1,392 @@
+{
+  "schemaVersion": "2026-09-08",
+  "receiptType": "release-gate",
+  "createdAt": "2026-10-14T11:59:14.961Z",
+  "workspace": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014",
+  "quick": false,
+  "status": "failed",
+  "qualification": "failed",
+  "partial": true,
+  "counts": {
+    "executed": 20,
+    "passed": 19,
+    "failed": 1,
+    "skipped": 2,
+    "total": 22
+  },
+  "summary": "19/20 executed checks passed; 1 failed; 2 skipped. Acceptance is incomplete: per-file-coverage, live-deploy-health.",
+  "scope": "Registered checks only. Packed-install covers keyless native evidence by default; real-provider, platform-matrix and publication results require their own evidence.",
+  "remediations": [
+    {
+      "id": "full-test-suite",
+      "status": "failed",
+      "remediation": "Fix full-test-suite before release."
+    },
+    {
+      "id": "per-file-coverage",
+      "status": "skipped",
+      "remediation": "Required gates did not pass: full-test-suite; stale or missing evidence cannot qualify this check."
+    },
+    {
+      "id": "live-deploy-health",
+      "status": "skipped",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health."
+    }
+  ],
+  "sourceCommit": "8fb531d52dcdb9a1ca090540e02b77ca7c2f0f42",
+  "rawReceiptSha256": "6eec7c2c103578a79ed6979c9caadbf71fb0a5ee3aaaf18fd7dd3a8c25e15973",
+  "steps": [
+    {
+      "id": "console-js-syntax",
+      "command": "node --check src/console/assets/app.js",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:29:22.696Z",
+      "endedAt": "2026-10-14T11:29:22.743Z",
+      "remediation": null,
+      "needs": [],
+      "after": [],
+      "allowFailure": false
+    },
+    {
+      "id": "openapi-parse",
+      "command": "node -e import('yaml').then(YAML=>{const fs=require('fs'); YAML.parse(fs.readFileSync('website/openapi.yaml','utf8'));})",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:29:22.743Z",
+      "endedAt": "2026-10-14T11:29:22.973Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "console-js-syntax"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "typecheck",
+      "command": "npm run typecheck",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:29:22.973Z",
+      "endedAt": "2026-10-14T11:29:49.522Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "openapi-parse"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "typecheck-tests",
+      "command": "npm run typecheck:tests",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:29:49.522Z",
+      "endedAt": "2026-10-14T11:30:25.408Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "typecheck"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:30:25.408Z",
+      "endedAt": "2026-10-14T11:30:57.040Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "typecheck-tests"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "lint",
+      "command": "npm run lint",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:30:57.040Z",
+      "endedAt": "2026-10-14T11:30:59.921Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "build"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "source-duplicates",
+      "command": "npm run check:duplicates",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:30:59.921Z",
+      "endedAt": "2026-10-14T11:31:00.621Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "lint"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "source-dead-code",
+      "command": "npm run check:dead-code",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:31:00.621Z",
+      "endedAt": "2026-10-14T11:31:03.544Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "source-duplicates"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "package-lint",
+      "command": "npm run check:package",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:31:03.544Z",
+      "endedAt": "2026-10-14T11:31:07.581Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "source-dead-code"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "citations",
+      "command": "npm run check:citations",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:31:07.582Z",
+      "endedAt": "2026-10-14T11:31:07.906Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "package-lint"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "packed-install",
+      "command": "node scripts/packed-install-check.mjs --no-build",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:31:07.906Z",
+      "endedAt": "2026-10-14T11:31:31.031Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "citations"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "gap-0626-adversarial-regression",
+      "command": "npx vitest run tests/gap0626AdversarialRegression.test.ts",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:31:31.031Z",
+      "endedAt": "2026-10-14T11:31:35.811Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "packed-install"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "full-test-suite",
+      "command": "npx vitest run --coverage --coverage.reportOnFailure --exclude tests/performance/** --reporter=dot --reporter=json --outputFile.json=/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-full-test-suite-StESWl/results.json",
+      "status": "failed",
+      "startedAt": "2026-10-14T11:31:35.811Z",
+      "endedAt": "2026-10-14T11:56:36.227Z",
+      "remediation": "Fix full-test-suite before release.",
+      "artifact": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-full-test-suite-StESWl/results.json",
+        "produced": true,
+        "valid": false,
+        "sha256": "2994944de79412eb1d0312d7c4b0ee6787963730b4df4fc8b828664818df7a9f",
+        "counts": {
+          "total": 24360,
+          "passed": 24360,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "failedSuites": 1,
+          "pendingSuites": 0,
+          "files": 1688
+        },
+        "temporary": false,
+        "retained": true
+      },
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "gap-0626-adversarial-regression"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "performance-floors",
+      "command": "npx vitest run tests/performance --no-file-parallelism --reporter=dot --reporter=json --outputFile.json=/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-performance-floors-2lXlKq/results.json",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:56:36.656Z",
+      "endedAt": "2026-10-14T11:56:51.824Z",
+      "remediation": null,
+      "artifact": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-p0-33-20261014/tmp/release-gate/vitest-performance-floors-2lXlKq/results.json",
+        "produced": true,
+        "valid": true,
+        "sha256": "5ee07fe9686d8903b6b3103523b7c680e2c2f7379d507b34f74959da63c7e036",
+        "counts": {
+          "total": 5,
+          "passed": 5,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "failedSuites": 0,
+          "pendingSuites": 0,
+          "files": 4
+        },
+        "temporary": false,
+        "retained": true
+      },
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "full-test-suite"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "per-file-coverage",
+      "command": null,
+      "status": "skipped",
+      "startedAt": "2026-10-14T11:56:51.825Z",
+      "endedAt": "2026-10-14T11:56:51.825Z",
+      "remediation": "Required gates did not pass: full-test-suite; stale or missing evidence cannot qualify this check.",
+      "needs": [
+        "full-test-suite"
+      ],
+      "after": [
+        "performance-floors"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "command-inventory",
+      "command": "node dist/cli.js commands --markdown --out /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-44KDtQ/CLI_COMMAND_INVENTORY.md",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:56:51.825Z",
+      "endedAt": "2026-10-14T11:56:52.665Z",
+      "remediation": null,
+      "artifact": {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-release-gate-artifacts-44KDtQ/CLI_COMMAND_INVENTORY.md",
+        "produced": true,
+        "temporary": true,
+        "retained": false
+      },
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "per-file-coverage"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "architecture-boundaries",
+      "command": "node scripts/architecture-boundaries-check.mjs",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:56:52.665Z",
+      "endedAt": "2026-10-14T11:56:54.182Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "command-inventory"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "docs-drift-public-naming",
+      "command": "npm run check:docs-drift",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:56:54.182Z",
+      "endedAt": "2026-10-14T11:56:54.553Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "architecture-boundaries"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "runtime-dependency-audit",
+      "command": "npm run audit:runtime",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:56:54.554Z",
+      "endedAt": "2026-10-14T11:56:55.222Z",
+      "remediation": null,
+      "needs": [],
+      "after": [
+        "docs-drift-public-naming"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "cli-and-domain-smoke",
+      "command": "node dist/cli.js --help && node dist/cli.js domain pack list --json",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:56:55.223Z",
+      "endedAt": "2026-10-14T11:56:56.760Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "runtime-dependency-audit"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "install-persona-qa",
+      "command": "npm run qa:install-personas -- --json --out tmp/persona-install-qa/latest.json",
+      "status": "passed",
+      "startedAt": "2026-10-14T11:56:56.761Z",
+      "endedAt": "2026-10-14T11:59:14.960Z",
+      "remediation": null,
+      "needs": [
+        "build"
+      ],
+      "after": [
+        "cli-and-domain-smoke"
+      ],
+      "allowFailure": false
+    },
+    {
+      "id": "live-deploy-health",
+      "command": null,
+      "status": "skipped",
+      "startedAt": "2026-10-14T11:59:14.960Z",
+      "endedAt": "2026-10-14T11:59:14.960Z",
+      "remediation": "Set AMC_RELEASE_GATE_LIVE_URL to verify deployed health.",
+      "needs": [],
+      "after": [
+        "install-persona-qa"
+      ],
+      "allowFailure": false
+    }
+  ],
+  "failedDiagnostics": [
+    {
+      "id": "full-test-suite",
+      "stderr": " without a licence\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/industryPackWeightingPaymentInvariance.test.ts > industry pack weighting never depends on payment > B1: lifecycle layer scores are identical with and without a licence\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/notaryComposeIntegration.test.ts > optional Compose notary listener and policy signing > signs the original digest through the actual CLI service and policy producer, retaining auth and payload checks\n[amc] Explicit notary admission expanded the auditor signing role (c9e63ad689dd60417b673bd900417531fba18239696a5b97fc5445fbf5f18419).\n\nstderr | tests/questionScoreExplainability.test.ts > question score explainability receipts > diagnostic reports include question explainability receipts in JSON and markdown\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.2, seen at L0).\n\nstderr | tests/newDomainEvidenceCaps.test.ts > new domain runner caps > AMC-VOICE-1 is capped when high-risk workspace lacks llm request/response evidence\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L0).\n\nstderr | tests/helmChartSecrets.test.ts > helm chart bootstrap secret > schema rejects change-me bootstrap values and accepts the shipped values files\nstrict mode: missing type \"string\" for keyword \"pattern\" at \"#/properties/image/then/properties/digest\" (strictTypes)\n\nstderr | tests/helmChartVersion.test.ts > helm chart version and image pinning > requireDigest without digest refuses (template fail and schema)\nstrict mode: missing type \"string\" for keyword \"pattern\" at \"#/properties/image/then/properties/digest\" (strictTypes)\n\nerror: too many arguments for 'set'. Expected 1 argument but got 2.\nstderr | tests/amcDeclarativeConfig.test.ts > configInit > refuses to overwrite without --force\n\u2717 /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-config-test-NMm9gR/amcconfig.yaml already exists. Use --force to overwrite.\n\nindustryPacks=17\nstderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend another question's evidence at L0-L2\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L2).\n\nstderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend it at L3+ either, which was already true\n[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L4).\n\nstderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > cannot be turned off any more (P1-07)\nSTRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level\n\n\n\u23af\u23af\u23af\u23af\u23af\u23af Failed Suites 1 \u23af\u23af\u23af\u23af\u23af\u23af\u23af\n\n FAIL  tests/publicDocsArtifact.test.ts [ tests/publicDocsArtifact.test.ts ]\nError: Hook timed out in 10000ms.\nIf this is a long-running hook, pass a timeout value as the last argument or configure it globally with \"hookTimeout\".\n \u276f tests/publicDocsArtifact.test.ts:59:1\n     57| }\n     58|\n     59| afterAll(() => {\n       | ^\n     60|   for (const directory of temporaryRoots) rmSync(directory, { recursiv\u2026\n     61| });\n\n\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af\u23af[1/1]\u23af\n\nERROR: Coverage for functions (72.89%) does not meet global threshold (75%)\n"
+    }
+  ]
+}

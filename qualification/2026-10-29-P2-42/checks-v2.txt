@@ -1,0 +1,9 @@
+lint exit=0 check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 21; 16 random marker(s); 0 pending entries.
+check:gates exit=0 check:gates: every evaluated gate requirement has a registered, non-synthetic emitter.
+check:dead-code exit=0 No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped
+check:duplicates exit=0 No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped
+check:counts exit=0 Published source counts match the repository; this check does not execute tests.
+check:api-ref exit=0 docs/API_REFERENCE.md matches the source.
+check:docs-drift exit=0 Docs drift check passed (342 files scanned; truth claims and commands checked in 264 public files; 5 logged exceptions).
+check:schemas exit=0 gen-spec-schemas: 46 schemas current; 90 contract fixtures agree
+check:architecture-boundaries exit=0 }

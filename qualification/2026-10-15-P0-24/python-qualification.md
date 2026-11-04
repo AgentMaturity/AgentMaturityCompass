@@ -1,0 +1,13 @@
+The bounded current-source Python checks pass: 12 unchanged existing tests and five actual constructor/digest/registry cases, with zero failures, errors, skips, pending, or todo cases. This is 17 current-source cases, not full P0-24 acceptance.
+
+The run used genuine Python 3.12.14 in a fresh private venv. Seven direct requirements resolved to 18 installed packages plus the venv's pip distribution. The real installation completed with exit 0 in 4,651 ms; pip check reported no broken requirements. Exact install/download metadata, resolved versions, freeze output, command streams, and timings are retained.
+
+Imports used the actual amc and watch entry points. The real settings initialization created only empty cache, exports, and logs directories within the owned fixture; no state file or database was created. Both real tampered-pack admissions raised Policy pack digest mismatch, with the same registry object and serialized bytes unchanged.
+
+A complete 206-file private amc package copy ran the identical five assertions: baseline 5/5, historical wrong prompt-ID mutant 4/5, exact restoration 5/5. Actual child exits were 0, 1, 0. The sole mutant failure was the current-ID set assertion: ATLAS_T0048_PROMPT_INJECTION appeared in place of ATLAS_T0051_PROMPT_INJECTION. Version and all other source bytes stayed intact. The genuine mutated constructor still produced a valid digest, so this proves ID-assertion sensitivity rather than cryptographic admission semantics.
+
+The two independent digest-tamper controls deliberately use synthetic P024_TAMPER IDs, not claimed ATLAS inventory. This keeps their unchanged tamper assertions meaningful during the wrong-ID producer matrix. Generated UUIDs and timestamps are genuine and retained in every actual pack artifact; none were patched or invented.
+
+All 20 source/config/test pins and the complete live 206-file package are unchanged. The private full package was restored byte-for-byte. Only the authorized private runtime/evidence tree and this receipt pair were written. No repository source, old test, historical log, counter, Node runtime, native ABI, shared environment, or user environment changed.
+
+This qualifies canned local Python behavior of the already-landed source correction. It does not verify current law or ATLAS release content, approve an expert mapping, authenticate an issuer, execute real enforcement, or provide full-platform/coverage/packaging/server/hosted/release/Done acceptance. The credential-free inspected runtime path invokes no transport; no global syscall network-denial mechanism was installed. Installation genuinely downloaded dependencies. The detailed JSON and artifact index retain each actual result and the expected mutant failure.

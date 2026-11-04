@@ -25,7 +25,7 @@ import {
 } from "../lifecycle/artifactSignature.js";
 import { writeRollbackLifecycleReceipt } from "../lifecycle/changeReceipt.js";
 import { ControlFileLockError, withControlFileLock } from "../lifecycle/controlFileLock.js";
-import { typedMultiAgentGraphDigest, typedMultiAgentGraphSchema } from "../fleet/typedGraph.js";
+import { agentTypedMultiAgentGraphPath, typedMultiAgentGraphDigest, typedMultiAgentGraphSchema } from "../fleet/typedGraph.js";
 import { ensureDir, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -698,7 +698,7 @@ function candidateResources(workspace: string, agentId: string): CandidateResour
     { kind: "agent", path: paths.agentConfig, schema: "agent.config.yaml" },
     { kind: "agent", path: paths.agentConfigSig, mutable: false, schema: "signature" },
     { kind: "graph", path: paths.contextGraph, schema: "context-graph.json" },
-    { kind: "graph", path: join(workspace, ".amc", "fleet", "typed-graphs", "latest.json"), schema: "typed-multi-agent-graph.json" },
+    { kind: "graph", path: agentTypedMultiAgentGraphPath(workspace, agentId), schema: "typed-multi-agent-graph.json" },
     { kind: "prompt", path: paths.promptAddendum, schema: "prompt-addendum.md" },
     { kind: "guardrail", path: paths.guardrails, schema: "guardrails.yaml" },
     { kind: "policy", path: paths.gatePolicy, schema: "gatePolicy.json" },

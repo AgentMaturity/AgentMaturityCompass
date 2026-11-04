@@ -4,10 +4,11 @@
  * goes through withClaim with the server's own envelope (the readiness evaluator's `claim`, or the router's unbound
  * claim where no producer exists yet), never one composed here.
  *
- * Identity: the MCP server is a local process with no per-user session. An `amc approvals login` token file named by
- * AMC_A4_SESSION_TOKEN_FILE in the server's MCP config is the principal (admission native_login_token, in memory only),
- * re-resolved against the signed users.yaml on every call. That file is the user's whole Studio session and the agent
- * host can read it, so only a VIEWER-only user's session is accepted. The comment tool refuses without one; reads without
+ * Identity: the MCP server is a local process with no per-user session. An `amc approvals login --a4-comment-only` token
+ * file named by AMC_A4_SESSION_TOKEN_FILE in the server's MCP config is the principal (admission native_login_token, in
+ * memory only), re-resolved against the signed users.yaml on every call. The agent host can read that file, so only an
+ * `a4_comment`-scoped credential (signed into the session token; Studio admits it for A4 reads and comments only) of a
+ * VIEWER-only user is accepted. The comment tool refuses without one; reads without
  * one answer as the router's admin token does (every project, reads only). Never a tool argument. Every tool refuses
  * while the workspace is read-only.
  *
@@ -24,8 +25,8 @@ import { z, ZodError } from "zod";
 import { A4BlobError } from "../a4/a4Blobs.js";
 import { conformanceView } from "../a4/a4Conformance.js";
 import { evaluateFor, loadA4State } from "../a4/a4Gates.js";
-import { A4_API_PREFIX, headStage } from "../a4/a4Router.js";
-import { A4_STAGES, a4PreviewEnabled, type A4Member, type A4Principal, type A4ProjectRow, type A4ProjectV1, type A4Stage } from "../a4/a4Schema.js";
+import { A4_API_PREFIX, A4_UNPARSED_RECORD, headStage, projectView } from "../a4/a4Router.js";
+import { A4_STAGES, a4PreviewEnabled, type A4Member, type A4Principal, type A4Stage } from "../a4/a4Schema.js";
 import { A4StoreError, openA4Store, type A4Store } from "../a4/a4Store.js";
 import { resolveApiRolePolicy } from "../api/accessPolicy.js";
 import { listVerifiedUsers, verifyUsersConfigSignature } from "../auth/authApi.js";
@@ -38,7 +39,7 @@ import { verifyTrustConfigSignature } from "../trust/trustConfig.js";
 import { unboundClaim, withClaim } from "./mcpClaimOutput.js";
 
 /** The MCP server config's env entry naming the `amc approvals login` token file; its path is never printed. */
-export const A4_SESSION_TOKEN_ENV = "AMC_A4_SESSION_TOKEN_FILE";
+const A4_SESSION_TOKEN_ENV = "AMC_A4_SESSION_TOKEN_FILE";
 
 const TOOLS = [
   { name: "amc_a4_list_projects", description: "List the A4 Forge projects this identity may read (read-only)", input: "{ workspace?: string }" },
@@ -92,10 +93,7 @@ function refusal(name: string, status: number, code: string, message: string): R
 
 /** The router's sendError classification, so a stored row that no longer parses is an integrity failure and nothing else leaks raw. */
 function refusalFor(name: string, error: unknown): Refusal {
-  if (error instanceof ZodError) {
-    const issue = error.issues[0];
-    return refusal(name, 409, "A4_INTEGRITY_FAILED", `A stored A4 record does not parse${issue ? ` (${issue.path.join(".") || "row"}: ${issue.message})` : ""}.`);
-  }
+  if (error instanceof ZodError) return refusal(name, 409, "A4_INTEGRITY_FAILED", A4_UNPARSED_RECORD);
   if (error instanceof A4BlobError) return refusal(name, error.code === "VAULT_LOCKED" ? 423 : error.code === "SECRET_SCAN_REFUSED" ? 400 : 409, error.code, error.message);
   const tagged = error as { status?: unknown; code?: unknown } | null;
   if (error instanceof Error && typeof tagged?.status === "number" && typeof tagged.code === "string") return refusal(name, tagged.status, tagged.code, error.message);
@@ -149,13 +147,19 @@ function sessionPrincipal(workspace: string, pathname: string, method: "GET" | "
   if (!tokenFile) return null;
   let read: ReturnType<typeof readNativeApprovalSession>;
   try {
-    read = readNativeApprovalSession(workspace, tokenFile);
+    read = readNativeApprovalSession(workspace, tokenFile, "a4_comment");
   } catch (error) {
     // An open error names the file; only the token checks' own messages pass through.
     const reason = error instanceof Error && (error as NodeJS.ErrnoException).code === undefined ? error.message : "The session token file could not be opened";
     throw new A4StoreError(401, "A4_SESSION_REQUIRED", `${reason}. Run \`amc approvals login\` for a new token file.`);
   }
   const actor = read.payload;
+  // Only a comment-scoped credential: Studio admits it for A4 reads and comments and nothing else, so the agent host
+  // holding this file cannot decide an approval or reach another route with it (P1-64 follow-up).
+  if (actor.scope !== "a4_comment") {
+    throw new A4StoreError(403, "A4_SESSION_NOT_COMMENT_SCOPED", `The ${A4_SESSION_TOKEN_ENV} session is a full Studio session. `
+      + "Log in with `amc approvals login --a4-comment-only` for a credential Studio admits only for A4 reads and comments.");
+  }
   let verified: ReturnType<typeof listVerifiedUsers>;
   try {
     verified = listVerifiedUsers(workspace);
@@ -193,14 +197,6 @@ const readinessAt = (ctx: Ctx, state: ReturnType<typeof loadA4State>, stage: A4S
 /** This process's signing probe is not READY: always, since it never holds the vault. */
 const signingHere = (readiness: ReturnType<typeof readinessAt>): boolean =>
   readiness.items.some((item) => item.id === "signing.available" && item.status !== "READY");
-
-/** `amc.a4-project/v1`, as the router's projectView builds it. */
-const projectView = (row: A4ProjectRow, members: readonly A4Member[], readiness: A4ProjectV1["readiness"]): A4ProjectV1 => ({
-  schema: "amc.a4-project/v1", projectId: row.project_id, workspaceId: row.workspace_id, agentId: row.agent_id, name: row.name, stage: row.stage,
-  step: row.step, hold: row.hold === 1, holdReason: row.hold_reason, revisionNo: row.revision_no, headSeq: row.head_seq, headDigest: row.head_digest,
-  deployedReleaseId: row.deployed_release_id, baseReleaseId: row.base_release_id, createdByKey: row.created_by_key, createdTs: row.created_ts,
-  updatedTs: row.updated_ts, members: [...members], readiness
-});
 
 async function a4Tool(host: Host, name: string, workspace: string | undefined, pathname: string, method: "GET" | "POST",
   handle: (ctx: Ctx) => ToolResult | Promise<ToolResult>): Promise<ToolResult> {
@@ -294,7 +290,7 @@ export function registerA4Tools(server: McpServer, host: Host): void {
       // Studio's route checks membership, dedupes the clientRequestId, writes the encrypted blob and signs the transition.
       const baseUrl = localStudioUrl(ctx.store.workspace);
       const { status, body } = await createA4Client({ baseUrl, session: ctx.session, timeoutMs: STUDIO_TIMEOUT_MS }).comment(args.projectId,
-        { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId }).catch((error: unknown) => {
+        { body: args.body, cardId: args.cardId, inReplyTo: args.inReplyTo ?? null, clientRequestId: args.clientRequestId, via: "mcp" }).catch((error: unknown) => {
         throw studioFailure(error, baseUrl);
       });
       // Missing data never reads as recorded: a success names this project and a seq, and a refusal carries its error.

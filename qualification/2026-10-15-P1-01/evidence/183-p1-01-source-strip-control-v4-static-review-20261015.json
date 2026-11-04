@@ -1,0 +1,87 @@
+{
+  "schema": "amc-private-p1-01-source-strip-control-v4-static-review/1",
+  "createdAt": "2026-10-15T08:39:14.760004+00:00",
+  "reviewer": "/root/native_race_static_review",
+  "driver": {
+    "path": "/private/tmp/p1-01-source-strip-control-v4-prepared-20261015.py",
+    "bytes": 11064,
+    "sha256": "01931c4fd626984a21946ed5276df8eed94d7ab716052509c9f67dea7ea4cb59"
+  },
+  "previousDriver": {
+    "path": "/private/tmp/p1-01-source-strip-control-v3-prepared-20261015.py",
+    "bytes": 10086,
+    "sha256": "2bfcf3374a0d3cd26388d334c887c27cae0c2957ff7d09a9b66eeba2c76fa5b5"
+  },
+  "blockingFindings": [],
+  "method": "Read complete exact v3-to-v4 diff, current package build script, full bundle-kernel source and unchanged kernel source. Read/hash only the frozen prior failed-C kernel JS/TS plus current accepted parent bundle. No runtime, parser, imports, build, mutation or restoration by reviewer.",
+  "deltaAssessment": [
+    "The one added block runs only after real tsc exit0 and successful group ESRCH, before mutant probes or restoration. No compiler diagnostic is ignored.",
+    "It requires exact known 1003-byte compiler-thin SHA256 7960e3a179f94a8ed511eb24176d49da67e8e162919e71878b4cc14c514e14d1. Frozen prior compiler output, prior kernel TS and current parent kernel TS all match those bytes.",
+    "The thin compiler artifact is retained outside the private source copy; the accepted parent bundle is copied back and both hashes recorded. Full manifest verification then still requires the bundle to equal accepted compiled bytes and permits only receipt.ts, receipt.js and existing .d.ts changes. All other unexpected JavaScript deltas remain failures.",
+    "Normal package build runs tsc, copy-assets, bundle-kernel and api:build. bundle-kernel intentionally replaces this thin private @amc/core and @amc/cordis wrapper. Preserving the already accepted bundle as a constant is source-derived, not an arbitrary output exception.",
+    "The before/mutant/restored receipt and schema children all see the same accepted kernel bundle. The changed public receipt module is still required to differ and its source pin is checked."
+  ],
+  "kernelEvidence": {
+    "thinBytes": 1003,
+    "thinSha256": "7960e3a179f94a8ed511eb24176d49da67e8e162919e71878b4cc14c514e14d1",
+    "parentAcceptedBundleBytes": 394335,
+    "parentAcceptedBundleSha256": "501cb8767e687f8b029ae872ab9583c115de89f4224a848bb0ca49d2a7a4d726"
+  },
+  "meaningLimits": [
+    "This is a narrow source-to-compiled public-contract guard control with a held-constant kernel artifact. It is not a fresh complete mutant npm build, bundle regeneration, installed/packed CLI or kernel-route qualification.",
+    "Literal passthrough compilation failure remains separate and unresolved; the strip control cannot be counted as literal acceptance completion. V3 remains unexecuted per root instruction.",
+    "Prior v3 ownership/process/restoration gates and unbounded child-wait/unknown-PGID/borrowed-dependency/manifest-membership limits are unchanged.",
+    "Actual compiler result, retained thin and mutant bytes, diagnostic attribution, ESRCH and preservation require a later independent actual review."
+  ],
+  "futureBaseAbsentAtReview": false,
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-v4-prepared-20261015.py",
+      "bytes": 11064,
+      "sha256": "01931c4fd626984a21946ed5276df8eed94d7ab716052509c9f67dea7ea4cb59"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-v3-prepared-20261015.py",
+      "bytes": 10086,
+      "sha256": "2bfcf3374a0d3cd26388d334c887c27cae0c2957ff7d09a9b66eeba2c76fa5b5"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-strip-control-v3-static-review-20261015.json",
+      "bytes": 3752,
+      "sha256": "176a627d6fc7f4a5328b6cb7052c8627622e14fc29688a46a8eda8cb70db5412"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/scripts/bundle-kernel.mjs",
+      "bytes": 5519,
+      "sha256": "2a7e9124d730a95d43df9ef2ca527d93dae6af74281fc15627b82661493b1597"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/src/kernel/amcRuntime.ts",
+      "bytes": 1003,
+      "sha256": "7960e3a179f94a8ed511eb24176d49da67e8e162919e71878b4cc14c514e14d1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-01-qualification/AgentMaturityCompass/dist/kernel/amcRuntime.js",
+      "bytes": 394335,
+      "sha256": "501cb8767e687f8b029ae872ab9583c115de89f4224a848bb0ca49d2a7a4d726"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-control-20261015/copy/src/kernel/amcRuntime.ts",
+      "bytes": 1003,
+      "sha256": "7960e3a179f94a8ed511eb24176d49da67e8e162919e71878b4cc14c514e14d1"
+    },
+    {
+      "path": "/private/tmp/p1-01-source-control-20261015/copy/dist/kernel/amcRuntime.js",
+      "bytes": 1003,
+      "sha256": "7960e3a179f94a8ed511eb24176d49da67e8e162919e71878b4cc14c514e14d1"
+    }
+  ],
+  "runtimeAuthorizedByThisReview": false,
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true
+}

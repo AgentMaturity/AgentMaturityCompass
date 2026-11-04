@@ -1,0 +1,40 @@
+{
+  "schema": "p125pc-preservation-after-controls/1",
+  "at": "2026-10-17T02:05:37.432645+00:00",
+  "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout",
+  "all175BytesAndPhysicalPinsExact": true,
+  "twelveOldAndDistinctThirteenthNativeExact": true,
+  "all102SourceFreshPhysicalPairsAnd23CompiledPairsExact": true,
+  "bothSourceFreshCleanIndexesEmpty": true,
+  "heldRHead18RowsIndexExact": true,
+  "noMutationOfOriginalSourceProductionOrCompiledOrNative": true,
+  "actualChecks": {
+    "selectedPathsEachRoot": 102,
+    "compiledPairs": 23,
+    "protectedInputs": 175,
+    "nativePhysicalPins": 13,
+    "allSelectedBytesAndPhysicalPinsExact": true,
+    "heldRHeadStatusIndexExact": true,
+    "runtimeProtectedInputsPin": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59",
+      "dev": 16777231,
+      "inode": 543919887,
+      "nlink": 1
+    },
+    "prechangeProtectedInputsPin": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac",
+      "dev": 16777231,
+      "inode": 543919520,
+      "nlink": 1
+    },
+    "oldOneTestSourcePreservedAndOnlyOneExplicitSuccessor": true
+  }
+}

@@ -1,0 +1,207 @@
+{
+  "schema": "p139-two-causal-control-design/1",
+  "scope": "Private exact patch and witness design only; root alone admits, applies, executes and restores.",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "sourceHead": "81758acea6c861a00a27f48475a93a79307a29d5",
+  "operators": [
+    {
+      "operator": "skip-issuer-equality",
+      "targetRel": "src/mcp/oauth/discovery.ts",
+      "originalSource": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/mcp/oauth/discovery.ts",
+        "bytes": 13603,
+        "sha256": "18a60455c4b13609710bf0638f5ab316bba4d4d678bb04bca8c2fd5ba58fb4f0"
+      },
+      "frozenOriginal": {
+        "path": "/private/tmp/p1-39-mcp-qualification-20261016/causal-control-design/originals/src/mcp/oauth/discovery.ts",
+        "bytes": 13603,
+        "sha256": "18a60455c4b13609710bf0638f5ab316bba4d4d678bb04bca8c2fd5ba58fb4f0"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-39-mcp-qualification-20261016/causal-control-design/skip-issuer-equality.patch",
+        "bytes": 732,
+        "sha256": "2058910d17b99af6ababcebafb52f93f140623d4ba9525f8612dde0abb9c0ff5"
+      },
+      "matchExactlyOnce": true,
+      "beforeFragment": {
+        "utf8": "    if (!document || typeof document !== \"object\" || document.issuer !== issuer) {\n",
+        "bytes": 83,
+        "sha256": "cd5421c8d16f93753bfc15d29b38af2635798b109c98e4d6b706f6b5a163da15"
+      },
+      "replacementFragment": {
+        "utf8": "    if (!document || typeof document !== \"object\") {\n",
+        "bytes": 53,
+        "sha256": "103f3399782e0df5b6190a25628ed1affb48887b0d25352d410aa760b8d11afc"
+      },
+      "expectedPostApplySource": {
+        "bytes": 13573,
+        "sha256": "d8ab3e1f0dabb06a52098eee544d7a37fee6403e9ea12c6b0abe80ca79981a02"
+      },
+      "sourceOnly": true,
+      "compiledOutputsRebuilt": false,
+      "applied": false,
+      "executed": false
+    },
+    {
+      "operator": "allow-first-tools-call-reissue",
+      "targetRel": "src/mcp/nativeMcpHttpTransport.ts",
+      "originalSource": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/mcp/nativeMcpHttpTransport.ts",
+        "bytes": 41548,
+        "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b"
+      },
+      "frozenOriginal": {
+        "path": "/private/tmp/p1-39-mcp-qualification-20261016/causal-control-design/originals/src/mcp/nativeMcpHttpTransport.ts",
+        "bytes": 41548,
+        "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-39-mcp-qualification-20261016/causal-control-design/allow-first-tools-call-reissue.patch",
+        "bytes": 837,
+        "sha256": "87160f888e507af1c0781129fb6a3ad974f2392e0e41373b922a7d8b9b608c62"
+      },
+      "matchExactlyOnce": true,
+      "beforeFragment": {
+        "utf8": "          if (reissuable && attempt === 0) continue;\n",
+        "bytes": 53,
+        "sha256": "1d15b39bf5d84f0e4d05b07d67ee13ae683187c6a552272d7872fe48e4eac037"
+      },
+      "replacementFragment": {
+        "utf8": "          if ((reissuable || rpc.method === \"tools/call\") && attempt === 0) continue;\n",
+        "bytes": 86,
+        "sha256": "f25ab03b0330ecdcfc57549f01ce9d24eacc450f87a88875f32ad577acad5b79"
+      },
+      "expectedPostApplySource": {
+        "bytes": 41581,
+        "sha256": "40ab482595c38beef71d12122a1d03929f9cd649abbe31e661404e5d6b28ad6e"
+      },
+      "sourceOnly": true,
+      "compiledOutputsRebuilt": false,
+      "applied": false,
+      "executed": false
+    }
+  ],
+  "allowedControlFailureIdentities": {
+    "skip-issuer-equality": [
+      {
+        "file": "tests/mcp/mcpOauth.test.ts",
+        "suite": "P1-39 first local OAuth qualification",
+        "name": "refuses a literal issuer mismatch after a matching issuer positive",
+        "fullName": "P1-39 first local OAuth qualification > refuses a literal issuer mismatch after a matching issuer positive"
+      }
+    ],
+    "allow-first-tools-call-reissue": [
+      {
+        "file": "tests/mcp/mcp20260728.test.ts",
+        "suite": "P1-39 governed stateless MCP public flow",
+        "name": "a finite broken tools/call response is not replayed and disposes its grant",
+        "fullName": "P1-39 governed stateless MCP public flow > a finite broken tools/call response is not replayed and disposes its grant"
+      },
+      {
+        "file": "tests/mcp/mcp20260728.test.ts",
+        "suite": "P1-39 governed stateless MCP public flow",
+        "name": "a broken tools/call is recorded with strict typed unknown evidence",
+        "fullName": "P1-39 governed stateless MCP public flow > a broken tools/call is recorded with strict typed unknown evidence"
+      }
+    ]
+  },
+  "witnesses": [
+    {
+      "operator": "skip-issuer-equality",
+      "identity": {
+        "file": "tests/mcp/mcpOauth.test.ts",
+        "suite": "P1-39 first local OAuth qualification",
+        "name": "refuses a literal issuer mismatch after a matching issuer positive",
+        "fullName": "P1-39 first local OAuth qualification > refuses a literal issuer mismatch after a matching issuer positive"
+      },
+      "primary": {
+        "line": 220,
+        "assertion": "expect(mismatch.failed).toBe(true);",
+        "requiredPriorReached": {
+          "line": 219,
+          "assertion": "expect(matching.issuer === f.issuer).toBe(true);"
+        }
+      },
+      "mechanism": "The first matching metadata positive and mismatching metadata both retain valid object/endpoints/S256. Only the literal trailing-slash issuer mismatch ceases to refuse. The function still returns its requested issuer argument, so a downstream issuer-field check cannot substitute for the refusal witness.",
+      "actualEvidenceToReview": "Read the original assertion failure and retained literal-issuer-mismatch public facts: matchingIssuer, mismatchFailed, classification/fixed diagnostic and the two metadata request paths. Setup, fetch, object or S256 refusal is not this causal witness.",
+      "laterAssertionsMaskedAtPrimary": [
+        "mismatch.error instanceof NativeMcpOAuthRefused",
+        "mismatchFixedDiagnostic",
+        "exact final request transcript assertion"
+      ],
+      "independentPreservation": "RFC9207 response iss/state validation and S256 policy are unchanged; their failures are not blanket-allowed."
+    },
+    {
+      "operator": "allow-first-tools-call-reissue",
+      "identity": {
+        "file": "tests/mcp/mcp20260728.test.ts",
+        "suite": "P1-39 governed stateless MCP public flow",
+        "name": "a finite broken tools/call response is not replayed and disposes its grant",
+        "fullName": "P1-39 governed stateless MCP public flow > a finite broken tools/call response is not replayed and disposes its grant"
+      },
+      "primary": {
+        "line": 358,
+        "assertion": "expect(f.effectCount()).toBe(1);"
+      },
+      "mechanism": "The owned endpoint increments the effect before its first finite comment-only SSE EOF. EOF becomes NativeMcpReconnectTransient. The widened catch gate admits a first-attempt tools/call reissue, while the retained attempt===0 limit prevents unbounded reissues. The existing second response is a valid matching JSON-RPC complete result with its new wire id. No fixture or transport response is altered.",
+      "actualEvidenceToReview": "Require the actual retained ordered tools/call HTTP rows, first finite-sse-eof and later json response, differing request ids, real effects and original first failure frame. A hang, forced cleanup, setup failure or malformed second response is not replay proof.",
+      "laterAssertionsMaskedAtPrimary": [
+        "single tools/call count",
+        "first EOF row assertion",
+        "non-OK outcome and typed unknown diagnostics",
+        "recorded call/result evidence assertions",
+        "grant disposed assertion",
+        "subsequent denied call/no-dispatch assertions"
+      ]
+    },
+    {
+      "operator": "allow-first-tools-call-reissue",
+      "identity": {
+        "file": "tests/mcp/mcp20260728.test.ts",
+        "suite": "P1-39 governed stateless MCP public flow",
+        "name": "a broken tools/call is recorded with strict typed unknown evidence",
+        "fullName": "P1-39 governed stateless MCP public flow > a broken tools/call is recorded with strict typed unknown evidence"
+      },
+      "primary": {
+        "line": 375,
+        "assertion": "expect(f.toolRequests()).toHaveLength(1);"
+      },
+      "mechanism": "This separate real EOF fixture also counts tool POSTs before its strict typed uncertainty assertions. A replay may stop this case at its earlier request-count assertion.",
+      "actualEvidenceToReview": "Use actual first frame and retained request/effect rows. The later strict typed metadata assertion must be described as masked when the request-count witness fails first.",
+      "laterAssertionsMaskedAtPrimary": [
+        "assertRecordedPair(f, 0, outcome)",
+        "result.meta.outcome === TOOL_OUTCOME_UNKNOWN",
+        "outcome.outcome === TOOL_OUTCOME_UNKNOWN",
+        "content contains TOOL_OUTCOME_UNKNOWN"
+      ]
+    }
+  ],
+  "failureClassification": "Allowed identities are a finite review boundary, not predicted failure counts or preapproved outcomes. Root must classify every actual failure and first frame. Any other identity, setup, guard, endpoint, cleanup, observer, timeout, late/unhandled error or process failure is unexplained until separately reviewed; it gains no causal credit. Preserve raw first failures and masked later assertions without relabeling them as executed failures.",
+  "preservedNegatives": [
+    "Original positive governed stateless call",
+    "One reissue and exhausted reissue for tools/list",
+    "Invalid or input_required resultType cases (their received results are not the transient EOF gate)",
+    "Wrong response id refusal",
+    "Untrusted TOOL_OUTCOME_UNKNOWN marker remains ERROR",
+    "OAuth state/iss and S256 checks",
+    "Legacy regressions and exact modern pin refusal"
+  ],
+  "restoreProtocol": [
+    "Root must first admit the exact source authority/working root and actual frozen-runner baseline; these private patches provide no ownership, freeze, quality or fresh-source waiver.",
+    "Bind both target originals and all protected source/test/runner/native/compiled/halt pins before applying one operator. Keep an exclusive original record and require exact original target bytes and one match. Do not apply both operators together.",
+    "Apply only the named one-line source replacement. Require the expected post-apply full-source byte count/hash; all other selected/protected bytes, tests, compiler output and guards remain exact. Do not rebuild or compile the mutant, or claim compiled-child control sensitivity.",
+    "Run only root-admitted unchanged frozen source tests. Observe actual raw reporter identities/hooks, public fixture facts, full body/cleanup errors, first sensitive assertion, native resource closure, process exit and post-exit facts. Never introduce signals, parser shortcuts, deadline extensions or fixture adjustments to manufacture a red result.",
+    "Before restore, root must read and record the actual original failures/public evidence and masking. Do not infer every later assertion failed, do not use an assertion text match in place of a reached semantic witness and do not assert predicted aggregate pass/fail counts.",
+    "Restore only from the exclusive frozen original after checking that the target is the exact expected mutant and no other writer changed it. Guard regular-file/non-symlink identity and descriptors before overwrite; verify restored full bytes/hash and preserved protected pins.",
+    "Close the root-owned original-source rerun after each restored operator using the unchanged frozen runner and actual current test identities. Check full hooks/cleanup/process and late evidence. Retain both red and original records separately. Any restoration or original-run failure remains open.",
+    "Only after exact restoration and its completed original-source rerun may root admit the next operator. This design fabricates no future apply/restore record, count, green result, quality waiver, formal Done or release evidence."
+  ],
+  "allReadsFinished": true,
+  "blockers": [],
+  "patchesApplied": false,
+  "mutantSourcesStored": false,
+  "compiledOrRuntimeExecuted": false,
+  "checkoutOrIndexWrites": false,
+  "qualificationCredit": false,
+  "predictedAggregateCounts": false
+}

@@ -27,6 +27,13 @@ const planArgs = z.object({
 export type PlanPayload = z.infer<typeof planArgs>;
 export type PlanRecord = SessionListHeader & PlanPayload;
 
+export function renderPlan(payload: PlanPayload): string {
+  return [
+    ...(payload.summary ? [payload.summary] : []),
+    ...payload.steps.map((step, index) => `${index + 1}. [${step.status}] ${step.title}`)
+  ].join("\n") || "[amc: plan is empty]";
+}
+
 const STORE: SessionListStore = { name: "plan", kind: "amc.native.plan", fileName: "plan.json", auditType: "NATIVE_PLAN" };
 
 export function planTool(options: { readonly sessionId: SessionIdSource; readonly record: NativeReceiptRecorder }): ToolDefinition {
@@ -55,10 +62,7 @@ export function planTool(options: { readonly sessionId: SessionIdSource; readonl
       additionalProperties: false
     },
     argsSchema: planArgs,
-    render: (payload) => [
-      ...(payload.summary ? [payload.summary] : []),
-      ...payload.steps.map((step, index) => `${index + 1}. [${step.status}] ${step.title}`)
-    ].join("\n") || "[amc: plan is empty]"
+    render: renderPlan
   }, options.sessionId, options.record);
 }
 

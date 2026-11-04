@@ -1,0 +1,573 @@
+{
+  "schema": "p125k-explicit-public-record-audit/1",
+  "at": "2026-10-16T23:31:39.938060+00:00",
+  "phase": "p125k-source-combined",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "expectedPhaseState": "green",
+  "outcome": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-source-combined-outcome.json",
+    "bytes": 5868,
+    "sha256": "d2aafa5affb0220bf3c68b90785d16a7b28197d110f73251c7aa97704509b8ad"
+  },
+  "grantPublicCount": 4,
+  "checkpointPublicCount": 2,
+  "children": 22,
+  "explicitChildStreamHashCount": 44,
+  "closedSockets": 6,
+  "closedLedgerOwners": 9,
+  "grantRows": [
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/public-evidence.json",
+        "bytes": 12987,
+        "sha256": "44217bfdca6f39a1bb4773b012c6f353dd99cafb9f576dab57bc18685d940184"
+      },
+      "caseId": "FIRST-GRANT",
+      "bodyFailed": false,
+      "childCount": 6,
+      "requestPaths": [
+        "/good-first"
+      ],
+      "reply": {
+        "path": "/good-first",
+        "querySha256": "ad72aba764024e9fdc4c72ee537f85ba8bb1e291ea96e5e5df36eb52456f6787",
+        "responseSha256": "163d3a96a528e5502e281f65b1cea8357e66d6e5ad145ae0a1fbedad1e314df5",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-2.stderr",
+          "bytes": 3059,
+          "sha256": "c5a8a8827a2e10eccebdcd49e5642209626e90fc7f2fb7aa769d047a6959524b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-3.stderr",
+          "bytes": 1665,
+          "sha256": "45a579957e28c2f3750785878b40f08584bcde7696ab5be1d57fb213a6f86073"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-5.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-5.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-6.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-BYIcro/child-6.stderr",
+          "bytes": 120,
+          "sha256": "859f607b6d126c6011e9234da63136f5370eabceacb34b9df332afa534114ef5"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 1,
+      "cleanupErrors": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/public-evidence.json",
+        "bytes": 13549,
+        "sha256": "506946e30ba5b40d05088b76a7c28cd21aee6f6d6492a4998cc1920189fe7e4c"
+      },
+      "caseId": "HTTP500-THEN-GRANT",
+      "bodyFailed": false,
+      "childCount": 6,
+      "requestPaths": [
+        "/http-first",
+        "/good-second"
+      ],
+      "reply": {
+        "path": "/good-second",
+        "querySha256": "dc9ac12b2e58d215775ced607e41ae04f56f5c591bd72be9b6e43d6d9def463a",
+        "responseSha256": "6077347af2f48d70df3a39f7d9e00fb44b331bf3cc707daaa51f64850d188305",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-2.stderr",
+          "bytes": 1350,
+          "sha256": "57f9489daab25f62df39bcce2108e2bdaf755839a007bc8cacfc1016f0b98f80"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-3.stderr",
+          "bytes": 1237,
+          "sha256": "d6de93b71b4ca1188519149f476cb9eb38f3734518a36faabfcd6e1a6cc1f758"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-5.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-5.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-6.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-owocYo/child-6.stderr",
+          "bytes": 120,
+          "sha256": "7aed672ce598ef8e6196a60e4f200bbaa4c212c7c6a1bc8d8a977d549833d9f8"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 2,
+      "cleanupErrors": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/public-evidence.json",
+        "bytes": 12896,
+        "sha256": "fa449f4deb970008476f16a0b99333078127084e90af45fabeac0984e83b64ab"
+      },
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "bodyFailed": false,
+      "childCount": 6,
+      "requestPaths": [
+        "/http-first",
+        "/checkpoint-good"
+      ],
+      "reply": {
+        "path": "/checkpoint-good",
+        "querySha256": "2f21e8c3a21d19a151e82539b1d97b428fe6aa7f0b5c801e849500beef3569f9",
+        "responseSha256": "67bbbb572e8b48d96b822530dddfb4f11153e6fc3e1a07783c2da74f007365c4",
+        "queryBoundOpenSslVerified": true,
+        "amcVerified": true,
+        "refusalCode": null
+      },
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-2.stderr",
+          "bytes": 742,
+          "sha256": "c1b9875cf022f2f81f0f3167a36cb128874da904e974db0bcea73d5f59a37207"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-3.stderr",
+          "bytes": 1547,
+          "sha256": "e7bfb7d76d33366a7459acda6723aad8b6c4c066399826c5961910ca9181a5dd"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-5.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-5.stderr",
+          "bytes": 354,
+          "sha256": "af8fd3f32be122a12b698ccddc109a83a4a8d01b1362d3681821b420b593ec1b"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-6.stdout",
+          "bytes": 17,
+          "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/child-6.stderr",
+          "bytes": 120,
+          "sha256": "a43ff7c14d454e27cc5dc31409df89d69cc305159c886b3f8d9cd4e0a1d14b78"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 2,
+      "cleanupErrors": 0
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/public-evidence.json",
+        "bytes": 8236,
+        "sha256": "02fb76b36466c8ee9bc217d0d532f5128cadf305b23cd9847222c0d6acb78a79"
+      },
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "bodyFailed": false,
+      "childCount": 4,
+      "requestPaths": [
+        "/http-first"
+      ],
+      "reply": null,
+      "childrenAndExplicitStreamPins": [
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/child-1.stdout",
+          "bytes": 63,
+          "sha256": "50bc8ea637df53e57f6a77e21416ec9a320b8123447130cd1be83698a4863c29"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/child-1.stderr",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/child-2.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/child-2.stderr",
+          "bytes": 1930,
+          "sha256": "117ec20fc4cf0e7de42f8d9b8dfa65d969d8891ad651b9ec6f1ad3782a89d31e"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/child-3.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/child-3.stderr",
+          "bytes": 1096,
+          "sha256": "11096a7d6921877fa7be9b702c4cb2703220e0d4c54c87964fe8f332d5af5b89"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/child-4.stdout",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/child-4.stderr",
+          "bytes": 80,
+          "sha256": "3ec4f8e62fa9a3da3f39346845fafc0b553e6a7d82b0444bbddf87af3c881fc3"
+        }
+      ],
+      "allChildrenNatural0AndClosed": true,
+      "socketCount": 1,
+      "cleanupErrors": 0
+    }
+  ],
+  "checkpointRows": [
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/checkpoint-public-evidence.json",
+        "bytes": 10847,
+        "sha256": "8d5184a9808014aa618b2f10c567c846ece5daa8edcfeb74caf790da41d6889c"
+      },
+      "caseId": "CHECKPOINT-PENDING-GRANT",
+      "bodyFailed": false,
+      "bodyErrorName": null,
+      "ledgerOwners": 5,
+      "allCleanupEnvironmentNativeImmutableExact": true,
+      "trust": {
+        "mode": "pinned",
+        "signatureVerifiedListCount": 1,
+        "rootKeyId": "3d3fbb5284eeb4241e4d30943d73093dd25e72f031ed6dbfc893e10fc82e4986",
+        "monitorFingerprint": "1d649594027faf8823f3627643f2bf42fbedf530dd7c375dacb5364bc791f9e3",
+        "tsaLoaded": true,
+        "signedList": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/home/checkpoint-trust-list.json",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-fVQOMM/home/checkpoint-trust-list.json",
+          "bytes": 1993,
+          "sha256": "d165e3590bc28b24e187b85369634744d8095c3b7fae5c2515f2dabbf1465cc9",
+          "dev": 16777231,
+          "inode": 543659459,
+          "nlink": 1
+        }
+      },
+      "initialLedger": {
+        "ok": true,
+        "chain": true,
+        "governance": true,
+        "anchored": true,
+        "errors": 0,
+        "seedEventId": "070ad053-7b3f-4399-a1ab-f33a375bcf47",
+        "sessionId": "93bcc364-9b90-4b71-959b-4d73d559c047",
+        "eventCount": 1
+      },
+      "checkpointFacts": {
+        "pending": {
+          "result": {
+            "sequence": 1,
+            "status": "pending",
+            "failures": [
+              "checkpoint-tsa: HTTP 500"
+            ]
+          },
+          "signedCheckpoint": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/.amc/time/checkpoints/1.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/.amc/time/checkpoints/1.json",
+            "bytes": 704,
+            "sha256": "a997728e7f15db1ed7e7c4bbbb997ad469a5f6532d43c8316c6b4fe5076e8691",
+            "dev": 16777231,
+            "inode": 543659464,
+            "nlink": 1
+          },
+          "signatureValid": true,
+          "eventCount": 1,
+          "tokenAbsent": true,
+          "timeline": [
+            {
+              "sequence": 1,
+              "genTime": null,
+              "detail": null,
+              "status": "pending"
+            }
+          ]
+        },
+        "completed": {
+          "result": [
+            {
+              "sequence": 1,
+              "status": "timestamped",
+              "failures": []
+            }
+          ],
+          "sequenceCount": 1,
+          "checkpointBytesUnchanged": true,
+          "token": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/.amc/time/checkpoints/1.tsr",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-8YocFY/.amc/time/checkpoints/1.tsr",
+            "bytes": 2298,
+            "sha256": "8c7f265b0acf11721bdc0cd5c37d1ed1ccdd6bd402da38db1a82b2b4eef0267b",
+            "dev": 16777231,
+            "inode": 543659472,
+            "nlink": 1
+          },
+          "storedTokenMatchesIndependentGrant": true,
+          "attested": {
+            "genTime": "2026-10-16T23:27:30.000Z",
+            "anchorId": "amc-p125-grant-test-root",
+            "messageImprint": {
+              "hashAlgorithm": "sha256",
+              "digest": "adb54be651d1a8f0e48a95a1f10a72aa9af4da3ac7c6af9573c06bfc9f8c2b98"
+            },
+            "revocationChecked": false
+          },
+          "checkpointRows": [
+            {
+              "id": "14c16375-c55c-479a-8539-8cae9e326fb8",
+              "eventHash": "a11209ac67ab64c30c7009d376cea52f003dd63685ccda10018e9d7312bf5bb0",
+              "meta": {
+                "checkpointSequence": 1,
+                "checkpointSha256": "adb54be651d1a8f0e48a95a1f10a72aa9af4da3ac7c6af9573c06bfc9f8c2b98",
+                "tokenSha256": "8c7f265b0acf11721bdc0cd5c37d1ed1ccdd6bd402da38db1a82b2b4eef0267b"
+              }
+            }
+          ],
+          "ledger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0
+          },
+          "timeline": [
+            {
+              "sequence": 1,
+              "genTime": "2026-10-16T23:27:30.000Z",
+              "detail": null,
+              "status": "timestamped"
+            }
+          ],
+          "seedIndex": 0,
+          "seedTime": {
+            "time": {
+              "claimedAt": "2026-10-16T23:27:30.188Z",
+              "attested": {
+                "kind": "rfc3161",
+                "tsa": {
+                  "subject": "CN=AMC TSA GRANT SIGNER TEST ONLY",
+                  "certSha256": "a95c7b08571aef44fb01056b76f04474e9b3c38b0f395c31d0fdc0f0e43145af",
+                  "anchorId": "amc-p125-grant-test-root"
+                },
+                "genTime": "2026-10-16T23:27:30.000Z",
+                "accuracyMs": null,
+                "policyOid": "1.2.3.4.1",
+                "serialNumber": "2",
+                "messageImprint": {
+                  "hashAlgorithm": "sha256",
+                  "digest": "adb54be651d1a8f0e48a95a1f10a72aa9af4da3ac7c6af9573c06bfc9f8c2b98"
+                },
+                "tokenDerB64": "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",
+                "revocationChecked": false
+              },
+              "basis": "attested-upper-bound",
+              "window": {
+                "notBefore": null,
+                "notAfter": "2026-10-16T23:27:30.000Z"
+              }
+            },
+            "findings": []
+          }
+        }
+      }
+    },
+    {
+      "public": {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-cvBhs9/checkpoint-public-evidence.json",
+        "bytes": 5098,
+        "sha256": "3821a53a5f21ca5226a209bbaf2dde71cef6d04fbceadb7489a68c88ead46c39"
+      },
+      "caseId": "CHECKPOINT-REQUIRED-REFUSAL",
+      "bodyFailed": false,
+      "bodyErrorName": null,
+      "ledgerOwners": 4,
+      "allCleanupEnvironmentNativeImmutableExact": true,
+      "trust": {
+        "mode": "pinned",
+        "signatureVerifiedListCount": 1,
+        "rootKeyId": "d5bae57121c30203c71607b403be8573864d702b9d3cf1c2409652426d18e595",
+        "monitorFingerprint": "42fab6a2d88b854d8aa1477999cfe4149dd357386b9b21249578c2a64a73aac4",
+        "tsaLoaded": true,
+        "signedList": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/home/checkpoint-trust-list.json",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-private-brtKkz/home/checkpoint-trust-list.json",
+          "bytes": 1993,
+          "sha256": "f2cc2cd2e5f25c153517f4c7bc0690ee1fc342fd6f8918e7dbd98c036067bb5b",
+          "dev": 16777231,
+          "inode": 543659627,
+          "nlink": 1
+        }
+      },
+      "initialLedger": {
+        "ok": true,
+        "chain": true,
+        "governance": true,
+        "anchored": true,
+        "errors": 0,
+        "seedEventId": "815e6cd4-c10b-4cbe-aaba-18a9af24db5e",
+        "sessionId": "fac01b34-e14e-4f4a-a76a-0b04a408394f",
+        "eventCount": 1
+      },
+      "checkpointFacts": {
+        "required": {
+          "rejected": true,
+          "rejectionName": "Error",
+          "expectedRejection": true,
+          "signatureValid": true,
+          "tokenAbsent": true,
+          "sequenceCount": 1,
+          "signedCheckpoint": {
+            "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-cvBhs9/.amc/time/checkpoints/1.json",
+            "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p125-grant-workspace-cvBhs9/.amc/time/checkpoints/1.json",
+            "bytes": 704,
+            "sha256": "9d82189e71a27519777018da40ee21e38e437d58f5d5b27486a001853bf038cc",
+            "dev": 16777231,
+            "inode": 543659632,
+            "nlink": 1
+          },
+          "eventCount": 1,
+          "checkpointRowCount": 0,
+          "ledger": {
+            "ok": true,
+            "chain": true,
+            "governance": true,
+            "anchored": true,
+            "errors": 0
+          },
+          "timeline": [
+            {
+              "sequence": 1,
+              "genTime": null,
+              "detail": null,
+              "status": "pending"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "noSigningRootTraversalOrKeyRead": true,
+  "noStreamPublication": true,
+  "boundedObservationNotUniversalIsolation": true
+}

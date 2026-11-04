@@ -1,0 +1,443 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 473,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/publicMethodology.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/fullDiagnostic.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/quickscoreShare.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/traceEvidenceMapper.test.ts"
+  ],
+  "testCount": 30,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "543349049",
+      "name": "tests/publicMethodology.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/publicMethodology.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "543349049_0",
+      "name": "tests/publicMethodology.test.ts public methodology manifest",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "543349049_0_0",
+      "name": "tests/publicMethodology.test.ts public methodology manifest publishes a deterministic public methodology id, version, and hash",
+      "fullName": "public methodology manifest publishes a deterministic public methodology id, version, and hash",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "543349049_0_1",
+      "name": "tests/publicMethodology.test.ts public methodology manifest renders auditor-readable methodology metadata",
+      "fullName": "public methodology manifest renders auditor-readable methodology metadata",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "543349049_0_2",
+      "name": "tests/publicMethodology.test.ts public methodology manifest binds the methodology manifest into diagnostic reports and markdown",
+      "fullName": "public methodology manifest binds the methodology manifest into diagnostic reports and markdown",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "543349049_1",
+      "name": "tests/publicMethodology.test.ts the release a bump supersedes stays verifiable",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "543349049_1_0",
+      "name": "tests/publicMethodology.test.ts the release a bump supersedes stays verifiable the immediately previous release resolves as historical, not unknown",
+      "fullName": "the release a bump supersedes stays verifiable the immediately previous release resolves as historical, not unknown",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1350613507",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/fullDiagnostic.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1350613507_0",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_0",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic getAllQuestions returns current default questions",
+      "fullName": "fullDiagnostic getAllQuestions returns current default questions",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_1",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic getQuestionsByLayer returns 5 layers in canonical order",
+      "fullName": "fullDiagnostic getQuestionsByLayer returns 5 layers in canonical order",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_2",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic layer question counts match expected totals",
+      "fullName": "fullDiagnostic layer question counts match expected totals",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_3",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic all layer questions sum to current default count",
+      "fullName": "fullDiagnostic all layer questions sum to current default count",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_4",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic scoreFullDiagnostic returns L0 with empty answers",
+      "fullName": "fullDiagnostic scoreFullDiagnostic returns L0 with empty answers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_5",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic scoreFullDiagnostic returns L5 when all answers are 5",
+      "fullName": "fullDiagnostic scoreFullDiagnostic returns L5 when all answers are 5",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_6",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic scoreFullDiagnostic computes correct layer averages",
+      "fullName": "fullDiagnostic scoreFullDiagnostic computes correct layer averages",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_7",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic recommendations are sorted by level ascending and capped at 5",
+      "fullName": "fullDiagnostic recommendations are sorted by level ascending and capped at 5",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_8",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic recommendations include howToImprove text",
+      "fullName": "fullDiagnostic recommendations include howToImprove text",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_9",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic clamps out-of-range scores",
+      "fullName": "fullDiagnostic clamps out-of-range scores",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_10",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic percentage thresholds map to correct levels",
+      "fullName": "fullDiagnostic percentage thresholds map to correct levels",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1350613507_0_11",
+      "name": "tests/diagnostic/fullDiagnostic.test.ts fullDiagnostic result shape matches FullDiagnosticResult interface",
+      "fullName": "fullDiagnostic result shape matches FullDiagnosticResult interface",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1553806797",
+      "name": "tests/diagnostic/quickscoreShare.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/quickscoreShare.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1553806797_0",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1553806797_0_0",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share generateShareableSummary",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1553806797_0_0_0",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share generateShareableSummary generates markdown with badge and table",
+      "fullName": "quickscore share generateShareableSummary generates markdown with badge and table",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1553806797_0_0_1",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share generateShareableSummary generates plain text summary",
+      "fullName": "quickscore share generateShareableSummary generates plain text summary",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1553806797_0_0_2",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share generateShareableSummary uses default agent name when not provided",
+      "fullName": "quickscore share generateShareableSummary uses default agent name when not provided",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1553806797_0_0_3",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share generateShareableSummary includes badge",
+      "fullName": "quickscore share generateShareableSummary includes badge",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1553806797_0_1",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share formatPostQuickscoreFlow",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1553806797_0_1_0",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share formatPostQuickscoreFlow shows current level and improvement path",
+      "fullName": "quickscore share formatPostQuickscoreFlow shows current level and improvement path",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1553806797_0_1_1",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share formatPostQuickscoreFlow lists top recommendations with why and how",
+      "fullName": "quickscore share formatPostQuickscoreFlow lists top recommendations with why and how",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1553806797_0_1_2",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share formatPostQuickscoreFlow handles L5 with no recommendations",
+      "fullName": "quickscore share formatPostQuickscoreFlow handles L5 with no recommendations",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1553806797_0_1_3",
+      "name": "tests/diagnostic/quickscoreShare.test.ts quickscore share formatPostQuickscoreFlow includes share CTA",
+      "fullName": "quickscore share formatPostQuickscoreFlow includes share CTA",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-963793456",
+      "name": "tests/diagnostic/traceEvidenceMapper.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/traceEvidenceMapper.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-963793456_0",
+      "name": "tests/diagnostic/traceEvidenceMapper.test.ts TraceEvidenceMapper",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-963793456_0_0",
+      "name": "tests/diagnostic/traceEvidenceMapper.test.ts TraceEvidenceMapper maps traces to evidence answers",
+      "fullName": "TraceEvidenceMapper maps traces to evidence answers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-963793456_0_1",
+      "name": "tests/diagnostic/traceEvidenceMapper.test.ts TraceEvidenceMapper detects retrieval and guards",
+      "fullName": "TraceEvidenceMapper detects retrieval and guards",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-963793456_0_2",
+      "name": "tests/diagnostic/traceEvidenceMapper.test.ts TraceEvidenceMapper detects cost tracking",
+      "fullName": "TraceEvidenceMapper detects cost tracking",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-963793456_0_3",
+      "name": "tests/diagnostic/traceEvidenceMapper.test.ts TraceEvidenceMapper computes latency percentiles",
+      "fullName": "TraceEvidenceMapper computes latency percentiles",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-963793456_0_4",
+      "name": "tests/diagnostic/traceEvidenceMapper.test.ts TraceEvidenceMapper handles empty trace list",
+      "fullName": "TraceEvidenceMapper handles empty trace list",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-963793456_0_5",
+      "name": "tests/diagnostic/traceEvidenceMapper.test.ts TraceEvidenceMapper assigns confidence based on trace count",
+      "fullName": "TraceEvidenceMapper assigns confidence based on trace count",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

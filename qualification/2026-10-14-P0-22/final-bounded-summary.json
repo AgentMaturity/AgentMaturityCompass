@@ -1,0 +1,167 @@
+{
+  "source": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "scope": "Bounded Node22 qualification; not full acceptance",
+  "tests": {
+    "numTotalTests": 512,
+    "numPassedTests": 510,
+    "numFailedTests": 2,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "numFailedTestSuites": 2,
+    "numPendingTestSuites": 0,
+    "success": false,
+    "snapshot": {
+      "added": 0,
+      "failure": false,
+      "filesAdded": 0,
+      "filesRemoved": 0,
+      "filesRemovedList": [],
+      "filesUnmatched": 0,
+      "filesUpdated": 0,
+      "matched": 23,
+      "total": 23,
+      "unchecked": 0,
+      "uncheckedKeysByFile": [],
+      "unmatched": 0,
+      "updated": 0,
+      "didUpdate": false
+    }
+  },
+  "failures": [
+    {
+      "file": "cliClaimLabels.e2e.test.ts",
+      "name": "actual strict CLI result labels in a signed, keyless private workspace amc passport search \u2014 actual result required",
+      "failureMessages": [
+        "AssertionError: passport search: successful [] has no claim fields: expected 0 to be greater than 0\n    at assertClaimFields (/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/cliClaimLabels.e2e.test.ts:269:72)\n    at /Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/cliClaimLabels.e2e.test.ts:368:65\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withWorkspacePermit (/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/cliClaimLabels.e2e.test.ts:213:16)\n    at /Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/cliClaimLabels.e2e.test.ts:359:7\n    at file:///Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "cliClaimLabels.e2e.test.ts",
+      "name": "actual strict CLI result labels in a signed, keyless private workspace amc leaderboard show \u2014 actual result required",
+      "failureMessages": [
+        "AssertionError: leaderboard show: successful [] has no claim fields: expected 0 to be greater than 0\n    at assertClaimFields (/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/cliClaimLabels.e2e.test.ts:269:72)\n    at /Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/cliClaimLabels.e2e.test.ts:368:65\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at withWorkspacePermit (/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/cliClaimLabels.e2e.test.ts:213:16)\n    at /Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/cliClaimLabels.e2e.test.ts:359:7\n    at file:///Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "name": "final-source-build",
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 31168,
+      "startedUtc": "2026-10-14T16:50:16.602584+00:00",
+      "log": "/private/tmp/p0-22-final-source-build-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-typecheck",
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 33580,
+      "startedUtc": "2026-10-14T16:51:13.427386+00:00",
+      "log": "/private/tmp/p0-22-final-typecheck-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-test-typecheck",
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 38764,
+      "startedUtc": "2026-10-14T16:51:47.060135+00:00",
+      "log": "/private/tmp/p0-22-final-test-typecheck-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-lint",
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 3060,
+      "startedUtc": "2026-10-14T16:52:25.881518+00:00",
+      "log": "/private/tmp/p0-22-final-lint-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-freeze",
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1285,
+      "startedUtc": "2026-10-14T16:52:28.985592+00:00",
+      "log": "/private/tmp/p0-22-final-freeze-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-architecture",
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1640,
+      "startedUtc": "2026-10-14T16:52:30.319176+00:00",
+      "log": "/private/tmp/p0-22-final-architecture-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-counts",
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 344,
+      "startedUtc": "2026-10-14T16:52:32.004776+00:00",
+      "log": "/private/tmp/p0-22-final-counts-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-docs-drift",
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 279,
+      "startedUtc": "2026-10-14T16:52:32.394119+00:00",
+      "log": "/private/tmp/p0-22-final-docs-drift-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-source-duplicates",
+      "cmd": "npm run check:duplicates",
+      "exit": 1,
+      "durationMs": 1334,
+      "startedUtc": "2026-10-14T16:52:32.718448+00:00",
+      "log": "/private/tmp/p0-22-final-source-duplicates-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-source-dead-code",
+      "cmd": "npm run check:dead-code",
+      "exit": 1,
+      "durationMs": 3401,
+      "startedUtc": "2026-10-14T16:52:34.099613+00:00",
+      "log": "/private/tmp/p0-22-final-source-dead-code-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-clean-source",
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 54100,
+      "startedUtc": "2026-10-14T16:52:37.548607+00:00",
+      "log": "/private/tmp/p0-22-final-clean-source-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    },
+    {
+      "name": "final-bounded-node22",
+      "cmd": "pnpm exec vitest run tests/cliResultCommandRegistry.test.ts tests/cliClaimLabels.e2e.test.ts tests/fleetScoring.test.ts tests/cognitionLab.test.ts tests/diagnosticReportStatus.test.ts tests/industryPackAudit.test.ts tests/transparencyReport.test.ts tests/assuranceReportProvenance.test.ts tests/executiveBrief.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/benchmarks/benchRunner.test.ts tests/complianceReportReadability.test.ts tests/compliance/complianceMatrix.test.ts tests/dataResidency.test.ts tests/claims/claimEligibility.test.ts tests/claims/claimAdapters.test.ts tests/claims/claimLabels.test.ts tests/domainExampleMode.test.ts tests/selfReportedLevelCap.test.ts tests/complyReportFrameworkSelection.test.ts --reporter=default --reporter=json --outputFile.json=tmp/p0-22-qualification/final-bounded-node22.json",
+      "exit": 1,
+      "durationMs": 159953,
+      "startedUtc": "2026-10-14T16:51:13.391911+00:00",
+      "log": "/private/tmp/p0-22-final-bounded-node22-20261014.log",
+      "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+    }
+  ],
+  "rawReport": {
+    "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tmp/p0-22-qualification/final-bounded-node22.json",
+    "sha256": "5f519062d66f4f463a9b07c3da144b609f87ef522f6b3929ebf519314dbbc2b8",
+    "bytes": 181700
+  },
+  "fullSuite": "Not rerun on this final source: full suite, global/per-file coverage, Node24/hosted matrix remain open. Earlier P0-50 full-gate evidence is contextual and is not transferred.",
+  "sourceQuality": {
+    "duplicates": 1270,
+    "deadCode": 2784,
+    "status": "failed; no waiver or cleanup"
+  }
+}

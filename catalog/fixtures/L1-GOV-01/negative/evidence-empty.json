@@ -1,0 +1,31 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-GOV-01",
+  "polarity": "negative",
+  "evidenceClass": "empty",
+  "setup": {
+    "harness": "evidence",
+    "window": {
+      "start": "2026-01-01T00:00:00.000Z",
+      "end": "2026-10-18T12:00:00.000Z"
+    },
+    "subject": {
+      "tenantId": "governance-fixture-tenant",
+      "workspaceId": "governance-fixture-workspace",
+      "deploymentId": "governance-benefits-caseworker-fixture",
+      "agentId": "governance-fixture-agent",
+      "subjectId": null
+    },
+    "plan": {
+      "applicability": "applicable",
+      "policyDigest": "sha256:fixture-policy",
+      "mode": "enforce"
+    },
+    "items": [],
+    "priorUses": []
+  },
+  "expected": {
+    "result": "not_evaluated",
+    "reasonCode": "incomplete"
+  }
+}

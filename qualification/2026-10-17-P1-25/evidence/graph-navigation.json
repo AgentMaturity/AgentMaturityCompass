@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-16T18:30:01.296313+00:00",
+  "argv": [
+    "/Users/sid/.local/bin/graphify",
+    "query",
+    "verifyTimestampToken",
+    "--budget",
+    "1200"
+  ],
+  "cwd": "/Users/sid/AgentMaturityCompass",
+  "exit": 0,
+  "graph": {
+    "path": "/Users/sid/AgentMaturityCompass/graphify-out/graph.json",
+    "bytes": 45692207,
+    "mtimeUtc": "2026-09-08T07:09:47.313812+00:00"
+  },
+  "currentGraphAuthority": false,
+  "boundary": "Existing graph predates current source. Prior navigation identified installed0.9.74 against project refreshpin0.9.56; no refresh, watcher or server requested. Query is navigation only; relevant source will be verified directly.",
+  "stdout": {
+    "path": "/private/tmp/p1-25-time-qualification-20261016/graph-query.stdout",
+    "bytes": 25,
+    "sha256": "7be6c5a6bc38a01208505da40a89b0102ad7c265b9c4598d33a26dcf5265c289"
+  },
+  "stderr": {
+    "path": "/private/tmp/p1-25-time-qualification-20261016/graph-query.stderr",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

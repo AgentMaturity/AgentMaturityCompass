@@ -1,0 +1,22 @@
+{
+  "at": "2026-10-17T00:34:47.038885+00:00",
+  "rootFullReportRead": true,
+  "review": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/review.json",
+    "bytes": 12821,
+    "sha256": "0356aa901047919eea12c5f332b1e259739ce382ae9d2460f64d502795e1c1ef"
+  },
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-scope-preparation/seal-v2.json",
+    "bytes": 3469,
+    "sha256": "038a9411972d150259615df4dd9d06608c17eb9484e6b495e44752a21d9ae1f6"
+  },
+  "noConcreteOverlapAt186RootSnapshot": true,
+  "historicalNineRootsFiveVersionsRemainOwnedAndPreserved": true,
+  "onlyFutureThreeOwnMetadataSuccessorsAndNewBoundedWindowPrefix": true,
+  "privateAssemblyAndFilledManifestReviewStillRequired": true,
+  "rootCurrentHostedAllPrPathsWipFreezeD15RequiredBeforeSourceCopy": true,
+  "noSourceAllocationOrWriteYet": true,
+  "missingReservationBindingPreservedWithoutProbeReleaseOrNewApprovalHold": true,
+  "allHoldsPreserved": true
+}

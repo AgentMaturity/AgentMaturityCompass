@@ -27,7 +27,9 @@ const sourceAst = (source: string) => ts.createSourceFile("studioServer.ts", sou
 function currentGuards(source: string): Array<{ text: string; start: number; end: number }> {
   const ast = sourceAst(source), rows: Array<{ text: string; start: number; end: number }> = [];
   function walk(node: ts.Node) {
-    if (ts.isIfStatement(node) && node.expression.getText(ast) === "!requireUnlockedVaultForSigning()") {
+    // Route-entry guards answer 423 from a block. P2-08's in-publication re-checks (`if (...) throw`)
+    // are additional and not part of this frozen inventory.
+    if (ts.isIfStatement(node) && node.expression.getText(ast) === "!requireUnlockedVaultForSigning()" && ts.isBlock(node.thenStatement)) {
       rows.push({ text: node.getText(ast), start: node.getStart(ast), end: node.end });
     }
     ts.forEachChild(node, walk);

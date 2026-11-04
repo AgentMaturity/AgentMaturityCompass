@@ -1,0 +1,361 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > reviews a version-bound catalog and executes one granted call without a session
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-zJFjq9/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a finite broken tools/call response is not replayed and disposes its grant
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-WPCVQp/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a broken tools/call is recorded with strict typed unknown evidence
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-w4RFwy/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > one finite tools/list EOF is reissued once with a new wire id
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-yc2Abq/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > two finite tools/list EOFs exhaust the single reissue allowance
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-usqROE/public-evidence.json
+
+ ✓ tests/actions/idempotency.test.ts (7 tests) 2814ms
+     ✓ the durable journal rejects reusing one key for a second execution atomically  491ms
+     ✓ transports the declared Idempotency-Key once, replacing hostile case variants  503ms
+     ✓ transports the declared X-P104-Execution-Key once, replacing hostile case variants  442ms
+     ✓ the real HTTP oracle replays the same key/body and refuses a conflicting body without another effect  525ms
+     ✓ the named argument is overwritten while authorization and intent digests exclude only the carrier  440ms
+     ✓ unknown intent blocks the same agent and a genuine second agent without any extra wire request or effect  403ms
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > catalog and explicit grant admission refuse before dispatch and ignore a long TTL after catalog drift
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-rpZyIl/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > missing resultType remains complete for the real catalog and governed call
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-LkjpPT/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > tools/list input_required resultType is refused before a catalog or tool call
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-cVbJDY/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > tools/list invalid resultType is refused before a catalog or tool call
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-OFpvCD/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > tools/call input_required resultType cannot complete or trigger a replay
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-4T3tII/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > unpinned method-not-found probe discovers the negotiated legacy catalog
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-HSa5Xh/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > an exact modern pin refuses the same legacy endpoint before initialization
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-d98LOw/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > an exact supported legacy pin initializes without a discover probe
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-v0xtWy/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > a different supported initialize version refuses an exact legacy pin before catalog discovery
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-CeQ3nQ/public-evidence.json
+
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > tools/call invalid resultType cannot complete or trigger a replay
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-dT6qHC/public-evidence.json
+
+ ✓ tests/approvalSeam.test.ts (13 tests) 4951ms
+     ✓ a rogue answerer's out-of-union value becomes unavailable and does NOT proceed  476ms
+     ✓ a throwing answerer fails the QUESTION closed, not the caller open  364ms
+     ✓ an answerer that never settles is timed out to unavailable  371ms
+     ✓ an abstaining answerer passes the question to the engine  438ms
+     ✓ two distinct approvers on a WRITE_HIGH request produce allow  429ms
+     ✓ an action class the policy needs no approvers for does not block  352ms
+     ✓ one approver is not a quorum: the request expires unavailable  740ms
+     ✓ a denial is a decision, and it is deny rather than unavailable  305ms
+     ✓ a grant does not verify once the config it was bound to changes  415ms
+     ✓ two signed rows, one approval id, inside one turn window  392ms
+     ✓ an approval cannot be recorded outside an open turn  326ms
+     ✓ an unsigned policy yields unavailable and is not silently repaired  334ms
+stdout | tests/mcp/mcp20260728.test.ts > P1-39 governed stateless MCP public flow > a tools/list response for another id is refused without response remapping
+AMC_P139_STATELESS_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-1Ly6JP/public-evidence.json
+
+ ✓ tests/mcp/mcp20260728.test.ts (12 tests) 5288ms
+     ✓ reviews a version-bound catalog and executes one granted call without a session  671ms
+     ✓ a finite broken tools/call response is not replayed and disposes its grant  545ms
+     ✓ a broken tools/call is recorded with strict typed unknown evidence  502ms
+     ✓ one finite tools/list EOF is reissued once with a new wire id  392ms
+     ✓ two finite tools/list EOFs exhaust the single reissue allowance  380ms
+     ✓ catalog and explicit grant admission refuse before dispatch and ignore a long TTL after catalog drift  446ms
+     ✓ missing resultType remains complete for the real catalog and governed call  445ms
+     ✓ tools/list invalid resultType is refused before a catalog or tool call  332ms
+     ✓ tools/call input_required resultType cannot complete or trigger a replay  444ms
+     ✓ tools/call invalid resultType cannot complete or trigger a replay  514ms
+     ✓ a tools/list response for another id is refused without response remapping  322ms
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > discovers explicit and fallback protected-resource metadata and ordered issuer metadata
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-zEkP9k/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > refuses a literal issuer mismatch after a matching issuer positive
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-ApnpF5/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > requires advertised S256 without masking its finite negative rows
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-WLvzfN/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > validates the public RFC9207 iss table, exact state and fixed errors
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-JmKbdK/public-evidence.json
+
+stdout | tests/mcp/mcpLegacyFallback.test.ts > P1-39 explicit legacy MCP discovery > legacy mount receipts bind the reviewed version and a version-only change requires a new digest
+AMC_P139_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-legacy-2yYcBs/public-evidence.json
+
+ ✓ tests/mcp/mcpLegacyFallback.test.ts (5 tests) 677ms
+     ✓ legacy mount receipts bind the reviewed version and a version-only change requires a new digest  527ms
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 first local OAuth qualification > performs real S256 resource-bound authorization and persists the real grant
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-5MXw8P/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth registration and redirect qualification > honors client priority and explicit dynamic registration opt-in
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-RMnMCM/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth registration and redirect qualification > refuses OAuth redirects and forbidden non-loopback HTTP URLs before target fetch
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-3CCNWk/public-evidence.json
+
+stdout | tests/mcp/mcpOauth.test.ts > P1-39 OAuth registration and redirect qualification > refuses OAuth redirects and forbidden non-loopback HTTP URLs before target fetch
+AMC_P139_OAUTH_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-rnXbxO/public-evidence.json
+
+ ✓ tests/mcp/mcpOauth.test.ts (7 tests) 203ms
+ ✓ tests/toolPipeline.test.ts (18 tests) 21ms
+ ✓ tests/mcpComplianceSafety.test.ts (15 tests) 22ms
+ ✓ tests/actions/normalizeArguments.test.ts (25 tests) 11ms
+ ✓ tests/agentToolsetWiring.test.ts (20 tests) 7415ms
+     ✓ names both configs and the command that creates each  433ms
+     ✓ reports the write scope so an operator can see it rather than discover it  359ms
+     ✓ reports ready once both are signed  392ms
+     ✓ reports whether the machine can confine, without blocking on it  388ms
+     ✓ publishes a catalogue the model can actually call  340ms
+     ✓ marks writes exclusive and reads parallel  331ms
+     ✓ does not offer a tool that publishes no parameter schema  377ms
+     ✓ reads a file and returns its contents  425ms
+     ✓ enforces read-before-edit through the seam  523ms
+     ✓ returns DENIED, with the reason, when a guard refuses  470ms
+     ✓ runs a bash command the allowlist permits  536ms
+     ✓ denies everything in an unconfigured workspace — which is why readiness exists  382ms
+     ✓ refuses a prompt-injection payload AT THE TOOL BOUNDARY  387ms
+     ✓ does not refuse ordinary arguments that merely look encoded  402ms
+     ✓ passes the MEASURED confinement answer, not a hopeful constant  361ms
+ ✓ tests/mcpAgentProvider.test.ts (24 tests) 408ms
+ ✓ tests/mcpClaimLabels.test.ts (23 tests) 7372ms
+     ✓ discovers the exact 11 default tools with A4 preview disabled  455ms
+     ✓ a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper  415ms
+     ✓ amc_list_agents returns actual canonical claim fields  346ms
+     ✓ amc_quickscore returns actual canonical claim fields  309ms
+     ✓ amc_get_guide returns actual canonical claim fields  354ms
+     ✓ amc_check_compliance returns actual canonical claim fields  358ms
+     ✓ amc_transparency_report returns actual canonical claim fields  360ms
+     ✓ amc_score_agent returns actual canonical claim fields  359ms
+     ✓ amc_list_evidence returns actual canonical claim fields  321ms
+     ✓ amc_get_recommendations returns actual canonical claim fields  317ms
+     ✓ paid fixture refuses inherited pack ID hasOwnProperty  316ms
+     ✓ a missing agent response is an error, not successful claim coverage  422ms
+     ✓ the incident-clock extension returns a regulated not-evaluated claim separately  384ms
+ ✓ tests/mcpServer.test.ts (11 tests) 13ms
+ ✓ tests/mcpTrustLedger.test.ts (4 tests) 29ms
+ ❯ tests/actions/authorizationRecheck.test.ts (25 tests | 3 failed) 9572ms
+     ✓ 01: a genuine grant for 100.00 USD to acme-001 executes once and binds real signed evidence  486ms
+     ✓ 02: a grant for 100.00 cannot authorize 1000.00  443ms
+     ✓ 03: changed recipient refuses the protected fact  452ms
+     ✓ 03: changed destination refuses the protected fact  354ms
+     ✓ 03: changed resourceId refuses the protected fact  416ms
+     ✓ 03: changed resourceVersion refuses the protected fact  441ms
+     ✓ 04: an authentic refund approval cannot authorize transfer  374ms
+     ✓ 05: a re-signed tools revision after approval names both policy and deployment changes  356ms
+     ✓ 06a: approval expiry between bind and recheck refuses without an effect  405ms
+     × 06b: cancelling an already granted approval through the public API must revoke its authority 382ms
+     ✓ 06c: the public pending-cancellation control refuses and is distinct from post-grant withdrawal  368ms
+     ✓ 06d: a genuinely signed lease revoked after bind refuses before the effect  383ms
+     ✓ 07: consent text and a real foreign approval id in arguments grant no authority  391ms
+     ✓ 08: an authentic WRITE_LOW grant cannot authorize the signed FINANCIAL class  335ms
+     × 09: copying actual approval files to another workspace does not transfer authority 608ms
+     ✓ 10a: replay of one real approval executes exactly one owned effect  331ms
+     ✓ 10b: two concurrent pipeline calls spend a genuine grant only once (same-process control)  331ms
+     ✓ 11: a READ_ONLY child cannot widen into FINANCIAL  303ms
+     ✓ 12a: a real signed active FINANCIAL freeze refuses before the effect  329ms
+     × 12b: a malformed retained freeze is diagnosed as authority_store_unavailable 304ms
+     ✓ 13: Code Mode sub-call admission requires bound approval (not worker or confinement qualification) 232ms
+     ✓ 14a: FINANCIAL without signed binding declarations refuses  301ms
+     ✓ 14b: a JSON numeric amount is refused, not interpreted as a decimal approval  465ms
+     ✓ guard A: changing the call after binding refuses without spending its still-matching grant  431ms
+     ✓ guard B: the engine refuses a changed intent hash despite the matching intent id and tool  347ms
+ ✓ tests/mcpAnalyzerScoreGaming.test.ts (3 tests) 16ms
+ ✓ tests/mcpAnalyzerUrlInjection.test.ts (1 test) 132ms
+ ✓ tests/reconciliationDefectsMcpHttp.test.ts (2 tests) 1132ms
+     ✓ a non-EXECUTE call with schema-invalid arguments is refused without a remote call  596ms
+     ✓ a result received after grant disposal is reported as executed and discarded  532ms
+ ✓ tests/reconciliationDefectsMcp.test.ts (2 tests) 1311ms
+     ✓ a discarded received result says the remote tool executed and was not replayed  806ms
+     ✓ simulation refuses arguments that the reviewed schema refuses  501ms
+ ✓ tests/mcpServerTools.test.ts (3 tests) 11ms
+ ✓ tests/nativeMcpHttp.test.ts (15 tests) 10951ms
+     ✓ executes false SSE with pinned origin/session and private header redaction  720ms
+     ✓ executes true SSE with pinned origin/session and private header redaction  582ms
+     ✓ configuration resolves header references only, pins bytes and refuses control/origin fields  398ms
+     ✓ redirects never send credentials to a second origin  702ms
+     ✓ authentication challenges do not enroll OAuth or expose response credentials  314ms
+     ✓ session replacement is refused without using the replacement identity  328ms
+     ✓ bounds declared oversized bodies  439ms
+     ✓ bounds streamed oversized bodies  382ms
+     ✓ catalog changes and credential leaks do not reach a remote tool  510ms
+     ✓ catalog notifications dispose the grant without automatic reconnect  572ms
+     ✓ idle notifications outlive request timeout, then expire at the independently configured bound  2896ms
+     ✓ protocol failure tolerates reentrant error and close handlers with one bounded termination  346ms
+     ✓ a notification flood exhausts the bounded connection instead of accumulating state  495ms
+     ✓ cancellation aborts the active stream, terminates the session and removes the grant  540ms
+     ✓ timeouts and remote error results retain distinct failure facts  1723ms
+ ✓ tests/mcpTools.test.ts (7 tests) 13ms
+ ✓ tests/agentToolsetSession.test.ts (2 tests) 796ms
+     ✓ leaves the ledger verifiable after a real tool call  457ms
+     ✓ reports a tool call recorded against a session nobody started  335ms
+ ✓ tests/nativeMcpClient.test.ts (15 tests) 11132ms
+     ✓ valid schemas execute through the signed allowlist; invalid arguments never reach the server  859ms
+     ✓ a mounted capability cannot bypass the independent signed allowlist  691ms
+     ✓ wrong catalog pins and absent remote grants leave no mounted capability  807ms
+     ✓ catalog drift is refused before dispatch and list-change notifications revoke active grants  838ms
+     ✓ output schemas on earlier catalog pages are enforced  654ms
+     ✓ input schemas sharing an id cannot reuse another tool's validator  534ms
+     ✓ output schemas sharing an id stay independent of SDK cache state  690ms
+     ✓ remote errors retain structured details and timeouts retain their separate failure fact  2561ms
+     ✓ required task execution is explicitly refused instead of dispatching a synchronous call  491ms
+     ✓ explicit secrets are child-only, scrubbed from results and catalog leakage refuses  740ms
+     ✓ cancellation disposes the connection and prevents later calls  681ms
+     ✓ output schema validation precedes secret redaction  511ms
+     ✓ a reviewed MCP-only policy is ready and late mounting still exposes and executes its pinned tool  604ms
+ ✓ tests/actions/failureBehaviour.test.ts (31 tests) 15315ms
+     ✓ a real journal request refusal causes zero effects  507ms
+     ✓ a real journal start refusal causes zero effects  403ms
+     ✓ SQLite rejects requested atomically without orphan evidence/session rows  365ms
+     ✓ SQLite rejects started atomically without orphan evidence/session rows  401ms
+     ✓ the owned effect sees its committed signed started intent  389ms
+     ✓ a throwing recorder marks completion incomplete and blocks the next financial call while reads run  313ms
+     ✓ a real completion-store failure retains started and blocks the agent in this process  391ms
+     ✓ crash_after_start_before_dispatch recovers unknown without replay  3895ms
+     ✓ crash_after_dispatch_before_ack recovers unknown without replay  3681ms
+     ✓ 'declared applied'  306ms
+     ✓ a final HTTP401 after a journaled tool produces a signed incident and no later started  304ms
+ ✓ tests/actions/reconcile.test.ts (51 tests) 16473ms
+     ✓ lost payment reply settles the real committed intent without another body or effect  483ms
+     ✓ a pre-effect ambiguous body is found not_applied without creating its payment  409ms
+     ✓ a completed payment with failed recorder evidence is restored without repeating the effect  453ms
+     ✓ synthetic public journal requested with complete evidence is ineligible and never asks an adapter  328ms
+     ✓ synthetic public journal authorized with complete evidence is ineligible and never asks an adapter  355ms
+     ✓ synthetic public journal started with complete evidence is ineligible and never asks an adapter  346ms
+     ✓ synthetic public journal denied with complete evidence is ineligible and never asks an adapter  351ms
+     ✓ synthetic public journal cancelled with complete evidence is ineligible and never asks an adapter  335ms
+     ✓ synthetic public journal completed with complete evidence is ineligible and never asks an adapter  335ms
+     ✓ a contradictory 'amount' is signed, incidented and continues to block subsequent dispatch  436ms
+     ✓ a contradictory 'recipient' is signed, incidented and continues to block subsequent dispatch  336ms
+     ✓ a contradictory 'destination' is signed, incidented and continues to block subsequent dispatch  359ms
+     ✓ a contradictory 'resource' is signed, incidented and continues to block subsequent dispatch  415ms
+     ✓ a claimed not_applied cannot replace a completed applied effect with incomplete evidence  364ms
+     ✓ unknown backs off at 1,2,4,8,16,32,60,60 minutes and a successful resolution clears that process-local schedule  598ms
+     ✓ malformed adapter answer: 'empty unknown reason' remains unknown without appending a receipt  321ms
+     ✓ malformed adapter answer: 'invalid timestamp' remains unknown without appending a receipt  354ms
+     ✓ malformed adapter answer: 'invalid applied facts' remains unknown without appending a receipt  307ms
+     ✓ an unavailable adapter (missing) cannot settle an intent  446ms
+     ✓ an unavailable adapter (wrong adapter id) cannot settle an intent  468ms
+     ✓ a deletion without a declared adapter remains blocked for operator resolution  364ms
+     ✓ an owned invalid tools signature cannot supply a reconcile adapter  377ms
+     ✓ an execution from another workspace is not found and cannot be reconciled here  621ms
+     ✓ not_applied retention age=1001 ms with a 1000 ms declaration  310ms
+     ✓ a controlled in-flight abort returns unknown without a hanging lookup or a native-deadline claim  302ms
+     ✓ a genuine grant from another workspace supplies no authority in this workspace  414ms
+     ✓ replaying real signed bytes from another workspace is refused  447ms
+ ✓ tests/actions/receiptStates.test.ts (71 tests) 18334ms
+     ✓ none -> authorized refuses through the public journal without any persisted write  418ms
+     ✓ none -> started refuses through the public journal without any persisted write  438ms
+     ✓ none -> completed refuses through the public journal without any persisted write  425ms
+     ✓ none -> denied refuses through the public journal without any persisted write  368ms
+     ✓ none -> outcome_unknown refuses through the public journal without any persisted write  344ms
+     ✓ requested -> requested refuses through the public journal without any persisted write  392ms
+     ✓ requested -> started refuses through the public journal without any persisted write  323ms
+     ✓ requested -> completed refuses through the public journal without any persisted write  304ms
+     ✓ requested -> outcome_unknown refuses through the public journal without any persisted write  348ms
+     ✓ authorized -> requested refuses through the public journal without any persisted write  330ms
+     ✓ authorized -> authorized refuses through the public journal without any persisted write  336ms
+     ✓ authorized -> completed refuses through the public journal without any persisted write  316ms
+     ✓ authorized -> outcome_unknown refuses through the public journal without any persisted write  393ms
+     ✓ started -> requested refuses through the public journal without any persisted write  303ms
+     ✓ started -> authorized refuses through the public journal without any persisted write  318ms
+     ✓ started -> started refuses through the public journal without any persisted write  314ms
+     ✓ completed -> requested refuses through the public journal without any persisted write  457ms
+     ✓ completed -> authorized refuses through the public journal without any persisted write  415ms
+     ✓ completed -> started refuses through the public journal without any persisted write  385ms
+     ✓ completed -> completed refuses through the public journal without any persisted write  315ms
+     ✓ completed -> denied refuses through the public journal without any persisted write  360ms
+stdout | tests/actions/faultMatrix.test.ts
+P104 observed fault-matrix artifact /var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p104-fault-matrix-Bo2qTA/fault-matrix.json
+
+ ✓ tests/actions/faultMatrix.test.ts (16 tests) 12421ms
+     ✓ journal_down_before_request  416ms
+     ✓ authority_store_down_at_recheck  321ms
+     ✓ crash_after_start_before_dispatch  3609ms
+     ✓ crash_after_dispatch_before_ack  2077ms
+     ✓ crash_after_start_before_dispatch  1989ms
+     ✓ crash_after_dispatch_before_ack  1805ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/actions/authorizationRecheck.test.ts > P1-02 authorization recheck: fourteen specification groups > 06b: cancelling an already granted approval through the public API must revoke its authority
+AssertionError: expected { …(3) } to deeply equal { cancellationError: null, …(2) }
+
+- Expected
++ Received
+
+  {
+-   "allowed": false,
+-   "cancellationError": null,
+-   "effects": 0,
++   "allowed": true,
++   "cancellationError": "approval request is not pending: QUORUM_MET",
++   "effects": 1,
+  }
+
+ ❯ tests/actions/authorizationRecheck.test.ts:324:82
+    322|     // Preserve the real API response AND the subsequent execution. Pe…
+    323|     // cancellation would not prove that a reviewed grant can be withd…
+    324|     expect({ cancellationError, allowed: outcome.ok, effects: f.bodies…
+       |                                                                                  ^
+    325|     refused(f, outcome, "approval_not_granted");
+    326|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/actions/authorizationRecheck.test.ts > P1-02 authorization recheck: fourteen specification groups > 09: copying actual approval files to another workspace does not transfer authority
+AssertionError: expected 'authority_store_unavailable: approval…' to match /approval_intent_mismatch|approval_not…/
+
+- Expected:
+/approval_intent_mismatch|approval_not_granted/
+
++ Received:
+"authority_store_unavailable: approval apprreq_5c2be4b28aed42fba98c992aa4e1ba4a could not be read: invalid approval request signature: signature verification failed"
+
+ ❯ tests/actions/authorizationRecheck.test.ts:374:36
+    372|     expect(outcome.denied?.stage).toBe("authorization");
+    373|     // These are the specification's two allowed cross-workspace diagn…
+    374|     expect(outcome.denied?.reason).toMatch(/approval_intent_mismatch|a…
+       |                                    ^
+    375|   });
+    376|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/actions/authorizationRecheck.test.ts > P1-02 authorization recheck: fourteen specification groups > 12b: a malformed retained freeze is diagnosed as authority_store_unavailable
+AssertionError: expected 'action_class_frozen' to contain 'authority_store_unavailable'
+
+Expected: "authority_store_unavailable"
+Received: "action_class_frozen"
+
+ ❯ refused tests/actions/authorizationRecheck.test.ts:234:34
+    232|   expect(outcome.ok).toBe(false);
+    233|   expect(outcome.denied?.stage).toBe("authorization");
+    234|   expect(outcome.denied?.reason).toContain(code);
+       |                                  ^
+    235| }
+    236|
+ ❯ tests/actions/authorizationRecheck.test.ts:428:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed | 26 passed (27)
+      Tests  3 failed | 425 passed (428)
+   Start at  21:01:29
+   Duration  22.70s (transform 24.23s, setup 656ms, import 54.51s, tests 126.83s, environment 2ms)
+
+JSON report written to /private/tmp/p1-37-post-typecheck-20261016/p139-mcp-pipeline-journal-regression.raw.json

@@ -1,0 +1,21 @@
+{
+  "at": "2026-10-16T20:20:18.536744+00:00",
+  "previousBoundedClosure": "/private/tmp/p1-12-compiled-guard-qualification-20261017/bounded-closure.json",
+  "sourceHead": "fc2e64eb6ea0cf092c7a6ea86229f9628083eb35",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "branch": "codex/p1-26-tree-qualification",
+  "previousBranchPreserved": "codex/p1-12-compiled-guard-qualification",
+  "gitSwitchExit": 0,
+  "sourceClean": true,
+  "indexEmpty": true,
+  "scopeProposed": [
+    "tests/transparency/rfc9162.test.ts",
+    "tests/transparency/legacyAmbiguity.test.ts",
+    "qualification/2026-10-17-P1-26/"
+  ],
+  "fullIssueDone": false,
+  "fullP125DependencyOpen": true,
+  "permanentPublicEntryApprovalStillRequired": true,
+  "allHoldsRetained": true,
+  "productExecutionOrSourceEdit": false
+}

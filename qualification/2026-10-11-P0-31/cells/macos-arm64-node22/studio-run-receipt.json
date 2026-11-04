@@ -1,0 +1,402 @@
+{
+  "sourceCommit": "756bd6977dce19f4ef781bdb492c38d6777964f7",
+  "artifactSha256": "21190c7da41e9fc5bf87e168416b34085f223df8cf80425e420557011ebc0340",
+  "artifactPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-rc/rc.tgz",
+  "root": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio",
+  "startedAt": "2026-10-11T07:31:37.288580+00:00",
+  "commands": [
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "--version"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-01.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/opt/homebrew/Cellar/node@22/22.22.0/lib/node_modules/npm/bin/npm-cli.js",
+        "install",
+        "--prefix",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation",
+        "--no-audit",
+        "--no-fund",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-rc/rc.tgz"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-02.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "bootstrap"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-03.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-04.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "firewall",
+        "enable",
+        "--mode",
+        "block",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-05.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "up",
+        "--demo",
+        "--no-open",
+        "--no-baseline"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/demo",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-06.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-rc/src/scripts/studio-native-browser-check.mjs",
+        "--fixture",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/fixture.json",
+        "--out",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/browser",
+        "--dependency-root",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-rc/src",
+        "--browser-executable",
+        "/Users/sid/Library/Caches/ms-playwright/chromium_headless_shell-1234/chrome-headless-shell-mac-arm64/chrome-headless-shell"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-07.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "down"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/demo",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-08.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "5a411eff-0cd6-4aec-b8d7-ea821340901d",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-09.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "eecd8872-6afb-48f5-92d5-992f6370f72a",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-10.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "23373877-e7e6-46f0-92e7-93577dab0022",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-11.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "746da18c-4e03-49cf-959d-5cb7165469de",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-12.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "3c8b64dd-e414-40da-a7d8-33c16119b5b6",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-13.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "afb58b0b-3311-4bd0-aa0d-9e2140374d25",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-14.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "--agent",
+        "browser-agent",
+        "agent-loop",
+        "verify",
+        "da1b3718-57dc-458f-95c6-0496a2463461",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-15.log"
+    },
+    {
+      "argv": [
+        "/opt/homebrew/Cellar/node@22/22.22.0/bin/node",
+        "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/installation/node_modules/agent-maturity-compass/dist/cli.js",
+        "session",
+        "verify",
+        "--json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/owner",
+      "exitCode": 0,
+      "timedOut": false,
+      "interrupted": false,
+      "failure": null,
+      "processGroupReaped": true,
+      "cleanupError": null,
+      "log": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/command-16.log"
+    }
+  ],
+  "cleanup": [
+    {
+      "resource": "owned demo daemon",
+      "signalCommandExit": 0,
+      "knownPid": 30244,
+      "groupId": 30244,
+      "processGroupReaped": true,
+      "ok": true
+    },
+    {
+      "resource": "owned foreground Studio",
+      "exitCode": 0,
+      "processGroupReaped": true,
+      "ok": true
+    },
+    {
+      "resource": "private fixture credentials/workspaces/raw log",
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "harnessHashes": {
+    "scripts/studio-native-browser-check.mjs": "ff835c580a58c0d08220abd14aecffebbd1dba2a758fe1aa3890e5b4f09abf0e",
+    "tests/e2e/native-tasks-page.mjs": "22ed3520cb14b5bb45b489200e2051e8bc6ecf47b22f8240f20e0550ee720fb3",
+    "scripts/lib/nativeStudioBrowserReceipt.mjs": "2624565f6d09c28f66ce750ac53e6b12f2e92a1f3997db47035aa10ab54bce5e",
+    "scripts/installed-studio-browser-check.py": "10d8a28b8dec29fdb0dde5cb75ef581f424a6f064623dbb037cbdf955315e3c4"
+  },
+  "nodeSha256": "ffc2e45b8634d59a3ce7cc5b800054150b881335f0669c0d62d3f6643538b43e",
+  "nodeVersion": "v22.22.0",
+  "browserExecutableSha256": "7687bff7cb2db075f250e6d5848bbc8838cac3802ac3952a899c574f8eccab45",
+  "helperSha256": "10d8a28b8dec29fdb0dde5cb75ef581f424a6f064623dbb037cbdf955315e3c4",
+  "trustBoundary": "Local pre-execution workspace key consistency; not independent external anchoring",
+  "installedCliSha256": "8b9ec22158bcb23a0f0123e1b12abfce1d9cd1675ba9c9f3aad6b54019ac9165",
+  "preExecutionMonitorSha256": "05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce",
+  "browserExitCode": 0,
+  "fixtureFile": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/P0-31b-runs/darwin-n22/studio/fixture.json",
+  "sentinelPreserved": true,
+  "browserReceiptComplete": true,
+  "coldVerifiers": [
+    {
+      "sessionId": "5a411eff-0cd6-4aec-b8d7-ea821340901d",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"5a411eff-0cd6-4aec-b8d7-ea821340901d\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"ab17ef0f-c890-4b27-a515-baa39cd31fac\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    },\n    {\n      \"headerEventId\": \"91cbefc9-c1df-4dd4-b8ee-68fdbf27fe1f\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"expectedFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "eecd8872-6afb-48f5-92d5-992f6370f72a",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"eecd8872-6afb-48f5-92d5-992f6370f72a\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"947e70b6-0ef2-4ac0-9596-7062b3ece5b7\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"expectedFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "23373877-e7e6-46f0-92e7-93577dab0022",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"23373877-e7e6-46f0-92e7-93577dab0022\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"71743644-1942-49e2-b8ac-173846b4b014\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"expectedFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "746da18c-4e03-49cf-959d-5cb7165469de",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"746da18c-4e03-49cf-959d-5cb7165469de\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"81034fab-e559-4ec4-8c9b-cfad724f8245\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    },\n    {\n      \"headerEventId\": \"0390e7cf-e2b8-41c6-a862-2e3121989ee7\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"expectedFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "3c8b64dd-e414-40da-a7d8-33c16119b5b6",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"3c8b64dd-e414-40da-a7d8-33c16119b5b6\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"e32f8d9e-ef23-4e94-b4e2-47c315e3215e\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    },\n    {\n      \"headerEventId\": \"c8498af7-5775-4e2c-818b-488f89824379\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"expectedFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "afb58b0b-3311-4bd0-aa0d-9e2140374d25",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"afb58b0b-3311-4bd0-aa0d-9e2140374d25\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"b2c29c1d-31bb-4a1b-b862-32143a9a4ec5\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"expectedFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "sessionId": "da1b3718-57dc-458f-95c6-0496a2463461",
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"sessionId\": \"da1b3718-57dc-458f-95c6-0496a2463461\",\n  \"ok\": true,\n  \"prefixVerified\": false,\n  \"integrityOk\": true,\n  \"ledgerOk\": true,\n  \"ledgerErrors\": [],\n  \"sessionChainErrors\": [],\n  \"unsignedRowIds\": [],\n  \"requests\": [\n    {\n      \"headerEventId\": \"2dce20c1-4704-413f-835e-b9ae13da5ce9\",\n      \"status\": \"reconstructed\",\n      \"detail\": null\n    }\n  ],\n  \"scope\": \"complete-ledger\",\n  \"unfinalizedSessions\": [],\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"expectedFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  }\n}\n",
+      "kind": "native request reconstruction"
+    },
+    {
+      "exitCode": 0,
+      "valid": true,
+      "output": "{\n  \"ok\": true,\n  \"errors\": [],\n  \"chain\": {\n    \"ok\": true,\n    \"errors\": []\n  },\n  \"governance\": {\n    \"ok\": true,\n    \"errors\": []\n  },\n  \"trustRoot\": {\n    \"anchored\": true,\n    \"monitorFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"expectedFingerprint\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n    \"monitorAdmission\": {\n      \"signature\": \"ledger monitor key\",\n      \"purpose\": \"ledger-row\",\n      \"keyId\": \"05b2a1a44a73ac70c5837e06e1b3afd32bf0894ffdb20a9cc15eff193b9738ce\",\n      \"status\": \"admitted\",\n      \"source\": \"explicit-key\",\n      \"listId\": null,\n      \"timeBasis\": null,\n      \"detail\": null\n    }\n  },\n  \"sessions\": {\n    \"open\": [],\n    \"released\": [\n      \"5a411eff-0cd6-4aec-b8d7-ea821340901d\",\n      \"eecd8872-6afb-48f5-92d5-992f6370f72a\",\n      \"23373877-e7e6-46f0-92e7-93577dab0022\",\n      \"746da18c-4e03-49cf-959d-5cb7165469de\",\n      \"3c8b64dd-e414-40da-a7d8-33c16119b5b6\",\n      \"afb58b0b-3311-4bd0-aa0d-9e2140374d25\"\n    ],\n    \"interrupted\": [],\n    \"closed\": [\n      \"da1b3718-57dc-458f-95c6-0496a2463461\"\n    ]\n  },\n  \"claimKind\": \"self_reported\",\n  \"statusDimensions\": {\n    \"applicability\": {\n      \"state\": \"applicable\"\n    },\n    \"evidence\": \"incomplete\",\n    \"result\": \"not_evaluated\",\n    \"enforcement\": {\n      \"state\": \"none\"\n    },\n    \"review\": \"pending\"\n  },\n  \"claimLabel\": \"Claim: Self-reported \u00b7 Result: not evaluated \u00b7 Evidence: incomplete \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: applicable\"\n}\n",
+      "kind": "ledger"
+    }
+  ],
+  "finishedAt": "2026-10-11T07:32:40.341997+00:00"
+}

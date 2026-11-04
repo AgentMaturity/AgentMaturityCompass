@@ -1,0 +1,444 @@
+"""UNEXECUTED P041 preparation. No copy/setup/fixture/runtime is made by authoring.
+Root supplies a separate fully bound plan and per-control hash release.
+Only the NEW27-case private fixture is in scope. Original config/guards30s stay.
+No signals except owned-PGID probe0, no retry/cleanup/exception restoration.
+"""
+from pathlib import Path
+from datetime import datetime, timezone
+import argparse
+import errno
+import hashlib
+import json
+import os
+import re
+import stat
+import subprocess
+import sys
+import time
+
+BASE = Path('/private/tmp/p0-41-causal-qualification-v2-20261015')
+ROOT = Path('/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass')
+COPY = BASE / 'source'
+PREPARED = Path('/private/tmp/p0-41-causal-plan-v2-prepared-20261015.json')
+PREPARED_SHA = '40c69dbdf6df2937236595b352e539eb0e88c7d842970421cb62123f4b30ad8a'
+FIXTURE = 'tests/p041ProgramMetricsQualification.test.ts'
+TARGET = 'scripts/program-metrics.mjs'
+CODE = '58e91dcef111bf02f773dcbfd1921d428cf75e34'
+ORDER = ('P041-M1-missing-source-zero', 'P041-M2-vacuous-file-pass')
+ACTIVE = BASE / 'ACTIVE'
+HALTED = BASE / 'HALTED.json'
+LATE = [r'Unhandled Errors?', r'Unhandled Rejection', r'uncaught exception',
+        r'Error during teardown', r'Tests modified the repository workspace',
+        r'Hook timed out', r'Error:.*global.?teardown', r'ELIFECYCLE',
+        r'error during close', r'close timed out', r'error during global teardown',
+        r'Tests closed successfully but something prevents']
+
+class Stop(Exception):
+    pass
+
+def require(ok, message):
+    if not ok:
+        raise Stop(message)
+
+def stamp():
+    return datetime.now(timezone.utc).isoformat()
+
+def read(path):
+    return json.loads(Path(path).read_text())
+
+def sha(data):
+    return hashlib.sha256(data).hexdigest()
+
+def pin(path):
+    path = Path(path)
+    data = path.read_bytes()
+    return {'path': str(path), 'bytes': len(data), 'sha256': sha(data)}
+
+def verify_pin(value):
+    require(isinstance(value, dict) and isinstance(value.get('path'), str), 'Unbound input pin')
+    require(pin(value['path']) == {k: value[k] for k in ('path', 'bytes', 'sha256')},
+            'Pinned input changed: ' + value['path'])
+
+def write_bytes_new(path, data):
+    descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+    with os.fdopen(descriptor, 'wb') as out:
+        out.write(data)
+        out.flush()
+        os.fsync(out.fileno())
+
+def write_new(path, value):
+    write_bytes_new(path, (json.dumps(value, indent=2) + '\n').encode())
+
+def owned_dir(path, create=False):
+    path = Path(path)
+    if create:
+        path.mkdir(mode=0o700)
+    info = path.lstat()
+    require(stat.S_ISDIR(info.st_mode) and info.st_uid == os.getuid()
+            and stat.S_IMODE(info.st_mode) == 0o700, 'Not an owned0700 directory: ' + str(path))
+
+def no_uncertainty():
+    require(not ACTIVE.exists() and not HALTED.exists(), 'ACTIVE/HALTED forbids further runtime or source writes')
+
+def plan_refs(plan):
+    keys = ('sourceManifest', 'compiledManifest', 'physicalManifest', 'node', 'observer',
+            'caseIdentities', 'setup', 'setupIndex')
+    return [plan[k] for k in keys] + [plan['fixture']['prepared'], plan['fixture']['copied'],
+            plan['native']] + plan['externalPins']
+
+def validate_plan(path):
+    verify_pin({'path': str(PREPARED), 'bytes': PREPARED.stat().st_size, 'sha256': PREPARED_SHA})
+    template = read(PREPARED)
+    plan = read(path)
+    require(plan.get('bound') is True and plan.get('productionSource') == CODE, 'Plan remains unbound')
+    require(plan.get('root') == str(ROOT) and plan.get('sourceRoot') == str(COPY), 'Wrong source roots')
+    require(re.fullmatch(r'[a-f0-9]{40}', plan.get('parentSource', '')) is not None
+            and plan['parentSource'] != '0' * 40, 'Unbound parent source')
+    require(plan.get('corpus') == [FIXTURE] and plan.get('caseCount') == 27,
+            'Only the frozen NEW27-case corpus is in scope')
+    require(plan.get('controls') == template['controls'], 'Exact prepared control recipes changed')
+    require(isinstance(plan.get('externalPins'), list) and plan['externalPins'], 'External preservation pins must be nonempty')
+    require(plan.get('preparedPlan') == pin(PREPARED), 'Prepared plan binding differs')
+    for value in plan_refs(plan):
+        verify_pin(value)
+    require(Path(plan['fixture']['copied']['path']) == COPY / FIXTURE, 'Overlay path differs')
+    require(plan['fixture']['prepared']['sha256'] == plan['fixture']['copied']['sha256'],
+            'Prepared/copied fixture bytes differ')
+    identities = read(plan['caseIdentities']['path'])
+    require(isinstance(identities, list) and len(identities) == 27
+            and all(row['file'] == FIXTURE and isinstance(row['fullName'], str) and row['fullName']
+                    for row in identities)
+            and len({(row['file'], row['fullName']) for row in identities}) == 27,
+            'NEW27 exact fullName identities are not frozen uniquely')
+    owned_dir(BASE)
+    owned_dir(BASE / 'home')
+    owned_dir(BASE / 'tmp')
+    require(not (COPY / '.git').exists(), 'Private source must not acquire .git')
+    return plan
+
+def file_map(directory):
+    result = {}
+    for parent, directories, files in os.walk(directory, followlinks=False):
+        if Path(parent) == directory:
+            directories[:] = [name for name in directories if name != 'node_modules']
+        for name in directories:
+            require(not (Path(parent) / name).is_symlink(), 'Unexpected private directory symlink')
+        for name in files:
+            path = Path(parent) / name
+            info = path.lstat()
+            require(stat.S_ISREG(info.st_mode) and info.st_nlink == 1,
+                    'Not an independent regular private file: ' + str(path))
+            result[str(path.relative_to(directory))] = sha(path.read_bytes())
+    return result
+
+def check_inputs(plan, target_sha):
+    for value in plan_refs(plan):
+        verify_pin(value)
+    source = read(plan['sourceManifest']['path'])
+    compiled = read(plan['compiledManifest']['path'])
+    physical = read(plan['physicalManifest']['path'])
+    require(isinstance(source, dict) and len(source) == 8574
+            and isinstance(compiled, dict) and len(compiled) == 4529
+            and not set(source).intersection(compiled), 'Source/compiled universe differs')
+    expected = source | compiled
+    require(FIXTURE not in expected and source[TARGET] == plan['controls'][0]['baselineSha256'],
+            'Overlay or target baseline differs')
+    require(isinstance(physical, list) and len(physical) == 13103
+            and {row['path'] for row in physical} == set(expected), 'Physical manifest membership differs')
+    require(all(not Path(rel).is_absolute() and '..' not in Path(rel).parts
+                and rel not in ('.git', 'node_modules') for rel in expected), 'Unsafe manifest path')
+    copy_ids, parent_ids = set(), set()
+    parent_changes = []
+    for row in physical:
+        rel = row['path']
+        parent = ROOT / rel
+        private = COPY / rel
+        ps, cs = parent.lstat(), private.lstat()
+        require(stat.S_ISREG(ps.st_mode) and stat.S_ISREG(cs.st_mode)
+                and cs.st_nlink == row['copyNlink'] == 1, 'Physical regular/link count differs: ' + rel)
+        require((ps.st_dev, ps.st_ino) == (row['sourceDevice'], row['sourceInode'])
+                and (cs.st_dev, cs.st_ino) == (row['copyDevice'], row['copyInode'])
+                and stat.S_IMODE(ps.st_mode) == stat.S_IMODE(cs.st_mode) == row['mode'],
+                'Physical identity/mode changed: ' + rel)
+        parent_ids.add((ps.st_dev, ps.st_ino))
+        copy_ids.add((cs.st_dev, cs.st_ino))
+        if ps.st_size != row['bytes'] or sha(parent.read_bytes()) != row['sha256'] or row['sha256'] != expected[rel]:
+            parent_changes.append(rel)
+    require(not parent_changes and len(copy_ids) == 13103
+            and copy_ids.isdisjoint(parent_ids), 'Parent bytes or independent copy identities changed')
+    actual_dist = {str(p.relative_to(ROOT)) for p in (ROOT / 'dist').rglob('*') if p.is_file()}
+    require(actual_dist == set(compiled), 'Parent dist membership changed')
+    prepared_stat = Path(plan['fixture']['prepared']['path']).stat()
+    overlay_stat = (COPY / FIXTURE).lstat()
+    require(stat.S_ISREG(overlay_stat.st_mode) and overlay_stat.st_nlink == 1
+            and (overlay_stat.st_dev, overlay_stat.st_ino) not in copy_ids | parent_ids
+            and (overlay_stat.st_dev, overlay_stat.st_ino) != (prepared_stat.st_dev, prepared_stat.st_ino),
+            'Overlay is not an independent unique regular file')
+    require(not (ROOT / FIXTURE).exists(), 'NEW private fixture appeared in parent source')
+    link = plan['nodeModulesLink']
+    require(link['path'] == str(COPY / 'node_modules') and (COPY / 'node_modules').is_symlink()
+            and os.readlink(COPY / 'node_modules') == link['target']
+            and str((COPY / 'node_modules').resolve()) == link['resolved']
+            and link['resolved'] == str(ROOT / 'node_modules'), 'Borrowed dependency link changed')
+    actual = file_map(COPY)
+    expected[TARGET] = target_sha
+    expected[FIXTURE] = plan['fixture']['copied']['sha256']
+    require(actual == expected and len(actual) == 13104, 'Private source/dist/overlay delta differs')
+    native = plan['native']
+    info = Path(native['path']).stat()
+    require({k: native[k] for k in ('device', 'inode', 'nlink', 'mode')} ==
+            {'device': info.st_dev, 'inode': info.st_ino, 'nlink': info.st_nlink,
+             'mode': stat.S_IMODE(info.st_mode)}, 'Borrowed native identity changed')
+    return {'capturedUtc': stamp(), 'parentSourceChecked': 8574, 'parentCompiledChecked': 4529,
+            'privateFilesChecked': 13104, 'native': native, 'targetSha256': target_sha,
+            'privateHashMapSha256': sha(json.dumps(actual, sort_keys=True).encode()),
+            'parentDelta': [], 'privateUnexpectedDelta': [], 'externalPinDelta': [],
+            'limits': 'Tracked manifest bytes and owned group only; no universal cache/network/OS/detached-descendant isolation.'}
+
+def group_probe(pgid):
+    try:
+        os.killpg(pgid, 0)
+    except OSError as error:
+        return {'capturedUtc': stamp(), 'pgid': pgid, 'signal': 0,
+                'absentByESRCH': error.errno == errno.ESRCH, 'errno': error.errno}
+    return {'capturedUtc': stamp(), 'pgid': pgid, 'signal': 0, 'absentByESRCH': False, 'errno': None}
+
+def classify(plan, raw, observer, log, process_exit, stage, pid):
+    wanted = {(r['file'], r['fullName']) for r in read(plan['caseIdentities']['path'])}
+    require(observer['pid'] == pid and observer['cwd'] == str(COPY)
+            and observer['testCount'] == 27 and observer['unhandledErrors'] == []
+            and observer['reason'] in ('passed', 'failed'), 'Observer process/completion binding failed')
+    require(observer['files'] == [str(COPY / FIXTURE)], 'Observer file membership differs')
+    observed = {}
+    for task in observer['tasks']:
+        require(isinstance(task['hooks'], dict) and all(v == 'pass' for v in task['hooks'].values()),
+                'Hook not passed')
+        require(task['state'] in ('pass', 'fail'), 'Pending/unknown observer task')
+        if task['kind'] != 'test':
+            require(task['errors'] == [], 'File/suite non-body error')
+            continue
+        key = (FIXTURE, task['fullName'])
+        require(key not in observed, 'Duplicate observer fullName')
+        observed[key] = task
+    actual = {}
+    require(len(raw['testResults']) == 1 and raw['testResults'][0]['name'] == str(COPY / FIXTURE),
+            'Raw file membership differs')
+    file = raw['testResults'][0]
+    require(file.get('message', '') == '', 'Raw collection/file diagnostic')
+    for test in file['assertionResults']:
+        key = (FIXTURE, test['fullName'])
+        require(key not in actual and test['status'] in ('passed', 'failed'), 'Duplicate/pending raw assertion')
+        actual[key] = test
+    require(set(actual) == set(observed) == wanted and len(actual) == 27, 'Actual NEW fullName identities differ')
+    require(raw['numTotalTests'] == 27 and raw['numPendingTests'] == 0
+            and raw['numTodoTests'] == 0 and raw['numPendingTestSuites'] == 0, 'Incomplete raw count')
+    failures = []
+    plain = lambda text: re.sub(r'\x1b\[[0-9;]*m', '', str(text)).replace('\r\n', '\n')
+    for key in sorted(wanted):
+        test, task = actual[key], observed[key]
+        require((test['status'] == 'passed') == (task['state'] == 'pass'), 'Raw/observer status disagreement')
+        if test['status'] == 'passed':
+            require(task['errors'] == [] and test['failureMessages'] == [], 'Passed case retains an error')
+            continue
+        errors, messages = task['errors'], test['failureMessages']
+        require(errors and messages and all(error.get('name') == 'AssertionError' for error in errors),
+                'Failure is not solely a retained body AssertionError')
+        raw_message = plain('\n'.join(messages))
+        for error in errors:
+            message, stack = plain(error.get('message', '')), plain(error.get('stack', ''))
+            require(message and message in raw_message, 'Raw/observer AssertionError message mismatch')
+            require(re.search(r'tests/p041ProgramMetricsQualification\.test\.ts:\d+:\d+', stack)
+                    and 'tests/setup/' not in stack, 'Missing body source frame or setup stack')
+        failures.append({'file': key[0], 'fullName': key[1], 'rawFailureMessages': messages,
+                         'observerErrors': errors})
+    late = [pattern for pattern in LATE if re.search(pattern, log, flags=re.IGNORECASE)]
+    require(not late, 'Known late/global/close diagnostic: ' + str(late))
+    require(raw['numFailedTests'] == len(failures) and raw['numPassedTests'] == 27 - len(failures),
+            'Raw pass/failure counters disagree')
+    if failures:
+        require(stage == 'mutant' and process_exit == 1 and raw['success'] is False
+                and observer['reason'] == 'failed', 'Unexpected or inconsistent failure')
+        verdict = 'body-assertions-observed-awaiting-root-source-attribution'
+    else:
+        require(process_exit == 0 and raw['success'] is True and raw['numFailedTestSuites'] == 0
+                and observer['reason'] == 'passed', 'Incomplete successful process')
+        verdict = 'survivor' if stage == 'mutant' else 'passed'
+    return {'classification': verdict, 'total': 27, 'passed': 27 - len(failures),
+            'failed': len(failures), 'pending': 0, 'todo': 0, 'failures': failures,
+            'killClaim': False, 'formalAcceptanceClosed': False}
+
+def new_container(name):
+    path = BASE / name
+    if not path.exists():
+        owned_dir(path, create=True)
+    else:
+        owned_dir(path)
+    return path
+
+def run_phase(plan, control, stage, target_sha):
+    no_uncertainty()
+    phase = control + '--' + stage
+    directory = new_container('phases') / phase
+    owned_dir(directory, create=True)
+    home = BASE / 'home' / phase
+    temporary = BASE / 'tmp' / phase
+    artifacts = new_container('cli-artifacts') / phase
+    for path in (home, temporary, artifacts):
+        owned_dir(path, create=True)
+    require(not any(artifacts.iterdir()) and COPY not in artifacts.parents
+            and artifacts not in COPY.parents, 'CLI artifact directory is not fresh/external')
+    write_new(directory / 'inputs-before.json', check_inputs(plan, target_sha))
+    observer_producer = directory / 'observer-producer.json'
+    raw_producer = directory / 'raw-producer.json'
+    log_producer = directory / 'stdout-stderr.log'
+    node = Path(plan['node']['path'])
+    argv = [str(node), str(ROOT / 'node_modules/vitest/vitest.mjs'), 'run', FIXTURE,
+            '--cache=false', '--maxWorkers=1', '--no-file-parallelism',
+            '--reporter=default', '--reporter=json', '--reporter=' + plan['observer']['path'],
+            '--outputFile.json=' + str(raw_producer)]
+    env = {'PATH': str(node.parent) + ':/usr/bin:/bin:/usr/sbin:/sbin',
+           'HOME': str(home), 'TMPDIR': str(temporary), 'LANG': 'C', 'LC_ALL': 'C',
+           'GIT_NO_LAZY_FETCH': '1', 'AMC_P021_RUNTIME_OBSERVER_PATH': str(observer_producer),
+           'AMC_P041_QUALIFICATION_ARTIFACT_ROOT': str(artifacts)}
+    require(len(env) == 8, 'Environment allowlist drift')
+    write_new(ACTIVE, {'phase': phase, 'startedUtc': stamp(), 'state': 'launching',
+                      'rule': 'Persistent on uncertainty; no automatic signal, cleanup or restoration.'})
+    started = time.monotonic()
+    with log_producer.open('x') as streams:
+        child = subprocess.Popen(argv, cwd=COPY, env=env, stdout=streams, stderr=subprocess.STDOUT,
+                                 start_new_session=True)
+        try:
+            observed_pgid = os.getpgid(child.pid)
+        except ProcessLookupError:
+            observed_pgid = None
+        process = {'startedUtc': stamp(), 'pid': child.pid, 'ownedPgid': child.pid,
+                   'observedPgidAfterLaunch': observed_pgid, 'cwd': str(COPY), 'argv': argv,
+                   'environmentKeys': sorted(env), 'home': str(home), 'tmpdir': str(temporary),
+                   'cliArtifactRoot': str(artifacts), 'node': plan['node'],
+                   'environmentLimit': 'Explicit8 keys, no OS or universal network/cache isolation.'}
+        write_new(directory / 'owned-process.json', process)
+        try:
+            code = child.wait(timeout=420)
+        except subprocess.TimeoutExpired:
+            write_new(directory / 'timeout.json', {'capturedUtc': stamp(), 'pid': child.pid,
+                      'pgid': child.pid, 'timeoutSeconds': 420, 'outputFilesMayStillChange': True,
+                      'action': 'No signal, no extra wait/retry/cleanup/restoration; ACTIVE persists.'})
+            raise Stop('Outer420s expired; process/output lifecycle unresolved')
+    probe_started = time.monotonic()
+    probes = []
+    while True:
+        probe = group_probe(child.pid)
+        probes.append(probe)
+        if probe['absentByESRCH'] or time.monotonic() - probe_started >= 5:
+            break
+        time.sleep(min(0.05, max(0, 5 - (time.monotonic() - probe_started))))
+    command = process | {'exit': code, 'endedUtc': stamp(),
+        'durationMs': round((time.monotonic() - started) * 1000),
+        'ownedGroupProbes': probes, 'groupAbsentByESRCH': probe['absentByESRCH'],
+        'signalsOtherThanZeroSent': False, 'maxGroupPollingSeconds': 5}
+    write_new(directory / 'command.json', command)
+    require(probe['absentByESRCH'], 'Owned group remains/uncertain; no restoration or next phase')
+    require(observed_pgid == child.pid, 'Owned session PGID was not positively observed')
+    for producer, name in ((log_producer, 'stdout-stderr-frozen.log'),
+                           (raw_producer, 'raw.json'), (observer_producer, 'observer.json')):
+        write_bytes_new(directory / name, producer.read_bytes())
+    require(code in (0, 1), 'Signal or unexpected process exit is infrastructure')
+    result = classify(plan, read(directory / 'raw.json'), read(directory / 'observer.json'),
+                      (directory / 'stdout-stderr-frozen.log').read_text(errors='replace'),
+                      code, stage, child.pid)
+    result['ownedGroupAbsentByESRCH'] = True
+    result['cliArtifactRoot'] = str(artifacts)
+    write_new(directory / 'inputs-after.json', check_inputs(plan, target_sha))
+    write_new(directory / 'classification.json', result)
+    write_new(directory / 'artifacts.json',
+              [pin(path) for path in sorted(directory.iterdir()) if path.is_file()])
+    require(stage != 'mutant' or result['failed'] > 0,
+            'Mutant survivor retained; stop for root review without claiming a kill or automatic restoration')
+    ACTIVE.unlink()
+    print(json.dumps({'phase': phase, 'exit': code, 'total': 27, 'passed': result['passed'],
+                      'failed': result['failed'], 'classification': result['classification']}), flush=True)
+    return result
+
+def release_check(plan, plan_path, release_path, control):
+    release = read(release_path)
+    require(release.get('authorization') == 'START_P041_CAUSAL_' + control,
+            'Exact per-control root START authorization missing')
+    expected = {'control': control, 'planPath': str(plan_path), 'planSha256': pin(plan_path)['sha256'],
+                'controllerPath': str(Path(__file__).resolve()), 'controllerSha256': pin(__file__)['sha256'],
+                'parentSource': plan['parentSource'], 'productionSource': CODE,
+                'sourceRoot': str(COPY), 'parentRoot': str(ROOT)}
+    require(all(release.get(k) == v for k, v in expected.items()), 'Release binding mismatch')
+    if control == ORDER[1]:
+        previous = BASE / ('result--' + ORDER[0] + '.json')
+        require(previous.is_file() and release.get('previousResult') == pin(previous),
+                'M2 requires root-pinned completed M1 result')
+        require(read(previous).get('restoredExactly') is True, 'M1 restoration not completed')
+    else:
+        require(not (BASE / ('started--' + ORDER[1] + '.json')).exists(), 'Control order violated')
+    return expected
+
+def write_source(path, data):
+    no_uncertainty()
+    with path.open('r+b') as out:
+        out.write(data)
+        out.truncate()
+        out.flush()
+        os.fsync(out.fileno())
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('action', choices=['run'])
+    parser.add_argument('--control', required=True, choices=ORDER)
+    parser.add_argument('--plan', required=True)
+    parser.add_argument('--release', required=True)
+    args = parser.parse_args()
+    no_uncertainty()
+    plan_path, release_path = Path(args.plan).resolve(), Path(args.release).resolve()
+    plan = validate_plan(plan_path)
+    binding = release_check(plan, plan_path, release_path, args.control)
+    recipe = next(row for row in plan['controls'] if row['id'] == args.control)
+    write_new(BASE / ('started--' + args.control + '.json'),
+              {'startedUtc': stamp(), 'release': pin(release_path), 'binding': binding,
+               'rule': 'This control cannot be repeated in this namespace.'})
+    original = (COPY / TARGET).read_bytes()
+    require(sha(original) == recipe['baselineSha256'] and len(original) == recipe['baselineBytes'],
+            'Original script differs')
+    write_bytes_new(BASE / ('original-source--' + args.control + '.mjs'), original)
+    baseline = run_phase(plan, args.control, 'baseline', recipe['baselineSha256'])
+    require(original.count(recipe['find'].encode()) == recipe['occurrences'] == 1, 'Anchor is not exact-once')
+    mutant = original.replace(recipe['find'].encode(), recipe['replacement'].encode(), 1)
+    require(sha(mutant) == recipe['proposedMutantSha256'] and len(mutant) == recipe['proposedMutantBytes'],
+            'Derived exact mutant hash/size differs')
+    write_bytes_new(BASE / ('mutant-source--' + args.control + '.mjs'), mutant)
+    require(baseline['ownedGroupAbsentByESRCH'] is True, 'Baseline lifecycle unresolved')
+    check_inputs(plan, recipe['baselineSha256'])
+    write_source(COPY / TARGET, mutant)
+    altered = run_phase(plan, args.control, 'mutant', recipe['proposedMutantSha256'])
+    require(altered['ownedGroupAbsentByESRCH'] is True, 'Mutant lifecycle unresolved')
+    check_inputs(plan, recipe['proposedMutantSha256'])
+    write_source(COPY / TARGET, original)
+    restored = run_phase(plan, args.control, 'restored', recipe['baselineSha256'])
+    preservation = check_inputs(plan, recipe['baselineSha256'])
+    write_new(BASE / ('result--' + args.control + '.json'),
+              {'control': args.control, 'plan': pin(plan_path), 'release': pin(release_path),
+               'baseline': baseline, 'mutant': altered, 'restored': restored,
+               'restoredExactly': True, 'finalPreservation': preservation,
+               'verdict': 'body-assertion-sensitivity-awaiting-root-first-frame-and-masking-audit',
+               'killClaim': False, 'formalAcceptanceClosed': False,
+               'limits': ['NEW fixture, not historical coverage or a program outcome measurement.',
+                          'Observer precedes global teardown; actual exit/full streams checked separately.',
+                          'Owned group only; detached descendants/cache/network/OS isolation not universal.']})
+    print(json.dumps({'control': args.control, 'restoredExactly': True, 'killClaim': False}), flush=True)
+
+if __name__ == '__main__':
+    try:
+        main()
+    except Exception as error:
+        if BASE.is_dir() and not HALTED.exists():
+            write_new(HALTED, {'capturedUtc': stamp(), 'errorType': type(error).__name__,
+                      'message': str(error), 'activeMarkerRetained': ACTIVE.exists(),
+                      'automaticRestorationOnException': False,
+                      'rule': 'No automatic signal, retry, cleanup, restoration or further runtime.'})
+        print(json.dumps({'halted': True, 'errorType': type(error).__name__, 'message': str(error),
+                          'activeMarkerRetained': ACTIVE.exists()}), flush=True)
+        sys.exit(2)

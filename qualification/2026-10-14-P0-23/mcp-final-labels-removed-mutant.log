@@ -1,0 +1,147 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass
+
+ ❯ tests/mcpClaimLabels.test.ts (23 tests | 16 failed) 3969ms
+     ✓ discovers the exact 11 default tools with A4 preview disabled 227ms
+     × a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper 195ms
+     × amc_list_agents returns actual canonical claim fields 179ms
+     × amc_quickscore returns actual canonical claim fields 178ms
+     × amc_get_guide returns actual canonical claim fields 181ms
+     × amc_check_compliance returns actual canonical claim fields 176ms
+     × amc_transparency_report returns actual canonical claim fields 185ms
+     × amc_score_sector_pack returns actual canonical claim fields 170ms
+     × amc_score_agent returns actual canonical claim fields 175ms
+     × amc_list_evidence returns actual canonical claim fields 166ms
+     × amc_query_diagnostic returns actual canonical claim fields 167ms
+     × amc_get_recommendations returns actual canonical claim fields 173ms
+     × a current transparency run with checked seal true preserves its own claim 178ms
+     × a current transparency run with checked seal false preserves its own claim 174ms
+     ✓ paid fixture refuses inherited pack ID __proto__ 160ms
+     ✓ paid fixture refuses inherited pack ID constructor 159ms
+     ✓ paid fixture refuses inherited pack ID toString 160ms
+     ✓ paid fixture refuses inherited pack ID hasOwnProperty 161ms
+     ✓ an unpaid pack request remains an access refusal without an invented result 161ms
+     × amc_list_evidence keeps an empty workspace result not evaluated 161ms
+     × amc_query_diagnostic keeps an empty workspace result not evaluated 159ms
+     ✓ a missing agent response is an error, not successful claim coverage 159ms
+     × the incident-clock extension returns a regulated not-evaluated claim separately 162ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 16 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper
+AssertionError: expected [ { type: 'text', …(1) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/mcpClaimLabels.test.ts:238:28
+    236|     });
+    237|     expect(result.isError).not.toBe(true);
+    238|     expect(result.content).toHaveLength(2);
+       |                            ^
+    239|     const first = result.content[0];
+    240|     const label = result.content[1];
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/16]⎯
+
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_list_agents returns actual canonical claim fields
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_quickscore returns actual canonical claim fields
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_get_guide returns actual canonical claim fields
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_check_compliance returns actual canonical claim fields
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_transparency_report returns actual canonical claim fields
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_score_sector_pack returns actual canonical claim fields
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_score_agent returns actual canonical claim fields
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_list_evidence returns actual canonical claim fields
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_query_diagnostic returns actual canonical claim fields
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_get_recommendations returns actual canonical claim fields
+AssertionError: expected [ { type: 'text', …(1) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ claimResult tests/mcpClaimLabels.test.ts:178:26
+    176| function claimResult(result: CallToolResult) {
+    177|   expect(result.isError).not.toBe(true);
+    178|   expect(result.content).toHaveLength(2);
+       |                          ^
+    179|   const first = result.content[0];
+    180|   const label = result.content[1];
+ ❯ tests/mcpClaimLabels.test.ts:268:52
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/16]⎯
+
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > a current transparency run with checked seal true preserves its own claim
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > a current transparency run with checked seal false preserves its own claim
+AssertionError: expected [ { type: 'text', …(1) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ claimResult tests/mcpClaimLabels.test.ts:178:26
+    176| function claimResult(result: CallToolResult) {
+    177|   expect(result.isError).not.toBe(true);
+    178|   expect(result.content).toHaveLength(2);
+       |                          ^
+    179|   const first = result.content[0];
+    180|   const label = result.content[1];
+ ❯ tests/mcpClaimLabels.test.ts:303:52
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/16]⎯
+
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_list_evidence keeps an empty workspace result not evaluated
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > amc_query_diagnostic keeps an empty workspace result not evaluated
+AssertionError: expected [ { type: 'text', …(1) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ claimResult tests/mcpClaimLabels.test.ts:178:26
+    176| function claimResult(result: CallToolResult) {
+    177|   expect(result.isError).not.toBe(true);
+    178|   expect(result.content).toHaveLength(2);
+       |                          ^
+    179|   const first = result.content[0];
+    180|   const label = result.content[1];
+ ❯ tests/mcpClaimLabels.test.ts:337:52
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/16]⎯
+
+ FAIL  tests/mcpClaimLabels.test.ts > AMC MCP claim labels through the SDK > the incident-clock extension returns a regulated not-evaluated claim separately
+AssertionError: expected [ { type: 'text', …(1) } ] to have a length of 2 but got 1
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ claimResult tests/mcpClaimLabels.test.ts:178:26
+    176| function claimResult(result: CallToolResult) {
+    177|   expect(result.isError).not.toBe(true);
+    178|   expect(result.content).toHaveLength(2);
+       |                          ^
+    179|   const first = result.content[0];
+    180|   const label = result.content[1];
+ ❯ tests/mcpClaimLabels.test.ts:361:52
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/16]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  16 failed | 7 passed (23)
+   Start at  23:01:56
+   Duration  7.22s (transform 2.32s, setup 20ms, import 3.11s, tests 3.97s, environment 0ms)
+
+JSON report written to /private/tmp/p0-23-mcp-final-labels-removed-mutant-20261014.json

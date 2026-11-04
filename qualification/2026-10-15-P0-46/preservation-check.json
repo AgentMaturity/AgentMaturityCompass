@@ -1,0 +1,33 @@
+{
+  "source": "4c8f39b583a51c7bc1b2bba180c8aef60a94263f",
+  "atUtc": "2026-10-14T18:52:32.056828+00:00",
+  "checkouts": {
+    "primary": {
+      "path": "/Users/sid/AgentMaturityCompass",
+      "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+      "trackedStatus": ""
+    },
+    "Claude": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone",
+      "head": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+      "trackedStatus": ""
+    }
+  },
+  "heldRef": {
+    "repository": "/Users/sid/AgentMaturityCompass",
+    "name": "refs/heads/pending-main-442cd919",
+    "sha": "3b4a673c8f6fc11a947279054979e977f95b34d1"
+  },
+  "reservationSha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+  "sourceActionWorkflowPackageLockScriptsArchivesEqualBase": true,
+  "protectedInputs": {
+    "amc-action/action.yml": "31d15a09916588db6565656a730d232976fbc25e3fc03c402e32216422efb970",
+    ".github/workflows/amc-pr-gate.yml": "cac2129b01e6c3b4ce3717863de8baa39be15a7a1d825f012ede2c12c2754834",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "pnpm-workspace.yaml": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "unused-code/plan-edits/manifest.json": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7"
+  },
+  "policy": "No production/action recreation, archive or D15 rewrite, freeze/floor/baseline/dependency change, shared prefix, held overlay, paused work, tracker closure, external message, push or release."
+}

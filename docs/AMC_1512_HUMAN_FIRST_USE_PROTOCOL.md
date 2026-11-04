@@ -260,7 +260,7 @@ are added to strict intake inputs. All new assertions are unexecuted source only
 
 Task `amc-1512-evidence-transfer-v2-2026-09-11` delivers a separately versioned
 mapping and blank review sidecar in
-`AMC_OS/RESEARCH/2026-09-11-amc-1512-evidence-transfer-v2/`:
+the evidence-transfer/2 packet (an internal record that is not published):
 `CAPTURE_INPUT_MAPPING.v2.md`, `EVIDENCE_TRANSFER_PROTOCOL.v2.md`, and
 `evidence-transfer.v2.template.json`. These target capture `2026-09-10.1`, intake
 `2026-09-10` and credentials `1` without changing strict inputs or the legacy packet.

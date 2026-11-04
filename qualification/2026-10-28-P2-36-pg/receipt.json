@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-36",
+  "date": "2026-10-28",
+  "commit": "43fd678b018cf598399f3419212757348477780e",
+  "branch": "rtd/w4-a4-pg",
+  "node": "not recorded",
+  "pnpm": "not recorded",
+  "os": "not recorded",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run check:schemas",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <35 test files: every test importing a changed module (related-test-selection.txt), plus tests/a4/*, tests/actions/*, tests/a4*.test.ts and tests/wormSideTables.test.ts>",
+      "exit": 0,
+      "durationMs": 0
+    }
+  ],
+  "tests": {
+    "total": 596,
+    "passed": 596,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "checks.txt",
+      "sha256": "7ee96aaecbf02d509ba81b3de1afdcd91e46ba3180ea626a40c0b86bb9c0090c"
+    },
+    {
+      "path": "mutation.txt",
+      "sha256": "6a5e8644a5b3295d9d072a8cef5ec144aed81f42b75e1ee94688b7bff296ffc0"
+    },
+    {
+      "path": "related-test-selection.txt",
+      "sha256": "a00b19b125e69fc2d12201d93c4b4a6ce534cd40f1a30ff34898af4e6a60b37e"
+    },
+    {
+      "path": "related-tests.txt",
+      "sha256": "ffe3e647ed5df7b55c5bf4969a21554510b40e2121bfa460700b85b0b2d35c47"
+    }
+  ],
+  "notes": "P2-36 follow-up: A4 and action-journal rows written through to the Postgres ledger mirror and carried in WORM exports, on rtd/w4-a4-pg, base e95619acb, recorded 2026-10-28. commit is the code commit 43fd678b0; the folder's files were committed on top of it in b129a50f7. Rows 1-11 are checks.txt (check name and rc per line, written as the npm scripts they name; flags were not recorded). Row 12 is related-tests.txt (35 files, 596 tests passed); its command line was not recorded, and the selection is the one README.md gives. tests is that run's summary. No real Postgres server was used: every Postgres test drives the SQLite-backed pg fake (tests/fixtures/fake-pg) through the real worker bridge. The real-Postgres drill (docs/runbooks/POSTGRES_FAILOVER.md section 4b) is pending for Sid. Mutations: mutation.txt records 13 guards (M1-M13), each killed by the new tests. Not killed: the mutation that would weaken the migration's row comparison, because the fake driver cannot make a copy differ from its source (README.md, What remains). Not recorded: node, pnpm, the OS and the command durations (durationMs 0 means not recorded). arch is not recorded here either; arm64 is a same-host inference from the item's first receipt, 2026-10-27-P2-36 (macOS 26.6.2 arm64, committed the same day), because the schema allows only arm64 or x64."
+}

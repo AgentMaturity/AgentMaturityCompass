@@ -1011,13 +1011,13 @@ export async function runMCPAgentRedTeam(
     }
   }
 
-  // Compute category scores
+  // Every category accumulator is created and incremented together for an executed scenario.
   const categoryScores: MCPAgentRedTeamReport["categoryScores"] = {} as any;
   for (const [cat, data] of Object.entries(categoryAccum)) {
     categoryScores[cat as MCPAttackCategory] = {
       tested: data.tested,
       passed: data.passed,
-      score: data.tested > 0 ? Math.round(data.totalScore / data.tested) : 100,
+      score: Math.round(data.totalScore / data.tested),
     };
   }
 

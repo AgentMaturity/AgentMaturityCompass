@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-16T20:12:10.952076+00:00",
+  "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/unused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed",
+  "bytes": 13501,
+  "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c",
+  "ignoredBy": "/Users/sid/AgentMaturityCompass/.git/info/exclude:19:/unused-code/\tunused-code/plan-edits/P2-07/src/identity/identityConfig.ts.landed\n",
+  "indexEmpty": true,
+  "userDecision": "Keep it held; continue other work.",
+  "staged": false,
+  "forceAddUsed": false,
+  "ignoreRulesChanged": false,
+  "workaroundUsed": false
+}

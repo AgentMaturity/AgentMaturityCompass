@@ -87,7 +87,7 @@ export function createNativeAcpImageFixture(workspace: string, write: AcpSink, o
         close: () => { writer.close({ reason: "fixture-completed" }); }
       };
     } else {
-      session = await prepareAcpNativeSession({ session: init, signal, onApprovalRaised: () => {},
+      session = await prepareAcpNativeSession({ session: init, signal, onApprovalRaised: () => {}, initiator: "test-operator",
         ...(resume ? { claimant: { pid: process.pid, hostId: hostname(), bootId: randomUUID(), startedAt: Date.now() } } : {}) });
     }
     sessions.set(sessionId, session); return session;

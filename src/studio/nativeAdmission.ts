@@ -51,6 +51,13 @@ export function isNativeStudioPath(pathname: string): boolean {
     || pathname === "/api/v1/a4" || pathname.startsWith("/api/v1/a4/");
 }
 
+/** Where an `a4_comment` session credential is admitted: every A4 read, and posting a comment. Nothing else. */
+export function isA4CommentScopeRoute(pathname: string, method: string): boolean {
+  const verb = method.toUpperCase();
+  return (pathname === "/api/v1/a4" || pathname.startsWith("/api/v1/a4/"))
+    && (verb === "GET" || (verb === "POST" && /^\/api\/v1\/a4\/projects\/[^/]+\/comments$/.test(pathname)));
+}
+
 /** Existing aliases all reach the same signed approval engine; none is a weaker granting path. */
 export function isNativeApprovalMutationPath(pathname: string, method: string): boolean {
   return method.toUpperCase() === "POST"

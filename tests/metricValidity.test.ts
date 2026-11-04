@@ -105,6 +105,13 @@ describe("metric proof refusal boundaries", () => {
     };
   }
 
+  test("AXE-30 metric interval retains normal critical value, percent scale, and six-decimal rounding", () => {
+    const fixture = input();
+    fixture.questionScores = [score("AMC-1.1", 0), score("AMC-1.2", 1), score("AMC-1.3", 2)];
+    const report = buildMetricValidationReport(fixture, []);
+    expect(report.rows[0]?.confidenceInterval).toEqual({ level: 0.95, lower: 0, upper: 42.632131, marginOfError: 22.632131 });
+  });
+
   const architectureBase: MetricValidationArchitectureRealityCheck = {
     architectureSignalId: "invalid-architecture-proof", architectureSignalType: "wrapper_agent_baseline",
     covered: true, evidenceRefs: ["proof-fixture"], artifactHash: "a".repeat(64)
@@ -229,7 +236,7 @@ describe("buildMetricValidationReport", () => {
     expect(report.rows[0]?.metricId).toBe("overall_maturity_score");
     expect(report.rows[0]?.owner).toBe("AMC Score");
     expect(report.rows[0]?.sampleSize).toBe(6);
-    expect(report.rows[0]?.confidenceInterval.level).toBe(0.95);
+    expect(report.rows[0]?.confidenceInterval?.level).toBe(0.95);
     expect(report.rows[0]?.interRaterAgreement).toBe(0.92);
     expect(report.rows[0]?.testRetestStability).toBeGreaterThan(0.8);
     expect(report.evalPack.replayable).toBe(true);

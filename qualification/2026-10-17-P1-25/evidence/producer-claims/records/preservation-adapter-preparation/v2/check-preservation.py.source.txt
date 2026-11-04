@@ -1,0 +1,77 @@
+from pathlib import Path
+import datetime,hashlib,json,re,stat,subprocess,sys
+C=Path('/private/tmp/p1-25-producer-qualification-20261017')
+N=Path('/private/tmp/p1-39-post-typecheck-20261016')
+SOURCE_COMMIT='5d4e9e8d74bef32e68090369223947691c5fea21'
+RUNTIME_SHA='42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59'
+BINDING_SHA='9aa8dc730a6daaffbaef8f24bf12c9595a4d07c721841fb27a6d874b2cc12980'
+SNAPSHOT_SHA='860123709cfd11075a6983574c4ad8cf62bf1d52cd70747b2066b8b514f01117'
+S=Path('/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass')
+R=Path('/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass')
+mode,head,out=sys.argv[1:]
+assert mode in ('before-metadata','after-metadata') and re.fullmatch('[0-9a-f]{40}',head)
+output=Path(out);assert output.is_absolute() and output.parent==C and not output.exists()
+assert all(not (N/name).exists() for name in ('ACTIVE','ACTIVE.json','HALTED','HALTED.json'))
+runtime_bytes=(C/'runtime-protected-inputs.json').read_bytes();binding_bytes=(C/'fresh-source-binding.json').read_bytes()
+assert hashlib.sha256(runtime_bytes).hexdigest()==RUNTIME_SHA and hashlib.sha256(binding_bytes).hexdigest()==BINDING_SHA
+P=json.loads(runtime_bytes);F=json.loads(binding_bytes)
+assert P['schema']=='p125pc-runtime-protected-inputs-after-one-own-test-successor/1' and P['missingReservationReprobe'] is False
+assert F['schema']=='p125pc-actual-fresh-source-binding/1' and F['sourceCommit']==SOURCE_COMMIT and F['sourceRoot']==str(S)
+def pin(row):
+ p=Path(row['path']);s=p.lstat();assert stat.S_ISREG(s.st_mode) and not p.is_symlink() and str(p.resolve())==row['physicalPath']==str(p)
+ b=p.read_bytes();assert (len(b),hashlib.sha256(b).hexdigest(),s.st_dev,s.st_ino,s.st_nlink)==(row['bytes'],row['sha256'],row['dev'],row['inode'],row['nlink'])
+ return (s.st_dev,s.st_ino)
+def git(root,*args):
+ r=subprocess.run(['git','--no-optional-locks','-C',str(root),*args],capture_output=True);assert r.returncode==0,r.stderr;return r.stdout.decode()
+assert len(P['inputs'])==175 and len(P['nativePins'])==12 and len(F['boundPaths'])==102 and len(F['compiledPairs'])==23
+assert F['selectedPathCount']==102 and F['compiledPairCount']==23 and F['selectedPhysicalFileCount']==204
+assert F['existingNativePins']==P['nativePins'] and F['allSelectedPhysicalFilesDistinctRegularSingleLink'] is True
+assert F['runtimeProtectedInputsPin']['sha256']==RUNTIME_SHA and F['all175ActiveProtectedInputsExact'] is True
+meta={str(S/'qualification/2026-10-17-P1-25'/name) for name in ('README.md','receipt.json','assembly-inputs.json')}
+rows=P['inputs']
+snapshot_path=C/'original-p125-packet-pinset.json';snapshot_bytes=snapshot_path.read_bytes()
+assert len(snapshot_bytes)==506921 and hashlib.sha256(snapshot_bytes).hexdigest()==SNAPSHOT_SHA
+snapshot=json.loads(snapshot_bytes)
+assert snapshot['schema']=='p125pc-prior-packet-byte-preservation/1' and snapshot['sourceHead']==SOURCE_COMMIT
+assert snapshot['previousMetadataCommit']=='8889784782c8f7413e1cccab579ae4b8b6f21cc1' and snapshot['priorSemanticSourceCommit']=='80268079f804ed0ecb7659cd02a75e8b88ee3e0d'
+assert snapshot['retainedRoot']==str(C/'original-p125-packet') and snapshot['sourceRoot']==str(S/'qualification/2026-10-17-P1-25')
+assert snapshot['all2378Exact'] is True and snapshot['all2378SourceHeadBlobsExact'] is True and len(snapshot['files'])==2378
+snapshot_rows={r['relativePath']:r for r in snapshot['files']};assert len(snapshot_rows)==2378
+old_three={r['path']:r for r in rows if r['path'] in meta};assert len(old_three)==3
+for path,r in old_three.items():
+ original=C/'original-p125-packet'/Path(path).name;st=original.lstat();assert stat.S_ISREG(st.st_mode) and original.resolve()==original and st.st_nlink==1
+ data=original.read_bytes();old_snapshot=snapshot_rows[original.name]
+ assert (len(data),hashlib.sha256(data).hexdigest())==(r['bytes'],r['sha256'])==(old_snapshot['bytes'],old_snapshot['sha256'])
+if mode=='after-metadata':
+ A=json.loads((C/'root-metadata-admission.json').read_text())
+ assert A['schema']=='p125pc-root-actual-source-metadata-admission/1' and A['sourceCommit']==SOURCE_COMMIT and A['readyForMetadataSuccessors'] is True
+ assert A['originalPacketPinsetPin']['path']==str(snapshot_path) and A['originalPacketPinsetPin']['sha256']==SNAPSHOT_SHA;pin(A['originalPacketPinsetPin'])
+ expectations_pin=A['publicationExpectationsPin'];assert expectations_pin['path']==str(C/'private-extension-root/publication-expectations.json');pin(expectations_pin)
+ E=json.loads(Path(expectations_pin['path']).read_text());assert E['sourceCommit']==SOURCE_COMMIT and E['newPrefix']=='evidence/producer-claims/'
+ assert set(E['existingPathsAllowedToChange'])=={'README.md','receipt.json','assembly-inputs.json'}
+ assert len(A['oldThree'])==len(A['newThree'])==3 and {r['path']:r for r in A['oldThree']}==old_three
+ admitted={r['path']:r for r in A['newThree']};expected={r['path']:r for r in E['metadataProtection']['newThreeActivePins']}
+ assert len(admitted)==len(expected)==3 and set(admitted)==set(expected)==meta
+ for path,r in admitted.items():
+  assert all(r[k]==old_three[path][k] for k in ('path','physicalPath','dev','inode','nlink')) and r['nlink']==1
+  assert all(r[k]==expected[path][k] for k in ('path','bytes','sha256'))
+ rows=[admitted[r['path']] if r['path'] in meta else r for r in rows]
+ assert len([r for r in rows if r['path'] not in meta])==172
+for r in rows:pin(r)
+natives=[*P['nativePins'],F['freshNative']];native_ids={pin(r) for r in natives};assert len(natives)==len(native_ids)==13
+seen=set()
+for r in F['boundPaths']:
+ for side in ('source','fresh'):
+  identity=pin(r[side]);assert identity not in seen;seen.add(identity)
+ assert (r['source']['bytes'],r['source']['sha256'])==(r['fresh']['bytes'],r['fresh']['sha256'])==(r['bytes'],r['sha256'])
+assert len(seen)==204 and not seen.intersection(native_ids)
+assert git(S,'rev-parse','HEAD').strip()==head and git(S,'branch','--show-current').strip()=='codex/p1-25-producer-qualification'
+assert git(Path(F['freshRoot']),'rev-parse','HEAD').strip()==F['sourceCommit']
+assert git(Path(F['freshRoot']),'status','--porcelain=v1')==git(Path(F['freshRoot']),'diff','--cached','--name-only')==''
+assert git(R,'rev-parse','HEAD').strip()==P['heldRHead']
+assert git(R,'status','--porcelain=v1')==P['heldRStatus'] and git(R,'diff','--cached','--name-only')==P['heldRStaged']==''
+if mode=='before-metadata':assert head==SOURCE_COMMIT and git(S,'status','--porcelain=v1')==git(S,'diff','--cached','--name-only')==''
+assert all(not (N/name).exists() for name in ('ACTIVE','ACTIVE.json','HALTED','HALTED.json'))
+value={'schema':'p125pc-root-current-preservation/1','at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'mode':mode,'sourceHead':head,'all175ActivePhysicalPinsExact':True,'other172OriginalAndThreeAdmittedMetadataSuccessorsExact':mode=='after-metadata','all102SourceFreshPairs23CompiledPairs204DistinctPhysicalFilesExact':True,'all13DistinctNativesExact':True,'freshCleanIndexEmpty':True,'heldR18RowsHeadIndexExact':True,'sourceCleanIndexEmptyRequired':mode=='before-metadata','noUniversalIsolationClaim':True}
+with output.open('x') as f:json.dump(value,f,indent=2);f.write('\n')
+print(json.dumps(value))

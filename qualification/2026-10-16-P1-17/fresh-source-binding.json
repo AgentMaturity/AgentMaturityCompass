@@ -1,0 +1,92 @@
+{
+  "schema": "p117-fresh-source-binding/1",
+  "sourceCommit": "3ebf7cbae4023a130ce9db5c9fe304010cd2e5db",
+  "root": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout",
+  "status": "",
+  "corpusAndSource": [
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/regulatoryClocks.test.ts",
+      "bytes": 9271,
+      "sha256": "93bf448e9b09b862f450f2a64e755c566e17d9fa52689ec0d69f95bcea6967f5",
+      "dev": 16777231,
+      "inode": 541955665,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentEvidencePacket.test.ts",
+      "bytes": 12458,
+      "sha256": "265743f7ee7f3d4652e5ae142448d7d80f0b9dd6a3bca9e49b2067e57e8e9e04",
+      "dev": 16777231,
+      "inode": 541955289,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/mcpServer.test.ts",
+      "bytes": 7722,
+      "sha256": "b69d6035b38eaa0c284d3e41dd27e2af8b464a4fce9a2ebdc57c974c09ff13ed",
+      "dev": 16777231,
+      "inode": 541955400,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+      "bytes": 17140,
+      "sha256": "fca85f54ead2982898d15f1547f2710e002ba0b6d2cbed527a648ff9985639bc",
+      "dev": 16777231,
+      "inode": 541955287,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockSurfaces.test.ts",
+      "bytes": 22743,
+      "sha256": "ded44f7549d6c56008b068f23761b6a92fde033a0a96dabf33b50a8b0d17ece5",
+      "dev": 16777231,
+      "inode": 541955288,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/src/incidents/regulatoryClocksTable.ts",
+      "bytes": 35373,
+      "sha256": "3070fa3420062b58e5b3a85469e08b649b8de6a9f41b1380cee12caa2efe8ea0",
+      "dev": 16777231,
+      "inode": 541952688,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/src/incidents/incidentClockEvents.ts",
+      "bytes": 10800,
+      "sha256": "09e05ad6c36e9048d42eebce87ef6a884aa278bbc72233b0e3fafb52b57a1f2b",
+      "dev": 16777231,
+      "inode": 541952679,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/src/incidents/incidentClockEvents.ts",
+      "bytes": 10800,
+      "sha256": "09e05ad6c36e9048d42eebce87ef6a884aa278bbc72233b0e3fafb52b57a1f2b",
+      "dev": 16777231,
+      "inode": 541952679,
+      "nlink": 1
+    }
+  ],
+  "nativeSource": {
+    "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 539175547,
+    "nlink": 1
+  },
+  "nativeFresh": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "dev": 16777231,
+    "inode": 541993341,
+    "nlink": 1
+  },
+  "borrowedRunner": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+  "sourceCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "separateInstallBuild": "clean-source47228ms exit0 PGID27824 ESRCH; full retained command log reviewed",
+  "fullAcceptance": false
+}

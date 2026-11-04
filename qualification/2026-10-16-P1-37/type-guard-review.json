@@ -1,0 +1,35 @@
+{
+  "schema": "p137-test-v4-type-guard-independent-review/1",
+  "base": {
+    "path": "/private/tmp/p1-37-qualification-20261016/test-proposal-v3/autoCompaction.test.ts",
+    "bytes": 44169,
+    "sha256": "de82e627018a708ea131fa7a23ac0a02d21413e88cf09fa11e759283ee4ea6c9"
+  },
+  "candidate": {
+    "path": "/private/tmp/p1-37-qualification-20261016/test-proposal-v4/autoCompaction.test.ts",
+    "bytes": 44184,
+    "sha256": "f81a60b6b46acc37f4003bd76d384e22637225100a7b805623db540ea8bc0f48"
+  },
+  "patch": {
+    "path": "/private/tmp/p1-37-qualification-20261016/test-proposal-v4/changes.patch",
+    "bytes": 706,
+    "sha256": "e5aa253f5b65f143d3ce97b0bdc1db8a93b59e071958640fab22113212dd1f57"
+  },
+  "exactOnlyChange": {
+    "before": "if (!ref?.locator) throw new Error(\"fixture did not retain an encrypted spill\");",
+    "after": "if (ref?.v !== 2 || !ref.locator) throw new Error(\"fixture did not retain an encrypted spill\");"
+  },
+  "allOtherBytesIdentical": true,
+  "registrationNamesAndTablesUnchanged": true,
+  "expectedRegistrations": 31,
+  "semantics": "The spill-specific fixture now explicitly rejects null and v1 references before using v2-only encodedSha256. On the existing valid-v2 path, every subsequent assertion and operation is unchanged. The preceding expect(ref?.v).toBe(2) was a runtime assertion rather than a TypeScript narrowing guard.",
+  "typedNarrowing": "If the guard returns normally, ref is non-null with discriminant v===2 and a truthy locator. No cast, compiler option, guard or production source change is introduced.",
+  "manualV1CompatibilityBodyUnchanged": true,
+  "blockingFindings": [],
+  "allReadsFinished": true,
+  "runtimeOrTypecheckExecuted": false,
+  "repositoryOrSourceWrites": false,
+  "metadataPreparationNote": "An initial metadata comparison expected absolute diff labels, while the retained patch correctly uses v3/ and v4/ labels. That assertion stopped before any audit artifact write. Repeating only the text comparison with the actual labels proves exact diff equality; no product runtime or file change occurred.",
+  "admissionConclusion": "No static blocker found for root to apply the separately admitted one-line test guard and qualify it in the new reviewed namespace. Actual TypeScript and runtime outcomes remain pending.",
+  "formalAcceptanceClosed": false
+}

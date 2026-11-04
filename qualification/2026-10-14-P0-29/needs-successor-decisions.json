@@ -1,0 +1,2245 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-10-14",
+  "preparedUtc": "2026-10-14T12:49:19.499210+00:00",
+  "reportStatus": "routing decision proposal only; unapproved and unqualified",
+  "acceptedMain": {
+    "checkout": "/Users/sid/AgentMaturityCompass",
+    "head": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+    "originMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+  },
+  "preservedOriginal": {
+    "path": "/Users/sid/.codex/xirp-projects/amc-rtd-2026-10-10-worktree-rtd-p0-29-gap-reconciliation/docs/program/gap-register-reconciliation.json",
+    "sha256": "7e25d40365fb187f23f4b646b4dc2c6b0b497ca771e7b52ffb578b6266e1e153",
+    "verifiedOn": {
+      "main": "55a5f121d50647c0b87f1f705586cf12e35784a2",
+      "date": "2026-10-10"
+    },
+    "modified": false
+  },
+  "counts": {
+    "unresolvedRows": 38,
+    "byAuthoringStatus": {
+      "mitigated": 12,
+      "open": 25,
+      "deferred": 1
+    },
+    "byGroup": {
+      "G1": 2,
+      "G2": 20,
+      "G3": 8,
+      "G6": 2,
+      "G8": 6
+    },
+    "decisionGroups": 36,
+    "sharedDecisionGroups": 2,
+    "independentDecisionGroups": 34
+  },
+  "unresolvedSetInspection": {
+    "listedIds": [
+      "G1-39",
+      "G1-46",
+      "G2-02",
+      "G2-04",
+      "G2-16",
+      "G2-23",
+      "G2-24",
+      "G2-25",
+      "G2-26",
+      "G2-27",
+      "G2-28",
+      "G2-31",
+      "G2-32",
+      "G2-33",
+      "G2-34",
+      "G2-35",
+      "G2-36",
+      "G2-37",
+      "G2-38",
+      "G2-39",
+      "G2-40",
+      "G2-41",
+      "G3-04",
+      "G3-06",
+      "G3-07",
+      "G3-11",
+      "G3-10",
+      "G3-15",
+      "G3-17",
+      "G3-27",
+      "G6-20",
+      "G6-23",
+      "G8-01",
+      "G8-03",
+      "G8-05",
+      "G8-12",
+      "G8-13",
+      "G8-25"
+    ],
+    "derivedIds": [
+      "G1-39",
+      "G1-46",
+      "G2-02",
+      "G2-04",
+      "G2-16",
+      "G2-23",
+      "G2-24",
+      "G2-25",
+      "G2-26",
+      "G2-27",
+      "G2-28",
+      "G2-31",
+      "G2-32",
+      "G2-33",
+      "G2-34",
+      "G2-35",
+      "G2-36",
+      "G2-37",
+      "G2-38",
+      "G2-39",
+      "G2-40",
+      "G2-41",
+      "G3-04",
+      "G3-06",
+      "G3-07",
+      "G3-11",
+      "G3-10",
+      "G3-15",
+      "G3-17",
+      "G3-27",
+      "G6-20",
+      "G6-23",
+      "G8-01",
+      "G8-03",
+      "G8-05",
+      "G8-12",
+      "G8-13",
+      "G8-25"
+    ],
+    "equal": true,
+    "supplementalMissingMappings": [],
+    "allAuthoringSuccessorsRemainNull": true
+  },
+  "currentSourceInspection": {
+    "uniqueSourceRefs": 63,
+    "sameBlobReferences": 62,
+    "changedReferences": [
+      {
+        "ref": "src/ledger/ledger.ts:1270-1294",
+        "path": "src/ledger/ledger.ts",
+        "originalBlob": "a80269b9e855dcd69749f3d457cc6a297995f42b",
+        "mainBlob": "aa1d539a15001c827e98af9453cc96c876300fe5"
+      }
+    ],
+    "sameRecordedNamedPathBlobs": 160,
+    "recordedAbsentLeafStringsStillNotLeafPaths": 35,
+    "limit": "These inventory comparisons preserve the original assertions. Directories, combined expressions, wildcard patterns and incomplete namespaces require typed observations; leaf-string absence is not whole-scope absence or functional proof."
+  },
+  "planReview": {
+    "specsDirectory": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs",
+    "individualEngineeringSpecs": 181,
+    "indexedEngineeringIssues": 180,
+    "standaloneNotIndexed": [
+      "P1-78"
+    ],
+    "standaloneNotIndexedLimit": "P1-78 is explicitly a proposed key; no assignment uses it.",
+    "explicitUnresolvedIdReferencesOutsideP0_29": [],
+    "relevantFullSpecs": [
+      {
+        "key": "P0-07",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-07.md",
+        "sha256": "755bf681095798609c4da968d720e8ff239a268e1dc3743a51051badeec914ca",
+        "bytes": 10453
+      },
+      {
+        "key": "P0-26",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-26.md",
+        "sha256": "f93db22557ec8efe753a13a3a8d64f1e88ca8625aac53c91d481fd202065c1fa",
+        "bytes": 11744
+      },
+      {
+        "key": "P0-37",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-37.md",
+        "sha256": "9136488354e3d906ca990c8cdd3c3c4820fc36a582bccfcdae39659f0bd71bb6",
+        "bytes": 14874
+      },
+      {
+        "key": "P1-12",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-12.md",
+        "sha256": "5628e7b045ac658ca36544ddb02454c5eb6efd0a86c62f17f1cafa61ebb2747d",
+        "bytes": 13970
+      },
+      {
+        "key": "P1-15",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-15.md",
+        "sha256": "e26e311398e6e2ae05163f69c3b6ff7bb1aabce5f393b6aacedd9b8e9d2cf6da",
+        "bytes": 11849
+      },
+      {
+        "key": "P1-40",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-40.md",
+        "sha256": "687039559f26dd79ab42880509e548809f4fac3c626b4d32aea54b17e73d105c",
+        "bytes": 10781
+      },
+      {
+        "key": "P1-52",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-52.md",
+        "sha256": "5e63eeb8bc10d898d7cafab80da5fdbe445b44a47f5c411926149d17aaa840e0",
+        "bytes": 9702
+      },
+      {
+        "key": "P1-53",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-53.md",
+        "sha256": "7042110300abcfbde9dd93e3e30a7e7bc2ec287a30ad5f64bf263f580c1f13e5",
+        "bytes": 12784
+      },
+      {
+        "key": "P2-07",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-07.md",
+        "sha256": "5362e96e1e60e6d89f8764f2595b8853d3302ca371885bf52cdf393f29e0a306",
+        "bytes": 18876
+      },
+      {
+        "key": "P2-09",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-09.md",
+        "sha256": "2b78e58ee2bfcd93b8bef3f88539a63a61e8b3b6b809ab276e0e23b8f0252b72",
+        "bytes": 18918
+      },
+      {
+        "key": "P2-11",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-11.md",
+        "sha256": "1c4739cd0e4fd07c7c9cfe41db43d0f6e2e9ba747cc757dd1a25b1ca699bd72f",
+        "bytes": 16399
+      },
+      {
+        "key": "P2-13",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-13.md",
+        "sha256": "b7b6cc1c69c34feda38445fdd551cb7cc6b5c7a55ffce58c4a5f00ba9f8181f5",
+        "bytes": 9978
+      },
+      {
+        "key": "P2-29",
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-29.md",
+        "sha256": "da5f0ce264839bdb5cab3a4e50163c68307b08dcac88fe117972366d4f15205a",
+        "bytes": 10997
+      }
+    ],
+    "scopeExclusions": [
+      {
+        "key": "P1-52",
+        "line": 25,
+        "reason": "Excludes removing dead code and deduplicating."
+      },
+      {
+        "key": "P2-29",
+        "line": 27,
+        "reason": "Owns CLI/docs/reviewer independence and optional CLI decomposition, not general orphan-library cleanup."
+      },
+      {
+        "key": "P0-26",
+        "line": 1,
+        "reason": "Owns 30 station-question drop decisions only."
+      },
+      {
+        "key": "P1-53",
+        "line": 34,
+        "reason": "Owns named catalog/rubric/crosswalk systems, not arbitrary analytics or module overlaps."
+      },
+      {
+        "key": "P2-09",
+        "line": 73,
+        "reason": "Other SQLite files and host.db remain on the volume; it does not consolidate all stores."
+      }
+    ]
+  },
+  "answerInstructions": {
+    "forEachGroup": "Answer the stated common decision, then give each row a complete accepted scope and one accountable owner. Cite an existing plan key only if its approved scope covers the entire row; otherwise propose a follow-up scope without inventing a key. Leaving a decision deferred preserves the unresolved entry.",
+    "acceptedLibraryBoundaryRequires": [
+      "exact modules and public API",
+      "what is supported and what consumers may infer",
+      "source/behavior acceptance evidence",
+      "owner of remaining acceptance"
+    ],
+    "answersDoNotAuthorize": [
+      "source remediation",
+      "cleanup, deletion or untracking",
+      "tracker changes",
+      "paused AMC-1500/G4 or AMC-1503/G7 resumption",
+      "freeze exceptions or guard bypass"
+    ],
+    "knownNonCommonDecision": "G2-25 and G8-13 must not share a decision merely because both titles say score analytics: their named module sets differ, and G8-13 has a namespace-resolution gap."
+  },
+  "rows": [
+    {
+      "id": "G1-39",
+      "finding": "4 vault \"backward-compat\" wrappers (memoryTtl.storeWithTtl, screenshotRedact, secretsBroker.mintSecretToken, undoLayer) return `stored:true`/`redacted:true`/tokens without doing anything — and are the barrel-exported names",
+      "historicalLocation": "src/vault/{memoryTtl,screenshotRedact,secretsBroker,undoLayer}.ts",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Wrappers now store/redact/mint, but undoChange returns reverse payload rather than restoring resources. Cluster acceptance remains.",
+      "whyNoExactWholeScopeSuccessor": "The four-wrapper finding is heterogeneous. Three wrappers now perform their stated effects, but undoChange returns a reverse payload rather than restoring a resource. No current spec takes responsibility for the full wrapper contract and the remaining undo acceptance.",
+      "specificUserDecision": "Define the supported contract for undoChange: preview/reverse-payload library or actual restoration. Name an owner for the remaining contract and cluster acceptance.",
+      "decisionGroup": "row-G1-39",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/vault/memoryTtl.ts:61-70",
+        "src/vault/screenshotRedact.ts:68-81",
+        "src/vault/secretsBroker.ts:95-106",
+        "src/vault/undoLayer.ts:61-80"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G1-46",
+      "finding": "19 vendor LiveDrift wrappers + 7 provider-drift adapters present vendor-branded \"live drift\" proofs (HELM/Humanloop/Promptfoo/…) but never call any vendor; caller supplies rows",
+      "historicalLocation": "src/watch/*LiveDrift.ts; src/benchmarks/{helm,humanloop,…}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Vendor wrappers require individual claim/reachability disposition; broad historical grouping is insufficient.",
+      "whyNoExactWholeScopeSuccessor": "The original 19 vendor wrappers and seven adapters are not fully enumerated in the draft. Their claims, input provenance and runtime consumers need individual disposition. No existing issue covers this whole vendor-wrapper inventory.",
+      "specificUserDecision": "Enumerate all original wrapper/adaptor members and decide each supported claim and runtime boundary. Name one accountable whole-row owner or approve a scoped follow-up.",
+      "decisionGroup": "row-G1-46",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/watch/bishengObservabilityLiveDrift.ts:1-35"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-02",
+      "finding": "Assurance orphan pack cluster: 7 unimported pack modules (2 near-dup spellings of wired packs) + 6 legacy `*PackV1.json` fixtures",
+      "historicalLocation": "src/assurance/packs/{do-not-answer-pack,toxicchat-pack,multiTurnDeepEvalPack,selfReportGamingPack,economicAmplificationPack,overthinkingDetectionPack,zombieAgentPersistencePack}.ts; fixtures/packs/*PackV1.json",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Three orphan spellings are absent and multiTurnDeepEvalPack is registered; economicAmplification/overthinking/zombie modules remain. Mixed wiring/deletion does not close the whole cluster.",
+      "whyNoExactWholeScopeSuccessor": "The finding combines removed aliases/legacy fixtures with retained assurance packs. Existing pack-conversion plans name different pack sets, and no whole-cluster owner or accepted library boundary is documented. The wildcard fixture reference remains unresolved.",
+      "specificUserDecision": "Decide supported library, runtime pack, or deprecation treatment for each retained pack and resolve the wildcard fixture set. Name the whole-cluster owner.",
+      "decisionGroup": "row-G2-02",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/assurance/packs/index.ts:87-95",
+        "src/assurance/packs/index.ts:204-214"
+      ],
+      "observationalResolutionCaveats": [
+        {
+          "id": "G2-02",
+          "originalValue": "fixtures/packs/*PackV1.json",
+          "kind": "unresolved_combined_or_pattern_expression",
+          "treePrefix": null,
+          "examples": []
+        }
+      ],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-04",
+      "finding": "Benchmarks dead files: `benchCli` (8-line parser), `valueSigner`, `value/connectors` (3), `cgxSigner`, `cgxQuery`, `transformSse`, `crypto/signing/signerNotary`",
+      "historicalLocation": "src/benchmarks/benchCli.ts; src/value/{valueSigner.ts,connectors/*}; src/cgx/{cgxSigner,cgxQuery}.ts; src/transformation/transformSse.ts; src/crypto/signing/signerNotary.ts",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Named dead shims are absent but benchCli and connectors remain; the historical log explicitly retained the live parser. Full cluster disposition needs review.",
+      "whyNoExactWholeScopeSuccessor": "The row combines removed shims with a retained live parser and three value connectors. CLI deprecation and catalog consolidation do not decide every retained member of this mixed cluster.",
+      "specificUserDecision": "Confirm intentional parser/connector boundaries or the desired consolidation/deprecation scope, with an owner covering every retained member.",
+      "decisionGroup": "row-G2-04",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/benchmarks/benchCli.ts:1-8"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-16",
+      "finding": "Score dead cluster: `costPredictability`, `decisionExplainability`, `testProdParity`; `scoreHistoryCli` (and `scoreHistory` reachable only through it)",
+      "historicalLocation": "src/score/{costPredictability,decisionExplainability,testProdParity,scoreHistoryCli,scoreHistory}.ts",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Four dead score modules are absent, but scoreHistory remains; original cluster cannot be called wholly deleted.",
+      "whyNoExactWholeScopeSuccessor": "Four members are absent, while scoreHistory remains. No existing spec owns its retained consumer/storage boundary plus acceptance of the complete original deletion claim.",
+      "specificUserDecision": "Decide whether scoreHistory is a supported storage/library surface or needs consolidation; identify its consumers and name the complete-row owner.",
+      "decisionGroup": "row-G2-16",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/score/scoreHistory.ts:1-22"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-23",
+      "finding": "Misc dead: `adapters/adapterDoctor`, `claims/index` barrel, `vault/keyRotation` (verified dead), `bridge/tests/fixtures/openai-chat.json`",
+      "historicalLocation": "src/adapters/adapterDoctor.ts; src/claims/index.ts; src/vault/keyRotation.ts; src/bridge/tests/fixtures/openai-chat.json",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Adapter/claims/vault shims are absent, but the bridge fixture remains; log range cannot prove complete deletion.",
+      "whyNoExactWholeScopeSuccessor": "The named shims are absent but the bridge fixture remains. No plan issue establishes whether that fixture is intentional, superseded or a residual, so the whole grouped claim is not disposed of.",
+      "specificUserDecision": "Decide the retained bridge fixture purpose and acceptance; name the owner of the remaining grouped disposition.",
+      "decisionGroup": "row-G2-23",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/bridge/tests/fixtures/openai-chat.json:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-24",
+      "finding": "Product ORPHAN-barrel (~47): 33 in-memory heuristic modules (real TF-IDF/DAG/sagas) + 4 Python-port modules + scratchpad/promptModules/asyncCallback + tool* estimators",
+      "historicalLocation": "src/product/index.ts (cli.ts dynamic-imports only 7 symbols; root src/index.ts skips the barrel)",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "The roughly 47 product modules span heuristics, ports, callbacks and estimators. No current spec enumerates and owns this full cluster or accepts its library boundary; generic CLI consolidation is insufficient.",
+      "specificUserDecision": "Choose supported library boundaries or concrete runtime consumers for the enumerated product cluster; assign one accountable owner to the complete scope.",
+      "decisionGroup": "row-G2-24",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/product/index.ts:1-6",
+        "src/index.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-25",
+      "finding": "Score analytics ORPHAN-barrel (~26): real, tested algorithm code reachable only via package barrel",
+      "historicalLocation": "src/score/{nlpMetrics,statisticalAnalysis,safetyMetrics,scoreExplainer,antiGaming,crossFrameworkMapping,ragGroundingEval,ragMaturity,graduatedAutonomy,catastrophicRiskIndicators,...}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "P1-53 owns crossFrameworkMapping within the larger analytics cluster, but not all roughly 26 algorithms. The remaining supported-library/product-consumer boundary has no whole-row owner.",
+      "specificUserDecision": "Decide the non-catalog analytics library/consumer boundary separately from P1-53 and name the whole-cluster owner.",
+      "decisionGroup": "row-G2-25",
+      "narrowUnapprovedPlanLeads": [
+        {
+          "planKey": "P1-53",
+          "approvalStatus": "unapproved",
+          "coverage": "partial only",
+          "coveredScope": "crossFrameworkMapping only",
+          "uncoveredScope": "Does not own the remaining roughly 26-member analytics cluster.",
+          "evidence": [
+            {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-53.md",
+              "line": 34
+            }
+          ],
+          "assignmentApplied": false
+        }
+      ],
+      "sourceRefs": [
+        "src/score/nlpMetrics.ts:1-6",
+        "src/score/statisticalAnalysis.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-26",
+      "finding": "Diagnostic analytics ORPHAN-barrel (7) + gap-receipt cluster (7)",
+      "historicalLocation": "src/diagnostic/{identityStability,knownUnknowns,componentConfidence,selfCalibration,riskTiers,longitudinalTracking,evalReplayCorpusBoundary}.ts; src/audit/{posthocAuditSampling,reviewerIndependence}.ts; src/runtime/{stateCheckpoint,autonomyBoundary,degradedModeContract}.ts; src/security/supplyChainPosture.ts; src/fleet/cascadeSimulator.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "The row combines seven diagnostic analytics modules with seven gap-receipt/control modules. P2-29 owns reviewerIndependence, one member only. No whole-cluster scope or accepted boundary is established.",
+      "specificUserDecision": "Decide the diagnostic analytics and gap-receipt module boundaries separately; specify how all 14 members receive accepted scope and ownership.",
+      "decisionGroup": "row-G2-26",
+      "narrowUnapprovedPlanLeads": [
+        {
+          "planKey": "P2-29",
+          "approvalStatus": "unapproved",
+          "coverage": "partial only",
+          "coveredScope": "reviewerIndependence only",
+          "uncoveredScope": "Does not own the other diagnostic and gap-receipt modules.",
+          "evidence": [
+            {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-29.md",
+              "line": 45
+            }
+          ],
+          "assignmentApplied": false
+        }
+      ],
+      "sourceRefs": [
+        "src/diagnostic/identityStability.ts:1-6",
+        "src/diagnostic/knownUnknowns.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-27",
+      "finding": "Steer pipeline ORPHAN-barrel: 5 stages reachable only via unimported barrel (only race/liquid/privacyTiers used)",
+      "historicalLocation": "src/steer/{autotune,feedbackLoop,hygiene,harmClassifier,parameterMatrix}.ts; src/steer/index.ts; research/eval_*",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "No spec owns the complete five-stage steer library or its consumption boundary. A package barrel and the use of race/liquid/privacyTiers do not establish acceptance for the remaining pipeline.",
+      "specificUserDecision": "Decide whether the five steer stages are a supported public library, a product pipeline, or future deprecation scope; name the owner and consumers.",
+      "decisionGroup": "row-G2-27",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/steer/autotune.ts:1-6",
+        "src/steer/feedbackLoop.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-28",
+      "finding": "Claims lifecycle state machine dead-ends via unimported `claims/index`",
+      "historicalLocation": "src/claims/{claimFactory,claimLifecycle,claimVerify,promotionGate,quarantine,contradictions}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "No spec explicitly transfers all six original claims-lifecycle modules into the newer claim contract or accepts them as a separate library. A similarly named claim service is not an ownership assignment.",
+      "specificUserDecision": "Decide whether original claims-lifecycle modules are distinct supported contracts or must adapt to the newer claim service; name the scope and owner.",
+      "decisionGroup": "row-G2-28",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/claims/claimFactory.ts:1-6",
+        "src/claims/claimLifecycle.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-31",
+      "finding": "Entire `src/hallucination` dir orphaned (polished module + tests + docs, no CLI/API/studio wiring)",
+      "historicalLocation": "src/hallucination/{index,types,detector,deterministicDetectors,llmJudge}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "The complete five-file hallucination library lacks an accepted supported-library or product-wiring disposition. The common library boundary can be reviewed with G8-12, but G8-12 retains separate failure-parsing acceptance.",
+      "specificUserDecision": "Choose the shared hallucination library boundary, then name the owner of G2-31 wiring or accepted-library acceptance.",
+      "decisionGroup": "hallucination-library-boundary",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/hallucination/index.ts:1-6",
+        "src/hallucination/types.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-32",
+      "finding": "Incidents advanced layer reachable only via package barrel; CLI/API use incidentStore alone",
+      "historicalLocation": "src/incidents/{incidentTimeline,incidentGraph,causalInference,autoAssembly,incidentRegression,index}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "Advanced incident modules and the live incidentStore path have no accepted whole-layer relationship. Regulatory-clock and incident workflow issues do not own all these advanced modules.",
+      "specificUserDecision": "Decide the advanced incident layer relationship to incidentStore and its supported consumers; name the whole-layer owner.",
+      "decisionGroup": "row-G2-32",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/incidents/incidentTimeline.ts:1-6",
+        "src/incidents/incidentGraph.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-33",
+      "finding": "Vault orphan cluster (4 real): dataResidency, honeytokens, invoiceFraud, knowledgeRefreshLineage",
+      "historicalLocation": "src/vault/{dataResidency,honeytokens,invoiceFraud,knowledgeRefreshLineage}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "The four vault modules have different functions and data risks. Current residency/redaction plans address live enforcement paths, not the complete orphan-module boundary or invoice/honeytoken/lineage acceptance.",
+      "specificUserDecision": "Decide per-module residency/honeytoken/fraud/lineage support and consumers; name an accountable owner for the four-module boundary.",
+      "decisionGroup": "row-G2-33",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/vault/dataResidency.ts:1-6",
+        "src/vault/honeytokens.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-34",
+      "finding": "Values engines orphaned while assurance packs of same name never import them",
+      "historicalLocation": "src/values/{valueCoherence,disempowerment,index}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "No spec binds both values engines to their corresponding assurance packs or accepts them as standalone libraries. Pack conversions do not establish this full engine-to-pack mapping.",
+      "specificUserDecision": "Decide whether and how each values engine is used by a pack, or accept its independent library contract; name the complete owner.",
+      "decisionGroup": "row-G2-34",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/values/valueCoherence.ts:1-6",
+        "src/values/disempowerment.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-35",
+      "finding": "Ops orphan-barrel: nlPolicy, receiptInterchange, passportSchemaCompatibility, artifactProvenance (779L), modelRouter, amcPolicies",
+      "historicalLocation": "src/ops/modelRouter.ts; src/governor/{nlPolicy,amcPolicies}.ts; src/passport/{receiptInterchange,passportSchemaCompatibility}.ts; src/artifact/artifactProvenance.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "The row mixes policy generation, receipts, passport compatibility, provenance and model routing. No single existing issue owns every member or defines accepted public-library limits.",
+      "specificUserDecision": "Decide supported boundaries and consumers for all policy/receipt/passport/provenance/routing members; name a whole-row owner.",
+      "decisionGroup": "row-G2-35",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/ops/modelRouter.ts:1-6",
+        "src/governor/nlPolicy.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-36",
+      "finding": "Integrations + compliance + observability record-builders orphaned; SCIM handler never mounted",
+      "historicalLocation": "src/integrations/{automationBridge,noCodeGovernanceCli,noCodeGovernanceStore,noCodeWebhookAdapters,partnerInteroperability,scimAdapter,platformConfigs}.ts; src/compliance/{controlCrosswalk,exceptionLifecycle,policyDrift,providerRisk}.ts; src/observability/{costBudgetEvidence,riskCostLatencySlo,routerFallbackSafety}.ts; src/plugins/pluginApiVersion.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "P1-53 touches controlCrosswalk only, while this row spans many integration, compliance, observability and plugin modules. P2-07 targets the real identity SCIM path, not the whole generic integration cluster.",
+      "specificUserDecision": "Decide each generic integration/compliance/observability/plugin boundary, keeping the real identity SCIM work separate; name the complete-row owner.",
+      "decisionGroup": "row-G2-36",
+      "narrowUnapprovedPlanLeads": [
+        {
+          "planKey": "P1-53",
+          "approvalStatus": "unapproved",
+          "coverage": "partial only",
+          "coveredScope": "controlCrosswalk catalog adapter only",
+          "uncoveredScope": "Does not own the remaining generic integration/compliance/observability/plugin cluster.",
+          "evidence": [
+            {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-53.md",
+              "line": 34
+            }
+          ],
+          "assignmentApplied": false
+        }
+      ],
+      "sourceRefs": [
+        "src/integrations/automationBridge.ts:1-6",
+        "src/integrations/noCodeGovernanceCli.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-37",
+      "finding": "Toolhub/redteam/simulator orphan-barrel (real, tested): grants, contracts, exploit/adversarial suites, whatIfs, jailbreak subtree",
+      "historicalLocation": "src/toolhub/{leastPrivilegeGrants,toolSchemaContracts,toolhubClient}.ts; src/redteam/{exploitLedger,adversarialGenerator,multilingualAttacks,promptInjectionRegressionSuite,modelSpecificAttacks,jailbreak/*}.ts; src/simulator/{budgetsWhatIf,governorWhatIf}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "Action-journal and executed-assurance issues cover particular runtime paths. They do not establish disposition for the complete grants/contracts/redteam/jailbreak/what-if library inventory.",
+      "specificUserDecision": "Decide which grants/contracts/redteam/jailbreak/what-if libraries are supported and which runtime consumers are required; name the full-inventory owner.",
+      "decisionGroup": "row-G2-37",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/toolhub/leastPrivilegeGrants.ts:1-6",
+        "src/toolhub/toolSchemaContracts.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-38",
+      "finding": "Eval real-but-unwired: `llmApiIntegration` (genuine OpenAI/Anthropic fetch — the fix for the mock judge), customAssertionEngine, costLatencyAssertions, effectAutoAgentReplayCorpus",
+      "historicalLocation": "src/eval/{llmApiIntegration,customAssertionEngine,costLatencyAssertions,effectAutoAgentReplayCorpus}.ts",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Production judge client is wired, but the original row also names other assertion/replay modules whose individual wiring remains unresolved.",
+      "whyNoExactWholeScopeSuccessor": "The production judge is wired, but custom assertions, cost/latency assertions and the replay corpus remain separate acceptance items. Judge calibration is not a whole-row routing decision for all four modules.",
+      "specificUserDecision": "Decide the remaining custom-assertion, cost/latency and replay-corpus boundaries after the wired judge; name the complete owner.",
+      "decisionGroup": "row-G2-38",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/eval/llmJudgeEngine.ts:349-367"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-39",
+      "finding": "`enterpriseIam` (415L SSO/RBAC/audit, flagged \"#1 blocker\") + `mcpServerRiskAttestation` (518L) barrel-/test-reachable only",
+      "historicalLocation": "src/auth/enterpriseIam.ts; src/mcp/mcpServerRiskAttestation.ts",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Enterprise IAM explicitly says embedder library rather than AMC authorization; risk-attestation scope still needs individual disposition.",
+      "whyNoExactWholeScopeSuccessor": "P2-07 explicitly refers enterpriseIam wording to P2-29, but that does not cover mcpServerRiskAttestation. The IAM library boundary and MCP risk-attestation disposition must both be owned before the whole row can be assigned.",
+      "specificUserDecision": "Confirm enterpriseIam wording transfer if desired, and separately specify the MCP risk-attestation boundary and acceptance owner.",
+      "decisionGroup": "row-G2-39",
+      "narrowUnapprovedPlanLeads": [
+        {
+          "planKey": "P2-29",
+          "approvalStatus": "unapproved",
+          "coverage": "partial only",
+          "coveredScope": "enterpriseIam wording only, explicitly referred by P2-07:45",
+          "uncoveredScope": "Does not own MCP risk-attestation disposition.",
+          "evidence": [
+            {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-29.md",
+              "line": 27
+            },
+            {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-07.md",
+              "line": 45
+            }
+          ],
+          "assignmentApplied": false
+        }
+      ],
+      "sourceRefs": [
+        "src/auth/enterpriseIam.ts:20-31"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-40",
+      "finding": "Monitoring stranded island: functional in-memory DriftDetector/RealtimeMonitor exported only via barrel; real drift lives in src/drift",
+      "historicalLocation": "src/monitoring/{driftDetection,realtimeDashboard}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "The two monitoring modules share a library boundary with G3-11, but no current issue accepts that boundary or their product wiring. G3-11 additionally covers real drift modules and the continuousMonitor wrapper.",
+      "specificUserDecision": "Choose the shared monitoring-library boundary, then name the owner of these two modules and any required product consumers.",
+      "decisionGroup": "monitoring-library-boundary",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/monitoring/driftDetection.ts:1-6",
+        "src/monitoring/realtimeDashboard.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G2-41",
+      "finding": "Benchmarks research cluster + shield S-modules + shield/signing (real ed25519) orphaned",
+      "historicalLocation": "src/benchmarks/{evalHarness,academicPaper,consortium}.ts; src/shield/{9 S-modules,signing}.ts",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "The row combines research benchmarks, an incompletely enumerated shield cluster and real signing. The parsed src/shield/9 token is not a file path. No exact whole-scope successor can be established before resolving the cluster inventory.",
+      "specificUserDecision": "Resolve the shield S-module inventory first, then decide research/signing library boundaries and the whole-row owner.",
+      "decisionGroup": "row-G2-41",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/benchmarks/evalHarness.ts:1-6",
+        "src/benchmarks/academicPaper.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [
+        {
+          "id": "G2-41",
+          "originalValue": "src/shield/9",
+          "kind": "unresolved_numeric_cluster_token",
+          "treePrefix": null,
+          "examples": []
+        }
+      ],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G3-04",
+      "finding": "Two benchmark subsystems + drifted UI twins",
+      "historicalLocation": "`src/bench/` (18 files, real registry, `/bench/*`) vs `src/benchmarks/` (24 files, provider-drift + `frontierBaseline`/`benchRunner` facades, `/benchmarks/list`); `console/.../app.js` vs `benchmarks.js`",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "Neither benchmark-study issue owns retirement or consolidation of both src/bench and src/benchmarks plus their UI twins. Distinct legitimate purposes versus a canonical subsystem remain undecided.",
+      "specificUserDecision": "Choose one canonical benchmark/UI subsystem or document supported distinct purposes. Name the owner of all migrations and public consumers.",
+      "decisionGroup": "row-G3-04",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/bench/benchApi.ts:1-6",
+        "src/bench/benchArtifact.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G3-06",
+      "finding": "`classifyEuAiActRisk` implemented twice",
+      "historicalLocation": "`src/compliance/euAiActClassifier.ts` (wired) vs `src/compliance/globalRegulatory.ts` (orphan)",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "P2-11 owns the wired EU classifier, but its touch scope does not include retiring or adapting globalRegulatory. No approved scope covers both implementations and their public consumers.",
+      "specificUserDecision": "Decide whether the older classifier becomes an adapter, remains a distinct documented contract, or is deprecated. Approve a scope covering both implementations and name the owner.",
+      "decisionGroup": "row-G3-06",
+      "narrowUnapprovedPlanLeads": [
+        {
+          "planKey": "P2-11",
+          "approvalStatus": "unapproved",
+          "coverage": "partial only",
+          "coveredScope": "wired euAiActClassifier only; P1-53:34 explicitly refers classifier ownership here",
+          "uncoveredScope": "Does not own globalRegulatory retirement/adaptation or both public contracts.",
+          "evidence": [
+            {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-11.md",
+              "line": 35
+            },
+            {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-53.md",
+              "line": 34
+            }
+          ],
+          "assignmentApplied": false
+        }
+      ],
+      "sourceRefs": [
+        "src/compliance/euAiActClassifier.ts:1-6",
+        "src/compliance/globalRegulatory.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G3-07",
+      "finding": "claims/ vs score/ same-name modules",
+      "historicalLocation": "`src/claims/claimExpiry.ts`≈`src/score/claimExpiry.ts`; `src/claims/confidenceDrift.ts`≈`src/score/confidenceDrift.ts`",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "The draft records two combined approximately-equal expressions as absent leaf paths. These are unresolved source relationships, not absence evidence. The exact paired contracts and consumers must be resolved before a whole-row successor can be proposed.",
+      "specificUserDecision": "Resolve each pair into exact source paths, APIs and consumers, then choose distinct contracts or a canonical implementation and name the owner.",
+      "decisionGroup": "row-G3-07",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [],
+      "observationalResolutionCaveats": [
+        {
+          "id": "G3-07",
+          "originalValue": "src/claims/claimExpiry.ts≈src/score/claimExpiry.ts",
+          "kind": "unresolved_combined_or_pattern_expression",
+          "treePrefix": null,
+          "examples": []
+        },
+        {
+          "id": "G3-07",
+          "originalValue": "src/claims/confidenceDrift.ts≈src/score/confidenceDrift.ts",
+          "kind": "unresolved_combined_or_pattern_expression",
+          "treePrefix": null,
+          "examples": []
+        }
+      ],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G3-11",
+      "finding": "monitoring/ vs drift/",
+      "historicalLocation": "`src/monitoring/` (DriftDetector, RealtimeMonitor — barrel-only) vs `src/drift/` (freezeEngine, real); `drift/continuousMonitor` wraps `monitor/trustDriftMonitor`",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "The shared monitoring-library boundary can be decided with G2-40. The broader drift subsystem and continuousMonitor/trustDriftMonitor relationship require an additional explicit consolidation or distinct-purpose decision and owner.",
+      "specificUserDecision": "Answer the shared monitoring boundary, then separately decide the real drift/continuousMonitor relationship and name its owner.",
+      "decisionGroup": "monitoring-library-boundary",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/monitoring/driftDetection.ts:1-6",
+        "src/monitoring/realtimeDashboard.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G3-10",
+      "finding": "Two approval stores",
+      "historicalLocation": "`src/approvals/approvalStore.ts` + `approvalSchema.ts` (barrel-only) vs `approvalChainStore.ts`",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "No current spec chooses or reconciles both original approval stores as a single canonical store or supported distinct contracts. Signed approval execution work alone does not establish this data-store boundary.",
+      "specificUserDecision": "Choose one canonical approval store or document distinct supported contracts, with migration and signed-execution compatibility owned explicitly.",
+      "decisionGroup": "row-G3-10",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/approvals/approvalStore.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G3-15",
+      "finding": "app.js dead equalizer/benchmarks twins",
+      "historicalLocation": "`src/console/assets/app.js` (3,833L) unreachable branches vs live `equalizer.js`/`benchmarks.js`",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "P2-29 owns CLI/docs consolidation, not these inline console equalizer/benchmark duplicates. No current issue identifies the canonical UI implementation and owns removal or adaptation of both twins.",
+      "specificUserDecision": "Identify the canonical equalizer/benchmark UI implementations and the accepted inline-console boundary; name the owner of the complete duplicate pair set.",
+      "decisionGroup": "row-G3-15",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/console/assets/app.js:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G3-17",
+      "finding": "Badge/share logic re-implemented inline",
+      "historicalLocation": "`src/diagnostic/quickscoreShare.ts` + `src/…/badgeCli.ts` vs cli.ts inline shields URL (×2, ~3243/~3430)",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "No row-specific complete remedy or accepted library/consolidation boundary was established. Historical evidence is retained; successor assignment needs Sid/integrator.",
+      "whyNoExactWholeScopeSuccessor": "Docs badge corrections do not own deduplication of inline share/badge implementation. No existing issue establishes the canonical helper, its consumer contracts and migration acceptance.",
+      "specificUserDecision": "Identify the canonical badge/share helper and migration compatibility for all inline callers; name the owner.",
+      "decisionGroup": "row-G3-17",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/diagnostic/quickscoreShare.ts:1-6"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G3-27",
+      "finding": "Three disjoint Python client/product surfaces",
+      "historicalLocation": "`platform/python` (port), `sdk/python/amc_sdk` (CLI subprocess), `src/sdk/python/amc_client` (Bridge HTTP)",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Python platform is scoped as demonstration, but three SDK/product paths remain. Choosing one client is still a human/integrator decision.",
+      "whyNoExactWholeScopeSuccessor": "P2-13 owns the modern CLI-backed Python execution client. It does not retire the demonstration port or Bridge HTTP client. Original directory/module observations also require correction: two roots exist and amc_client resolves to a .py file.",
+      "specificUserDecision": "Choose the supported roles of all three Python surfaces and any compatibility/deprecation policy. P2-13 can be a partial lead only after explicit scope approval.",
+      "decisionGroup": "row-G3-27",
+      "narrowUnapprovedPlanLeads": [
+        {
+          "planKey": "P2-13",
+          "approvalStatus": "unapproved",
+          "coverage": "partial only",
+          "coveredScope": "modern sdk/python/amc_sdk execution contract only",
+          "uncoveredScope": "Does not own retirement of platform/python or src/sdk/python/amc_client.py.",
+          "evidence": [
+            {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P2-13.md",
+              "line": 43
+            }
+          ],
+          "assignmentApplied": false
+        }
+      ],
+      "sourceRefs": [
+        "platform/python/README.md:1-13",
+        "src/sdk/python/README.md:1-30"
+      ],
+      "observationalResolutionCaveats": [
+        {
+          "id": "G3-27",
+          "originalValue": "platform/python",
+          "kind": "present_directory_misrecorded_as_absent_leaf",
+          "treePrefix": "platform/python/",
+          "examples": [
+            "platform/python/.amc/score_sessions.sqlite",
+            "platform/python/Makefile",
+            "platform/python/README.md"
+          ]
+        },
+        {
+          "id": "G3-27",
+          "originalValue": "sdk/python/amc_sdk",
+          "kind": "present_directory_misrecorded_as_absent_leaf",
+          "treePrefix": "sdk/python/amc_sdk/",
+          "examples": [
+            "sdk/python/amc_sdk/__init__.py",
+            "sdk/python/amc_sdk/client.py",
+            "sdk/python/amc_sdk/proof.py"
+          ]
+        },
+        {
+          "id": "G3-27",
+          "originalValue": "src/sdk/python/amc_client",
+          "kind": "unresolved_extension_shorthand_with_existing_candidate",
+          "treePrefix": null,
+          "examples": [
+            "src/sdk/python/amc_client.py"
+          ]
+        }
+      ],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G6-20",
+      "finding": "A security control (`trustBoundaryMode`) is read from an **unsigned** config; unlike ~14 sibling policies it has no `.sig` (also `guardrails.yaml`, `eval-harness.yaml`)",
+      "historicalLocation": "`.amc/amc.config.yaml:21`",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Ledger requires a verified signature for isolated trustBoundaryMode; original guardrails/eval-harness siblings were not individually reconciled.",
+      "whyNoExactWholeScopeSuccessor": "Ledger signature admission is source-present, but the original guardrails and eval-harness sibling policies remain unreviewed. P1-15 explicitly excludes guardrails.yaml signing and asks for a follow-up; compiled-policy work does not own all unsigned sibling configurations.",
+      "specificUserDecision": "Identify which unsigned sibling configurations influence security, then accept an inactive/reference boundary or approve signed-policy acceptance and a named owner for every sibling.",
+      "decisionGroup": "row-G6-20",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/ledger/ledger.ts:1270-1294",
+        "src/config/amcConfigSignature.ts:45-70"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G6-23",
+      "finding": "Vault falls back to hardcoded `amc-test-passphrase` under test env; predictable but test-gated (prod path now throws)",
+      "historicalLocation": "`src/vault/vault.ts:105-116`",
+      "currentAuthoringStatus": "deferred",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Predictable passphrase is a test-only historical finding. Current test-only confinement acceptance is deferred and no tests were authored or run.",
+      "whyNoExactWholeScopeSuccessor": "P0-37 owns exposure, distrust and rotation consequences of the published test passphrase, not proof of current test-only confinement. P0-07 excludes product vault edits. A specific confinement acceptance owner is still needed.",
+      "specificUserDecision": "Specify the exact test-only passphrase boundary and evidence required to accept confinement, or approve a separate vault-hardening follow-up; name the owner.",
+      "decisionGroup": "row-G6-23",
+      "narrowUnapprovedPlanLeads": [
+        {
+          "planKey": "P0-37",
+          "approvalStatus": "unapproved",
+          "coverage": "partial only",
+          "coveredScope": "exposure/distrust/rotation consequence only",
+          "uncoveredScope": "Related context, not a proposed owner for test-only confinement.",
+          "evidence": [
+            {
+              "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-37.md",
+              "line": 38
+            }
+          ],
+          "assignmentApplied": false
+        }
+      ],
+      "sourceRefs": [
+        "src/vault/vault.ts:126-146"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G8-01",
+      "finding": "11 distinct SQLite stores opened via 3 incompatible idioms (pooled `sqlitePool`, raw `new Database()` in 13 files, `nativeGuard` ABI self-heal wrapper)",
+      "historicalLocation": "`src/storage/sqlitePool.ts`, `src/storage/nativeGuard.ts`, `ledger/ledger.ts`, `product/productDb.ts`, `workspaces/hostDb.ts`, `integrations/integrationDeliveryQueue.ts`, +7",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Specific opener bugs changed (dirname and pool usage), while raw and pooled SQLite stores remain; complete consolidation is not established.",
+      "whyNoExactWholeScopeSuccessor": "P2-09 concerns the evidence ledger/guard-events/Postgres backend and explicitly leaves host.db and other SQLite files on the volume. It does not own consolidation of all 11 original stores and three opening idioms.",
+      "specificUserDecision": "Decide whether independent stores are supported with common opening rules or whether all-store consolidation is required; name the complete owner.",
+      "decisionGroup": "row-G8-01",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/product/productDb.ts:31-40",
+        "src/storage/sqlitePool.ts:65-74"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G8-03",
+      "finding": "13 in-memory-only stores reset every CLI invocation — data never persists across runs",
+      "historicalLocation": "`agents/insiderRisk.ts`, `governance/multiTenant.ts`, `assurance/microCanary.ts`+`falsePositiveTracker.ts`, `integrations/scimAdapter.ts` (`InMemoryScimUserStore`), `passport/agentDiscovery.ts`, `ops/{latencyAccounting,overheadAccounting,governanceSlo,degradationMode,backpressure}.ts`, `monitoring/*`, `receiptChain.ts`, `lessonLearnedDatabase.ts`",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Discovery persists, but the original heterogeneous stores include in-memory SCIM and monitoring. Five repaired stores do not dispose of all thirteen.",
+      "whyNoExactWholeScopeSuccessor": "The row combines 13 stores with different durability requirements; some process-local state may be intentional. Persisting five stores or hardening the identity SCIM route does not dispose of every member or define which state must persist.",
+      "specificUserDecision": "Classify every original store as intentionally ephemeral or requiring restart durability, with its lifecycle and acceptance owner. Keep the list complete.",
+      "decisionGroup": "row-G8-03",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/passport/agentDiscovery.ts:116-146",
+        "src/integrations/scimAdapter.ts:1-10",
+        "src/integrations/scimAdapter.ts:50-64"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G8-05",
+      "finding": "Mutable runtime/fleet state committed to git",
+      "historicalLocation": "`.amc/current-agent`, `.amc/fleet/governance-state.json`, `.amc/context-graph.json`, `.amc/agents/default/quality/ratings.json`, `.amc/targets/default.target.json`",
+      "currentAuthoringStatus": "mitigated",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Three mutable state files are absent; context-graph and signed-paired target remain tracked. Original all-five removal scope needs explicit boundary acceptance.",
+      "whyNoExactWholeScopeSuccessor": "Three listed state files are absent, but context-graph and the signed target remain tracked. No existing issue accepts the all-five tracking boundary. Any cleanup or untracking requires a separate approved scope and must preserve authored state.",
+      "specificUserDecision": "Decide the tracked-fixture versus mutable-runtime-state boundary for all five files. Name an owner; this packet authorizes no cleanup or deletion.",
+      "decisionGroup": "row-G8-05",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        ".gitignore:111-139"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G8-12",
+      "finding": "Entire `src/hallucination/` dir orphaned — polished module + tests + docs, no runtime path",
+      "historicalLocation": "`src/hallucination/`",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Hallucination package remains as a library; product wiring, failure parsing and accepted boundary still need successor assignment.",
+      "whyNoExactWholeScopeSuccessor": "The same five-file library boundary is shared with G2-31. Product failure parsing and model-failure behavior remain additional G8-12 acceptance, so a common boundary decision alone is insufficient.",
+      "specificUserDecision": "Answer the common hallucination boundary and separately specify model/failure parsing acceptance and its owner.",
+      "decisionGroup": "hallucination-library-boundary",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/hallucination/index.ts:1-38",
+        "src/hallucination/llmJudge.ts:129-153"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G8-13",
+      "finding": "Score-analytics cluster reachable only through `src/index.ts` barrel — no product path scores with them",
+      "historicalLocation": "`src/score/{identityStability,longitudinalTracking,knownUnknowns,componentConfidence,riskTiers,selfCalibration,evalReplayCorpusBoundary}.ts`",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "Original analytics cluster needs module-by-module disposition; a barrel export does not prove a product consumer.",
+      "whyNoExactWholeScopeSuccessor": "The original src/score paths are absent as leaves, while matching basenames appear in the src/diagnostic analytics inventory of G2-26. The historical location and actual intended modules must be resolved; this is not the same cluster as G2-25.",
+      "specificUserDecision": "Resolve the historical namespace and intended analytics members before deciding consumers/library scope and naming an owner. Do not combine it with G2-25.",
+      "decisionGroup": "row-G8-13",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "src/index.ts:1-9"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    },
+    {
+      "id": "G8-25",
+      "finding": "Complete standalone service embedded at repo top level",
+      "historicalLocation": "`qa/` (30 files: Express + Postgres + WebSocket + Claude bot engine, own lockfile, 7 migrations, 1 test)",
+      "currentAuthoringStatus": "open",
+      "currentAuthoringSuccessor": {
+        "planKey": null,
+        "paused": null
+      },
+      "originalAuthoringReason": "qa/package.json and independent QA README remain. Accepted standalone-service boundary or relocation is unresolved; G8-25b does not close it.",
+      "whyNoExactWholeScopeSuccessor": "No current issue owns accepting or relocating the standalone qa service with its separate runtime, lockfile, migrations and tests. CLI/docs consolidation and supplemental scanner-path repair do not establish that service boundary.",
+      "specificUserDecision": "Accept a documented standalone QA-service boundary or approve a relocation/deprecation proposal, with a named owner and separate runtime/build/support acceptance.",
+      "decisionGroup": "row-G8-25",
+      "narrowUnapprovedPlanLeads": [],
+      "sourceRefs": [
+        "qa/package.json:1-31",
+        "qa/README.md:1-25"
+      ],
+      "observationalResolutionCaveats": [],
+      "decision": null,
+      "approvedWholeScopeSuccessor": null
+    }
+  ],
+  "decisionGroups": [
+    {
+      "id": "row-G1-39",
+      "rowIds": [
+        "G1-39"
+      ],
+      "commonDecision": "Define the supported contract for undoChange: preview/reverse-payload library or actual restoration. Name an owner for the remaining contract and cluster acceptance.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G1-39",
+          "decision": "Define the supported contract for undoChange: preview/reverse-payload library or actual restoration. Name an owner for the remaining contract and cluster acceptance."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G1-46",
+      "rowIds": [
+        "G1-46"
+      ],
+      "commonDecision": "Enumerate all original wrapper/adaptor members and decide each supported claim and runtime boundary. Name one accountable whole-row owner or approve a scoped follow-up.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G1-46",
+          "decision": "Enumerate all original wrapper/adaptor members and decide each supported claim and runtime boundary. Name one accountable whole-row owner or approve a scoped follow-up."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-02",
+      "rowIds": [
+        "G2-02"
+      ],
+      "commonDecision": "Decide supported library, runtime pack, or deprecation treatment for each retained pack and resolve the wildcard fixture set. Name the whole-cluster owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-02",
+          "decision": "Decide supported library, runtime pack, or deprecation treatment for each retained pack and resolve the wildcard fixture set. Name the whole-cluster owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-04",
+      "rowIds": [
+        "G2-04"
+      ],
+      "commonDecision": "Confirm intentional parser/connector boundaries or the desired consolidation/deprecation scope, with an owner covering every retained member.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-04",
+          "decision": "Confirm intentional parser/connector boundaries or the desired consolidation/deprecation scope, with an owner covering every retained member."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-16",
+      "rowIds": [
+        "G2-16"
+      ],
+      "commonDecision": "Decide whether scoreHistory is a supported storage/library surface or needs consolidation; identify its consumers and name the complete-row owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-16",
+          "decision": "Decide whether scoreHistory is a supported storage/library surface or needs consolidation; identify its consumers and name the complete-row owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-23",
+      "rowIds": [
+        "G2-23"
+      ],
+      "commonDecision": "Decide the retained bridge fixture purpose and acceptance; name the owner of the remaining grouped disposition.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-23",
+          "decision": "Decide the retained bridge fixture purpose and acceptance; name the owner of the remaining grouped disposition."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-24",
+      "rowIds": [
+        "G2-24"
+      ],
+      "commonDecision": "Choose supported library boundaries or concrete runtime consumers for the enumerated product cluster; assign one accountable owner to the complete scope.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-24",
+          "decision": "Choose supported library boundaries or concrete runtime consumers for the enumerated product cluster; assign one accountable owner to the complete scope."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-25",
+      "rowIds": [
+        "G2-25"
+      ],
+      "commonDecision": "Decide the non-catalog analytics library/consumer boundary separately from P1-53 and name the whole-cluster owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-25",
+          "decision": "Decide the non-catalog analytics library/consumer boundary separately from P1-53 and name the whole-cluster owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-26",
+      "rowIds": [
+        "G2-26"
+      ],
+      "commonDecision": "Decide the diagnostic analytics and gap-receipt module boundaries separately; specify how all 14 members receive accepted scope and ownership.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-26",
+          "decision": "Decide the diagnostic analytics and gap-receipt module boundaries separately; specify how all 14 members receive accepted scope and ownership."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-27",
+      "rowIds": [
+        "G2-27"
+      ],
+      "commonDecision": "Decide whether the five steer stages are a supported public library, a product pipeline, or future deprecation scope; name the owner and consumers.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-27",
+          "decision": "Decide whether the five steer stages are a supported public library, a product pipeline, or future deprecation scope; name the owner and consumers."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-28",
+      "rowIds": [
+        "G2-28"
+      ],
+      "commonDecision": "Decide whether original claims-lifecycle modules are distinct supported contracts or must adapt to the newer claim service; name the scope and owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-28",
+          "decision": "Decide whether original claims-lifecycle modules are distinct supported contracts or must adapt to the newer claim service; name the scope and owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "hallucination-library-boundary",
+      "rowIds": [
+        "G2-31",
+        "G8-12"
+      ],
+      "commonDecision": "Choose the supported boundary for the same five src/hallucination files: independent library, named product consumers, or a separately approved deprecation proposal.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-31",
+          "decision": "Choose the shared hallucination library boundary, then name the owner of G2-31 wiring or accepted-library acceptance."
+        },
+        {
+          "id": "G8-12",
+          "decision": "Answer the common hallucination boundary and separately specify model/failure parsing acceptance and its owner."
+        }
+      ],
+      "limit": "G2-31 keeps its wiring/library acceptance. G8-12 additionally needs failure parsing and model-failure acceptance. One boundary answer does not close or assign either row.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-32",
+      "rowIds": [
+        "G2-32"
+      ],
+      "commonDecision": "Decide the advanced incident layer relationship to incidentStore and its supported consumers; name the whole-layer owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-32",
+          "decision": "Decide the advanced incident layer relationship to incidentStore and its supported consumers; name the whole-layer owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-33",
+      "rowIds": [
+        "G2-33"
+      ],
+      "commonDecision": "Decide per-module residency/honeytoken/fraud/lineage support and consumers; name an accountable owner for the four-module boundary.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-33",
+          "decision": "Decide per-module residency/honeytoken/fraud/lineage support and consumers; name an accountable owner for the four-module boundary."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-34",
+      "rowIds": [
+        "G2-34"
+      ],
+      "commonDecision": "Decide whether and how each values engine is used by a pack, or accept its independent library contract; name the complete owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-34",
+          "decision": "Decide whether and how each values engine is used by a pack, or accept its independent library contract; name the complete owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-35",
+      "rowIds": [
+        "G2-35"
+      ],
+      "commonDecision": "Decide supported boundaries and consumers for all policy/receipt/passport/provenance/routing members; name a whole-row owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-35",
+          "decision": "Decide supported boundaries and consumers for all policy/receipt/passport/provenance/routing members; name a whole-row owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-36",
+      "rowIds": [
+        "G2-36"
+      ],
+      "commonDecision": "Decide each generic integration/compliance/observability/plugin boundary, keeping the real identity SCIM work separate; name the complete-row owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-36",
+          "decision": "Decide each generic integration/compliance/observability/plugin boundary, keeping the real identity SCIM work separate; name the complete-row owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-37",
+      "rowIds": [
+        "G2-37"
+      ],
+      "commonDecision": "Decide which grants/contracts/redteam/jailbreak/what-if libraries are supported and which runtime consumers are required; name the full-inventory owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-37",
+          "decision": "Decide which grants/contracts/redteam/jailbreak/what-if libraries are supported and which runtime consumers are required; name the full-inventory owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-38",
+      "rowIds": [
+        "G2-38"
+      ],
+      "commonDecision": "Decide the remaining custom-assertion, cost/latency and replay-corpus boundaries after the wired judge; name the complete owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-38",
+          "decision": "Decide the remaining custom-assertion, cost/latency and replay-corpus boundaries after the wired judge; name the complete owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-39",
+      "rowIds": [
+        "G2-39"
+      ],
+      "commonDecision": "Confirm enterpriseIam wording transfer if desired, and separately specify the MCP risk-attestation boundary and acceptance owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-39",
+          "decision": "Confirm enterpriseIam wording transfer if desired, and separately specify the MCP risk-attestation boundary and acceptance owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "monitoring-library-boundary",
+      "rowIds": [
+        "G2-40",
+        "G3-11"
+      ],
+      "commonDecision": "Choose the supported boundary for src/monitoring/driftDetection.ts and realtimeDashboard.ts: standalone library or an explicitly scoped relationship with the real drift subsystem.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-40",
+          "decision": "Choose the shared monitoring-library boundary, then name the owner of these two modules and any required product consumers."
+        },
+        {
+          "id": "G3-11",
+          "decision": "Answer the shared monitoring boundary, then separately decide the real drift/continuousMonitor relationship and name its owner."
+        }
+      ],
+      "limit": "G2-40 keeps its two-module consumer/library acceptance. G3-11 additionally covers the real drift modules and continuousMonitor/trustDriftMonitor wrapper. Both IDs and their separate residuals remain.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G2-41",
+      "rowIds": [
+        "G2-41"
+      ],
+      "commonDecision": "Resolve the shield S-module inventory first, then decide research/signing library boundaries and the whole-row owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G2-41",
+          "decision": "Resolve the shield S-module inventory first, then decide research/signing library boundaries and the whole-row owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G3-04",
+      "rowIds": [
+        "G3-04"
+      ],
+      "commonDecision": "Choose one canonical benchmark/UI subsystem or document supported distinct purposes. Name the owner of all migrations and public consumers.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G3-04",
+          "decision": "Choose one canonical benchmark/UI subsystem or document supported distinct purposes. Name the owner of all migrations and public consumers."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G3-06",
+      "rowIds": [
+        "G3-06"
+      ],
+      "commonDecision": "Decide whether the older classifier becomes an adapter, remains a distinct documented contract, or is deprecated. Approve a scope covering both implementations and name the owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G3-06",
+          "decision": "Decide whether the older classifier becomes an adapter, remains a distinct documented contract, or is deprecated. Approve a scope covering both implementations and name the owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G3-07",
+      "rowIds": [
+        "G3-07"
+      ],
+      "commonDecision": "Resolve each pair into exact source paths, APIs and consumers, then choose distinct contracts or a canonical implementation and name the owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G3-07",
+          "decision": "Resolve each pair into exact source paths, APIs and consumers, then choose distinct contracts or a canonical implementation and name the owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G3-10",
+      "rowIds": [
+        "G3-10"
+      ],
+      "commonDecision": "Choose one canonical approval store or document distinct supported contracts, with migration and signed-execution compatibility owned explicitly.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G3-10",
+          "decision": "Choose one canonical approval store or document distinct supported contracts, with migration and signed-execution compatibility owned explicitly."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G3-15",
+      "rowIds": [
+        "G3-15"
+      ],
+      "commonDecision": "Identify the canonical equalizer/benchmark UI implementations and the accepted inline-console boundary; name the owner of the complete duplicate pair set.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G3-15",
+          "decision": "Identify the canonical equalizer/benchmark UI implementations and the accepted inline-console boundary; name the owner of the complete duplicate pair set."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G3-17",
+      "rowIds": [
+        "G3-17"
+      ],
+      "commonDecision": "Identify the canonical badge/share helper and migration compatibility for all inline callers; name the owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G3-17",
+          "decision": "Identify the canonical badge/share helper and migration compatibility for all inline callers; name the owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G3-27",
+      "rowIds": [
+        "G3-27"
+      ],
+      "commonDecision": "Choose the supported roles of all three Python surfaces and any compatibility/deprecation policy. P2-13 can be a partial lead only after explicit scope approval.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G3-27",
+          "decision": "Choose the supported roles of all three Python surfaces and any compatibility/deprecation policy. P2-13 can be a partial lead only after explicit scope approval."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G6-20",
+      "rowIds": [
+        "G6-20"
+      ],
+      "commonDecision": "Identify which unsigned sibling configurations influence security, then accept an inactive/reference boundary or approve signed-policy acceptance and a named owner for every sibling.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G6-20",
+          "decision": "Identify which unsigned sibling configurations influence security, then accept an inactive/reference boundary or approve signed-policy acceptance and a named owner for every sibling."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G6-23",
+      "rowIds": [
+        "G6-23"
+      ],
+      "commonDecision": "Specify the exact test-only passphrase boundary and evidence required to accept confinement, or approve a separate vault-hardening follow-up; name the owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G6-23",
+          "decision": "Specify the exact test-only passphrase boundary and evidence required to accept confinement, or approve a separate vault-hardening follow-up; name the owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G8-01",
+      "rowIds": [
+        "G8-01"
+      ],
+      "commonDecision": "Decide whether independent stores are supported with common opening rules or whether all-store consolidation is required; name the complete owner.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G8-01",
+          "decision": "Decide whether independent stores are supported with common opening rules or whether all-store consolidation is required; name the complete owner."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G8-03",
+      "rowIds": [
+        "G8-03"
+      ],
+      "commonDecision": "Classify every original store as intentionally ephemeral or requiring restart durability, with its lifecycle and acceptance owner. Keep the list complete.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G8-03",
+          "decision": "Classify every original store as intentionally ephemeral or requiring restart durability, with its lifecycle and acceptance owner. Keep the list complete."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G8-05",
+      "rowIds": [
+        "G8-05"
+      ],
+      "commonDecision": "Decide the tracked-fixture versus mutable-runtime-state boundary for all five files. Name an owner; this packet authorizes no cleanup or deletion.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G8-05",
+          "decision": "Decide the tracked-fixture versus mutable-runtime-state boundary for all five files. Name an owner; this packet authorizes no cleanup or deletion."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G8-13",
+      "rowIds": [
+        "G8-13"
+      ],
+      "commonDecision": "Resolve the historical namespace and intended analytics members before deciding consumers/library scope and naming an owner. Do not combine it with G2-25.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G8-13",
+          "decision": "Resolve the historical namespace and intended analytics members before deciding consumers/library scope and naming an owner. Do not combine it with G2-25."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    },
+    {
+      "id": "row-G8-25",
+      "rowIds": [
+        "G8-25"
+      ],
+      "commonDecision": "Accept a documented standalone QA-service boundary or approve a relocation/deprecation proposal, with a named owner and separate runtime/build/support acceptance.",
+      "remainingPerRowDecisions": [
+        {
+          "id": "G8-25",
+          "decision": "Accept a documented standalone QA-service boundary or approve a relocation/deprecation proposal, with a named owner and separate runtime/build/support acceptance."
+        }
+      ],
+      "limit": "Answer this row independently; sharing a broad theme with another row does not establish common ownership.",
+      "userAnswer": null
+    }
+  ],
+  "g6_07AcceptanceClarification": {
+    "id": "G6-07",
+    "proposalStatus": "unapproved acceptance wording clarification",
+    "currentAuthoringStatus": "open",
+    "retainedSuccessor": {
+      "planKey": "P0-09",
+      "paused": null
+    },
+    "retainedLinkedIssue": "AMC-1525",
+    "oldReasonStalePart": "mutation, installed trust-root and human acceptance remain unperformed",
+    "whyClarificationIsNeeded": "The draft did not execute P0-29 qualification. However, accepted main already carries a dated P0-09 runtime/forgery/mutation receipt; a blanket claim that mutations have never been performed is stale. Historical scoped proof does not establish current complete acceptance.",
+    "historicalReceipt": {
+      "path": "qualification/2026-10-07-P0-09/receipt.json",
+      "date": "2026-10-07",
+      "testedCommit": "cbbd012b5c5291481a72987f865eae8dbd26785f",
+      "node": "v25.5.0",
+      "tests": {
+        "total": 8819,
+        "passed": 8819,
+        "failed": 0,
+        "skipped": 0
+      },
+      "limits": "Totals overlap across focused/affected/parity runs. Full-suite, whole-suite coverage, performance and release gate are outside this receipt. It records remaining pinning/portable-verifier scopes."
+    },
+    "sourceEvidence": [
+      {
+        "path": "src/crypto/keys.ts",
+        "firstLine": 18,
+        "lastLine": 22
+      },
+      {
+        "path": "src/crypto/keyHistoryEnvelope.ts",
+        "firstLine": 91,
+        "lastLine": 102
+      },
+      {
+        "path": "qualification/2026-10-07-P0-09/README.md",
+        "firstLine": 142,
+        "lastLine": 149
+      },
+      {
+        "path": "qualification/2026-10-07-P0-09/README.md",
+        "firstLine": 193,
+        "lastLine": 203
+      },
+      {
+        "path": "qualification/2026-10-07-P0-09/receipt.json",
+        "firstLine": 188,
+        "lastLine": 188
+      }
+    ],
+    "proposedReplacementReason": "Current main rejects unsigned legacy history and admits history through signed role-bound envelopes. P0-09 records historical scoped runtime, forgery and mutation proof at cbbd012b5c5291481a72987f865eae8dbd26785f. This P0-29 source review has not rerun that proof or qualified every affected surface. Portable verifier/pinning and operator trust-root/rotation acceptance remain explicit residual scopes; keep G6-07 open, mapped to P0-09, with AMC-1525 linked. Do not force implemented or claim that no historical mutation proof exists.",
+    "proposedSpotCheckClarification": "Retain the current open -> P0-09 assertion, but tie its reason to named residual acceptance and record the historical P0-09 receipt separately. A historical receipt must not automatically promote the row or qualify P0-29.",
+    "applied": false
+  },
+  "historicalInventoryResolutionCaveats": [
+    {
+      "id": "G2-02",
+      "originalValue": "fixtures/packs/*PackV1.json",
+      "kind": "unresolved_combined_or_pattern_expression",
+      "treePrefix": null,
+      "examples": []
+    },
+    {
+      "id": "G2-41",
+      "originalValue": "src/shield/9",
+      "kind": "unresolved_numeric_cluster_token",
+      "treePrefix": null,
+      "examples": []
+    },
+    {
+      "id": "G3-07",
+      "originalValue": "src/claims/claimExpiry.ts≈src/score/claimExpiry.ts",
+      "kind": "unresolved_combined_or_pattern_expression",
+      "treePrefix": null,
+      "examples": []
+    },
+    {
+      "id": "G3-07",
+      "originalValue": "src/claims/confidenceDrift.ts≈src/score/confidenceDrift.ts",
+      "kind": "unresolved_combined_or_pattern_expression",
+      "treePrefix": null,
+      "examples": []
+    },
+    {
+      "id": "G3-30",
+      "originalValue": "scripts/swarm-test.py↔swarm-test-v2.py",
+      "kind": "unresolved_combined_or_pattern_expression",
+      "treePrefix": null,
+      "examples": []
+    },
+    {
+      "id": "G3-30",
+      "originalValue": "internal/debug/test-model-scanner.cjs↔.mjs",
+      "kind": "unresolved_combined_or_pattern_expression",
+      "treePrefix": null,
+      "examples": []
+    },
+    {
+      "id": "G3-26",
+      "originalValue": "platform/python/amc/score",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "platform/python/amc/score/",
+      "examples": [
+        "platform/python/amc/score/EVIDENCE_SYSTEM_REPORT.md",
+        "platform/python/amc/score/__init__.py",
+        "platform/python/amc/score/adversarial.py"
+      ]
+    },
+    {
+      "id": "G3-26",
+      "originalValue": "platform/python/amc/shield",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "platform/python/amc/shield/",
+      "examples": [
+        "platform/python/amc/shield/__init__.py",
+        "platform/python/amc/shield/s10_detector.py",
+        "platform/python/amc/shield/s11_attachment_detonation.py"
+      ]
+    },
+    {
+      "id": "G3-26",
+      "originalValue": "platform/python/amc/enforce",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "platform/python/amc/enforce/",
+      "examples": [
+        "platform/python/amc/enforce/__init__.py",
+        "platform/python/amc/enforce/e10_gateway_scanner.py",
+        "platform/python/amc/enforce/e11_mdns_controller.py"
+      ]
+    },
+    {
+      "id": "G3-26",
+      "originalValue": "platform/python/amc/vault",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "platform/python/amc/vault/",
+      "examples": [
+        "platform/python/amc/vault/__init__.py",
+        "platform/python/amc/vault/v10_undo_layer.py",
+        "platform/python/amc/vault/v11_metadata_scrubber.py"
+      ]
+    },
+    {
+      "id": "G3-26",
+      "originalValue": "platform/python/amc/watch",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "platform/python/amc/watch/",
+      "examples": [
+        "platform/python/amc/watch/__init__.py",
+        "platform/python/amc/watch/prebuilt_policy_packs.py",
+        "platform/python/amc/watch/w10_policy_packs.py"
+      ]
+    },
+    {
+      "id": "G3-26",
+      "originalValue": "platform/python/amc/product",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "platform/python/amc/product/",
+      "examples": [
+        "platform/python/amc/product/__init__.py",
+        "platform/python/amc/product/ab_testing.py",
+        "platform/python/amc/product/api_wrapper_generator.py"
+      ]
+    },
+    {
+      "id": "G3-27",
+      "originalValue": "platform/python",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "platform/python/",
+      "examples": [
+        "platform/python/.amc/score_sessions.sqlite",
+        "platform/python/Makefile",
+        "platform/python/README.md"
+      ]
+    },
+    {
+      "id": "G3-27",
+      "originalValue": "sdk/python/amc_sdk",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "sdk/python/amc_sdk/",
+      "examples": [
+        "sdk/python/amc_sdk/__init__.py",
+        "sdk/python/amc_sdk/client.py",
+        "sdk/python/amc_sdk/proof.py"
+      ]
+    },
+    {
+      "id": "G3-27",
+      "originalValue": "src/sdk/python/amc_client",
+      "kind": "unresolved_extension_shorthand_with_existing_candidate",
+      "treePrefix": null,
+      "examples": [
+        "src/sdk/python/amc_client.py"
+      ]
+    },
+    {
+      "id": "G3-29",
+      "originalValue": "docs/research",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "docs/research/",
+      "examples": [
+        "docs/research/gap-0610-trism-agentic-live-drift.md"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/enforce",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/enforce/",
+      "examples": [
+        "src/enforce/abac.ts",
+        "src/enforce/actionEvidenceLogic.ts",
+        "src/enforce/actionEvidenceLogicCli.ts"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/governor",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/governor/",
+      "examples": [
+        "src/governor/actionCatalog.ts",
+        "src/governor/actionPolicyEngine.ts",
+        "src/governor/actionPolicySchema.ts"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/fleet",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/fleet/",
+      "examples": [
+        "src/fleet/cascadeSimulator.ts",
+        "src/fleet/contradictionDetector.ts",
+        "src/fleet/delegationPacket.ts"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/api",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/api/",
+      "examples": [
+        "src/api/accessPolicy.ts",
+        "src/api/adaptersRouter.ts",
+        "src/api/agentTimelineRouter.ts"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/sdk",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/sdk/",
+      "examples": [
+        "src/sdk/a4Client.ts",
+        "src/sdk/amcAgent.ts",
+        "src/sdk/amcClient.ts"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/ops",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/ops/",
+      "examples": [
+        "src/ops/audit.ts",
+        "src/ops/backpressure.ts",
+        "src/ops/backup/backupCli.ts"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/claims",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/claims/",
+      "examples": [
+        "src/claims/claimConfidence.ts",
+        "src/claims/claimExpiry.ts",
+        "src/claims/claimFactory.ts"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/score",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/score/",
+      "examples": [
+        "src/score/a2aProtocol.ts",
+        "src/score/adaptiveAccessControl.ts",
+        "src/score/adversarial.ts"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/assurance",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/assurance/",
+      "examples": [
+        "src/assurance/agentResponder.ts",
+        "src/assurance/assuranceCertificates.ts",
+        "src/assurance/assuranceCli.ts"
+      ]
+    },
+    {
+      "id": "G4-33",
+      "originalValue": "src/observability",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/observability/",
+      "examples": [
+        "src/observability/anomalyDetector.ts",
+        "src/observability/costBudgetEvidence.ts",
+        "src/observability/costTracker.ts"
+      ]
+    },
+    {
+      "id": "G4-35",
+      "originalValue": "src/guide",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/guide/",
+      "examples": [
+        "src/guide/fixCli.ts",
+        "src/guide/frameworkGuide.ts",
+        "src/guide/guideGenerator.ts"
+      ]
+    },
+    {
+      "id": "G4-35",
+      "originalValue": "src/eval",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/eval/",
+      "examples": [
+        "src/eval/amcJudgeIntegration.ts",
+        "src/eval/costLatencyAssertions.ts",
+        "src/eval/customAssertionEngine.ts"
+      ]
+    },
+    {
+      "id": "G5-05",
+      "originalValue": "docs/RESEARCH_PAPERS_2026",
+      "kind": "unresolved_extension_shorthand_with_existing_candidate",
+      "treePrefix": null,
+      "examples": [
+        "docs/RESEARCH_PAPERS_2026.md"
+      ]
+    },
+    {
+      "id": "G5-28",
+      "originalValue": "docs/research/gap-0610↔source-reviews/gap-0610",
+      "kind": "unresolved_combined_or_pattern_expression",
+      "treePrefix": null,
+      "examples": []
+    },
+    {
+      "id": "G6-04",
+      "originalValue": "deploy/compose/secrets/*.txt",
+      "kind": "unresolved_combined_or_pattern_expression",
+      "treePrefix": null,
+      "examples": []
+    },
+    {
+      "id": "G7-13",
+      "originalValue": "src/casebooks",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/casebooks/",
+      "examples": [
+        "src/casebooks/casebookCli.ts",
+        "src/casebooks/casebookRunner.ts",
+        "src/casebooks/casebookSchema.ts"
+      ]
+    },
+    {
+      "id": "G7-13",
+      "originalValue": "src/eoc",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/eoc/",
+      "examples": [
+        "src/eoc/flows.ts"
+      ]
+    },
+    {
+      "id": "G7-13",
+      "originalValue": "src/executive",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/executive/",
+      "examples": [
+        "src/executive/brief.ts"
+      ]
+    },
+    {
+      "id": "G7-13",
+      "originalValue": "src/bootstrap",
+      "kind": "present_directory_misrecorded_as_absent_leaf",
+      "treePrefix": "src/bootstrap/",
+      "examples": [
+        "src/bootstrap/bootstrap.ts"
+      ]
+    },
+    {
+      "id": "G7-22",
+      "originalValue": "scripts/swarm-test*.py",
+      "kind": "unresolved_combined_or_pattern_expression",
+      "treePrefix": null,
+      "examples": []
+    }
+  ],
+  "appliedChanges": {
+    "rowStatuses": false,
+    "successors": false,
+    "worktrees": false,
+    "trackers": false,
+    "freezeChecks": false,
+    "sourceRemediation": false
+  },
+  "limits": [
+    "No P0-29 tests, mutation checks or qualification commands ran.",
+    "No whole-row assignment is approved or applied.",
+    "The only writes are the two requested /private/tmp reports.",
+    "Original register IDs, supplemental distinctions, historical fields, paused groups and conditional close-out proposals remain untouched."
+  ]
+}

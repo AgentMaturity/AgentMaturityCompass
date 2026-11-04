@@ -1,0 +1,17 @@
+# Independent AMC-1508 original-corpus review
+
+No actionable findings were found in the frozen original-corpus packet.
+
+The raw reports retain the same 21 named definitions in all 16 corpus processes. The initial baseline passes 21/21. The five controls produce 21 → 20 → 21, 21 → 17 → 21, 21 → 18 → 21, 21 → 19 → 21, and 21 → 17 → 21. All 14 failures are original AssertionErrors; no pending, setup, transform, transport, timeout or cleanup failure is used as a guard result. These are 336 repeated executions of 21 definitions.
+
+M1 fails the first principal helper assertion at line 170, masking its later helper checks. M2 accepts the four extra submittedBy fields at line 135 while the source still uses the authenticated principal. M3 fails for blank identity and the direct/registry omitted-principal seams; ordinary anonymous and missing-identity delegated refusals remain protected earlier. M4 admits the deliberately elevated injected agent OPERATOR and lease OWNER fixtures. All route status failures mask later SQL comparisons. The exact historical body composite can select someone-else; same-user, empty and null inputs do not each imply a different forged identity. No mutated post-failure SQL rows or independent operation counters were retained.
+
+The four current reconstructed source controls and the one exact historical composite retain distinct provenance. Each literal source and compiled correspondence matches once, but only the TypeScript target was mutated. Frozen mutant bodies and patches reproduce exactly, with one source-file delta per control. The original tests, config, setup, guards and 30-second deadlines are unchanged. The spec's storing-principal wording remains distinct from the current strict 400/no-insertion contract.
+
+All 1,677 artifact references match their hashes. All 7,739 source files, 4,529 compiled files and 12,268 private files match their prepared/restored manifests. The 89 protected pins, 1,515 prior references, two late predecessor pins, eight prior final file manifests, 307 dependency links and native binary bytes and physical identity remain exact. Dist was never changed. The retained first-render Markdown differs from the final Markdown only by the four recorded spacing corrections.
+
+This corpus injects supported authentication, request, response and limiter seams while using real RBAC, registry/router and SQLite. Intact phases assert the stored principal, nested payload and retained selected rows. Those comparisons cover selected SQL columns, not all database bytes. The original singleton close/cleanup is preserved; its silent close-error catch does not establish a new cold-process guarantee. Portal records remain unsigned accountability data.
+
+Root's separate 21/21 raw result and new single-command extraction are verified additional inputs. Its wrapper copies the inherited environment and then sets PATH, HOME and GIT_NO_LAZY_FETCH; exact inherited values were not recorded. The private lane's recorded allowlist does not apply to that root run. The launcher fingerprint shows Node v22.23.3/ABI 127, without claiming per-worker fingerprint output.
+
+No HTTP qualification namespace was read. No product import, parser, syntax/type check, test, rerun, compiler, build, install, network request, Git command or source/input change was performed by this reviewer. No cookie/credential authentication, tenant/race, full batch, Node24, full suite, release or Done acceptance is claimed. All scoped reads are complete.

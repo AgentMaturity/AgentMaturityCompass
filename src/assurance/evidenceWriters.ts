@@ -250,6 +250,8 @@ export function writeAssuranceAudit(params: {
   auditType: string;
   severity?: "LOW" | "MED" | "HIGH" | "CRITICAL";
   message: string;
+  /** Fields the row attests beyond the message (a sandbox backend and its receipt digest), in its payload and meta. */
+  attests?: Readonly<Record<string, unknown>>;
 }): string {
   const severity = params.severity ?? "HIGH";
   const payload = JSON.stringify({
@@ -257,14 +259,15 @@ export function writeAssuranceAudit(params: {
     severity,
     message: params.message,
     packId: params.packId,
-    scenarioId: params.scenarioId
+    scenarioId: params.scenarioId,
+    ...params.attests
   });
-  const event = params.ledger.appendEvidenceWithReceipt({
+  const evidence = {
     sessionId: params.sessionId,
     runtime: params.runtime,
-    eventType: "audit",
+    eventType: "audit" as const,
     payload,
-    payloadExt: "json",
+    payloadExt: "json" as const,
     inline: true,
     meta: {
       source: "assurance",
@@ -274,8 +277,14 @@ export function writeAssuranceAudit(params: {
       packId: params.packId,
       scenarioId: params.scenarioId,
       agentId: params.agentId,
-      trustTier: params.trustTier
-    },
+      trustTier: params.trustTier,
+      ...params.attests
+    }
+  };
+  // `assurance run --no-sign` mints no receipt (AMC_NO_SIGN=1 authorizes none): the audit is a plain unsigned row.
+  if (process.env.AMC_NO_SIGN === "1") return params.ledger.appendEvidence(evidence);
+  const event = params.ledger.appendEvidenceWithReceipt({
+    ...evidence,
     receipt: {
       kind: params.auditType.startsWith("TOOL_") ? "tool_action" : "guard_check",
       agentId: params.agentId,

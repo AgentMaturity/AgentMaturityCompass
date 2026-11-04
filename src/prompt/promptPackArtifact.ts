@@ -1,13 +1,16 @@
-import { collectFiles as collectArchiveFiles } from "../utils/archiveFiles.js";
+import { resolveAgentId } from "../fleet/paths.js";
+import type { LessonTransferRequest } from "../learning/lessonProvenance.js";
+import { assertPromptLessonOutputs, assertPromptLessonsCurrent } from "./promptLessonTransfer.js";
 import { mkdtempSync, readFileSync, readdirSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve } from "node:path";
-import { spawnSync } from "node:child_process";
+import { join, resolve } from "node:path";
 import { canonicalize } from "../utils/json.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
+import { pathExists, readUtf8 } from "../utils/fs.js";
 import { sha256Hex } from "../utils/hash.js";
 import { getPublicKeyHistory } from "../crypto/keys.js";
-import { signFileWithAuditor } from "../org/orgSigner.js";
+import { signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
+import { promptArchiveBytes } from "./promptArchive.js";
+import { capturePromptFiles, publishPromptFiles } from "./promptPublication.js";
 import { compilePromptPack } from "./promptCompiler.js";
 import {
   promptLintSchema,
@@ -48,19 +51,6 @@ function cleanupDir(path: string): void {
   }
 }
 
-function collectFiles(root: string): string[] {
-  return collectArchiveFiles(root);
-}
-
-function tarCreateDeterministic(sourceDir: string, outFile: string): void {
-  ensureDir(dirname(outFile));
-  const files = collectFiles(sourceDir);
-  const out = spawnSync("tar", ["-czf", outFile, "-C", sourceDir, ...files], { encoding: "utf8" });
-  if (out.status !== 0) {
-    throw new Error(`failed to create prompt pack: ${(`${out.stdout ?? ""}${out.stderr ?? ""}`).trim()}`);
-  }
-}
-
 function tarExtract(bundleFile: string, outDir: string): void {
   extractValidatedTarGzipArchive({ file: bundleFile, destination: outDir, label: "archive", limits: AMC_ARCHIVE_LIMITS });
 }
@@ -89,7 +79,7 @@ function parseProviderFiles(root: string): PromptProviderFiles {
     gemini: promptProviderGeminiSchema.parse(JSON.parse(readUtf8(join(root, "provider", "gemini.json"))) as unknown),
     xai: promptProviderOpenAiSchema.parse(JSON.parse(readUtf8(join(root, "provider", "xai.json"))) as unknown),
     openrouter: promptProviderOpenAiSchema.parse(JSON.parse(readUtf8(join(root, "provider", "openrouter.json"))) as unknown),
-    generic: promptProviderGenericSchema.parse({
+    generic: promptProviderGenericSchema.parse(pathExists(join(root, "provider", "generic.json")) ? JSON.parse(readUtf8(join(root, "provider", "generic.json"))) : {
       v: 1,
       systemMessage: readUtf8(join(root, "provider", "openai.json")).length > 0
         ? (JSON.parse(readUtf8(join(root, "provider", "openai.json"))) as { systemMessage: string }).systemMessage
@@ -111,60 +101,25 @@ export function buildPromptPackArtifact(params: {
   workspace: string;
   agentId?: string;
   outFile: string;
+  lessons?: LessonTransferRequest;
 }): PromptPackBuildResult {
-  const compiled = compilePromptPack({
-    workspace: params.workspace,
-    agentId: params.agentId
-  });
-  const signature = promptPackSignatureSchema.parse(signPromptPack(params.workspace, compiled.pack));
-  const signerPub =
-    signature.envelope
-      ? Buffer.from(signature.envelope.pubkeyB64, "base64").toString("utf8")
-      : (getPublicKeyHistory(params.workspace, "auditor")[0] ?? "");
-  if (!signerPub) {
-    throw new Error("missing signer pubkey for prompt pack");
-  }
-
-  const temp = mkdtempSync(join(tmpdir(), "amc-prompt-pack-"));
   const outFile = resolve(params.outFile);
-  try {
-    const root = join(temp, "amc-prompt");
-    ensureDir(root);
-    ensureDir(join(root, "meta"));
-    ensureDir(join(root, "provider"));
-    ensureDir(join(root, "lint"));
-
-    writeFileAtomic(join(root, "pack.json"), `${canonicalize(compiled.pack)}\n`, 0o644);
-    writeFileAtomic(join(root, "pack.sig"), `${canonicalize(signature)}\n`, 0o644);
-    writeFileAtomic(join(root, "signer.pub"), signerPub, 0o644);
-
-    writeFileAtomic(join(root, "meta", "cgx.pack.sha256"), `${compiled.hashes.cgxPackSha256}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "policy.sha256"), `${compiled.hashes.policySha256}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "bank.sha256"), `${compiled.hashes.bankSha256}\n`, 0o644);
-    writeFileAtomic(join(root, "meta", "canon.sha256"), `${compiled.hashes.canonSha256}\n`, 0o644);
-
-    writeFileAtomic(join(root, "provider", "openai.json"), `${canonicalize(compiled.providerFiles.openai)}\n`, 0o644);
-    writeFileAtomic(join(root, "provider", "anthropic.json"), `${canonicalize(compiled.providerFiles.anthropic)}\n`, 0o644);
-    writeFileAtomic(join(root, "provider", "gemini.json"), `${canonicalize(compiled.providerFiles.gemini)}\n`, 0o644);
-    writeFileAtomic(join(root, "provider", "xai.json"), `${canonicalize(compiled.providerFiles.xai)}\n`, 0o644);
-    writeFileAtomic(join(root, "provider", "openrouter.json"), `${canonicalize(compiled.providerFiles.openrouter)}\n`, 0o644);
-
-    writeFileAtomic(join(root, "lint", "lint.json"), `${canonicalize(promptLintSchema.parse(compiled.lint))}\n`, 0o644);
-    const lintSigPath = signFileWithAuditor(params.workspace, join(root, "lint", "lint.json"));
-    writeFileAtomic(join(root, "lint", "lint.sig"), readFileSync(lintSigPath), 0o644);
-
-    tarCreateDeterministic(temp, outFile);
-    return {
-      outFile,
-      sha256: sha256Hex(readFileSync(outFile)),
-      pack: compiled.pack,
-      signature,
-      lint: compiled.lint,
-      providerFiles: compiled.providerFiles
-    };
-  } finally {
-    cleanupDir(temp);
-  }
+  assertPromptLessonOutputs(params.workspace, [outFile], params.lessons !== undefined);
+  const before = capturePromptFiles([outFile]);
+  const agentId = resolveAgentId(params.workspace, params.agentId ?? "default");
+  const compiled = compilePromptPack({ workspace: params.workspace, agentId, lessons: params.lessons });
+  const signature = promptPackSignatureSchema.parse(signPromptPack(params.workspace, compiled.pack));
+  const signerPub = signature.envelope ? Buffer.from(signature.envelope.pubkeyB64, "base64").toString("utf8") : (getPublicKeyHistory(params.workspace, "auditor")[0] ?? "");
+  if (!signerPub) throw new Error("missing signer pubkey for prompt pack");
+  const lint = `${canonicalize(promptLintSchema.parse(compiled.lint))}\n`;
+  const lintSignature = JSON.stringify(signSerializedPayloadWithAuditor(params.workspace, lint), null, 2);
+  const bytes = promptArchiveBytes(compiled, signature, signerPub, lintSignature);
+  const assertLessons = () => {
+    assertPromptLessonOutputs(params.workspace, [outFile], params.lessons !== undefined);
+    assertPromptLessonsCurrent(params.workspace, agentId, compiled.pack.checkpoints.lessonTransfer);
+  };
+  publishPromptFiles(params.workspace, before, [{ path: outFile, bytes }], assertLessons);
+  return { outFile, sha256: sha256Hex(bytes), pack: compiled.pack, signature, lint: compiled.lint, providerFiles: compiled.providerFiles };
 }
 
 export function inspectPromptPackArtifact(file: string): {

@@ -1,42 +1,37 @@
+import { percentileRank } from "../experiments/stats.js";
 import type { BenchArtifact } from "./benchSchema.js";
 
+/** One bench flattened for ranking; null where the bench did not measure the metric (not evaluated). */
 export interface BenchComparablePoint {
   benchId: string;
-  overall: number;
-  integrityIndex: number;
-  correlationRatio: number;
-  strategicOps: number;
-  leadership: number;
-  culture: number;
-  resilience: number;
-  skills: number;
+  overall: number | null;
+  integrityIndex: number | null;
+  correlationRatio: number | null;
+  strategicOps: number | null;
+  leadership: number | null;
+  culture: number | null;
+  resilience: number | null;
+  skills: number | null;
   ecosystemFocusRisk: number;
   clarityPathRisk: number;
   economicSignificanceRisk: number;
   riskAssuranceRisk: number;
   digitalDualityRisk: number;
-  emotionalValue: number;
-  functionalValue: number;
-  economicValue: number;
-  brandValue: number;
-  lifetimeValue: number;
-  valueScore: number;
+  emotionalValue: number | null;
+  functionalValue: number | null;
+  economicValue: number | null;
+  brandValue: number | null;
+  lifetimeValue: number | null;
+  valueScore: number | null;
 }
 
 export function flattenBenchMetrics(bench: BenchArtifact): BenchComparablePoint {
-  const valueScore =
-    typeof bench.metrics.valueDimensions.valueScore === "number"
-      ? bench.metrics.valueDimensions.valueScore
-      : Number(
-          (
-            (bench.metrics.valueDimensions.emotionalValue +
-              bench.metrics.valueDimensions.functionalValue +
-              bench.metrics.valueDimensions.economicValue +
-              bench.metrics.valueDimensions.brandValue +
-              bench.metrics.valueDimensions.lifetimeValue) /
-            5
-          ).toFixed(6)
-        );
+  const dims = bench.metrics.valueDimensions;
+  // A bench without a stored score averages its measured dimensions; with none measured the score is not evaluated.
+  const measured = [dims.emotionalValue, dims.functionalValue, dims.economicValue, dims.brandValue, dims.lifetimeValue]
+    .filter((value): value is number => typeof value === "number");
+  const valueScore = typeof dims.valueScore === "number" ? dims.valueScore
+    : measured.length > 0 ? Number((measured.reduce((sum, value) => sum + value, 0) / measured.length).toFixed(6)) : null;
   return {
     benchId: bench.benchId,
     overall: bench.metrics.maturity.overall,
@@ -52,33 +47,32 @@ export function flattenBenchMetrics(bench: BenchArtifact): BenchComparablePoint 
     economicSignificanceRisk: bench.metrics.strategyFailureRisks.economicSignificanceRisk,
     riskAssuranceRisk: bench.metrics.strategyFailureRisks.riskAssuranceRisk,
     digitalDualityRisk: bench.metrics.strategyFailureRisks.digitalDualityRisk,
-    emotionalValue: bench.metrics.valueDimensions.emotionalValue,
-    functionalValue: bench.metrics.valueDimensions.functionalValue,
-    economicValue: bench.metrics.valueDimensions.economicValue,
-    brandValue: bench.metrics.valueDimensions.brandValue,
-    lifetimeValue: bench.metrics.valueDimensions.lifetimeValue,
+    emotionalValue: dims.emotionalValue,
+    functionalValue: dims.functionalValue,
+    economicValue: dims.economicValue,
+    brandValue: dims.brandValue,
+    lifetimeValue: dims.lifetimeValue,
     valueScore
   };
 }
 
+// Unlike experiments/stats.ts quantile, this is the empirical percentile rank (fraction <= value), in percent.
+/** @deprecated Use percentileRank from ../experiments/stats.js for unrounded ranks. */
 export function percentile(values: number[], value: number): number {
-  if (values.length === 0) {
-    return 0;
-  }
-  const sorted = values.slice().sort((a, b) => a - b);
-  const rank = sorted.filter((entry) => entry <= value).length;
-  return Number(((rank / sorted.length) * 100).toFixed(4));
+  return Number(percentileRank(values, value).toFixed(4));
 }
 
 export function percentileTable(
   local: BenchComparablePoint,
   population: BenchComparablePoint[]
-): Record<string, number> {
-  const out: Record<string, number> = {};
-  const keys = Object.keys(local).filter((key) => key !== "benchId") as Array<keyof BenchComparablePoint>;
+): Record<string, number | null> {
+  const out: Record<string, number | null> = {};
+  const keys = Object.keys(local).filter((key) => key !== "benchId") as Array<Exclude<keyof BenchComparablePoint, "benchId">>;
   for (const key of keys) {
-    const values = population.map((entry) => Number(entry[key]));
-    out[key] = percentile(values, Number(local[key]));
+    // Rank only measured values: an unmeasured local metric has no rank, and unmeasured peers are not 0s to beat.
+    const value = local[key];
+    const values = population.flatMap((entry) => (entry[key] === null ? [] : [entry[key]]));
+    out[key] = value === null || values.length === 0 ? null : percentile(values, value);
   }
   return out;
 }
@@ -100,30 +94,40 @@ function riskComposite(point: BenchComparablePoint): number {
   ) / 5;
 }
 
-function normalizedVector(point: BenchComparablePoint): [number, number, number, number] {
+type PeerVector = [number | null, number | null, number, number | null];
+
+function normalizedVector(point: BenchComparablePoint): PeerVector {
   return [
-    point.overall / 5,
+    point.overall === null ? null : point.overall / 5,
     point.integrityIndex,
     riskComposite(point) / 100,
-    point.valueScore / 100
+    point.valueScore === null ? null : point.valueScore / 100
   ];
 }
 
-function euclidean(a: [number, number, number, number], b: [number, number, number, number]): number {
-  const d0 = a[0] - b[0];
-  const d1 = a[1] - b[1];
-  const d2 = a[2] - b[2];
-  const d3 = a[3] - b[3];
-  return Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2 + d3 * d3);
+/** Distance over the dimensions both points measured; an unmeasured dimension adds no distance rather than a fake 0. */
+function euclidean(a: PeerVector, b: PeerVector): number {
+  let sum = 0;
+  for (let i = 0; i < a.length; i += 1) {
+    const left = a[i], right = b[i];
+    if (left !== null && left !== undefined && right !== null && right !== undefined) sum += (left - right) ** 2;
+  }
+  return Math.sqrt(sum);
+}
+
+/** Mean of the measured values; null when none is measured. */
+function meanMeasured(values: Array<number | null>): number | null {
+  const measured = values.filter((value): value is number => value !== null);
+  return measured.length === 0 ? null : measured.reduce((sum, value) => sum + value, 0) / measured.length;
 }
 
 function chooseInitialMedoids(points: BenchComparablePoint[], k: number): BenchComparablePoint[] {
   const vectors = points.map((point) => normalizedVector(point));
-  const center: [number, number, number, number] = [
-    vectors.reduce((sum, row) => sum + row[0], 0) / Math.max(1, vectors.length),
-    vectors.reduce((sum, row) => sum + row[1], 0) / Math.max(1, vectors.length),
-    vectors.reduce((sum, row) => sum + row[2], 0) / Math.max(1, vectors.length),
-    vectors.reduce((sum, row) => sum + row[3], 0) / Math.max(1, vectors.length)
+  const center: PeerVector = [
+    meanMeasured(vectors.map((row) => row[0])),
+    meanMeasured(vectors.map((row) => row[1])),
+    meanMeasured(vectors.map((row) => row[2])) ?? 0,
+    meanMeasured(vectors.map((row) => row[3]))
   ];
   const ranked = points
     .map((point, index) => ({

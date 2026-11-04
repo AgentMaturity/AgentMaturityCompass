@@ -1,0 +1,216 @@
+{
+  "schema": "p125pc-independent-completed-runtime-review/1",
+  "at": "2026-10-17T02:09:20.629430+00:00",
+  "sourceCommit": "5d4e9e8d74bef32e68090369223947691c5fea21",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout",
+  "blockers": [],
+  "canonicalCasesNotSummed": 24,
+  "sixActualPhases": [
+    {
+      "phase": "p125pc-source-combined",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "durationMs": 4578,
+      "ownedPgid": 86040,
+      "resources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      }
+    },
+    {
+      "phase": "p125pc-fresh-canonical",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "durationMs": 5237,
+      "ownedPgid": 87712,
+      "resources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      }
+    },
+    {
+      "phase": "p125pc-m1",
+      "tests": {
+        "total": 24,
+        "passed": 23,
+        "failed": 1,
+        "skipped": 0
+      },
+      "durationMs": 4481,
+      "ownedPgid": 88201,
+      "resources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 44,
+        "explicitChildStreamHashCount": 88,
+        "closedSockets": 11,
+        "closedLedgerOwners": 34
+      }
+    },
+    {
+      "phase": "p125pc-restore1",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "durationMs": 4559,
+      "ownedPgid": 88380,
+      "resources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      }
+    },
+    {
+      "phase": "p125pc-m2",
+      "tests": {
+        "total": 24,
+        "passed": 23,
+        "failed": 1,
+        "skipped": 0
+      },
+      "durationMs": 4409,
+      "ownedPgid": 88516,
+      "resources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 44,
+        "explicitChildStreamHashCount": 88,
+        "closedSockets": 11,
+        "closedLedgerOwners": 36
+      }
+    },
+    {
+      "phase": "p125pc-restore2",
+      "tests": {
+        "total": 24,
+        "passed": 24,
+        "failed": 0,
+        "skipped": 0
+      },
+      "durationMs": 4639,
+      "ownedPgid": 88687,
+      "resources": {
+        "grantPublicCount": 7,
+        "checkpointPublicCount": 5,
+        "children": 46,
+        "explicitChildStreamHashCount": 92,
+        "closedSockets": 12,
+        "closedLedgerOwners": 38
+      }
+    }
+  ],
+  "checks": {
+    "sameOrderedUnique24AcrossSixPhases": true,
+    "all144PerFileOrderedOccurrenceObserverIdJoinsExact": true,
+    "same3HookTaskEntries4PassingValues": true,
+    "allRawProducerSnapshotBytesAndCommandArtifactPinsExact": true,
+    "allErrorsFullStacksAndManualFailureMessagesMatch": true,
+    "noHookUnhandledLateSkipSignalOrCleanupError": true,
+    "all72ExplicitPublicFileHashesAndLogLifecycleJsonEqual": true,
+    "allActualChildExitClose0SocketRequestAndLedgerOwnerRecordsMatchAudits": true,
+    "producerGreenTwoOwnQueryProofsAndRedOneOwnQueryProof": true,
+    "eachOwnQueryResponseHashAndVerifierArgvTokenDigestJoinExact": true,
+    "sharedReplyObservationLastProofOnly": true,
+    "greenActualCoveredRowsFindingsBoundsAndFinalLedgerNonmutationPositive": true,
+    "redMissingLaterFactsReceiveNoCredit": true,
+    "allFourActualSixFieldActionRecordsUnchanged": true,
+    "separateRootDirectActionClosureAttestationsBindExactPhysicalPinsAndFields": true,
+    "allApplyReturnsBeforeMutantStartAndRestoresBeforeGreenAndNextControl": true,
+    "manualClassificationsAfterClosedRedBeforeExplicitRestores": true,
+    "actualFunctionBoundedMutantHashesLivePatchesAndOriginalsReconstructedExact": true,
+    "sameInodeExactRestoresAndOnlyFreshLedgerSourceMutation": true,
+    "current175ProtectedAnd204SelectedBytePhysicalPinsExact": true,
+    "current13DistinctNativeStatsExactNoNativePayloadRead": true,
+    "currentSourceFreshCleanAtSourceCommitAndR18IndexExact": true,
+    "allNineReadOnlyGitChildrenNatural0": true
+  },
+  "failureAndMasking": [
+    {
+      "operator": "DROP-PRODUCER-TS",
+      "actualFirstFrame": "698:36",
+      "classification": [
+        {
+          "test": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+          "messages": [
+            "expected 1792202534624 to be 1792202233999 // Object.is equality"
+          ],
+          "classification": "Intended producer timestamp preservation failure. Replacing input.ts with Date.now() stored 1792202534624 instead of requested backdate1792202233999. The other23 tests passed; no hook, unhandled or late error.",
+          "firstSensitiveFrame": "at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/tests/time/checkpointWindow.test.ts:698:36"
+        }
+      ],
+      "masking": [
+        "Postdated append/assertion707 not reached.",
+        "Second covering checkpoint/grant and covered ledger verification not reached.",
+        "Reader BACKDATED/POSTDATED finding assertions782/783 and final nonmutation/ledger checks not reached.",
+        "One first grant is independently query-bound; no second request/grant exists or is credited."
+      ],
+      "restoredInode": 543944368
+    },
+    {
+      "operator": "CLAMP-FUTURE-PRODUCER-TS",
+      "actualFirstFrame": "707:36",
+      "classification": [
+        {
+          "test": "P1-25 real signed ledger checkpoint transitions persists backdated and postdated producer claims in the signed ledger and reports their genuine checkpoint window",
+          "messages": [
+            "expected 1792202619879 to be 1792289019000 // Object.is equality"
+          ],
+          "classification": "Intended future producer timestamp preservation failure. Clamping input.ts at Date.now() retained the requested past claim but stored1792202619879 instead of future1792289019000. The other23 tests passed with no hook, unhandled or late error.",
+          "firstSensitiveFrame": "at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-0F9GlT/checkout/tests/time/checkpointWindow.test.ts:707:36"
+        }
+      ],
+      "masking": [
+        "Second covering checkpoint/grant and covered ledger verification not reached.",
+        "Reader BACKDATED/POSTDATED finding assertions782/783 and final nonmutation/ledger checks not reached.",
+        "One first grant independently query-bound; no second request/grant exists or is credited."
+      ],
+      "restoredInode": 543944368
+    }
+  ],
+  "publicBoundaries": {
+    "greenPerPhase": "7 TSA lifecycle and5 checkpoint publics;46 natural children,92 root-hashed stream records,12 closed sockets and38 closed ledger owners.",
+    "m1": "7/5 publics;44children/88 stream records/11sockets/34owners. One first producer grant; backdate mismatch698 masks postdate append, covering checkpoint, readers and final facts.",
+    "m2": "7/5 publics;44children/88 stream records/11sockets/36owners. Backdate preserved; future claim mismatch707 masks covering checkpoint, readers and final facts.",
+    "streamHashLimit": "Recorded per-child stream path/size/hash rows match successful root public audits. Child streams and signing siblings/keys were not opened or rehashed by this reviewer. Nonempty recorded stderr is retained; no claim of diagnostic-free child stderr.",
+    "nativeHashLimit": "All13 actual native dev/inode/nlink/size records were stat-verified and remain distinct. Native bytes were not reopened; byte/hash preservation is root/frozen-binding evidence, independently pinned here.",
+    "cryptoLimit": "Public query/response pins and exact child argv/digest/token facts were joined; no OpenSSL, signature, ledger or token cryptography was reexecuted.",
+    "lifecycleLimit": "Owned guard-close invocation, public pool/vault/environment/native assertions and wrapper group absence are bounded fixture evidence, not universal descendant/handle/environment isolation."
+  },
+  "downstreamCompatibility": "The immutable action JSONs intentionally have only argv/startedUtc/endedUtc/exit/stdout/stderr. Natural return is separately attested in the exact root runtime report. The earlier V2 assembler membership assumption needs its announced narrow V3 adaptation; no action record was modified.",
+  "readDiagnostics": {
+    "allMetadataCommandsNatural0": true,
+    "initialDirectLogDisplayTruncated": true,
+    "recovery": "Complete logs were consumed as bytes. All seven lifecycle JSON rows per phase were compared to exact named public JSON; non-lifecycle logs and all errors were separately projected. One combined projection also truncated its repeated display; exact full errors remain in pinned raw/observer/outcome and private observations. No source/product retry or dropped running process.",
+    "rootDisclosedReadError": "Root report retains a guessed receipt delta filename lookup failure corrected by the actual inventory; no mutation or runtime retry.",
+    "noReservationProbe": true
+  },
+  "limits": [
+    "No product/helper/parser/compiler/native/SQL/OpenSSL/network execution or signing-root traversal. No source/index/QA/ownership/reservation writes.",
+    "Only source-controlled fresh ledger.ts was mutated by root controls; compiled artifacts and native sensitivity receive no mutation credit.",
+    "Existing global quality remains RED1268 duplicates/2712 dead, unwaived. No metadata copy/commit/export/QA, whole P1-25, plan, release or F37 credit from this review."
+  ],
+  "inputPinCount": 509
+}

@@ -1,7 +1,3 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
-import YAML from "yaml";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
 import { openLedger } from "../ledger/ledger.js";
 import {
   type ActionClass,
@@ -11,27 +7,19 @@ import {
   type TargetProfile,
   type TrustTier
 } from "../types.js";
-import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { sha256Hex } from "../utils/hash.js";
-import { actionPolicySchema, type ActionPolicy, type ActionPolicyRule, type TrustTierAtLeast } from "./actionPolicySchema.js";
-import { getAgentPaths } from "../fleet/paths.js";
-import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { DEFAULT_RUN_INTEGRITY_AT_LEAST, runIntegrityAtLeast, type ActionPolicy, type ActionPolicyRule, type TrustTierAtLeast } from "./actionPolicySchema.js";
+import { latestTrustedRun } from "./runTrust.js";
+import { isSandboxAttestation } from "./sandboxEvidence.js";
+import { verifiedGovernorAssuranceSummary } from "../assurance/assuranceRunner.js";
+import { defaultActionPolicy } from "./actionPolicyStore.js";
+export { latestTrustedRun } from "./runTrust.js";
+export { ACTION_POLICY_WRITER_LOCK, actionPolicyWriterPendingPath, assertActionPolicyWriterReady,
+  actionPolicyPath, actionPolicySigPath, defaultActionPolicy, loadActionPolicy,
+  signActionPolicyWithLockHeld, signActionPolicy, initActionPolicy, initActionPolicyAsync, prepareActionPolicyPair, verifyActionPolicySignature } from "./actionPolicyStore.js";
 import {
   evaluatePolicyEvidenceLogic,
   policyEvidenceGateId,
 } from "./policyEvidenceLogic.js";
-
-export const ACTION_POLICY_WRITER_LOCK = "action-policy-writer" as const;
-
-export function actionPolicyWriterPendingPath(workspace: string): string {
-  return join(workspace, ".amc", ".action-policy-writer.pending.json");
-}
-
-export function assertActionPolicyWriterReady(workspace: string): void {
-  if (pathExists(actionPolicyWriterPendingPath(workspace))) {
-    throw new Error("Action Policy writer recovery is pending; retry the original exact-confirm apply first.");
-  }
-}
 
 export interface GovernorAssurancePackStatus {
   score: number;
@@ -46,8 +34,19 @@ export interface GovernorAssuranceSummary {
 export interface GovernorTrustSummary {
   trustTier: TrustTier;
   sandboxEvidence: boolean;
+  /**
+   * A hard gate no rule waives: the run history is refused (`runRefusal`), or the latest trusted run failed ledger
+   * verification, is not VALID or violated the trust boundary (`runTrustGap`). Callers OR in their own signature failures
+   * (ToolHub: `!configTrusted`; the runner: `anyUntrustedConfig`). Never set for a merely missing or low-integrity run:
+   * that is the rule's `run-integrity` condition.
+   */
   untrustedConfig: boolean;
-  correlationRatio: number;
+  /** The latest trusted run's ratio; null when there is no run or it measured no correlation. */
+  correlationRatio: number | null;
+  /** Why the latest run file was not used (seal, agent or ledger anchor failed); absent when nothing was refused. */
+  runRefusal?: string;
+  /** With `untrustedConfig` from the run: why the latest trusted run cannot vouch at any threshold. */
+  runTrustGap?: string;
 }
 
 export interface GovernorWorkOrderContext {
@@ -110,289 +109,12 @@ export interface GovernorDecision {
   requiredExecTicket: boolean;
 }
 
-interface ActionPolicySignature {
-  digestSha256: string;
-  signature: string;
-  signedTs: number;
-  signer: "auditor";
-}
-
 const TRUST_RANK: Record<TrustTierAtLeast | TrustTier, number> = {
   SELF_REPORTED: 1,
   ATTESTED: 2,
   OBSERVED: 3,
   OBSERVED_HARDENED: 4
 };
-
-export function actionPolicyPath(workspace: string): string {
-  return join(workspace, ".amc", "action-policy.yaml");
-}
-
-export function actionPolicySigPath(workspace: string): string {
-  return `${actionPolicyPath(workspace)}.sig`;
-}
-
-function signActionPolicyDigest(workspace: string, digest: string): string {
-  return signHexDigest(digest, getPrivateKeyPem(workspace, "auditor"));
-}
-
-export function defaultActionPolicy(): ActionPolicy {
-  return actionPolicySchema.parse({
-    version: 1,
-    defaultMode: "DENY",
-    riskTierDefaults: {
-      low: { requireSandboxForExecute: false },
-      medium: { requireSandboxForExecute: true },
-      high: { requireSandboxForExecute: true },
-      critical: { requireSandboxForExecute: true }
-    },
-    actions: [
-      {
-        actionClass: "READ_ONLY",
-        minEffectiveQuestionLevels: {
-          "AMC-1.7": 2,
-          "AMC-3.3.1": 2
-        },
-        requireTrustTierAtLeast: "OBSERVED",
-        requireAssurancePacks: {
-          injection: { minScore: 60, maxSucceeded: 0 }
-        },
-        allowExecute: true,
-        requireExecTicket: false
-      },
-      {
-        actionClass: "WRITE_LOW",
-        minEffectiveQuestionLevels: {
-          "AMC-1.7": 3,
-          "AMC-1.8": 3,
-          "AMC-3.3.1": 3,
-          "AMC-4.6": 3
-        },
-        requireTrustTierAtLeast: "OBSERVED",
-        requireAssurancePacks: {
-          unsafe_tooling: { minScore: 75, maxSucceeded: 0 },
-          governance_bypass: { minScore: 75, maxSucceeded: 0 }
-        },
-        allowExecute: true,
-        requireExecTicket: false
-      },
-      {
-        actionClass: "WRITE_HIGH",
-        minEffectiveQuestionLevels: {
-          "AMC-1.8": 4,
-          "AMC-1.7": 4,
-          "AMC-3.3.1": 4,
-          "AMC-4.6": 4
-        },
-        requireTrustTierAtLeast: "OBSERVED_HARDENED",
-        requireAssurancePacks: {
-          unsafe_tooling: { minScore: 85, maxSucceeded: 0 },
-          governance_bypass: { minScore: 85, maxSucceeded: 0 }
-        },
-        allowExecute: true,
-        requireExecTicket: true
-      },
-      {
-        actionClass: "DEPLOY",
-        minEffectiveQuestionLevels: {
-          "AMC-1.8": 4,
-          "AMC-1.7": 4,
-          "AMC-1.5": 4,
-          "AMC-2.5": 3,
-          "AMC-3.3.1": 4,
-          "AMC-3.3.4": 3,
-          "AMC-4.6": 4,
-          "AMC-5.3": 3
-        },
-        requireTrustTierAtLeast: "OBSERVED_HARDENED",
-        requireAssurancePacks: {
-          unsafe_tooling: { minScore: 85, maxSucceeded: 0 },
-          governance_bypass: { minScore: 85, maxSucceeded: 0 },
-          hallucination: { minScore: 85, maxSucceeded: 0 }
-        },
-        allowExecute: true,
-        requireExecTicket: true
-      },
-      {
-        actionClass: "SECURITY",
-        minEffectiveQuestionLevels: {
-          "AMC-1.8": 5,
-          "AMC-3.2.3": 5,
-          "AMC-3.3.1": 5,
-          "AMC-4.6": 5
-        },
-        requireTrustTierAtLeast: "OBSERVED_HARDENED",
-        requireAssurancePacks: {
-          exfiltration: { minScore: 90, maxSucceeded: 0 },
-          injection: { minScore: 90, maxSucceeded: 0 },
-          governance_bypass: { minScore: 90, maxSucceeded: 0 }
-        },
-        allowExecute: false,
-        requireExecTicket: true
-      },
-      {
-        actionClass: "FINANCIAL",
-        minEffectiveQuestionLevels: {
-          "AMC-1.8": 5,
-          "AMC-3.3.1": 5,
-          "AMC-4.6": 5
-        },
-        requireTrustTierAtLeast: "OBSERVED_HARDENED",
-        requireAssurancePacks: {
-          governance_bypass: { minScore: 90, maxSucceeded: 0 },
-          hallucination: { minScore: 90, maxSucceeded: 0 }
-        },
-        allowExecute: false,
-        requireExecTicket: true
-      },
-      {
-        actionClass: "NETWORK_EXTERNAL",
-        minEffectiveQuestionLevels: {
-          "AMC-1.5": 4,
-          "AMC-1.8": 4,
-          "AMC-4.6": 4
-        },
-        requireTrustTierAtLeast: "OBSERVED_HARDENED",
-        requireAssurancePacks: {
-          exfiltration: { minScore: 85, maxSucceeded: 0 },
-          injection: { minScore: 85, maxSucceeded: 0 }
-        },
-        allowExecute: false,
-        requireExecTicket: true
-      },
-      {
-        actionClass: "DATA_EXPORT",
-        minEffectiveQuestionLevels: {
-          "AMC-1.8": 5,
-          "AMC-3.2.3": 5,
-          "AMC-3.3.1": 5
-        },
-        requireTrustTierAtLeast: "OBSERVED_HARDENED",
-        requireAssurancePacks: {
-          exfiltration: { minScore: 90, maxSucceeded: 0 }
-        },
-        allowExecute: false,
-        requireExecTicket: true
-      },
-      {
-        actionClass: "IDENTITY",
-        minEffectiveQuestionLevels: {
-          "AMC-1.8": 5,
-          "AMC-3.2.3": 5,
-          "AMC-4.6": 5
-        },
-        requireTrustTierAtLeast: "OBSERVED_HARDENED",
-        requireAssurancePacks: {
-          governance_bypass: { minScore: 90, maxSucceeded: 0 },
-          injection: { minScore: 90, maxSucceeded: 0 }
-        },
-        allowExecute: false,
-        requireExecTicket: true
-      }
-    ]
-  });
-}
-
-export function loadActionPolicy(workspace: string, explicitPath?: string): ActionPolicy {
-  const file = explicitPath ? resolve(workspace, explicitPath) : actionPolicyPath(workspace);
-  if (!pathExists(file)) {
-    throw new Error(`Action policy not found: ${file}`);
-  }
-  return actionPolicySchema.parse(YAML.parse(readUtf8(file)) as unknown);
-}
-
-export function signActionPolicyWithLockHeld(workspace: string, explicitPath?: string): string {
-  const file = explicitPath ? resolve(workspace, explicitPath) : actionPolicyPath(workspace);
-  if (!pathExists(file)) {
-    throw new Error(`Action policy not found: ${file}`);
-  }
-  const digest = sha256Hex(readFileSync(file));
-  const payload: ActionPolicySignature = {
-    digestSha256: digest,
-    signature: signActionPolicyDigest(workspace, digest),
-    signedTs: Date.now(),
-    signer: "auditor"
-  };
-  const sigPath = `${file}.sig`;
-  writeFileAtomic(sigPath, JSON.stringify(payload, null, 2), 0o644);
-  return sigPath;
-}
-
-export function signActionPolicy(workspace: string, explicitPath?: string): string {
-  const file = explicitPath ? resolve(workspace, explicitPath) : actionPolicyPath(workspace);
-  return withControlFileLock({
-    root: dirname(file),
-    name: ACTION_POLICY_WRITER_LOCK,
-    timeoutMs: 500,
-    operation: () => {
-      assertActionPolicyWriterReady(workspace);
-      return signActionPolicyWithLockHeld(workspace, explicitPath);
-    },
-  });
-}
-
-export function initActionPolicy(workspace: string, policy?: ActionPolicy): {
-  policyPath: string;
-  signaturePath: string;
-} {
-  ensureDir(join(workspace, ".amc"));
-  const targetPath = actionPolicyPath(workspace);
-  return withControlFileLock({
-    root: dirname(targetPath),
-    name: ACTION_POLICY_WRITER_LOCK,
-    timeoutMs: 500,
-    operation: () => {
-      assertActionPolicyWriterReady(workspace);
-      const parsed = actionPolicySchema.parse(policy ?? defaultActionPolicy());
-      writeFileAtomic(targetPath, YAML.stringify(parsed), 0o644);
-      const signaturePath = signActionPolicyWithLockHeld(workspace);
-      return {
-        policyPath: targetPath,
-        signaturePath
-      };
-    },
-  });
-}
-
-export function verifyActionPolicySignature(workspace: string, explicitPath?: string): {
-  valid: boolean;
-  signatureExists: boolean;
-  reason: string | null;
-  path: string;
-  sigPath: string;
-} {
-  const path = explicitPath ? resolve(workspace, explicitPath) : actionPolicyPath(workspace);
-  const sigPath = `${path}.sig`;
-  if (!pathExists(path)) {
-    return { valid: false, signatureExists: false, reason: "action policy missing", path, sigPath };
-  }
-  if (!pathExists(sigPath)) {
-    return { valid: false, signatureExists: false, reason: "action policy signature missing", path, sigPath };
-  }
-  try {
-    const sig = JSON.parse(readUtf8(sigPath)) as ActionPolicySignature;
-    const digest = sha256Hex(readFileSync(path));
-    if (digest !== sig.digestSha256) {
-      return { valid: false, signatureExists: true, reason: "digest mismatch", path, sigPath };
-    }
-    const valid = verifyHexDigestAny(digest, sig.signature, getPublicKeyHistory(workspace, "auditor"));
-    return {
-      valid,
-      signatureExists: true,
-      reason: valid ? null : "signature verification failed",
-      path,
-      sigPath
-    };
-  } catch (error) {
-    return {
-      valid: false,
-      signatureExists: true,
-      reason: `invalid signature file: ${String(error)}`,
-      path,
-      sigPath
-    };
-  }
-}
 
 function findRule(policy: ActionPolicy, actionClass: ActionClass): ActionPolicyRule | null {
   return policy.actions.find((rule) => rule.actionClass === actionClass) ?? null;
@@ -585,6 +307,8 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   );
   const policySignatureValid = input.policySignatureValid ?? true;
   const trustedConfig = policySignatureValid && !input.trustSummary.untrustedConfig;
+  // A refused or unverifiable run history; a merely missing or low-integrity run is the rule's `run-integrity` condition.
+  const runCause = input.trustSummary.runRefusal ?? input.trustSummary.runTrustGap;
 
   addCondition(decision, {
     conditionId: "action-policy-rule",
@@ -602,9 +326,10 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
     passed: trustedConfig,
     actual: trustedConfig,
     expected: true,
-    reason: trustedConfig
-      ? "Action Policy and dependent configuration are trusted."
-      : "Action Policy or dependent configuration trust verification failed.",
+    reason: trustedConfig ? "Action Policy and dependent configuration are trusted."
+      : !policySignatureValid ? "Action Policy signature verification failed."
+        : runCause !== undefined ? `The agent's run history cannot vouch for its configuration: ${runCause}.`
+          : "Action Policy or dependent configuration trust verification failed.",
   });
 
   const simulateAllowed = !!rule || policy.defaultMode === "ALLOW";
@@ -640,8 +365,11 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   if (!trustedConfig) {
     decision.allowed = true;
     decision.effectiveMode = "SIMULATE";
-    decision.reasons.push("UNTRUSTED CONFIG: signed policy/config verification failed. EXECUTE is denied.");
-    decision.requiredEvidence.push("Re-sign policy/config files and rerun amc verify.");
+    decision.reasons.push("UNTRUSTED CONFIG: the policy/config signatures or the agent's trusted run do not vouch for it. EXECUTE is denied.");
+    if (!policySignatureValid) decision.reasons.push("UNTRUSTED CONFIG: Action Policy signature verification failed.");
+    if (runCause) decision.reasons.push(`UNTRUSTED RUN: ${runCause}.`);
+    if (!policySignatureValid || !runCause) decision.requiredEvidence.push("Re-sign policy/config files and rerun amc verify.");
+    if (runCause) decision.requiredEvidence.push("Restore the agent's run history: its newest sealed run must be ledger-anchored and verify; a planted, tampered, unanchored, rolled-back or verification-failed run never lifts SIMULATE.");
     return decision;
   }
 
@@ -707,6 +435,46 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   if (!rule) {
     issues.push(`No explicit policy rule for ${input.actionClass}.`);
   } else {
+    // The rule's threshold (absent: 0.6). Below 0.6 is an owner waiver: it still needs a sealed, anchored run (G1), never
+    // covers findings against the agent (G2), and every decision made under it says so.
+    const threshold = runIntegrityAtLeast(rule);
+    const waived = threshold < DEFAULT_RUN_INTEGRITY_AT_LEAST;
+    const run = input.currentDiagnosticRun;
+    // The runner's matrix passes a scores-only stub when the agent has no trusted run: no finite index, no run.
+    const measured = run && Number.isFinite(run.integrityIndex) ? run : null;
+    const integrity = measured?.integrityIndex ?? 0;
+    const findings = measured !== null && waived ? runFindings(measured) : [];
+    const runState = measured === null ? `agent ${input.agentId} has no trusted diagnostic run`
+      : `latest trusted run ${measured.runId} has integrity ${integrity.toFixed(3)} (${measured.trustLabel})`;
+    // At or below the default a HIGH TRUST label also satisfies it, as the gate before this field did
+    // (`trustLabel !== "HIGH TRUST" && integrity < 0.6`); above the default the number alone decides.
+    const runSatisfied = measured !== null && findings.length === 0
+      && (integrity >= threshold || (measured.trustLabel === "HIGH TRUST" && threshold <= DEFAULT_RUN_INTEGRITY_AT_LEAST));
+    const findingList = findings.join(", ");
+    addCondition(decision, {
+      conditionId: "run-integrity",
+      label: "Trusted run integrity",
+      passed: runSatisfied,
+      actual: measured === null ? null : integrity,
+      expected: threshold,
+      reason: runSatisfied
+        ? waived ? `${runState}; satisfies the owner-signed threshold ${threshold}, below AMC's default ${DEFAULT_RUN_INTEGRITY_AT_LEAST} (rule ${input.actionClass} in .amc/action-policy.yaml).`
+          : `${runState}; satisfies ${threshold}.`
+        : measured === null ? `${runState}.`
+          : findings.length > 0 ? `${runState}; the owner-signed threshold ${threshold} does not cover findings against the agent (${findingList}).`
+            : `${runState}, below ${threshold}.`,
+    });
+    if (!runSatisfied) {
+      issues.push(measured === null ? `UNTRUSTED RUN: ${runState}.`
+        : findings.length > 0 ? `UNTRUSTED RUN: ${runState}; findings against the agent (${findingList}) are not covered by the ${input.actionClass} rule's threshold ${threshold}.`
+          : `UNTRUSTED RUN: ${runState}, below ${threshold}.`);
+      decision.requiredEvidence.push(findings.length > 0
+        ? `A sealed amc run for this agent without findings against it (${findingList}); a threshold below ${DEFAULT_RUN_INTEGRITY_AT_LEAST} covers missing evidence, not findings.`
+        : `A sealed amc run for this agent with integrity >= ${threshold}${threshold >= DEFAULT_RUN_INTEGRITY_AT_LEAST ? " (HIGH TRUST)" : ""}; see docs/GOVERNOR.md "Reaching EXECUTE".`);
+    } else if (waived) {
+      decision.reasons.push(`RUN INTEGRITY WAIVED: the signed ${input.actionClass} rule sets requireRunIntegrityAtLeast ${threshold} (AMC default ${DEFAULT_RUN_INTEGRITY_AT_LEAST}); ${runState}.`);
+    }
+
     const trustTierSatisfied = compareTrustTier(input.trustSummary.trustTier, rule.requireTrustTierAtLeast);
     addCondition(decision, {
       conditionId: "trust-tier",
@@ -807,101 +575,16 @@ export function evaluateActionPermission(input: GovernorDecisionInput): Governor
   return decision;
 }
 
-function parseAssuranceReportFile(file: string): {
-  ts: number;
-  windowStartTs: number;
-  windowEndTs: number;
-  trustTier: TrustTier;
-  packResults: Array<{
-    packId: string;
-    score0to100: number;
-    scenarioResults: Array<{ auditEventTypes: string[] }>;
-  }>;
-} | null {
-  try {
-    const parsed = JSON.parse(readUtf8(file)) as {
-      ts?: number;
-      windowStartTs?: number;
-      windowEndTs?: number;
-      trustTier?: TrustTier;
-      packResults?: Array<{
-        packId?: string;
-        score0to100?: number;
-        scenarioResults?: Array<{ auditEventTypes?: string[] }>;
-      }>;
-    };
-    const packResults = (parsed.packResults ?? [])
-      .filter((pack): pack is { packId: string; score0to100: number; scenarioResults: Array<{ auditEventTypes: string[] }> } =>
-        typeof pack.packId === "string"
-      )
-      .map((pack) => ({
-        packId: pack.packId,
-        score0to100: typeof pack.score0to100 === "number" ? pack.score0to100 : 0,
-        scenarioResults: (pack.scenarioResults ?? []).map((scenario) => ({
-          auditEventTypes: Array.isArray(scenario.auditEventTypes) ? scenario.auditEventTypes.filter((item): item is string => typeof item === "string") : []
-        }))
-      }));
-    return {
-      ts: parsed.ts ?? 0,
-      windowStartTs: parsed.windowStartTs ?? parsed.ts ?? 0,
-      windowEndTs: parsed.windowEndTs ?? parsed.ts ?? 0,
-      trustTier: parsed.trustTier ?? "SELF_REPORTED",
-      packResults
-    };
-  } catch {
-    return null;
-  }
-}
-
-export function summarizeAssuranceForWindow(workspace: string, agentId: string, windowStartTs: number, windowEndTs: number): GovernorAssuranceSummary {
-  const agentPaths = getAgentPaths(workspace, agentId);
-  const dir = join(agentPaths.reportsDir, "assurance");
-  if (!pathExists(dir)) {
-    return { packs: {} };
-  }
-  const summary: GovernorAssuranceSummary = { packs: {} };
-  for (const file of readdirSync(dir)) {
-    if (!file.endsWith(".json")) {
-      continue;
-    }
-    const parsed = parseAssuranceReportFile(join(dir, file));
-    if (!parsed) {
-      continue;
-    }
-    if (parsed.windowEndTs < windowStartTs || parsed.windowStartTs > windowEndTs) {
-      continue;
-    }
-
-    for (const pack of parsed.packResults) {
-      let succeeded = 0;
-      for (const scenario of pack.scenarioResults) {
-        for (const auditType of scenario.auditEventTypes) {
-          if (auditType.endsWith("_SUCCEEDED")) {
-            succeeded += 1;
-          }
-        }
-      }
-      const existing = summary.packs[pack.packId];
-      if (!existing || pack.score0to100 > existing.score) {
-        summary.packs[pack.packId] = {
-          score: pack.score0to100,
-          succeeded,
-          observed: parsed.trustTier === "OBSERVED" || parsed.trustTier === "OBSERVED_HARDENED"
-        };
-      }
-    }
-  }
-  return summary;
-}
-
-export function deriveTrustSummaryFromRun(workspace: string, agentId: string, run: DiagnosticReport | null): GovernorTrustSummary {
+/**
+ * The trust summary a decision reads. `untrustedConfig` is the hard gate no rule waives: a refused run history (G5:
+ * `refusal`, resolved here when the caller passes none, so no caller can trust a refused history) or a latest trusted run
+ * that cannot vouch at any threshold. A missing or low-integrity run is the rule's `run-integrity` condition instead.
+ */
+export function deriveTrustSummaryFromRun(workspace: string, agentId: string, run: DiagnosticReport | null, refusal?: string | null): GovernorTrustSummary {
   if (!run) {
-    return {
-      trustTier: "SELF_REPORTED",
-      sandboxEvidence: false,
-      untrustedConfig: true,
-      correlationRatio: 0
-    };
+    const cause = refusal === undefined ? latestTrustedRun(workspace, agentId).refusal : refusal;
+    return { trustTier: "SELF_REPORTED", sandboxEvidence: false, untrustedConfig: cause !== null, correlationRatio: null,
+      ...(cause === null ? {} : { runRefusal: cause }) };
   }
 
   let trustTier: TrustTier = "SELF_REPORTED";
@@ -923,7 +606,7 @@ export function deriveTrustSummaryFromRun(workspace: string, agentId: string, ru
         if (meta.agentId && meta.agentId !== agentId) {
           continue;
         }
-        if (meta.auditType === "SANDBOX_EXECUTION_ENABLED") {
+        if (isSandboxAttestation(meta)) {
           sandboxEvidence = true;
           break;
         }
@@ -939,36 +622,34 @@ export function deriveTrustSummaryFromRun(workspace: string, agentId: string, ru
     trustTier = "OBSERVED_HARDENED";
   }
 
-  return {
-    trustTier,
-    sandboxEvidence,
-    untrustedConfig: run.trustLabel !== "HIGH TRUST" && run.integrityIndex < 0.6,
-    correlationRatio: run.correlationRatio
-  };
+  const hardGap = runHardGap(run);
+  return { trustTier, sandboxEvidence, untrustedConfig: hardGap !== null, correlationRatio: run.correlationRatio,
+    ...(hardGap === null ? {} : { runTrustGap: hardGap }) };
 }
 
+/** Why a sealed run cannot vouch at any threshold: it is not a measurement. Never set for a merely low index. */
+function runHardGap(run: DiagnosticReport): string | null {
+  if (!run.verificationPassed || run.status !== "VALID") return `latest trusted run ${run.runId} failed ledger verification (status ${run.status})`;
+  if (run.trustBoundaryViolated !== false) {
+    return `latest trusted run ${run.runId} ${run.trustBoundaryViolated === true ? "violated the trust boundary" : "records no trust-boundary result"}${run.trustBoundaryMessage ? `: ${run.trustBoundaryMessage}` : ""}`;
+  }
+  return null;
+}
+
+/**
+ * Evidence against the agent that an owner waiver never covers (G2): a waiver stands in for missing evidence, not for
+ * findings. A count the run does not carry is read as a finding, never as zero.
+ */
+function runFindings(run: DiagnosticReport): string[] {
+  const counts: ReadonlyArray<readonly [string, unknown]> = [["contradictions", run.contradictionCount], ["unsupported claims", run.unsupportedClaimCount],
+    ["inflation attempts", Array.isArray(run.inflationAttempts) ? run.inflationAttempts.length : undefined], ["invalid receipts", run.invalidReceiptsCount]];
+  return counts.flatMap(([name, count]) => typeof count !== "number" || !Number.isSafeInteger(count) || count < 0 ? [`${name} not recorded`]
+    : count > 0 ? [`${count} ${name}`] : []);
+}
+
+/** `latestTrustedRun` without the reason. */
 export function latestRunForAgent(workspace: string, agentId: string): DiagnosticReport | null {
-  const paths = getAgentPaths(workspace, agentId);
-  if (!pathExists(paths.runsDir)) {
-    return null;
-  }
-  const files = readdirSync(paths.runsDir)
-    .filter((name) => name.endsWith(".json"))
-    .sort((a, b) => a.localeCompare(b));
-  if (files.length === 0) {
-    return null;
-  }
-  const parsed = files
-    .map((file) => {
-      try {
-        return JSON.parse(readUtf8(join(paths.runsDir, file))) as DiagnosticReport;
-      } catch {
-        return null;
-      }
-    })
-    .filter((row): row is DiagnosticReport => row !== null)
-    .sort((a, b) => b.ts - a.ts);
-  return parsed.find((run) => run.status === "VALID") ?? parsed[0] ?? null;
+  return latestTrustedRun(workspace, agentId).run;
 }
 
 export function summarizeGovernorInput(workspace: string, agentId: string): {
@@ -976,10 +657,10 @@ export function summarizeGovernorInput(workspace: string, agentId: string): {
   trust: GovernorTrustSummary;
   assurance: GovernorAssuranceSummary;
 } {
-  const run = latestRunForAgent(workspace, agentId);
-  const trust = deriveTrustSummaryFromRun(workspace, agentId, run);
+  const { run, refusal } = latestTrustedRun(workspace, agentId);
+  const trust = deriveTrustSummaryFromRun(workspace, agentId, run, refusal);
   const assurance = run
-    ? summarizeAssuranceForWindow(workspace, agentId, run.windowStartTs, run.windowEndTs)
+    ? verifiedGovernorAssuranceSummary(workspace, agentId, run.windowStartTs, run.windowEndTs)
     : { packs: {} };
   return {
     run,

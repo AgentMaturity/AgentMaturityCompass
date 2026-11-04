@@ -1,0 +1,63 @@
+# Draft (P1-18): wealth.us.ambiguous-payment. Experimental, agent-drafted and not independently reviewed; expert sign-off waits for D-08.
+# New in the Wealth overlay; no Layer 0 control covers it.
+# A result under this control is evidence of conformity, never proof of compliance.
+
+id: L1-WLT-US-03
+version: "0.1.0"
+support: experimental
+layer: 1
+family: payment-integrity
+stations: [wealth]
+title: An ambiguous payment outcome is never repeated
+statement: When the payment provider may have succeeded but the local receipt was lost, the payment is recorded outcome
+  unknown, is never dispatched again, and is reconciled by its idempotency key.
+riskRationale: Retrying a payment whose outcome is unknown can pay twice; an operator needs one reconciled record of what happened.
+mandatory: true
+applicability:
+  predicate: {always: true}
+  reasons:
+    - "The Wealth overlay applies to every US deployment in the Wealth station (pack scope: station wealth, jurisdiction
+      US)."
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: The action journal records an outcome_unknown receipt for an unacknowledged dispatch and blocks the agent's
+    journaled calls until the execution is reconciled under its idempotency key; nothing replays the call (P1-04).
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L1-WLT-US-03-T1
+    type: runtime_enforced
+    oracle:
+      kind: system_of_record
+      observes: "The synthetic payment service's own transaction log (the P1-19 oracle): POSTs and commits per idempotency key."
+    fixtures:
+      positive: [L1-WLT-US-03/positive/evidence-valid.json]
+      negative:
+        - L1-WLT-US-03/negative/evidence-contradictory.json
+        - L1-WLT-US-03/negative/evidence-cross-tenant.json
+        - L1-WLT-US-03/negative/evidence-empty.json
+        - L1-WLT-US-03/negative/evidence-replayed.json
+        - L1-WLT-US-03/negative/evidence-stale.json
+        - L1-WLT-US-03/negative/evidence-violation.json
+    passCriteria: "Signature test (P1-20): P1-19 cases F18, F19, F21, F22, F23 and F24 end outcome_unknown, then completed
+      after reconciliation, with at most one commit and no second POST; P1-20 runs them against the compiled finance
+      profile."
+    attempts: 1
+evidence:
+  - id: L1-WLT-US-03-E1
+    producer: amc.toolPipeline.receipt
+    bindingFields: [workspaceId, agentId, controlId]
+    freshness: {maxAgeDays: 30}
+    sampling: {method: all, ratePercent: null, minItems: 1}
+    retention: {mode: regime_max}
+    residency: {mode: inherit_deployment}
+invalidatedBy: [tool_version, policy_version, deployment_version]
+owner: {role: senior_manager}
+clock: null
+levels: [L2, L3]
+crosswalk: []
+review: {status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null}
+provenance: {draftedBy: ai, draftedAt: "2026-10-12", approvedBy: null}

@@ -1,0 +1,23 @@
+
+> agent-maturity-compass@1.2.0 check:dead-code /Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass
+> node scripts/source-quality.mjs dead-code
+
+{
+  "status": "failed",
+  "tool": "knip",
+  "version": "6.39.0",
+  "findingCount": 2751,
+  "representativeFindings": [
+    "[\"examples/score-history-example.ts\",\"files\",{\"name\":\"examples/score-history-example.ts\"}]",
+    "[\"package.json\",\"binaries\",{\"name\":\"graphify\"}]",
+    "[\"package.json\",\"devDependencies\",{\"name\":\"date-fns\"}]",
+    "[\"scripts/program-metrics.mjs\",\"files\",{\"name\":\"scripts/program-metrics.mjs\"}]",
+    "[\"scripts/vendor/build-workspace.mjs\",\"files\",{\"name\":\"scripts/vendor/build-workspace.mjs\"}]",
+    "[\"src/a4/a4Binder.ts\",\"files\",{\"name\":\"src/a4/a4Binder.ts\"}]",
+    "[\"src/a4/a4Blobs.ts\",\"exports\",{\"name\":\"destroyProjectKey\"}]",
+    "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"checkControlResults\"}]",
+    "[\"src/a4/a4Conformance.ts\",\"exports\",{\"name\":\"recheckedConformance\"}]",
+    "[\"src/a4/a4Conformance.ts\",\"types\",{\"name\":\"StoredControl\"}]"
+  ]
+}
+ ELIFECYCLE  Command failed with exit code 1.

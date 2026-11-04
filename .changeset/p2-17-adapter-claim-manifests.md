@@ -1,0 +1,5 @@
+---
+"agent-maturity-compass": patch
+---
+
+Adapter claim manifests and a generated harness support matrix (P2-17 part A). Each governed harness (Pi, Claude Code, DeepSeek Harness, Codex) has a manifest in `docs/adapters/manifests/` listing, per hook, whether AMC enforces or only observes there, what the harness does when the hook fails, and the qualification-record cases that back each enforced hook. `src/adapters/conformance/adapterManifest.ts` refuses a manifest that claims enforcement at a hook that does not block on failure, has no backing case, or cites a record that its qualification `receipt.json` does not hash. `docs/adapters/SUPPORT_MATRIX.md` is generated from the manifests by `node scripts/gen-harness-matrix.mjs --write` and drift-checked by `tests/harnessMatrix.test.ts`. Pi 1.0.2 and 1.0.4 and Claude Code 2.1.296 are enforced at their listed hooks; DeepSeek Harness is observe-only (launch capture) and Codex is not supported yet. `docs/adapters/SUPPORT_POLICY.md` is a draft pending the maintainer's approval. No CLI command is added.

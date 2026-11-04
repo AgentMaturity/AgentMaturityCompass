@@ -12,18 +12,36 @@
       ],
       "type": "string"
     },
+    "amcSteps": {
+      "additionalProperties": false,
+      "properties": {
+        "freezeIncidentId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "restoreReceiptPath": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "restoreReceiptPath",
+        "freezeIncidentId"
+      ],
+      "type": "object"
+    },
     "claimKind": {
       "const": "self_reported",
       "type": "string"
     },
     "enforceManifestId": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "environment": {
@@ -60,12 +78,19 @@
       "type": "string"
     },
     "recordedStatus": {
-      "enum": [
-        "succeeded",
-        "failed",
-        "partial"
-      ],
-      "type": "string"
+      "anyOf": [
+        {
+          "enum": [
+            "succeeded",
+            "failed",
+            "partial"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ]
     },
     "releaseId": {
       "minLength": 1,
@@ -87,13 +112,9 @@
       "type": "string"
     },
     "toReleaseId": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "ts": {
@@ -115,6 +136,7 @@
     "leaseIdsRevoked",
     "receiptSha256",
     "recordedStatus",
+    "amcSteps",
     "amcCheckStatus",
     "recordedByKey",
     "claimKind",

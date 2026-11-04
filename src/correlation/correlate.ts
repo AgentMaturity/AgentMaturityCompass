@@ -26,7 +26,8 @@ export interface CorrelationMetrics {
   mismatchedAgentId: number;
   bodyHashMismatches: number;
   unknownAgentReceipts: number;
-  correlationRatio: number;
+  /** Valid receipts over traces that carry one; null (not measured) when no trace in the window carries a receipt. */
+  correlationRatio: number | null;
   issues: CorrelationIssue[];
 }
 
@@ -146,8 +147,8 @@ export function correlateTracesAgainstEvidence(params: {
     }
   }
 
-  const correlationRatio = validReceipts / Math.max(1, totalTracesWithReceipt);
-  if (totalTracesWithReceipt > 0 && correlationRatio < 0.9) {
+  const correlationRatio = totalTracesWithReceipt > 0 ? validReceipts / totalTracesWithReceipt : null;
+  if (correlationRatio !== null && correlationRatio < 0.9) {
     issues.push({
       auditType: "TRACE_CORRELATION_LOW",
       severity: "HIGH",

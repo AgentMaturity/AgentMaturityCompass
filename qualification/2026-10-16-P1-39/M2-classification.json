@@ -1,0 +1,213 @@
+{
+  "operator": "allow-first-tools-call-reissue",
+  "rootOriginalFailuresAndPublicEvidenceRead": true,
+  "causalWitnessEstablished": true,
+  "unexplainedFailures": [],
+  "actualTotal": 81,
+  "actualPassed": 79,
+  "actualFailed": 2,
+  "failures": [
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts",
+      "fullName": "P1-39 governed stateless MCP public flow a finite broken tools/call response is not replayed and disposes its grant",
+      "failureMessages": [
+        "AssertionError: expected 2 to be 1 // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:358:31\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:353:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts",
+      "fullName": "P1-39 governed stateless MCP public flow a broken tools/call is recorded with strict typed unknown evidence",
+      "failureMessages": [
+        "AssertionError: expected [ { ordinal: 6, \u2026(27) }, \u2026(1) ] to have a length of 1 but got 2\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1389:20)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:375:32\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:258:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcp20260728.test.ts:373:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    }
+  ],
+  "actualOrderedReplayFacts": [
+    {
+      "label": "stateless-tool-no-replay",
+      "publicPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-VF7pmM/public-evidence.json",
+      "actualEffects": 2,
+      "toolRows": [
+        {
+          "ordinal": 6,
+          "httpMethod": "POST",
+          "path": "/mcp",
+          "rpc": "tools/call",
+          "id": 3,
+          "meta": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "amc-governed-native-tools",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {}
+          },
+          "bodyBytes": 308,
+          "bodySha256": "a39d34892be659b0f3114eaf4f80a5330dd0931b2f307d69adc0aa141a0f9ff6",
+          "query": "caf\u00e9",
+          "protocolHeader": "2026-07-28",
+          "methodHeader": "tools/call",
+          "nameHeader": "lookup",
+          "paramHeader": "=?base64?Y2Fmw6k=?=",
+          "originMatches": true,
+          "acceptJson": true,
+          "acceptSse": true,
+          "requestSessionPresent": false,
+          "lastEventIdPresent": false,
+          "requestEnded": true,
+          "requestComplete": true,
+          "requestClosed": true,
+          "responseStatus": 200,
+          "responseKind": "finite-sse-eof",
+          "responseId": null,
+          "responseResultType": null,
+          "responseSessionPresent": false,
+          "responseFinished": true,
+          "responseClosed": true
+        },
+        {
+          "ordinal": 7,
+          "httpMethod": "POST",
+          "path": "/mcp",
+          "rpc": "tools/call",
+          "id": "amc-reissue-1",
+          "meta": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "amc-governed-native-tools",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {}
+          },
+          "bodyBytes": 322,
+          "bodySha256": "5d8f97359e1b5119a0ef363c50324465ea6bba0896ba24499757a78e7bbbe0bd",
+          "query": "caf\u00e9",
+          "protocolHeader": "2026-07-28",
+          "methodHeader": "tools/call",
+          "nameHeader": "lookup",
+          "paramHeader": "=?base64?Y2Fmw6k=?=",
+          "originMatches": true,
+          "acceptJson": true,
+          "acceptSse": true,
+          "requestSessionPresent": false,
+          "lastEventIdPresent": false,
+          "requestEnded": true,
+          "requestComplete": true,
+          "requestClosed": true,
+          "responseStatus": 200,
+          "responseKind": "json",
+          "responseId": "amc-reissue-1",
+          "responseResultType": "complete",
+          "responseSessionPresent": true,
+          "responseFinished": true,
+          "responseClosed": true
+        }
+      ],
+      "observedOutcome": "OK"
+    },
+    {
+      "label": "strict-typed-unknown-evidence",
+      "publicPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-stateless-L479Rt/public-evidence.json",
+      "actualEffects": 2,
+      "toolRows": [
+        {
+          "ordinal": 6,
+          "httpMethod": "POST",
+          "path": "/mcp",
+          "rpc": "tools/call",
+          "id": 3,
+          "meta": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "amc-governed-native-tools",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {}
+          },
+          "bodyBytes": 308,
+          "bodySha256": "a39d34892be659b0f3114eaf4f80a5330dd0931b2f307d69adc0aa141a0f9ff6",
+          "query": "caf\u00e9",
+          "protocolHeader": "2026-07-28",
+          "methodHeader": "tools/call",
+          "nameHeader": "lookup",
+          "paramHeader": "=?base64?Y2Fmw6k=?=",
+          "originMatches": true,
+          "acceptJson": true,
+          "acceptSse": true,
+          "requestSessionPresent": false,
+          "lastEventIdPresent": false,
+          "requestEnded": true,
+          "requestComplete": true,
+          "requestClosed": true,
+          "responseStatus": 200,
+          "responseKind": "finite-sse-eof",
+          "responseId": null,
+          "responseResultType": null,
+          "responseSessionPresent": false,
+          "responseFinished": true,
+          "responseClosed": true
+        },
+        {
+          "ordinal": 7,
+          "httpMethod": "POST",
+          "path": "/mcp",
+          "rpc": "tools/call",
+          "id": "amc-reissue-1",
+          "meta": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "amc-governed-native-tools",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {}
+          },
+          "bodyBytes": 322,
+          "bodySha256": "5d8f97359e1b5119a0ef363c50324465ea6bba0896ba24499757a78e7bbbe0bd",
+          "query": "caf\u00e9",
+          "protocolHeader": "2026-07-28",
+          "methodHeader": "tools/call",
+          "nameHeader": "lookup",
+          "paramHeader": "=?base64?Y2Fmw6k=?=",
+          "originMatches": true,
+          "acceptJson": true,
+          "acceptSse": true,
+          "requestSessionPresent": false,
+          "lastEventIdPresent": false,
+          "requestEnded": true,
+          "requestComplete": true,
+          "requestClosed": true,
+          "responseStatus": 200,
+          "responseKind": "json",
+          "responseId": "amc-reissue-1",
+          "responseResultType": "complete",
+          "responseSessionPresent": true,
+          "responseFinished": true,
+          "responseClosed": true
+        }
+      ],
+      "observedOutcome": "OK"
+    }
+  ],
+  "firstSensitiveFrames": [
+    "mcp20260728.test.ts358:31 effectCount expected1 actual2",
+    "mcp20260728.test.ts375:32 tools/call count expected1 actual2"
+  ],
+  "maskedAfterFirstFailure": {
+    "noReplay": [
+      "later request-count/EOF assertions",
+      "outcome/recorded evidence",
+      "grant disposal and subsequent denied call assertions"
+    ],
+    "strictTyped": [
+      "assertRecordedPair at376",
+      "typed UNKNOWN assertions at379-380",
+      "content UNKNOWN marker assertion"
+    ]
+  },
+  "hooksPassed": 60,
+  "all32FixtureLifecycleRecordsClean": true,
+  "exit": 1,
+  "ownedPgid": 83995,
+  "ESRCH": true,
+  "noCompiledChildSensitivityClaim": true
+}

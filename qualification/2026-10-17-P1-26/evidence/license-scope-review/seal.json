@@ -1,0 +1,31 @@
+{
+  "schema": "p126-extra-license-path-scope-seal/1",
+  "at": "2026-10-16T20:24:28.374449+00:00",
+  "review": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/review.json",
+    "bytes": 4365,
+    "sha256": "c05d04a188efb0a329c01df6a446a9eba45dd00eb7d51de4ad7d49f06f779a04"
+  },
+  "readme": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/README.md",
+    "bytes": 2232,
+    "sha256": "da6204af120ec9682bfbc8bbe90c2b4e1b8ec4e338e5af9d186469b35ca11a37"
+  },
+  "pins": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/pins.json",
+    "bytes": 2698,
+    "sha256": "f2607281397fc00124ba83931b99e2568868f4fa6818bbe730f9b4c509083635"
+  },
+  "observations": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/observations.json",
+    "bytes": 195077,
+    "sha256": "1a550eddab6bf4417019f091bef549bc18b5a50c6600cf03bb035e6976be2140"
+  },
+  "pendingAddendum": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/license-scope-review/pending-reservation-addendum.md",
+    "bytes": 832,
+    "sha256": "68b13bf0c55895a63fc4d92bcfa8ebd833923aaa7da27e53a3392d8455613e05"
+  },
+  "blockersForExtraPath": [],
+  "allocationOrExecutionClaim": false
+}

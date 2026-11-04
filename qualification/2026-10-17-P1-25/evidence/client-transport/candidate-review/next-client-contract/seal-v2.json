@@ -1,0 +1,16 @@
+{
+  "schema": "p125-client-contract-prose-adoption/1",
+  "originalSeal": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/seal.json",
+    "bytes": 2316,
+    "sha256": "05e5c701260639885e0edfbeccee89ce316cc7d40248027b0be8201cbfa969d8"
+  },
+  "preferredReadme": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/README-v2.md",
+    "bytes": 3190,
+    "sha256": "26011e460008dc598848a631a9f5e4e0cae3f2003920eee6cc302ef05373d0a4"
+  },
+  "change": "Grammatical spacing/prose only. Matrix, lifecycle, recipes, source pins and review are unchanged; original README/seal retained.",
+  "semanticChange": false,
+  "noExecutionOrCheckoutWrites": true
+}

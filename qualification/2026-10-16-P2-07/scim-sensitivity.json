@@ -1,0 +1,152 @@
+{
+  "rootBodyReview": {
+    "at": "2026-10-16T14:38:19.952101+00:00",
+    "sourceCommit": "5d5604758d5a8cf5a519346c98318667b88059a2",
+    "phase": "p207s-filtered-remove-control",
+    "operator": "filtered-remove-silent-noop",
+    "targetRel": "src/identity/scim/scimGroups.ts",
+    "mutationSha256": "8702a52c88d5eb9c53806b3e42ff87b545ca74b4613a0119b1e3a12c14d172d1",
+    "outcome": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/p207s-filtered-remove-control-outcome.json",
+      "bytes": 121779,
+      "sha256": "1678074dcce6d64ca5515bde42951e7f21c8d41641eda84c5302603283497217"
+    },
+    "applyRecord": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/filtered-remove-silent-noop-apply.json",
+      "bytes": 2464,
+      "sha256": "992f6e398288608c3c97b025523a9f7719d7b0b76e425794570b0957def9077a"
+    },
+    "publicWitness": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-Wsqf05/observations/public-evidence.json",
+      "bytes": 7945,
+      "sha256": "ecff7f7ce1f9ef287ffec62b3c7f69f9528dc4129c26218ead897e82df9dde90"
+    },
+    "allFailuresClassified": true,
+    "primarySemanticWitnessReached": true,
+    "failureCount": 1,
+    "firstSensitiveAssertion": "After actual filtered PATCH and GET both returned HTTP200, scimHardening.test.ts:337:33 asserted target roles [AUDITOR]. Actual target retained [AUDITOR, VIEWER]; both returned member sets still contained the target. This is the real role-revocation body assertion, not transport/setup/teardown failure.",
+    "masking": "Line336 HTTP200 assertion passed. Line337 failed first. Later survivor-role and full patched/fetched group equality assertions at338-339 were masked; snapshots were gathered before the failure but are not credited as reached assertions. All other159 tests and28 hooks passed; public cleanup/environment and natural command closure passed. The unchanged compiled pending child receives no SCIM TS-control sensitivity credit.",
+    "compiledOutputsRebuilt": false,
+    "formalDone": false
+  },
+  "apply": {
+    "action": "apply",
+    "operator": "filtered-remove-silent-noop",
+    "sourceCommit": "5d5604758d5a8cf5a519346c98318667b88059a2",
+    "sourceCwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "targetRel": "src/identity/scim/scimGroups.ts",
+    "before": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout/src/identity/scim/scimGroups.ts",
+      "bytes": 8432,
+      "sha256": "8c893ef273dcd620adc058864c19f18783642693ea3f09d2ae9163bffabf1640"
+    },
+    "expectedAfter": {
+      "bytes": 8431,
+      "sha256": "8702a52c88d5eb9c53806b3e42ff87b545ca74b4613a0119b1e3a12c14d172d1"
+    },
+    "original": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/executed-controls/originals/filtered-remove-silent-noop/src/identity/scim/scimGroups.ts",
+      "bytes": 8432,
+      "sha256": "8c893ef273dcd620adc058864c19f18783642693ea3f09d2ae9163bffabf1640"
+    },
+    "initial": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/p207s-initial-six-files-outcome.json",
+      "bytes": 120496,
+      "sha256": "4ff9b79aee4b9a40cc8f55c859a5bc0ff12fe8cba9e3e5c1ae8b0787961da2c8"
+    },
+    "prerequisite": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/p207s-fresh-six-files-outcome.json",
+      "bytes": 120548,
+      "sha256": "c4a354cf709ff9be1eb9bc0dcb464b095f7cc7b0aae1788b0576e6ac706b1479"
+    },
+    "admission": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/q-control-write-admission.json",
+      "bytes": 1603,
+      "sha256": "c8912f9c63946cba1d198100554e6c2ce644afc7a78d08810f57d4e8b8eedf5b"
+    },
+    "binding": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/fresh-source-binding.json",
+      "bytes": 159566,
+      "sha256": "f7cf557f2138073ff2a053f50a50dc7672d518ac55901f51ade73f5b65d790c9"
+    },
+    "auditRuntime": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/audit-runtime.py",
+      "bytes": 7512,
+      "sha256": "90026fa030ba648fd30ef27207bc328b58977940e0080cd53dc15640970a3d50"
+    },
+    "after": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout/src/identity/scim/scimGroups.ts",
+      "bytes": 8431,
+      "sha256": "8702a52c88d5eb9c53806b3e42ff87b545ca74b4613a0119b1e3a12c14d172d1"
+    },
+    "at": "2026-10-16T14:37:07.262191+00:00",
+    "compiledOutputsRebuilt": false,
+    "compilerOrBuildValidityClaim": false,
+    "sourceOnlyMutant": true,
+    "pendingCompiledChildGetsScimControlCredit": false,
+    "formalDone": false
+  },
+  "restore": {
+    "action": "restore",
+    "operator": "filtered-remove-silent-noop",
+    "sourceCommit": "5d5604758d5a8cf5a519346c98318667b88059a2",
+    "sourceCwd": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "targetRel": "src/identity/scim/scimGroups.ts",
+    "before": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout/src/identity/scim/scimGroups.ts",
+      "bytes": 8431,
+      "sha256": "8702a52c88d5eb9c53806b3e42ff87b545ca74b4613a0119b1e3a12c14d172d1"
+    },
+    "original": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/executed-controls/originals/filtered-remove-silent-noop/src/identity/scim/scimGroups.ts",
+      "bytes": 8432,
+      "sha256": "8c893ef273dcd620adc058864c19f18783642693ea3f09d2ae9163bffabf1640"
+    },
+    "outcome": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/p207s-filtered-remove-control-outcome.json",
+      "bytes": 121779,
+      "sha256": "1678074dcce6d64ca5515bde42951e7f21c8d41641eda84c5302603283497217"
+    },
+    "rootSemanticReview": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/filtered-remove-root-body-review.json",
+      "bytes": 1970,
+      "sha256": "c1b3656d79a927a36f281b3e653ea8dcd2dbfc49de159acbd497cf413bec8334"
+    },
+    "initial": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/p207s-initial-six-files-outcome.json",
+      "bytes": 120496,
+      "sha256": "4ff9b79aee4b9a40cc8f55c859a5bc0ff12fe8cba9e3e5c1ae8b0787961da2c8"
+    },
+    "prerequisite": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/p207s-fresh-six-files-outcome.json",
+      "bytes": 120548,
+      "sha256": "c4a354cf709ff9be1eb9bc0dcb464b095f7cc7b0aae1788b0576e6ac706b1479"
+    },
+    "admission": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/q-control-write-admission.json",
+      "bytes": 1603,
+      "sha256": "c8912f9c63946cba1d198100554e6c2ce644afc7a78d08810f57d4e8b8eedf5b"
+    },
+    "binding": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/fresh-source-binding.json",
+      "bytes": 159566,
+      "sha256": "f7cf557f2138073ff2a053f50a50dc7672d518ac55901f51ade73f5b65d790c9"
+    },
+    "auditRuntime": {
+      "path": "/private/tmp/p2-07-scim-qualification-20261016/audit-runtime.py",
+      "bytes": 7512,
+      "sha256": "90026fa030ba648fd30ef27207bc328b58977940e0080cd53dc15640970a3d50"
+    },
+    "restored": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout/src/identity/scim/scimGroups.ts",
+      "bytes": 8432,
+      "sha256": "8c893ef273dcd620adc058864c19f18783642693ea3f09d2ae9163bffabf1640"
+    },
+    "at": "2026-10-16T14:38:20.826425+00:00",
+    "compiledOutputsRebuilt": false,
+    "compilerOrBuildValidityClaim": false,
+    "sourceOnlyMutant": true,
+    "pendingCompiledChildGetsScimControlCredit": false,
+    "formalDone": false
+  }
+}

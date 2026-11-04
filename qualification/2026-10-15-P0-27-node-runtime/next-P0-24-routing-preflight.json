@@ -1,0 +1,757 @@
+{
+  "kind": "Read-only next P0-24 plan/source/dependency/ownership qualification routing preflight; not current law or expert approval",
+  "capturedUtc": "2026-10-14T21:51:14.291071+00:00",
+  "workspaceObserved": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+  "sourceRef": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "observedHead": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "observedPorcelain": "",
+  "ownWritesOnly": [
+    "/private/tmp/p0-27-compat-next-P0-24-routing-preflight-20261015.json",
+    "/private/tmp/p0-27-compat-next-P0-24-routing-preflight-20261015.md"
+  ],
+  "ancestry": {
+    "parent": "f10d97257bc1fc7cb04f5cda98624b38793e456a",
+    "allProductionSourceTreeEqualsP019MeasuredF10": true,
+    "changeFromF10": [
+      "tests/assuranceSessionQualification.test.ts: two runtime guards accept22/24; behavior unchanged"
+    ],
+    "P019ArtifactF28IsSiblingOfCompatSourceNotAncestor": true,
+    "P019CanonicalPacketPreservedSeparately": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass atf28ccd983060d863c1b24fcf592b3e289cc759aa; all83 canonical files still present. No artifacts were deleted from that preserved tree.",
+    "pythonFixAncestor": "3b088c3c7ca1f10daf2b1576f9bd208a6605a7b5, source-only Python ATLAS followup already on this line."
+  },
+  "plan": {
+    "P024": {
+      "status": "In review",
+      "priority": "High",
+      "due": "2026-10-25",
+      "route": "Agent-Doable, Needs-Expert",
+      "blockedBy": [
+        "P0-12"
+      ],
+      "blocks": [
+        "P1-15",
+        "P1-42",
+        "GATE-G0"
+      ]
+    },
+    "dependencyDistinction": "Issues markP0-12/P0-25 Done historically. Current schema/catalogue/register, linter, package/CI/release wiring exist in source, but this preflight executes none and does not adopt historicalDone as fresh qualification.",
+    "fullSpecsRead": [
+      "P0-24 all119 lines",
+      "P0-12 all115 lines",
+      "P0-25 all113 lines",
+      "D-08 all58 lines",
+      "D-15 all45 lines"
+    ],
+    "D08": "Experimental drafting/merge may precede reviewer recruitment; AI cannot approve law. Named credentials/conflicts/reviewer pairs and row signoffs are human-owned. Whole current-law/expert/release acceptance is not established."
+  },
+  "planAndControlPins": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-24.md",
+      "sha256": "987379047505747c015445813d885aeba1a004baeb6694db0a20719fab3c05fa",
+      "bytes": 20512,
+      "lines": 119
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-12.md",
+      "sha256": "f94eefedc203a97625fb703f91c7c9469563472aad62b270c6442aafb3ae15fd",
+      "bytes": 16730,
+      "lines": 115
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-25.md",
+      "sha256": "43834fb56a8fafd4705b65e66dfa54a49c278a91254afe8a40154d1e00592181",
+      "bytes": 14004,
+      "lines": 113
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-08.md",
+      "sha256": "b5816287cb4b6f7421794ec834e7dbc3cc35da77d819d4a6d79ef5dda961125d",
+      "bytes": 4210,
+      "lines": 58
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/D-15.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0",
+      "bytes": 3052,
+      "lines": 45
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541",
+      "bytes": 38227,
+      "lines": 270
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04",
+      "bytes": 78486,
+      "lines": 910
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca",
+      "bytes": 275376,
+      "lines": 1616
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/pending-checks.md",
+      "sha256": "6339ea6398fddcfbe18ea96a40b839241745ec138378772c77a581ede1b57870",
+      "bytes": 196468,
+      "lines": 904
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/needs-snapshot.mjs",
+      "sha256": "3bfbe4c68e4860ad6f344433eae4f39e864462798f75ff2c58d8cef488bae1b3",
+      "bytes": 4859,
+      "lines": 66
+    }
+  ],
+  "sourcePins": [
+    {
+      "relativePath": "src/compliance/euAiActClassifier.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/euAiActClassifier.ts",
+      "sha256": "d6c07ba0835c5624fc70d371572da8e6ca3a8c267cf167a0469cf5b5434268a0",
+      "bytes": 24121,
+      "lines": 630
+    },
+    {
+      "relativePath": "src/compliance/globalRegulatory.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/globalRegulatory.ts",
+      "sha256": "e5e92f53673968950f9ef8ca72c71d9ab58ab7524d0bb7331f26d60a4730acec",
+      "bytes": 24498,
+      "lines": 474
+    },
+    {
+      "relativePath": "src/compliance/citations/citationRecord.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/citationRecord.ts",
+      "sha256": "5e62a8c868bfffdb952055e408eea1b8c81db78cf151b30d7213a9771fc0f6f9",
+      "bytes": 1708,
+      "lines": 45
+    },
+    {
+      "relativePath": "src/compliance/citations/frameworkIds.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/frameworkIds.ts",
+      "sha256": "a17b09ea9c8c7fa4459ae0cd9efdb8849009fd3638140c11a71f9f93f86b640f",
+      "bytes": 2061,
+      "lines": 54
+    },
+    {
+      "relativePath": "src/compliance/citations/lint.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/lint.ts",
+      "sha256": "35cc58ee94b64c32ad7aa9719dc61134384cd4a3677070c4ae02ab3b88cacf7f",
+      "bytes": 7865,
+      "lines": 132
+    },
+    {
+      "relativePath": "src/compliance/citations/officialHosts.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/officialHosts.ts",
+      "sha256": "da2d28e320495df599cc87fcbf356faa6796a8f5d18fef8bda8893115761ba36",
+      "bytes": 1932,
+      "lines": 35
+    },
+    {
+      "relativePath": "src/compliance/citations/supersededInstruments.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/supersededInstruments.ts",
+      "sha256": "cacff8b81e91e18c1c19af36d3919fd0bcaf8da43e9779194d197c399dc5b899",
+      "bytes": 2171,
+      "lines": 60
+    },
+    {
+      "relativePath": "src/compliance/citations/reference/atlas.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/reference/atlas.json",
+      "sha256": "472ed81c037c7fadd3b29d5ef995abba8f111ad3a58f16dcf9876985e294a4f9",
+      "bytes": 16945,
+      "lines": 844
+    },
+    {
+      "relativePath": "src/compliance/citations/reference/nistAiRmf.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/reference/nistAiRmf.json",
+      "sha256": "3dc23935f3c7dc4a31357277854dcc28d4196fbea078dd7a20f3f9c6c2360aa1",
+      "bytes": 17818,
+      "lines": 300
+    },
+    {
+      "relativePath": "src/compliance/citations/reference/iso42001AnnexA.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/citations/reference/iso42001AnnexA.json",
+      "sha256": "415c9c5aa7c51f2e9b519a6c90dccfe9664e0ec57089281612125ba63a5fa545",
+      "bytes": 278,
+      "lines": 6
+    },
+    {
+      "relativePath": "src/compliance/regulatory/register.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/regulatory/register.json",
+      "sha256": "95e254f9d96b4908746fcc7147596682e9c968613db070ede3cc301a8b23b6e2",
+      "bytes": 458334,
+      "lines": 4841
+    },
+    {
+      "relativePath": "src/domains/packs/regulatorySchema.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/regulatorySchema.ts",
+      "sha256": "61aaa47c94a3ba537390e1409de7d117211915d020bf1ca98bd2cf8b43762d61",
+      "bytes": 12723,
+      "lines": 260
+    },
+    {
+      "relativePath": "src/domains/packs/regulatoryCatalogue.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/regulatoryCatalogue.ts",
+      "sha256": "4b93f182cbd8124b0f3883b0396ccff0de81bfc3130b799ff33bf644f877a69c",
+      "bytes": 459,
+      "lines": 7
+    },
+    {
+      "relativePath": "src/domains/packs/catalogueHelpers.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/catalogueHelpers.ts",
+      "sha256": "f2f529a2125e7192ced7e96dbd52e698dbac0d5362dbce45668bbb0e211e05dc",
+      "bytes": 2963,
+      "lines": 83
+    },
+    {
+      "relativePath": "src/domains/packs/catalogueUs.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/catalogueUs.ts",
+      "sha256": "feaa6b3c653a4777d3484378287ef1c5ff73cb7f92550dffa103cd5226c4ddb2",
+      "bytes": 17062,
+      "lines": 153
+    },
+    {
+      "relativePath": "src/domains/packs/catalogueEu.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/catalogueEu.ts",
+      "sha256": "55b4e5e86d081811b4f760860045bc15fee33c44cded4648dc224308cbf6c429",
+      "bytes": 22665,
+      "lines": 224
+    },
+    {
+      "relativePath": "src/domains/packs/catalogueIntl.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/packs/catalogueIntl.ts",
+      "sha256": "42c1f586a05bc19e271a91c678c9543e0354c6ffb929d394dd1af99cc46d9be8",
+      "bytes": 24947,
+      "lines": 196
+    },
+    {
+      "relativePath": "src/domains/industryPackAudit.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/industryPackAudit.ts",
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+      "bytes": 26330,
+      "lines": 516
+    },
+    {
+      "relativePath": "src/domains/industryPacks.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/industryPacks.ts",
+      "sha256": "4c107021524aa7805ea7e32b55e6d65e74f17d5c88dc5c85cbcaa56ce0ea34d7",
+      "bytes": 621751,
+      "lines": 2603
+    },
+    {
+      "relativePath": "src/domains/domainRegistry.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/domainRegistry.ts",
+      "sha256": "498b600bb76ee4e2726d8e5319efe7c042e58a6ad133c77aa1fc11754466d385",
+      "bytes": 17145,
+      "lines": 278
+    },
+    {
+      "relativePath": "src/domains/domainModuleMap.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/domains/domainModuleMap.ts",
+      "sha256": "088e248599046916ca0551af0594bb5643123ab6b3c74f4f55eb309b32f19bad",
+      "bytes": 22736,
+      "lines": 644
+    },
+    {
+      "relativePath": "src/score/crossFrameworkMapping.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/score/crossFrameworkMapping.ts",
+      "sha256": "c40def13e74d79099544768e3f105159f6d08f212a23d0cb96607e1851d05ebc",
+      "bytes": 30532,
+      "lines": 256
+    },
+    {
+      "relativePath": "src/score/domainPacks.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/score/domainPacks.ts",
+      "sha256": "4f01d76961a0db3deed76cb01c7a86d0b6cb1525566b163d42e8adf25832cbaf",
+      "bytes": 38665,
+      "lines": 751
+    },
+    {
+      "relativePath": "src/assurance/packs/financialModelRiskPack.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/assurance/packs/financialModelRiskPack.ts",
+      "sha256": "c913df0ae02ecb95131a70c0ab387a986bca807158adf2bd6cecfa1b22287b25",
+      "bytes": 3074,
+      "lines": 88
+    },
+    {
+      "relativePath": "src/compliance/builtInMappings.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/compliance/builtInMappings.ts",
+      "sha256": "6d0a44c467ec7a918b4fbd56f911cf897463b393bc2b2f46fc1bedf5278d73b5",
+      "bytes": 71290,
+      "lines": 2036
+    },
+    {
+      "relativePath": "src/cli.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "bytes": 1064339,
+      "lines": 24430
+    },
+    {
+      "relativePath": "docs/program/citation-corrections.md",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/docs/program/citation-corrections.md",
+      "sha256": "9feef321bbbd3cefcb90dc769aee8e8f04d3ea9b0ff447ac30495cb2e0ed640b",
+      "bytes": 15044,
+      "lines": 87
+    },
+    {
+      "relativePath": "scripts/check-citations.mjs",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/scripts/check-citations.mjs",
+      "sha256": "300f7be119ae2289774fdc90ddaafbdd6ee1a1da3a020de1d6dd8ec9743bca6d",
+      "bytes": 14165,
+      "lines": 276
+    },
+    {
+      "relativePath": "scripts/check-regulatory-currency.mjs",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/scripts/check-regulatory-currency.mjs",
+      "sha256": "2e86a6035a4c389e498bbcaa92a21bfa671d4611fb66ffd7edfcd9de2fc1aff3",
+      "bytes": 10338,
+      "lines": 186
+    },
+    {
+      "relativePath": "scripts/citations-baseline.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/scripts/citations-baseline.json",
+      "sha256": "31d07b0f9ea2022e1994f0b9692a3a55c87271d4aaf5e645d9b68a3583d69f59",
+      "bytes": 2413,
+      "lines": 46
+    },
+    {
+      "relativePath": "scripts/freeze-baseline.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "bytes": 554,
+      "lines": 32
+    },
+    {
+      "relativePath": "scripts/line-budgets.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/scripts/line-budgets.json",
+      "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+      "bytes": 2713,
+      "lines": 66
+    },
+    {
+      "relativePath": "unused-code/plan-edits/manifest.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "bytes": 18181,
+      "lines": 405
+    },
+    {
+      "relativePath": "package.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "bytes": 8631,
+      "lines": 218
+    },
+    {
+      "relativePath": "pnpm-lock.yaml",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "bytes": 155432,
+      "lines": 4839
+    },
+    {
+      "relativePath": "pnpm-workspace.yaml",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/pnpm-workspace.yaml",
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+      "bytes": 1521,
+      "lines": 36
+    },
+    {
+      "relativePath": ".github/workflows/ci.yml",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/.github/workflows/ci.yml",
+      "sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6",
+      "bytes": 14134,
+      "lines": 392
+    },
+    {
+      "relativePath": "scripts/release-gate.mjs",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/scripts/release-gate.mjs",
+      "sha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+      "bytes": 17338,
+      "lines": 335
+    },
+    {
+      "relativePath": "tests/citations/lintCitations.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/citations/lintCitations.test.ts",
+      "sha256": "d8ac693789c976e7cc84fe1ad020c4513f517d51c2188499315e8bc054c426ae",
+      "bytes": 5086,
+      "lines": 121
+    },
+    {
+      "relativePath": "tests/citations/checkCitationsCli.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/citations/checkCitationsCli.test.ts",
+      "sha256": "033144efd88c3c8e0693394dd5d77447d05fa4a178078c0cd54829afe38ff927",
+      "bytes": 5280,
+      "lines": 105
+    },
+    {
+      "relativePath": "tests/fixtures/citations/cases.json",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/fixtures/citations/cases.json",
+      "sha256": "3152a37dbf27c4b8b053b1f40c0fe5f6d99caeeb48ee25838e8d99fa50920939",
+      "bytes": 5107,
+      "lines": 119
+    },
+    {
+      "relativePath": "tests/compliance/mappingPackRefs.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/compliance/mappingPackRefs.test.ts",
+      "sha256": "1be04f21bdce6ea977d83751a29121f595b04bc5fb1286a4a97564c2839ca614",
+      "bytes": 1171,
+      "lines": 22
+    },
+    {
+      "relativePath": "tests/euAiActTimeline.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/euAiActTimeline.test.ts",
+      "sha256": "1beba740b5c2ea40dc51ecc821b2cc68064eb1c56411f1e677ff4ba295d71b28",
+      "bytes": 3328,
+      "lines": 73
+    },
+    {
+      "relativePath": "tests/industryPackAudit.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/industryPackAudit.test.ts",
+      "sha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+      "bytes": 7124,
+      "lines": 147
+    },
+    {
+      "relativePath": "tests/industryPacks-infotainment.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/industryPacks-infotainment.test.ts",
+      "sha256": "b0290855e8e044546eccd0d881f72a595beddc58a4f04f437eb835cf2779c301",
+      "bytes": 1006,
+      "lines": 22
+    },
+    {
+      "relativePath": "tests/industryPackSchema.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/industryPackSchema.test.ts",
+      "sha256": "19dae14eea0dc504e2e98863e075a264d75ec967b2677ce3af24698be64fe146",
+      "bytes": 8737,
+      "lines": 159
+    },
+    {
+      "relativePath": "tests/industryPackRegulatoryRefresh.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/industryPackRegulatoryRefresh.test.ts",
+      "sha256": "a870c633ddae97f3dd76c429e49451a203635f6dfee806eb16c14a96371b0c61",
+      "bytes": 3032,
+      "lines": 55
+    },
+    {
+      "relativePath": "tests/regulatoryCurrencyRegister.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/tests/regulatoryCurrencyRegister.test.ts",
+      "sha256": "c37cc6cc61463e7c57175763ca1f53f1e84e39ef361abbbe0665bf687eddb3c8",
+      "bytes": 5305,
+      "lines": 107
+    },
+    {
+      "relativePath": "platform/python/amc/watch/prebuilt_policy_packs.py",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/platform/python/amc/watch/prebuilt_policy_packs.py",
+      "sha256": "50a7256ea64c83d1e6ee8721a635121f6da4d872f90f98fbb26aabbad9fe62b1",
+      "bytes": 16876,
+      "lines": 426
+    },
+    {
+      "relativePath": "platform/python/amc/watch/w10_policy_packs.py",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/platform/python/amc/watch/w10_policy_packs.py",
+      "sha256": "139678dd455c42c348c70669ee9ede489c242b116a6deb16abd8ce0efbcc039f",
+      "bytes": 4391,
+      "lines": 129
+    },
+    {
+      "relativePath": "platform/python/tests/test_prebuilt_policy_packs.py",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/platform/python/tests/test_prebuilt_policy_packs.py",
+      "sha256": "2868755642efb44799e44bb37db714f89bc4bbb3f75e05ff2b374fd361a482eb",
+      "bytes": 3378,
+      "lines": 118
+    },
+    {
+      "relativePath": "platform/python/pyproject.toml",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/platform/python/pyproject.toml",
+      "sha256": "de3a20a7c1e0fe4ba52333974bf3197729de478c3ec9be4648ad83608bcd0ec5",
+      "bytes": 2567,
+      "lines": 94
+    },
+    {
+      "relativePath": ".changeset/citation-corrections-p0-24.md",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/.changeset/citation-corrections-p0-24.md",
+      "sha256": "c83bf7f873e12e1e1e2e0a3c6e3fac93bfd9e8f0d3d755e6f9d8b3dabc619d4a",
+      "bytes": 2993,
+      "lines": 18
+    },
+    {
+      "relativePath": ".changeset/python-atlas-ids.md",
+      "path": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass/.changeset/python-atlas-ids.md",
+      "sha256": "905f60e6f948c80dd39aae378e3deb0b3743a87783766fcb54c3a83161e311f4",
+      "bytes": 377,
+      "lines": 5
+    }
+  ],
+  "graph": {
+    "copy": "/private/tmp/p0-52-graph-navigation-w8xr443v",
+    "graph": {
+      "path": "/private/tmp/p0-52-graph-navigation-w8xr443v/graphify-out/graph.json",
+      "sha256": "99e0260b5f587018d878098ae134a761b41747f7b18c75004c623d3b14f2d395",
+      "bytes": 45692207,
+      "lines": 1381181
+    },
+    "builtAtCommit": "4247e610e214a5b07de631c394acdaf0f5ed679e",
+    "nodes": 36459,
+    "reviewedRefreshVersion": "0.9.56",
+    "installedObservedVersion": "0.9.74",
+    "queries": [
+      {
+        "argv": [
+          "/Users/sid/.local/bin/graphify",
+          "query",
+          "classify citations atlas",
+          "--budget",
+          "2300"
+        ],
+        "result": "BFS depth2,130 nodes found/61 shown,69 truncated; ambiguous broad navigation only."
+      },
+      {
+        "argv": [
+          "/Users/sid/.local/bin/graphify",
+          "query",
+          "classifyEuAiActRisk",
+          "--budget",
+          "1400"
+        ],
+        "result": "BFS depth2,14 nodes; named euAiActClassifier.ts L93 and CLI dynamic import, classifier result/remediation/roadmap helpers. Current locations/content verified directly."
+      }
+    ],
+    "vocabExpansion": [
+      "classify",
+      "citations",
+      "atlas"
+    ],
+    "limits": "Existing stale graph reused, no refresh/watcher/server/export or source-current claim. Interpreter metadata and read-only query only."
+  },
+  "currentSourceContracts": {
+    "classifier": "Import named classifyEuAiActRisk from src/compliance/euAiActClassifier.ts, not the different sector/usecase classifier in globalRegulatory.ts. emotionRecognition is documented workplace/education context, triggers UNACCEPTABLE and Art.5(1)(f), and precedesHIGH/LIMITED. The medical/safety exception exists in description/help only; no separate context/purpose/exception parameters exist. This is code behavior, not an approved legal ruling for arbitrary real deployments.",
+    "classifierControlsPlanned": [
+      {
+        "input": {
+          "emotionRecognition": true
+        },
+        "expectedCodeResult": "UNACCEPTABLE, articleArt.5(1)(f), CRITICAL finding, Art.5 application date from current constant."
+      },
+      {
+        "input": {
+          "emotionRecognition": true,
+          "chatbot": true,
+          "employment": true
+        },
+        "expectedCodeResult": "UNACCEPTABLE precedence, no misleading downgrade toHIGH/LIMITED."
+      },
+      {
+        "input": {
+          "emotionRecognition": false,
+          "chatbot": true
+        },
+        "expectedCodeResult": "LIMITED,Art.50(1), noArt.5(1)(f)."
+      },
+      {
+        "input": {
+          "socialScoring": true
+        },
+        "expectedCodeResult": "UNACCEPTABLE,Art.5(1)(c), no public-authority-only label."
+      },
+      {
+        "input": {
+          "humanInteraction": true
+        },
+        "expectedCodeResult": "LIMITED,Art.50(1), no deepfake classification."
+      },
+      {
+        "input": {},
+        "expectedCodeResult": "MINIMAL, no applicationDates, current helper behavior only."
+      }
+    ],
+    "catalogue": "Current P024_NOTE is experimental: P0-24 correction, awaiting expert sign-off. P024_READ is historical2026-10-07; URL/date/hash values are authored source metadata, not a new fetch. Longest exact/prefix-alias match requires a separator; unverified catalogue records refuse URL/retrievedAt/effectiveDate; confirmed-status records require officialhttps/source retrieval, repealed records require supersededBy.",
+    "linter": "CIT001/CIT003/CIT005 zero tolerance; malformedCIT002 zero tolerance, membership/pairCIT002 ratcheted, CIT004 metadata/incomplete ratcheted. Exact required pack IDs versus case/dash/underscore-normalized relatedIDs are distinct. Host/schema membership only, no network/content/legal truth checker.",
+    "baselineFileDeclaredTotals": {
+      "CIT001": 0,
+      "CIT002": 3,
+      "CIT003": 0,
+      "CIT004": 620,
+      "CIT005": 0
+    },
+    "baselineNotRuntimeFindings": "Current JSON encodesCIT0023(twoISO A.5+AML.T0019) andCIT004620. No check:citations run occurred, so do not report fresh observed findings or passing gate yet.",
+    "recordSchema": "Requires instrument/clause/edition/jurisdiction/oneof7statusTypes, effective/compliance nullable date strings plus dateNote when null, URL and retrievedAt orcontentSha256. It verifies metadata shape, not legal correctness.",
+    "referenceTables": {
+      "atlas": 208,
+      "nistAiRmf": 72,
+      "iso42001AnnexA": 0,
+      "ATLAST0019Present": false,
+      "sourceMetadataDeclared": "URLs/retrievedAt2026-10-07/SHA recorded. No primary source opened now; empty ISO table remains named-expert boundary."
+    },
+    "actualCliShape": "Futureoptional argv: node dist/cli.js compliance risk-classify --emotion-recognition --json. Current CLI uses self-reported regulated unverifiedClaim and actuallabels; no real legal approval or measurements. Source/shared path stays reserved and unchanged.",
+    "missingSpecTest": "tests/citationCorrections.test.ts is absent; existing timeline/linter/mapping tests cover only their current contracts, not wholeP024 source corrections."
+  },
+  "existingBaselineFiles": [
+    "tests/citations/lintCitations.test.ts",
+    "tests/citations/checkCitationsCli.test.ts",
+    "tests/compliance/mappingPackRefs.test.ts",
+    "tests/euAiActTimeline.test.ts",
+    "tests/industryPackSchema.test.ts",
+    "tests/industryPackRegulatoryRefresh.test.ts",
+    "tests/industryPackAudit.test.ts",
+    "tests/industryPacks-infotainment.test.ts"
+  ],
+  "heldContent": {
+    "correctionLogRows": 31,
+    "allExpertColumnsEmpty": true,
+    "selectedUnappliedExpertRows": [
+      {
+        "row": "13",
+        "scope": "`industryPackAudit.ts` transparency anchor",
+        "status": "Not applied: needs expert (MAP 3.4 covers operator and practitioner proficiency)",
+        "expert": ""
+      },
+      {
+        "row": "14",
+        "scope": "`industryPackAudit.ts` monitoring anchor",
+        "status": "Not applied: needs expert (MEASURE 2.7 covers security and resilience)",
+        "expert": ""
+      },
+      {
+        "row": "15",
+        "scope": "`industryPackAudit.ts` privacy, security and human-oversight anchors",
+        "status": "Not applied: needs expert",
+        "expert": ""
+      },
+      {
+        "row": "17",
+        "scope": "`industryPackAudit.ts` ISO/IEC 42001 anchors",
+        "status": "Not applied: needs expert with a licensed copy; also recheck A.6, A.6.1, A.6.2, A.7, A.8, A.9. Still in the CIT002 baseline",
+        "expert": ""
+      },
+      {
+        "row": "25",
+        "scope": "`src/score/domainPacks.ts` GOV-5; `src/domains/domainModuleMap.ts`",
+        "status": "Text not changed: needs expert to name a replacement or remove it. Catalogue record `us-eo-13985` marks it repealed",
+        "expert": ""
+      },
+      {
+        "row": "29",
+        "scope": "`register.json` `us-nist-ai-rmf`, `us-nist-ai-600-1`, `us-co-sb24-205`, `us-co-sb26-189`, `br-lgpd`, `in-dpdp`",
+        "status": "Not applied: choosing affected packs is an applicability judgment no source states; needs a proposal and expert confirmation (P0-12 follow-up)",
+        "expert": ""
+      }
+    ],
+    "alsoNeedsExpert": "Rows4,10a,12,16,18 and23 carry confirmation/selection work. All41 industry classification strings require expert review; draft applies/logstatus is not approval.",
+    "Illinois": "Row10a records unverified820ILCS42/no catalogue record and a pending HB3773 decision. Do not invent source URL, recorded retrieval, replacement/control or expert endorsement.",
+    "registerMissingAffectedPacks": [
+      {
+        "id": "us-nist-ai-rmf",
+        "status": "in-force",
+        "verifiedDeclared": true,
+        "affectedPacksPresent": false,
+        "lastReviewed": "2026-10-03"
+      },
+      {
+        "id": "us-nist-ai-600-1",
+        "status": "in-force",
+        "verifiedDeclared": true,
+        "affectedPacksPresent": false,
+        "lastReviewed": "2026-10-03"
+      },
+      {
+        "id": "us-co-sb24-205",
+        "status": "superseded",
+        "verifiedDeclared": true,
+        "affectedPacksPresent": false,
+        "lastReviewed": "2026-10-03"
+      },
+      {
+        "id": "us-co-sb26-189",
+        "status": "enacted-not-yet-applicable",
+        "verifiedDeclared": true,
+        "affectedPacksPresent": false,
+        "lastReviewed": "2026-10-03"
+      },
+      {
+        "id": "br-lgpd",
+        "status": "in-force",
+        "verifiedDeclared": false,
+        "affectedPacksPresent": false,
+        "lastReviewed": "2026-10-03"
+      },
+      {
+        "id": "in-dpdp",
+        "status": "partially-applicable",
+        "verifiedDeclared": false,
+        "affectedPacksPresent": false,
+        "lastReviewed": "2026-10-03"
+      }
+    ],
+    "landingRows27_28_30": "Correctionlog routes candidate-only clause/FSMA/certification-source rows toP1-45/P1-42/P1-16 when absent. Preserve applicability and landing ownership; do not port held sources.",
+    "P012Inherited": "Host ratification, listing-only source evidence, EU ServiceDesk-vs-EURLex verified ruling, four-withdrawn-as-superseded entries, observations/dates and unretrieved jurisdictions remain review work, not cleared by a linter pass."
+  },
+  "pythonReconciliation": {
+    "historicalNotes": "pending-checks:55 and correctionlogrow19 still describeT0048/T0051 followup.",
+    "currentSource": "Commit3b088c3c7 already changes rule/remediation prompt injection toT0051 and jailbreak toT0054, version1.1. Source only; noPython import/test/pack instantiation/compatibility or fresh ATLAS release validation occurred here.",
+    "existingTest": "platform/python/tests/test_prebuilt_policy_packs.py exists and imports actual PolicyPack; future runtime requires separate owned Python dependencies per pyproject, never touching user/shared environment.",
+    "scope": "The TS citation collector does not inspect Python source, so a TS linter pass cannot prove Python coverage. If selected, add a new separate behavior control through actual Python constructor after root readiness; preserve rule IDs/digest/version and earlier data. No Python source edit needed just to fix already-corrected IDs."
+  },
+  "freezeAndOwnership": {
+    "freezeActive": true,
+    "P024NotInAllowedInventoryExceptionKeys": true,
+    "historicalChangesetMarker": "citation-corrections-p0-24.md declares citation-text exception with no new question/CLI path; marker is not present source release/ownership authority.",
+    "readOnlyNeedsSnapshotCommand": [
+      "/opt/homebrew/opt/node@22/bin/node",
+      "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/needs-snapshot.mjs",
+      "--paths",
+      "src/compliance/euAiActClassifier.ts",
+      "src/score/domainPacks.ts",
+      "src/domains/domainRegistry.ts",
+      "src/domains/domainModuleMap.ts",
+      "src/domains/industryPackAudit.ts",
+      "src/score/crossFrameworkMapping.ts",
+      "src/compliance/builtInMappings.ts",
+      "src/domains/industryPacks.ts",
+      "src/assurance/packs/financialModelRiskPack.ts",
+      "platform/python/amc/watch/prebuilt_policy_packs.py",
+      "--at",
+      "75cbdf8a1b83ed6b3851ecce3a069940352a40cd"
+    ],
+    "needsSnapshotExit": 0,
+    "needsSnapshotOutput": "none\n",
+    "existingD15RowsForTheseTenPaths": 0,
+    "snapshotInterpretation": "No matching registered archive rows were found for these ten paths, and the existing read-only helper reportsnone. No original snapshot is claimed verified where none exists; no archive/manifest edit or absence-based permission follows. Re-run exact path preflight at any authorized production edit boundary.",
+    "genericReservation1496": "Every nonE17/nonCodex Agent-Doable item is reserved; P0-24 is not an enumerated Codex lane even though omitted from explicit list. Human serial qualification/fix intent authorizes bounded qualification preparation, not blanket shared/production transfer.",
+    "proposedWriteScopeAfterRootAssignment": "Only a NEW narrowly named P0-24 qualification test and private fixtures/receipts; root owns managed checkout/deps/build/static/freeze/count/commit boundaries. All production, oldtests/helpers, linter/baseline, current catalogue/log, sharedCLI/registry, archives/guards, held/paused source stay read-only.",
+    "sourceRepairDecision": "Any actual defect requiring production/catalogue/log/baseline changes needs exact reviewable scope and ownership resolution first. No idle/absence/quota clearance or expert content approval is inferred."
+  },
+  "boundedNextSeam": {
+    "name": "Existing classifier and experimental citation metadata/ratchet behavior qualification",
+    "why": "Code is already landed; code contracts and refusals can be exercised without choosing expert identifiers, fetching laws as implicit truth, changing frozen content, burning debt or importing held followups.",
+    "passingCriteria": "Nonvacuous current classifier/emotion precedence and exclusion controls; actual catalogue resolution and changed-record experimental note/URL/retrieved metadata; original13linter fixtures +CLIratchet +mappingreferences; actual current compiled collector output and exit; no positive expert/regulatedlegal claim.",
+    "refusalCriteria": "Unknown/malformed IDs, wrong prompt pairing, prohibited A.5 policy pair, exact pack mismatch, bogus host/incomplete metadata/invalid status, superseded live reference, abovebaseline or zero-tolerance findings, baseline update withoutreason/unknown flags. Preserve corpus baseline; any real failure remainsRED.",
+    "causalPlan": "After build readiness copy actual compiled classifier and citation/linter/CLI dependency closure. Move only existing emotion descriptor back toLIMITED/Art.50(3), expecting same current emotion assertions tofail; separately make CIT003 resolveralways true and bypass abovebaselinecomparison, expecting specific unchanged refusal assertions tofail. Use identical inputs and observer, valid imports, rawbaseline/mutant/restored counts and exact restoration; no live mutation.",
+    "futureActualCommands": [
+      "git --no-optional-locks rev-parse HEAD",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/citations/lintCitations.test.ts tests/citations/checkCitationsCli.test.ts tests/compliance/mappingPackRefs.test.ts tests/euAiActTimeline.test.ts --maxWorkers=1 --reporter=json --outputFile=<owned-private-baseline.json>",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node scripts/check-citations.mjs --json",
+      "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node scripts/check-regulatory-currency.mjs --as-of 2026-10-15 --json",
+      "After root authorizesnewtest: same explicitNode22 vitest command adding assignednewP024file, rawJSON/privateevidence; no npmtest/pretest-build shortcut.",
+      "Only after source/deps/build readiness and separate Python scope: <owned-python> -m pytest platform/python/tests/test_prebuilt_policy_packs.py; constructor-ID qualification uses currentactualmodule, not a text-only assertion."
+    ],
+    "commandPrerequisites": "Root completes currentP027compat, assigns isolatedsource pin/worktree/newtest, runs own frozen install/build. Do not invoke any command above from this read-only preflight. Existing compiled collector requires fresh build; Node24/Python followups remain separate runtime ownership, no shared native rebuild.",
+    "fullAcceptanceNotImplied": "Spec still requires per-row status/catalogue records/reviewlog, red-first/history/mutation evidence, fullsuite/types/lint/count/docs outcomes and named-expert/release acceptance. This seam gives a bounded technical receipt only."
+  },
+  "primarySourcePolicy": {
+    "openedLegalPrimarySourcesNow": false,
+    "currentLawLegalAccuracyClaim": false,
+    "noFactsFromMemory": true,
+    "futureRequirement": "Before correcting/re-verifying legal text, actually open authoritative primary source pages/data/PDFs, record actualretrievedAt/contentSHA/excerpts and access failures, then namedexpert approval where required. Paywall/unreachable source remains unverified; no invented retrieval or approval."
+  },
+  "preservedLimits": [
+    "P0-19 strictINVALID measuredartifact and unappliedseal-order decision remainopen;47echo/P2-27 deferred.",
+    "P0-27 strictsystem/mixedSQLite lifecycle and other unsigned/startcleanup debt unchanged; current22/24compat owned byroot, no interference or outcome claimed here.",
+    "P0-22/P0-23/P0-51/P0-52 activefailures, P0-20/P0-52 source decisions, P0-29/P0-22 skips, pausedP2-02/A4/privacy/native work remain.",
+    "No nexttests, servers, build, install, imports, productCLI, Python/model/provider, currentlaw/expert/wholeP024/Node24/G0/release qualification performed."
+  ],
+  "actions": "Read fullselectedspecs/plan/control/source/test files and Git only; one existing staleGraphify query/refinement and existing readonly needs-snapshot helper. Wrote only this specified private JSON/Markdown pair."
+}

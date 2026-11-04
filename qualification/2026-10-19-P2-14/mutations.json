@@ -1,0 +1,1353 @@
+{
+  "summary": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/summary.json",
+    "sha256": "4ab1ef972822b3d9cd759918667cfdd1478b82bcfb76ca26bf34c3ce176194d7",
+    "bytes": 20717
+  },
+  "plan": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/mutation-plan-execution-ready-760bf.json",
+    "sha256": "8771f21266838e19fcf3542a151e224547150229330f440270cf99caaa50fb6f",
+    "bytes": 61442
+  },
+  "runner": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/run-isolated-mutations-final-760bf.py",
+    "sha256": "3b9636f0ee4fc23993c8f5afa0519e44d83cf5b664288f83d80ab7a078f0bde7",
+    "bytes": 35386
+  },
+  "planned": 34,
+  "killed": 34,
+  "initialGreen": {
+    "passed": true,
+    "command": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/initial-green/command.json",
+      "sha256": "51d5dc6b27d5805eb0fc2e813e86408e4db60f38a771fb72361ad9a277894ceb",
+      "bytes": 2923
+    },
+    "nativeReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/initial-green/report.json",
+      "sha256": "1b01b91e4a55de83efaa27e89eb37233efa100708c742ecffae6e9ec913893a7",
+      "bytes": 8639
+    },
+    "rawLog": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/initial-green/raw.log",
+      "sha256": "cb17bbb088167c73b2279e49d16b4d2214246c8f1a07d4d404d6a04d7d8059f0",
+      "bytes": 494
+    },
+    "counts": {
+      "numTotalTests": 23,
+      "numPassedTests": 23,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0
+    }
+  },
+  "restoredGreen": {
+    "passed": true,
+    "command": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/restored-green/command.json",
+      "sha256": "0b9035bfe073368c93e46670887bfcb6ff96a73ba31892b6a817fca0452cdb84",
+      "bytes": 2925
+    },
+    "nativeReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/restored-green/report.json",
+      "sha256": "4d585a180e74a60f41e1ae501893f6a86293edb11f967bf2fc43568d2dd657d0",
+      "bytes": 8639
+    },
+    "rawLog": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/restored-green/raw.log",
+      "sha256": "90ed4d40c1de2eec1f4fedf4bf70011e09cacc584d8c3f1ac4c6e0816975e5cd",
+      "bytes": 495
+    },
+    "counts": {
+      "numTotalTests": 23,
+      "numPassedTests": 23,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0
+    }
+  },
+  "sourceRestoreChecks": [
+    {
+      "path": "tests/containment/windowsRunnerPrototype.test.ts",
+      "sha256": "d57d37652979c23911f0f1d846357f90fb22114ad42c2101572259e67cd3c190",
+      "exactRestore": true
+    },
+    {
+      "path": "src/sandbox/windowsRunnerPrototype.ts",
+      "sha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef",
+      "exactRestore": true
+    }
+  ],
+  "variants": [
+    {
+      "id": "actual-host-entry-refusal",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-01-actual-host-entry-refusal.json",
+        "sha256": "d85115cf5c588dae7a48e02ba7131b272204282b6c6e7c7a3e45ab1753539f5a",
+        "bytes": 2107
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/01-actual-host-entry-refusal/command.json",
+        "sha256": "97b125a3989d6cf68b662a95d39021ef2249157b992afa83c92d7ff3e1e2fb2c",
+        "bytes": 4079
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/01-actual-host-entry-refusal/report.json",
+        "sha256": "536413af92dba3b4104e115efa70390b249d214a1d270dfa7178b9b0bf9c4f18",
+        "bytes": 8973
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/01-actual-host-entry-refusal/raw.log",
+        "sha256": "e2e96574e9adbe0b36dd61b46321d165db79837f71e9ca3c613bd6c9f827c921",
+        "bytes": 1646
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary real host entry always refuses and has no API or platform override",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:46:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "real\\ host\\ entry\\ always\\ refuses\\ and\\ has\\ no\\ API\\ or\\ platform\\ override": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "request-strict-shape",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-02-request-strict-shape.json",
+        "sha256": "48c5e83a3b72f476dc04078506b8b597086ebcc7bbeb954864e79766dd2b1577",
+        "bytes": 2038
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/02-request-strict-shape/command.json",
+        "sha256": "7b201c56c37c827d84617b1ef23558071f07fb8fa7a31b221c0fb11940163749",
+        "bytes": 4026
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/02-request-strict-shape/report.json",
+        "sha256": "08665320af6e88c97444d4d31df0d8aa4c1ab055066d26dc0d36bb71ca2af68d",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/02-request-strict-shape/raw.log",
+        "sha256": "3beca0bbad889caed84ceb76a6d379620c9ad52b8117e4725627b9a90c3aef16",
+        "bytes": 1623
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary malformed requests refuse before fake API invocation",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:68:28\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "request-argv-shape-family",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-03-request-argv-shape-family.json",
+        "sha256": "8249605f0870ad1f511061a91e83b35ec1f5497e96c64ef33d55fd90c726f6ff",
+        "bytes": 2032
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/03-request-argv-shape-family/command.json",
+        "sha256": "fd8b7885c46e11200db0b59b2bb5a63360204e051f5158c71b1e330c11fe9bde",
+        "bytes": 4041
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/03-request-argv-shape-family/report.json",
+        "sha256": "a6e69d7483c2daefa1982ab9412627e81f25395447506beea63c8d8f91bf571f",
+        "bytes": 9120
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/03-request-argv-shape-family/raw.log",
+        "sha256": "243aa34bca854e9e1e63053c505e1986d1bfc801d0dfa48168cb6a74c1e2312e",
+        "bytes": 1628
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary malformed requests refuse before fake API invocation",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:68:28\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "argument-nul-refusal",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-04-argument-nul-refusal.json",
+        "sha256": "02408695b5ce6d33c4d4af42cb1699f2f343999996317cd43641da2163a63c7c",
+        "bytes": 2022
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/04-argument-nul-refusal/command.json",
+        "sha256": "f103dfcda9f24b9c4ef3c6eb210848e92ac2738723a0f95ac8a1e46d12fbfab9",
+        "bytes": 4026
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/04-argument-nul-refusal/report.json",
+        "sha256": "370f1b298756ecfb5ceee083576de82b40c8f6f68c87996e7a49681232d6d34e",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/04-argument-nul-refusal/raw.log",
+        "sha256": "1f7720085c9783f2debeec45bb0cef1f266f75715712950292163ea6b7a80baf",
+        "bytes": 1623
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary malformed requests refuse before fake API invocation",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:68:28\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "request-nonempty-cwd",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-05-request-nonempty-cwd.json",
+        "sha256": "dd8a6598b77cbbdf6ecea1a1504580c13a634bb2269d99233e6d602be01b77bd",
+        "bytes": 2027
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/05-request-nonempty-cwd/command.json",
+        "sha256": "580395ae5b1c378b76f8285d6824683beb885e5a97bb93f35cfd7bb8c0241f1f",
+        "bytes": 4026
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/05-request-nonempty-cwd/report.json",
+        "sha256": "7b6852431532a423f2adae99188fa752f9760e4d33a4f182988d195a45ffbd47",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/05-request-nonempty-cwd/raw.log",
+        "sha256": "533050f757d3c5e645237935f66899d28bb6b7715db7271c5136705c506fc3a1",
+        "bytes": 1623
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary malformed requests refuse before fake API invocation",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:68:28\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "digest-shape-family",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-06-digest-shape-family.json",
+        "sha256": "73a802c582ecb106bd71a34bf8a90c516f6c31c25dc309aad584bcf86c7414a0",
+        "bytes": 2039
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/06-digest-shape-family/command.json",
+        "sha256": "268b61cc21623118e2bdda0d47b0dc706a6acb8c717bbed34de9fc3e48e5c28a",
+        "bytes": 4023
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/06-digest-shape-family/report.json",
+        "sha256": "e0df9ddf4ebd64bc279e5605b20a4605c5a1940e132e37966ccf1d7b0504359f",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/06-digest-shape-family/raw.log",
+        "sha256": "47ea488ef3c39c01d9bfab68d45068429ad56d8b71442d772ca5156317bf2c04",
+        "bytes": 1622
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary malformed requests refuse before fake API invocation",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:68:28\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "malformed\\ requests\\ refuse\\ before\\ fake\\ API\\ invocation": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "api-object-availability",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-07-api-object-availability.json",
+        "sha256": "5b4807bd971b04463d0b5578b45796402179c7aaae5fcdeb62694e329d0c9770",
+        "bytes": 2022
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/07-api-object-availability/command.json",
+        "sha256": "dc87b91a5299570427d65ead26feb8d3fb2579629d23445dd38bf2aac5a21928",
+        "bytes": 4029
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/07-api-object-availability/report.json",
+        "sha256": "b7736eb959655a9438d71e5e2045f172964f98cb8791b92864e5d647e7910f8f",
+        "bytes": 8973
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/07-api-object-availability/raw.log",
+        "sha256": "7ade564587f9209cb86d2b2744f33034698734180741da1b38842a2ccefe84ea",
+        "bytes": 1621
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary missing or malformed fake API refuses before run",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:51:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "missing\\ or\\ malformed\\ fake\\ API\\ refuses\\ before\\ run": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "api-method-shape",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-08-api-method-shape.json",
+        "sha256": "aed4c997330163d688ff369c538aa1ed00591b2654941e5655d7ebf90aa02c17",
+        "bytes": 2014
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/08-api-method-shape/command.json",
+        "sha256": "5c9cd08470fc3184b7f72a342b50c28ea4bd2ab7ce2f0f744e187303caa4fe75",
+        "bytes": 4008
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/08-api-method-shape/report.json",
+        "sha256": "6bb2fb3c3eaae75c5d1573bc3b8b044c122d3a92175010cdb3e9842869a5d992",
+        "bytes": 9120
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/08-api-method-shape/raw.log",
+        "sha256": "03470484250e8129984f6c6f90e65fe765a62e7ad153d1bb6cb452e7f0215f19",
+        "bytes": 1614
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary missing or malformed fake API refuses before run",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:51:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "missing\\ or\\ malformed\\ fake\\ API\\ refuses\\ before\\ run": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "api-prerequisite-verdict",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-09-api-prerequisite-verdict.json",
+        "sha256": "8eb4d881a03780caea29ebdf9f68770ec17c25694fb1b684dfef67d7b3fcefb1",
+        "bytes": 2050
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/09-api-prerequisite-verdict/command.json",
+        "sha256": "d3a1959f6954162be0452f425ac931752575c2b9cd3e1aa7a0a1e4fc51d13653",
+        "bytes": 4056
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/09-api-prerequisite-verdict/report.json",
+        "sha256": "84f06917fef192eea95e3875f1812140a3f1b1c70ece7000a58f4b56b54a4c9c",
+        "bytes": 9120
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/09-api-prerequisite-verdict/raw.log",
+        "sha256": "69a672c1ad78ff42188f3459d32995762bceee685b2f036cbccef2a8e5223c7c",
+        "bytes": 1634
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary unavailable and malformed availability answers do not launch",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:57:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "unavailable\\ and\\ malformed\\ availability\\ answers\\ do\\ not\\ launch": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "api-prerequisite-exception",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-10-api-prerequisite-exception.json",
+        "sha256": "3ad91b3842ac229cfb624c3994e7e3eda8c0094bf8607afa653fe9a553c12ac1",
+        "bytes": 2047
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/10-api-prerequisite-exception/command.json",
+        "sha256": "0b459aeb3143ad66282d10b6240df612688d24d5e1fe7d02675747c25e1e122d",
+        "bytes": 4040
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/10-api-prerequisite-exception/report.json",
+        "sha256": "cf26cd3f0b7108da9d6ea32c2805ac49a0dfbfc1d9b6237b27de089eb36eaf29",
+        "bytes": 9120
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/10-api-prerequisite-exception/raw.log",
+        "sha256": "11702c6d04d9517334b201499143aab04f458c9bbc455b9ca9b262da887b2a7a",
+        "bytes": 1624
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary availability exceptions have bounded public reasons",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:62:39\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "availability\\ exceptions\\ have\\ bounded\\ public\\ reasons": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "request-outer-freeze",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-11-request-outer-freeze.json",
+        "sha256": "014e6b7f87889ca91f005b072b1b8492f0d7483fd313ec267eb06a9489ef3134",
+        "bytes": 2089
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/11-request-outer-freeze/command.json",
+        "sha256": "4732f48115a57e931564ddb4371de612c4a6eb5b889a0478ef71c914db8dce87",
+        "bytes": 4070
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/11-request-outer-freeze/report.json",
+        "sha256": "2959b83ffba36a3da703142d58aa63e2ca7459c150fd0e3a3b5131c4736eef98",
+        "bytes": 8969
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/11-request-outer-freeze/raw.log",
+        "sha256": "44533bd1ca899d93f86518fd213402562e15b46a6b85a7dd57bef34a1b310ca9",
+        "bytes": 1426
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary validating the response uses a frozen snapshot, not mutable caller inputs",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'simulation-complete' }\n(7 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:173:38\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "validating\\ the\\ response\\ uses\\ a\\ frozen\\ snapshot,\\ not\\ mutable\\ caller\\ inputs": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "request-argv-freeze",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-12-request-argv-freeze.json",
+        "sha256": "7ac2771a2ed266a185bf32a0c3d831050481a3350ee955fb1f2ed52cd05fdc50",
+        "bytes": 2086
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/12-request-argv-freeze/command.json",
+        "sha256": "de50a591a62651846f8a2374556c3c046eeeb2803bb6733607306a17fdef1ce7",
+        "bytes": 4066
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/12-request-argv-freeze/report.json",
+        "sha256": "df4ea4d5ee16e5dae3c7338e30bc6fd6f686c1af5b08d81918e70c9670785cc0",
+        "bytes": 8968
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/12-request-argv-freeze/raw.log",
+        "sha256": "55cbc97bbb11948b3d2c62b44046b18942232de00243449b7a6cc97af080aec5",
+        "bytes": 1425
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary validating the response uses a frozen snapshot, not mutable caller inputs",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'simulation-complete' }\n(7 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:173:38\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "validating\\ the\\ response\\ uses\\ a\\ frozen\\ snapshot,\\ not\\ mutable\\ caller\\ inputs": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "request-owned-copy",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-13-request-owned-copy.json",
+        "sha256": "a25aa6517696cb5839ece27e2cb2d395c50085130595ca3a5bdc6ae8a66753e8",
+        "bytes": 2124
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/13-request-owned-copy/command.json",
+        "sha256": "574c61b3aedc86c1ccc52cf812283a6e1a6bee1b02fff42f8beead2e1b65f35d",
+        "bytes": 4064
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/13-request-owned-copy/report.json",
+        "sha256": "c33c052fbe5cc825d31138fdb4062ad40ae53fbd554a6f347aedc013aaa40d96",
+        "bytes": 8968
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/13-request-owned-copy/raw.log",
+        "sha256": "b0bd11d7bff9a90fcd86b83f32e4954970360c9cdef085379ba6c4fcec78b583",
+        "bytes": 1424
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary validating the response uses a frozen snapshot, not mutable caller inputs",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'simulation-complete' }\n(7 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:173:38\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "validating\\ the\\ response\\ uses\\ a\\ frozen\\ snapshot,\\ not\\ mutable\\ caller\\ inputs": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "fresh-invocation-nonce",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-14-fresh-invocation-nonce.json",
+        "sha256": "bd1487ff5d1675c6badd2cb602f43b6aada499d017e86bb15f4db197bf0252e2",
+        "bytes": 2111
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/14-fresh-invocation-nonce/command.json",
+        "sha256": "c5290af3a1d8b7ebed5587b61a0c974a51747dda7f6c8d5da013750541ed41b4",
+        "bytes": 4079
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/14-fresh-invocation-nonce/report.json",
+        "sha256": "f6ed1acfc1ba2287034d9ec349554d8554ac45e0604391a0f5efac5290435aa5",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/14-fresh-invocation-nonce/raw.log",
+        "sha256": "399921341d58c200e60fcd7edbbf3e10f612c8d53672a1f2d548d29147ebae5e",
+        "bytes": 1644
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary replaying a previous otherwise matching status refuses on the new nonce",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:134:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "replaying\\ a\\ previous\\ otherwise\\ matching\\ status\\ refuses\\ on\\ the\\ new\\ nonce": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "transport-child-numeric-contract",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-15-transport-child-numeric-contract.json",
+        "sha256": "c6b293b2e5fd0cb2a799e1e975a641f47a592712928fe034870d8e4fd959c9ba",
+        "bytes": 2128
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/15-transport-child-numeric-contract/command.json",
+        "sha256": "7ba6f03c78bf87b9a3651a62d6d4548a9ef021ec33fc210c3783237428f56611",
+        "bytes": 4101
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/15-transport-child-numeric-contract/report.json",
+        "sha256": "30aafa1789c63f5e80ee8d72a7bf9a35e54933304291c534f828191c75054d83",
+        "bytes": 9108
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/15-transport-child-numeric-contract/raw.log",
+        "sha256": "de430422573ab8ee532f085c7a5ce3efa9081944a6825b1cd50c7fab398cbb05",
+        "bytes": 1577
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary invalid transport child identities and exit values refuse without coercion",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:141:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "invalid\\ transport\\ child\\ identities\\ and\\ exit\\ values\\ refuse\\ without\\ coercion": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "exit-numeric-contract",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-16-exit-numeric-contract.json",
+        "sha256": "f58d676fe1aeaab4a7f27b59b34db263d57a61b03cbe974fd128849e7f3acf0a",
+        "bytes": 2097
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/16-exit-numeric-contract/command.json",
+        "sha256": "b0cd06307e094b54a07daaaa7cefbeded9468a0b5a497f64f260c2abd25edd5c",
+        "bytes": 4069
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/16-exit-numeric-contract/report.json",
+        "sha256": "bb1b6105dde9c0eee62165f07fcfe4db329a9381b0d35faf66ac07927762a060",
+        "bytes": 9108
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/16-exit-numeric-contract/raw.log",
+        "sha256": "66b8cb1f8a7a0a4eca27a07260c8b48e5eedd588766468cd98069a054698377d",
+        "bytes": 1566
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary invalid transport child identities and exit values refuse without coercion",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'refused', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:141:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "invalid\\ transport\\ child\\ identities\\ and\\ exit\\ values\\ refuse\\ without\\ coercion": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "mandatory-missing-launcher-status",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-17-mandatory-missing-launcher-status.json",
+        "sha256": "f6638b87a26ceb08c03c2da64c3a141ad7f16ab76b6e63fa36e70e8a97638c9d",
+        "bytes": 2477
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/17-mandatory-missing-launcher-status/command.json",
+        "sha256": "e584b83c4b03061ac36191b3feb4cc16d3bf237f58a44eaaad2a55f941fad913",
+        "bytes": 5839
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/17-mandatory-missing-launcher-status/report.json",
+        "sha256": "1fabc6b1fc60e1b8f8f70b92fe3bd7200fea1b0e9b4572de93f2b62458d42611",
+        "bytes": 11419
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/17-mandatory-missing-launcher-status/raw.log",
+        "sha256": "d3bcbe07af5832af290a4a3df2e3484f05bbd346808ac530f89aa3aadd420cd7",
+        "bytes": 3781
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary missing launcher status cannot complete the simulation",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:87:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary stdout cannot substitute for the separate launcher status channel",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:150:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary fake enforcement claims never fabricate a native receipt or fallback",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:179:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "missing\\ launcher\\ status\\ cannot\\ complete\\ the\\ simulation": true,
+        "stdout\\ cannot\\ substitute\\ for\\ the\\ separate\\ launcher\\ status\\ channel": true,
+        "fake\\ enforcement\\ claims\\ never\\ fabricate\\ a\\ native\\ receipt\\ or\\ fallback": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "empty-launcher-status",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-18-empty-launcher-status.json",
+        "sha256": "715984c02f04664d979bc71cfe682f34e9c566ee34887bbdfd9db147583da9cb",
+        "bytes": 2037
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/18-empty-launcher-status/command.json",
+        "sha256": "ec1e32c7a55e3257947f20376fe85a331db0207d6863368e199593b7f61ac806",
+        "bytes": 4033
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/18-empty-launcher-status/report.json",
+        "sha256": "935b9db0b66d698c2a7e9a073fd6c7d4397b6c71bc875dcbf17b44809dd6136c",
+        "bytes": 9120
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/18-empty-launcher-status/raw.log",
+        "sha256": "55256cd810618fd990bbb0fa538aba36bcefd9c8561e6bf656e76e6b2306720d",
+        "bytes": 1624
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary missing launcher status cannot complete the simulation",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:87:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "missing\\ launcher\\ status\\ cannot\\ complete\\ the\\ simulation": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "status-byte-cap-family",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-19-status-byte-cap-family.json",
+        "sha256": "ee8714ca566b63a3d9d20abe3748932548ffa61bcd786131d2f4b37213df903e",
+        "bytes": 2235
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/19-status-byte-cap-family/command.json",
+        "sha256": "316ba54dc23edb64af945824a8649b9ac43147dacd2ad7acca0a331a52e45595",
+        "bytes": 4903
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/19-status-byte-cap-family/report.json",
+        "sha256": "1d1e3cfb1dcc19268d97971bbee29f243771cc80d1ca3b43fd33cf81dad749ab",
+        "bytes": 10271
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/19-status-byte-cap-family/raw.log",
+        "sha256": "cd646156046f1a75460206b5ea2c4b105171031445eb5cf6e338cb1f280a8dac",
+        "bytes": 2690
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary oversized status refuses before successful parsing",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:107:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary shadowed status byteLength cannot bypass the captured-byte cap",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:115:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "oversized\\ status\\ refuses\\ before\\ successful\\ parsing": true,
+        "shadowed\\ status\\ byteLength\\ cannot\\ bypass\\ the\\ captured\\-byte\\ cap": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "utf8-refusal-result",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-20-utf8-refusal-result.json",
+        "sha256": "a351c9cfc23db9296a74431f3e4413b0af4f359e2e7cbe9ebc408cb5dc83d39c",
+        "bytes": 2041
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/20-utf8-refusal-result/command.json",
+        "sha256": "e6e6b7729fc03c141383f5fe17f3f214ba6f2d5461886ff2eddb661d090e76e3",
+        "bytes": 4038
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/20-utf8-refusal-result/report.json",
+        "sha256": "e7104aef658349ce766f8e6f8c83be6513bbd9c020dcbc8a9fbaff8827276217",
+        "bytes": 9122
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/20-utf8-refusal-result/raw.log",
+        "sha256": "930a86b9f26b7e92a1f18340333c155757937192cc65e79d0abf0b206989a079",
+        "bytes": 1626
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary invalid UTF-8 status bytes cannot complete the simulation",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:103:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "invalid\\ UTF\\-8\\ status\\ bytes\\ cannot\\ complete\\ the\\ simulation": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "malformed-json-promotion",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-21-malformed-json-promotion.json",
+        "sha256": "de703ef1544249ced023d1761edd0ad92e62f0113a152a6695d962cd27ad4033",
+        "bytes": 2042
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/21-malformed-json-promotion/command.json",
+        "sha256": "00ade350bc05db63b29ef53e38473faf563fad378a75034407e962de501e4b39",
+        "bytes": 4046
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/21-malformed-json-promotion/report.json",
+        "sha256": "de7b87341ad3adb4cb5df0c7e8f933ec0d7af7dd7bf06ca295dcdc78985a6a7d",
+        "bytes": 9120
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/21-malformed-json-promotion/raw.log",
+        "sha256": "348a9c36b971c35bf4d1c14201fc4af155328253aa08398523ef9fc5c53d2d8a",
+        "bytes": 1628
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary malformed JSON, strict fields and type confusion refuse",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:93:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "malformed\\ JSON,\\ strict\\ fields\\ and\\ type\\ confusion\\ refuse": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "status-strict-fields",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-22-status-strict-fields.json",
+        "sha256": "ffa5444d2686714e45daf51beb826a7908c20e5db11029ca1a3308c6f60c26f2",
+        "bytes": 2055
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/22-status-strict-fields/command.json",
+        "sha256": "5c36689616c35d2d813300b82ffc2a6dac52c85f984c700c75cd0d6d6eb2474c",
+        "bytes": 4035
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/22-status-strict-fields/report.json",
+        "sha256": "d75222f5d9f85daf023da4458b5225637f75195282fc481c7cfd92d11bf88b46",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/22-status-strict-fields/raw.log",
+        "sha256": "2a15c0b6f9e6c4fc658077faf7e546e9ff46ca5844f2de152d35c05ed2fbef2a",
+        "bytes": 1624
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary malformed JSON, strict fields and type confusion refuse",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:97:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "malformed\\ JSON,\\ strict\\ fields\\ and\\ type\\ confusion\\ refuse": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "status-version",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-23-status-version.json",
+        "sha256": "4d1ff0e2918f2a5142577b812848b07353759c7c06b0fc1999df7a58ec8b18b0",
+        "bytes": 2021
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/23-status-version/command.json",
+        "sha256": "28061e85540c2bba53cd13fb205794710f28c8228df3c2d1ed6a0f3d479253a6",
+        "bytes": 4017
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/23-status-version/report.json",
+        "sha256": "e61f16bdb02de190d039ca87fc6bf1765f689abc00df4e75b4e2fadea98985e4",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/23-status-version/raw.log",
+        "sha256": "1c5fe87139cb4ecb73eb67390e1d9f4651ef25a09924ea01ed12643aff98f579",
+        "bytes": 1618
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary malformed JSON, strict fields and type confusion refuse",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:97:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "malformed\\ JSON,\\ strict\\ fields\\ and\\ type\\ confusion\\ refuse": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "status-child-binding",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-24-status-child-binding.json",
+        "sha256": "ddeba8fb77b64f79c878a5da5e973aa2c3cf68797ee8a97fe7977fb252aef6d6",
+        "bytes": 2053
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/24-status-child-binding/command.json",
+        "sha256": "251d3f446abc385974ad632814b5cf2a2091453430ce6c4a013895af1d414f73",
+        "bytes": 4053
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/24-status-child-binding/report.json",
+        "sha256": "c24e83167a54bada724296d2dea88e94625d83a6b6da1627532d865fca3b08bf",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/24-status-child-binding/raw.log",
+        "sha256": "9d41e87fe69d587a996f709f2be969a6a364614f9ed9792743eeb88bab16fde9",
+        "bytes": 1633
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary status for another child refuses with all other bindings valid",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:120:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "status\\ for\\ another\\ child\\ refuses\\ with\\ all\\ other\\ bindings\\ valid": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "status-policy-binding",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-25-status-policy-binding.json",
+        "sha256": "3662c15fa4bfe5b9649a48d476bb21c42f4d5e127cd49db3798d088f6eee32bd",
+        "bytes": 2006
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/25-status-policy-binding/command.json",
+        "sha256": "dcc4d5682758fd7dbf44e2b32ed63c0980728824034f9706b83fda345f5d66cd",
+        "bytes": 4017
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/25-status-policy-binding/report.json",
+        "sha256": "db4e0d8c15be54d7c97bcf69562916146c4b804c9d67348c1f3149fa3aa2decb",
+        "bytes": 9120
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/25-status-policy-binding/raw.log",
+        "sha256": "7267d04bdabf89bb20a0d59a55b949ca30313b3abebe487bbfbfcf4d8449571b",
+        "bytes": 1618
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary status for another valid policy digest refuses",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:124:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "status\\ for\\ another\\ valid\\ policy\\ digest\\ refuses": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "status-invocation-binding",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-26-status-invocation-binding.json",
+        "sha256": "5a6e29d5f3b5a392a4efd19364036e4eb4b8d3d5e246b62fa03bb2a510b52ca7",
+        "bytes": 2217
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/26-status-invocation-binding/command.json",
+        "sha256": "9d1321405c07ada07bcf41f8b7a8ff5eabe4307c501838f280724beabc3553ca",
+        "bytes": 4920
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/26-status-invocation-binding/report.json",
+        "sha256": "241855ffc91acca135805db11cfc3effd500ead2ec56a13793421b72caf11c20",
+        "bytes": 10269
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/26-status-invocation-binding/raw.log",
+        "sha256": "68403f31567e9529f85682db094db9ff57b41e97b7ea2d53a5929a9b7b447db3",
+        "bytes": 2697
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary status for another invocation nonce refuses",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:128:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary replaying a previous otherwise matching status refuses on the new nonce",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:134:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "status\\ for\\ another\\ invocation\\ nonce\\ refuses": true,
+        "replaying\\ a\\ previous\\ otherwise\\ matching\\ status\\ refuses\\ on\\ the\\ new\\ nonce": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "status-exit-binding",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-27-status-exit-binding.json",
+        "sha256": "bca034ba9c800a7f187b0185a5611588a56575ed32c36f2082259665835b401c",
+        "bytes": 2064
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/27-status-exit-binding/command.json",
+        "sha256": "bb4cf558d6aadb970d30fb8f948dc2b158e6b02f38eda6b64224ca144c7bdf60",
+        "bytes": 4062
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/27-status-exit-binding/report.json",
+        "sha256": "4cbcece6a1fed459b43aecb7197aab0e7a7fa15a33f443885ee972e461a2d6ed",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/27-status-exit-binding/raw.log",
+        "sha256": "6e9b79336b0444970afa59181741890bc22074a6de126e72a45eceae57885fd5",
+        "bytes": 1638
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary a different valid launcher exit cannot authenticate status exit zero",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:146:5\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "a\\ different\\ valid\\ launcher\\ exit\\ cannot\\ authenticate\\ status\\ exit\\ zero": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "run-exception-refusal",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-28-run-exception-refusal.json",
+        "sha256": "b48d4693fbf9087bbe932148b80062bdf2297be6eaf79abdee472591968fc56d",
+        "bytes": 2082
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/28-run-exception-refusal/command.json",
+        "sha256": "2188b28603e7b4da547fa7428b8f2d7dec1912c6d1c0df3c265009a15a44ce24",
+        "bytes": 4062
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/28-run-exception-refusal/report.json",
+        "sha256": "efc36040176709cf2296e7166030b0d721b7b9ccebffa02d7ecd8afc1077543b",
+        "bytes": 9122
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/28-run-exception-refusal/raw.log",
+        "sha256": "437b275ed4c6a8f80629c55ead5a31c0f4b73eea6afa00a60de0eaec42fba886",
+        "bytes": 1635
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary run exceptions clean partial fake resources without leaking errors",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:154:39\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "run\\ exceptions\\ clean\\ partial\\ fake\\ resources\\ without\\ leaking\\ errors": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "cleanup-call-required",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-29-cleanup-call-required.json",
+        "sha256": "5dfc677beb8c0e41286158793bbcca9bb24eeda6b4197acf92e882935bc114a5",
+        "bytes": 2273
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/29-cleanup-call-required/command.json",
+        "sha256": "f537070740fb6cd7635cd01c0f8b4152832bfad5f7224f98a02d6e0e73bcbe01",
+        "bytes": 4866
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/29-cleanup-call-required/report.json",
+        "sha256": "8cc6d345b326ea182dc87bcaff09e2bb0fdcfac70d3759a6a3527e6650b9d95e",
+        "bytes": 8894
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/29-cleanup-call-required/raw.log",
+        "sha256": "5bc57eed30c10672d2410aea56b90ce71dd2ebefeb4a7e97eb99e58320e7adb3",
+        "bytes": 2229
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary valid status completes only a synthetic simulation after cleanup",
+          "failureMessages": [
+            "AssertionError: expected [ 'run' ] to deeply equal [ 'run', 'cleanup' ]\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:75:66\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        },
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary run exceptions clean partial fake resources without leaking errors",
+          "failureMessages": [
+            "AssertionError: expected [ 'run' ] to deeply equal [ 'run', 'cleanup' ]\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:155:22\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup": true,
+        "run\\ exceptions\\ clean\\ partial\\ fake\\ resources\\ without\\ leaking\\ errors": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "cleanup-failure-propagated",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-30-cleanup-failure-propagated.json",
+        "sha256": "f6eda7b25d4d04b311c1137a5510d308e0fa4464f1926b7d7c2a517a97a5dc72",
+        "bytes": 2101
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/30-cleanup-failure-propagated/command.json",
+        "sha256": "e5e94d2cb88ca41a4f6e5f8f181a921a97f05e4ee39bbd0c3ae310bdd692744b",
+        "bytes": 4097
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/30-cleanup-failure-propagated/report.json",
+        "sha256": "bb0bf049d6859c2c7e9d402e82dc8ca8580c42785f0177eb64a88b5011d1c882",
+        "bytes": 9121
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/30-cleanup-failure-propagated/raw.log",
+        "sha256": "068e856597d33fe8df9759ad85feb75ace701752ae903782e92f874df98c464e",
+        "bytes": 1650
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary cleanup failure overrides both valid and invalid status without tree proof",
+          "failureMessages": [
+            "AssertionError: expected { kind: 'simulation-complete', …(7) } to match object { kind: 'refused', …(2) }\n(5 matching properties omitted from actual)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1283:10)\n    at Proxy.<anonymous> (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/chai/index.js:1700:25)\n    at refused (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:33:38)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:161:7\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "cleanup\\ failure\\ overrides\\ both\\ valid\\ and\\ invalid\\ status\\ without\\ tree\\ proof": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "never-confined",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-31-never-confined.json",
+        "sha256": "5ba7063fd45f0c73e3c945ae4f1c72bb66e97ecf95a10b96b5e518af915eda63",
+        "bytes": 2032
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/31-never-confined/command.json",
+        "sha256": "6123ea934e225a96596499a0ab05654a577c0ad11e9991616af4fc59b2aa102e",
+        "bytes": 3992
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/31-never-confined/report.json",
+        "sha256": "133e5d2a231885615209188f5ce724a3fffd781abf4cae5696e248ce8bd0c890",
+        "bytes": 8721
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/31-never-confined/raw.log",
+        "sha256": "88e36f8048cfa30c57e771484920f54ee91f2471a3c45825ad6cd882269bfcc4",
+        "bytes": 1456
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary valid status completes only a synthetic simulation after cleanup",
+          "failureMessages": [
+            "AssertionError: expected true to be false // Object.is equality\n    at noEvidence (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:28:27)\n    at exercise (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:36:68)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:73:35\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "never-tree-proven",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-32-never-tree-proven.json",
+        "sha256": "72de21d403b5119de82049f31e0061bd7ac3305f74420457c6f174e4f6275109",
+        "bytes": 2043
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/32-never-tree-proven/command.json",
+        "sha256": "6041f2776ff467c83199986dccfde8a27ce7ffffeea211cad6c7ed709aee8ee3",
+        "bytes": 4000
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/32-never-tree-proven/report.json",
+        "sha256": "61c56bae6daab15ce749bb5bbb9713ef28dfb58bbc5236d9381e2d0daf78fae2",
+        "bytes": 8720
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/32-never-tree-proven/raw.log",
+        "sha256": "215bdbbb5fe6aa0c87318d42e80d4e9bd8de6d61dc058240326d605f3e45455a",
+        "bytes": 1502
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary valid status completes only a synthetic simulation after cleanup",
+          "failureMessages": [
+            "AssertionError: expected true to be false // Object.is equality\n    at noEvidence (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:28:70)\n    at exercise (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:36:68)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:73:35\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "never-native-exit",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-33-never-native-exit.json",
+        "sha256": "a8a265f7cfbb5359b2a49308c41bdf9dd5d7ee5e99c01ecb8cd4f4c2c88fe5c3",
+        "bytes": 2050
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/33-never-native-exit/command.json",
+        "sha256": "79a5e661bb4f74328d42c555433791bf8af1fe1693d9d617993337a17708f196",
+        "bytes": 3975
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/33-never-native-exit/report.json",
+        "sha256": "b92314a5207843c3ff147b9a56d79f64fbc21e10c77fa7b579c6eba26b199501",
+        "bytes": 8696
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/33-never-native-exit/raw.log",
+        "sha256": "9c2ade6555c694f4e7d01e3e79c5ef62248aed38ec5ac408d1e3c6740b1814d3",
+        "bytes": 1509
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary valid status completes only a synthetic simulation after cleanup",
+          "failureMessages": [
+            "AssertionError: expected +0 to be null\n    at noEvidence (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:28:107)\n    at exercise (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:36:68)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:73:35\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    },
+    {
+      "id": "always-unmeasured",
+      "record": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutation-34-always-unmeasured.json",
+        "sha256": "e586afd231d01add9ca1b4b8e69e86a2bd2da2e1752eae454752f8aed707e908",
+        "bytes": 2060
+      },
+      "execution": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/34-always-unmeasured/command.json",
+        "sha256": "b7e8f66c2796812182777b87900535c0eebfb3f517e476e1d62941699f20b7ea",
+        "bytes": 4016
+      },
+      "nativeReport": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/34-always-unmeasured/report.json",
+        "sha256": "373e636bdbaf953b7b033fd30434db864e6652311e0258ae8bad1b9b236c735c",
+        "bytes": 8736
+      },
+      "rawLog": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-14/isolated-mutations/760bf885a4f601a1786912dbc687dc245d123d0f/reviewed-34-v1/mutations/34-always-unmeasured/raw.log",
+        "sha256": "1a4dca9f9da4a3a127cef090a29fbd0514d8e276761e5611ffe35cf1cde7a315",
+        "bytes": 1485
+      },
+      "failedAssertions": [
+        {
+          "file": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts",
+          "fullName": "P2-14 cut-first Windows prototype boundary valid status completes only a synthetic simulation after cleanup",
+          "failureMessages": [
+            "AssertionError: expected 'measured' to be 'not-measured' // Object.is equality\n    at noEvidence (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:29:30)\n    at exercise (/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:36:68)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/tests/containment/windowsRunnerPrototype.test.ts:73:35\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-14-mutations-760bf/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "requiredFailureMatches": {
+        "valid\\ status\\ completes\\ only\\ a\\ synthetic\\ simulation\\ after\\ cleanup": true
+      },
+      "restoredSha256": "180ade0c15f09932399595c71df9ce2c555f94318bd859020b6c14b06855f1ef"
+    }
+  ],
+  "limits": [
+    "One guard-family mutation does not prove each sibling primitive min/max/enum independently. Current request cases target empty argv, NUL argument, empty cwd, digest and unknown field; individual untested standard-library bounds are not claimed separately.",
+    "The status cap mutant weakens the two overlapping caps together; neither independent cap or intrinsic copying is falsely counted killed.",
+    "UTF8 and numeric shape cases have independent later parse/equality defenses. Their stated result/diagnostic promotions do not claim unauthorized effects or removal-only bypasses.",
+    "Method snapshots, status-buffer copying and every typed-array intrinsic are reviewed structure, not independently killed subpredicates. Do not expand the measured kill claim beyond each stated counterexample."
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "schema": "p125-current-ownership-dependency-review/1",
+  "at": "2026-10-16T18:35:05.407749+00:00",
+  "localDate": "2026-10-17",
+  "state": "READ_ONLY_REFRESH_FOR_ROOT_ALLOCATION_DECISION",
+  "allReadsFinished": true,
+  "blockers": [],
+  "formalDone": false,
+  "allocationMade": false,
+  "source": {
+    "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "head": "4f53ff7e5fa4363ccadad1995c679888b222173e",
+    "branch": "codex/p1-25-timestamp-qualification",
+    "clean": true,
+    "indexEmpty": true,
+    "P107BranchPreservedAtSameHead": true
+  },
+  "plan": {
+    "currentPlan": {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    "rule": "earliest open gate,priority,due date,dependency depth; missing decisions block dependents",
+    "order": [
+      "P1-25",
+      "P1-11"
+    ],
+    "P125": {
+      "priority": "High",
+      "due": "2026-12-11",
+      "wholeIssueBlockedBy": [
+        "P1-01"
+      ],
+      "blocks": [
+        "P1-26"
+      ]
+    },
+    "P111": {
+      "priority": "High",
+      "due": "2027-01-08",
+      "blockedBy": [
+        "P0-08",
+        "P0-17",
+        "P1-09"
+      ]
+    },
+    "boundaries": "Root closed only P107 bounded checkpoint. P101/P135/P107 whole acceptance and other user holds are not resolved by this lane."
+  },
+  "prospectiveExactScope": {
+    "test": "tests/time/verifyTimestamp.test.ts",
+    "testOnlyFixtureDirectory": "tests/fixtures/rfc3161/",
+    "metadata": "qualification/2026-10-17-P1-25/",
+    "notAllocatedByThisReport": true,
+    "optionalGeneratorExcluded": "scripts/fixtures/gen-rfc3161.mjs",
+    "historical16MetadataScopeRetainedButNotSelected": "qualification/2026-10-16-P1-25/",
+    "productionExistingTestsPackageLockGuardsAndVariantsReadOnly": true
+  },
+  "ownership": {
+    "registeredRoots": 170,
+    "retainedFreshRoots": 7,
+    "physicalRoots": 177,
+    "membershipAdded": [
+      "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout"
+    ],
+    "membershipRemoved": [],
+    "activePathAbsentChecks": 531,
+    "all5CheckedTargetsAbsentAcross177": true,
+    "targetStatusesEmpty177": true,
+    "selectedSourceStatusesEmpty177": true,
+    "all10RegistryRetainedHistoriesEmpty": true,
+    "nearbyTestsUnderTestsTimeFound": [],
+    "sourcePresence": 77,
+    "coreVerifierDerTimeEvidenceAndDependencyReviewVariants": 1,
+    "clientVariants": 2,
+    "checkpointVariants": 3,
+    "trustedTimeDocVariants": 2,
+    "oldSourcePinsComparedAndUnchanged": 532,
+    "newQ107SourcePins": 7,
+    "disjointNewPathEvidenceIsNotSourceOwnerRelease": true
+  },
+  "reservation": {
+    "lastKnownBinding": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "livePathCurrentlyMissing": true,
+    "freshCurrentEqualityClaimed": false,
+    "initialFileNotFoundPreserved": {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/preparation-stop.json",
+      "bytes": 605,
+      "sha256": "f19ac201cacb0ac9871de4efe804881be959cc15d0dd96bd8103a2f26c962c9e"
+    },
+    "recovery": {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/ownership-admission/reservation-metadata-recovery.json",
+      "bytes": 3118,
+      "sha256": "ba4eec1218344092ce7ea9c370f7e394871ed7bb38b149e6013d7f36ba7ac5e5"
+    },
+    "recoveryResult": "Relevant exact Claude session metadata contained839 reservation matches and only the old missing path; no replacement file found in relevant scratch/session trees. Historical instructions were not executed.",
+    "priorRelevantOwnership": "Last-known1183-1194 releases only TSA/Rekor carriers with configured fallback gates/timer handling, preserves no-effect caveat and excludes ledger/index/Studio. No prior exact prospective test/fixture/metadata reservation was found.",
+    "currentLimitation": "Current reservation deltas cannot be checked without a live replacement. Retain the last-known binding and all holds; disappearance does not release ownership or create an invented human approval requirement. Root owns allocation decision."
+  },
+  "preservation": {
+    "allAvailable47PriorInputPinsExact": true,
+    "priorInputsMissingCurrent": 1,
+    "heldRPinsExact": 26,
+    "heldRExact18StatusRowsHeadAndEmptyIndex": true,
+    "heldArchiveExact": true,
+    "ClaudeFinitePinsExact": 10,
+    "ClaudeCheckpointAndTrustedTimeDiffsExact": true,
+    "sourceVariantsNotTransplanted": true
+  },
+  "dependencyFit": {
+    "entryPoint": "verifyTimestampToken({token:Buffer,expectedDigestHex,nonceHex?,anchors}) returns real AttestedTime success or fixed error code",
+    "runtimeImports": [
+      "node:crypto createHash/verify/X509Certificate",
+      "src/time/der.ts",
+      "src/time/timeEvidence.ts uses existing zod"
+    ],
+    "typeOnlyImports": [
+      "TrustContext",
+      "TimestampAuthority"
+    ],
+    "newPackageNeededForTestingExistingBuiltinEntryPoint": false,
+    "packageApprovalCriterion": "Spec requires Sid approval in the PR before a package is added. Current review says no dependency added/decision pending; no package or lockfile change proposed. Existing builtin scope does not close this whole-issue criterion.",
+    "fixturePrerequisite": "No allocated fixture/test exists. Root must independently establish genuine CMS/X509 signed test-only token positives and public digest/nonce/genTime/anchor expectations before negative-code credit. No cryptography/tool feasibility executed here.",
+    "testExecution": "Existing Vitest/Node22,unchanged global guards and30s deadline; physical checkout identity from import.meta. Root alone owns materialization and runtime.",
+    "coreSafety": "64KiB token cap; real CMS signature/ESS/imprint/nonce/pinned path/EKU/genTime validity checks; revocation remainsfalse. Missing/noncritical EKU and validity negatives need valid signed earlier witnesses, not arbitrary corrupted bytes."
+  },
+  "remainingScope": [
+    "P101 publication gaps and package-review approval criterion",
+    "client real literal-loopback request/nonce/content/fallback/required-time behavior",
+    "checkpoint pending-to-verified/chaining/window and actual session-seal integration",
+    "certificate and noncertificate issuance/time admission/per-event report seams",
+    "OpenSSL interop and separately admitted persisted reproducibility generator",
+    "fresh-source/controls/full suite/global quality/CI/release/wholeP125"
+  ],
+  "rootOwnedNext": [
+    "Resolve current reservation path/delta evidence if available while retaining last-known ownership; review this finite exact scope. No source allocation is made here.",
+    "Root performs current hosted full-path/WIP audit excluding verified Dependabot from WIP only, D15 and freeze. This report makes no fresh hosted/D15/freeze claim.",
+    "Review real fixture generation privately, then separately authorize test/fixture materialization and actual qualification. Optional generator remains outside scope."
+  ],
+  "heldPreserved": [
+    "all Claude source/docs/recent signing/admission work",
+    "P101/P135/P107 broader gaps",
+    "held private package approval",
+    "provider/config/archive and KnipD15",
+    "P009 precedence and P102/P103diagnostics/cancellation",
+    "F37 user skip and all other held decisions"
+  ],
+  "executionBoundary": "Read-only Git metadata/log/status and finite file/path/hash/stat/session reservation metadata only. No product/parser/compiler/test/native/SQL/network/process probe, source/test/fixture/generator proposal, checkout/index/QA/guard write, hosted query or Claude message. Private B30 packet only."
+}

@@ -3,6 +3,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import YAML from "yaml";
+import { renderClaimLegend } from "../src/claims/eligibility/render.js";
 import {
   generateTransparencyReport,
   renderTransparencyReportMarkdown,
@@ -23,6 +24,7 @@ function createTestWorkspace(opts?: {
   integrityIndex?: number;
   avgLevel?: number;
   secondLayerLevel?: number;
+  amcVersion?: string;
 }): { workspace: string; agentId: string } {
   const workspace = mkdtempSync(join(tmpdir(), "amc-test-"));
   const agentId = "test-agent";
@@ -105,6 +107,7 @@ function createTestWorkspace(opts?: {
       evidenceToCollectNext: [],
       runSealSig: "sig-placeholder",
       reportJsonSha256: "abc123def456abc123def456abc123def456abc123def456abc123def456abcd",
+      ...(opts?.amcVersion ? { methodology: { amcVersion: opts.amcVersion } } : {}),
     };
     writeFileSync(join(agentDir, "runs", "run-001.json"), JSON.stringify(run));
   }
@@ -206,6 +209,31 @@ describe("generateTransparencyReport", () => {
     expect(md).toContain("## 🔐 Trust Evidence");
     expect(md).toContain("Test Agent");
     expect(md).toContain("test-agent");
+    expect(md).toContain(report.claimLabel);
+    expect(md).toContain(renderClaimLegend("markdown"));
+    expect(md.split("\n").find((line) => line.startsWith("Claim: "))).toMatchSnapshot();
+  });
+
+  it.each(["1.1.1", undefined])("preserves legacy version %s in rendered transparency output", (amcVersion) => {
+    const { workspace, agentId } = createTestWorkspace({ amcVersion });
+    tracked(workspace);
+    const report = generateTransparencyReport(agentId, workspace);
+    const md = renderTransparencyReportMarkdown(report);
+    expect(report.claimKind).toBe("self_reported");
+    expect(report.claimLabel).toContain("Claim: Legacy (1.x), self-reported");
+    expect(md).toContain(report.claimLabel);
+    expect(md).toContain(renderClaimLegend("markdown"));
+  });
+
+  it("does not promote an unsealed current transparency run to observed", () => {
+    const { workspace, agentId } = createTestWorkspace({ amcVersion: "1.2.0" });
+    tracked(workspace);
+    const report = generateTransparencyReport(agentId, workspace);
+    expect(report.claimKind).toBe("self_reported");
+    expect(report.statusDimensions.result).toBe("not_evaluated");
+    expect(renderTransparencyReportMarkdown(report)).toContain(report.claimLabel);
+    expect(report.claimLabel).not.toContain("Independently reviewed");
+    expect(renderTransparencyReportMarkdown(report).split("\n").find((line) => line.startsWith("Claim: "))).toMatchSnapshot();
   });
 
   it("renders valid JSON", () => {

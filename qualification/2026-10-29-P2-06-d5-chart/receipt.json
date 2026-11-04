@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-06",
+  "date": "2026-10-29",
+  "commit": "3ef7438a69c7b5041911d606cdb7f2098885781d",
+  "branch": "rtd/w7-d5-chart",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6); kind v0.33.0 (Kubernetes v1.37.0) in a colima VM (Docker linux/arm64)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 35576
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 29819
+    },
+    {
+      "cmd": "npm run typecheck:tests (after 3ef7438a6; the first run at e2d913412 exited 2 on the untyped --only option, fixed there)",
+      "exit": 0,
+      "durationMs": 49893
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 3184
+    },
+    {
+      "cmd": "npm run check:gates",
+      "exit": 0,
+      "durationMs": 380
+    },
+    {
+      "cmd": "npm run check:dead-code",
+      "exit": 0,
+      "durationMs": 3710
+    },
+    {
+      "cmd": "npm run check:duplicates",
+      "exit": 0,
+      "durationMs": 698
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 727
+    },
+    {
+      "cmd": "npm run check:api-ref",
+      "exit": 0,
+      "durationMs": 237
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 468
+    },
+    {
+      "cmd": "npx vitest run <39 test files touching the changed modules: enterpriseData.test.ts deployPackCheck.test.ts deployPackProbe.test.ts deploymentPack.test.ts helmChartKeyProvider.test.ts helmChartMetrics.test.ts helmChartOrigins.test.ts helmChartSecrets.test.ts helmChartVersion.test.ts helmProviderDrift.test.ts k8sManifestsSecrets.test.ts adapterCapabilityReceiptCli.test.ts asyncAssuranceCertificate.test.ts asyncBackupCreate.test.ts asyncBenchmarkExport.test.ts asyncBomPublication.test.ts asyncCanaryOverrides.test.ts asyncConsoleSnapshot.test.ts asyncHandoffPublication.test.ts asyncOutcomeReportPublication.test.ts asyncWorkspaceOversight.test.ts consoleSnapshotAsyncHttp.test.ts freezePublicationCli.test.ts opsPolicyCli.test.ts oversightAsyncHttp.test.ts oversightSqlExclusion.test.ts providerContract.test.ts purposeProviders.test.ts retentionAsyncCli.test.ts rollbackPackCli.test.ts trustCompositionReportCli.test.ts verifyRepairAsyncCli.test.ts workspaceRecordFpCli.test.ts ledgerEncryption.test.ts ledgerEncryptionMigration.test.ts ledgerEncryptionSecurity.test.ts qualificationReceipts.test.ts referenceDeploymentHarness.test.ts releasePrepare.test.ts> --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "python3 d5-mutate.py (15 mutations, see mutations.json)",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "colima ssh -- docker build --target studio -t amc-studio:w7-d5 . (commit 2866b1ec6), kind load, scripts/deploy/kind-image-digest.mjs",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "node scripts/qualify-reference-deployment.mjs --kube-context kind-amc-p206 --release amc-rd --image-a <N> --image-b <N> --out qualification/2026-10-29-P2-06/kind-d5 --targets <placeholder> --ephemeral-secrets --only INS-1,INS-2,BR-1 --keep",
+      "exit": 1,
+      "durationMs": 66070
+    }
+  ],
+  "tests": {
+    "total": 468,
+    "passed": 468,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "helm-renders.txt",
+      "sha256": "0804d7f2513d2d5ae918a0b735bcecf3e8a5ffe18aaea4a1e95b1567b61857c2"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "480e03f62eadafc28fab20b16052c2f243c9b816fbb5483ba612bcd878b05f56"
+    }
+  ],
+  "notes": "The harness exits 1 because --only leaves 19 checks not run, which count as failed; the three selected checks (INS-1, INS-2, BR-1) passed, recorded in qualification/2026-10-29-P2-06/kind-d5/. Image N built at 2866b1ec6; later commits change a test and a JSDoc type only. SoftHSM variant and CR-4 pending (no PKCS#11 wrapper or pkcs11js in the image)."
+}

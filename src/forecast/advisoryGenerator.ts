@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { AdvisoryRecord, ForecastAnomaly, ForecastDrift, ForecastScope } from "./forecastSchema.js";
-import { loadLatestTransformPlan } from "../transformation/transformTasks.js";
+import { loadForecastTransformPlan } from "./forecastTransformPlan.js";
 
 function defaultNextSteps(category: AdvisoryRecord["category"], scope: ForecastScope): string[] {
   const target =
@@ -39,12 +39,7 @@ function defaultNextSteps(category: AdvisoryRecord["category"], scope: ForecastS
 }
 
 function topTransformTaskSteps(workspace: string, scope: ForecastScope): string[] {
-  const plan =
-    scope.type === "AGENT"
-      ? loadLatestTransformPlan(workspace, { type: "AGENT", agentId: scope.id })
-      : scope.type === "NODE"
-        ? loadLatestTransformPlan(workspace, { type: "NODE", nodeId: scope.id })
-        : null;
+  const { plan } = loadForecastTransformPlan(workspace, scope);
   if (!plan) {
     return [];
   }
@@ -63,11 +58,12 @@ function createAdvisory(params: {
   evidenceRefs: AdvisoryRecord["evidenceRefs"];
   whyNow: string[];
   workspace: string;
+  transformSteps?: () => readonly string[];
 }): AdvisoryRecord {
   const advisoryId = `adv_${Date.now()}_${randomUUID().replace(/-/g, "").slice(0, 8)}`;
   const steps = [
     ...defaultNextSteps(params.category, params.scope),
-    ...topTransformTaskSteps(params.workspace, params.scope)
+    ...(params.transformSteps?.() ?? topTransformTaskSteps(params.workspace, params.scope))
   ];
   return {
     advisoryId,
@@ -84,6 +80,7 @@ function createAdvisory(params: {
 
 export function generateAdvisories(params: {
   workspace: string;
+  transformSteps?: () => readonly string[];
   scope: ForecastScope;
   drift: ForecastDrift[];
   anomalies: ForecastAnomaly[];
@@ -101,6 +98,7 @@ export function generateAdvisories(params: {
     advisories.push(
       createAdvisory({
         workspace: params.workspace,
+        transformSteps: params.transformSteps,
         scope: params.scope,
         severity: "CRITICAL",
         category: "INTEGRITY",
@@ -118,6 +116,7 @@ export function generateAdvisories(params: {
     advisories.push(
       createAdvisory({
         workspace: params.workspace,
+        transformSteps: params.transformSteps,
         scope: params.scope,
         severity: drift.severity,
         category: "DRIFT",
@@ -132,6 +131,7 @@ export function generateAdvisories(params: {
     advisories.push(
       createAdvisory({
         workspace: params.workspace,
+        transformSteps: params.transformSteps,
         scope: params.scope,
         severity: anomaly.severity,
         category: "ANOMALY",
@@ -146,6 +146,7 @@ export function generateAdvisories(params: {
     advisories.push(
       createAdvisory({
         workspace: params.workspace,
+        transformSteps: params.transformSteps,
         scope: params.scope,
         severity: "CRITICAL",
         category: "RISK_INDEX",
@@ -158,6 +159,7 @@ export function generateAdvisories(params: {
     advisories.push(
       createAdvisory({
         workspace: params.workspace,
+        transformSteps: params.transformSteps,
         scope: params.scope,
         severity: "WARN",
         category: "RISK_INDEX",
@@ -172,6 +174,7 @@ export function generateAdvisories(params: {
     advisories.push(
       createAdvisory({
         workspace: params.workspace,
+        transformSteps: params.transformSteps,
         scope: params.scope,
         severity: params.valueDrop > 0.15 ? "CRITICAL" : "WARN",
         category: "VALUE_REGRESSION",
@@ -183,4 +186,11 @@ export function generateAdvisories(params: {
   }
 
   return advisories;
+}
+
+export function captureAdvisoryRecommendations(workspace: string, input: ForecastScope) {
+  const scope = { ...input }, steps = topTransformTaskSteps(workspace, scope), expected = JSON.stringify(steps);
+  return { steps, assertCurrent() {
+    if (JSON.stringify(topTransformTaskSteps(workspace, scope)) !== expected) throw new Error("selected forecast recommendation inputs changed while signing");
+  } };
 }

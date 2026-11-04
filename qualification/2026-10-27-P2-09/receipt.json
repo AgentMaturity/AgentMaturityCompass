@@ -1,0 +1,243 @@
+{
+  "schemaVersion": 1,
+  "key": "P2-09",
+  "date": "2026-10-27",
+  "commit": "b14b656e199f03fc7d97371676b8dc452f63ddba",
+  "branch": "rtd/p2-09c-guard-events-cutover",
+  "node": "v22.23.3",
+  "pnpm": "not recorded",
+  "os": "macOS 26.6.2",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:freeze",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/ledgerEncryption.test.ts tests/ledgerEncryptionMigration.test.ts tests/ledgerDowngradeGuard.test.ts tests/backupWalSafety.test.ts tests/keys/providerContract.test.ts tests/actions/receiptStates.test.ts --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <362 related files> --maxWorkers=2",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <49 failing files> (base 7bdb1627a, rebuilt dist)",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <13 files with failures not on base, after fixes>",
+      "exit": 1,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/wormExport.test.ts tests/ledgerEncryption.test.ts tests/ledgerEncryptionSecurity.test.ts tests/retentionSpill.test.ts --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/genCountsSemantics.test.ts tests/freezeGuard.test.ts tests/evidenceCommandReferences.test.ts tests/cliResultCommandRegistry.test.ts tests/guardEventConsolidation.test.ts --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run tests/guardEventCutover.test.ts tests/cliResultCommandRegistry.test.ts --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 0
+    },
+    {
+      "cmd": "npx vitest run <74 files touching evidenceEmitter, guard events, retention, deletionGate> --maxWorkers=2",
+      "exit": 1,
+      "durationMs": 0
+    }
+  ],
+  "tests": null,
+  "artifacts": [
+    {
+      "path": "a-related-files.txt",
+      "sha256": "c7ab10910e583d9a2636bbdc22b0fb803d30c486e915537ff95e4dd5307280d4"
+    },
+    {
+      "path": "receipt-a.json",
+      "sha256": "07c453ae54157510e3b841f183efc838370318348c8a5eefe5fc782b0b1f1129"
+    },
+    {
+      "path": "receipt-b.json",
+      "sha256": "7a180e415d4c62f94f4588507fefa593d5af554dd59ca409766dcf8db6fc66b0"
+    },
+    {
+      "path": "receipt-c.json",
+      "sha256": "6d50b8fe821957928895df8b1cab8422644b1cd188d8f03567bc98083d56591d"
+    }
+  ],
+  "notes": "Folder receipt for P2-09 slices a, b and c (2026-10-27), written 2026-10-31 from the three slice receipts kept in this folder (receipt-a.json, receipt-b.json, receipt-c.json); the folder had no receipt.json. Commands copy every slice command and exit in order: rows 1-16 are receipt-a.json (slice a, rtd/p2-09a-ledger-encryption, base 7bdb1627a, committed with 3f84b030c), rows 17-29 receipt-b.json (slice b, rtd/p2-09b-worm-export on d62ed9b48, committed with 23f510e26) and rows 30-42 receipt-c.json (slice c, rtd/p2-09c-guard-events-cutover on ec563cbd7, committed with b14b656e1, the commit named here, which holds all three slices). Non-zero exits: row 12, check:freeze, fails on the base too (P3-14 and P2-30 are not in the base baseline), and P2-09 needs adding to allowedExceptionKeys by the integrator. Row 14 is slice a's first pass over the 362 related files in a-related-files.txt, before two fixes: 4589 tests, 177 failed. Row 15 reruns the 49 failing files on base 7bdb1627a (stashed tree, rebuilt dist): 779 passed, 113 failed. Row 16 reruns the 13 files with failures not on the base, after the fixes: 108 passed, 1 failed (freezePublicationCli 'actual freeze lift CLI…', which also fails on the base). Row 42 runs the 74 files touching evidenceEmitter, guard events, retention and deletionGate: 1728 passed, 3 failed, all 3 also failing on base 7bdb1627a. Other recorded counts: row 13, 6 files, 129 tests, 0 failed; row 28, 23 tests, 0 failed; row 29 ran after rewording the worm-export description, which the result-keyword registry test flagged; row 41, 11 tests, 0 failed. check:dead-code found 0 new findings in each slice; check:duplicates exited 0 reporting 3 transformApi.ts findings that the base reports identically. tests is null: the runs overlap and are not additive, so they are not summed. Mutation checks (each made one named test fail, then restored): 3 in slice a, 2 in slice b and 2 in slice c, named in the slice receipts. Slice c red/green: tests/guardEventCutover.test.ts failed 3/3 on the 09b source and passes 3/3. The security-review follow-ups of slices a (d62ed9b48) and b (ec563cbd7) are described in README.md; their reruns were not recorded as commands. Pending Sid: ADR 018 approval, P2-09 in the freeze baseline's allowedExceptionKeys, and the real S3 Object Lock bucket run (runbook in README.md). pnpm and the command durations were not recorded (durationMs 0 means not recorded)."
+}

@@ -1,0 +1,11 @@
+{
+  "schema": "p124-final-restoration/1",
+  "sourceCommit": "7ee3c45d35d70c3e0be00b65c7b73991529717c0",
+  "R": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "Q": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-hVswTc/checkout",
+  "matchedPins": 40,
+  "bothStatusClean": true,
+  "restoredGreen109": true,
+  "protectedInputsUnchanged": true,
+  "compiledMutantsQualified": false
+}

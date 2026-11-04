@@ -1,0 +1,266 @@
+{
+  "schemaVersion": 1,
+  "reviewedAtUtc": "2026-10-14T22:09:53.340866+00:00",
+  "scope": "Read-only independent review of cold CLI observer correction and two retained actual phases. No observer, product runtime, import, test, build, or source/canonical edit by this reviewer. Only this review pair is written.",
+  "result": "no actionable findings within bounded observer scope",
+  "findings": [],
+  "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+  "initialBoundary": {
+    "actualProcesses": 3,
+    "processExits": [
+      0,
+      0,
+      0
+    ],
+    "classificationsMatched": true,
+    "observerPassed": 0,
+    "observerFailed": 3,
+    "cause": "Invented literal experimental requirement fails each observer; no product failure is inferred.",
+    "preserved": true
+  },
+  "correctedBoundary": {
+    "actualProcesses": 3,
+    "processExits": [
+      0,
+      0,
+      0
+    ],
+    "observerPassed": 3,
+    "observerFailed": 0,
+    "parentRecordedPhaseExit": 0,
+    "parentRecordedPhaseDurationMs": 2966,
+    "timingAttribution": "Individual process durations are read from actual JSON; parent wrapper phase exit/duration are attributed to parent notice, not independently rerun."
+  },
+  "exactDiffVerified": {
+    "onlyDestinationRenamingAndClaimAssertions": true,
+    "argvFixturesIdentical": true,
+    "tierArticleAndFalseEmotionExclusionAssertionsPreserved": true,
+    "timeoutsRuntimeAndMinimalEnvironmentUnchanged": true,
+    "sourceChangeForCorrection": false
+  },
+  "publicContract": {
+    "cliReference": "src/cli.ts:12809-12814 uses unverifiedClaim(compliance:euAiActRiskTier,1,{regulated:true}); JSON adds withClaimFields, text prints printClaimResult.",
+    "adapterReference": "src/claims/eligibility/adapters/results.ts:57-73 supplies SELF_REPORTED tiers and proposed not_evaluated result.",
+    "evaluationReference": "src/claims/eligibility/evaluate.ts:103-143 defaults regulated applicability unresolved, enforcement none, review pending, and derives self_reported without observed tiers/pinned independent review.",
+    "rendererReference": "src/claims/eligibility/render.ts:57-77 renders canonical six-part claim line.",
+    "documentationReference": "docs/CLAIM_KINDS.md:12,24-26,43-44,111 describes kinds/dimensions and canonical pending unresolved example.",
+    "actualCanonicalLineIndependentlyMatched": "Claim: Self-reported \u00b7 Result: not evaluated (no applicability decision is recorded) \u00b7 Evidence: sufficient \u00b7 Enforcement: none \u00b7 Review: pending \u00b7 Applicability: unresolved",
+    "jsonStatusDimensionsIndependentlyMatched": true,
+    "textCanonicalLineMatchedAsWholeLine": true,
+    "experimentalLiteralIsNotTheStructuredReviewState": true
+  },
+  "cases": [
+    {
+      "name": "emotion-json",
+      "identicalArgv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/dist/cli.js",
+        "compliance",
+        "risk-classify",
+        "--emotion-recognition",
+        "--json"
+      ],
+      "initialProcessExit": 0,
+      "initialObserverPass": false,
+      "finalProcessExit": 0,
+      "finalObserverPass": true,
+      "finalDurationMs": 1387,
+      "initialStreams": [
+        {
+          "path": "/private/tmp/p0-24-cold-cli-qualification-20261015/emotion-json/stdout.txt",
+          "sha256": "e91d039a44bf581fb4d4f3a545e50387deb8b46545778632c393a218bdad643d",
+          "bytes": 1631
+        },
+        {
+          "path": "/private/tmp/p0-24-cold-cli-qualification-20261015/emotion-json/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "finalStreams": [
+        {
+          "path": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/emotion-json/stdout.txt",
+          "sha256": "05f56e3775d5a75d70d8304623da8457134c4d1ffb8c716039dd32608a8a3581",
+          "bytes": 1631
+        },
+        {
+          "path": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/emotion-json/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "snapshotIntervalUnchanged": true
+    },
+    {
+      "name": "emotion-text",
+      "identicalArgv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/dist/cli.js",
+        "compliance",
+        "risk-classify",
+        "--emotion-recognition"
+      ],
+      "initialProcessExit": 0,
+      "initialObserverPass": false,
+      "finalProcessExit": 0,
+      "finalObserverPass": true,
+      "finalDurationMs": 739,
+      "initialStreams": [
+        {
+          "path": "/private/tmp/p0-24-cold-cli-qualification-20261015/emotion-text/stdout.txt",
+          "sha256": "8207fc3dfaec056dd6b489dfff31890a4c089f7486eea69fc82d598cd344a3ab",
+          "bytes": 1038
+        },
+        {
+          "path": "/private/tmp/p0-24-cold-cli-qualification-20261015/emotion-text/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "finalStreams": [
+        {
+          "path": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/emotion-text/stdout.txt",
+          "sha256": "8207fc3dfaec056dd6b489dfff31890a4c089f7486eea69fc82d598cd344a3ab",
+          "bytes": 1038
+        },
+        {
+          "path": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/emotion-text/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "snapshotIntervalUnchanged": true
+    },
+    {
+      "name": "false-emotion-chatbot-json",
+      "identicalArgv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/dist/cli.js",
+        "compliance",
+        "risk-classify",
+        "--capabilities",
+        "{\"emotionRecognition\":false,\"chatbot\":true}",
+        "--json"
+      ],
+      "initialProcessExit": 0,
+      "initialObserverPass": false,
+      "finalProcessExit": 0,
+      "finalObserverPass": true,
+      "finalDurationMs": 716,
+      "initialStreams": [
+        {
+          "path": "/private/tmp/p0-24-cold-cli-qualification-20261015/false-emotion-chatbot-json/stdout.txt",
+          "sha256": "ee30f0f25d7f0d5011af82d9d76c2148194d82a0e9a7456f038248eda9dbef3e",
+          "bytes": 1506
+        },
+        {
+          "path": "/private/tmp/p0-24-cold-cli-qualification-20261015/false-emotion-chatbot-json/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "finalStreams": [
+        {
+          "path": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/false-emotion-chatbot-json/stdout.txt",
+          "sha256": "cc7cd8e3d5acb15a6726c04e336dc1e554f70f2de308274d73cd1310dc6f7003",
+          "bytes": 1506
+        },
+        {
+          "path": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015/false-emotion-chatbot-json/stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "bytes": 0
+        }
+      ],
+      "snapshotIntervalUnchanged": true
+    }
+  ],
+  "pins": [
+    {
+      "path": "/private/tmp/p0-24-cold-cli-observer-correction-20261015.json",
+      "sha256": "d8a0b3447a50e84298d6648d4e2cd03e1dfbbf0e2355fbacecae341f0da3f4ff",
+      "bytes": 942
+    },
+    {
+      "path": "/private/tmp/p0-24-cold-cli-qualification-20261015.py",
+      "sha256": "f4af574c65260ea9bfd8c682120a075651662c16308b2c27bbe679a57912e627",
+      "bytes": 3678
+    },
+    {
+      "path": "/private/tmp/p0-24-cold-cli-qualification-20261015.json",
+      "sha256": "17654fa58f9a8cdab357e310dccc2d189cbe31a383bafc98bd8a68aa50e41495",
+      "bytes": 7538
+    },
+    {
+      "path": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015.py",
+      "sha256": "f506ac882a9a43f9e562c9ffda6b864db0f41ba34595ebb49928cdbbfbaf7a59",
+      "bytes": 3990
+    },
+    {
+      "path": "/private/tmp/p0-24-cold-cli-corrected-observer-20261015.json",
+      "sha256": "798c945835afc169fcfb43b02502325920bcc67e3ba5be6162e1e94f9aa590d5",
+      "bytes": 7469
+    }
+  ],
+  "sourceAndCompiledPins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/cli.ts",
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+      "bytes": 1064339
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/compliance/euAiActClassifier.ts",
+      "sha256": "d6c07ba0835c5624fc70d371572da8e6ca3a8c267cf167a0469cf5b5434268a0",
+      "bytes": 24121
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/cli/claimOutput.ts",
+      "sha256": "1abdc50016d1b45d4cfc1b50217e715194133256cb4427823a89793045437686",
+      "bytes": 10568
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/claims/eligibility/adapters/results.ts",
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "bytes": 9797
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+      "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0",
+      "bytes": 5777
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/claims/eligibility/render.ts",
+      "sha256": "274b20ebbef6a2a3746ef88ceea552a2717a94e61b264698e6a4afd48791b1da",
+      "bytes": 7029
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/docs/CLAIM_KINDS.md",
+      "sha256": "af3ba70e70583ba42cfe81b9f7a5275f6a74097c33ed741feda9e8fc5c1e0e52",
+      "bytes": 19131
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/dist/cli.js",
+      "sha256": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f",
+      "bytes": 1054087
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/dist/compliance/euAiActClassifier.js",
+      "sha256": "cdb8bee9870d6acd51dedcbd8d0120b47306a4a285e473fbbdd26b3b3f73ac00",
+      "bytes": 22692
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/dist/cli/claimOutput.js",
+      "sha256": "be1ae5da76422488712f490ea8fc24698f785d4553eb2d871485f5e5abf3f89d",
+      "bytes": 9075
+    }
+  ],
+  "limits": [
+    "These three argv cases establish the actual declared-capability classification and existing label contract only.",
+    "The false-emotion plus chatbot case tests absence of Art.5(1)(f) under emotionRecognition:false; it is not a medical/safety exception or contextual applicability test.",
+    "Current AgentCapabilities models emotionRecognition as a workplace/education declaration; it has no separate medical/safety-exemption or context decision inputs. safetyComponent concerns regulated product risk and is not an emotion-recognition exemption.",
+    "Classifier summaries/remediation contain legal wording; this review observes those strings and does not endorse current law, model applicability, dates, exceptions, expert approval, or legal conclusions.",
+    "Filesystem comparison ends immediately after each process before capturing stdout/stderr; it is not all-lifecycle, symlink, race, or cross-store transactional proof.",
+    "No live model/provider, server/API/auth, real enforcement, full CLI inventory/full AMC suite, coverage, hostedCI, release or Done approval.",
+    "Current quality, freeze and expert holds remain open.",
+    "A/B receipts are not included in this completed CLI review; independent cross-review awaits their separate final paths."
+  ]
+}

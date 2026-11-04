@@ -1,0 +1,8 @@
+{
+  "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "int": "83641bceb68659737d7678daeff3fbb2728e2301",
+  "node": "v22.23.3",
+  "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+  "statusPorcelain": "?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json",
+  "fullSuite": "Required once on final merged source after non-suite checks; earlier runs preserved."
+}

@@ -1,0 +1,554 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-47",
+  "date": "2026-10-14",
+  "commit": "71ed73e5886bc957130f9712985281d1b1149fca",
+  "branch": "codex/p0-47-current-qualification",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 30600
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/apiRouterResponseParity.test.ts tests/archiveFilesParity.test.ts tests/assuranceScenarioContextParity.test.ts tests/auditEvidenceAccountingParity.test.ts tests/controlHttpResponsesParity.test.ts tests/diagnosticResponseScoringParity.test.ts tests/explainabilityContractParity.test.ts tests/liveDriftEvidenceFieldsParity.test.ts tests/liveDriftProofStatsParity.test.ts tests/metricCoverageSummaryParity.test.ts tests/metricParameterContractParity.test.ts tests/metricRowPublicContract.test.ts tests/mobileFetchSdk.test.ts tests/nativeSecondSharingRestoration.test.ts tests/pdfRenderingParity.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts tests/privateStoreLocatorVisibility.test.ts tests/providerDriftDescriptorParity.test.ts tests/providerDriftRowContractsParity.test.ts tests/signedArtifactVerificationParity.test.ts tests/studioRouteRoleContextParity.test.ts tests/studioVaultSigningContextParity.test.ts tests/watchReceiptSharingRestoration.test.ts tests/watchReceiptValidationParity.test.ts tests/workspacePathRedactionParity.test.ts --reporter=json --outputFile=/private/tmp/p0-47-current-parity-20261014.json",
+      "exit": 1,
+      "durationMs": 90491
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/planEditsManifest.test.ts -t 'rejects missing and unrelated base commits' --reporter=json --outputFile=/private/tmp/p0-47-dist-provenance-red-20261014.json",
+      "exit": 1,
+      "durationMs": 1025
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/planEditsManifest.test.ts --reporter=json --outputFile=/private/tmp/p0-47-helper-manifest-green-20261014.json",
+      "exit": 0,
+      "durationMs": 5905
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 558
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 825
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 2364
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 5386
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 38344
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 48825
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/apiRouterResponseParity.test.ts tests/archiveFilesParity.test.ts tests/assuranceScenarioContextParity.test.ts tests/auditEvidenceAccountingParity.test.ts tests/controlHttpResponsesParity.test.ts tests/diagnosticResponseScoringParity.test.ts tests/explainabilityContractParity.test.ts tests/liveDriftEvidenceFieldsParity.test.ts tests/liveDriftProofStatsParity.test.ts tests/metricCoverageSummaryParity.test.ts tests/metricParameterContractParity.test.ts tests/metricRowPublicContract.test.ts tests/mobileFetchSdk.test.ts tests/nativeSecondSharingRestoration.test.ts tests/pdfRenderingParity.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts tests/privateStoreLocatorVisibility.test.ts tests/providerDriftDescriptorParity.test.ts tests/providerDriftRowContractsParity.test.ts tests/signedArtifactVerificationParity.test.ts tests/studioRouteRoleContextParity.test.ts tests/studioVaultSigningContextParity.test.ts tests/watchReceiptSharingRestoration.test.ts tests/watchReceiptValidationParity.test.ts tests/workspacePathRedactionParity.test.ts --reporter=json --outputFile=/private/tmp/p0-47-current-parity-20261014.json",
+      "exit": 0,
+      "durationMs": 90874
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 1867
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2083
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 62687
+    },
+    {
+      "cmd": "npm run check:qualification",
+      "exit": 0,
+      "durationMs": 352
+    },
+    {
+      "cmd": "npm run test:coverage -- --exclude 'tests/performance/**' --coverage.reportOnFailure --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=/private/tmp/p0-47-full-correctness-20261014.json",
+      "exit": 1,
+      "durationMs": 621983
+    },
+    {
+      "cmd": "npm run check:coverage",
+      "exit": 1,
+      "durationMs": 210
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/performance --no-file-parallelism --reporter=json --outputFile=/private/tmp/p0-47-performance-20261014.json",
+      "exit": 0,
+      "durationMs": 12254
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/apiRouters.test.ts tests/questionScoreExplainability.test.ts tests/enterpriseSsoScim.test.ts tests/security/api-security.test.ts tests/studioNativeTaskService.test.ts --reporter=json --outputFile=/private/tmp/p0-47-focused-fixture-repairs-20261014.json",
+      "exit": 0,
+      "durationMs": 21116
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/jsonlWriterResume.test.ts tests/nativeManagedRecovery.test.ts tests/nativeValidationOutcomeSurfaces.test.ts tests/nativeSandboxPolicyBinding.test.ts tests/compliance/dataResidencyPersistence.test.ts --reporter=json --outputFile=/private/tmp/p0-47-additional-fixture-repairs-20261014.json",
+      "exit": 0,
+      "durationMs": 38925
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/apiRouterResponseParity.test.ts tests/archiveFilesParity.test.ts tests/assuranceScenarioContextParity.test.ts tests/auditEvidenceAccountingParity.test.ts tests/controlHttpResponsesParity.test.ts tests/diagnosticResponseScoringParity.test.ts tests/explainabilityContractParity.test.ts tests/liveDriftEvidenceFieldsParity.test.ts tests/liveDriftProofStatsParity.test.ts tests/metricCoverageSummaryParity.test.ts tests/metricParameterContractParity.test.ts tests/metricRowPublicContract.test.ts tests/mobileFetchSdk.test.ts tests/nativeSecondSharingRestoration.test.ts tests/pdfRenderingParity.test.ts tests/planEditsManifest.test.ts tests/privateModuleHelperVisibility.test.ts tests/privateStoreLocatorVisibility.test.ts tests/providerDriftDescriptorParity.test.ts tests/providerDriftRowContractsParity.test.ts tests/signedArtifactVerificationParity.test.ts tests/studioRouteRoleContextParity.test.ts tests/studioVaultSigningContextParity.test.ts tests/watchReceiptSharingRestoration.test.ts tests/watchReceiptValidationParity.test.ts tests/workspacePathRedactionParity.test.ts --reporter=json --outputFile=/private/tmp/p0-47-live-read-integration-mutant-20261014.json",
+      "exit": 1,
+      "durationMs": 96772
+    },
+    {
+      "cmd": "npm run check:freeze",
+      "exit": 0,
+      "durationMs": 2187
+    },
+    {
+      "cmd": "npm run lint",
+      "exit": 0,
+      "durationMs": 4124
+    },
+    {
+      "cmd": "npm run typecheck",
+      "exit": 0,
+      "durationMs": 31325
+    },
+    {
+      "cmd": "npm run typecheck:tests",
+      "exit": 0,
+      "durationMs": 42301
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/compareBadgeDocs.test.ts tests/evidencePathsExist.test.ts tests/llmResponsesCapabilities.test.ts tests/publicDocsArtifact.test.ts tests/publicDocsGraph.test.ts tests/compliance/evidenceBinding.test.ts --reporter=json --outputFile=/private/tmp/p0-47-doc-source-repairs-20261014.json",
+      "exit": 0,
+      "durationMs": 71724
+    },
+    {
+      "cmd": "npm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 336
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 1,
+      "durationMs": 418
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 1,
+      "durationMs": 444
+    },
+    {
+      "cmd": "npm run build",
+      "exit": 0,
+      "durationMs": 31094
+    },
+    {
+      "cmd": "npm run check:counts",
+      "exit": 0,
+      "durationMs": 495
+    },
+    {
+      "cmd": "npm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1741
+    },
+    {
+      "cmd": "npm run check:clean-source",
+      "exit": 0,
+      "durationMs": 51389
+    },
+    {
+      "cmd": "npm run test:coverage -- --exclude 'tests/performance/**' --coverage.reportOnFailure --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=/private/tmp/p0-47-full-correctness-repaired-20261014.json",
+      "exit": 1,
+      "durationMs": 609195
+    },
+    {
+      "cmd": "npm run check:coverage",
+      "exit": 1,
+      "durationMs": 220
+    },
+    {
+      "cmd": "pnpm exec vitest run tests/performance --no-file-parallelism --reporter=json --outputFile=/private/tmp/p0-47-performance-repaired-20261014.json",
+      "exit": 0,
+      "durationMs": 12461
+    }
+  ],
+  "tests": {
+    "total": 23119,
+    "passed": 23119,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "D-15-recorded-decision.md",
+      "sha256": "673fffd2af872dc2da0efbd2fcbe35ebcfa3d785e7b4e339ece56714107619c0"
+    },
+    {
+      "path": "README.md",
+      "sha256": "22cdbc587c5558428db07c603242dcbb24f4debe70869cda77bee5a1f35349f8"
+    },
+    {
+      "path": "acceptance-integrity-review.json",
+      "sha256": "4ddddaddf04bb5070831b5d460bcb29cbfa3b60e8d050737544a73df337bb477"
+    },
+    {
+      "path": "acceptance-integrity-review.md",
+      "sha256": "4984c2699f5778fea4719767b9f398d82fe2f51644037a3dc8eecd23d46ccba0"
+    },
+    {
+      "path": "accepted-main-parity-failures.json",
+      "sha256": "c6a0ea38958f845b68119c881fa393e8c296819489054fbd70364131987827ff"
+    },
+    {
+      "path": "additional-fixture-repairs.log",
+      "sha256": "0bd483ea518ae168d8f4b8a639f015143ae87c55bfac54609fcda9e010a4c88a"
+    },
+    {
+      "path": "additional-fixture-reuse.json",
+      "sha256": "ff76ce1ba9b6a27f4c4f0fb94ca17ca875d2c6c13480d6284cdb2ff7f301b35d"
+    },
+    {
+      "path": "additional-fixture-reuse.md",
+      "sha256": "6d048485dfa9896bef156c72b4cd8db417ad82429fa94a9ba1f24e2e2608a7ae"
+    },
+    {
+      "path": "applied-doc-source-repairs-review.json",
+      "sha256": "41b2e92203c87df2d232270ce4e96e1a07ab2e2ff1e9ef3a80b39f944b587b0b"
+    },
+    {
+      "path": "applied-doc-source-repairs-review.md",
+      "sha256": "5ca0c8b0194c4f7f20bce6a3a691889eea143d3939b07d3cd90aa1853dc8f081"
+    },
+    {
+      "path": "applied-doc-source-repairs.json",
+      "sha256": "d0b1328fee2991f430c3d87d5776c119d7bbd1f0eeeae05164ebd050496d6baf"
+    },
+    {
+      "path": "architecture.log",
+      "sha256": "1ddf0c2656c0342d67ff0a5dc2839c4ccdce1bb4bc254f42a473b9803679f374"
+    },
+    {
+      "path": "bounded-reuse-provenance.json",
+      "sha256": "49eb032ae9d264a8ce6967d0ea35da82905a7accd617b7343cca46586fed0eb9"
+    },
+    {
+      "path": "build.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a"
+    },
+    {
+      "path": "commands.jsonl",
+      "sha256": "392bd53f5edaa242fd63675587e131109c60ce0b9180b3dd1952e1cdd35ab25b"
+    },
+    {
+      "path": "counts.log",
+      "sha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630"
+    },
+    {
+      "path": "coverage-denominator-audit.json",
+      "sha256": "74c5ac82f7bf8b746ce5fa227f0e684dc90509397697dfa726f69f78a1db0bc7"
+    },
+    {
+      "path": "coverage-denominator-audit.md",
+      "sha256": "fce843190c67c01cdc4da4c42f1ab7f76d875a18ea1834e29a9fe95125450d0f"
+    },
+    {
+      "path": "coverage-summary-71ed.json",
+      "sha256": "830b8755874ac72e2839a41d2135d813211c86f5669f53f6e98e4a5a2ae417f6"
+    },
+    {
+      "path": "coverage-summary-7a81.json",
+      "sha256": "2fafa6a93c31413bcb10ce51cfffa84fa136a554dc4e112a03cba5e3319a7b28"
+    },
+    {
+      "path": "dist-provenance-red.json",
+      "sha256": "d6ad35eea4bbb577d64a1286edaaf54648d1ef8b01677cd2196933516878f195"
+    },
+    {
+      "path": "dist-provenance-red.log",
+      "sha256": "fe4de6b947e93495b8c694faefe5a1984203b139a73e9b710a6069c87f058e2f"
+    },
+    {
+      "path": "doc-inventory-failure-diagnosis.json",
+      "sha256": "5553e46c5deec2c6a3e9bd1448d1baca2fc5dfbace0416f8c004e713629e76a0"
+    },
+    {
+      "path": "doc-inventory-failure-diagnosis.md",
+      "sha256": "2fada30fe97c28544c827053d1468f6a0d16c2bb5ee15d9b980077058a5382f7"
+    },
+    {
+      "path": "doc-source-repairs.log",
+      "sha256": "d6ffdf22881f0079a8e0464efb3b15a2e4370ffcbf450b9125903bb7cf8f5c95"
+    },
+    {
+      "path": "docs.log",
+      "sha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0"
+    },
+    {
+      "path": "fixture-repairs-review.json",
+      "sha256": "b00734bfe87ad935ec498931efdb0ecb4cc2a3014afd3918a49adde68380fafb"
+    },
+    {
+      "path": "fixture-repairs-review.md",
+      "sha256": "95fd6130a434ed6ecf96939b03f21a9c94903aaadc210e18a73375de1cc0dd9b"
+    },
+    {
+      "path": "focused-fixture-repairs.log",
+      "sha256": "5c68516ad9d168cacc95fb02b07e6db0125ff343779e7c27f46e4d6383b3dbaf"
+    },
+    {
+      "path": "focused-repairs-summary.json",
+      "sha256": "69deb83e2145e06d5fcdc0bb68a79c99d51e6705b4f671ff2f1f6b74e0c5f5ec"
+    },
+    {
+      "path": "four-historical-probes.json",
+      "sha256": "1b6da243077efa2ec60f237e040f402c2181c8456c928ea642ee7d096cd42a63"
+    },
+    {
+      "path": "four-historical-probes.md",
+      "sha256": "71bd46bcfd9991bbc5ed0d9d202064f6779d44b970d29f7068bf3996d5d7cc17"
+    },
+    {
+      "path": "freeze-repaired.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811"
+    },
+    {
+      "path": "freeze.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811"
+    },
+    {
+      "path": "full-correctness-7a81-summary.json",
+      "sha256": "0f0af8bf3bb5ce2163e6a0684b5fab43846f391e1ff9baede8288f0e141dcb0f"
+    },
+    {
+      "path": "full-correctness-repaired-summary.json",
+      "sha256": "655c39f0c7b7ff10495d517e597f684df1ed59c9738f5f7bc9b9353a5e2eddb3"
+    },
+    {
+      "path": "fullrun-failure-preflight.json",
+      "sha256": "65bdb7ccceb0de9e23a65bcd52ce99c8e979707d719a94087ceaa4d851c28d1b"
+    },
+    {
+      "path": "fullrun-failure-preflight.md",
+      "sha256": "f3b3d2c80ab42dd5bd550afcb042338ad029e5b8146ec46c40cf4e843d8781af"
+    },
+    {
+      "path": "graph-limit.json",
+      "sha256": "2c1e4e5ed8c23d894323906cfc24e6ee74ed614de130db9fa3f46eb8fb2a475f"
+    },
+    {
+      "path": "graph-navigation.log",
+      "sha256": "6873167f38328f4027255ce4e8c27fb52d86ea0f4b627ec08365c4afcfc62f71"
+    },
+    {
+      "path": "helper-manifest-green.json",
+      "sha256": "e9931c8aa3ff14006df27f292c9ca8ee1c0dc768b231e01c9e692e4d68fa6cb9"
+    },
+    {
+      "path": "helper-manifest-green.log",
+      "sha256": "da5a1c72e8489ceea03e1d80edc08389dc4749ea7c8e7b1cec6875d553941c07"
+    },
+    {
+      "path": "helper-mutants-restored.json",
+      "sha256": "390d201dc566a728402e714d2afd72492973080aeac26ccb1937f98cc4fd8f77"
+    },
+    {
+      "path": "helper-mutants-restored.log",
+      "sha256": "d6d12bd6e5a15c0ab37da012ecc83a7503953ec2054535c804cf901e86f97154"
+    },
+    {
+      "path": "helper-mutation-summary.json",
+      "sha256": "42db4932c4ce0e1f8c0ecf84128127c014c2d2f46c8663d746e4f57c9e1634d5"
+    },
+    {
+      "path": "lint.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898"
+    },
+    {
+      "path": "live-read-helper-mutant.json",
+      "sha256": "72dc371400e62df483e5acc2348b53b12e6d811c2b6c224dda178aed361cd5f1"
+    },
+    {
+      "path": "live-read-helper-mutant.log",
+      "sha256": "b3881c3ab1882faea86f06567017478525723cc2b07a108930ff2e3857434faa"
+    },
+    {
+      "path": "live-read-integration-mutation-summary.json",
+      "sha256": "97f64c719c5faa4e800d11c6f7fad431ad369be2223d20e8a8d105c6d1b9607e"
+    },
+    {
+      "path": "merged-pr-38-acceptance.json",
+      "sha256": "c7af4b05fb2fdd119052cfe031c9ae280bc100024776f6a6deabfb77efe931f7"
+    },
+    {
+      "path": "native-fixture-diagnosis.json",
+      "sha256": "a7b1a678b15ebe816031fd40a638c6139128d647e7cf475c437a7d15a9061b25"
+    },
+    {
+      "path": "native-fixture-diagnosis.md",
+      "sha256": "97706ddac5a3b5c26995aca82e77ad7f890177173bfa17cb21c27f19cbcfb4f9"
+    },
+    {
+      "path": "node24-final-component.json",
+      "sha256": "eedae31d76aed90a34cc89e266294ce10025a9bc8a1894e32ad0b28cb11eb7e5"
+    },
+    {
+      "path": "node24-final-component.md",
+      "sha256": "4eaaa4d6e0199478fec52d9823bd46f5104be122341fe77c8d16a4bfec0a0c01"
+    },
+    {
+      "path": "node24-prerequisites.json",
+      "sha256": "f7f4cc1255329f9c0b9b3c24182886680eb2d15cb416d701c02e1ac5e8d397fb"
+    },
+    {
+      "path": "node24-repaired-results.json",
+      "sha256": "b4cf553d944abe4b4b918e2a38c6325f5a504b19c68714576afb35f000c35f85"
+    },
+    {
+      "path": "node24-repaired-results.md",
+      "sha256": "7c46fb0ebcc4d2be8fa1128ea36ace5d1e8fd0899442d8c3eb34e95cd5b7f199"
+    },
+    {
+      "path": "node24-results.json",
+      "sha256": "708d3f6e493209100cb307724259304761a43f966afeec953268617131cea706"
+    },
+    {
+      "path": "omitted-sha-helper-mutant.json",
+      "sha256": "4e7e17894a888ca701dc5f41b80d5e70e4f11ff955a560113652117d7442bbe1"
+    },
+    {
+      "path": "omitted-sha-helper-mutant.log",
+      "sha256": "3a36044f816a9585824779778f3cc7f52dd907f417c29b590fe5e8be14c1e5b1"
+    },
+    {
+      "path": "parity-baseline-diagnosis.json",
+      "sha256": "044001856c522d064c4a9543bd97395e99942d22c2e59bbba7ecf40a1afad4e6"
+    },
+    {
+      "path": "parity-baseline-diagnosis.md",
+      "sha256": "ab15367b675636b087539feccd7fe02d32a50271c358da7ffc6de42f09dc0aeb"
+    },
+    {
+      "path": "parity-repaired-summary.json",
+      "sha256": "2a1b9748b31a9307401c25efd01ff1344443ebd4808659b1f62860a6fa5a2a2e"
+    },
+    {
+      "path": "parity-repaired.log",
+      "sha256": "1382776039220749603a04f312b78cca33f988cbd8d293d92760839e3e61c73b"
+    },
+    {
+      "path": "per-file-diagnostic-7a81.json",
+      "sha256": "9a1c5648e66d8a1927d06d529ea0f1e06ba045ee729c0d65846c795ef6b97686"
+    },
+    {
+      "path": "per-file-diagnostic.log",
+      "sha256": "ae13d10864322706cf6e396c15fd56e69212a08910d6608e90fe3b09ed807561"
+    },
+    {
+      "path": "per-file-repaired.json",
+      "sha256": "b9231c4a1c926b8adc5bce6ebaa0a8fe5ab0b5204ae95e43c9dc739557dfdc94"
+    },
+    {
+      "path": "per-file-repaired.log",
+      "sha256": "c7f993df6b8d9e2d1a1f9550cc89e1603afd50b2c4e8407c1e17d15a742d0d3d"
+    },
+    {
+      "path": "performance-repaired-summary.json",
+      "sha256": "182222e4a621c63419254579cb03c8c8af3baad43979aa4e7ce0cde12cbd9223"
+    },
+    {
+      "path": "performance-repaired.log",
+      "sha256": "5cc146a146172dc3fef4d187a45010dc80048757748a5f71a337efcdd47d33eb"
+    },
+    {
+      "path": "performance.log",
+      "sha256": "b5693d862f6b4fab5ed5ed9cc8ecaace6c384cc8d4ba653ad0636ca09f7f2173"
+    },
+    {
+      "path": "preservation-boundaries-final.json",
+      "sha256": "a4ac513dcf9a7c733af6bff0b14bb2c5c28db54a7b7b00550abdc84e0d0aae6c"
+    },
+    {
+      "path": "readonly-preflight.json",
+      "sha256": "93941bbde2b274098767f380eff5ef13a0f9eb027ef78da6de4e8d1090f749ba"
+    },
+    {
+      "path": "readonly-preflight.md",
+      "sha256": "cd9fa009ff7ac7556c635698279af8f875996916374e37d5231104accd437b09"
+    },
+    {
+      "path": "repairs-architecture-after-build.log",
+      "sha256": "67b191effb3c4ce306bc0da9fbda45391552d13454cca141136ab9828a923068"
+    },
+    {
+      "path": "repairs-architecture.log",
+      "sha256": "63c0d7881fa832e3bad7f63dc9c952c831f2516a3d7730b7d70232fdf435b979"
+    },
+    {
+      "path": "repairs-build.log",
+      "sha256": "516ccd433616698b973476f1c77413724a1e6563c4cf02160260917164fc2c2a"
+    },
+    {
+      "path": "repairs-clean-source.log",
+      "sha256": "33b1ee87df8ba91a20f8d66fb702949a6215a6efacad2476f7077cd7dfb4ebf1"
+    },
+    {
+      "path": "repairs-counts-after-build.log",
+      "sha256": "a2ae3cae17c8353cf503e5a8c33c8def635220fcc2892e5514a8824f74454630"
+    },
+    {
+      "path": "repairs-counts.log",
+      "sha256": "463457563db1970a58371992df001370a34566f3a66b8731582f02181af4b0cd"
+    },
+    {
+      "path": "repairs-docs.log",
+      "sha256": "496e5a178832976fb79379985f745b649d87a7783285b90590a936e8202207c0"
+    },
+    {
+      "path": "repairs-freeze.log",
+      "sha256": "26127faafb4df55e7ae5d92af2cdc72f2537f6b58a4dd716d96e427f0c20b811"
+    },
+    {
+      "path": "repairs-lint.log",
+      "sha256": "040222d6959186f49b79c0b39e44d5ce4480cf11f1903c61fbd334c027ddf898"
+    },
+    {
+      "path": "repairs-typecheck-tests.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    },
+    {
+      "path": "repairs-typecheck.log",
+      "sha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d"
+    },
+    {
+      "path": "typecheck-tests-repaired.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    },
+    {
+      "path": "typecheck-tests.log",
+      "sha256": "366916d5096c94755a6df4da14b7567f0602cd91b70cfb77482368bc4293568b"
+    },
+    {
+      "path": "typecheck.log",
+      "sha256": "fcc68f772403ea039a2942eeaeec6ec00419f4c723add862d0afa87e27c23f6d"
+    }
+  ],
+  "notes": "BLOCKED on global and per-file coverage. At source 71ed73e5, full correctness JSON success is true: 23,119 tests passed, zero failed suites, failures, pending or todos. The command exits 1 solely because functions coverage is 72.09% against 75%; per-file coverage also exits 1 with 894 violations in 281 files. Floors, baseline and exclusions are unchanged. Separate serial performance passes all 5 tests. Node 24 passes all 7,369 tests across 42 parity and repaired files, plus build, test typecheck, accepted-base freeze and real clean-source qualification. This is component evidence, not a Node 24 full-suite claim. Earlier source 7a81 had 51 actual failures; all have bounded repairs. Actual negative guard mutations, missing/unrelated compiled ancestry regression and four historical source/declaration probes are retained with restored bytes. The live-read integration mutant had 78 failures and 145 pending cases after collection failures; it is negative evidence, never a positive run. Counts and architecture checks initially failed during rebuild because dist was absent, then passed after build; both phases are retained. Source/test typechecks, lint, docs/counts/architecture, unchanged freeze and clean-source pass. No coverage waiver, Done, successful whole qualification, hosted CI, merge, release or live claim. The user skipped P0-29 and directed continuation by plan priority; next work is P0-48."
+}

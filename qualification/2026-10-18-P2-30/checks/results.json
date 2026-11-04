@@ -1,0 +1,173 @@
+[
+  {
+    "name": "build",
+    "cmd": "npm run -s build",
+    "exit": 0,
+    "durationMs": 122564,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/build.log",
+    "rawLogSha256": "774308182ea1bd242f016c23c0710d6507a644223fee4e57ef8fffc54f2a7290",
+    "rawLogBytes": 375
+  },
+  {
+    "name": "typecheck",
+    "cmd": "npm run -s typecheck",
+    "exit": 0,
+    "durationMs": 53136,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/typecheck.log",
+    "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rawLogBytes": 0
+  },
+  {
+    "name": "typecheck-tests",
+    "cmd": "npm run -s typecheck:tests",
+    "exit": 0,
+    "durationMs": 100613,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/typecheck-tests.log",
+    "rawLogSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "rawLogBytes": 0
+  },
+  {
+    "name": "lint",
+    "cmd": "npm run -s lint",
+    "exit": 0,
+    "durationMs": 5800,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/lint.log",
+    "rawLogSha256": "6dd3b111e2445cdf1c3f7c4bf1c955c29ca50e177b71ffac0437f1509ff9f272",
+    "rawLogBytes": 200
+  },
+  {
+    "name": "counts",
+    "cmd": "npm run -s check:counts",
+    "exit": 0,
+    "durationMs": 974,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/counts.log",
+    "rawLogSha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e",
+    "rawLogBytes": 81
+  },
+  {
+    "name": "docs-drift",
+    "cmd": "npm run -s check:docs-drift",
+    "exit": 0,
+    "durationMs": 535,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/docs-drift.log",
+    "rawLogSha256": "64447a202778f84dbabec491c625e20c941cfab633b7f92ca1e74766455fcf27",
+    "rawLogBytes": 121
+  },
+  {
+    "name": "freeze",
+    "cmd": "pnpm check:freeze -- --base-ref int",
+    "exit": 0,
+    "durationMs": 2621,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/freeze.log",
+    "rawLogSha256": "2485e0d16c681a2b211466c309da4d992c57f4a39695c4245b910521d215062e",
+    "rawLogBytes": 269
+  },
+  {
+    "name": "architecture-boundaries",
+    "cmd": "npm run -s check:architecture-boundaries",
+    "exit": 0,
+    "durationMs": 2804,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/architecture-boundaries.log",
+    "rawLogSha256": "72f91e3a1710df407206463c6ee5ca181c3a97ec64a67928d4d5211518fc61f0",
+    "rawLogBytes": 98504
+  },
+  {
+    "name": "gates",
+    "cmd": "npm run -s check:gates",
+    "exit": 0,
+    "durationMs": 371,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/gates.log",
+    "rawLogSha256": "33b1524c497f2dc75568122e323116f8e83b882ac9cdd6cc8eefddbc8efbaaa5",
+    "rawLogBytes": 659
+  },
+  {
+    "name": "schemas",
+    "cmd": "npm run -s check:schemas",
+    "exit": 0,
+    "durationMs": 952,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/schemas.log",
+    "rawLogSha256": "77692763578c3d43a023fd09a3a488cd6404b2522d85fb1a0c89a6de8939e431",
+    "rawLogBytes": 65
+  },
+  {
+    "name": "api-ref",
+    "cmd": "npm run -s check:api-ref",
+    "exit": 0,
+    "durationMs": 245,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/api-ref.log",
+    "rawLogSha256": "b3f05c856b6880ccf5985f87f8939d6948fc30ce3dc70edd6c71e0e1dff3cb2d",
+    "rawLogBytes": 42
+  },
+  {
+    "name": "threat-model",
+    "cmd": "npm run -s check:threat-model",
+    "exit": 0,
+    "durationMs": 283,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/threat-model.log",
+    "rawLogSha256": "7725d3acddc571c57f01d4fb9aa7de921d9055cd621828093e80ba416790f6d4",
+    "rawLogBytes": 113
+  },
+  {
+    "name": "citations",
+    "cmd": "npm run -s check:citations",
+    "exit": 0,
+    "durationMs": 425,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/citations.log",
+    "rawLogSha256": "e33b74b89cbd86f764c98d7575336830660ccaa2fae8b71e86b94b22c777862d",
+    "rawLogBytes": 373
+  },
+  {
+    "name": "qualification",
+    "cmd": "npm run -s check:qualification",
+    "exit": 0,
+    "durationMs": 410,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/qualification.log",
+    "rawLogSha256": "5bd4fcadbfd651ef90f4bcb20806cba0ae568f0747c9cb1d79ffd5e248f51771",
+    "rawLogBytes": 65
+  },
+  {
+    "name": "duplicates",
+    "cmd": "npm run -s check:duplicates",
+    "exit": 0,
+    "durationMs": 1940,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/duplicates.log",
+    "rawLogSha256": "28e2d0a990960444589213e32c4bacac4bedaf3e4a99528b4056150b51b6c413",
+    "rawLogBytes": 193
+  },
+  {
+    "name": "dead-code",
+    "cmd": "npm run -s check:dead-code",
+    "exit": 1,
+    "durationMs": 5952,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/dead-code.log",
+    "rawLogSha256": "a938c388087604a3523fb7f5c0da42738b114581fc08fa857d23ba7ed34e779d",
+    "rawLogBytes": 648
+  },
+  {
+    "name": "clean-source",
+    "cmd": "npm run -s check:clean-source",
+    "exit": 0,
+    "durationMs": 167307,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/clean-source.log",
+    "rawLogSha256": "6fdbaaf131d88c21473d134e11c1396037e5ee155ba9dab0f6a63e70a24d06a7",
+    "rawLogBytes": 791
+  },
+  {
+    "name": "focused",
+    "cmd": "npx vitest run tests/catalog/stations/technology tests/catalog/l0 tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/regulatoryClocks.test.ts",
+    "exit": 0,
+    "durationMs": 92156,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/focused.log",
+    "rawLogSha256": "8ba8f3e9350ecf4181eaf24f784e63e08528346b9b47605c98d8252e00b1eb36",
+    "rawLogBytes": 255
+  },
+  {
+    "name": "full-suite",
+    "cmd": "npm test -- --reporter=dot",
+    "exit": 130,
+    "durationMs": 4658565,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite.log",
+    "rawLogSha256": "7d573fed9a87bee1e967c76a7dccd7992d11cb6f0f0fd493efb86c67b4efbb61",
+    "rawLogBytes": 135620
+  }
+]

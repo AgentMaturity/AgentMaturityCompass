@@ -47,7 +47,7 @@ describe("ci init --no-sign", () => {
   });
 
   test("keeps the UX audit aligned with vault-less CI setup", () => {
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(audit).toContain("ci init --no-sign generates unsigned CI policy/workflow");
     expect(audit).toContain("Signed CI setup still requires vault initialization");
@@ -70,7 +70,7 @@ describe("ci init --no-sign", () => {
 
   test("documents provider-specific signed CI secret setup", () => {
     const docs = readFileSync(resolve(process.cwd(), "docs/CI_TEMPLATES.md"), "utf8");
-    const audit = readFileSync(resolve(process.cwd(), "docs/UX_AUDIT_REPORT.md"), "utf8");
+    const audit = readFileSync(resolve(process.cwd(), "docs/archive/UX_AUDIT_REPORT.md"), "utf8");
 
     expect(docs).toContain("## Provider-Specific Signed CI Secret Examples");
     expect(docs).toContain("### GitHub Actions");

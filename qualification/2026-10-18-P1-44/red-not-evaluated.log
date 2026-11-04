@@ -1,0 +1,337 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/wt/p1-44
+
+ ❯ tests/industryPackNotEvaluated.test.ts (7 tests | 7 failed) 606ms
+     × no answers: nothing evaluated, no percentage, no level, no gap 7ms
+     × one question unanswered: it is listed, the others are reported, and no overall score exists 1ms
+     × every question answered: a self-reported score and nothing left unevaluated 1ms
+     × CLI: amc domain pack run --baseline --json reports every question not evaluated and no score 217ms
+     × MCP amc_score_sector_pack: no score or level for unanswered questions 226ms
+     × MCP amc_score_industry_pack: returns the shared result unchanged 142ms
+     × an unanswered control is not evaluated: no level, no gap, and the overall has no score 3ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 7 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/industryPackNotEvaluated.test.ts > the shared scorer (scoreIndustryPack) > no answers: nothing evaluated, no percentage, no level, no gap
+AssertionError: expected undefined to deeply equal [ 'WLT-DP-1', 'WLT-DP-2', …(13) ]
+
+- Expected:
+[
+  "WLT-DP-1",
+  "WLT-DP-2",
+  "WLT-DP-3",
+  "WLT-DP-4",
+  "WLT-DP-5",
+  "WLT-DP-6",
+  "WLT-DP-7",
+  "WLT-DP-8",
+  "WLT-DP-9",
+  "WLT-DP-10",
+  "WLT-DP-11",
+  "WLT-DP-12",
+  "WLT-DP-13",
+  "WLT-DP-14",
+  "WLT-DP-15",
+]
+
++ Received:
+undefined
+
+ ❯ tests/industryPackNotEvaluated.test.ts:26:44
+     24|   test("no answers: nothing evaluated, no percentage, no level, no gap…
+     25|     const result = scoreIndustryPack(PACK.id, {});
+     26|     expect(result.notEvaluatedQuestionIds).toEqual(ALL_IDS);
+       |                                            ^
+     27|     expect(result.percentage).toBeNull();
+     28|     expect(result.level).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/7]⎯
+
+ FAIL  tests/industryPackNotEvaluated.test.ts > the shared scorer (scoreIndustryPack) > one question unanswered: it is listed, the others are reported, and no overall score exists
+AssertionError: expected undefined to deeply equal [ 'WLT-DP-1' ]
+
+- Expected:
+[
+  "WLT-DP-1",
+]
+
++ Received:
+undefined
+
+ ❯ tests/industryPackNotEvaluated.test.ts:38:44
+     36|     const [missing, ...rest] = PACK.questions;
+     37|     const result = scoreIndustryPack(PACK.id, Object.fromEntries(rest.…
+     38|     expect(result.notEvaluatedQuestionIds).toEqual([missing!.id]);
+       |                                            ^
+     39|     expect(result.percentage).toBeNull();
+     40|     expect(result.level).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/7]⎯
+
+ FAIL  tests/industryPackNotEvaluated.test.ts > the shared scorer (scoreIndustryPack) > every question answered: a self-reported score and nothing left unevaluated
+AssertionError: expected undefined to deeply equal []
+
+- Expected:
+[]
+
++ Received:
+undefined
+
+ ❯ tests/industryPackNotEvaluated.test.ts:48:44
+     46|   test("every question answered: a self-reported score and nothing lef…
+     47|     const result = scoreIndustryPack(PACK.id, ALL);
+     48|     expect(result.notEvaluatedQuestionIds).toEqual([]);
+       |                                            ^
+     49|     expect(result.percentage).toBe(75);
+     50|     expect(result.level).toBeGreaterThan(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/7]⎯
+
+ FAIL  tests/industryPackNotEvaluated.test.ts > surfaces report the shared result > CLI: amc domain pack run --baseline --json reports every question not evaluated and no score
+AssertionError: expected undefined to deeply equal [ 'WLT-DP-1', 'WLT-DP-2', …(13) ]
+
+- Expected:
+[
+  "WLT-DP-1",
+  "WLT-DP-2",
+  "WLT-DP-3",
+  "WLT-DP-4",
+  "WLT-DP-5",
+  "WLT-DP-6",
+  "WLT-DP-7",
+  "WLT-DP-8",
+  "WLT-DP-9",
+  "WLT-DP-10",
+  "WLT-DP-11",
+  "WLT-DP-12",
+  "WLT-DP-13",
+  "WLT-DP-14",
+  "WLT-DP-15",
+]
+
++ Received:
+undefined
+
+ ❯ tests/industryPackNotEvaluated.test.ts:78:41
+     76|     await domainCmd.parseAsync(["pack", "run", "--pack", PACK.id, "--b…
+     77|     const out = JSON.parse(lines.join("\n")) as Record<string, unknown…
+     78|     expect(out.notEvaluatedQuestionIds).toEqual(ALL_IDS);
+       |                                         ^
+     79|     expect(out.percentage).toBeNull();
+     80|     expect(out.level).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL  tests/industryPackNotEvaluated.test.ts > surfaces report the shared result > MCP amc_score_sector_pack: no score or level for unanswered questions
+AssertionError: expected '## AMC Sector Pack Score: Digital Pay…' to contain 'not evaluated: 14 of 15 questions una…'
+
+- Expected
++ Received
+
+- not evaluated: 14 of 15 questions unanswered
++ ## AMC Sector Pack Score: Digital Payments
++ **Station:** wealth
++ **Score:** 7%
++ **Maturity Level:** L1
++ Self-assessment: incomplete (1/15 answered) (self-reported; not a certification)
++ **Risk Tier:** very-high
++ **Compliance Gaps (questions below L3):**
++   ⚠️ WLT-DP-2 (Compliance): L1 — below minimum. Ref: FATF Recommendation 10; FinCEN 31 CFR §1020.220
++   ⚠️ WLT-DP-3 (Ethics): L1 — below minimum. Ref: ECOA Reg. B §1002.6; EU AI Act Annex III §5(b)
++   ⚠️ WLT-DP-4 (Compliance): L1 — below minimum. Ref: PSD2 2015/2366 Art. 97; EBA RTS on SCA
++   ⚠️ WLT-DP-5 (Transparency): L1 — below minimum. Ref: PSD2 Art. 45; Dodd-Frank §1032
++   ⚠️ WLT-DP-6 (Safety): L1 — below minimum. Ref: EMV 3DS 2.3; ISO 20022 Fraud Reporting
++   ...and 9 more gaps
+
+ ❯ tests/industryPackNotEvaluated.test.ts:104:20
+    102|       const text = (partial.content as Array<{ text: string }>)[0]!.te…
+    103|       expect(partial.isError).toBeFalsy();
+    104|       expect(text).toContain(`not evaluated: ${ALL_IDS.length - 1} of …
+       |                    ^
+    105|       expect(text).not.toMatch(/\*\*Score:\*\* \d|\*\*Maturity Level:\…
+    106|       expect(text).not.toContain(`${ALL_IDS[1]} (`);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL  tests/industryPackNotEvaluated.test.ts > surfaces report the shared result > MCP amc_score_industry_pack: returns the shared result unchanged
+AssertionError: expected null to deeply equal { packId: 'digital-payments', …(10) }
+
+- Expected:
+{
+  "claimKind": "self_reported",
+  "complianceGaps": [
+    "WLT-DP-1 (Safety): L1 — below minimum. Ref: PCI DSS v4.0.1 Req. 3, Req. 4",
+    "WLT-DP-2 (Compliance): L1 — below minimum. Ref: FATF Recommendation 10; FinCEN 31 CFR §1020.220",
+    "WLT-DP-3 (Ethics): L1 — below minimum. Ref: ECOA Reg. B §1002.6; EU AI Act Annex III §5(b)",
+    "WLT-DP-4 (Compliance): L1 — below minimum. Ref: PSD2 2015/2366 Art. 97; EBA RTS on SCA",
+    "WLT-DP-5 (Transparency): L1 — below minimum. Ref: PSD2 Art. 45; Dodd-Frank §1032",
+    "WLT-DP-6 (Safety): L1 — below minimum. Ref: EMV 3DS 2.3; ISO 20022 Fraud Reporting",
+    "WLT-DP-7 (Governance): L1 — below minimum. Ref: FATF Recommendation 16; ISO 20022",
+    "WLT-DP-8 (Traceability): L1 — below minimum. Ref: Dodd-Frank §1033; PSD2 Art. 58",
+    "WLT-DP-9 (Compliance): L1 — below minimum. Ref: PCI DSS v4.0.1 Req. 12.3.2; EU DORA Art. 28",
+    "WLT-DP-10 (Safety): L1 — below minimum. Ref: PCI DSS v4.0.1 Req. 6.4.3",
+    "WLT-DP-11 (Governance): L1 — below minimum. Ref: EU DORA (EU) 2022/2554 Art. 17",
+    "WLT-DP-12 (Compliance): L1 — below minimum. Ref: EBA RTS on SCA (EU) 2018/389 Art. 4 (dynamic linking)",
+    "WLT-DP-13 (Payee Verification): L1 — below minimum. Ref: Regulation (EU) No 260/2012 Art. 5c; Regulation (EU) 2024/886",
+    "WLT-DP-14 (Crypto-Asset Transfer Information): L1 — below minimum. Ref: Regulation (EU) 2023/1113; FATF R.16",
+    "WLT-DP-15 (Resilience): L1 — below minimum. Ref: EU DORA (EU) 2022/2554 Arts. 24-25",
+  ],
+  "eligibleLevel": null,
+  "level": 1,
+  "packId": "digital-payments",
+  "packName": "Digital Payments",
+  "percentage": 0,
+  "questionResults": [
+    {
+      "dimension": "Safety",
+      "id": "WLT-DP-1",
+      "percentage": 0,
+      "score": 0,
+      "weight": 12,
+    },
+    {
+      "dimension": "Compliance",
+      "id": "WLT-DP-2",
+      "percentage": 0,
+      "score": 0,
+      "weight": 15,
+    },
+    {
+      "dimension": "Ethics",
+      "id": "WLT-DP-3",
+      "percentage": 0,
+      "score": 0,
+      "weight": 12,
+    },
+    {
+      "dimension": "Compliance",
+      "id": "WLT-DP-4",
+      "percentage": 0,
+      "score": 0,
+      "weight": 12,
+    },
+    {
+      "dimension": "Transparency",
+      "id": "WLT-DP-5",
+      "percentage": 0,
+      "score": 0,
+      "weight": 10,
+    },
+    {
+      "dimension": "Safety",
+      "id": "WLT-DP-6",
+      "percentage": 0,
+      "score": 0,
+      "weight": 12,
+    },
+    {
+      "dimension": "Governance",
+      "id": "WLT-DP-7",
+      "percentage": 0,
+      "score": 0,
+      "weight": 12,
+    },
+    {
+      "dimension": "Traceability",
+      "id": "WLT-DP-8",
+      "percentage": 0,
+      "score": 0,
+      "weight": 15,
+    },
+    {
+      "dimension": "Compliance",
+      "id": "WLT-DP-9",
+      "percentage": 0,
+      "score": 0,
+      "weight": 12,
+    },
+    {
+      "dimension": "Safety",
+      "id": "WLT-DP-10",
+      "percentage": 0,
+      "score": 0,
+      "weight": 15,
+    },
+    {
+      "dimension": "Governance",
+      "id": "WLT-DP-11",
+      "percentage": 0,
+      "score": 0,
+      "weight": 12,
+    },
+    {
+      "dimension": "Compliance",
+      "id": "WLT-DP-12",
+      "percentage": 0,
+      "score": 0,
+      "weight": 12,
+    },
+    {
+      "dimension": "Payee Verification",
+      "id": "WLT-DP-13",
+      "percentage": 0,
+      "score": 0,
+      "weight": 10,
+    },
+    {
+      "dimension": "Crypto-Asset Transfer Information",
+      "id": "WLT-DP-14",
+      "percentage": 0,
+      "score": 0,
+      "weight": 10,
+    },
+    {
+      "dimension": "Resilience",
+      "id": "WLT-DP-15",
+      "percentage": 0,
+      "score": 0,
+      "weight": 8,
+    },
+  ],
+  "riskTier": "very-high",
+  "selfAssessment": {
+    "answered": 0,
+    "complete": false,
+    "total": 15,
+  },
+  "stationId": "wealth",
+}
+
++ Received:
+null
+
+ ❯ tests/industryPackNotEvaluated.test.ts:119:27
+    117|       const out = await client.callTool({ name: "amc_score_industry_pa…
+    118|       const body = JSON.parse((out.content as Array<{ text: string }>)…
+    119|       expect(body.result).toEqual(scoreIndustryPack(PACK.id, {}));
+       |                           ^
+    120|       expect(body.result.notEvaluatedQuestionIds).toEqual(ALL_IDS);
+    121|       expect(body.result.level).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL  tests/industryPackNotEvaluated.test.ts > the pack audit uses the same rule > an unanswered control is not evaluated: no level, no gap, and the overall has no score
+AssertionError: expected 1 to be null
+
+- Expected:
+null
+
++ Received:
+1
+
+ ❯ tests/industryPackNotEvaluated.test.ts:133:27
+    131|     const audit = buildIndustryPackAudit({ pack: PACK, responses: Obje…
+    132|     const control = audit.controls.find((c) => c.id === missing!.id)!;
+    133|     expect(control.level).toBeNull();
+       |                           ^
+    134|     expect(control.status).toBe("NOT_EVALUATED");
+    135|     expect(audit.overall.percentage).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  7 failed (7)
+   Start at  09:01:24
+   Duration  33.94s (transform 29.74s, setup 190ms, import 32.76s, tests 606ms, environment 0ms)
+

@@ -1,0 +1,106 @@
+{
+  "kind": "amc.rollback-drill/1",
+  "sourceCommit": "3a358adbd3be062d1cd1b13d8451cf757e769777",
+  "startedAt": "2026-10-10T23:38:48.216Z",
+  "environment": {
+    "node": "v25.5.0",
+    "platform": "darwin",
+    "release": "25.6.0",
+    "arch": "arm64"
+  },
+  "images": {
+    "a": {
+      "ref": "amc-studio:drill-a",
+      "id": "sha256:908ea2ddc9eb6f476cb812239d69e74d70c1599c6456434315235107e7657c82"
+    },
+    "b": {
+      "ref": "amc-studio:drill-b",
+      "id": "sha256:344afd54d695a33f1a1d764cd0a4291ce9aecc59707fd6ddc4ca47d70626ce13"
+    }
+  },
+  "container": "amc-rollback-drill-1f5d00b3",
+  "volume": "amc-rollback-drill-1f5d00b3",
+  "steps": [
+    {
+      "id": "deploy-a",
+      "status": "passed",
+      "imageId": "sha256:908ea2ddc9eb6f476cb812239d69e74d70c1599c6456434315235107e7657c82"
+    },
+    {
+      "id": "probe-a",
+      "status": "passed",
+      "probe": {
+        "status": "verified-prefix",
+        "failedStep": null,
+        "verification": "anchored-prefix",
+        "verificationScope": {
+          "scope": "verified-prefix",
+          "unfinalizedSessions": [
+            "82c6ee8a-aa8d-426e-a000-c03353e2e523",
+            "6019b3b3-c09d-4672-967a-32104751ce98"
+          ]
+        },
+        "failedDetail": null
+      }
+    },
+    {
+      "id": "upgrade-b",
+      "status": "passed",
+      "imageId": "sha256:344afd54d695a33f1a1d764cd0a4291ce9aecc59707fd6ddc4ca47d70626ce13"
+    },
+    {
+      "id": "probe-b",
+      "status": "passed",
+      "probe": {
+        "status": "verified-prefix",
+        "failedStep": null,
+        "verification": "anchored-prefix",
+        "verificationScope": {
+          "scope": "verified-prefix",
+          "unfinalizedSessions": [
+            "82c6ee8a-aa8d-426e-a000-c03353e2e523",
+            "6019b3b3-c09d-4672-967a-32104751ce98",
+            "08076987-ef59-41f4-8c34-a1b9e47045ff"
+          ]
+        },
+        "failedDetail": null
+      }
+    },
+    {
+      "id": "rollback-a",
+      "status": "passed",
+      "imageId": "sha256:908ea2ddc9eb6f476cb812239d69e74d70c1599c6456434315235107e7657c82"
+    },
+    {
+      "id": "probe-after-rollback",
+      "status": "passed",
+      "probe": {
+        "status": "verified-prefix",
+        "failedStep": null,
+        "verification": "anchored-prefix",
+        "verificationScope": {
+          "scope": "verified-prefix",
+          "unfinalizedSessions": [
+            "82c6ee8a-aa8d-426e-a000-c03353e2e523",
+            "6019b3b3-c09d-4672-967a-32104751ce98",
+            "08076987-ef59-41f4-8c34-a1b9e47045ff",
+            "b1c7cd47-1e17-4006-93dd-bd22582ee221"
+          ]
+        },
+        "failedDetail": null
+      }
+    }
+  ],
+  "status": "passed",
+  "monitorPin": "448662f40ac1d3bf6c8b453d1a25b639a059bcbfe55510dc0fe4ce545a0634d4",
+  "probeStatuses": [
+    "verified-prefix",
+    "verified-prefix",
+    "verified-prefix"
+  ],
+  "monitorPinSource": "trust-on-first-use: read from the drill's own workspace volume after A's first bootstrap",
+  "notExercised": [
+    "Kubernetes/Helm rollback (helm rollback, kubectl rollout undo): container-level drill only"
+  ],
+  "finishedAt": "2026-10-10T23:39:43.205Z"
+}

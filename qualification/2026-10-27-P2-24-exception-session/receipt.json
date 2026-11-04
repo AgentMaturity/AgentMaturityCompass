@@ -1,0 +1,90 @@
+{
+ "schemaVersion": 1,
+ "key": "P2-24",
+ "date": "2026-10-27",
+ "commit": "62b7dc5d640863a33a87f2d5e7438bda7260b135",
+ "branch": "rtd/p2-24-bound-reviews",
+ "node": "v22.23.3",
+ "pnpm": "10.33.0",
+ "os": "macOS 26.6.2",
+ "arch": "arm64",
+ "commands": [
+  {
+   "cmd": "npm run -s build",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s typecheck:tests",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s lint",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:gates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:dead-code",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:duplicates",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:counts",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:api-ref",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:docs-drift",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npm run -s check:schemas",
+   "exit": 0,
+   "durationMs": 0
+  },
+  {
+   "cmd": "npx vitest run --maxWorkers=2 <64 affected test files>",
+   "exit": 0,
+   "durationMs": 0
+  }
+ ],
+ "tests": {
+  "total": 1770,
+  "passed": 1770,
+  "failed": 0,
+  "skipped": 0
+ },
+ "artifacts": [
+  {
+   "path": "mutations.json",
+   "sha256": "e68e044fff532041cb65e8aee0b2072bf4d45f37c4c95d031d87081abe6c4615"
+  },
+  {
+   "path": "red-before-fix.txt",
+   "sha256": "8a93ce3635d94b5bcbf63660e00da4528e9d390fac0a5262420b53fb245d0ead"
+  }
+ ],
+ "notes": "durationMs not measured (0)."
+}

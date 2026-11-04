@@ -46,13 +46,9 @@
           "type": "string"
         },
         "eligibleLevel": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "number",
+            "null"
           ]
         },
         "entitlement": {
@@ -443,13 +439,9 @@
                         "type": "string"
                       },
                       "eligibleLevel": {
-                        "anyOf": [
-                          {
-                            "type": "number"
-                          },
-                          {
-                            "type": "null"
-                          }
+                        "type": [
+                          "number",
+                          "null"
                         ]
                       },
                       "entitlement": {
@@ -749,13 +741,9 @@
                           "type": "string"
                         },
                         "trustTier": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
+                          "type": [
+                            "string",
+                            "null"
                           ]
                         }
                       },
@@ -811,13 +799,9 @@
                           "type": "string"
                         },
                         "trustTier": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
+                          "type": [
+                            "string",
+                            "null"
                           ]
                         }
                       },
@@ -879,13 +863,9 @@
                           "type": "string"
                         },
                         "trustTier": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
+                          "type": [
+                            "string",
+                            "null"
                           ]
                         }
                       },
@@ -983,13 +963,9 @@
                         "additionalProperties": false,
                         "properties": {
                           "detail": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
+                            "type": [
+                              "string",
+                              "null"
                             ]
                           },
                           "public": {
@@ -1009,13 +985,9 @@
                                 ]
                               },
                               "detail": {
-                                "anyOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
+                                "type": [
+                                  "string",
+                                  "null"
                                 ]
                               },
                               "logIndex": {
@@ -1165,33 +1137,21 @@
                               "additionalProperties": false,
                               "properties": {
                                 "detail": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
+                                  "type": [
+                                    "string",
+                                    "null"
                                   ]
                                 },
                                 "keyId": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
+                                  "type": [
+                                    "string",
+                                    "null"
                                   ]
                                 },
                                 "listId": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
+                                  "type": [
+                                    "string",
+                                    "null"
                                   ]
                                 },
                                 "purpose": {
@@ -1207,7 +1167,8 @@
                                     "notary",
                                     "evidence-authority",
                                     "independent-attestation",
-                                    "trust-list-root"
+                                    "trust-list-root",
+                                    "catalog-review"
                                   ],
                                   "type": "string"
                                 },
@@ -1293,6 +1254,95 @@
                           "type": "string"
                         },
                         "type": "array"
+                      },
+                      "reasonCodes": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "completeness": {
+                            "items": {
+                              "enum": [
+                                "EMPTY_EVIDENCE",
+                                "EVIDENCE_MISSING",
+                                "CONTRADICTORY_EVIDENCE",
+                                "OUTCOME_UNKNOWN"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "freshness": {
+                            "items": {
+                              "enum": [
+                                "ATTESTATION_EXPIRED",
+                                "NOT_YET_VALID",
+                                "REPLAYED_OR_SUPERSEDED",
+                                "CLAIMED_TIME_BEFORE_KEY_VALIDITY"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "integrity": {
+                            "items": {
+                              "enum": [
+                                "MALFORMED",
+                                "UNKNOWN_FIELD",
+                                "UNSUPPORTED_VERSION",
+                                "DIGEST_MISMATCH",
+                                "SIGNATURE_INVALID"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "issuerAdmission": {
+                            "items": {
+                              "enum": [
+                                "ISSUER_NOT_PINNED",
+                                "ISSUER_WRONG_PURPOSE",
+                                "ISSUER_REVOKED",
+                                "ISSUER_DISTRUSTED",
+                                "KEY_NOT_YET_VALID",
+                                "KEY_EXPIRED",
+                                "TRUST_LIST_EXPIRED",
+                                "TRUST_LIST_SIGNATURE_INVALID",
+                                "UNANCHORED",
+                                "ROLLBACK_DETECTED"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "satisfaction": {
+                            "items": {
+                              "enum": [
+                                "CLAIMED_RESULT_FAILED",
+                                "NOT_RECOMPUTABLE"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "scope": {
+                            "items": {
+                              "enum": [
+                                "SCOPE_MISMATCH",
+                                "FOREIGN_EVIDENCE"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "integrity",
+                          "issuerAdmission",
+                          "scope",
+                          "freshness",
+                          "completeness",
+                          "satisfaction"
+                        ],
+                        "type": "object"
                       },
                       "satisfaction": {
                         "additionalProperties": false,
@@ -1502,7 +1552,7 @@
                         "additionalProperties": false,
                         "properties": {
                           "name": {
-                            "const": "agent-maturity-compass",
+                            "minLength": 1,
                             "type": "string"
                           },
                           "version": {
@@ -1677,13 +1727,9 @@
                           "type": "string"
                         },
                         "trustTier": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
+                          "type": [
+                            "string",
+                            "null"
                           ]
                         }
                       },
@@ -1739,13 +1785,9 @@
                           "type": "string"
                         },
                         "trustTier": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
+                          "type": [
+                            "string",
+                            "null"
                           ]
                         }
                       },
@@ -1807,13 +1849,9 @@
                           "type": "string"
                         },
                         "trustTier": {
-                          "anyOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "null"
-                            }
+                          "type": [
+                            "string",
+                            "null"
                           ]
                         }
                       },
@@ -1912,13 +1950,9 @@
                         "additionalProperties": false,
                         "properties": {
                           "detail": {
-                            "anyOf": [
-                              {
-                                "type": "string"
-                              },
-                              {
-                                "type": "null"
-                              }
+                            "type": [
+                              "string",
+                              "null"
                             ]
                           },
                           "public": {
@@ -1938,13 +1972,9 @@
                                 ]
                               },
                               "detail": {
-                                "anyOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "null"
-                                  }
+                                "type": [
+                                  "string",
+                                  "null"
                                 ]
                               },
                               "logIndex": {
@@ -2094,33 +2124,21 @@
                               "additionalProperties": false,
                               "properties": {
                                 "detail": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
+                                  "type": [
+                                    "string",
+                                    "null"
                                   ]
                                 },
                                 "keyId": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
+                                  "type": [
+                                    "string",
+                                    "null"
                                   ]
                                 },
                                 "listId": {
-                                  "anyOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "null"
-                                    }
+                                  "type": [
+                                    "string",
+                                    "null"
                                   ]
                                 },
                                 "purpose": {
@@ -2136,7 +2154,8 @@
                                     "notary",
                                     "evidence-authority",
                                     "independent-attestation",
-                                    "trust-list-root"
+                                    "trust-list-root",
+                                    "catalog-review"
                                   ],
                                   "type": "string"
                                 },
@@ -2222,6 +2241,95 @@
                           "type": "string"
                         },
                         "type": "array"
+                      },
+                      "reasonCodes": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "completeness": {
+                            "items": {
+                              "enum": [
+                                "EMPTY_EVIDENCE",
+                                "EVIDENCE_MISSING",
+                                "CONTRADICTORY_EVIDENCE",
+                                "OUTCOME_UNKNOWN"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "freshness": {
+                            "items": {
+                              "enum": [
+                                "ATTESTATION_EXPIRED",
+                                "NOT_YET_VALID",
+                                "REPLAYED_OR_SUPERSEDED",
+                                "CLAIMED_TIME_BEFORE_KEY_VALIDITY"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "integrity": {
+                            "items": {
+                              "enum": [
+                                "MALFORMED",
+                                "UNKNOWN_FIELD",
+                                "UNSUPPORTED_VERSION",
+                                "DIGEST_MISMATCH",
+                                "SIGNATURE_INVALID"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "issuerAdmission": {
+                            "items": {
+                              "enum": [
+                                "ISSUER_NOT_PINNED",
+                                "ISSUER_WRONG_PURPOSE",
+                                "ISSUER_REVOKED",
+                                "ISSUER_DISTRUSTED",
+                                "KEY_NOT_YET_VALID",
+                                "KEY_EXPIRED",
+                                "TRUST_LIST_EXPIRED",
+                                "TRUST_LIST_SIGNATURE_INVALID",
+                                "UNANCHORED",
+                                "ROLLBACK_DETECTED"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "satisfaction": {
+                            "items": {
+                              "enum": [
+                                "CLAIMED_RESULT_FAILED",
+                                "NOT_RECOMPUTABLE"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "scope": {
+                            "items": {
+                              "enum": [
+                                "SCOPE_MISMATCH",
+                                "FOREIGN_EVIDENCE"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "integrity",
+                          "issuerAdmission",
+                          "scope",
+                          "freshness",
+                          "completeness",
+                          "satisfaction"
+                        ],
+                        "type": "object"
                       },
                       "satisfaction": {
                         "additionalProperties": false,
@@ -2431,7 +2539,7 @@
                         "additionalProperties": false,
                         "properties": {
                           "name": {
-                            "const": "agent-maturity-compass",
+                            "minLength": 1,
                             "type": "string"
                           },
                           "version": {

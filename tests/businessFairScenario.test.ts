@@ -118,7 +118,7 @@ describe("business FAIR-style scenario analysis", () => {
     expect(readProjectFile("docs/QUICKSTART.md")).toContain("amc business fair-scenario --scenario claims-ai-data-leak");
     expect(readProjectFile("docs/GETTING_STARTED.md")).toContain("Run a FAIR-style calibrated scenario distribution");
 
-    const audit = readProjectFile("docs/AUDIT_50_AGENTS_BATCH5.md");
+    const audit = readProjectFile("docs/archive/AUDIT_50_AGENTS_BATCH5.md");
     expect(audit).toContain("FAIR-style scenario loss distribution — ✅ Resolved 2026-06-16");
     expect(audit).toContain("not a certified Open FAIR implementation");
     expect(audit).not.toContain("No Monte Carlo or calibrated loss-distribution model.");

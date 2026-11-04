@@ -1,0 +1,11 @@
+P2-12 RED run, before any src change (base int dc8c34d04 plus the new tests only; local macOS arm64, Node 22, not CI).
+Command: npx vitest run tests/resumeRules.test.ts tests/sessionWriterFencing.test.ts tests/resumeReconciliation.test.ts tests/sessionMigrationReceipt.test.ts --maxWorkers=2
+Result (transcribed from the run's summary):
+  Test Files  4 failed (4)
+  Tests  2 failed (2)
+  - tests/resumeRules.test.ts: failed to load (src/session/resumeRules.ts does not exist)
+  - tests/sessionWriterFencing.test.ts: failed to load (src/session/writerFence.ts does not exist)
+  - tests/resumeReconciliation.test.ts: failed to load (src/session/resumeRules.ts does not exist)
+  - tests/sessionMigrationReceipt.test.ts > a version-1 owner gets exactly one session/migration row ...: expected 1 session/migration row, received 0
+  - tests/sessionMigrationReceipt.test.ts > a version-2 writer cannot be followed by a version-1 row: expected the append to throw, it did not
+GREEN after implementation: see receipt.json (focused tests).

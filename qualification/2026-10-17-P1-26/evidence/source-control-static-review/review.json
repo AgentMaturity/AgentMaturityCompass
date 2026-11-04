@@ -1,0 +1,168 @@
+{
+  "schema": "p126-source-control-independent-static-review/1",
+  "at": "2026-10-16T20:44:31.072844+00:00",
+  "blockers": [],
+  "verdict": "The exact adaptation has no concrete static blocker for root’s explicitly invoked, finite two-control protocol. Actual binding, pristine fresh canonical execution and mutation outcomes are future evidence.",
+  "helper": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/source-control.py",
+    "bytes": 5192,
+    "sha256": "4ba51e9887743f213c0a21b69366cb1f73e47d14ae66f4e4c553be63a7a7989f",
+    "physicalPath": "/private/tmp/p1-26-tree-qualification-20261017/source-control.py",
+    "dev": 16777231,
+    "inode": 543338974,
+    "nlink": 1
+  },
+  "priorHelper": {
+    "path": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control.py",
+    "bytes": 5206,
+    "sha256": "61844915b8ce3fedcaa2a28f8a602f60f2f2b24ae557df29a3ced6554c834104",
+    "physicalPath": "/private/tmp/p1-12-compiled-guard-qualification-20261017/source-control.py",
+    "dev": 16777231,
+    "inode": 543248517,
+    "nlink": 1
+  },
+  "fullBothHelpersRead": true,
+  "exactFiniteAdaptation": {
+    "allOtherBytesUnchanged": true,
+    "replacements": [
+      {
+        "before": "/private/tmp/p1-12-compiled-guard-qualification-20261017",
+        "after": "/private/tmp/p1-26-tree-qualification-20261017",
+        "occurrences": 1
+      },
+      {
+        "before": "number in ('1', '2', '3')",
+        "after": "number in ('1', '2')",
+        "occurrences": 1
+      },
+      {
+        "before": "77004cfb385395daca564a826acd68a62caf5de4b5eec3b0bca6e919dd2a3226",
+        "after": "ab18653c468145664a58bcb7e5ea80d9e9579fad72280e0ef2ece5d96ce2945b",
+        "occurrences": 1
+      },
+      {
+        "before": "['controls'][int(number) - 1]",
+        "after": "['operators'][int(number) - 1]",
+        "occurrences": 1
+      },
+      {
+        "before": "control['targetRel']",
+        "after": "control['target']",
+        "occurrences": 5
+      },
+      {
+        "before": "control['sourceSha256']",
+        "after": "control['originalFile']['sha256']",
+        "occurrences": 2
+      },
+      {
+        "before": "control['replacement']",
+        "after": "control['after']",
+        "occurrences": 1
+      },
+      {
+        "before": "control['proposedSha256ComputedOnly']",
+        "after": "control['proposedWholeFile']['sha256']",
+        "occurrences": 1
+      },
+      {
+        "before": "p112-m",
+        "after": "p126-m",
+        "occurrences": 4
+      },
+      {
+        "before": "outcome['tests']['total'] == 35",
+        "after": "outcome['tests']['total'] == 54",
+        "occurrences": 1
+      }
+    ],
+    "privateDelta": "adaptation.patch"
+  },
+  "schemaFit": {
+    "operatorsArrayCount": 2,
+    "allowedNumbers": [
+      "1",
+      "2"
+    ],
+    "modeValues": [
+      "apply",
+      "restore"
+    ],
+    "target": "operators[].target",
+    "originalDigest": "operators[].originalFile.sha256",
+    "replacement": "operators[].after",
+    "computedDigest": "operators[].proposedWholeFile.sha256",
+    "controlJsonHashExact": true,
+    "originalAndProposedByteCountsAlsoComparedStatically": true,
+    "outcomeTotal": 54,
+    "actualSourceCombinedTotal": 54,
+    "futureFreshCohortNotClaimed": true,
+    "operatorFacts": [
+      {
+        "number": "1",
+        "id": "M1-prefix-swap",
+        "target": "src/transparency/rfc9162.ts",
+        "beforeMatches": 1,
+        "original": {
+          "bytes": 6476,
+          "sha256": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35"
+        },
+        "proposedTextHashOnly": {
+          "bytes": 6476,
+          "sha256": "4526ad7242fdd7846e6bc0e837dc8a023a18d71ea226cf0d74187279e7d5942c"
+        },
+        "fileCreated": false,
+        "executed": false
+      },
+      {
+        "number": "2",
+        "id": "M2-inclusion-terminal-size",
+        "target": "src/transparency/rfc9162.ts",
+        "beforeMatches": 1,
+        "original": {
+          "bytes": 6476,
+          "sha256": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35"
+        },
+        "proposedTextHashOnly": {
+          "bytes": 6458,
+          "sha256": "5df810447a4da0eefc1e8fa59cf1c75567fb619d01883cc0f683d60249777e45"
+        },
+        "fileCreated": false,
+        "executed": false
+      }
+    ]
+  },
+  "beforeWrites": {
+    "namespace": "The existing N ACTIVE.json and HALTED.json absence assertions are unchanged. No marker is cleared, recreated or bypassed.",
+    "rootAndHeads": "q must name an amc-clean-source-*/checkout. Both Q and S HEAD must equal the future binding sourceCommit; Q index is empty. Apply also requires Q status to be empty.",
+    "corpus": "Apply checks every boundPaths byte/hash in S and Q. The actual future row count, source commit, compiled and native bindings are not yet reviewed.",
+    "physicalTarget": "Target lstat must be regular, single-link and physically canonical, with an inode different from the S target. This is a finite path-based pre-write check, not guarded-FD/atomic/continuous isolation.",
+    "mutation": "Exact original SHA and S byte equality, one before-text match and computed proposed SHA precede original.open(xb) and the target write. The original is retained; a live Git patch is saved exclusively. Existing original/metadata collisions fail rather than overwrite history.",
+    "automaticBehavior": "Exactly one requested operation; no loop, retry, timer, signal, compiler, test or automatic restore."
+  },
+  "restore": {
+    "actualRedGate": "Requires matching p126-mN phase, actual exit1, total54 with failed>0, raw/observer join, no unhandled/late errors, natural group ESRCH/no nonzero signals, and test-kind task errors. No predicted failed count is encoded.",
+    "manualSemanticGate": "Requires a separate root classification with rootAllFailuresRead, phase/operator/sourceCommit, exact outcome SHA, and noHookOrEnvironmentFailure. These are trusted root review fields, not a replacement for root reading the actual raw/log/observer and classifying first assertions/masks.",
+    "byteGate": "The current target must match the retained apply-record mutant digest. Original backup must match the fixed original SHA before writing. Restored bytes must equal S; clean Q status and every bound source byte/hash are checked afterward.",
+    "evidence": "Apply/restore JSON records and original/live patch files are exclusive writes with source commit and target physical metadata. Any partial or failed invocation remains root-owned failure evidence; this review grants no automatic recovery."
+  },
+  "rootOwnedPrerequisitesAlreadyInProtocol": [
+    "Supply and fully review actual source commit, owned Q and immutable binding after build/clean-source closure.",
+    "Review the same actual54 identities in a closed pristine fresh canonical run before invoking either control.",
+    "Check the planned selected-source, eight compiled-pair and six native bindings at the actual future boundary; this helper does not independently attest native identities or enforce a standalone complete canonical-admission protocol.",
+    "Invoke one control at a time, manually read/classify actual RED, restore exact source and rerun the identical cohort; preserve old markers and helper/observer/wrapper bytes."
+  ],
+  "binding": {
+    "path": "/private/tmp/p1-26-tree-qualification-20261017/fresh-source-binding.json",
+    "existsAtReview": false,
+    "validated": false,
+    "futureRowsOrIdentitiesClaimed": false
+  },
+  "unchangedBoundaries": [
+    "No source or compiled/native mutation occurred during review.",
+    "No source, test, package, guard, scanner, deadline or baseline change is recommended.",
+    "No fresh/canonical/control/restore result, failure count, full issue, quality or public authority claim is made.",
+    "All held work, reservations, Claude variants and F37 skip remain intact."
+  ],
+  "execution": "Full text reads, finite standard-library byte/hash/diff/JSON comparisons, and private review writes only. No Python helper/parser/compiler, product, tests, native addon, SQL, network or process-probe execution; no checkout/index/Git/QA mutation."
+}

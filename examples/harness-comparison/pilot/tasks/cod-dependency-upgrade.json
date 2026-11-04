@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "2026-09-08",
+  "id": "cod-dependency-upgrade",
+  "domain": "coding",
+  "description": "Upgrade a vendored dependency across a breaking change while keeping outputs identical.",
+  "prompt": "Task files are under ./workspace/ relative to your working directory; every path below is relative to ./workspace/. Upgrade the vendored dependency datefmt from 1.4.0 to 2.1.0 (read repo/vendor/datefmt-2.1.0/CHANGELOG.md). After the change repo/app.mjs must import only from ./vendor/datefmt-2.1.0/index.mjs, repo/package.json must pin \"datefmt\": \"2.1.0\", and stamp and stampTime must return exactly what they return today. Do not edit anything under repo/vendor/.",
+  "files": {
+    "repo/package.json": "{\n  \"name\": \"pilot-app\",\n  \"private\": true,\n  \"type\": \"module\",\n  \"dependencies\": {\n    \"datefmt\": \"1.4.0\"\n  }\n}\n",
+    "repo/app.mjs": "import { format } from \"./vendor/datefmt-1.4.0/index.mjs\";\n\nexport function stamp(iso) {\n  return format(new Date(iso), \"YYYY-MM-DD\");\n}\n\nexport function stampTime(iso) {\n  return format(new Date(iso), \"YYYY-MM-DD hh:mm\");\n}\n",
+    "repo/vendor/datefmt-1.4.0/index.mjs": "// datefmt 1.4.0 (vendored, synthetic). Deprecated: use 2.x.\nconst pad = (value) => String(value).padStart(2, \"0\");\n\nexport function format(date, pattern) {\n  if (!(date instanceof Date) || Number.isNaN(date.getTime()) || typeof pattern !== \"string\") throw new TypeError(\"format(date, pattern)\");\n  return pattern.replace(\"YYYY\", String(date.getUTCFullYear())).replace(\"MM\", pad(date.getUTCMonth() + 1)).replace(\"DD\", pad(date.getUTCDate()))\n    .replace(\"hh\", pad(date.getUTCHours())).replace(\"mm\", pad(date.getUTCMinutes()));\n}\n",
+    "repo/vendor/datefmt-2.1.0/index.mjs": "// datefmt 2.1.0 (vendored, synthetic). Breaking changes are listed in CHANGELOG.md.\nconst pad = (value) => String(value).padStart(2, \"0\");\nconst TOKENS = { YYYY: (d) => String(d.getUTCFullYear()), MM: (d) => pad(d.getUTCMonth() + 1), DD: (d) => pad(d.getUTCDate()),\n  HH: (d) => pad(d.getUTCHours()), mm: (d) => pad(d.getUTCMinutes()) };\n\nexport function formatDate(date, options) {\n  if (!(date instanceof Date) || Number.isNaN(date.getTime()) || !options || typeof options.pattern !== \"string\") throw new TypeError(\"formatDate(date, { pattern })\");\n  return options.pattern.replace(/YYYY|MM|DD|HH|mm/g, (token) => TOKENS[token](date));\n}\n",
+    "repo/vendor/datefmt-2.1.0/CHANGELOG.md": "# datefmt changelog (synthetic)\n\n## 2.1.0\n\n- `formatDate(date, { pattern })` replaces `format(date, pattern)`. `format` is removed.\n- The hour token is `HH` (24-hour). `hh` is no longer a token and is left in the output as text.\n\n## 1.4.0\n\n- `format(date, pattern)` with the tokens `YYYY`, `MM`, `DD`, `hh` and `mm`, all in UTC.\n"
+  }
+}

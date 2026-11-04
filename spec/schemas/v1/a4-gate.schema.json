@@ -145,23 +145,15 @@
                 ]
               },
               "hostMembershipId": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
+                "type": [
+                  "string",
+                  "null"
                 ]
               },
               "usersYamlSignerFingerprint": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
+                "type": [
+                  "string",
+                  "null"
                 ]
               }
             },
@@ -335,13 +327,9 @@
           "type": "boolean"
         },
         "envelopeValid": {
-          "anyOf": [
-            {
-              "type": "boolean"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "boolean",
+            "null"
           ]
         }
       },
@@ -593,6 +581,10 @@
           "maximum": 9007199254740991,
           "minimum": -9007199254740991,
           "type": "integer"
+        },
+        "initiator": {
+          "minLength": 1,
+          "type": "string"
         },
         "intentId": {
           "minLength": 1,

@@ -1,0 +1,374 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-37",
+  "date": "2026-10-16",
+  "commit": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+  "branch": "codex/p1-37-qualification",
+  "node": "22.23.3 (ABI127)",
+  "pnpm": "10.33.0",
+  "os": "macOS (darwin)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/autoCompaction.test.ts",
+      "exit": 0,
+      "durationMs": 198
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-existing-manual-compaction-baseline.raw.json",
+      "exit": 0,
+      "durationMs": 6443
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/agentLoopTurnMachine.test.ts tests/agentLoopReconstructable.test.ts tests/agentLoopRetry.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-disabled-loop-compatibility.raw.json",
+      "exit": 0,
+      "durationMs": 6521
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-first-complete-three-files.raw.json",
+      "exit": 1,
+      "durationMs": 9420
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-37-qualification-20261016/inspect-missing-usage.py",
+      "exit": 0,
+      "durationMs": 38
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-corrected-three-files.raw.json",
+      "exit": 0,
+      "durationMs": 9584
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node --max-old-space-size=8192 node_modules/typescript/bin/tsc --noEmit -p tsconfig.json",
+      "exit": 0,
+      "durationMs": 26128
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 38974
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-v4-three-files.raw.json",
+      "exit": 0,
+      "durationMs": 9498
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm run lint",
+      "exit": 0,
+      "durationMs": 3023
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm run build",
+      "exit": 0,
+      "durationMs": 31010
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 0,
+      "durationMs": 202
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 238
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 221
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 244
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1098
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 179
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1506
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 586
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2579
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-37-qualification-20261016/deadcode-delta.mjs",
+      "exit": 1,
+      "durationMs": 2565
+    },
+    {
+      "cmd": "python3 /private/tmp/p1-37-qualification-20261016/hosted-refresh.py",
+      "exit": 1,
+      "durationMs": 137
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 46759
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-fresh-canonical.raw.json",
+      "exit": 0,
+      "durationMs": 9806
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-mutant-recent.raw.json",
+      "exit": 1,
+      "durationMs": 9064
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-restored-recent.raw.json",
+      "exit": 0,
+      "durationMs": 9469
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-mutant-trigger.raw.json",
+      "exit": 1,
+      "durationMs": 7055
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-restored-trigger.raw.json",
+      "exit": 0,
+      "durationMs": 9310
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-16-P1-37",
+      "exit": 0,
+      "durationMs": 186
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node -p 'JSON.stringify({node:process.version,abi:process.versions.modules,platform:process.platform,arch:process.arch})'",
+      "exit": 0,
+      "durationMs": 49
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --version",
+      "exit": 0,
+      "durationMs": 179
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 2,
+      "durationMs": 37776
+    }
+  ],
+  "tests": {
+    "total": 51,
+    "passed": 51,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "83d5d47092d5bc6fd888da61be2fd35725664bf63fcc2ee58c67d2b87d8b0132"
+    },
+    {
+      "path": "canonical-runtime-independent-review.json",
+      "sha256": "ecfb9e5385dfe228ff8af610073fb324f5e523bc2be71eb07aaef6fe205a8548"
+    },
+    {
+      "path": "causal-chain-independent-review.json",
+      "sha256": "118210e4a228883b3b448def83879efba129b3b6ca4cdafbc99d16a623ebc522"
+    },
+    {
+      "path": "cold-cli-observation.json",
+      "sha256": "7651bef64717547be9c1015201a359d5b1d0cadb9946c57e30fea6a2be5a2b29"
+    },
+    {
+      "path": "cold-cli.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "cold-cli.stdout",
+      "sha256": "0297e372b0ff2d3a06a83891f9a7330f807d9501e16e2214f05fc868676ee36b"
+    },
+    {
+      "path": "commands.json",
+      "sha256": "ec933b1107fd6c1a26371dd71244466f44dc357fe115b85acd5744ef4abf9610"
+    },
+    {
+      "path": "compiler-closure-independent-review.json",
+      "sha256": "f089f5a58d01062e03849460ae183dac6a0684fc94320ae15d6cc79b501361c9"
+    },
+    {
+      "path": "compiler-closure.json",
+      "sha256": "a0d667b589c87a8237f40c820d82c8ae414235b2e7577c48a8c585b00537f3d4"
+    },
+    {
+      "path": "compiler-halt/ACTIVE.json",
+      "sha256": "90eb356b14c052743c5f405c514b52a1c3132b2c3d578bc7e2e70b573672ed13"
+    },
+    {
+      "path": "compiler-halt/HALTED.json",
+      "sha256": "8d778f747a485c094f78a74863ed7e6fb331b4ca6494b5dc35d3251327d6cfcf"
+    },
+    {
+      "path": "compiler-halt/owned-group-after-exit.json",
+      "sha256": "19e2c46b46033e654152556eb500621cd37b8dfec70ccae535822d5b66341ba1"
+    },
+    {
+      "path": "compiler-halt/owned-process.json",
+      "sha256": "277a98e7ff7c0d00cbc9dda9fe684dd40101c2af9d76852645c4ebe5a1127608"
+    },
+    {
+      "path": "compiler-halt/stdout-stderr.log",
+      "sha256": "c63f50bd5e4b2334507a7aef5f4266a926a1d25ae3bc5bda3517cabc78cf1bc7"
+    },
+    {
+      "path": "count-literal-proof.json",
+      "sha256": "9235a899bbafbfdab094c1bde05fad4bfb89d502baa6132d190d58e99b7e64a3"
+    },
+    {
+      "path": "evidence.json",
+      "sha256": "72d79924b10a765f14a36a456de629582eddfda997ef1c1d98cc440f2d2f0143"
+    },
+    {
+      "path": "final-restoration.json",
+      "sha256": "1bba617a82bbe202a6f4cdf2f881c84907a69af8bec93cff4bb7e3ac2eb4699a"
+    },
+    {
+      "path": "freeze-and-quality.json",
+      "sha256": "ca7222eb35c906dbe00110b58317561a9f05a88a204969524823ae9eb568e8c8"
+    },
+    {
+      "path": "fresh-source-binding.json",
+      "sha256": "58dd59d19da659aeaa7ac8b2b2897f8885f39a057ac8b2467b597370c395461c"
+    },
+    {
+      "path": "ordinary-staging-observation.json",
+      "sha256": "c9d748c543587c853d869a0cfc6e3da2ec6b20b81b14ea89e0fca76da09e545d"
+    },
+    {
+      "path": "ownership.json",
+      "sha256": "c471d8fb020df9989d0558f9e06b4beb0af213941a1f3750090b3c2ac38b4872"
+    },
+    {
+      "path": "post-typecheck-root-admission.json",
+      "sha256": "88808215267f3480c2ee1ec6eccd31ad407a8156babd9e7487583c94085cf1ee"
+    },
+    {
+      "path": "public-crypto-and-joins.json",
+      "sha256": "30c69dddb3bea0d3eeab9a629da778fc8ac9408fa570041277a50b132cd1feeb"
+    },
+    {
+      "path": "public-evidence.json",
+      "sha256": "017453fd36fb7855a795874a9ab04f687396c874452108a5aba89e1096ebefe2"
+    },
+    {
+      "path": "receipt-folder-root-admission.json",
+      "sha256": "20d3ae5d0d4abe5fd62a516a19b8f3a07f02d3be11f1a66a3d064f15f5747c0c"
+    },
+    {
+      "path": "runs/initial-v2-red/observer.json",
+      "sha256": "6436d2b75b64404ee64e8630a54ef4afca6a8a30609b5be5835b09bdeedb445b"
+    },
+    {
+      "path": "runs/initial-v2-red/raw.json",
+      "sha256": "e27d2d79bc53336532e853bb2b509a3f7f4cee2cbebee75e1d53e929463ef040"
+    },
+    {
+      "path": "runs/initial-v2-red/stdout-stderr.log",
+      "sha256": "26aeed4b43588dfe21a7eb861997d8be1657b013d65e75a1cb543b677c1888fd"
+    },
+    {
+      "path": "runs/p137-fresh-canonical/observer.json",
+      "sha256": "b5bbe7c7bba40f5d7aa03266de818126bfef8552de62a3138ceffd765148f7e6"
+    },
+    {
+      "path": "runs/p137-fresh-canonical/raw.json",
+      "sha256": "5488fb5ce414cbed9bb44fdade02e2a480ce571f46cda7f61e52f2f3d63dc755"
+    },
+    {
+      "path": "runs/p137-fresh-canonical/stdout-stderr.log",
+      "sha256": "278ecf3719e0f89bcfe218fda51450487c0454940d302f25bf0371fcf593d789"
+    },
+    {
+      "path": "runs/p137-mutant-recent/observer.json",
+      "sha256": "5d703303c960e4ae7cef0d916bf938c95934ef76401db48458ec1f4c71bc219a"
+    },
+    {
+      "path": "runs/p137-mutant-recent/raw.json",
+      "sha256": "3155a6a93aed853d04816e51adf35627f0febd151f70b6bb771c2cf424949114"
+    },
+    {
+      "path": "runs/p137-mutant-recent/stdout-stderr.log",
+      "sha256": "6dd21e322926c8fbd406d94ddf8d5d865d3fc9d09d251bb79df2a6a284d439c9"
+    },
+    {
+      "path": "runs/p137-mutant-trigger/observer.json",
+      "sha256": "2da01d59d94ca4de46cf34910c5df295d5aac255a0f446eb2c7eeecc0ac6f911"
+    },
+    {
+      "path": "runs/p137-mutant-trigger/raw.json",
+      "sha256": "bf29b4dc9d04d424723bbb008f5b73f2c1da2bc62c096f763792f8e2c0dd0a08"
+    },
+    {
+      "path": "runs/p137-mutant-trigger/stdout-stderr.log",
+      "sha256": "a8ca5079ca269183e57278cf0d2d23b19b22d2bd722a564743128c1506ee6370"
+    },
+    {
+      "path": "runs/p137-restored-recent/observer.json",
+      "sha256": "201868a27043a6a7d663d24a57e05e1327af3ee827f6a237c8a146b3a9adf4c4"
+    },
+    {
+      "path": "runs/p137-restored-recent/raw.json",
+      "sha256": "20a8ae406abed3ebbb6f9ccad18134addeb422536902690d028f46e83b632571"
+    },
+    {
+      "path": "runs/p137-restored-recent/stdout-stderr.log",
+      "sha256": "3feeadece929f09d685f4eb9d8655f558703fcf2cf26eec7944940eda1c8f816"
+    },
+    {
+      "path": "runs/p137-restored-trigger/observer.json",
+      "sha256": "2d35d12e6d4cd09a8174ccd4e78f3e8e97e2da64102b7d4e5043deb8d2453e3c"
+    },
+    {
+      "path": "runs/p137-restored-trigger/raw.json",
+      "sha256": "1cfb6aa24f26253ff91c706d4c3e644ce0da62dc755857cb18dc25b075a07174"
+    },
+    {
+      "path": "runs/p137-restored-trigger/stdout-stderr.log",
+      "sha256": "cb9b4d748fdfad9275c8bb6f3835ff6336a894722dee4af46c6c7504c23f4b38"
+    },
+    {
+      "path": "sensitivity.json",
+      "sha256": "93b2bd2dd6a6c7655583d26d3447e50f4f63537695098091ca08cb26d449085d"
+    },
+    {
+      "path": "source-commit-result.json",
+      "sha256": "52fc73ab8c64552c6057b7923f44e1423728f10434ccc806012480adb8ce2d0e"
+    },
+    {
+      "path": "test-corrections.json",
+      "sha256": "0af23c5b24edfa4456b6afc8c6d6838368cb75aba2bb1b98e7a7b74f758a7c5b"
+    },
+    {
+      "path": "type-guard-review.json",
+      "sha256": "686b32fc5cda7e53475b7aa55deb3a066ab30e8add31b40218041c74016dd839"
+    },
+    {
+      "path": "wrapper-delta-review.json",
+      "sha256": "8c935d947690c4bc85267abfbc8b2f3ab7c7f1447161f42e86063fec72d592f4"
+    }
+  ],
+  "notes": "This is bounded qualification, not formal Done. The canonical fresh checkout passed all 51 cases. The initial fixture run passed 49 of 50 cases and remains preserved. The compiler child exited 2 and its wrapper halted at 70 in that one failed attempt; the separately admitted v4 test guard repair passed. The two source-only mutations intentionally failed 3 and 7 cases, respectively; each exact restoration passed all 51 cases. Initial count drift and the private-HOME metadata authentication refusal remain recorded. Duplicate and dead-code checks still fail with 1,268 and 2,729 findings. No baseline was adopted or check waived. Production source and guards are unchanged. Full-suite, coverage, hosted and release acceptance, all held decisions and the F37 skip remain open."
+}

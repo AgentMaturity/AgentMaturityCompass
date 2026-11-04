@@ -115,13 +115,9 @@
       "type": "object"
     },
     "baseReleaseId": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "claim": {
@@ -137,13 +133,9 @@
           "type": "string"
         },
         "eligibleLevel": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "number",
+            "null"
           ]
         },
         "entitlement": {
@@ -472,23 +464,15 @@
               ]
             },
             "hostMembershipId": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "null"
               ]
             },
             "usersYamlSignerFingerprint": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "null"
               ]
             }
           },
@@ -551,23 +535,15 @@
           ]
         },
         "hostHint": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "string",
+            "null"
           ]
         },
         "imageDigest": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "string",
+            "null"
           ]
         },
         "kind": {
@@ -642,7 +618,10 @@
         "envelope": {
           "properties": {
             "alg": {
-              "const": "ed25519",
+              "enum": [
+                "ed25519",
+                "ecdsa-p256-sha256"
+              ],
               "type": "string"
             },
             "fingerprint": {
@@ -665,6 +644,14 @@
             },
             "signer": {
               "properties": {
+                "attestationBasis": {
+                  "enum": [
+                    "configured",
+                    "provider-metadata",
+                    "provider-reported"
+                  ],
+                  "type": "string"
+                },
                 "attestationLevel": {
                   "enum": [
                     "SOFTWARE",
@@ -758,14 +745,22 @@
           ]
         },
         "enforcementBoundary": {
-          "enum": [
-            "tool_pipeline",
-            "hook:PreToolUse",
-            "pi:tool_call",
-            "gateway",
-            "none"
-          ],
-          "type": "string"
+          "anyOf": [
+            {
+              "enum": [
+                "tool_pipeline",
+                "hook:PreToolUse",
+                "pi:tool_call",
+                "gateway",
+                "none"
+              ],
+              "type": "string"
+            },
+            {
+              "pattern": "^acs:[A-Za-z][A-Za-z0-9_]{0,63}$",
+              "type": "string"
+            }
+          ]
         },
         "evidenceTier": {
           "enum": [
@@ -796,13 +791,9 @@
           "type": "string"
         },
         "reason": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "string",
+            "null"
           ]
         },
         "source": {
@@ -904,23 +895,15 @@
                 "type": "string"
               },
               "evidenceRef": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
+                "type": [
+                  "string",
+                  "null"
                 ]
               },
               "reason": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
+                "type": [
+                  "string",
+                  "null"
                 ]
               },
               "satisfiedBy": {
@@ -979,13 +962,9 @@
       "type": "string"
     },
     "previousReleaseId": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "projectId": {
@@ -1022,13 +1001,9 @@
                 "type": "string"
               },
               "evidenceSource": {
-                "anyOf": [
-                  {
-                    "type": "string"
-                  },
-                  {
-                    "type": "null"
-                  }
+                "type": [
+                  "string",
+                  "null"
                 ]
               },
               "measure": {
@@ -1515,13 +1490,9 @@
       "additionalProperties": false,
       "properties": {
         "enforceManifestId": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "string",
+            "null"
           ]
         },
         "leaseIds": {
@@ -1539,13 +1510,9 @@
           "type": "array"
         },
         "releaseId": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
+          "type": [
+            "string",
+            "null"
           ]
         }
       },
@@ -1620,13 +1587,9 @@
               ]
             },
             "manifestId": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "null"
               ]
             },
             "restoreReceiptSha256": {
@@ -1663,13 +1626,9 @@
               ]
             },
             "lifecycleTransitionId": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "null"
               ]
             },
             "typedGraphDigest": {
@@ -1729,13 +1688,9 @@
                   "type": "string"
                 },
                 "eligibleLevel": {
-                  "anyOf": [
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "null"
-                    }
+                  "type": [
+                    "number",
+                    "null"
                   ]
                 },
                 "entitlement": {
@@ -2025,13 +1980,9 @@
               ]
             },
             "latestSealedRunId": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "null"
               ]
             }
           },
@@ -2097,13 +2048,9 @@
           "additionalProperties": false,
           "properties": {
             "deploymentReceiptRef": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
+              "type": [
+                "string",
+                "null"
               ]
             },
             "runtimeRunIds": {
@@ -2146,13 +2093,9 @@
       "type": "object"
     },
     "transparencyEntryId": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "updatePolicySha256": {

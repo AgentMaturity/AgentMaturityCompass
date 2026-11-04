@@ -1,0 +1,85 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > R2 reads unmarked dogfood metadata conservatively and preserves current marked rows
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-YSyFIW/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > R4 never promotes operator-chosen ATTESTED legacy provenance
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-zP9e5t/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > current public claim envelopes bypass the legacy classifier
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-JrGq1p/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance without an envelope classifies as R5 self-reported
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-2ttmTD/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance lazy claim stays self-reported instead of using current observed fallback
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-syeNJR/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-DTVSNA/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > an edited signed log line refuses further relabelling without changing originals
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-lgHTqB/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > a tampered migration receipt signature refuses its log and any further append
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-AtQf5v/public-evidence.json
+
+ ❯ tests/migration/legacyRelabel.test.ts (8 tests | 2 failed) 614ms
+     ✓ R2 reads unmarked dogfood metadata conservatively and preserves current marked rows 5ms
+     ✓ R4 never promotes operator-chosen ATTESTED legacy provenance 7ms
+     ✓ current public claim envelopes bypass the legacy classifier 3ms
+     × post-fix assurance without an envelope classifies as R5 self-reported 7ms
+     × post-fix assurance lazy claim stays self-reported instead of using current observed fallback 9ms
+     ✓ dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat 238ms
+     ✓ an edited signed log line refuses further relabelling without changing originals 173ms
+     ✓ a tampered migration receipt signature refuses its log and any further append 167ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance without an envelope classifies as R5 self-reported
+AssertionError: expected undefined to be 'R5-no-claim-envelope' // Object.is equality
+
+- Expected:
+"R5-no-claim-envelope"
+
++ Received:
+undefined
+
+ ❯ tests/migration/legacyRelabel.test.ts:165:27
+    163|       const found = classifyLegacyArtifact("assurance_report", postfix…
+    164|       f.facts = { found, specificationEdge: "MEASURED without claim en…
+    165|       expect(found?.rule).toBe("R5-no-claim-envelope");
+       |                           ^
+    166|       expect(found?.claimKind).toBe("self_reported"); expect(found?.le…
+    167|     });
+ ❯ owned tests/migration/legacyRelabel.test.ts:60:11
+ ❯ tests/migration/legacyRelabel.test.ts:162:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance lazy claim stays self-reported instead of using current observed fallback
+AssertionError: expected 'observed' to be 'self_reported' // Object.is equality
+
+Expected: "self_reported"
+Received: "observed"
+
+ ❯ tests/migration/legacyRelabel.test.ts:177:33
+    175|         legacyNoticePresent: visible.provenance.legacy !== undefined };
+    176|       expect(envelope.claimKind).toBe("observed");
+    177|       expect(visible.claimKind).toBe("self_reported"); expect(callback…
+       |                                 ^
+    178|       expect(visible.provenance.legacy !== undefined).toBe(true);
+    179|     });
+ ❯ owned tests/migration/legacyRelabel.test.ts:60:11
+ ❯ tests/migration/legacyRelabel.test.ts:171:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 6 passed (8)
+   Start at  22:06:13
+   Duration  2.98s (transform 1.68s, setup 19ms, import 2.24s, tests 614ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p135-strict-synthetic-baseline.raw.json

@@ -1,0 +1,47 @@
+[
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/classification.json",
+    "bytes": 229,
+    "sha256": "e8e68f8574b185caf06434b728c6f0b183061d0a1229ef6297c02b106c4fabbc"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/command.json",
+    "bytes": 1931,
+    "sha256": "c5079e5a9ffcf1628475914f04130ae38aaf32c91111b01837742e38929f721a"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/inputs-after.json",
+    "bytes": 830,
+    "sha256": "31f9b3f5f96824e9248d285de301709587a2444a7e0ca49e10f620cab752400f"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/inputs-before.json",
+    "bytes": 830,
+    "sha256": "4e12e4f19f3f09f95adddff18db4c1811ab8f16ec01c1a212606d048c2aa4059"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/observer.json",
+    "bytes": 20517,
+    "sha256": "1dc08e25457ddac9bb260cff9004992d5f3595f9cd5a93cb39163907ae55e8c0"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/owned-group-after-exit.json",
+    "bytes": 520,
+    "sha256": "920836cb3dc50d2a7f50ef2d839e6c9b2f6ed5e8fd3a845092f22be987fd7e33"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/owned-process.json",
+    "bytes": 1556,
+    "sha256": "f7a9487e6eee5af59e46d6d30b71e2728827d6a9b04d24d36d4e79a2c5dea2a9"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/raw.json",
+    "bytes": 13468,
+    "sha256": "229184f6fd0ad4b04d53a916c0ba7e28173cbb0ea31285048f02a1e1fc8e35c7"
+  },
+  {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/phases/P021-C2-L2-threshold--restored/stdout-stderr.log",
+    "bytes": 793,
+    "sha256": "12fd847888c733c4e053bd64da30aa9f4539034721b1ee543ae4dca868d59cf8"
+  }
+]

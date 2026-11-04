@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "commands/p112-lint/stdout-stderr.log",
+    "bytes": 447,
+    "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95"
+  },
+  "dataBase64": "Cj4gYWdlbnQtbWF0dXJpdHktY29tcGFzc0AxLjIuMCBsaW50IC9Vc2Vycy9zaWQvLmNvZGV4L3dvcmt0cmVlcy9wMi0wNy1zY2ltLXF1YWxpZmljYXRpb24vQWdlbnRNYXR1cml0eUNvbXBhc3MKPiBveGxpbnQgLS10eXBlLWF3YXJlIC0tZGVueS13YXJuaW5ncyAtYyAub3hsaW50cmMuanNvbiBzcmMgJiYgbm9kZSBzY3JpcHRzL2xpbnQtY29udHJhY3QubWpzICYmIG5vZGUgc2NyaXB0cy9jaGVjay1uby1mYWJyaWNhdGlvbi5tanMKCkxpbnQgY29udHJhY3QgcGFzc2VkOiB0aHJlZSB1bnNhZmUgcGF0dGVybnMgcmVqZWN0ZWQ7IHNhZmUgY291bnRlcnBhcnRzIGFjY2VwdGVkLgpjaGVjay1uby1mYWJyaWNhdGlvbjogcGFzc2VkOyBhbGxvd2xpc3RlZCBmaW5kaW5ncyBSMSAwLCBSMiAwLCBSMyAzMDMsIFI0IDEwOyAxNiByYW5kb20gbWFya2VyKHMpOyAwIHBlbmRpbmcgZW50cmllcy4K",
+  "boundary": "Exact original bytes, including whitespace, are preserved by base64. Decode and verify original.bytes and original.sha256. The original producer remains retained privately; no normalization or command-result change."
+}

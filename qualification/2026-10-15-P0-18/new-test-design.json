@@ -1,0 +1,524 @@
+{
+  "schemaVersion": 1,
+  "capturedUtc": "2026-10-14T22:28:46.058829+00:00",
+  "mode": "STATIC DESIGN ONLY",
+  "measuredSource": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "workspace": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass",
+  "prospectiveOnlyNewFile": "tests/claims/evidenceProvenanceQualification.test.ts",
+  "notAuthored": true,
+  "sourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "lines": 242,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee",
+      "relativePath": "src/claims/evidenceProvenance.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "lines": 202,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "relativePath": "src/trust/trustList.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "lines": 129,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991",
+      "relativePath": "src/trust/trustContext.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/admission.ts",
+      "bytes": 9401,
+      "lines": 146,
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "relativePath": "src/trust/admission.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+      "bytes": 604,
+      "lines": 10,
+      "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd",
+      "relativePath": "src/trust/keyPurposes.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "lines": 190,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c",
+      "relativePath": "src/crypto/keys.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "lines": 19,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "relativePath": "src/utils/json.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "lines": 1295,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14",
+      "relativePath": "src/ledger/ledger.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "lines": 71,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854",
+      "relativePath": "src/ledger/ledgerConnection.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+      "bytes": 3447,
+      "lines": 68,
+      "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c",
+      "relativePath": "src/ledger/trustTierValidation.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+      "bytes": 10253,
+      "lines": 256,
+      "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5",
+      "relativePath": "src/ingest/ingest.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+      "bytes": 70432,
+      "lines": 1971,
+      "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8",
+      "relativePath": "src/eval/evalImporters.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/eval/evalCli.ts",
+      "bytes": 1521,
+      "lines": 43,
+      "sha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6",
+      "relativePath": "src/eval/evalCli.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/dogfood/maturityEvidence.ts",
+      "bytes": 15973,
+      "lines": 484,
+      "sha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779",
+      "relativePath": "src/dogfood/maturityEvidence.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+      "bytes": 4710,
+      "lines": 109,
+      "sha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0",
+      "relativePath": "src/credentials/credentialsPaths.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/claims/evidenceProvenance.test.ts",
+      "bytes": 17646,
+      "lines": 269,
+      "sha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212",
+      "relativePath": "tests/claims/evidenceProvenance.test.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/evalImportTrust.test.ts",
+      "bytes": 5728,
+      "lines": 117,
+      "sha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4",
+      "relativePath": "tests/evalImportTrust.test.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/ingestAttestation.test.ts",
+      "bytes": 15700,
+      "lines": 254,
+      "sha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa",
+      "relativePath": "tests/ingestAttestation.test.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/trustTierWriteGuard.test.ts",
+      "bytes": 5739,
+      "lines": 100,
+      "sha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62",
+      "relativePath": "tests/trustTierWriteGuard.test.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/dogfoodMaturityEvidence.test.ts",
+      "bytes": 4544,
+      "lines": 91,
+      "sha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c",
+      "relativePath": "tests/dogfoodMaturityEvidence.test.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "lines": 93,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903",
+      "relativePath": "tests/externalEvidenceProfile.test.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+      "bytes": 5707,
+      "lines": 80,
+      "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f",
+      "relativePath": "tests/externalEvidenceExport.test.ts",
+      "matches072Source": true
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+      "bytes": 11569,
+      "lines": 207,
+      "sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a",
+      "relativePath": "tests/compliance/evidenceBinding.test.ts",
+      "matches072Source": true
+    }
+  ],
+  "fullSpec": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-18.md",
+    "bytes": 14225,
+    "lines": 106,
+    "sha256": "44892a201424c5271c9ebb936608c22d0ddca2f512fa5d840193118fa74590c4"
+  },
+  "routingReceipt": {
+    "path": "/private/tmp/p0-24-next-key-readonly-routing-preflight-20261015.json",
+    "bytes": 51638,
+    "lines": 1241,
+    "sha256": "c081db3fc51120aeb70b427e52170a2d72b3fb684df39b114fdda7fa11573771"
+  },
+  "existingEightBaselineFiles": [
+    {
+      "file": "tests/claims/evidenceProvenance.test.ts",
+      "lines": 269
+    },
+    {
+      "file": "tests/evalImportTrust.test.ts",
+      "lines": 117
+    },
+    {
+      "file": "tests/ingestAttestation.test.ts",
+      "lines": 254
+    },
+    {
+      "file": "tests/trustTierWriteGuard.test.ts",
+      "lines": 100
+    },
+    {
+      "file": "tests/dogfoodMaturityEvidence.test.ts",
+      "lines": 91
+    },
+    {
+      "file": "tests/externalEvidenceProfile.test.ts",
+      "lines": 93
+    },
+    {
+      "file": "tests/externalEvidenceExport.test.ts",
+      "lines": 80
+    },
+    {
+      "file": "tests/compliance/evidenceBinding.test.ts",
+      "lines": 207
+    }
+  ],
+  "baselineCoverageNotDuplicated": {
+    "provenance": "Unitproducer/caps/signaturevariants, boundreplaymatrix, dedup/window, diagnostictier andsyntheticgatecontrols alreadyexist, mostlyconstructedTrustContext orpost-signoperatorhome. Newcoldactualsignedloader+prepin/effects adds anadmission boundary ratherthan copyingthewholematrix.",
+    "eval": "All7formats/timepolicy/hiddenflagactualchild alreadyexisting. RootseparateprivateCLI/evalprobesshould retainexactargv/exit/effects; no additionalmonolithic importerbody here.",
+    "ingest": "Actualingest/operator/thirdparty/replay andP055subject/time/countcontrols exist, withconstructedcontextshortcut; newfixtureusesactualsignedlistloadbeforepositiveadmission.",
+    "writeGuard": "Enum/producertier/ownkey/outcome/receiptwriter controls exist; newcaseadds measurableeffects andactualsignedclosure provenance only.",
+    "dogfood": "Fourrealexistingcontrols includeactualseedingandno diagnosticrise; keepordinarybaseline distinct. Newpermanent file neednot run a fleet orcreate synthetic evidence garden.",
+    "S7": "M11importgate/M12lowerdeclaration alreadypinned inexternalEvidenceProfile/export originals; remain separatefromnewcoldprovenance corpus.",
+    "bindingInventory": "evidenceBinding.test.ts source-literalclassification andcompliancebinding remainoldbaseline; no newsourceenumerationmirror."
+  },
+  "proposedCaseInventory": [
+    {
+      "id": "loaded-trust-ingest-cold",
+      "title": "Actual signed trust-list load and genuine third-party ingestion survive a cold reader",
+      "assertions": [
+        "Independent Node crypto verifies the signed list and attester digest using public pins recorded before signatures. Actual loadTrustContext gives mode pinned, empty explicitPins and both allow flags false.",
+        "Actual ingest original review row remainsSELF_REPORTED; actual bound attested review copy readsATTESTED via readerTrustFor(workspace). Record all original event/payload/time/agent/session binding fields.",
+        "Original payload hash recomputes from readEventPayload plaintext, signed bundle digest matches independent canonical bytes, and both original/reviewcopy IDs are nonempty and distinct.",
+        "ATTESTED-stamped INGEST_ATTESTED audit metadata lacks originalEventId and therefore readsSELF_REPORTED; do not assert all stamped rows are admissible."
+      ]
+    },
+    {
+      "id": "missing-root",
+      "title": "A signed list with no separately recorded root refuses",
+      "assertions": [
+        "Default list exists but ownedhome trust-roots.json is absent; actual loadTrustContext throws codeTRUST_LIST_SIGNATURE_INVALID, message no trust-list root is pinned.",
+        "Fresh readerTrustFor returns null trust internally and bound review row downgradesSELF_REPORTED; do not reuse a cached reader closure."
+      ]
+    },
+    {
+      "id": "foreign-root-envelope",
+      "title": "A genuinely foreign-root-signed list cannot self-admit its carried root",
+      "assertions": [
+        "Generate and capture rootB public pin before listB signing; Node crypto verifiesB signature positively. Only rootA fingerprint is configured as trusted root.",
+        "Actual loader throwsTRUST_LIST_SIGNATURE_INVALID and cold read downgrades; do not pinB from envelope."
+      ]
+    },
+    {
+      "id": "list-tamper",
+      "title": "Parseable signed-list bytes changed after signing refuse before admission",
+      "assertions": [
+        "Change a meaningful entrypurpose after list signature without resigning; underlying schema remains valid. Independent Node crypto signature check false.",
+        "Actual loader throwsTRUST_LIST_SIGNATURE_INVALID; original evidence rows remain unchanged."
+      ]
+    },
+    {
+      "id": "own-key-refusal",
+      "title": "Monitor and auditor signatures remain self-attested even when actually pinned",
+      "assertions": [
+        "Record workspace monitor/auditor public IDs after bootstrap and before attestation signatures as exclusion evidence, never positive verifier authority.",
+        "Actual independently-root-signed list deliberately names each ownkey forindependent-attestation; actual attestIngestSession returnsSELF_REPORTED with operator's own reason. Cold metadata remains self_attested; no ownkey fixture is ever a positiveATTESTED control."
+      ]
+    },
+    {
+      "id": "wrong-purpose",
+      "title": "A genuine list that pins signer only forartifact-seal cannot conferATTESTED",
+      "assertions": [
+        "List signature valid under capturedrootA; actual entry purpose artifact-seal. Genuine attester signature still verifies independently.",
+        "verifyThirdPartyAttestation returns verifiedfalse and reason containswrong-purpose; cold bound storedreview downgradesSELF_REPORTED."
+      ]
+    },
+    {
+      "id": "revoked",
+      "title": "A newly cold loaded signed key-compromise revocation downgrades a previously valid copy",
+      "assertions": [
+        "Prepare genuine signed revoked variant before readonly phases; sameattester entryrevokedAt relativeactualclock and revocationReasonkey-compromise.",
+        "Actual signature remains valid but admission reasonrevoked; reader resultSELF_REPORTED. Scope local admission only, not automatic/global withdrawal orP051 closure."
+      ]
+    },
+    {
+      "id": "expired-entry",
+      "title": "A signer validity window that expired refuses while its signed list remains valid",
+      "assertions": [
+        "Keep list expiresAt in future, but entryvalidTo past with validFrom earlier; no forged metadata or clock mock.",
+        "Loader succeeds, verifyThirdPartyAttestation refusesexpired, cold copySELF_REPORTED. Do not conflate listexpiration with entryexpiration."
+      ]
+    },
+    {
+      "id": "unpinned-attester",
+      "title": "Genuine signature alone does not admit a signer absent from a valid signed list",
+      "assertions": [
+        "Actual valid rootA list has no signer entry; list is genuine and loaded, not a constructednullcontext.",
+        "Independent Node crypto confirms boundattestation signaturevalid under pre-recorded signerpublicpin; production verifiedfalse reasonnot pinned, cold tierSELF_REPORTED."
+      ]
+    },
+    {
+      "id": "forged-attestation",
+      "title": "Signature from keyB claiming keyA refuses after real list admission",
+      "assertions": [
+        "Capture A/Bpublicpins first; sign digest withB, retainAkeyId in candidate; Bsignature positiveunderB and negativeunderA.",
+        "Use a local adversarial clone of theactualstoredrow, or an explicitly labelled owned fixture appended through realwriter shape guard; production verifiedfalse reasonsignature and tierSELF_REPORTED. No claim forgedrow wasaccepted cryptographically orhistorical."
+      ]
+    },
+    {
+      "id": "bound-subject-matrix",
+      "title": "Cold genuine signature cannot be reused across bound fields",
+      "assertions": [
+        "Using actual persistedoriginal and attestedreview metadata, create separately labelled adversarial row variants foranotheragent,anotherregistered session,anotherpayload hash,anotheroriginalEventId,and rowtime earlier than signedentry by5min+1ms.",
+        "Each still carries the original genuine signature, independently verified; each effectiveTrustTierSELF_REPORTED. Require the unaffectedoriginal positive in the same cold phase.",
+        "No historical/live row is rewritten; ifactualwriter is usedforvariants, create all ownedrows infinishedinitializerchild and record them separately fromauthentic reviewcopy."
+      ]
+    },
+    {
+      "id": "dedup-window",
+      "title": "Real persisted duplicate copies count once for the original event and signed-time window",
+      "assertions": [
+        "Append an owned duplicate usingactualledger append with genuineattestation, then close writerchild. Both copy rows independently readATTESTED.",
+        "countAttestedOnce in both roworders chooses earliestactualcopyID once; outside the signed entrytime window keeps no copy of that event. Existing unrelated/selfreported rows pass through unchanged.",
+        "Do not present thishelper check as full diagnostic/compliance evaluation; originals cover bothengines separately."
+      ]
+    },
+    {
+      "id": "writeguard-effects",
+      "title": "Actual elevated producer refusal creates no new evidence row",
+      "assertions": [
+        "Use initializedfinished-child fixture and actual ledgerappend for importedOBSERVED andATTESTED-without-shape; capture actualerror and raw rows before/aftereach attemptedappend.",
+        "Error matches the documentedproducer reason; row IDs/event hashes/payload refs unchanged. Sessionbootstrap/writerconnection setup must occurbefore measuredrefusal interval, and its effects remain recorded separately."
+      ]
+    },
+    {
+      "id": "legacy-synthetic-caps",
+      "title": "Cold-read local legacy projections and synthetic rows never gain provenance credit",
+      "assertions": [
+        "Actual original importedreview isSELF_REPORTED. A clearly labelled in-memorylegacy projection ofthatrow withdeclaredOBSERVED readsSELF_REPORTED. No claim anoldpersisted1.1row was created or rewritten.",
+        "Well-shaped unverifiedATTESTED localadversarial metadata readsSELF_REPORTED; synthetic claim/provenance flags returnnull; usefreshrowobjects becauseeventMeta is aWeakMapcache.",
+        "These controls are not storedrowmigration,allsourceinventoryorfullgatequalification."
+      ]
+    }
+  ],
+  "proposedRegisteredCount": 14,
+  "countLimit": "Design only; registration/actualassertioncountmustbeverifiedafter authoring. Tablevariants insidebound-subject case do not becomeclaimedseparatepasses. Rootmaytrimredundancybeforeauthoring.",
+  "actualContracts": {
+    "signTrustList": "signTrustList(list: TrustList, rootPrivateKeyPem: string): SignedTrustList",
+    "verifySignedTrustList": "verifySignedTrustList(signed: unknown, opts: { pinnedRootKeyIds: readonly string[]; now: Date }): TrustList",
+    "trustListSignatureBytes": "Buffer.concat([Buffer.from(\"AMC_TRUST_LIST_V1\", \"ascii\"), Buffer.from([0]), Buffer.from(canonicalize(list), \"utf8\")]); Ed25519sign(null,bytes,rootprivate). Never signHexDigest for thelist.",
+    "canonicalize": "JSON.stringify(sortDeep(value)): arrayorder retained; objectownkeys recursively lexicalsorted intoObject.create(null). Independent fixture canonicalizer must reproduce these bytes without importingsignTrustList internals.",
+    "ed25519KeyId": "sha256 ofcanonicalNode-exported Ed25519SPKI PEM UTF8, LFlineendings. Record byNodecreateHash on thegeneratedpublicPEM BEFOREsignature; compare toactual ed25519KeyId result, notartifactkeyId.",
+    "bundleDigest": "bundleDigest(bundle: readonly BundleEntry[]): string =sha256Hex(canonicalize(bundle)); BundleEntry{id:string,sha256:string,ts:number,agentId:string,sessionId:string}.",
+    "attesterSignatureBytes": "signHexDigest(digestHex,privateKeyPem) validates64lowercasehex and signs Buffer.from(digestHex,\"hex\") withEd25519; never the64-characterUTF8 hexstring. Verify independently withNodecrypto using prerecordedsignerpublickey.",
+    "loadTrustContext": "loadTrustContext(opts: LoadTrustContextOptions = {}): TrustContext; optsamcHome/env/now/pubkey/expectMonitor/trustLists/trustRoots/allowflags. Newfixture callsactualdefault loader withAMC_HOMEowned0700, HOMEseparate0700, noallowflags/publicartifactpins. Defaultpaths <AMC_HOME>/trust/amc-trust-list.json andtrust-roots.json {type:\"amc.trust-roots\",version:1,roots:[recordedRootFingerprint]}.",
+    "defaultLoaderFlow": "amcHome option beatsresolveAmcHome; AMC_HOME beats~/.config/amc. Defaultlist isreadonly boundedfile1MiB nofinalsymlink, rootfilestrictschema. Each signedlist verifies againstseparateroots atnow. Built-in distrust combineswithlist distrust. Lists alreadyverified inreturnedcontext; explicitPins[]/allowUnpinnedfalse/allowUnanchoredfalse expectedwithoutoverrideopts.",
+    "readerTrustFor": "readerTrustFor(workspace?: string): () => ReaderTrust; lazycachedonceperevaluation; defaultreaderTrustList callsloadTrustContext() andcatchesloaderexceptions to null. workspaceOwnKeyIds usesauthenticatedcurrent/history monitor/auditorpublickeys as exclusions. Alwayspassworkspaceinnewfixture; no readerTrustFor() omission whichcouldadmitownkey.",
+    "effectiveTrustTier": "effectiveTrustTier(event: Pick<EvidenceEvent,\"meta_json\"> & {payload_sha256?:string;session_id?:string;ts?:number}, reader: ReaderTrust | (()=>ReaderTrust)): TrustTier|null. syntheticnull; unknown/missingtierSELF_REPORTED; unboundATTESTEDSELF_REPORTED; boundATTESTEDverifyagainstloadedlist+ownexclusions; import/manual/externalnonATTESTED declarationsSELF_REPORTED.",
+    "binding": "hasAttestationShape requiresstringkeyId/sigB64/digestSha256. boundEntry requiresarraybundle, originalEventId/payload_sha256/metaagentId/rowsession_id/numberrowts; canonicalbundledigestmatch; findsentryid/hash/agent/sessionmatch andentryts<=rowts+300000. StoredmetaingestSessionId andattestedBy/statement are recorded but not the signedentrybindingfields; never invent authenticatedidentity.",
+    "attestIngestSession": "attestIngestSession({workspace,ingestSessionId,agentId?,attestedBy,statement,attesterSignature?:{keyId,sigB64},trust?:TrustContext|null}):{attestedEventCount,bundleHash,trustTier:\"ATTESTED\"|\"SELF_REPORTED\",reason}; trust mustcome fromactualsignedloader here. Missingidentity/statement throws; unsigned/invalid/ownkey storesSELF_REPORTED. Synthetic source refuses. Samekey/event replaythrows ratherthanstoringagain.",
+    "ingestEvidence": "ingestEvidence({workspace,agentId?,inputPath,type:\"generic_text\"|...}):{ingestSessionId,fileCount,eventIds}; actualreviewrows sourcegeneric_text,SELF_REPORTED andsessionsealed. ingestBundleHash(workspace,ingestSessionId,agentId?) buildsactualoriginalreviewbundle oldestfirst excludingattested_ingest copies.",
+    "countAttestedOnce": "countAttestedOnce<T extends ReadRow & Pick<EvidenceEvent,\"ts\">>(rows:readonlyT[],tierOf:(row:T)=>string|null|undefined,window:{startTs:number;endTs:number}):T[]; duplicatekey originalentryid+agentId, earliestrowts, closedinclusivewindowbysignedentryts; nonattested/unboundpassunchanged.",
+    "readOnlyLedger": "openLedger(workspacePath:string,options:{readonly?:boolean;store?:\"unsigned\"}={}):Ledger; readonlytrue directlynewDatabase(dbPath,{readonly:true,fileMustExist:true}),leasenull, noensurekeys/pool/migration. ActualledgergetAllEvents thenclose. ReadonlySQLite maycreateWALsidecars, so lifecycle/effectsboundariesmust beexplicit.",
+    "writeGuard": "assertTrustTierProvenance(meta,workspace?) checksenum, synthetic/import/manual/externalOBSERVEDrefusal, ATTESTEDshapeandworkspaceownkey exclusion. It isnotcryptographicadmission: correctlyshapedthirdpartyATTESTED canbewrittenandmustbereverified/downgradedbyreader. assertOutcomeTrustTier(source,tier) allowsOBSERVEDonlytoolhub andSELF_REPORTEDotherwise.",
+    "seederGuard": "assertDogfoodSeedingAllowed(env:NodeJS.ProcessEnv=process.env,modulePath=fileURLToPath(import.meta.url)):void; requiresenv.AMC_DEV_DOGFOOD==\"1\" andpathoutside node_modules. Reuseactualexport forprivateprobe withoutgenerating a fleet."
+  },
+  "actualReasons": {
+    "loaderMissingRoot": "TRUST_LIST_SIGNATURE_INVALID: <path>: no trust-list root is pinned (--trust-root or <rootsFile>)",
+    "loaderUntrustedOrTamperedSignature": "TrustListError.code TRUST_LIST_SIGNATURE_INVALID; no valid signature by a pinned root",
+    "loaderExpiredList": "TrustListError.code TRUST_LIST_EXPIRED; distinctfrom expiredentry",
+    "malformedList": "TrustListError.code TRUST_LIST_INVALID; schema/parsing, not anadmission verdict",
+    "thirdParty": [
+      "malformed attestation: keyId, sigB64 and digestSha256 are required",
+      "key <id> is one of the operator's own keys, not a third party",
+      "no trust list is loaded, so no attester key is pinned",
+      "not pinned: key <id> is in no loaded trust list",
+      "wrong-purpose / revoked / expired / distrusted: admission.detail",
+      "signature by <id> does not verify over <digest>"
+    ],
+    "unsignedAttest": "self-attested: no third-party signature was given",
+    "replay": "ingest session <session> is already attested by key <id> (event <id>); attest new evidence in a new ingest session",
+    "writeProducer": "trust tier <tier> is not allowed for <producer> evidence; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+    "writeOwn": "trust tier ATTESTED is not allowed with the workspace's own key; tiers derive from provenance (docs/EVIDENCE_TRUST.md)",
+    "seeder": "dogfood seeding is a development tool: set AMC_DEV_DOGFOOD=1 in a source checkout"
+  },
+  "fixtureLifecycle": [
+    "Parentonlycreatesownedfixturepath/safeHOME/AMC_HOME at0700. Parentmustnotinitializea pooledledger orkeepSQLitehandleswhilechildrenrun.",
+    "Finishedinitializerchild usesactualsource/compiledclosure APIs. GenerateRootA/RootB/AttesterA/AttesterB, persistpublicpins/identities/fingerprints andchronologicalphase BEFORElist/attestation signatures. Keepprivatekeymaterial memory-only orprivate0600fixtures excludedfromreceipts/logs.",
+    "ActualsignTrustList preparesvalid andnegative signedlist variants atrelativecurrentclock inowned0700homes; rootsfile contains onlythepre-recordedallowedfingerprint. Caller-entrylabels areexplicitlocaloperator-authoredfixture claims.",
+    "ActualinitWorkspace createsworkspacekeys/config. Recordownmonitor/auditor IDsas exclusions beforeattesting; do notuse theseasindependentpositivepins. ActualingestEvidence returnsrealoriginalrows; recordtheirIDs/payloadhash/time/session/agent. SignactualingestBundleHash hexbytesusingthirdpartykey and callactualattestIngestSession with actualloadTrustContext.",
+    "Allwriter/probe/refusal setup, copyappend anddedupfixtures finishininitializerchild. Closeeachledger andwaitforchildexit; recordexit/noerrors/exactrow inventory beforeanycoldreader. No pooledparent initializer + liveCLIchild mix.",
+    "Eachreader is a newchildwith freshmodule/readerclosure andspecificpreparedAMC_HOME. Takeexplicitinitialdirectory/byte/row snapshot, openactualopenLedger({readonly:true}), readgetAllEvents andclose, thenactualreaderTrustFor(workspace)/effectiveTrustTier/countAttestedOnce. Never initialize/migrate/repair/readwithworkspaceSelfTrust.",
+    "WAL/SHM effects: retain thefullpre-open/post-closeinventory, includingcreated/removedcoordination sidecars. Define semanticno-rewrite interval over rawevidence columns/signatures andDB/payload/key/listfiles; compareexistingbytesandreportWALexceptions honestly ratherthan excludingunexplaineddata effects. Ifnecessarytake a secondsnapshotafterreadonlyhandleopen andassertnochange whileonlypureprovenance helpers run; labelnarrowintervalexplicitly.",
+    "Defaultreaderloadrefusal is caught tonull byproduction; preserve theexplicitloadTrustContexterrorcode alongside observedSELF_REPORTED downgrade. Do not makeallcasespass by catchingsetup/import/SQL errors.",
+    "Raw childresults plus independentNodecrypto controls,publicpin chronologicalwitness, exactargv/envnames/runtimepath/version, fullfileeffects, rowIDs/hashes andsourcebefore/afterpins are retained. No hardcodedNode-major-only refusal inpermanenttest. No modelAPI/network/auth/certification/realexternalreview claim."
+  ],
+  "privateCausalDesign": {
+    "when": "Onlyafterfreshlane BUILDREADY andexplicitrootauthorization; no executionnow",
+    "closure": "Copyallcurrentdist files+package metadata+requiredsigned-listbuiltin/data/helper scripts intoanownedprivateclosure; onlyanexplicitdependencyresolver symlink ifneeded. Recordeachregularfilehash/path andsymlinktarget. RouteALLchildimportsinto privateclosure.",
+    "sameCorpus": "Keepnew14-case candidatebody,inputseeds/argv/listvariantbytes/publicpins/setuprecipes identical acrossbaseline/mutant/restored; privateextra seederprobes andexistingeval/S7baselines have their ownfixedcorpora andcounts. No filtering/skips/expectedfail conversion.",
+    "guards": [
+      {
+        "name": "legacy-read-cap",
+        "find": "return producer === \"amc-runtime\" ? declared : \"SELF_REPORTED\";",
+        "replace": "return declared;",
+        "assertion": "New legacy projection importdeclaredOBSERVED muststop readingSELF_REPORTED; assertionnotsetupfailure."
+      },
+      {
+        "name": "unpinned-trust-list-refusal",
+        "find": "if (!entry) return refuse(`not pinned: key ${record.keyId} is in no loaded trust list`);",
+        "replace": "if (!entry) return { verified: true, reason: \"owned private mutation: unpinned admission bypass\" };",
+        "assertion": "Genuineindependentlyverifiedsignaturewithactualsignedemptyentrylist now wronglyreadsATTESTED; negativeactualrowmustfail. This explicitly breaks theunpin boundary; simpleline deletionwouldcauseentryundefinedTypeError andisnotavalidcausalwitness."
+      },
+      {
+        "name": "subjectbinding-extra-followup",
+        "find": "&& entry?.agentId === meta.agentId && entry?.sessionId === row.session_id",
+        "replace": "&& entry?.sessionId === row.session_id",
+        "assertion": "Samegenuineoriginalsignatureonanotheragentrow nowwronglyATTESTED, unaffectedbaselinepositive stillvalid. This isP055followupguard, notoneofthesixoldspecmutations."
+      },
+      {
+        "name": "seederopt-in",
+        "find": "env.AMC_DEV_DOGFOOD !== \"1\" || <existing node_modules path check>",
+        "replace": "<same existing node_modules path check>",
+        "assertion": "FixedprivateactualassertDogfoodSeedingAllowed({},privatecompiledmodulepath) probe ceasestothrowrequiredmessage; no fleetexecution andnopermamentextraassertionclaimed. Runtimeauthor mustextractexactoneoccurrencefromcurrentcopiedmodule, notusetheplaceholderaspatchtext."
+      }
+    ],
+    "restoration": "Finallyrestoreoriginalbytesforalltouchedprivatefiles, compareentireclosuremanifest+symlinktargets, runidenticalrestoredcorpusandrecordactualcounts/sourcepins. Retain anyfirstsetup/observerfailures separately; no global-currentacceptanceinferred.",
+    "sixSpecGates": [
+      {
+        "id": "P018-1",
+        "mutation": "RestoreevalATTESTEDdefault",
+        "corpus": "Existing7formatimporttest/rootprivateevalprobe",
+        "limit": "Currentwriteguardmayrefusebeforeappend; recordactualsubstantive tiererror, notanacceptedtop-tierrow. DEFAULT_TRUST_TIER_BY_FORMAT nolongerexists."
+      },
+      {
+        "id": "P018-2",
+        "mutation": "Skiptrust-listlookup",
+        "corpus": "Newreal-loadunpinnegative inprivatecopy",
+        "limit": "Genuineinputsignaturevalid independently; no methodmock/importerror."
+      },
+      {
+        "id": "P018-3",
+        "mutation": "Removelegacyread-sidecap",
+        "corpus": "Newlegacyprojection plusold provenanceoriginals",
+        "limit": "No historicalpersistedroworrepairclaim."
+      },
+      {
+        "id": "P018-4",
+        "mutation": "RemoveAMC_DEV_DOGFOODguard",
+        "corpus": "Existingdogfoodoldbaseline orseparateprivateexportprobe",
+        "limit": "Do notclaimnewfilecountsincludefleet/modelacceptance."
+      },
+      {
+        "id": "AMC1516-M11",
+        "mutation": "Removeimportcapturegate",
+        "corpus": "ExistingexternalEvidenceProfile exactimportauthoritynegative",
+        "limit": "Portableprofilecontract, notingestsigneradmission."
+      },
+      {
+        "id": "AMC1516-M12",
+        "mutation": "Removeproducerlowerdeclarationclamp",
+        "corpus": "ExistingexternalEvidenceProfile lowerATTESTED/SELF_REPORTEDpositivecontrols",
+        "limit": "BothS7gates requireseparateexactinputbaseline/mutant/restoredandremainunexecutedhere."
+      }
+    ]
+  },
+  "contractDrifts": [
+    "OldP018 exactremovaltext1.2.0,currentevalCli+hiddenCLIsay2.0.0. Recordactualmessage/exit2 andretainoldspecmismatch; no releasechoice orsharedCLIedit.",
+    "OldP018step3 evidence-attestation vsP009/current independent-attestation. Useactualpurposewithoutinventingnewone; documentmismatch.",
+    "attestedBy/statement are recordedhumanlabels outsideattesterdigestbytes. Avalidkeysignatureauthenticateskey+digest, notperson/statementtruth.",
+    "Current ATTESTEDshape writeguard intentionally doesnotcryptographicallyadmit rows; coldreader mustverifyanddowngrade. No falseclaimallmalformed/forgedshapewrites are refused.",
+    "readerTrustFor(workspace) isrequiredtoexcludeownkeys; omissionofworkspacechangescontract andisnotacceptedpositivefixture shortcut."
+  ],
+  "freezeAndAuthorization": {
+    "reservation": {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "lines": 1616,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    "generic1496": "P018production remainsgenericnonE17/nonCodexreservation; explicitlist omission givesnoclearance.",
+    "shared1588": "src/cli.ts,resultCommandRegistry.ts,replParser.ts remainheld/net-zero coordinationpaths.",
+    "D15PriorReadOnly": "Prior75cb5path needs-snapshot returnednone andnomatchingmanifestrows. No frozenoriginalsarchived/verified bythatcheck; noclearance. Recheckexactproposedrepairpaths beforeanylaterauthorizedsourceedit.",
+    "prospectiveScope": "OnlyoneNEWtestafterrootassignsfreshownedlane; nooldtest/helper/production/sharedCLI/archive/guard/baseline/counteditfromthisdesign.",
+    "allHeld": "P051issuerfailures, previousstrictREDkeys,31P024experts/ISO, userP029/P022skips, pendingP019/P020/P052repairs,47echo,native/A4/API/privacy/Claudeheld work stayunresolved."
+  },
+  "graph": "ExistingstaleGraphifyqueryfirst isrecordedinroutingpreflight; direct072productionverified here. No freshgraph/server/watch/refresh.",
+  "operations": {
+    "onlyWrites": [
+      "/private/tmp/p0-18-qualification-design-20261015.json",
+      "/private/tmp/p0-18-qualification-design-20261015.md"
+    ],
+    "authoring": false,
+    "laneCreation": false,
+    "importsOrRuntime": false,
+    "testsBuildsInstalls": false,
+    "sourceMutations": false,
+    "legalFetch": false
+  }
+}

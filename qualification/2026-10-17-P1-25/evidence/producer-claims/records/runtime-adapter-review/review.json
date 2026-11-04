@@ -1,0 +1,96 @@
+{
+  "schema": "p125pc-independent-inert-runtime-adapter-review/1",
+  "at": "2026-10-17T01:51:59.191435+00:00",
+  "blockers": [],
+  "scope": "Exact sealed inert observed/public adapters and full deltas against C39; no helper or product execution.",
+  "preferredSeal": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/seal.json",
+    "bytes": 2890,
+    "sha256": "8975b52c93d09f8ea0cf77b2dc2ef1a397f1b2e61d198acf531cfc4081cf0924"
+  },
+  "preferredObserved": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+    "bytes": 2198,
+    "sha256": "468aee0d4ded5290f60e231fa6a94e3617f7a243de96f46f1ac1a77fd73dc439"
+  },
+  "preferredPublic": {
+    "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-audit-preparation/audit-public.py.source.txt",
+    "bytes": 40958,
+    "sha256": "805a2c8e5c5dc48c0d9f3dae9be5ed02babed5cc5a41fd94ef6bdff619d48a80"
+  },
+  "checks": {
+    "allNineSealedOutputsAnd24AuthorInputsByteExact": true,
+    "bothCompleteUnifiedDeltasIndependentlyReproduced": true,
+    "observedDiffOnlyNamespaceAndPhasePrefix": true,
+    "observedPinnedJoinPhysicalRootCohortHooksErrorsGuardsUnchanged": true,
+    "removingOnlyNewProducerFunctionDispatchCaseAndReversingNamespaceLocationsRecoversExactParentPublicBytes": true,
+    "fourPriorSemanticBranchesAndCommonCleanupNativeEnvironmentStreamGuardsPreserved": true,
+    "oldWindowAndCadenceLocationsShiftExactlyOne": true,
+    "newStoredClaimsWitnesses698And707ReaderWitnesses782And783MatchCandidate": true,
+    "producerPartialBranchRetainsReachedPrefixActualRowsBooleansAndLedgerErrorCounts": true,
+    "partialStoredMismatchNeverGrantsProducerAcceptance": true,
+    "completeRequiresTwoOwnNamedQueryResponseVerificationChildrenGrantDigestsTokenPinsAndConditionalSignerEquality": true,
+    "sharedReplyObservationBindsOnlyLastIndependentProof": true,
+    "completeRequiresActualStoredClaimsWindowFindingsSignedCheckpointFactsAndFinalNonmutation": true,
+    "actualNullAccuracyAndEqualSecondTimesRemainAllowed": true,
+    "resourceCountsDerivedFromUnchangedLoopsWithoutPredictedTotals": true,
+    "noSourceRuntimeCommitFreshControlOrRestorationOutcomeInvented": true
+  },
+  "producerSemantics": {
+    "firstGrant": "Actual first checkpoint result, signature/token match and actual ledger booleans/error count are prerequisites before requested claim facts.",
+    "storedClaims": "Requested backdate is ceil(first genTime - accuracy - 300000) - 1; postdate is first genTime + 86400000. Actual persisted row timestamps, distinct identities and ordered positions are retained.",
+    "queryProofs": "Each retained grant maps to its own checkpoint digest, actual request query/response and exact verification child argv. Token pins are compared when present. Two retained grants must share the owned anchor and signer.",
+    "covered": "Complete acceptance additionally requires the actual second head, ordered covered row indices, two signed checkpoint/token pins, checkpoint ledger-row metadata, both actual ledger verification positives and independent bound premises.",
+    "readerAndFinal": "The reader must receive actual stored timestamps and return BACKDATED_CLAIM/POSTDATED_CLAIM with the genuine attested window. Complete acceptance also requires final event/file nonmutation and actual ledger verification positives.",
+    "redBoundary": "Absent producer setup or later fields receive no credit; reached actual booleans and nonzero ledger error counts remain observations. Root must classify every real failure and masked later assertion."
+  },
+  "provenance": {
+    "sourceScopeReview": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/review.json",
+      "bytes": 14416,
+      "sha256": "ad6d0e4eac25a93a28d9f0762afa4a9da4a09a3ddb6f58e91f773aada0201564"
+    },
+    "sourceScopeSeal": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-scope-preparation/seal.json",
+      "bytes": 1688,
+      "sha256": "ca5ae93f70f18ea56e28590429555bdc8e8a0f684a961b119ee22a742f07e914"
+    },
+    "candidate": {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/next-producer-preparation/candidate-v1/checkpointWindow.test.ts.source.txt",
+      "bytes": 61752,
+      "sha256": "36ba6394d4c8b824e2fbe9e2d2b5c1729431bf0206c9d5d08c357ca70a33082a"
+    },
+    "actualPreparationPinset": {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/protected-inputs-v3.json",
+      "bytes": 88277,
+      "sha256": "ba4495dc366f2e2051cc29679815f540f4159c7f205c6b25c22cba2fdc5a5aac"
+    },
+    "prepared175RowsAnd12Natives": "Verified by the immediately preceding sealed source-scope snapshot. This adapter review does not claim a continuous fresh physical-pin check or adopt future runtime successors.",
+    "rootOnly": "Root owns source allocation, current runtime pins, exact product execution and actual fresh/control results."
+  },
+  "limitations": [
+    "Static text and metadata review only; no Python/TypeScript import, syntax parser, compiler, helper or product execution.",
+    "No signing-root, key, child-stream, native payload, SQL or network read/execution was performed. The executor may hash only explicitly named streams under unchanged guards.",
+    "This auditor records source-produced signature and ledger verification facts; it does not independently re-execute their cryptography.",
+    "The public record lacks a separate first seed hash, so exact first-head comparison remains the source assertion/GREEN-cohort boundary.",
+    "No full P1-25, plan, release, quality waiver or F37 credit. All holds and freeze/quality requirements remain open."
+  ],
+  "readCommands": {
+    "allNaturallyClosedZero": true,
+    "chunks": [
+      "2ddacc",
+      "28aca6",
+      "a94a62",
+      "dac2f2",
+      "4300f6",
+      "a903ba",
+      "547f16",
+      "20020f",
+      "1445a0",
+      "82728d",
+      "1178b0"
+    ],
+    "combinedReadDisplayTruncation": "The combined full-code read display was truncated; the potentially obscured public lines 185 through end were separately reread in full.",
+    "toolSessionsOutstanding": false
+  }
+}

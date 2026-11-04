@@ -1,0 +1,28 @@
+{
+  "schema": "p107-runtime-static-peer-seal/2",
+  "state": "STATIC_REVIEW_CLOSED_NO_BLOCKERS_UNEXECUTED",
+  "blockers": [],
+  "inputCount": 80,
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review-v2/review.json",
+      "bytes": 5689,
+      "sha256": "150c35d956b648dacb4c95ab2511728895738319f915f14c386edf55be0234e3",
+      "readScope": "Exact private review output."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review-v2/README.md",
+      "bytes": 1205,
+      "sha256": "7086fe4c5463fc80d33ce1cf542762f723fc78f5318dcd05639d881a6e7be9dd",
+      "readScope": "Exact private review output."
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-static-review-v2/pins.json",
+      "bytes": 28730,
+      "sha256": "0ad34bd2a4d810c90bc468c2e3176c3ff5c6eea914fb98858abf0b0305abe0ad",
+      "readScope": "Exact private review output."
+    }
+  ],
+  "candidateExecuted": false,
+  "checkoutIndexQaWrites": false
+}

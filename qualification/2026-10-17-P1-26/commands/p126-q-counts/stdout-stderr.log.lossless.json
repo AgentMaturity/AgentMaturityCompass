@@ -1,0 +1,11 @@
+{
+  "schema": "amc-qualification-lossless-original/1",
+  "encoding": "base64",
+  "original": {
+    "relativePath": "commands/p126-q-counts/stdout-stderr.log",
+    "bytes": 255,
+    "sha256": "823e067d99b62722d6424ad6473404d839fe23d0cf20ec27d0783a3bac3b9175"
+  },
+  "dataBase64": "Cj4gYWdlbnQtbWF0dXJpdHktY29tcGFzc0AxLjIuMCBjaGVjazpjb3VudHMgL3ByaXZhdGUvdmFyL2ZvbGRlcnMva3QvcjY2NXJrajUxNTlidzl6dDRycDJuNjZjMDAwMGduL1QvYW1jLWNsZWFuLXNvdXJjZS10cWtObTYvY2hlY2tvdXQKPiBub2RlIHNjcmlwdHMvZ2VuLWNvdW50cy5tanMgLS1jaGVjawoKUHVibGlzaGVkIHNvdXJjZSBjb3VudHMgbWF0Y2ggdGhlIHJlcG9zaXRvcnk7IHRoaXMgY2hlY2sgZG9lcyBub3QgZXhlY3V0ZSB0ZXN0cy4K",
+  "boundary": "Exact original bytes, including whitespace, are preserved by base64. Decode and verify original.bytes and original.sha256. The original producer remains retained privately; no normalization or command-result change."
+}

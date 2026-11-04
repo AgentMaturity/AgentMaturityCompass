@@ -1,0 +1,1901 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1516",
+  "reviewer": "Independent read-only review by /root/p0_22_report_audit",
+  "reviewCompletedUtc": "2026-10-15T00:17:33.437152+00:00",
+  "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "root": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "findings": [],
+  "conclusion": "The immutable packet supports bounded runtime sensitivity of nine distinct guards using unchanged 18-case profile or 26-case export corpora. It does not establish whole P0-30 acceptance or a successful M11 mutant typecheck.",
+  "reviewedPacket": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+      "bytes": 103946,
+      "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.md",
+      "bytes": 2900,
+      "sha256": "b6032d4dbd002d22d3703bd91002b82b9fba0be1a708f4cce78bd0029851b1e6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/artifact-index.json",
+      "bytes": 83180,
+      "sha256": "f814f7bca4271196598038dcb06da66e2ea2db4e928ae7297429bab8d3002903"
+    }
+  ],
+  "verification": {
+    "indexReferences": 344,
+    "frozenCommandPhases": 56,
+    "uniqueImmutablePinReferences": 797,
+    "frozenJournal": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 93010,
+      "sha256": "f4f80d974bc7edba545b6684dd4dc11891080d54dff83a0a319e372f46b78159"
+    },
+    "allReferencedHashesAndSizesMatch": true,
+    "allFrozenCommandJsonsMatchJournal": true,
+    "allFinalRawCaseNamesAndCountsMatch": true,
+    "allFinalMatricesZeroPendingTodo": true,
+    "allFinalMutantsOneMeasuredFailure": true,
+    "rootBaseline": {
+      "raw": {
+        "path": "/private/tmp/p0-30-AMC-1516-unchanged-five-file-baseline-20261015.json",
+        "bytes": 16872,
+        "sha256": "35aa2c24a0184af50838ee3a6902844748b3194d159a0e98eeb4c2d8f6896b80"
+      },
+      "counts": {
+        "numTotalTests": 44,
+        "numPassedTests": 44,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true
+      },
+      "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+      "rootReportedDurationMs": 5052
+    },
+    "uniqueOriginalCases": 44,
+    "profileCases": 18,
+    "exportCases": 26,
+    "caseSetsDisjoint": true,
+    "source": {
+      "sourceCommit": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+      "branch": "codex/p0-30-current-qualification",
+      "root31ProtectedPinsExact": true,
+      "readiness32PinsExact": true,
+      "liveSource7739ContentExact": true,
+      "liveCompiled4529FullNameSetAndContentExact": true,
+      "privateFull12268NameSetAndContentExact": true,
+      "capturedLiveStatusEmpty": true,
+      "fullClosureManifest": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+        "bytes": 1399777,
+        "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+      }
+    },
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "priorPackets": [
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+          "bytes": 95234,
+          "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+        },
+        "index": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/artifact-index.json",
+          "bytes": 80407,
+          "sha256": "88c47cfa764cab70825d6bf67ac3e23615bf6b95fbb7aee6ac6959b8d1f30339"
+        },
+        "indexReferences": 322,
+        "completeClosureFilesExact": 12268
+      },
+      {
+        "receipt": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.json",
+          "bytes": 21149,
+          "sha256": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad"
+        },
+        "index": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/artifact-index.json",
+          "bytes": 15704,
+          "sha256": "861366240c5cf98002552bf3ce6820155af84125c12d10ef48aa08e9d74152c7"
+        },
+        "indexReferences": 62,
+        "completeClosureFilesExact": 12268
+      }
+    ],
+    "priorPinnedReferences": 392,
+    "priorPhysicalFrozenAndActiveFixturesExact": true
+  },
+  "adaptations": {
+    "count": 6,
+    "files": [
+      {
+        "path": "tests/externalEvidenceProfile.test.ts",
+        "original": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903",
+        "adapted": "0c8afa656d7ccfa0f1166d39572914f5203de443b7f3e5ffb9c8ff2ce3efa7b7",
+        "importTargetOnly": true,
+        "replacements": [
+          [
+            "../../src/",
+            "../../dist/"
+          ],
+          [
+            "../src/",
+            "../dist/"
+          ]
+        ]
+      },
+      {
+        "path": "tests/importProvenance.test.ts",
+        "original": "37e5534c65b181b55140b4c402aceb44e25358b57df9e2af6896ba3bc04e43c4",
+        "adapted": "886b7da6500712b694d223f5073d889247be4ceafb01eaa7274dda40361c6078",
+        "importTargetOnly": true,
+        "replacements": [
+          [
+            "../../src/",
+            "../../dist/"
+          ],
+          [
+            "../src/",
+            "../dist/"
+          ]
+        ]
+      },
+      {
+        "path": "tests/neutralImporter.test.ts",
+        "original": "99164c15364cee66ee2e33e539d7fe1b9c197816ce3f22550e4b470e01e01421",
+        "adapted": "e5c9cef85b8a3d482c11fff2b041ea6c21cc0936862cfb5ce0413a9bfed68e2c",
+        "importTargetOnly": true,
+        "replacements": [
+          [
+            "../../src/",
+            "../../dist/"
+          ],
+          [
+            "../src/",
+            "../dist/"
+          ]
+        ]
+      },
+      {
+        "path": "tests/neutralImportMapping.test.ts",
+        "original": "9510fb35a0003e4f0049b5d2284a6bbbc00ab4584302fdd5e4bd6b6b7ecd5421",
+        "adapted": "3388a193651484ace584b415193c84c1b6b65c13de51c8073426986ad466882b",
+        "importTargetOnly": true,
+        "replacements": [
+          [
+            "../../src/",
+            "../../dist/"
+          ],
+          [
+            "../src/",
+            "../dist/"
+          ]
+        ]
+      },
+      {
+        "path": "tests/externalEvidenceExport.test.ts",
+        "original": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f",
+        "adapted": "956360b8644256da9374bdbd3b71b024e0606fe5b2caa4c105d01c1864abdb63",
+        "importTargetOnly": true,
+        "replacements": [
+          [
+            "../../src/",
+            "../../dist/"
+          ],
+          [
+            "../src/",
+            "../dist/"
+          ]
+        ]
+      },
+      {
+        "path": "tests/setup/guardWorkspace.ts",
+        "original": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+        "adapted": "2bfa7cf6368e6dffaaaa4a68086bf57421fbc706398659bfadd34f8577747eac",
+        "importTargetOnly": true,
+        "replacements": [
+          [
+            "../../src/",
+            "../../dist/"
+          ],
+          [
+            "../src/",
+            "../dist/"
+          ]
+        ]
+      }
+    ],
+    "method": "Reconstructed each adapted file solely by replacing ../../src/ and ../src/ import prefixes with their dist equivalents, verified its recorded adapted hash, and checked frozen original, live source and final private closure are byte-identical. Assertions, fixture inputs, cleanup, deadlines and other content were not changed. The general driver's cold-URL adaptation branches did not match this corpus."
+  },
+  "sameCorpus": {
+    "meaning": "The same registered test names, assertions, setup, cleanup, configuration and generator inputs run in each phase. Physical random keys, UUIDs and wall-clock fields are newly generated per fixture; identical physical keys or records across phases are not claimed.",
+    "originalFiles": [
+      "tests/externalEvidenceProfile.test.ts (15)",
+      "tests/importProvenance.test.ts (3)",
+      "tests/neutralImporter.test.ts (10)",
+      "tests/neutralImportMapping.test.ts (10)",
+      "tests/externalEvidenceExport.test.ts (6)"
+    ],
+    "positiveControls": "The original profile corpus contains unsigned SELF_REPORTED imports, genuine Ed25519-signed scoped ATTESTED and governed OBSERVED controls, producer/capture mismatch refusals and original/digest mismatch refusals. Export controls retain exact timing, duration, cancellation, bounded output and payload omission. These are synthetic fixtures and constructed authority contexts, not a default trust-list or real external identity qualification."
+  },
+  "matrices": [
+    {
+      "id": "S7-M11-profile-import-gate-221",
+      "phases": [
+        {
+          "phase": "baseline",
+          "total": 18,
+          "passed": 18,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 1000,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-baseline/raw-tests.json",
+            "bytes": 6749,
+            "sha256": "ec72d38534dae4718bce4c77936b8757dc8461b23528a02c215302c492ba0dd5"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-baseline/command.json",
+            "bytes": 1997,
+            "sha256": "752c9b0fa2fde4eac4cc6611365abad2a9f3960bebc0e46ac39d4f1b80f81599"
+          }
+        },
+        {
+          "phase": "mutant",
+          "total": 18,
+          "passed": 17,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "exit": 1,
+          "durationMs": 1006,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-mutant/raw-tests.json",
+            "bytes": 8195,
+            "sha256": "f510ca1a211955f9e281e1038a7e4c1fcc0279f2c6e724ad4674cd1398bbaf2f"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-mutant/command.json",
+            "bytes": 1983,
+            "sha256": "a88a7f084648143b9e74178b1625673102a67cbfe376937b65da58a3a9bfe01d"
+          }
+        },
+        {
+          "phase": "restored",
+          "total": 18,
+          "passed": 18,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 980,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-restored/raw-tests.json",
+            "bytes": 6749,
+            "sha256": "f3492c0dcfc8e4c794de86cab1212de2ad50c488d4c78c60328c63f866e05ab5"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-restored/command.json",
+            "bytes": 1996,
+            "sha256": "452dfe4b0c49f3d44c29fc9ddeeba660dc14a25fdc10b42a036c01cbefdf476f"
+          }
+        }
+      ],
+      "names": [
+        "external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent",
+        "external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time",
+        "external evidence profile rejects corrupt id without accepting a trust claim",
+        "external evidence profile rejects corrupt parent without accepting a trust claim",
+        "external evidence profile rejects corrupt tool without accepting a trust claim",
+        "external evidence profile rejects corrupt duration without accepting a trust claim",
+        "external evidence profile rejects corrupt calendar without accepting a trust claim",
+        "external evidence profile rejects corrupt digest without accepting a trust claim",
+        "external evidence profile rejects corrupt unicode without accepting a trust claim",
+        "external evidence profile a signing key cannot promote imports or self-admit",
+        "external evidence profile independent authority is scoped to producer and capture method",
+        "external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse",
+        "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+        "external evidence profile the verifier never raises a producer's own lower declaration",
+        "external evidence profile future fields/versions and duplicate tool settlements refuse",
+        "AMC-1506 — imports invent nothing a failed Pi v3 session yields zero inferred maturity and no observed evidence",
+        "AMC-1506 — imports invent nothing an arbitrary config file yields the same zeros",
+        "AMC-1506 — imports invent nothing episode and lifecycle views disclose import-only measurement, no positive Score/Shield verdict"
+      ],
+      "mutantFailures": [
+        {
+          "name": "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+          "messages": [
+            "AssertionError: expected { ok: true, errors: [], …(4) } to match object { ok: false, …(3) }\n(2 matching properties omitted from actual)"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "emission": {
+        "compilerExit": 2,
+        "compilerTypecheckPassed": false,
+        "preciseM11DiagnosticRetained": true,
+        "compilerEmittedChangedPaths": [
+          "kernel/amcRuntime.js",
+          "standard/externalEvidenceProfile.js"
+        ],
+        "targetedCompiledPaths": [
+          "standard/externalEvidenceProfile.d.ts",
+          "standard/externalEvidenceProfile.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "standard/externalEvidenceProfile.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "classification": "emitted-JS runtime guard sensitivity; exact TS mutant intentionally fails typecheck",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/parser-emitted-S7-M11-profile-import-gate-221-matrix.json",
+        "bytes": 11289,
+        "sha256": "e2b3986dee829fe07bfd130bece8efd5cdc6d199c953f736cdfd5f7eb758f7a8"
+      },
+      "sourceRecipeExactOnce": true,
+      "mutantCompiledOnly": [
+        "standard/externalEvidenceProfile.js"
+      ],
+      "restoredAll4529Exact": true
+    },
+    {
+      "id": "S7-M12-profile-lower-clamp-230",
+      "phases": [
+        {
+          "phase": "baseline",
+          "total": 18,
+          "passed": 18,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 965,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-baseline/raw-tests.json",
+            "bytes": 6739,
+            "sha256": "3cb3a3cd568c847dab037124e29c7f5ac58c44761690efe8591e78dd3221299c"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-baseline/command.json",
+            "bytes": 1891,
+            "sha256": "7d476ff75c8bd5e9e21337cca7f29b197524e46a49ff7b7e7ca808dec626336a"
+          }
+        },
+        {
+          "phase": "mutant",
+          "total": 18,
+          "passed": 17,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "exit": 1,
+          "durationMs": 965,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-mutant/raw-tests.json",
+            "bytes": 8206,
+            "sha256": "932f6075e78a6d59e805ba2a52da86711b72128c292d155d4afc45ba7c4faff8"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-mutant/command.json",
+            "bytes": 1877,
+            "sha256": "7da61e9720e426b2290c9f2ff9a7a0550d807b3335826ac0dc6e28a2dfb701a8"
+          }
+        },
+        {
+          "phase": "restored",
+          "total": 18,
+          "passed": 18,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 940,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-restored/raw-tests.json",
+            "bytes": 6736,
+            "sha256": "256e2411672018b7d6e93958d4c60cf9ec0079ba2039241ec389f2aada2df19a"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M12-profile-lower-clamp-230-restored/command.json",
+            "bytes": 1891,
+            "sha256": "421491bfbd4e3508b5272b7cc4b4efe0ae896ecd7ce19230eaf32e37a792222b"
+          }
+        }
+      ],
+      "names": [
+        "external evidence profile an internally valid unsigned import remains self-reported with unknown timing and unverified parent",
+        "external evidence profile semantic identity survives a different receipt time but signatures bind the receipt time",
+        "external evidence profile rejects corrupt id without accepting a trust claim",
+        "external evidence profile rejects corrupt parent without accepting a trust claim",
+        "external evidence profile rejects corrupt tool without accepting a trust claim",
+        "external evidence profile rejects corrupt duration without accepting a trust claim",
+        "external evidence profile rejects corrupt calendar without accepting a trust claim",
+        "external evidence profile rejects corrupt digest without accepting a trust claim",
+        "external evidence profile rejects corrupt unicode without accepting a trust claim",
+        "external evidence profile a signing key cannot promote imports or self-admit",
+        "external evidence profile independent authority is scoped to producer and capture method",
+        "external evidence profile governed observation requires the admitted signature and original/digest mismatches refuse",
+        "external evidence profile an authority that a direct JS caller admits for imports still cannot promote an import",
+        "external evidence profile the verifier never raises a producer's own lower declaration",
+        "external evidence profile future fields/versions and duplicate tool settlements refuse",
+        "AMC-1506 — imports invent nothing a failed Pi v3 session yields zero inferred maturity and no observed evidence",
+        "AMC-1506 — imports invent nothing an arbitrary config file yields the same zeros",
+        "AMC-1506 — imports invent nothing episode and lifecycle views disclose import-only measurement, no positive Score/Shield verdict"
+      ],
+      "mutantFailures": [
+        {
+          "name": "external evidence profile the verifier never raises a producer's own lower declaration",
+          "messages": [
+            "AssertionError: expected { ok: true, errors: [], …(4) } to match object { ok: true, …(2) }\n(3 matching properties omitted from actual)"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "emission": {
+        "compilerExit": 0,
+        "compilerTypecheckPassed": true,
+        "preciseM11DiagnosticRetained": false,
+        "compilerEmittedChangedPaths": [
+          "kernel/amcRuntime.js",
+          "standard/externalEvidenceProfile.js"
+        ],
+        "targetedCompiledPaths": [
+          "standard/externalEvidenceProfile.d.ts",
+          "standard/externalEvidenceProfile.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "standard/externalEvidenceProfile.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "classification": "assertion-specific runtime sensitivity",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M12-profile-lower-clamp-230-matrix.json",
+        "bytes": 11162,
+        "sha256": "ad2469d2db296089048b53c7a7959c7b4c8d4edc7f207b520e557dcd025d8615"
+      },
+      "sourceRecipeExactOnce": true,
+      "mutantCompiledOnly": [
+        "standard/externalEvidenceProfile.js"
+      ],
+      "restoredAll4529Exact": true
+    },
+    {
+      "id": "S7-M13-export-chunk-bound",
+      "phases": [
+        {
+          "phase": "baseline",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4347,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-baseline/raw-tests.json",
+            "bytes": 10569,
+            "sha256": "a418da7f7656953101fdadb5bf08554d9fd8bae8f2014ae582dde958ebb15d60"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-baseline/command.json",
+            "bytes": 1897,
+            "sha256": "e6437bc047f25069ef96df71947419d34f4d15eb6c7cb2cb0a88a949ea800958"
+          }
+        },
+        {
+          "phase": "mutant",
+          "total": 26,
+          "passed": 25,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "exit": 1,
+          "durationMs": 4242,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-mutant/raw-tests.json",
+            "bytes": 11846,
+            "sha256": "1d86f05f219d6e2f050d88c53ae7d0f055d41b0aa27b8320c105180e1c85756e"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-mutant/command.json",
+            "bytes": 1883,
+            "sha256": "4373bc038d9ee3059aee0de7130b143fd2e7d35356c68c21f34164d2dc20e30d"
+          }
+        },
+        {
+          "phase": "restored",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4259,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-restored/raw-tests.json",
+            "bytes": 10557,
+            "sha256": "5391775021b144c7b21028398a52995e26e7f9a46695211ecc778c7c9efd74b2"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M13-export-chunk-bound-restored/command.json",
+            "bytes": 1897,
+            "sha256": "04c96ddd35908bd7ea8ebf5ce96fd4e8a3557ee5064ddb33407b41f0fe8fd12a"
+          }
+        }
+      ],
+      "names": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "mutantFailures": [
+        {
+          "name": "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+          "messages": [
+            "AssertionError: expected [ 1000 ] to deeply equal [ 1000, 1 ]\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:71:51"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "emission": {
+        "compilerExit": 0,
+        "compilerTypecheckPassed": true,
+        "preciseM11DiagnosticRetained": false,
+        "compilerEmittedChangedPaths": [
+          "importers/externalEvidenceExport.js",
+          "kernel/amcRuntime.js"
+        ],
+        "targetedCompiledPaths": [
+          "importers/externalEvidenceExport.d.ts",
+          "importers/externalEvidenceExport.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "importers/externalEvidenceExport.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "classification": "assertion-specific runtime sensitivity",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M13-export-chunk-bound-matrix.json",
+        "bytes": 15029,
+        "sha256": "aff29a2399e4bee41fdf85c7ab468f6e7822c0629cc98c041fc33ed460658581"
+      },
+      "sourceRecipeExactOnce": true,
+      "mutantCompiledOnly": [
+        "importers/externalEvidenceExport.js"
+      ],
+      "restoredAll4529Exact": true
+    },
+    {
+      "id": "S7-M14-export-callback-cancel",
+      "phases": [
+        {
+          "phase": "baseline",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4315,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-baseline/raw-tests.json",
+            "bytes": 10563,
+            "sha256": "50e585c1a544f7516fd1ea2b6144721ef169ed7276500f7b66c280266446cda5"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-baseline/command.json",
+            "bytes": 1925,
+            "sha256": "de70e01ab499020a69683dfcfac461604c99311ebbaccd4b8650011a2fb6c267"
+          }
+        },
+        {
+          "phase": "mutant",
+          "total": 26,
+          "passed": 25,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "exit": 1,
+          "durationMs": 4228,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-mutant/raw-tests.json",
+            "bytes": 11888,
+            "sha256": "10bd0ce25d771f9dd7dcd6040299c9a0b3b14c496f598c3c033a874be9521f3a"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-mutant/command.json",
+            "bytes": 1911,
+            "sha256": "fa317b4310ef8c1ef091a81973326735534d12c2c8e1e63c184a9d4e682b451c"
+          }
+        },
+        {
+          "phase": "restored",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4340,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-restored/raw-tests.json",
+            "bytes": 10576,
+            "sha256": "bd9e65f0292e63e428b02da2a410bfba816b1763d353a8fcb6c0826833f93108"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M14-export-callback-cancel-restored/command.json",
+            "bytes": 1925,
+            "sha256": "b41f53ad78057aeee6e9e508018260a445ac54960558ddfc75f97db16852cdb7"
+          }
+        }
+      ],
+      "names": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "mutantFailures": [
+        {
+          "name": "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+          "messages": [
+            "AssertionError: expected [ [ 'metadata', 'unknown' ], …(3) ] to deeply equal [ [ 'cancel', 'cancelled' ], …(3) ]\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:47:62"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "emission": {
+        "compilerExit": 0,
+        "compilerTypecheckPassed": true,
+        "preciseM11DiagnosticRetained": false,
+        "compilerEmittedChangedPaths": [
+          "importers/externalEvidenceExport.js",
+          "kernel/amcRuntime.js"
+        ],
+        "targetedCompiledPaths": [
+          "importers/externalEvidenceExport.d.ts",
+          "importers/externalEvidenceExport.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "importers/externalEvidenceExport.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "classification": "assertion-specific runtime sensitivity",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M14-export-callback-cancel-matrix.json",
+        "bytes": 15008,
+        "sha256": "1346fcc956e0f86d793d99396391aea9b6d7c13f87f3d8b09b9994d6dae97805"
+      },
+      "sourceRecipeExactOnce": true,
+      "mutantCompiledOnly": [
+        "importers/externalEvidenceExport.js"
+      ],
+      "restoredAll4529Exact": true
+    },
+    {
+      "id": "S7-M15-export-unicode-replace",
+      "phases": [
+        {
+          "phase": "baseline",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4299,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-baseline/raw-tests.json",
+            "bytes": 10567,
+            "sha256": "708ee581543dcec866488a5244d53b9a0e498c9c142bbe027188dcd45695c6bc"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-baseline/command.json",
+            "bytes": 1925,
+            "sha256": "bb3d965b9d84e6ae49ce34b9d937c41f9d4d8dd842f177e41de04f32b8bc93dd"
+          }
+        },
+        {
+          "phase": "mutant",
+          "total": 26,
+          "passed": 25,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "exit": 1,
+          "durationMs": 4381,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-mutant/raw-tests.json",
+            "bytes": 11771,
+            "sha256": "347be133a2317cc1167b279dc74f1c202bf7d27c3687cbbce57ca878442a2314"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-mutant/command.json",
+            "bytes": 1911,
+            "sha256": "76ed630162378a07bba93544a85804ea7b187d43fbb5a93c237efc31d9790762"
+          }
+        },
+        {
+          "phase": "restored",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4219,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-restored/raw-tests.json",
+            "bytes": 10571,
+            "sha256": "8f3f8d638f40955886a2e426827d262f829f60aca0494570bd8d7b1684af08b8"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M15-export-unicode-replace-restored/command.json",
+            "bytes": 1925,
+            "sha256": "34234b19cbba0856660efbaeba9b53669f7f37a3de54f5cd8771b4dc7521ebc0"
+          }
+        }
+      ],
+      "names": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "mutantFailures": [
+        {
+          "name": "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+          "messages": [
+            "Error: Invalid imported evidence: events[0]: invalid attributes\n    at createImportedExternalEvidence (/private/tmp/p0-30-AMC-1516-qualification-20261015/closure/dist/standard/externalEvidenceProfile.js:179:15)"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "emission": {
+        "compilerExit": 0,
+        "compilerTypecheckPassed": true,
+        "preciseM11DiagnosticRetained": false,
+        "compilerEmittedChangedPaths": [
+          "importers/externalEvidenceExport.js",
+          "kernel/amcRuntime.js"
+        ],
+        "targetedCompiledPaths": [
+          "importers/externalEvidenceExport.d.ts",
+          "importers/externalEvidenceExport.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "importers/externalEvidenceExport.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "classification": "runtime normalization refusal for previously handled malformed-Unicode input; no unsafe output acceptance",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M15-export-unicode-replace-matrix.json",
+        "bytes": 15111,
+        "sha256": "5af314037825da21a1dac1db22d396bf3c7435f8f9ef62b87440a9d210a4a41d"
+      },
+      "sourceRecipeExactOnce": true,
+      "mutantCompiledOnly": [
+        "importers/externalEvidenceExport.js"
+      ],
+      "restoredAll4529Exact": true
+    },
+    {
+      "id": "S7-M16-export-time-range",
+      "phases": [
+        {
+          "phase": "baseline",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4226,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-baseline/raw-tests.json",
+            "bytes": 10573,
+            "sha256": "570b773a02603982e125790261ef397c5ce2a71a7388426b58031b0d33ba9f61"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-baseline/command.json",
+            "bytes": 1890,
+            "sha256": "f03ee56eaf5fbc0986f1899d55222293ac1e2868a3b23949047f2beca1f16012"
+          }
+        },
+        {
+          "phase": "mutant",
+          "total": 26,
+          "passed": 25,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "exit": 1,
+          "durationMs": 4280,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-mutant/raw-tests.json",
+            "bytes": 11600,
+            "sha256": "3daf7c94c8f4fb7b60414daf5891a479da3813b526b9ecc7729a7ae939f529fa"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-mutant/command.json",
+            "bytes": 1876,
+            "sha256": "8c05bba42b507be3c4f849cb4ec31d8df0db3fa7ea72dd49194d8e6332217a8b"
+          }
+        },
+        {
+          "phase": "restored",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4282,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-restored/raw-tests.json",
+            "bytes": 10574,
+            "sha256": "96ad6be8487ff5eea64e1325f2e583e2d499a8309eea326037b7923e6f582f60"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M16-export-time-range-restored/command.json",
+            "bytes": 1890,
+            "sha256": "d6f86f725d2f6b925642afd987f714f5e9ef1ae71d9fc7d4becbe7a00d04c087"
+          }
+        }
+      ],
+      "names": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "mutantFailures": [
+        {
+          "name": "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+          "messages": [
+            "RangeError: Invalid time value\n    at Date.toISOString (<anonymous>)"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "emission": {
+        "compilerExit": 0,
+        "compilerTypecheckPassed": true,
+        "preciseM11DiagnosticRetained": false,
+        "compilerEmittedChangedPaths": [
+          "importers/externalEvidenceExport.js",
+          "kernel/amcRuntime.js"
+        ],
+        "targetedCompiledPaths": [
+          "importers/externalEvidenceExport.d.ts",
+          "importers/externalEvidenceExport.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "importers/externalEvidenceExport.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "classification": "runtime RangeError for previously handled out-of-range timestamp fixture; not invalid timestamp acceptance",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M16-export-time-range-matrix.json",
+        "bytes": 14667,
+        "sha256": "25cddbcc58f61fb1e35f88676cf7cbc86855e502bd3d0351bbf02f83d3bec89f"
+      },
+      "sourceRecipeExactOnce": true,
+      "mutantCompiledOnly": [
+        "importers/externalEvidenceExport.js"
+      ],
+      "restoredAll4529Exact": true
+    },
+    {
+      "id": "S7-M17-export-duration-loss",
+      "phases": [
+        {
+          "phase": "baseline",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4212,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/raw-tests.json",
+            "bytes": 10562,
+            "sha256": "851a600a76b8976b3ee5f1a029da020d7ff1b12e9170b2ef4eb590796ef35f4f"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-baseline/command.json",
+            "bytes": 1911,
+            "sha256": "0010475bed0160f8495a9edf329fdf93305607e8645dcf114392b7b4090c9751"
+          }
+        },
+        {
+          "phase": "mutant",
+          "total": 26,
+          "passed": 25,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "exit": 1,
+          "durationMs": 4295,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/raw-tests.json",
+            "bytes": 11849,
+            "sha256": "f854cc03b2aaf15e1d90ecacde50ea4001bdaed8730a569a6a59ba44342fe133"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-mutant/command.json",
+            "bytes": 1897,
+            "sha256": "d6083c0f571b807b624f6b32d97822e9775e0fafd8ea04cfba5c8e93283aa2b5"
+          }
+        },
+        {
+          "phase": "restored",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4208,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/raw-tests.json",
+            "bytes": 10570,
+            "sha256": "9076f7096881dcc8126e051e7f12f7fb4b01b99b80b03ec970bf4c37524dafa1"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M17-export-duration-loss-restored/command.json",
+            "bytes": 1911,
+            "sha256": "e2737061ae791b3190a9846f400283dff319632388daba563718cbb4e16375e7"
+          }
+        }
+      ],
+      "names": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "mutantFailures": [
+        {
+          "name": "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+          "messages": [
+            "AssertionError: expected false to be true // Object.is equality\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:58:73"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "emission": {
+        "compilerExit": 0,
+        "compilerTypecheckPassed": true,
+        "preciseM11DiagnosticRetained": false,
+        "compilerEmittedChangedPaths": [
+          "importers/externalEvidenceExport.js",
+          "kernel/amcRuntime.js"
+        ],
+        "targetedCompiledPaths": [
+          "importers/externalEvidenceExport.d.ts",
+          "importers/externalEvidenceExport.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "importers/externalEvidenceExport.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "classification": "assertion-specific runtime sensitivity",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M17-export-duration-loss-matrix.json",
+        "bytes": 15013,
+        "sha256": "1c21545c2db54643db9feb02976f612a8190dba558381282d2a6d4556a04bfac"
+      },
+      "sourceRecipeExactOnce": true,
+      "mutantCompiledOnly": [
+        "importers/externalEvidenceExport.js"
+      ],
+      "restoredAll4529Exact": true
+    },
+    {
+      "id": "S7-M18-export-redaction-loss",
+      "phases": [
+        {
+          "phase": "baseline",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4217,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-baseline/raw-tests.json",
+            "bytes": 10557,
+            "sha256": "38ca46f0f1672b5752cdfdae314a3d4b6066472aec3a2dc3adcbde0bb6afcd8a"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-baseline/command.json",
+            "bytes": 1918,
+            "sha256": "4d15ce9eed48bd7ff8a73eaecdf129f5fa41a3a41e6541dd5f082eea3494c5e2"
+          }
+        },
+        {
+          "phase": "mutant",
+          "total": 26,
+          "passed": 25,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "exit": 1,
+          "durationMs": 4259,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-mutant/raw-tests.json",
+            "bytes": 11958,
+            "sha256": "7ef330359867a103026d4551bf9b124552ccc0ea096cc7b841325ee295439c2c"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-mutant/command.json",
+            "bytes": 1904,
+            "sha256": "cd723c2a16a8e05fa5d5d22b4faf6e48a1e02181b856d70d001b84ba0645ea65"
+          }
+        },
+        {
+          "phase": "restored",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4334,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-restored/raw-tests.json",
+            "bytes": 10557,
+            "sha256": "ffc89e5652b21b0d294ff51af8b3427cd683708fa303181b2ff472fd8034d3ae"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M18-export-redaction-loss-restored/command.json",
+            "bytes": 1918,
+            "sha256": "6b7a176f1bf2587317f1e1f7ca5cd1cb0ff0a0898dd1de48d9530ec8e291092b"
+          }
+        }
+      ],
+      "names": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "mutantFailures": [
+        {
+          "name": "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+          "messages": [
+            "AssertionError: expected [ …(5) ] to include 'Known sensitive source fields were re…'\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1319:15)"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "emission": {
+        "compilerExit": 0,
+        "compilerTypecheckPassed": true,
+        "preciseM11DiagnosticRetained": false,
+        "compilerEmittedChangedPaths": [
+          "importers/externalEvidenceExport.js",
+          "kernel/amcRuntime.js"
+        ],
+        "targetedCompiledPaths": [
+          "importers/externalEvidenceExport.d.ts",
+          "importers/externalEvidenceExport.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "importers/externalEvidenceExport.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "classification": "assertion-specific runtime sensitivity",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M18-export-redaction-loss-matrix.json",
+        "bytes": 15209,
+        "sha256": "abcfe97b090487d4f17264ac82a0fe6b7b7e6639659a9932872bb0bdd74b3d84"
+      },
+      "sourceRecipeExactOnce": true,
+      "mutantCompiledOnly": [
+        "importers/externalEvidenceExport.js"
+      ],
+      "restoredAll4529Exact": true
+    },
+    {
+      "id": "S7-M19-export-time-loss",
+      "phases": [
+        {
+          "phase": "baseline",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4261,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-baseline/raw-tests.json",
+            "bytes": 10571,
+            "sha256": "bf8b123e84cf3a7eaf070412428080de1cdcb399cb3e51f5f7f40ded33376cd1"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-baseline/command.json",
+            "bytes": 1883,
+            "sha256": "a8edc39c9434cb3a23d6154c94fd5866ab042565cd3192f0787a833e85158fb2"
+          }
+        },
+        {
+          "phase": "mutant",
+          "total": 26,
+          "passed": 25,
+          "failed": 1,
+          "pending": 0,
+          "todo": 0,
+          "exit": 1,
+          "durationMs": 4239,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-mutant/raw-tests.json",
+            "bytes": 11840,
+            "sha256": "07a5718926be45ad7bf376d23b624b2fc8366f97143cbc7e545d6a49d5e36c5d"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-mutant/command.json",
+            "bytes": 1869,
+            "sha256": "4532040dfb471e29cbfbe8d3074e9ecd6860c23ec30d6bf536ae4a2fd0e48f9f"
+          }
+        },
+        {
+          "phase": "restored",
+          "total": 26,
+          "passed": 26,
+          "failed": 0,
+          "pending": 0,
+          "todo": 0,
+          "exit": 0,
+          "durationMs": 4396,
+          "raw": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-restored/raw-tests.json",
+            "bytes": 10568,
+            "sha256": "bec801cb697e5fdf766f5f55dba425ab0fe597f27f44ace5509ec44380646119"
+          },
+          "command": {
+            "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/S7-M19-export-time-loss-restored/command.json",
+            "bytes": 1883,
+            "sha256": "333c6d69efe2c3780484118f0d0f2c3f33873d41aa6837817c3f730a59dfdf1e"
+          }
+        }
+      ],
+      "names": [
+        "neutralExternalEvidenceProfiles produces a valid self-reported unsigned import that omits payload content and infers no edges",
+        "neutralExternalEvidenceProfiles recognized source formats name the producer and media type",
+        "neutralExternalEvidenceProfiles cancellation and failure are kept apart and never become success",
+        "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+        "neutralExternalEvidenceProfiles malformed Unicode is replaced and long strings bounded instead of refusing the import",
+        "neutralExternalEvidenceProfiles large sources split into bounded parts without cross-part ancestry and disclose redaction",
+        "per-record neutral import mapping accounts for mixed rows without inventing missing time, duration, success or cost",
+        "per-record neutral import mapping keeps exact zero source duration distinct from absent and never replaces event time with ingest time",
+        "per-record neutral import mapping distinguishes retained wrapper context and artifact-only fields from mapped records",
+        "per-record neutral import mapping maps Pi rows by sanitized source identity, accounts for malformed physical lines and does not map the header",
+        "per-record neutral import mapping links actual callback capture envelope/span IDs while separating source time from capture time",
+        "per-record neutral import mapping links pinned DSH event sequences to their actual primary trace entries without calling structural events executions",
+        "per-record neutral import mapping does not silently map nonconforming rows in a recognized AMC trace stream",
+        "per-record neutral import mapping reports unusable files with known byte digests and unknown record counts, without a runnable apply action",
+        "per-record neutral import mapping keeps the semantic record map identical across review times and binds applied data to the reviewed snapshot",
+        "per-record neutral import mapping bounds record details without shrinking the complete record denominator",
+        "neutral importer dry run detects representative artifact categories without writing",
+        "neutral importer import writes redacted episode, manifest, lifecycle, and trace-index records",
+        "neutral importer external artifacts remain unverified without invented maturity or observed coverage",
+        "neutral importer source claims never become AMC evaluation results: {\"agent\":\"unmeasured\"}",
+        "neutral importer source claims never become AMC evaluation results: {\"benchmark\":\"forged\",\"metrics\":{\"finalLevel\":5,\"integrityIndex\":1,\"observed\":1,\"signed\":true}}",
+        "neutral importer source claims never become AMC evaluation results: {\"type\":\"message\",\"message\":{\"role\":\"toolResult\",\"isError\":true,\"content\":\"failed\"}}",
+        "neutral importer collaboration records import as telemetry-only runtime events linked to lifecycle evidence",
+        "neutral importer unsupported formats return actionable validation errors",
+        "neutral importer rollback removes imported artifacts and records a rollback receipt",
+        "neutral importer API exposes dry-run import detection"
+      ],
+      "mutantFailures": [
+        {
+          "name": "neutralExternalEvidenceProfiles source time and duration are kept only when exactly representable",
+          "messages": [
+            "AssertionError: expected false to be true // Object.is equality\n    at /private/tmp/p0-30-AMC-1516-qualification-20261015/closure/tests/externalEvidenceExport.test.ts:59:60"
+          ]
+        }
+      ],
+      "suiteFailures": [],
+      "emission": {
+        "compilerExit": 0,
+        "compilerTypecheckPassed": true,
+        "preciseM11DiagnosticRetained": false,
+        "compilerEmittedChangedPaths": [
+          "importers/externalEvidenceExport.js",
+          "kernel/amcRuntime.js"
+        ],
+        "targetedCompiledPaths": [
+          "importers/externalEvidenceExport.d.ts",
+          "importers/externalEvidenceExport.js"
+        ],
+        "restoredUntargetedBaselinePaths": [
+          "kernel/amcRuntime.js"
+        ],
+        "finalChangedPaths": [
+          "importers/externalEvidenceExport.js"
+        ],
+        "scope": "Actual tsc emission with non-targeted bundled siblings restored before any test; no standalone/kernel route mutation claim."
+      },
+      "classification": "assertion-specific runtime sensitivity",
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/S7-M19-export-time-loss-matrix.json",
+        "bytes": 15021,
+        "sha256": "08aa81722b29b4efd94d19d8c9d6fceb8d53d09c8673fef475be27ba6384bdfe"
+      },
+      "sourceRecipeExactOnce": true,
+      "mutantCompiledOnly": [
+        "importers/externalEvidenceExport.js"
+      ],
+      "restoredAll4529Exact": true
+    }
+  ],
+  "semanticReview": [
+    {
+      "guard": "M11",
+      "assertion": "tests/externalEvidenceProfile.test.ts:76",
+      "scope": "The deliberately permissive direct-JS authority fixture admits captureMethods=['import'] outside the normal type/authority loader. A genuine signature remains verified while the original import gate refuses promotion; the mutant becomes ok=true. Other normal strict authority fixtures mask this gate. This does not show a normal loader admits import authority.",
+      "source": "src/standard/externalEvidenceProfile.ts:221"
+    },
+    {
+      "guard": "M12",
+      "assertion": "tests/externalEvidenceProfile.test.ts:81",
+      "scope": "The first assertion compares the ATTESTED producer declaration with a governed OBSERVED-capable authority. Removing the clamp produces OBSERVED. The subsequent SELF_REPORTED branch at line83 is not reached in this failed case and is not independently measured.",
+      "source": "src/standard/externalEvidenceProfile.ts:230"
+    },
+    {
+      "guard": "M13",
+      "assertion": "tests/externalEvidenceExport.test.ts:71",
+      "scope": "With 1001 traces the chunk-denominator mutation leaves one 1000-event part instead of the exact [1000,1] expectation. The source slice remains bounded; the failure is a missing part/source-row loss, not acceptance of a 2000-event part.",
+      "source": "src/importers/externalEvidenceExport.ts:13"
+    },
+    {
+      "guard": "M14",
+      "assertion": "tests/externalEvidenceExport.test.ts:47",
+      "scope": "Removing only callback.cancelled changes the first fixture from cancel/cancelled to metadata/unknown. AbortError, status=cancelled and stopReason=aborted branches are unchanged; their independent mutation sensitivity is not claimed.",
+      "source": "src/importers/externalEvidenceExport.ts:51"
+    },
+    {
+      "guard": "M15",
+      "assertion": "tests/externalEvidenceExport.test.ts:64",
+      "scope": "The malformed-surrogate fixture reaches the unchanged createImportedExternalEvidence validator, which throws Error: Invalid imported evidence: events[0]: invalid attributes. The mutation breaks successful normalization and safely refuses output. No unsafe Unicode acceptance or unrelated setup failure is claimed.",
+      "source": "src/importers/externalEvidenceExport.ts:29"
+    },
+    {
+      "guard": "M16",
+      "assertion": "tests/externalEvidenceExport.test.ts:51",
+      "scope": "Removing the range condition reaches Date.toISOString with the out-of-range 8.64e15+1 fixture and throws RangeError: Invalid time value. This is an actual body failure, not acceptance of an invalid timestamp.",
+      "source": "src/importers/externalEvidenceExport.ts:45"
+    },
+    {
+      "guard": "M17/M17b",
+      "assertion": "tests/externalEvidenceExport.test.ts:58",
+      "scope": "The separate MAX_SAFE_INTEGER duration-only projection has absent timestamp, so removing duration precision-loss marking makes the loss predicate false without a timestamp-loss mask. M17b is an exact historical alias to the one M17 matrix, not a tenth distinct guard or second kill.",
+      "source": "src/importers/externalEvidenceExport.ts:50"
+    },
+    {
+      "guard": "M18",
+      "assertion": "tests/externalEvidenceExport.test.ts:76",
+      "scope": "The caller supplies redactionCount=2 and the original emitted notice is asserted. Removing the notice fails that assertion. This is a projection disclosure contract, not independent secret discovery, fresh redaction inventory or authentication.",
+      "source": "src/importers/externalEvidenceExport.ts:21"
+    },
+    {
+      "guard": "M19",
+      "assertion": "tests/externalEvidenceExport.test.ts:59",
+      "scope": "The invalid-timestamp-only projection has absent duration, independently exposing the missing time-loss notice. The valid zero timestamp/duration control remains in the unchanged same case.",
+      "source": "src/importers/externalEvidenceExport.ts:46"
+    }
+  ],
+  "M11Chronology": {
+    "independentTextProof": {
+      "expected": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/expected-target.js",
+        "bytes": 15242,
+        "sha256": "17c5f3504830309bfc4024260776e2f9939b26e2f114b6809bae3d2171c6c43d"
+      },
+      "actual": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/actual-target.js",
+        "bytes": 15258,
+        "sha256": "0b6d363c415c21c74f0a034fecc02b8c58abec1705b66b40824416f82428b361"
+      },
+      "actualOnlyAdditionalChange": "One newline and indentation before the same && authority condition. Complete remaining text is exact.",
+      "parserProofReadNotExecuted": {
+        "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/phases/parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof/stdout.log",
+        "bytes": 1793,
+        "sha256": "89f7bde23078b4d2087a6e1ad7aa7cc126c30eb558ee93ccbcab17f2a8cd3550"
+      },
+      "rootTextReview": {
+        "path": "/private/tmp/p0-30-AMC-1516-M11-root-emitted-diff-review-20261015.json",
+        "bytes": 2685,
+        "sha256": "53dcd0bfdb63a6f740c04d45bd6e644bd08537ec9a7a0034ece433d835b8cdf5"
+      }
+    },
+    "actualDiagnostic": "src/standard/externalEvidenceProfile.ts(222,46): error TS2345: Argument of type '\"import\" | \"producer-callback\" | \"governed-capture\"' is not assignable to parameter of type '\"producer-callback\" | \"governed-capture\"'.\n  Type '\"import\"' is not assignable to type '\"producer-callback\" | \"governed-capture\"'.\n",
+    "compilerExit": 2,
+    "typecheckPassed": false,
+    "classification": "Emitted JavaScript runtime sensitivity only.",
+    "unqualifiedEarlierAttempts": [
+      "First exact TS recipe stopped at actual TS2345 compiler exit2, restored source/compiled bytes, and ran neither a mutant nor restored corpus.",
+      "Second emitted-runtime attempt stopped at the scanner observer exit1, retained compiler exit2, restored bytes, and ran neither a mutant nor restored corpus."
+    ],
+    "finalProof": "Independently reconstructed complete expected JS from the pinned baseline and exact prescribed compiled guard removal. Saved expected text matches. Saved actual emitted text differs only by one newline/indentation before the same && authority condition; its SHA matches the sole targeted mutant JS manifest. The author parser-leaf proof and root text review were read and hash-checked, not executed by this reviewer."
+  },
+  "compilerIsolation": "The actual tsc command records remain intact. M11 retains its exact TS2345 stdout and exit2; the other eight mutant compiles exit0. Recorded emit maps include the bundled kernel sibling where tsc changed it; the controller restores all non-target outputs from pinned baseline bytes before any corpus run. Each measured final mutant map changes only its target JS; declarations and all other 4528 compiled files match. Every restored map and the final full 12268-file closure match their complete original name sets and content.",
+  "runtime": {
+    "actualCurrentLauncher": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10"
+    },
+    "launcherRaw": {
+      "path": "/private/tmp/p0-30-actual-runtime-fingerprint-20261015.log",
+      "bytes": 114,
+      "sha256": "6356112c023d338d4ce2eb165c4ea56d3e428ef958059d868a720d4b17a6639c"
+    },
+    "scope": "Current launcher ABI127 is observed; earlier child ABI is inferred from version/executable, not invented as a recorded field.",
+    "nativeBefore": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/native-before.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "nativeAfter": {
+      "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/native-after.json",
+      "bytes": 305,
+      "sha256": "817378b2664f3d92a8ae6740d6874c0820d982d243f625e4ee4c55e8af60d881"
+    },
+    "nativeRebuiltOrDependenciesInstalled": false
+  },
+  "commandStatuses": [
+    {
+      "phase": "AMC1516-private-copy-setup",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 3777
+    },
+    {
+      "phase": "S7-M11-profile-import-gate-221-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 959
+    },
+    {
+      "phase": "S7-M11-profile-import-gate-221-compile-mutant",
+      "exit": 2,
+      "executionError": null,
+      "durationMs": 28857
+    },
+    {
+      "phase": "S7-M11-profile-import-gate-221-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 29053
+    },
+    {
+      "phase": "emitted-S7-M11-profile-import-gate-221-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 1042
+    },
+    {
+      "phase": "emitted-S7-M11-profile-import-gate-221-compile-mutant",
+      "exit": 2,
+      "executionError": null,
+      "durationMs": 29075
+    },
+    {
+      "phase": "emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 318
+    },
+    {
+      "phase": "emitted-S7-M11-profile-import-gate-221-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28699
+    },
+    {
+      "phase": "parser-emitted-S7-M11-profile-import-gate-221-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 1000
+    },
+    {
+      "phase": "parser-emitted-S7-M11-profile-import-gate-221-compile-mutant",
+      "exit": 2,
+      "executionError": null,
+      "durationMs": 28438
+    },
+    {
+      "phase": "parser-emitted-S7-M11-profile-import-gate-221-compile-mutant-target-token-proof",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 312
+    },
+    {
+      "phase": "parser-emitted-S7-M11-profile-import-gate-221-mutant",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 1006
+    },
+    {
+      "phase": "parser-emitted-S7-M11-profile-import-gate-221-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28524
+    },
+    {
+      "phase": "parser-emitted-S7-M11-profile-import-gate-221-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 980
+    },
+    {
+      "phase": "S7-M12-profile-lower-clamp-230-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 965
+    },
+    {
+      "phase": "S7-M12-profile-lower-clamp-230-compile-mutant",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28580
+    },
+    {
+      "phase": "S7-M12-profile-lower-clamp-230-mutant",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 965
+    },
+    {
+      "phase": "S7-M12-profile-lower-clamp-230-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28846
+    },
+    {
+      "phase": "S7-M12-profile-lower-clamp-230-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 940
+    },
+    {
+      "phase": "S7-M13-export-chunk-bound-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4347
+    },
+    {
+      "phase": "S7-M13-export-chunk-bound-compile-mutant",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28840
+    },
+    {
+      "phase": "S7-M13-export-chunk-bound-mutant",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 4242
+    },
+    {
+      "phase": "S7-M13-export-chunk-bound-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28763
+    },
+    {
+      "phase": "S7-M13-export-chunk-bound-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4259
+    },
+    {
+      "phase": "S7-M14-export-callback-cancel-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4315
+    },
+    {
+      "phase": "S7-M14-export-callback-cancel-compile-mutant",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28625
+    },
+    {
+      "phase": "S7-M14-export-callback-cancel-mutant",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 4228
+    },
+    {
+      "phase": "S7-M14-export-callback-cancel-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28825
+    },
+    {
+      "phase": "S7-M14-export-callback-cancel-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4340
+    },
+    {
+      "phase": "S7-M15-export-unicode-replace-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4299
+    },
+    {
+      "phase": "S7-M15-export-unicode-replace-compile-mutant",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28837
+    },
+    {
+      "phase": "S7-M15-export-unicode-replace-mutant",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 4381
+    },
+    {
+      "phase": "S7-M15-export-unicode-replace-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28598
+    },
+    {
+      "phase": "S7-M15-export-unicode-replace-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4219
+    },
+    {
+      "phase": "S7-M16-export-time-range-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4226
+    },
+    {
+      "phase": "S7-M16-export-time-range-compile-mutant",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 29375
+    },
+    {
+      "phase": "S7-M16-export-time-range-mutant",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 4280
+    },
+    {
+      "phase": "S7-M16-export-time-range-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28776
+    },
+    {
+      "phase": "S7-M16-export-time-range-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4282
+    },
+    {
+      "phase": "S7-M17-export-duration-loss-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4212
+    },
+    {
+      "phase": "S7-M17-export-duration-loss-compile-mutant",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 29500
+    },
+    {
+      "phase": "S7-M17-export-duration-loss-mutant",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 4295
+    },
+    {
+      "phase": "S7-M17-export-duration-loss-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28563
+    },
+    {
+      "phase": "S7-M17-export-duration-loss-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4208
+    },
+    {
+      "phase": "S7-M18-export-redaction-loss-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4217
+    },
+    {
+      "phase": "S7-M18-export-redaction-loss-compile-mutant",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28474
+    },
+    {
+      "phase": "S7-M18-export-redaction-loss-mutant",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 4259
+    },
+    {
+      "phase": "S7-M18-export-redaction-loss-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28827
+    },
+    {
+      "phase": "S7-M18-export-redaction-loss-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4334
+    },
+    {
+      "phase": "S7-M19-export-time-loss-baseline",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4261
+    },
+    {
+      "phase": "S7-M19-export-time-loss-compile-mutant",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28580
+    },
+    {
+      "phase": "S7-M19-export-time-loss-mutant",
+      "exit": 1,
+      "executionError": null,
+      "durationMs": 4239
+    },
+    {
+      "phase": "S7-M19-export-time-loss-compile-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 28749
+    },
+    {
+      "phase": "S7-M19-export-time-loss-restored",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 4396
+    },
+    {
+      "phase": "AMC1516-final-preservation",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 2496
+    },
+    {
+      "phase": "AMC1516-final-live-status",
+      "exit": 0,
+      "executionError": null,
+      "durationMs": 46
+    }
+  ],
+  "limits": [
+    "Only the recorded source58/direct copied modules and specified fixture corpora are reviewed. Standalone/kernel mutated route coverage is not implied by restoring those siblings.",
+    "The API dry-run test invokes the real dispatcher with mocked IncomingMessage/ServerResponse. It does not exercise actual HTTP, authentication, tenant or deployment behavior.",
+    "Transport hooks deny selected in-process Node HTTP/DNS/socket APIs; they do not establish syscall-level network isolation.",
+    "Current same-launcher Node22/ABI127 evidence is directly observed; earlier child ABI remains inferred from recorded version/executable. Native integrity here is a read-only physical hash/device/inode/link comparison, not a new import/smoke test.",
+    "Previous AMC-1525 full cold matrix remains 44 pass/3 fail/15 pending and partial; its distinct ten-case supplement remains 10→7→10. Reusing exact prior fixture effects does not attach those effects to AMC-1516 tests.",
+    "Old P0-18 59-case totals and shared mapping cases are not added or double-counted. Nine distinct guards and ten historical IDs remain distinct counts.",
+    "No AMC-1517 lifecycle/reentry/runtime work, full historical 76 batch, held-runner transfer, Node24, full suite, coverage, hosted CI, release, production repair or Done approval is inferred.",
+    "Existing required quality failures are inherited context and were not rerun or repaired by this review. All reservations, paused scopes and freeze checks remain in force."
+  ],
+  "observerHistory": [
+    {
+      "operation": "Initial reviewer standard-library hash/comparison pass",
+      "outcome": "All matrix, adapter, index-reference traversal, source-content and M11 text assertions reached native physical-field check. Reviewer used dev/ino instead of receipt device/inode and stopped with KeyError dev. No product import/runtime/input change occurred.",
+      "correction": "Read exact native schema and repeated the read-only data proof with device/inode, preserving this observer error explicitly."
+    }
+  ],
+  "operations": {
+    "productImports": 0,
+    "testRuns": 0,
+    "compilerRuns": 0,
+    "builds": 0,
+    "syntaxChecks": 0,
+    "dependencyOrNativeChanges": 0,
+    "sourceOrInputEdits": 0,
+    "standardLibraryReadOnlyHashAndTextComparisons": true,
+    "writesOnly": [
+      "/private/tmp/p0-30-AMC-1516-independent-review-20261015.json",
+      "/private/tmp/p0-30-AMC-1516-independent-review-20261015.md"
+    ]
+  },
+  "allLiveReadsFinished": true
+}

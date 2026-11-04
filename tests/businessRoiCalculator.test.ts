@@ -111,7 +111,7 @@ describe("business trust-gap ROI calculator", () => {
     expect(read("README.md")).toContain("amc business roi --current-maturity 2 --target-maturity 3");
     expect(read("docs/QUICKSTART.md")).toContain("Calculate cost-of-trust-gap ROI");
     expect(read("docs/GETTING_STARTED.md")).toContain("Estimate first-year ROI from a maturity improvement");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).toContain("ROI calculator — ✅ Resolved 2026-06-16");
-    expect(read("docs/AUDIT_50_AGENTS_BATCH5.md")).not.toContain("No ROI calculator or \"cost of a trust gap\" document.");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).toContain("ROI calculator — ✅ Resolved 2026-06-16");
+    expect(read("docs/archive/AUDIT_50_AGENTS_BATCH5.md")).not.toContain("No ROI calculator or \"cost of a trust gap\" document.");
   });
 });

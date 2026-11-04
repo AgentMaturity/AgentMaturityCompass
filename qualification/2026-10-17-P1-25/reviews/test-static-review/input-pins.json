@@ -1,0 +1,470 @@
+{
+  "schema": "p125-independent-test-static-inputs/1",
+  "at": "2026-10-16T18:48:07.507850+00:00",
+  "rows": [
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-design/verifyTimestamp.test.ts",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-design/verifyTimestamp.test.ts",
+      "bytes": 11425,
+      "sha256": "47f9aa1984cf61ae0d1192d2c04d4f3138c0fa42d32145124552bd648eddeb31",
+      "dev": 16777231,
+      "ino": 543069142,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-design/README.md",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-design/README.md",
+      "bytes": 3899,
+      "sha256": "4853086ae02da05941461078ed391b2d0430e4ff2fd8ee1a94a3a75c9d26be23",
+      "dev": 16777231,
+      "ino": 543069702,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-design/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-design/input-pins.json",
+      "bytes": 6620,
+      "sha256": "6f7492cf3adc6fd50907fd5d7cb5354f3dc88df2bf9851bc67c0e7794cab2718",
+      "dev": 16777231,
+      "ino": 543069774,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-design/seal.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-design/seal.json",
+      "bytes": 2342,
+      "sha256": "5b4bfbac5fcb67e6c470ace349cb0b29f0d536c6d105534074294e021b225b51",
+      "dev": 16777231,
+      "ino": 543069775,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-design/author-review.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-design/author-review.json",
+      "bytes": 3288,
+      "sha256": "ab468a9ede56b9adb288ca4b6606a87f78aba204736df822f897147ee7059f6d",
+      "dev": 16777231,
+      "ino": 543069773,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-design/control-static-review.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-design/control-static-review.json",
+      "bytes": 1896,
+      "sha256": "ef81fbbe7c3d57e4c1734fa78952cc209c6720d0508069756df6c82105186e9d",
+      "dev": 16777231,
+      "ino": 543069701,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-design/matrix.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-design/matrix.json",
+      "bytes": 7385,
+      "sha256": "0073dc6abb231d0db13dc0df387b04abf4503dfa6265e3815a498264494db6b6",
+      "dev": 16777231,
+      "ino": 543069699,
+      "nlink": 1,
+      "readScope": "seal output hash checked; not used to infer runtime"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/test-design/manifest.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/test-design/manifest.json",
+      "bytes": 4071,
+      "sha256": "02a6076c1d5b1217279e751c8393683ae2379154c0c91e76efcfdd3261aea9b4",
+      "dev": 16777231,
+      "ino": 543069700,
+      "nlink": 1,
+      "readScope": "seal output hash checked; not used to infer runtime"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/verifyTimestamp.ts",
+      "bytes": 16478,
+      "sha256": "0bda59a3f898654a88e3b6f72e240f8530ebbd639cb0f268b015c507bc683c89",
+      "dev": 16777231,
+      "ino": 542461054,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/der.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/der.ts",
+      "bytes": 5959,
+      "sha256": "ff49c2620f6e403e66345856c055e25ddaa89696b8b59b273cc98e327be30eb6",
+      "dev": 16777231,
+      "ino": 542461051,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "dev": 16777231,
+      "ino": 542461052,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7",
+      "dev": 16777231,
+      "ino": 542461150,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+      "bytes": 2312,
+      "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d",
+      "dev": 16777231,
+      "ino": 542463301,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b",
+      "dev": 16777231,
+      "ino": 542461173,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+      "dev": 16777231,
+      "ino": 542463391,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+      "dev": 16777231,
+      "ino": 542463392,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "dev": 16777231,
+      "ino": 542464352,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/zod/package.json",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/zod/package.json",
+      "bytes": 3796,
+      "sha256": "c630bd10b52dcf71c112a2bf78dbf2734b9db58d62de663b8d86c2ec2c8cda2e",
+      "dev": 16777231,
+      "ino": 542477409,
+      "nlink": 1,
+      "readScope": "installed package JSON metadata only; no module loaded"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fixture-design/fixture-contract.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/fixture-design/fixture-contract.json",
+      "bytes": 3247,
+      "sha256": "60341b239e271f7483814b8a06a237080fde68cc858929c84da240750447dc79",
+      "dev": 16777231,
+      "ino": 543069241,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/root-generation-byte-review.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/root-generation-byte-review.json",
+      "bytes": 1250,
+      "sha256": "5ad64431544180d89cc49f7a43e83e3a971914b09a027a73574003d463c0c35e",
+      "dev": 16777231,
+      "ino": 543069786,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/generation-result.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/generation-result.json",
+      "bytes": 79333,
+      "sha256": "193afe2f43f4f318f4fe9888ca2907896117cc10a0ded7b115dd0c8bcb1ff3c9",
+      "dev": 16777231,
+      "ino": 543069651,
+      "nlink": 1,
+      "readScope": "full JSON metadata/command closure records; no key/body secrets read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/README.md",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/README.md",
+      "bytes": 784,
+      "sha256": "1ac37a60cabc739bfa0a0f8489f20346e3d4ba23789e918d54d85b667783eef8",
+      "dev": 16777231,
+      "ino": 543069649,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/expired.token.der",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/expired.token.der",
+      "bytes": 2356,
+      "sha256": "1baf6dd1c9d9601c98bf47506563b0226bfb132a884f674dad9eb641e3420d3a",
+      "dev": 16777231,
+      "ino": 543069645,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/missing-eku.token.der",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/missing-eku.token.der",
+      "bytes": 2332,
+      "sha256": "264ca611164421a268c868d0631660cbfc3423873cd9231514e7b9fd64280ec8",
+      "dev": 16777231,
+      "ino": 543069643,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/noncritical-eku.token.der",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/noncritical-eku.token.der",
+      "bytes": 2353,
+      "sha256": "84e186ce834f2a9f30a87a1b8ba722c95517c9e110a922ce72c72c67677d6896",
+      "dev": 16777231,
+      "ino": 543069644,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/provenance.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/provenance.json",
+      "bytes": 80160,
+      "sha256": "3c38fe129eecdd32d9f8cd2d89028dbe73e17ad5634ffd7b0667e0eef0c32366",
+      "dev": 16777231,
+      "ino": 543069650,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/public-certificates.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/public-certificates.json",
+      "bytes": 10021,
+      "sha256": "430746b4e4e721616a57bbec9d8b8a950cdd3b2631d51dc4925d263cb1642b52",
+      "dev": 16777231,
+      "ino": 543069640,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/query.der",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/query.der",
+      "bytes": 76,
+      "sha256": "6c039cf80c0e99b576a1802d7916835d5c11f85998c60ea866dc02a1403051c7",
+      "dev": 16777231,
+      "ino": 543069647,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/tampered-attribute.token.der",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/tampered-attribute.token.der",
+      "bytes": 2356,
+      "sha256": "fc6ac617be35765b6038bd928ec00d09de02cffbee88c6e99341d697517cfd1d",
+      "dev": 16777231,
+      "ino": 543069646,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/tstinfo.der",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/tstinfo.der",
+      "bytes": 93,
+      "sha256": "98e46babfb8aa4a7ba99eb4fd4976feca3f23a3e8cb6992ae93c435d6542ba35",
+      "dev": 16777231,
+      "ino": 543069648,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/valid.response.der",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/valid.response.der",
+      "bytes": 2365,
+      "sha256": "cf14b113569a5be83fd3491938f5cb650724fffef7c0a946edb09fb62c1fdc31",
+      "dev": 16777231,
+      "ino": 543069642,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/valid.token.der",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/public-fixtures/valid.token.der",
+      "bytes": 2356,
+      "sha256": "d45216b462f9286af58ab5a3694c82b3b1675959a45011ec9c35eef1e4973912",
+      "dev": 16777231,
+      "ino": 543069641,
+      "nlink": 1,
+      "readScope": "public bytes/hash; JSON structured metadata when JSON; no DER/X509/CMS parser executed"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/21-valid-cms-verify-content/stdout.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/21-valid-cms-verify-content/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dev": 16777231,
+      "ino": 543069525,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/21-valid-cms-verify-content/stderr.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/21-valid-cms-verify-content/stderr.log",
+      "bytes": 28,
+      "sha256": "25b50603c259a4e3172ed0f6315497daa374b9935c92d78abcd3d2e2dce2b97e",
+      "dev": 16777231,
+      "ino": 543069526,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/24-missing-eku-cms-verify-content/stdout.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/24-missing-eku-cms-verify-content/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dev": 16777231,
+      "ino": 543069542,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/24-missing-eku-cms-verify-content/stderr.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/24-missing-eku-cms-verify-content/stderr.log",
+      "bytes": 28,
+      "sha256": "25b50603c259a4e3172ed0f6315497daa374b9935c92d78abcd3d2e2dce2b97e",
+      "dev": 16777231,
+      "ino": 543069543,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/27-noncritical-eku-cms-verify-content/stdout.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/27-noncritical-eku-cms-verify-content/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dev": 16777231,
+      "ino": 543069559,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/27-noncritical-eku-cms-verify-content/stderr.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/27-noncritical-eku-cms-verify-content/stderr.log",
+      "bytes": 28,
+      "sha256": "25b50603c259a4e3172ed0f6315497daa374b9935c92d78abcd3d2e2dce2b97e",
+      "dev": 16777231,
+      "ino": 543069560,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/30-expired-cms-verify-content/stdout.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/30-expired-cms-verify-content/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dev": 16777231,
+      "ino": 543069576,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/30-expired-cms-verify-content/stderr.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/30-expired-cms-verify-content/stderr.log",
+      "bytes": 28,
+      "sha256": "25b50603c259a4e3172ed0f6315497daa374b9935c92d78abcd3d2e2dce2b97e",
+      "dev": 16777231,
+      "ino": 543069577,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/31-valid-independent-ts-verify/stdout.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/31-valid-independent-ts-verify/stdout.log",
+      "bytes": 17,
+      "sha256": "0fcf850642f4c89e2ef10aad49678b61d6c2fb60fd6ca9d7ab08b59627ebdc4f",
+      "dev": 16777231,
+      "ino": 543069582,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/31-valid-independent-ts-verify/stderr.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/31-valid-independent-ts-verify/stderr.log",
+      "bytes": 102,
+      "sha256": "5be175616e391a8825d285a31a6024eb0956de4de8d9c841d9a1137ec729c2d1",
+      "dev": 16777231,
+      "ino": 543069583,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/39-tampered-attribute-cms-refusal/stdout.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/39-tampered-attribute-cms-refusal/stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "dev": 16777231,
+      "ino": 543069623,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/39-tampered-attribute-cms-refusal/stderr.log",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/generation/attempt-01/commands/39-tampered-attribute-cms-refusal/stderr.log",
+      "bytes": 371,
+      "sha256": "061d1689024df0d84687096f677f5ee0dce30b4dd595ac6bfff3428ee71ab550",
+      "dev": 16777231,
+      "ino": 543069624,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+      "physicalPath": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-25.md",
+      "bytes": 12911,
+      "sha256": "db346645bc6ac0b783f22bbba50cb07b36e74832507218e4a2488a6d8b68f279",
+      "dev": 16777231,
+      "ino": 473795983,
+      "nlink": 1,
+      "readScope": "full read"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/fixture-design/generate-offline-fixtures-seal.json",
+      "physicalPath": "/private/tmp/p1-25-time-qualification-20261016/fixture-design/generate-offline-fixtures-seal.json",
+      "bytes": 2962,
+      "sha256": "f2d9275f93ec177423a6554a653e089b59f1e39c6a21ec5af99549503291d43c",
+      "dev": 16777231,
+      "ino": 543069658,
+      "nlink": 1,
+      "readScope": "historical generator author seal metadata"
+    }
+  ],
+  "allReadsFinished": true,
+  "author22InputHashesExact": true,
+  "author7OutputHashesExact": true,
+  "boundary": "Finite static source/metadata/byte audit; no product/parser/compiler/native/OpenSSL/test execution or checkout writes."
+}

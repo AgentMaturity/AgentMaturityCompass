@@ -1,6 +1,7 @@
+import { spawnSync } from "node:child_process";
 import { createServer } from "node:http";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { afterEach, describe, expect, test } from "vitest";
 import { initWorkspace } from "../src/workspace.js";
@@ -103,6 +104,20 @@ describe("audit binder + compliance maps", () => {
       trust: workspaceKeyTrust(ws)
     });
     expect(verify.ok, JSON.stringify(verify.errors)).toBe(true);
+  });
+
+  // P0-28: the shipped command printed "Evidence: sufficient" for a binder of an empty workspace.
+  test("amc audit binder create on an empty workspace claims no sufficient evidence", () => {
+    const ws = workspace();
+    const home = mkdtempSync(join(tmpdir(), "amc-audit-binder-home-"));
+    roots.push(home);
+    const result = spawnSync(process.execPath, [resolve("dist/cli.js"), "audit", "binder", "create", "--scope", "workspace",
+      "--out", join(ws, "empty.amcaudit")], { cwd: ws, encoding: "utf8", timeout: 120_000,
+      env: { ...process.env, NO_COLOR: "1", AMC_HOME: home, AMC_VAULT_PASSPHRASE: "audit-binder-passphrase" } });
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.stdout).toContain("Audit binder exported");
+    expect(result.stdout).toMatch(/^Claim: Self-reported · Result: not evaluated · Evidence: incomplete · /m);
+    expect(result.stdout).not.toContain("Evidence: sufficient");
   });
 
   test("audit policy/map tampering fails closed for audit API", async () => {

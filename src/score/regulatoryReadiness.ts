@@ -1,8 +1,6 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { sealedRunReportVerifies } from "../diagnostic/reportSeal.js";
-import { join } from "node:path";
-import { getAgentPaths, resolveAgentId } from "../fleet/paths.js";
-import type { DiagnosticReport } from "../types.js";
+import { latestTrustedRun } from "../governor/runTrust.js";
+import { deriveIntegrityIndex } from "../cert/trustCertificate.js";
+import { resolveAgentId } from "../fleet/paths.js";
 import { notEvaluatedCriteria, scoreEUAIActCompliance, type NotEvaluatedCriterion } from "./euAIActCompliance.js";
 import { scoreOWASPLLMCoverage } from "./owaspLLMCoverage.js";
 
@@ -75,13 +73,6 @@ const DEFAULT_WEIGHTS: WeightedComponents = {
   owaspLLM: 0.2
 };
 
-function clamp01(value: number): number {
-  if (!Number.isFinite(value)) {
-    return 0;
-  }
-  return Math.max(0, Math.min(1, value));
-}
-
 function normalizeWeights(overrides?: Partial<WeightedComponents>): WeightedComponents {
   const raw: WeightedComponents = {
     euAiAct: typeof overrides?.euAiAct === "number" ? overrides.euAiAct : DEFAULT_WEIGHTS.euAiAct,
@@ -104,58 +95,11 @@ function normalizeWeights(overrides?: Partial<WeightedComponents>): WeightedComp
   };
 }
 
-function deriveIntegrityIndex(report: Partial<DiagnosticReport>): number {
-  if (typeof report.integrityIndex === "number" && Number.isFinite(report.integrityIndex)) {
-    return clamp01(report.integrityIndex);
-  }
-  if (Array.isArray(report.layerScores) && report.layerScores.length > 0) {
-    const scores = report.layerScores
-      .map((row) => row?.avgFinalLevel)
-      .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
-    if (scores.length > 0) {
-      const avg = scores.reduce((sum, value) => sum + value, 0) / scores.length;
-      return clamp01(avg / 5);
-    }
-  }
-  return 0;
-}
-
 function loadLatestAgentIntegrity(workspace: string, agentId: string): LatestAgentIntegrity {
-  const paths = getAgentPaths(workspace, agentId);
-  if (!existsSync(paths.runsDir)) {
-    return { runId: null, integrityIndex: null };
-  }
-
-  const entries = readdirSync(paths.runsDir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".json"));
-  let best: { runId: string; ts: number; integrityIndex: number } | null = null;
-
-  for (const entry of entries) {
-    const file = join(paths.runsDir, entry.name);
-    try {
-      const parsed = JSON.parse(readFileSync(file, "utf8")) as Partial<DiagnosticReport>;
-      // A scoring input (the readiness verdict quotes this run's integrity), so
-      // only sealed reports count — G9-05.
-      if (!sealedRunReportVerifies(workspace, parsed as Record<string, unknown>)) {
-        continue;
-      }
-      const runId = typeof parsed.runId === "string" && parsed.runId.length > 0
-        ? parsed.runId
-        : entry.name.slice(0, -5);
-      const ts = typeof parsed.ts === "number" && Number.isFinite(parsed.ts) ? parsed.ts : 0;
-      const integrityIndex = deriveIntegrityIndex(parsed);
-      if (!best || ts > best.ts || (ts === best.ts && runId > best.runId)) {
-        best = { runId, ts, integrityIndex };
-      }
-    } catch {
-      // Ignore malformed run files.
-    }
-  }
-
-  if (!best) {
-    return { runId: null, integrityIndex: null };
-  }
-  return { runId: best.runId, integrityIndex: best.integrityIndex };
+  // A scoring input (the readiness verdict quotes this run's integrity), so only the trusted run counts: sealed (G9-05),
+  // bound to this agent, anchored in the ledger and not superseded there. A refused latest run is absent, not quoted.
+  const { run } = latestTrustedRun(workspace, agentId);
+  return run === null ? { runId: null, integrityIndex: null } : { runId: run.runId, integrityIndex: deriveIntegrityIndex(run) };
 }
 
 /** @deprecated Not evaluated since P0-15: it reports no score. Removal is a D-12 question. */

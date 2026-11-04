@@ -1,0 +1,31 @@
+Scope: all 13 workspace projects
+ WARN  There are cyclic workspace dependencies: /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/vendor/cordis, /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/vendor/include
+Lockfile is up to date, resolution step is skipped
+Progress: resolved 0, reused 1, downloaded 0, added 0
+Packages: +77 -126
+++++++++++++++++++++++++++++++--------------------------------------------------
+Progress: resolved 0, reused 203, downloaded 0, added 74
+Progress: resolved 0, reused 203, downloaded 0, added 77, done
+
+. postinstall$ node scripts/postinstall.js || true
+. postinstall:   ┌──────────────────────────────────────────────┐
+. postinstall:   │                                              │
+. postinstall:   │   🧭  Agent Maturity Compass installed!      │
+. postinstall:   │                                              │
+. postinstall:   │   Quick start:                               │
+. postinstall:   │     amc                                      │
+. postinstall:   │     amc up                                   │
+. postinstall:   │     amc quickscore --rapid                   │
+. postinstall:   │                                              │
+. postinstall:   │   Docs:  amc --help                          │
+. postinstall:   │                                              │
+. postinstall:   └──────────────────────────────────────────────┘
+. postinstall: Done
+╭ Warning ─────────────────────────────────────────────────────────────────────╮
+│                                                                              │
+│   Ignored build scripts: @google/genai@2.21.0, protobufjs@7.6.6.             │
+│   Run "pnpm approve-builds" to pick which dependencies should be allowed     │
+│   to run scripts.                                                            │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+Done in 2.3s using pnpm v10.33.0

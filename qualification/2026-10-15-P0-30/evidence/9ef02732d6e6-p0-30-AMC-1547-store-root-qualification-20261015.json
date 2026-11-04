@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1547",
+  "slice": "NEW_TWO_CASE_SIGNED_LEGACY_ROOT_READS",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T02:03:22.135474+00:00",
+  "state": "BOUNDED_TWO_CASE_BASELINE_AND_SOURCE_CONTROL_COMPLETE",
+  "workspace": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015",
+  "construction": "Independent physical filesystem copy, not a Git clone.",
+  "byteExactNewFixture": {
+    "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/closure/tests/storeRootQualification.test.ts",
+    "bytes": 10950,
+    "sha256": "fa5fa483e98e41c1c16c6caa23b497a884f71abebde0739fcd934512c7fa6236"
+  },
+  "initialBaseline": {
+    "raw": {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/new-two-case-legacy-storage-root-baseline/raw-tests.json",
+      "bytes": 1360,
+      "sha256": "221931b697d809d5df583f63998a3f151743892b26ed6c00ea237c2d7d281cbe"
+    },
+    "command": {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/new-two-case-legacy-storage-root-baseline/command.json",
+      "bytes": 2517,
+      "sha256": "e693a500c6be45e588e6e270ee62417e75bc2201047f38d3a48b9d2fdbe58265"
+    },
+    "actualPassed": 2,
+    "failedPendingTodo": [
+      0,
+      0,
+      0
+    ]
+  },
+  "control": {
+    "id": "P30-1547-store-root",
+    "provenance": "Exact recovered held full-batch recipe; no execution, reconstruction or transfer.",
+    "sourceTarget": "src/session/spill/spillStore.ts",
+    "counts": {
+      "baseline": {
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0
+      },
+      "mutant": {
+        "numTotalTests": 2,
+        "numPassedTests": 0,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": false,
+        "exit": 1
+      },
+      "restored": {
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "success": true,
+        "exit": 0
+      }
+    },
+    "failures": [
+      {
+        "name": "refuses a parent storage-root override while a strict descendant reads the signed legacy fixture",
+        "firstLine": "AssertionError: expected { status: 'ok', detail: null, \u2026(2) } to deeply equal { status: 'tampered', \u2026(3) }",
+        "locations": [
+          "storeRootQualification.test.ts:166:23"
+        ],
+        "fullFailureMessageSha256": "04059c0cfb834fd3b16e60422e30d1d3c1aa93b7f35a8c1ea156743a0cd565a7",
+        "retainedTrace": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-mutant/raw-tests.json",
+          "bytes": 4032,
+          "sha256": "b951c78c17f31fa4f6cbcb161b8da0814dd29db53ee47e860562126b0bfab229"
+        }
+      },
+      {
+        "name": "refuses a sibling storage-root override while a strict descendant reads the signed legacy fixture",
+        "firstLine": "AssertionError: expected { status: 'ok', detail: null, \u2026(2) } to deeply equal { status: 'tampered', \u2026(3) }",
+        "locations": [
+          "storeRootQualification.test.ts:166:23"
+        ],
+        "fullFailureMessageSha256": "04059c0cfb834fd3b16e60422e30d1d3c1aa93b7f35a8c1ea156743a0cd565a7",
+        "retainedTrace": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/phases/P30-1547-store-root-mutant/raw-tests.json",
+          "bytes": 4032,
+          "sha256": "b951c78c17f31fa4f6cbcb161b8da0814dd29db53ee47e860562126b0bfab229"
+        }
+      }
+    ],
+    "matrix": {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/P30-1547-store-root-matrix.json",
+      "bytes": 33948,
+      "sha256": "fdc4893a5153d63952d9d0bdb8100a2f5701252f97b640b49e82cab2b8c6f51b"
+    },
+    "sourceChange": {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/P30-1547-store-root-source-change.json",
+      "bytes": 2213,
+      "sha256": "962420a0519cdd3cbf2d0de8729e676f22b3641fc139cabc8a5e886f202df03c"
+    },
+    "meaning": "The exact guard removal lets both owned parent/sibling override reads return ok with the exact expected plaintext length/hash. Healthy strict-descendant controls remain ok and recorded snapshots unchanged. This is actual legacy read-root sensitivity, not a missing/permission/setup error."
+  },
+  "effectInventory": {
+    "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/effect-observation-inventory.json",
+    "bytes": 34415,
+    "sha256": "f50add1af05dee17cbbf38d143841f889573c179b8ecc4addd858208ccc9b984"
+  },
+  "runtimeFingerprint": {
+    "node": "v22.23.3",
+    "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "modulesABI": "127",
+    "napi": "10"
+  },
+  "runtimeScope": "All eight actual case effect records independently print worker version/executable/ABI127. Fingerprint is separately observed. Explicit qualified Node22 and credential-free allowlisted launch environment; fixture credentials are generated locally.",
+  "signedReferenceBoundary": "A genuine local Ledger producer signs the tested row. The test uses product canonicalMetadataForHash for the preimage, then actual SHA and Nodecrypto verify the event hash/signature. This is not an independent canonicalization implementation, full ledger chain/seal/trust verifier or row-authentication enforcement by readSpilled itself. readSpilled receives the ref extracted from that genuine row and performs the public legacy-v1 object read/digest checks.",
+  "pinChronologyAndTrust": "ensureSigningKeys signs initial histories before monitor pin capture. The captured public hashes precede the tested row only, in the byte-exact source order. Final records overwrite intermediate states and raw public/private signing material is deleted with the fixture, so hash-only booleans do not permit offline full signature replay or immutable temporal proof. No independent external operator/person authority is claimed.",
+  "rootAndSnapshotBoundary": "Workspace retains the local ledger/trust context. Healthy root is workspace/retained-objects; candidate is owned fixture parent or sibling-objects. No transport root or invented baseStoreRoot/ledgerStoreRoot API. Both read results and named snapshots precede contract assertions. Snapshot equality excludes atime/mtime/ctime and does not claim universal filesystem effects or race resistance.",
+  "lifecycleBoundary": "Normal ledger and all process-private pools close before read snapshots and in finally, with surfaced cleanup errors. This remains one isolated same-process worker, not a cold child, universal descriptor-closure proof or repair of prior P027 mixed-parent SQLITE_CORRUPT cause.",
+  "preservation": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "newPrivateSourceFiles": 1,
+    "fullPrivateClosure": 12269,
+    "allSourceRestoredExact": true,
+    "allCompiledBytesNeverChanged": true,
+    "protectedPins": 157,
+    "priorArtifactReferences": 2094,
+    "authorReviewPins": 5,
+    "latePredecessorPins": 2,
+    "allReferencedPriorArtifactsAndManifestListedActualClosuresExact": true,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "rootHead": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "rootGitStatus": "clean",
+    "normalConfigGuardsFileAloneOneWorkerDualReportersDefault30sUnchanged": true
+  },
+  "originalCountingCorrection": {
+    "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/registered-title-count-correction.json",
+    "bytes": 650,
+    "sha256": "ff9acd6fcb77e8efc80e4a21f8a51c1753c6075206972b0df714b106e90bd670"
+  },
+  "formalAndCausalBoundary": "Two new registered cases repeated four times are eight executions, separate from original lifecycle15 survivor and source58 union170 registrations/164 distinct rendered titles. No original packet or expectation was rewritten.",
+  "limits": [
+    "Legacy-v1 plaintext manual objects only; no encrypted spill generation/publication, erasure/retention, CLI, provider, installed package, external identity or whole-log/full-cold qualification.",
+    "No old/held19 test/helper/runner transfer, production/permanent test/helper/CLI/counter/docs/guard/archive/dependency/native/root Git edit, compiler/build/import adapter or dist mutation.",
+    "No AMC1522/P0-32 closure, original batch/full P0-30/Node24/full suite/coverage/hosted/G0/release/Done acceptance."
+  ],
+  "setupChronology": {
+    "frozenReport": {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/setup-prepared.json",
+      "bytes": 5234,
+      "sha256": "156b5a95b456bf9b570636e4ee9573291156c29f7377d66a827cb61a2aaeae1a"
+    },
+    "frozenMarkdown": {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/setup-prepared.md",
+      "bytes": 2240,
+      "sha256": "ef0291fc1359af4165845d12f244f2f98e85a67afc9d90bd19e5fa22b6fbd736"
+    },
+    "frozenIndex": {
+      "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 508567,
+      "sha256": "694a9a485123b3ddb92df2da7c100733b8b83b6eb26145734b4e68d597466ae5"
+    }
+  },
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 12684,
+    "sha256": "e13183bad3d4e8573c7f0c5c138a18cc3bbebea99ffa35e57f1642280183aeaa"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/artifact-index.json",
+    "bytes": 523773,
+    "sha256": "409f4bc4cc25b1933939d19f3d9c024ffd3e69f8d670a7109aa0962d6f026814"
+  },
+  "allRuntimeAndLiveReadsFinished": true
+}

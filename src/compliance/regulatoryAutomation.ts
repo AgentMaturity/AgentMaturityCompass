@@ -1,3 +1,5 @@
+import type { EvidenceOutcome } from "../types.js";
+import { ratioOrNull } from "../utils/ratio.js";
 /**
  * Regulatory Automation Engine for AMC Comply
  *
@@ -78,8 +80,10 @@ export interface ComplianceGapAnalysis {
   id: string;
   timestamp: number;
   regulatoryChange: RegulatoryChange;
-  currentCoverage: number;
-  projectedCoverage: number;
+  currentCoverage: number | null;
+  projectedCoverage: number | null;
+  outcome: EvidenceOutcome;
+  sampleSize: number;
   gaps: ComplianceGap[];
   remediationPlan: RemediationStep[];
   daysUntilEffective: number;
@@ -115,8 +119,10 @@ export interface RegulatoryImpactAssessment {
   change: RegulatoryChange;
   affectedAgents: number;
   affectedDimensions: string[];
-  scoreImpact: Array<{ dimension: string; currentAvg: number; projectedAvg: number; delta: number }>;
-  complianceRisk: number;
+  scoreImpact: Array<{ dimension: string; currentAvg: number | null; projectedAvg: number | null; delta: number | null; outcome: EvidenceOutcome; sampleSize: number }>;
+  complianceRisk: number | null;
+  outcome: EvidenceOutcome;
+  sampleSize: number;
   timeToCompliance: number;
   recommendations: string[];
   /** Cost estimate for full remediation */
@@ -580,7 +586,7 @@ export class RegulatoryMonitor extends EventEmitter {
     }
 
     const coveredCount = change.impactedControls.filter(c => covered.includes(c)).length;
-    const currentCoverage = change.impactedControls.length > 0 ? (coveredCount / change.impactedControls.length) * 100 : 100;
+    const currentCoverage = ratioOrNull(coveredCount * 100, change.impactedControls.length);
 
     // Build remediation plan with dependency ordering
     const remediationPlan: RemediationStep[] = gaps.map((gap, i) => ({
@@ -609,8 +615,11 @@ export class RegulatoryMonitor extends EventEmitter {
       id: randomUUID(),
       timestamp: Date.now(),
       regulatoryChange: change,
-      currentCoverage: Math.round(currentCoverage * 10) / 10,
-      projectedCoverage: Math.round(currentCoverage * 10) / 10,
+      currentCoverage: currentCoverage === null ? null : Math.round(currentCoverage * 10) / 10,
+      projectedCoverage: currentCoverage === null ? null : Math.round(currentCoverage * 10) / 10,
+      // Without a covered list the coverage rests on assuming every mapped control is covered: not a measurement.
+      outcome: currentCoverage === null || currentCoveredControls === undefined ? "not_evaluated" : "measured",
+      sampleSize: change.impactedControls.length,
       gaps,
       remediationPlan,
       daysUntilEffective,
@@ -634,23 +643,27 @@ export class RegulatoryMonitor extends EventEmitter {
       change.impactedControls.map(c => CONTROL_TO_DIMENSION[c]).filter((d): d is string => !!d)
     )];
 
-    const scoreImpact = affectedDimensions.map(dim => {
+    const scoreImpact = affectedDimensions.map<RegulatoryImpactAssessment["scoreImpact"][number]>(dim => {
       const dimScores = fleetScores
         .map(a => a.dimensionScores[dim])
         .filter((s): s is number => s !== undefined);
-      const currentAvg = dimScores.length > 0 ? dimScores.reduce((a, b) => a + b, 0) / dimScores.length : 0;
+      const currentAvg = ratioOrNull(dimScores.reduce((a, b) => a + b, 0), dimScores.length);
       const projectedScores = dimScores.map(s => s >= 55 ? s : s * 0.9);
-      const projectedAvg = projectedScores.length > 0 ? projectedScores.reduce((a, b) => a + b, 0) / projectedScores.length : 0;
+      const projectedAvg = ratioOrNull(projectedScores.reduce((a, b) => a + b, 0), projectedScores.length);
       return {
         dimension: dim,
-        currentAvg: Math.round(currentAvg * 10) / 10,
-        projectedAvg: Math.round(projectedAvg * 10) / 10,
-        delta: Math.round((projectedAvg - currentAvg) * 10) / 10,
+        currentAvg: currentAvg === null ? null : Math.round(currentAvg * 10) / 10,
+        projectedAvg: projectedAvg === null ? null : Math.round(projectedAvg * 10) / 10,
+        delta: projectedAvg === null || currentAvg === null ? null : Math.round((projectedAvg - currentAvg) * 10) / 10,
+        outcome: currentAvg === null || projectedAvg === null ? "not_evaluated" : "measured",
+        sampleSize: dimScores.length,
       };
     });
 
-    const affectedAgents = fleetScores.filter(a =>
-      affectedDimensions.some(d => (a.dimensionScores[d] ?? 0) < 55)
+    // The sample is the agents with a finite score in an affected dimension; a NaN or missing score evaluates nothing.
+    const scored = fleetScores.filter(a => affectedDimensions.some(d => Number.isFinite(a.dimensionScores[d])));
+    const affectedAgents = scored.filter(a =>
+      affectedDimensions.some(d => Number.isFinite(a.dimensionScores[d]) && a.dimensionScores[d]! < 55)
     ).length;
 
     const totalHours = affectedAgents * affectedDimensions.length * 2;
@@ -662,7 +675,9 @@ export class RegulatoryMonitor extends EventEmitter {
       affectedAgents,
       affectedDimensions,
       scoreImpact,
-      complianceRisk: Math.min(100, Math.round((affectedAgents / Math.max(1, fleetScores.length)) * 100)),
+      complianceRisk: scored.length === 0 ? null : Math.min(100, Math.round((affectedAgents / scored.length) * 100)),
+      outcome: scored.length === 0 ? "not_evaluated" : "measured",
+      sampleSize: scored.length,
       timeToCompliance: totalHours,
       recommendations: [
         `${affectedAgents} of ${fleetScores.length} agents need remediation across ${affectedDimensions.length} dimensions.`,

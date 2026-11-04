@@ -17,6 +17,10 @@
  *   by a read; writes address them by path so an operator can set one without
  *   ever having read it. A settings dump is exactly the artifact that ends up
  *   pasted into an issue.
+ *
+ * LIBRARY-ONLY (GAP-WP39, D04 correction). No AMC runtime surface reads or
+ * persists a SettingsStore today; it is held in memory by whoever builds one,
+ * and only tests do. Do not cite it as the source of a live setting.
  */
 import Schema from "@amc/schemastery";
 

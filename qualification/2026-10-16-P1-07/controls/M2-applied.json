@@ -1,0 +1,21 @@
+{
+  "schema": "p107-owned-source-control-operation/1",
+  "at": "2026-10-16T18:14:49.776816+00:00",
+  "operation": "apply",
+  "number": 2,
+  "name": "M2-register-seeder",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout",
+  "sourceCommit": "0e06b251a8ff18d8d087657f8a2b62866da89b5c",
+  "target": "src/diagnostic/evidenceEmitters.ts",
+  "actualBytes": 13197,
+  "actualSha256": "5a837201d16449baf1c93da9342709510fa2fe8b0363dad5b94836af91684890",
+  "expected": {
+    "bytes": 13197,
+    "sha256": "5a837201d16449baf1c93da9342709510fa2fe8b0363dad5b94836af91684890"
+  },
+  "otherBound32InputsExactExceptOwnedTarget": true,
+  "allThreeNativePinsExact": true,
+  "sourceAndBorrowedCheckoutUnmodified": true,
+  "compiledOutputMutation": false,
+  "forceResetRestoreNoVerifyBaselineOrWaiver": false
+}

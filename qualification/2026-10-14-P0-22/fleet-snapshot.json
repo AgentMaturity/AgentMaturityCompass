@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "issue": "P0-22",
+  "createdAt": "2026-10-14T16:17:09.480021+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass",
+  "sourceHead": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "scope": "One stable fleet snapshot added to the existing legacy-member regression, plus its generated snapshot file. No production edits, new cases, build, install or dependency mutation.",
+  "componentTestsPassed": true,
+  "wholeIssueQualified": false,
+  "committed": false,
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/fleetScoring.test.ts",
+      "sha256": "2aa8c769ff733061ca4cf21e93945bbe2ba6062463ffcc44c42b5c4a3f20b5af"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/tests/__snapshots__/fleetScoring.test.ts.snap",
+      "sha256": "f098fda312718787d85f8b802eede5dc425d3fbb5637c63aedab4511bb604756",
+      "entries": 1
+    }
+  ],
+  "sourcePreserved": {
+    "path": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/src/fleet/fleetScoring.ts",
+    "sha256": "d3cd518d67098de05da446c5c9faa22eea664c4cf2e70e00ae3ef8fe8260b602",
+    "architectureLineCount": 800
+  },
+  "projection": "Actual legacy/current rendered claim cells, the actual canonical aggregate claim line and the complete rendered legend. Runtime durations, timestamps, generated run/session IDs, scores and paths are omitted. The fixed legacy notice reference is preserved because it is part of the canonical wording. No label or legend is independently regenerated for the snapshot.",
+  "phases": [
+    {
+      "phase": "seed",
+      "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/fleetScoring.test.ts --update --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-22-fleet-snapshot-seed-20261014.json > /private/tmp/p0-22-fleet-snapshot-seed-20261014.log 2>&1",
+      "exitCode": 0,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "snapshot": {
+        "added": 1,
+        "failure": false,
+        "filesAdded": 1,
+        "filesRemoved": 0,
+        "filesRemovedList": [],
+        "filesUnmatched": 0,
+        "filesUpdated": 0,
+        "matched": 0,
+        "total": 1,
+        "unchecked": 0,
+        "uncheckedKeysByFile": [],
+        "unmatched": 0,
+        "updated": 0,
+        "didUpdate": true
+      },
+      "report": "/private/tmp/p0-22-fleet-snapshot-seed-20261014.json",
+      "reportSha256": "cbc9b516d72d1c82dedd79f28eaa234c43aa2b4fee41f24371d873315293c741",
+      "log": "/private/tmp/p0-22-fleet-snapshot-seed-20261014.log",
+      "logSha256": "2f2c2979e2323c70568e57c1ca5782bb6a1d5c13cf637215bb4a0cba07e6aa7f"
+    },
+    {
+      "phase": "final",
+      "command": "PATH=/opt/homebrew/opt/node@22/bin:$PATH /opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/fleetScoring.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-22-fleet-snapshot-final-20261014.json > /private/tmp/p0-22-fleet-snapshot-final-20261014.log 2>&1",
+      "exitCode": 0,
+      "counts": {
+        "success": true,
+        "numTotalTests": 10,
+        "numPassedTests": 10,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "snapshot": {
+        "added": 0,
+        "failure": false,
+        "filesAdded": 0,
+        "filesRemoved": 0,
+        "filesRemovedList": [],
+        "filesUnmatched": 0,
+        "filesUpdated": 0,
+        "matched": 1,
+        "total": 1,
+        "unchecked": 0,
+        "uncheckedKeysByFile": [],
+        "unmatched": 0,
+        "updated": 0,
+        "didUpdate": false
+      },
+      "report": "/private/tmp/p0-22-fleet-snapshot-final-20261014.json",
+      "reportSha256": "6b32847ecc0e164d428f876a065941c8f10bcaae92da94e3019df680745eb0d5",
+      "log": "/private/tmp/p0-22-fleet-snapshot-final-20261014.log",
+      "logSha256": "0afdb9f8a531a61c4949b25f2b66fe43fdebcd53042c1a28ed1cf73b304aa0bb"
+    }
+  ],
+  "newCases": 0,
+  "finalCases": 10,
+  "snapshotAdded": 1,
+  "remainingBuildersReceipt": "/private/tmp/p0-22-report-contracts-20261014.json",
+  "combinedBuilderCoverage": 13,
+  "combinedSnapshotEntries": 23,
+  "limits": [
+    "Only this ten-case fleet suite ran in these phases, under explicit Node22.23.3 executable and PATH.",
+    "The other 12 builders have a separate 115-case receipt; these counts are not a whole-suite or hosted CI claim.",
+    "Root review and remaining required qualification checks must precede commit or closure."
+  ]
+}

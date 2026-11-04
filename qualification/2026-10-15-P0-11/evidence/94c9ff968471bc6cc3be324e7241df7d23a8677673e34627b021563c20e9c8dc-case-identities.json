@@ -1,0 +1,62 @@
+{
+  "map": [
+    {
+      "file": "tests/threatModelMap.test.ts",
+      "fullName": "check-threat-model a valid map passes"
+    },
+    {
+      "file": "tests/threatModelMap.test.ts",
+      "fullName": "check-threat-model a cited path that does not exist fails and names the entry"
+    },
+    {
+      "file": "tests/threatModelMap.test.ts",
+      "fullName": "check-threat-model a symbol absent from its file fails"
+    },
+    {
+      "file": "tests/threatModelMap.test.ts",
+      "fullName": "check-threat-model an owner that is not a plan key fails"
+    },
+    {
+      "file": "tests/threatModelMap.test.ts",
+      "fullName": "check-threat-model a failure row with no test and no owner fails"
+    },
+    {
+      "file": "tests/threatModelMap.test.ts",
+      "fullName": "check-threat-model the real channel map passes with 16 channels and 8 failure rows"
+    },
+    {
+      "file": "tests/threatModelMap.test.ts",
+      "fullName": "check-threat-model the threat model document names every channel, failure row and ASI id in the map"
+    }
+  ],
+  "recording": [
+    {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "fullName": "a governed call leaves evidence records an ALLOWED call"
+    },
+    {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "fullName": "a governed call leaves evidence records a DENIED call, with which guard refused and why"
+    },
+    {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "fullName": "a governed call leaves evidence writes an audit row AND a metric row per call"
+    },
+    {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "fullName": "a governed call leaves evidence correlates a call to its token, so a denial can be traced"
+    },
+    {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "fullName": "a governed call leaves evidence does NOT copy the arguments into the audit row"
+    },
+    {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "fullName": "recording never breaks the call returns the tool's real outcome when the recorder throws"
+    },
+    {
+      "file": "tests/toolEvidenceRecording.test.ts",
+      "fullName": "the projection itself labels the three outcomes distinctly"
+    }
+  ]
+}

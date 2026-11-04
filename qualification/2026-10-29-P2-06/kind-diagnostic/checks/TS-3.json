@@ -1,0 +1,11 @@
+{
+  "id": "TS-3",
+  "scenario": "Evidence isolation",
+  "status": "not_run",
+  "reason": "needs a second tenant release (one release per namespace) and per-tenant fixtures; the cross-tenant evidence fixture",
+  "blockedBy": [
+    "P1-11",
+    "P2-06 follow-up"
+  ],
+  "durationMs": 1
+}

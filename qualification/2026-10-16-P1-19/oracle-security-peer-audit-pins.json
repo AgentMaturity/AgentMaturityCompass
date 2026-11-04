@@ -1,0 +1,142 @@
+{
+  "schema": "p119-oracle-security-peer-pins/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-audit/README.md",
+      "bytes": 2379,
+      "sha256": "ce8af54ae3b0e1344589c9739a9a0b9890aec23f7fc3c448099ccb4e72c736e9"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/security-peer-audit/review.json",
+      "bytes": 15398,
+      "sha256": "4c335c07288ad7df93573e9cff7cb5c7252cc14e5b68b4ad5b53afba15b532e2"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 19409,
+      "sha256": "f238a3dddc0f9aa5079ef1c8c859a5620948272fafefca5ca3081462a1d0eded"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 27458,
+      "sha256": "3a988d22647c9be6499b8df5c08fc3dde1d0281f1b1da4bda71c3f41e21b04f7"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/interface-admission.json",
+      "bytes": 2562,
+      "sha256": "c37e2cd57f679c3b51b8b3705e6572e58fd9c514b488f2fe3b8c86bd1fe0bbbb"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/interface-proposal.json",
+      "bytes": 7286,
+      "sha256": "009727dbbcd6f2196b96a0122a3c7fc89094da6401adbc3965ffcca5e99520ce"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/interface-clarification.json",
+      "bytes": 1367,
+      "sha256": "9fc44bcbeb75f6d078979a7cced7e34bd3e8d7f6a2369e5a60a0b778a0128ae0"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/interface-proposal.json",
+      "bytes": 6339,
+      "sha256": "45554f7dd7a58af479e767b6a2659636b869c33060eb048705138d2691071578"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/tests/helpers/financeOracleQualification.ts",
+      "bytes": 28312,
+      "sha256": "e05d08d0c9b96edd241e07e431ee888ddaf7883b6a6af863713698e396ead66f"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 4248,
+      "sha256": "6eb27cc9f186720bd2836e6a018607ddae85308d6a8ee762eca72ae9796a662d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/actionJournal.ts",
+      "bytes": 33320,
+      "sha256": "b42e3b88bc1a849d4c5409259a4328ea4f1a29a660bf9e0e4f55e1d96916e1b4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/receiptStates.ts",
+      "bytes": 7612,
+      "sha256": "7df3a6cf1e7f4a54e384ede867577dcf184c669e607ce164a578f72a93d25446"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorizationRecord.ts",
+      "bytes": 4176,
+      "sha256": "03707d72dfecef59af3e003dcbca4a675b06dffd5f568bada178d171f446150d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/authorize.ts",
+      "bytes": 20450,
+      "sha256": "af4922cc2dcab1a66a0e25cfdc459f2b5d629602e925d9509499571bab303e90"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/actions/normalizeArguments.ts",
+      "bytes": 6300,
+      "sha256": "4efdbc0db4e4926c87509754e94867b1eafd45b13a2d14dca9a79749dbe81908"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/contracts/v1/authorizationRecord.ts",
+      "bytes": 3279,
+      "sha256": "2e67a443157adabbcd05ab47f52619a26a93c4edf5bcb2a2da4c1e9deccab953"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalQuorum.ts",
+      "bytes": 4388,
+      "sha256": "0f2c806ee6bb748f209f649b1c19092ec93bfe75b349c8a0aa381a90549e62a8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalChainStore.ts",
+      "bytes": 26341,
+      "sha256": "72f14a9fe4a01375ab20a4129f05a7ef8c2ccd6959cdc2777a87f429d7f443ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalEngine.ts",
+      "bytes": 21065,
+      "sha256": "a2257cea092960d8815e6608e4d2cd416cba5d429eabb6e3a1147d7902e91b06"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/cli-session-commands.ts",
+      "bytes": 17552,
+      "sha256": "c640189b30cecb2539e59cb2f088d3a4a8277f3431cc2a145c88706694e015ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/ledger/ledgerVerification.ts",
+      "bytes": 35501,
+      "sha256": "6bbc4237e126b8cb5d070eb8e9c5c58d267a5a2fd8eab754f4d4a22860ec479e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/vault/vault.ts",
+      "bytes": 29540,
+      "sha256": "f37212a91c1e9ea1f35dac7bcfd03481e5ce26a1fe80a56f6843e3fbb8e02e84"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/toolhub/toolhubValidators.ts",
+      "bytes": 14760,
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolRegistry.ts",
+      "bytes": 8048,
+      "sha256": "450c22e67f490d19fb7e90236c7240090ed05b4366e31eb179bde4384f8eae7c"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/tools/toolPipeline.ts",
+      "bytes": 32498,
+      "sha256": "185437847aef58288e7d56601d8fef7d47de3fbbbb9ec0e6adf51d23a92d429b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/fleet/paths.ts",
+      "bytes": 5396,
+      "sha256": "3afaf4c383ddf5c5d6faeb383bc4e6db3f2f250457a23e142a7ed28b4506a1e9"
+    }
+  ]
+}

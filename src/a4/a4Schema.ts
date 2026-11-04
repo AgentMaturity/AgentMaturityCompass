@@ -35,7 +35,6 @@ export * from "../contracts/v1/a4ValueClaim.js";
 export type A4Stage = (typeof A4_STAGES)[number];
 export type A4Step = (typeof A4_STEPS)[number];
 export type A4Lane = (typeof A4_LANES)[number];
-export type A4GateKind = (typeof A4_GATES)[number];
 
 export const A4_REF_KINDS = [
   "stage_output", "ledger_event", "receipt", "session", "artifact", "approval", "manifest", "plan", "control_result", "package",
@@ -68,13 +67,46 @@ const GOVERNANCE_BOUND_ITEMS = [
   // request (ACKNOWLEDGED supersedes an open gate), so the item is bound.
   "sod.self_provisioned"
 ] as const;
-export const A4_BOUND_ITEMS: Readonly<Record<A4Stage, readonly string[]>> = {
+const BOUND_ITEMS_V1: Readonly<Record<A4Stage, readonly string[]>> = {
   aspire: [...GOVERNANCE_BOUND_ITEMS],
   assemble: [...GOVERNANCE_BOUND_ITEMS],
   adapt: [...GOVERNANCE_BOUND_ITEMS],
-  // Consumed gates of the lineage, not this gate's votes: stable while this gate is open.
-  activate: [...GOVERNANCE_BOUND_ITEMS, "lineage.independent_approvals"]
+  // Consumed gates of the lineage, not this gate's votes: stable while this gate is open. Activate's own items (P1-62)
+  // move only when a revision, a release, its transparency entry, a deployment receipt, an AMC check or a monitor ref is recorded (the receipt and
+  // check ids are their reason codes, so the deployment approval binds them); one that moves while a gate is open leaves
+  // it STALE (readinessMoved), as decide and complete refuse it.
+  activate: [...GOVERNANCE_BOUND_ITEMS, "lineage.independent_approvals", "deployment.same_host", "package.transparency", "deployment.receipt", "deployment.amc_check",
+    "lease.scope", "monitoring.source", "regulatory_sources_status"]
 };
+/**
+ * The bound sets by intent version: a gate's GATE_REQUESTED body names the `boundItemsVersion` it was requested under
+ * (none is version 1), so a gate requested before a set changed still verifies under the set it bound. Version 2 binds
+ * Adapt's owner acknowledgements, `plan_unresolved` and D-21's `regulatory_sources_status`: one recorded after the
+ * request now supersedes the gate whose intent holds it, and none supersedes a gate whose intent does not.
+ */
+const BOUND_ITEMS_BY_VERSION: Readonly<Record<number, Readonly<Record<A4Stage, readonly string[]>>>> = {
+  1: BOUND_ITEMS_V1,
+  2: { ...BOUND_ITEMS_V1, adapt: [...BOUND_ITEMS_V1.adapt, "plan_unresolved", "regulatory_sources_status"] }
+};
+export const A4_BOUND_ITEMS_VERSION = 2;
+export const A4_BOUND_ITEMS = BOUND_ITEMS_BY_VERSION[A4_BOUND_ITEMS_VERSION]!;
+/**
+ * The acknowledgements that leave open a gate whose known bound set does not hold them: the items a later intent version
+ * added (a version 1 Adapt gate never bound them). Every other acknowledgement supersedes as design §6.7 says.
+ */
+const NON_BINDING_ACKS: Readonly<Record<string, readonly string[]>> = { adapt: ["plan_unresolved", "regulatory_sources_status"] };
+/** A gate's stored `bound_items_json` as a list of ids; undefined when it is null or not such a list (unknown, so never narrower). */
+export const storedBoundItems = (text: string | null | undefined): string[] | undefined => {
+  try {
+    const value: unknown = JSON.parse(String(text));
+    return Array.isArray(value) && value.every((id) => typeof id === "string") ? value as string[] : undefined;
+  } catch {
+    return undefined;
+  }
+};
+/** The set a gate of `stage` binds under `version` (a GATE_REQUESTED body's `boundItemsVersion`; absent is 1); null for an unknown version. */
+export const boundItemsFor = (stage: A4Stage, version: unknown): readonly string[] | null =>
+  (version === undefined ? BOUND_ITEMS_V1 : typeof version === "number" ? BOUND_ITEMS_BY_VERSION[version] : undefined)?.[stage] ?? null;
 
 /**
  * The session-id prefix of the turns A4 composes itself (Adapt's context probe on the stub provider,
@@ -122,15 +154,20 @@ export interface A4ChainLink {
 
 /**
  * The later transition that supersedes `gate`, or null (design §6.7). A HOLD cleared by a later RESUME does not
- * supersede; GATE_CONSUMED supersedes only its own gate; EVIDENCE_REF and ACKNOWLEDGED only on the bound revision.
+ * supersede; GATE_CONSUMED supersedes only its own gate; EVIDENCE_REF and ACKNOWLEDGED only on the bound revision, and
+ * ACKNOWLEDGED of a listed non-binding item (NON_BINDING_ACKS) only when the gate's intent binds it.
  */
-export function gateSupersededBy(chain: readonly A4ChainLink[], gate: { gateId: string; revisionNo: number; requestedSeq: number }): A4ChainLink | null {
+export function gateSupersededBy(chain: readonly A4ChainLink[], gate: { gateId: string; revisionNo: number; requestedSeq: number;
+  /** The gate's stage and stored bound set (`storedBoundItems`; undefined when unknown, and then every ACKNOWLEDGED supersedes). */
+  stage?: string; boundItemIds?: readonly string[] }): A4ChainLink | null {
   const later = chain.filter((link) => link.seq > gate.requestedSeq).sort((a, b) => a.seq - b.seq);
   for (const link of later) {
     if (!(A4_SUPERSEDING_KINDS as readonly string[]).includes(link.kind)) continue;
     if (link.kind === "HOLD" && later.some((resume) => resume.kind === "RESUME" && resume.seq > link.seq)) continue;
     if (link.kind === "GATE_CONSUMED" && link.body.gateId !== gate.gateId) continue;
     if ((link.kind === "EVIDENCE_REF" || link.kind === "ACKNOWLEDGED") && link.revisionNo !== gate.revisionNo) continue;
+    if (link.kind === "ACKNOWLEDGED" && gate.boundItemIds !== undefined && !gate.boundItemIds.includes(String(link.body.itemId))
+      && (NON_BINDING_ACKS[gate.stage ?? ""] ?? []).includes(String(link.body.itemId))) continue;
     return link;
   }
   return null;
@@ -269,7 +306,12 @@ export function mapRiskTier(tier: "low" | "med" | "medium" | "high" | "critical"
   return tier === "med" ? "medium" : tier;
 }
 
-export const a4QuestionSchema = z.strictObject({
+/** The routers' request fields (src/a4/a4Router.ts, src/a4/a4RouterStages.ts): a client request id, an expected sequence, a stated reason. */
+export const clientRequestIdSchema = z.string().regex(/^[A-Za-z0-9_-]{8,128}$/, "clientRequestId: 8 to 128 letters, digits, _ or -");
+export const headSeqSchema = z.number().int().min(0);
+export const reasonSchema = z.string().trim().min(1).max(2000);
+
+const a4QuestionSchema = z.strictObject({
   id: nonEmpty, stage: z.enum(A4_STAGES), prompt: nonEmpty, dependsOn: z.array(z.string()),
   required: z.boolean(), kind: z.enum(["text", "list", "choice", "fact"])
 });
@@ -321,7 +363,6 @@ export const a4MemberRowSchema = z.object({
   project_id: text, seq: int, event: z.enum(["added", "roles_changed", "removed"]), principal_key: text, auth_source: text, user_id: text,
   username: text, roles_json: text, actor_key: text, evidence_event_id: text, ts: int
 });
-export type A4MemberRow = z.infer<typeof a4MemberRowSchema>;
 export const a4CommentRowSchema = z.object({
   comment_id: text, project_id: text, revision_no: int, stage: text.nullable(), card_id: text, author_key: text, body_sha256: sha256HexSchema,
   blob_ref: sha256HexSchema, in_reply_to: text.nullable(), evidence_event_id: text, ts: int
@@ -364,7 +405,6 @@ export const a4RequestRowSchema = z.object({
   principal_key: text, client_request_id: text, body_hash: text, project_id: text.nullable(), response_json: text,
   redacted: z.union([z.literal(0), z.literal(1)]), ts: int
 });
-export type A4RequestRow = z.infer<typeof a4RequestRowSchema>;
 export const a4EffectRowSchema = z.object({
   effect_id: text, project_id: text, gate_id: text, execution_id: text, approval_request_id: text.nullable(), owner_pid: int,
   owner_host: text, started_ts: int, heartbeat_ts: int, state: z.enum(["running", "finished", "failed"])

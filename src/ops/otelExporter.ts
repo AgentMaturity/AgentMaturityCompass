@@ -1,4 +1,9 @@
 /**
+ * library-only, not enforced by production telemetry: this compatibility exporter
+ * has no production caller. Canonical export lives in src/observability/otelExporter.ts.
+ * WP26 should reuse the W3C trace-context and conversion helpers through that path
+ * before treating this module as an active telemetry integration.
+ *
  * otelExporter.ts — Native OpenTelemetry Protocol (OTLP) exporter for AMC traces.
  *
  * Converts AMC's native trace format (AMCTraceV1) into OpenTelemetry-compatible

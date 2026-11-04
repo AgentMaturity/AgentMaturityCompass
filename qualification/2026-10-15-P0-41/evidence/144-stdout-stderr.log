@@ -1,0 +1,17 @@
+{
+  "node": "v22.23.3",
+  "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+  "modulesABI": "127",
+  "napi": "10",
+  "cwd": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+  "sqliteSelected": 1,
+  "native": {
+    "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "device": 16777231,
+    "inode": 538905647,
+    "nlink": 1
+  },
+  "boundary": "Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference."
+}

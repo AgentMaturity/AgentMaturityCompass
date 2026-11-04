@@ -1,0 +1,113 @@
+{
+  "schema": "p119-oracle-producer-v4-peer-review-pins/1",
+  "closedOutputs": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4-peer-review/README.md",
+      "bytes": 1810,
+      "sha256": "7d8e8d25ac5ae635d4ce40bb9a427314e9db214670311a22f2bdba135178b372",
+      "device": 16777231,
+      "inode": 541769743,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4-peer-review/review.json",
+      "bytes": 8743,
+      "sha256": "cea350afb3bfceb88e442c284c02992acf79c228ae6b17ab65dce8a7d35a6998",
+      "device": 16777231,
+      "inode": 541769744,
+      "nlink": 1
+    }
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v3/tests/helpers/financeOracleQualification.ts",
+      "bytes": 30699,
+      "sha256": "9ffa86ac0ba2fefc0d92b7f0553886c43d19bcc4bb1eb41716e5c339ed6f137b",
+      "device": 16777231,
+      "inode": 541766827,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v3/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 4470,
+      "sha256": "d6eb1814e0106dfc5773e6791a8c7856e43e717e3573cf3ced82029a18cf9ed5",
+      "device": 16777231,
+      "inode": 541766828,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/tests/helpers/financeOracleQualification.ts",
+      "bytes": 33264,
+      "sha256": "71a0979b2408cd6eb77261d184c2248387f5a938e0f95ef315ce465e511d9923",
+      "device": 16777231,
+      "inode": 541766974,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 5398,
+      "sha256": "080f70bc5ce81013b55735343a3ed7a504a5649f911bc5d05e499af96d3c863d",
+      "device": 16777231,
+      "inode": 541766975,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/financeOracleQualification.ts.v3-to-v4.patch",
+      "bytes": 11268,
+      "sha256": "f35a35587f2c84508d6191ec096ed29512856d60ff5ae3581d3b88ca7329945f",
+      "device": 16777231,
+      "inode": 541767541,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/financeOracle.test.ts.v3-to-v4.patch",
+      "bytes": 1191,
+      "sha256": "bbd8098cec54549b284d8f8b5c68dc878478eaeb518a294fb1181bdbacea4f0f",
+      "device": 16777231,
+      "inode": 541767542,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-proposal/v4/README.md",
+      "bytes": 9629,
+      "sha256": "0bac80154048a3e5901ee2732e7770a3612d7c8a7ece27674b26ce29d6d25fe2",
+      "device": 16777231,
+      "inode": 541767378,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/source-proposal/v2/interface-addendum.json",
+      "bytes": 2005,
+      "sha256": "937865aa4653c63da62a43f875cc7692efab111e411dad5c7bbe2aa79d6281c3",
+      "device": 16777231,
+      "inode": 541767459,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicyEngine.ts",
+      "bytes": 12366,
+      "sha256": "19b046e71142f66a5ba514bb1ea8bb1d26bbc39ddd15cfb882bab253d3c517c5",
+      "device": 16777231,
+      "inode": 539133630,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalPolicySchema.ts",
+      "bytes": 2472,
+      "sha256": "fb7f5bbe8f1711d994e20a982a73c817a6f0651873b9ad091cc9b3d19f2d1456",
+      "device": 16777231,
+      "inode": 539133631,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/approvals/approvalEngine.ts",
+      "bytes": 21065,
+      "sha256": "a2257cea092960d8815e6608e4d2cd416cba5d429eabb6e3a1147d7902e91b06",
+      "device": 16777231,
+      "inode": 539133628,
+      "nlink": 1
+    }
+  ],
+  "inputsRecheckedAtClosure": true,
+  "allReadsAndWritesFinished": true
+}

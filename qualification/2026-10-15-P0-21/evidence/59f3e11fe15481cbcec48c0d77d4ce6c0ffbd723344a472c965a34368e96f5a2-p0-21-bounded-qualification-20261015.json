@@ -1,0 +1,485 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-21",
+  "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T05:37:43.137930+00:00",
+  "state": "complete-pending-independent-review",
+  "formalAcceptanceClosed": false,
+  "originalCorpora": {
+    "source": "f58d88d80ab490490184354cc8665631d6999cc1",
+    "capturedUtc": "2026-10-15T04:57:28.011766+00:00",
+    "separateOriginalRuns": [
+      {
+        "phase": "original-core",
+        "registered": 37,
+        "passed": 37,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "raw": {
+          "path": "/private/tmp/p0-21-original-core-20261015.json",
+          "bytes": 13531,
+          "sha256": "5956cd0924105ed8af8c535a0d9a9e5700f9bedcc684dc012f983d97393ac9e2"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observers/original-core.json",
+          "bytes": 20673,
+          "sha256": "a184fdece85e47d6d25d4e6730bfa21157598b152a3e15cc8a067ea9df5ceacb"
+        },
+        "combinedStream": {
+          "path": "/private/tmp/p0-21-original-core-20261015.log",
+          "bytes": 756,
+          "sha256": "ca86226e2433acbe6a56afdce4619cdcd7752deca2aa8286eaf52c62790ce15d"
+        },
+        "fileCounts": [
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domainAssessmentUnits.test.ts",
+            "registered": 4
+          },
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/logisticsIndustryPack.test.ts",
+            "registered": 2
+          },
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/noCertificationFromSelfAssessment.test.ts",
+            "registered": 7
+          },
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreUnits.test.ts",
+            "registered": 4
+          },
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/selfReportedLevelCap.test.ts",
+            "registered": 5
+          },
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/transparencyReport.test.ts",
+            "registered": 15
+          }
+        ],
+        "observerPid": 10289,
+        "recordedInfrastructureOrKnownLateErrors": 0
+      },
+      {
+        "phase": "original-cli",
+        "registered": 14,
+        "passed": 14,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "raw": {
+          "path": "/private/tmp/p0-21-original-cli-20261015.json",
+          "bytes": 5336,
+          "sha256": "11395d84ec62ac0282a2f3c0b027c934b525c461ee006dcdf1bab2a90e36b925"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observers/original-cli.json",
+          "bytes": 7690,
+          "sha256": "8b7547cd2f35a3de1c8918cc234298d4ce6e5599780be0cb39b6992cc27fc2f3"
+        },
+        "combinedStream": {
+          "path": "/private/tmp/p0-21-original-cli-20261015.log",
+          "bytes": 1283,
+          "sha256": "0ff82949f54c37bdb3799f3a4db37f13d03e6d75a681e2d1b35d4bbc88270d41"
+        },
+        "fileCounts": [
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/industryAdjustCurrentScore.test.ts",
+            "registered": 14
+          }
+        ],
+        "observerPid": 10346,
+        "recordedInfrastructureOrKnownLateErrors": 0
+      },
+      {
+        "phase": "original-consumers",
+        "registered": 48,
+        "passed": 48,
+        "failed": 0,
+        "pending": 0,
+        "todo": 0,
+        "raw": {
+          "path": "/private/tmp/p0-21-original-consumers-20261015.json",
+          "bytes": 15550,
+          "sha256": "7922b303999bdc675f210fe4613f803fc19cee76b3060f68a7f0874007d8e32d"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observers/original-consumers.json",
+          "bytes": 21993,
+          "sha256": "8a147dbc48d51bcbc96fa1e15754e12a4f620fc3c16713bc2937a078eacfff83"
+        },
+        "combinedStream": {
+          "path": "/private/tmp/p0-21-original-consumers-20261015.log",
+          "bytes": 543,
+          "sha256": "c2c535d81692936b3bcf1034871d5f5fadfd0442bec1a29687f23eedee9d6f08"
+        },
+        "fileCounts": [
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domain-assessment.test.ts",
+            "registered": 3
+          },
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/domain-packs.test.ts",
+            "registered": 8
+          },
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/mcpComplianceSafety.test.ts",
+            "registered": 15
+          },
+          {
+            "file": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/tests/scoreCrossFrameworkMapping.test.ts",
+            "registered": 22
+          }
+        ],
+        "observerPid": 10463,
+        "recordedInfrastructureOrKnownLateErrors": 0
+      }
+    ],
+    "distinctOriginalRegistrationsAcross11Files": 99,
+    "boundary": "Three separate unchanged original invocations:37core,14CLI,48consumers. No single99-case invocation is claimed. Loops/parameter fixtures expand only as measured. Core MCP entitlement/transport are mocked; diagnostic input rows are hand-shaped ParsedEvidenceEvents. CLI14 uses actual built entrypoint with inherited environment and local hand-authored run JSON, not authenticated stored results. Canned MCP capabilities/benchmark counters are fixture data. No full paid transport, signed storage, legal truth or compliance authority claim.",
+    "runtime": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "sqliteSelected": 1,
+      "native": {
+        "path": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "device": 16777231,
+        "inode": 538645305,
+        "nlink": 1
+      },
+      "boundary": "Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference."
+    },
+    "priorP025NativeUnchangedAndPhysicalDistinct": true,
+    "compiled4529EqualP025": true,
+    "reporterBoundary": "Private run-end observation plus separately inspected known post-exit diagnostics; no universal child teardown or all-filesystem effects claim."
+  },
+  "originalCorporaSummary": {
+    "path": "/private/tmp/p0-21-qualification-20261015/original-corpora-summary.json",
+    "bytes": 6370,
+    "sha256": "c6098f0805c3ec3879a90f4f03f29d6fbe51047f9dd9a327c6c966c6750d6e52"
+  },
+  "causalSummary": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015.json",
+    "bytes": 214028,
+    "sha256": "dedf4697037ceaf365245141a3422852e5d8f1c6d9d1f12c662d7c8debf1955a"
+  },
+  "causalMarkdown": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015.md",
+    "bytes": 3685,
+    "sha256": "15681f6d48f6bc635f385d1a5b83746d315e565af0023f2dc7d89e2ac4e54ac3"
+  },
+  "runtimeArtifactIndex": {
+    "path": "/private/tmp/p0-21-causal-qualification-20261015/runtime-artifact-index-v3.json",
+    "bytes": 73776,
+    "sha256": "a46ee93ebf9105bb3f335a60db052a56021e8228367c2a4aa6c96132f22c990e"
+  },
+  "finalSourcePreservation": {
+    "path": "/private/tmp/p0-21-qualification-20261015/final-source-preservation.json",
+    "bytes": 3360,
+    "sha256": "fe710a627ff7dfbaf45dee56a00b57c9a34c2c754c8df66976cdd283298ade24"
+  },
+  "commandsFrozen": {
+    "path": "/private/tmp/p0-21-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 6667,
+    "sha256": "215d1ff940be928d96363cb833c679fd198beab796054ca10076db78fc05ed40"
+  },
+  "rootCommandCount": 15,
+  "rootCommands": [
+    {
+      "phase": "install",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "pnpm install --frozen-lockfile --store-dir /private/tmp/p0-21-qualification-20261015/store --package-import-method copy --side-effects-cache=false",
+      "exit": 0,
+      "durationMs": 4827,
+      "startedUtc": "2026-10-15T04:53:09.640239+00:00",
+      "log": "/private/tmp/p0-21-install-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "build",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run build",
+      "exit": 0,
+      "durationMs": 30596,
+      "startedUtc": "2026-10-15T04:53:19.293630+00:00",
+      "log": "/private/tmp/p0-21-build-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "runtime-fingerprint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p0-21-qualification-20261015/runtime-fingerprint.cjs",
+      "exit": 0,
+      "durationMs": 69,
+      "startedUtc": "2026-10-15T04:54:02.572144+00:00",
+      "log": "/private/tmp/p0-21-runtime-fingerprint-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "normal-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1403,
+      "startedUtc": "2026-10-15T04:54:02.777848+00:00",
+      "log": "/private/tmp/p0-21-normal-freeze-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "original-core",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/scoreUnits.test.ts tests/domainAssessmentUnits.test.ts tests/noCertificationFromSelfAssessment.test.ts tests/selfReportedLevelCap.test.ts tests/logisticsIndustryPack.test.ts tests/transparencyReport.test.ts --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-21-original-core-20261015.json",
+      "exit": 0,
+      "durationMs": 5100,
+      "startedUtc": "2026-10-15T04:54:04.288764+00:00",
+      "log": "/private/tmp/p0-21-original-core-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "original-cli",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/industryAdjustCurrentScore.test.ts --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-21-original-cli-20261015.json",
+      "exit": 0,
+      "durationMs": 9858,
+      "startedUtc": "2026-10-15T04:54:38.507676+00:00",
+      "log": "/private/tmp/p0-21-original-cli-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "original-consumers",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/domain-packs.test.ts tests/domain-assessment.test.ts tests/scoreCrossFrameworkMapping.test.ts tests/mcpComplianceSafety.test.ts --maxWorkers=1 --no-file-parallelism --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p0-21-original-consumers-20261015.json",
+      "exit": 0,
+      "durationMs": 3303,
+      "startedUtc": "2026-10-15T04:56:06.106774+00:00",
+      "log": "/private/tmp/p0-21-original-consumers-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "docs",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:docs-drift",
+      "exit": 0,
+      "durationMs": 458,
+      "startedUtc": "2026-10-15T04:57:02.485921+00:00",
+      "log": "/private/tmp/p0-21-docs-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "counts",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:counts",
+      "exit": 0,
+      "durationMs": 549,
+      "startedUtc": "2026-10-15T04:57:02.479111+00:00",
+      "log": "/private/tmp/p0-21-counts-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "architecture",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1928,
+      "startedUtc": "2026-10-15T04:57:02.482494+00:00",
+      "log": "/private/tmp/p0-21-architecture-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "no-fabrication",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:no-fabrication",
+      "exit": 0,
+      "durationMs": 2255,
+      "startedUtc": "2026-10-15T04:57:02.492436+00:00",
+      "log": "/private/tmp/p0-21-no-fabrication-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "certification-word-inventory",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "git grep -n -i -w -e certified -e certificationReadiness -e certificationStatus -e MCP-Certified -- src",
+      "exit": 0,
+      "durationMs": 184,
+      "startedUtc": "2026-10-15T04:58:54.519430+00:00",
+      "log": "/private/tmp/p0-21-certification-word-inventory-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "no-fabrication-strict-json",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "npm run check:no-fabrication -- --strict --json",
+      "exit": 0,
+      "durationMs": 2097,
+      "startedUtc": "2026-10-15T04:59:18.709409+00:00",
+      "log": "/private/tmp/p0-21-no-fabrication-strict-json-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "pre-causal-normal-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1703,
+      "startedUtc": "2026-10-15T05:12:34.316819+00:00",
+      "log": "/private/tmp/p0-21-pre-causal-normal-freeze-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    },
+    {
+      "phase": "final-normal-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-21-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1282,
+      "startedUtc": "2026-10-15T05:24:13.434534+00:00",
+      "log": "/private/tmp/p0-21-final-normal-freeze-20261015.log",
+      "head": "f58d88d80ab490490184354cc8665631d6999cc1"
+    }
+  ],
+  "rootCommandLogPins": [
+    {
+      "path": "/private/tmp/p0-21-install-20261015.log",
+      "bytes": 2709,
+      "sha256": "7ad2d470b588af11ffe25e10872fc3434a644c8bdb1fa051a5c36a6e462ea109"
+    },
+    {
+      "path": "/private/tmp/p0-21-build-20261015.log",
+      "bytes": 945,
+      "sha256": "e4205a530c5ed6516d4830233c94dfc59f8374de2eb81be782ca541e45fe7496"
+    },
+    {
+      "path": "/private/tmp/p0-21-runtime-fingerprint-20261015.log",
+      "bytes": 737,
+      "sha256": "46cb7ab921acf2c641d081efbcc470ca2783e8c0949c2def46411f657ae666a8"
+    },
+    {
+      "path": "/private/tmp/p0-21-normal-freeze-20261015.log",
+      "bytes": 263,
+      "sha256": "7e1b84db4ccd638c6efaf8f56cb078525d514a938272b2c7b6c3b17eacb44f67"
+    },
+    {
+      "path": "/private/tmp/p0-21-original-core-20261015.log",
+      "bytes": 756,
+      "sha256": "ca86226e2433acbe6a56afdce4619cdcd7752deca2aa8286eaf52c62790ce15d"
+    },
+    {
+      "path": "/private/tmp/p0-21-original-cli-20261015.log",
+      "bytes": 1283,
+      "sha256": "0ff82949f54c37bdb3799f3a4db37f13d03e6d75a681e2d1b35d4bbc88270d41"
+    },
+    {
+      "path": "/private/tmp/p0-21-original-consumers-20261015.log",
+      "bytes": 543,
+      "sha256": "c2c535d81692936b3bcf1034871d5f5fadfd0442bec1a29687f23eedee9d6f08"
+    },
+    {
+      "path": "/private/tmp/p0-21-docs-20261015.log",
+      "bytes": 200,
+      "sha256": "177bcb248fa70f06c5a9f3956c1be6b665658478ccf7efe05a5f02b7f9eb9bef"
+    },
+    {
+      "path": "/private/tmp/p0-21-counts-20261015.log",
+      "bytes": 234,
+      "sha256": "9367c2824739442c7f25c8cb34ab4c62e6320b84d9f2a788807ceeec33ec8870"
+    },
+    {
+      "path": "/private/tmp/p0-21-architecture-20261015.log",
+      "bytes": 95608,
+      "sha256": "5495ab779e80e9505b5889ae2c7af0eb64b613b8f11c29923ed10a8a37cbc825"
+    },
+    {
+      "path": "/private/tmp/p0-21-no-fabrication-20261015.log",
+      "bytes": 281,
+      "sha256": "d218069e902f8c458e0f753669cd8d2c27b4bb4ac9de6ec9a81868377f40237f"
+    },
+    {
+      "path": "/private/tmp/p0-21-certification-word-inventory-20261015.log",
+      "bytes": 4869,
+      "sha256": "205684cb61db1414956d9574367a883650b87e1f1616b59ebb664b09fbba38d9"
+    },
+    {
+      "path": "/private/tmp/p0-21-no-fabrication-strict-json-20261015.log",
+      "bytes": 539,
+      "sha256": "4c4a509ec6802be639fddd51520e50e13853ee8b95972f5e7028ec32309b1982"
+    },
+    {
+      "path": "/private/tmp/p0-21-pre-causal-normal-freeze-20261015.log",
+      "bytes": 263,
+      "sha256": "7e1b84db4ccd638c6efaf8f56cb078525d514a938272b2c7b6c3b17eacb44f67"
+    },
+    {
+      "path": "/private/tmp/p0-21-final-normal-freeze-20261015.log",
+      "bytes": 263,
+      "sha256": "7e1b84db4ccd638c6efaf8f56cb078525d514a938272b2c7b6c3b17eacb44f67"
+    }
+  ],
+  "separateCausalCommandCount": 18,
+  "causalExecutionCounts": {
+    "total": 666,
+    "passed": 655,
+    "failed": 11,
+    "pending": 0,
+    "todo": 0
+  },
+  "countingRule": "15 root command records and 18 separate causal command records are not one 33-test invocation. Original three runs contain 99 registrations across 11 files; the same core 37 are repeated in causal phases.",
+  "wordingAcceptanceGap": {
+    "path": "/private/tmp/p0-21-qualification-20261015/certification-wording-acceptance-gap.json",
+    "bytes": 9804,
+    "sha256": "9ba0ccbdd290475da8e8e8e44524da92ef3799e3cc49db2c5aaebecf07df4267"
+  },
+  "exactSourceValidationContext": {
+    "path": "/private/tmp/p0-21-qualification-20261015/exact-source-validation-context.json",
+    "bytes": 3352,
+    "sha256": "79da41374b6d9d69dbaa7b819d9cc2b52804633577eaf1566c93eca9545298fe"
+  },
+  "unwaivedSourceQuality": {
+    "duplicateFindings": 1269,
+    "deadCodeFindings": 2751,
+    "status": "failed, not rerun or waived in P021"
+  },
+  "limits": [
+    "Bounded qualification is complete pending independent actual review; formal acceptance remains open.",
+    "Original 37 core, 14 CLI and 48 consumer cases are three separate runs. Causal controls repeat the same 37 cases 18 times; they add no unique original cases.",
+    "C4 observes registry policy acceptance of SELF_REPORTED at L3, not actual unsafe L3 behavior or a provenance-gate bypass. Later OBSERVED L2 and audit schema /3 remain unchanged.",
+    "C6 is a representative two-site historical size regression, not an exact old-file restoration. The formula changes per-answer interpretation; actual assertions observe invalid raw 6/80 admission and domain 60 versus 50, not a directly measured final 6% aggregate.",
+    "Failures retain first assertion frames. Later assertions in the same case can be masked; semantic root attribution and independent actual review remain pending.",
+    "Source-mode execution uses an owned physical filesystem copy without .git and borrowed unchanged parent dependencies. No compiler, import rewrite, production edit, or dist mutation was performed.",
+    "Only the owned process group was probed with signal zero after exit. Detached descendants, all caches, all dependency bytes and universal healthy teardown are not proven absent.",
+    "Core entitlement/SDK transport are mocked; diagnostic ParsedEvidenceEvents are hand-shaped. CLI14 uses local hand-authored run JSON with inherited environment. Canned capabilities are not model, paid SDK, authentication, signed-storage, legal-truth or compliance-authority evidence.",
+    "The literal certification wording inventory retains 20 lines, 10 outside explicit permanent R4 files. The unchanged strict no-fabrication guard passes with zero pending entries; that does not close literal acceptance reconciliation.",
+    "Required source quality remains unwaived: 1269 duplicate findings and 2751 dead-code findings. Prior exact-code type/lint/clean-source validations retain their original source and command attribution; they are not fresh P021 runs.",
+    "User-skipped P029, P022 two empty arrays, P023 held API/Studio failures, P051 issuer/formal failures, P024 strict ISO/expert gaps, P019 runner proposal, P020 shared-CLI proposal, and P030 held runner/full batch/installed-pack gaps remain unresolved as previously recorded.",
+    "Claude work, shared CLI/API/Studio/A4, paused P2-02, reservations and pending transfers remain preserved. No ownership clearance follows from these results.",
+    "Full suite, coverage, Node24, hosted CI, PR/merge, release, G0 and Done are not established. P045 is read-only next-lane preparation, not runtime evidence."
+  ],
+  "nextReadOnlyCandidate": {
+    "key": "P0-45",
+    "readiness": {
+      "path": "/private/tmp/p0-45-readonly-readiness-20261015.json",
+      "bytes": 46780,
+      "sha256": "4b2742a95afa6f06d8c3b680fe7264df0c6548e1784e76d41a03f3d0cd86c8c0"
+    },
+    "runtimePerformed": false
+  }
+}

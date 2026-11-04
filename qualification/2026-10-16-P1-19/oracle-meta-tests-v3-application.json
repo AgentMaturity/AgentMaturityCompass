@@ -1,0 +1,22 @@
+{
+  "capturedUtc": "2026-10-15T22:39:38.244311+00:00",
+  "scope": "Reviewed closed v3 tests/helper only for genuine positive missing-oracle baseline",
+  "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+  "files": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+      "bytes": 30699,
+      "sha256": "9ffa86ac0ba2fefc0d92b7f0553886c43d19bcc4bb1eb41716e5c339ed6f137b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 4470,
+      "sha256": "d6eb1814e0106dfc5773e6791a8c7856e43e717e3573cf3ced82029a18cf9ed5"
+    }
+  ],
+  "qualifiedBuildRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout",
+  "sourceOracleFilesApplied": false,
+  "D15ExactPaths": "none",
+  "runtimeExecuted": false,
+  "formalAcceptance": false
+}

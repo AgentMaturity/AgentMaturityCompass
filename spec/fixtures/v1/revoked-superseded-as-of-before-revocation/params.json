@@ -1,0 +1,15 @@
+{
+  "asOf": "2026-09-10T00:00:00.000Z",
+  "trustRoots": [
+    "7284d995184959356042352b876f5eb02b11b250dc7bdd99f58a584e70a1390c"
+  ],
+  "expect": {
+    "tenant": "tenant-a",
+    "deployment": "payments-prod",
+    "subject": "agent-payments",
+    "profile": "finance-ops"
+  },
+  "knownSequences": {
+    "agent-payments": 7
+  }
+}

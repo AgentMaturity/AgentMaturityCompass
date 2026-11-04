@@ -1,0 +1,168 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 2459,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts"
+  ],
+  "testCount": 8,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-1549412082",
+      "name": "tests/lighthouse/financeOracle.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1549412082_0",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_0",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a real completed journaled payment passes every mandatory oracle check",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a real completed journaled payment passes every mandatory oracle check",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "stack": "Error: Owned oracle-1 failed: exit=1, signal=null, PID absent=true, captureError=false, truncated=false\n    at requireClosed (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:232:11)\n    at Object.runOracle (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:341:31)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:30:62\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:333:7\n    at withFinance (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts:214:9)\n    at withOracleFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:277:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:30:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20",
+          "message": "Owned oracle-1 failed: exit=1, signal=null, PID absent=true, captureError=false, truncated=false",
+          "constructor": "Function<Error>",
+          "name": "Error",
+          "toString": "Function<toString>",
+          "stacks": [
+            {
+              "method": "requireClosed",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 232,
+              "column": 11
+            },
+            {
+              "method": "Object.runOracle",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 341,
+              "column": 31
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 30,
+              "column": 62
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 333,
+              "column": 7
+            },
+            {
+              "method": "withFinance",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts",
+              "line": 214,
+              "column": 9
+            },
+            {
+              "method": "withOracleFixture",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+              "line": 277,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+              "line": 30,
+              "column": 5
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_1",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a second real payment under another key and the same reference specifically fails no-duplicate",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a second real payment under another key and the same reference specifically fails no-duplicate",
+      "filepath": null,
+      "state": null,
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_2",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers an actual post-authorization amount corruption specifically fails payload-bound",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers an actual post-authorization amount corruption specifically fails payload-bound",
+      "filepath": null,
+      "state": null,
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_3",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a genuine provider-only commit has no matching completed AMC receipt",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a genuine provider-only commit has no matching completed AMC receipt",
+      "filepath": null,
+      "state": null,
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_4",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a copied closed log with its final newline removed specifically fails txlog-chain",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a copied closed log with its final newline removed specifically fails txlog-chain",
+      "filepath": null,
+      "state": null,
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_5",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers adapter stdout pass and verified flags cannot manufacture a receipt or trust anchor",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers adapter stdout pass and verified flags cannot manufacture a receipt or trust anchor",
+      "filepath": null,
+      "state": null,
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_6",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers changing a genuine pre-dispatch argument preimage cannot preserve authorization",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers changing a genuine pre-dispatch argument preimage cannot preserve authorization",
+      "filepath": null,
+      "state": null,
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_7",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a corrupted genuine decision signature is refused without re-signing authority",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a corrupted genuine decision signature is refused without re-signing authority",
+      "filepath": null,
+      "state": null,
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

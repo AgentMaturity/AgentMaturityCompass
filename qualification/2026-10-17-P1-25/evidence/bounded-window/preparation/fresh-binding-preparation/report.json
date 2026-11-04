@@ -1,0 +1,36 @@
+{
+  "schema": "p125w-inert-fresh-binding-preparation-report/1",
+  "at": "2026-10-17T00:10:21.757919+00:00",
+  "blockers": [],
+  "source": "Pinned B37 bind-fresh.py adapted privately only.",
+  "currentNameListsComparedExact": {
+    "selectedRelativeNames": 94,
+    "compiledPairs": 19,
+    "sameAsB37": true
+  },
+  "runtimePrerequisites": {
+    "actualSourceCheckpointCommitRequired": true,
+    "actualClosedP125wCleanSourceCommandAndKeptLogRequired": true,
+    "fourActiveHaltedMarkerAbsencesRequired": true,
+    "heldRHeadStatusIndexExactRequired": true,
+    "sourceAndFreshCleanSameActualCommitRequired": true,
+    "activeProtectedRows": 151,
+    "priorNativePins": 10,
+    "distinctTotalNativePinsAfterFresh": 11,
+    "selectedFilesPerRoot": 94,
+    "distinctSelectedPhysicalFiles": 188,
+    "compiledPairs": 19
+  },
+  "outputSchema": "p125w-actual-fresh-source-binding/1",
+  "changedProtectionFlag": "all151ActiveProtectedInputsExact",
+  "noSourceCommitFreshRootHashesResultsPredicted": true,
+  "vitestCreditFromHelper": false,
+  "prospectiveCountOrCompiledHashesAdopted": false,
+  "importedParsedCompiledExecuted": false,
+  "sourceIndexQaWrites": false,
+  "limits": [
+    "Finite file and native pins do not establish complete dependency or universal descendant/loader/environment isolation.",
+    "Actual source checkpoint, clean-source process and fresh checkout do not exist as adopted inputs in this preparation.",
+    "Root must read and review exact inert bytes and actual prerequisites before helper use."
+  ]
+}

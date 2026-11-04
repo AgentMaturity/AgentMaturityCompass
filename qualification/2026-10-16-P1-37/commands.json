@@ -1,0 +1,1790 @@
+{
+  "closedNormalRows": [
+    {
+      "phase": "p137-first-scope-d15",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/autoCompaction.test.ts",
+      "exit": 0,
+      "durationMs": 198,
+      "startedUtc": "2026-10-16T10:27:22.697996+00:00",
+      "endedUtc": "2026-10-16T10:27:22.909695+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-scope-d15/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 35373,
+        "ownedPgid": 35373,
+        "observedPgidAfterLaunch": 35373,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+          "--paths",
+          "tests/autoCompaction.test.ts"
+        ],
+        "startedUtc": "2026-10-16T10:27:22.697996+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-scope-d15/stdout-stderr.log",
+        "bytes": 5,
+        "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-scope-d15/command.json",
+        "bytes": 1403,
+        "sha256": "8de384b44732dd1e2c666b67c1a0baaf9ae7e2af563981c1175c4fe67c80d497"
+      }
+    },
+    {
+      "phase": "p137-existing-manual-compaction-baseline",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-existing-manual-compaction-baseline.raw.json",
+      "exit": 0,
+      "durationMs": 6443,
+      "startedUtc": "2026-10-16T10:27:37.197414+00:00",
+      "endedUtc": "2026-10-16T10:27:43.654516+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-existing-manual-compaction-baseline/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 35411,
+        "ownedPgid": 35411,
+        "observedPgidAfterLaunch": 35411,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-existing-manual-compaction-baseline.raw.json"
+        ],
+        "startedUtc": "2026-10-16T10:27:37.197414+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p137-existing-manual-compaction-baseline.raw.json",
+          "bytes": 8283,
+          "sha256": "d48372b6b4841751310ea01371e0c33861f6d7fdf8dbe61f66e1bad74497bf5e"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-existing-manual-compaction-baseline/raw.json",
+          "bytes": 8283,
+          "sha256": "d48372b6b4841751310ea01371e0c33861f6d7fdf8dbe61f66e1bad74497bf5e"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-existing-manual-compaction-baseline/observer.json",
+          "bytes": 12491,
+          "sha256": "5e67e7fad4ae8660019fe3cab5d071fb0af638246b2052b933c536b5d9f5499a"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-existing-manual-compaction-baseline/stdout-stderr.log",
+        "bytes": 633,
+        "sha256": "d47884a7738b9f3e17367f0132bb0020dda14ec2cd7b51747056a2681bcc7774"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-existing-manual-compaction-baseline/command.json",
+        "bytes": 2771,
+        "sha256": "e682710f113f6f4f5e9f0e3741b440179f0903f50fe62d46c67248023e049e89"
+      }
+    },
+    {
+      "phase": "p137-disabled-loop-compatibility",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/agentLoopTurnMachine.test.ts tests/agentLoopReconstructable.test.ts tests/agentLoopRetry.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-disabled-loop-compatibility.raw.json",
+      "exit": 0,
+      "durationMs": 6521,
+      "startedUtc": "2026-10-16T10:30:45.996766+00:00",
+      "endedUtc": "2026-10-16T10:30:52.531515+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-disabled-loop-compatibility/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 35959,
+        "ownedPgid": 35959,
+        "observedPgidAfterLaunch": 35959,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/agentLoopTurnMachine.test.ts",
+          "tests/agentLoopReconstructable.test.ts",
+          "tests/agentLoopRetry.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-disabled-loop-compatibility.raw.json"
+        ],
+        "startedUtc": "2026-10-16T10:30:45.996766+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p137-disabled-loop-compatibility.raw.json",
+          "bytes": 16625,
+          "sha256": "325798ec9802aafa8a5c7dc56f71089b45929b39a7c9079006d46c40a1675d75"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-disabled-loop-compatibility/raw.json",
+          "bytes": 16625,
+          "sha256": "325798ec9802aafa8a5c7dc56f71089b45929b39a7c9079006d46c40a1675d75"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-disabled-loop-compatibility/observer.json",
+          "bytes": 24008,
+          "sha256": "ccdc92d320a2f87d8c2634251ef69037777d2f5bce4b77150916aa2c7ac74f07"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-disabled-loop-compatibility/stdout-stderr.log",
+        "bytes": 899,
+        "sha256": "735b2db2541dd3222afdf6555ff32da187082d2f948019736e3fe6a39c6a8375"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-disabled-loop-compatibility/command.json",
+        "bytes": 2784,
+        "sha256": "5acedbc66942379a2787c15f19d9c0f47403216d599dcb4f885369ef7bf58c0a"
+      }
+    },
+    {
+      "phase": "p137-first-complete-three-files",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-first-complete-three-files.raw.json",
+      "exit": 1,
+      "durationMs": 9420,
+      "startedUtc": "2026-10-16T10:39:39.560361+00:00",
+      "endedUtc": "2026-10-16T10:39:48.994385+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-complete-three-files/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 37198,
+        "ownedPgid": 37198,
+        "observedPgidAfterLaunch": 37198,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/autoCompaction.test.ts",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-first-complete-three-files.raw.json"
+        ],
+        "startedUtc": "2026-10-16T10:39:39.560361+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p137-first-complete-three-files.raw.json",
+          "bytes": 21366,
+          "sha256": "e27d2d79bc53336532e853bb2b509a3f7f4cee2cbebee75e1d53e929463ef040"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-complete-three-files/raw.json",
+          "bytes": 21366,
+          "sha256": "e27d2d79bc53336532e853bb2b509a3f7f4cee2cbebee75e1d53e929463ef040"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-complete-three-files/observer.json",
+          "bytes": 31101,
+          "sha256": "6436d2b75b64404ee64e8630a54ef4afca6a8a30609b5be5835b09bdeedb445b"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-complete-three-files/stdout-stderr.log",
+        "bytes": 5582,
+        "sha256": "26aeed4b43588dfe21a7eb861997d8be1657b013d65e75a1cb543b677c1888fd"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-first-complete-three-files/command.json",
+        "bytes": 2771,
+        "sha256": "f8eb9d8c0321de3d1780ca55787ab89ea855246bf27da0fe1535603742216401"
+      }
+    },
+    {
+      "phase": "p137-missing-usage-inspection",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "python3 /private/tmp/p1-37-qualification-20261016/inspect-missing-usage.py",
+      "exit": 0,
+      "durationMs": 38,
+      "startedUtc": "2026-10-16T10:41:19.602531+00:00",
+      "endedUtc": "2026-10-16T10:41:19.655185+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-missing-usage-inspection/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 37421,
+        "ownedPgid": 37421,
+        "observedPgidAfterLaunch": 37421,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "python3",
+          "/private/tmp/p1-37-qualification-20261016/inspect-missing-usage.py"
+        ],
+        "startedUtc": "2026-10-16T10:41:19.602531+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-missing-usage-inspection/stdout-stderr.log",
+        "bytes": 1471,
+        "sha256": "b8c9b81183c87507645b1d49052e4b15db5306659820f482cb93fefcc4daa750"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-missing-usage-inspection/command.json",
+        "bytes": 1278,
+        "sha256": "9ee090d6744a060eaa40787d255ad4d6af0d3e5c616c01bb47efa4061dd76451"
+      }
+    },
+    {
+      "phase": "p137-corrected-three-files",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-corrected-three-files.raw.json",
+      "exit": 0,
+      "durationMs": 9584,
+      "startedUtc": "2026-10-16T10:45:20.770582+00:00",
+      "endedUtc": "2026-10-16T10:45:30.368372+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-corrected-three-files/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 37813,
+        "ownedPgid": 37813,
+        "observedPgidAfterLaunch": 37813,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/autoCompaction.test.ts",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-03-post-typecheck-20261016/p137-corrected-three-files.raw.json"
+        ],
+        "startedUtc": "2026-10-16T10:45:20.770582+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/p137-corrected-three-files.raw.json",
+          "bytes": 21095,
+          "sha256": "42e48636542e92228e30d86d6976a4567b73afb1626a644ac2f637ed2568929e"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-corrected-three-files/raw.json",
+          "bytes": 21095,
+          "sha256": "42e48636542e92228e30d86d6976a4567b73afb1626a644ac2f637ed2568929e"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-corrected-three-files/observer.json",
+          "bytes": 28669,
+          "sha256": "f93d7caa7ff63100183c0d64eae9a060325441752614d061d05459f78f25d035"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-corrected-three-files/stdout-stderr.log",
+        "bytes": 2175,
+        "sha256": "0e388e3d7e49f4c4cf05887b05b25cfafa48ed376ac6d927533420697ab66a1f"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-corrected-three-files/command.json",
+        "bytes": 2736,
+        "sha256": "a921c80bc2be7284802bf70fd8821107cdd3ce3384d862935596e1df80667050"
+      }
+    },
+    {
+      "phase": "p137-source-typecheck",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node --max-old-space-size=8192 node_modules/typescript/bin/tsc --noEmit -p tsconfig.json",
+      "exit": 0,
+      "durationMs": 26128,
+      "startedUtc": "2026-10-16T10:46:00.021699+00:00",
+      "endedUtc": "2026-10-16T10:46:26.165900+00:00",
+      "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-source-typecheck/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 37990,
+        "ownedPgid": 37990,
+        "observedPgidAfterLaunch": 37990,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "--max-old-space-size=8192",
+          "node_modules/typescript/bin/tsc",
+          "--noEmit",
+          "-p",
+          "tsconfig.json"
+        ],
+        "startedUtc": "2026-10-16T10:46:00.021699+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-source-typecheck/stdout-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p137-source-typecheck/command.json",
+        "bytes": 1365,
+        "sha256": "3a0ac357fb62cde32c7abf4795fdb7a0c90383d8d5e2b8d34efbcb749e34d9e3"
+      }
+    },
+    {
+      "phase": "p137-tests-typecheck-v4",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 38974,
+      "startedUtc": "2026-10-16T10:52:56.329977+00:00",
+      "endedUtc": "2026-10-16T10:53:35.316320+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-tests-typecheck-v4/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39015,
+        "ownedPgid": 39015,
+        "observedPgidAfterLaunch": 39015,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.tests.json",
+          "--noEmit"
+        ],
+        "startedUtc": "2026-10-16T10:52:56.329977+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-tests-typecheck-v4/stdout-stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-tests-typecheck-v4/command.json",
+        "bytes": 1326,
+        "sha256": "6d7ec131c525daf4515b5de35c7f204b711c951746ea82731494655cbfe57f86"
+      }
+    },
+    {
+      "phase": "p137-v4-three-files",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-v4-three-files.raw.json",
+      "exit": 0,
+      "durationMs": 9498,
+      "startedUtc": "2026-10-16T10:53:41.124304+00:00",
+      "endedUtc": "2026-10-16T10:53:50.633249+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-v4-three-files/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39132,
+        "ownedPgid": 39132,
+        "observedPgidAfterLaunch": 39132,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "tests/autoCompaction.test.ts",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-v4-three-files.raw.json"
+        ],
+        "startedUtc": "2026-10-16T10:53:41.124304+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/p137-v4-three-files.raw.json",
+          "bytes": 21101,
+          "sha256": "484d1b5086d03971e5fa1888e2396df8c5b838eb6d51c2cf8b8986193bc9e33a"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-v4-three-files/raw.json",
+          "bytes": 21101,
+          "sha256": "484d1b5086d03971e5fa1888e2396df8c5b838eb6d51c2cf8b8986193bc9e33a"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-v4-three-files/observer.json",
+          "bytes": 28669,
+          "sha256": "5bb146e239dcd140278347f36bd05a970e73a73f88b261f070fdda4819c34e94"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-v4-three-files/stdout-stderr.log",
+        "bytes": 2168,
+        "sha256": "f80bf1b9e56c0f5b96a7154ce758dcd013df9169fff12c092baaf3fa825716c2"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-v4-three-files/command.json",
+        "bytes": 2687,
+        "sha256": "2d0fd51694eda5201d27bde077858444cbcadaa6d6d35b60abbedb7950ca3ff1"
+      }
+    },
+    {
+      "phase": "p137-lint",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/bin/pnpm run lint",
+      "exit": 0,
+      "durationMs": 3023,
+      "startedUtc": "2026-10-16T10:54:15.685061+00:00",
+      "endedUtc": "2026-10-16T10:54:18.717974+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-lint/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39206,
+        "ownedPgid": 39206,
+        "observedPgidAfterLaunch": 39206,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/bin/pnpm",
+          "run",
+          "lint"
+        ],
+        "startedUtc": "2026-10-16T10:54:15.685061+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-lint/stdout-stderr.log",
+        "bytes": 443,
+        "sha256": "d08987d08f71a61edb2971955d0b863717bb9862df09fb5e1d629ddec3d48dec"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-lint/command.json",
+        "bytes": 1157,
+        "sha256": "2646b92c484fc787d0bf4243da0ef50fbbcf4c691ec25e47a47d706839b85bea"
+      }
+    },
+    {
+      "phase": "p137-build",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/bin/pnpm run build",
+      "exit": 0,
+      "durationMs": 31010,
+      "startedUtc": "2026-10-16T10:54:25.932758+00:00",
+      "endedUtc": "2026-10-16T10:54:56.952998+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-build/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39257,
+        "ownedPgid": 39257,
+        "observedPgidAfterLaunch": 39257,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/bin/pnpm",
+          "run",
+          "build"
+        ],
+        "startedUtc": "2026-10-16T10:54:25.932758+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-build/stdout-stderr.log",
+        "bytes": 1155,
+        "sha256": "d648674a4fe1eab0e727b64057881aa64c2ec1dd2b91cd061321f1699ed4fa6c"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-build/command.json",
+        "bytes": 1162,
+        "sha256": "ae1b743c1b8cce0878d2025dcf84b0c1517f216e492a2f7d324e796bf48da19f"
+      }
+    },
+    {
+      "phase": "p137-count-scope-d15",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 0,
+      "durationMs": 202,
+      "startedUtc": "2026-10-16T10:55:03.678098+00:00",
+      "endedUtc": "2026-10-16T10:55:03.902164+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-count-scope-d15/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39390,
+        "ownedPgid": 39390,
+        "observedPgidAfterLaunch": 39390,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+          "--paths",
+          "README.md",
+          "CONTRIBUTING.md",
+          "website/index.html",
+          "website/lite.html",
+          "website/i18n.js",
+          "docs/content/show-hn-draft.md",
+          "docs/content/reddit-launch-drafts.md",
+          "docs/internal/competitive-landscape.md",
+          "docs/internal/mirofish-simulation-council.md",
+          "whitepaper/AMC_WHITEPAPER_v1.md"
+        ],
+        "startedUtc": "2026-10-16T10:55:03.678098+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-count-scope-d15/stdout-stderr.log",
+        "bytes": 5,
+        "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-count-scope-d15/command.json",
+        "bytes": 1896,
+        "sha256": "b04d2097bb64e3a570150d90c431aa9db1407fda80c605e2f2b726a478c3cb1c"
+      }
+    },
+    {
+      "phase": "p137-counts-initial",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 238,
+      "startedUtc": "2026-10-16T10:55:08.582251+00:00",
+      "endedUtc": "2026-10-16T10:55:08.831141+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-counts-initial/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39411,
+        "ownedPgid": 39411,
+        "observedPgidAfterLaunch": 39411,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-16T10:55:08.582251+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-counts-initial/stdout-stderr.log",
+        "bytes": 1228,
+        "sha256": "35b1e82a105d9fe3b5c4857c6045a3d0847ef4584f56b7512ee77685009478c7"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-counts-initial/command.json",
+        "bytes": 1244,
+        "sha256": "0cf1344fd9df7dbcdd51d6d985c7083985269089e0d5aa6722109d71d1cf65ab"
+      }
+    },
+    {
+      "phase": "p137-counts-generate",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 221,
+      "startedUtc": "2026-10-16T10:55:19.429361+00:00",
+      "endedUtc": "2026-10-16T10:55:19.660570+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-counts-generate/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39431,
+        "ownedPgid": 39431,
+        "observedPgidAfterLaunch": 39431,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--write"
+        ],
+        "startedUtc": "2026-10-16T10:55:19.429361+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-counts-generate/stdout-stderr.log",
+        "bytes": 20,
+        "sha256": "af2efd3653982107415b54c40fb39c661c7c140dc2114164e4f285eb0ff8945d"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-counts-generate/command.json",
+        "bytes": 1246,
+        "sha256": "37d01c06d870a2e06cadd2750b0666da9873d8f75608785081ed8206a8864744"
+      }
+    },
+    {
+      "phase": "p137-counts-final",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 244,
+      "startedUtc": "2026-10-16T10:55:33.082289+00:00",
+      "endedUtc": "2026-10-16T10:55:33.346731+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-counts-final/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39459,
+        "ownedPgid": 39459,
+        "observedPgidAfterLaunch": 39459,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/gen-counts.mjs",
+          "--check"
+        ],
+        "startedUtc": "2026-10-16T10:55:33.082289+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-counts-final/stdout-stderr.log",
+        "bytes": 81,
+        "sha256": "f22f32c8cce95da49779f77a8612a0ff3f01e55a3673dd741fc91b51cba93f8e"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-counts-final/command.json",
+        "bytes": 1240,
+        "sha256": "016a739a7e75fe832ba585b1773fe0881563c9670d8d44bf8b7382e2eb59384f"
+      }
+    },
+    {
+      "phase": "p137-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1098,
+      "startedUtc": "2026-10-16T10:55:33.534847+00:00",
+      "endedUtc": "2026-10-16T10:55:34.641416+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-freeze/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39465,
+        "ownedPgid": 39465,
+        "observedPgidAfterLaunch": 39465,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/check-freeze.mjs"
+        ],
+        "startedUtc": "2026-10-16T10:55:33.534847+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-freeze/stdout-stderr.log",
+        "bytes": 116,
+        "sha256": "bf2c6aa2a9a9bc0f0d1679f94040946347d7e819a28bc7e33bc7235806bb6253"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-freeze/command.json",
+        "bytes": 1214,
+        "sha256": "ada5b3f07012bb94084366bec99cd500d2f7fbd688389f2371b27c63a4512e39"
+      }
+    },
+    {
+      "phase": "p137-docs-drift",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 179,
+      "startedUtc": "2026-10-16T10:55:44.149817+00:00",
+      "endedUtc": "2026-10-16T10:55:44.339490+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-docs-drift/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39507,
+        "ownedPgid": 39507,
+        "observedPgidAfterLaunch": 39507,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/docs-drift-check.mjs"
+        ],
+        "startedUtc": "2026-10-16T10:55:44.149817+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-docs-drift/stdout-stderr.log",
+        "bytes": 45,
+        "sha256": "5407ecd8d6d4e86e27cada4e5cfb641626af7a5f0c2e7c6ac879cd34ecbd8d92"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-docs-drift/command.json",
+        "bytes": 1229,
+        "sha256": "babd0856cc03796385ad620add4ed972e9ccdf5b4c0480c86c77dfba611538ec"
+      }
+    },
+    {
+      "phase": "p137-architecture",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1506,
+      "startedUtc": "2026-10-16T10:55:44.451150+00:00",
+      "endedUtc": "2026-10-16T10:55:45.966973+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-architecture/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39515,
+        "ownedPgid": 39515,
+        "observedPgidAfterLaunch": 39515,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/architecture-boundaries-check.mjs"
+        ],
+        "startedUtc": "2026-10-16T10:55:44.451150+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-architecture/stdout-stderr.log",
+        "bytes": 95677,
+        "sha256": "789916e57e4e08b7f22e5c0c287cbfdff07ecf79231fbce1b97389a590c7e500"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-architecture/command.json",
+        "bytes": 1260,
+        "sha256": "52faf1ea0c4e38497a2ebfc424d11a27be621525d8b1c4cf5eea1dfb4b5cc408"
+      }
+    },
+    {
+      "phase": "p137-duplicates",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 586,
+      "startedUtc": "2026-10-16T10:56:01.953752+00:00",
+      "endedUtc": "2026-10-16T10:56:02.550136+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-duplicates/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39544,
+        "ownedPgid": 39544,
+        "observedPgidAfterLaunch": 39544,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "duplicates"
+        ],
+        "startedUtc": "2026-10-16T10:56:01.953752+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-duplicates/stdout-stderr.log",
+        "bytes": 1845,
+        "sha256": "1b1ba849c8834dbaae46182c501fe720fb6fb86d5f953ab27cd83fd01b4ba50d"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-duplicates/command.json",
+        "bytes": 1250,
+        "sha256": "3f29edb904d6f508642231e2758bdf9e247f5f7bf1474f6d62fe595db99bb44d"
+      }
+    },
+    {
+      "phase": "p137-dead-code",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2579,
+      "startedUtc": "2026-10-16T10:56:08.752830+00:00",
+      "endedUtc": "2026-10-16T10:56:11.341560+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-dead-code/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39562,
+        "ownedPgid": 39562,
+        "observedPgidAfterLaunch": 39562,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/source-quality.mjs",
+          "dead-code"
+        ],
+        "startedUtc": "2026-10-16T10:56:08.752830+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-dead-code/stdout-stderr.log",
+        "bytes": 962,
+        "sha256": "62cd3d72a7f0a60b9e0fa5138c938743c2a1aba525af326a6f02685f0645323a"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-dead-code/command.json",
+        "bytes": 1247,
+        "sha256": "f3bff19e4f6ba1b1175f47d4a69fed4657a5b5297ac2957dbb2384f19401fe3b"
+      }
+    },
+    {
+      "phase": "p137-deadcode-delta",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-37-qualification-20261016/deadcode-delta.mjs",
+      "exit": 1,
+      "durationMs": 2565,
+      "startedUtc": "2026-10-16T10:56:36.808971+00:00",
+      "endedUtc": "2026-10-16T10:56:39.387070+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-deadcode-delta/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39614,
+        "ownedPgid": 39614,
+        "observedPgidAfterLaunch": 39614,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/private/tmp/p1-37-qualification-20261016/deadcode-delta.mjs"
+        ],
+        "startedUtc": "2026-10-16T10:56:36.808971+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-deadcode-delta/stdout-stderr.log",
+        "bytes": 248954,
+        "sha256": "3734e60edfd694ddb25afd436ad39f9431326dde0f429a5ff93e171071ddd3c6"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-deadcode-delta/command.json",
+        "bytes": 1302,
+        "sha256": "3e72c6cb5d8c5b68ae0a52426829b22ce004664ddd8177880eebf0323012d741"
+      }
+    },
+    {
+      "phase": "p137-hosted-refresh",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "python3 /private/tmp/p1-37-qualification-20261016/hosted-refresh.py",
+      "exit": 1,
+      "durationMs": 137,
+      "startedUtc": "2026-10-16T10:57:04.221930+00:00",
+      "endedUtc": "2026-10-16T10:57:04.369495+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-hosted-refresh/stdout-stderr.log",
+      "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "headAfter": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+      "ownedProcess": {
+        "pid": 39661,
+        "ownedPgid": 39661,
+        "observedPgidAfterLaunch": 39661,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "python3",
+          "/private/tmp/p1-37-qualification-20261016/hosted-refresh.py"
+        ],
+        "startedUtc": "2026-10-16T10:57:04.221930+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-hosted-refresh/stdout-stderr.log",
+        "bytes": 335,
+        "sha256": "081f5723371b9ca53cd5396e906eb348320c81f1acb6b221314beb6d84b7acdc"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-hosted-refresh/command.json",
+        "bytes": 1245,
+        "sha256": "07149cc099849fe3e96b7530ecb3c4a89db6c040990747eadc976d3a20cf6f4d"
+      }
+    },
+    {
+      "phase": "p137-clean-source",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 46759,
+      "startedUtc": "2026-10-16T10:58:39.622848+00:00",
+      "endedUtc": "2026-10-16T10:59:26.391946+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-clean-source/stdout-stderr.log",
+      "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "ownedProcess": {
+        "pid": 39824,
+        "ownedPgid": 39824,
+        "observedPgidAfterLaunch": 39824,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/clean-source-check.mjs",
+          "--keep"
+        ],
+        "startedUtc": "2026-10-16T10:58:39.622848+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-clean-source/stdout-stderr.log",
+        "bytes": 852,
+        "sha256": "ccf8b32f27c97158860a73158263c933dcb8bce9787c7f11b86d8509ce80fc99"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-clean-source/command.json",
+        "bytes": 1256,
+        "sha256": "2cc5172e4d4b765faa570b2eb2758bad611b754798a19b919ae7243cef6558c9"
+      }
+    },
+    {
+      "phase": "p137-fresh-canonical",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-fresh-canonical.raw.json",
+      "exit": 0,
+      "durationMs": 9806,
+      "startedUtc": "2026-10-16T11:00:00.372337+00:00",
+      "endedUtc": "2026-10-16T11:00:10.191950+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/stdout-stderr.log",
+      "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "ownedProcess": {
+        "pid": 40300,
+        "ownedPgid": 40300,
+        "observedPgidAfterLaunch": 40300,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout",
+          "tests/autoCompaction.test.ts",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-fresh-canonical.raw.json"
+        ],
+        "startedUtc": "2026-10-16T11:00:00.372337+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/p137-fresh-canonical.raw.json",
+          "bytes": 21170,
+          "sha256": "5488fb5ce414cbed9bb44fdade02e2a480ce571f46cda7f61e52f2f3d63dc755"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/raw.json",
+          "bytes": 21170,
+          "sha256": "5488fb5ce414cbed9bb44fdade02e2a480ce571f46cda7f61e52f2f3d63dc755"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/observer.json",
+          "bytes": 28789,
+          "sha256": "b5bbe7c7bba40f5d7aa03266de818126bfef8552de62a3138ceffd765148f7e6"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/stdout-stderr.log",
+        "bytes": 2150,
+        "sha256": "278ecf3719e0f89bcfe218fda51450487c0454940d302f25bf0371fcf593d789"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/command.json",
+        "bytes": 2894,
+        "sha256": "85f64c4c54d879304797c2a87f11c90e9bc390cd390a1f248d37d01136166b7b"
+      }
+    },
+    {
+      "phase": "p137-mutant-recent",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-mutant-recent.raw.json",
+      "exit": 1,
+      "durationMs": 9064,
+      "startedUtc": "2026-10-16T11:00:45.942366+00:00",
+      "endedUtc": "2026-10-16T11:00:55.018620+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-recent/stdout-stderr.log",
+      "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "ownedProcess": {
+        "pid": 40421,
+        "ownedPgid": 40421,
+        "observedPgidAfterLaunch": 40421,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout",
+          "tests/autoCompaction.test.ts",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-mutant-recent.raw.json"
+        ],
+        "startedUtc": "2026-10-16T11:00:45.942366+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/p137-mutant-recent.raw.json",
+          "bytes": 23820,
+          "sha256": "3155a6a93aed853d04816e51adf35627f0febd151f70b6bb771c2cf424949114"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-recent/raw.json",
+          "bytes": 23820,
+          "sha256": "3155a6a93aed853d04816e51adf35627f0febd151f70b6bb771c2cf424949114"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-recent/observer.json",
+          "bytes": 35717,
+          "sha256": "5d703303c960e4ae7cef0d916bf938c95934ef76401db48458ec1f4c71bc219a"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-recent/stdout-stderr.log",
+        "bytes": 8489,
+        "sha256": "6dd21e322926c8fbd406d94ddf8d5d865d3fc9d09d251bb79df2a6a284d439c9"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-recent/command.json",
+        "bytes": 2880,
+        "sha256": "6bbd0e3be02ce66a47374caf77bc4c6f9d900be141d8264d5fa1d50aafec2d1b"
+      }
+    },
+    {
+      "phase": "p137-restored-recent",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-restored-recent.raw.json",
+      "exit": 0,
+      "durationMs": 9469,
+      "startedUtc": "2026-10-16T11:01:23.757983+00:00",
+      "endedUtc": "2026-10-16T11:01:33.244572+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-recent/stdout-stderr.log",
+      "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "ownedProcess": {
+        "pid": 40529,
+        "ownedPgid": 40529,
+        "observedPgidAfterLaunch": 40529,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout",
+          "tests/autoCompaction.test.ts",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-restored-recent.raw.json"
+        ],
+        "startedUtc": "2026-10-16T11:01:23.757983+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/p137-restored-recent.raw.json",
+          "bytes": 21162,
+          "sha256": "20a8ae406abed3ebbb6f9ccad18134addeb422536902690d028f46e83b632571"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-recent/raw.json",
+          "bytes": 21162,
+          "sha256": "20a8ae406abed3ebbb6f9ccad18134addeb422536902690d028f46e83b632571"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-recent/observer.json",
+          "bytes": 28789,
+          "sha256": "201868a27043a6a7d663d24a57e05e1327af3ee827f6a237c8a146b3a9adf4c4"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-recent/stdout-stderr.log",
+        "bytes": 2279,
+        "sha256": "3feeadece929f09d685f4eb9d8655f558703fcf2cf26eec7944940eda1c8f816"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-recent/command.json",
+        "bytes": 2894,
+        "sha256": "60c8c1660d2b6fe446bde34844e753ad25ca62af8751a7c9b30fcb979f4535c9"
+      }
+    },
+    {
+      "phase": "p137-mutant-trigger",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-mutant-trigger.raw.json",
+      "exit": 1,
+      "durationMs": 7055,
+      "startedUtc": "2026-10-16T11:01:54.463045+00:00",
+      "endedUtc": "2026-10-16T11:02:01.530028+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-trigger/stdout-stderr.log",
+      "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "ownedProcess": {
+        "pid": 40681,
+        "ownedPgid": 40681,
+        "observedPgidAfterLaunch": 40681,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout",
+          "tests/autoCompaction.test.ts",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-mutant-trigger.raw.json"
+        ],
+        "startedUtc": "2026-10-16T11:01:54.463045+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/p137-mutant-trigger.raw.json",
+          "bytes": 27608,
+          "sha256": "bf29b4dc9d04d424723bbb008f5b73f2c1da2bc62c096f763792f8e2c0dd0a08"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-trigger/raw.json",
+          "bytes": 27608,
+          "sha256": "bf29b4dc9d04d424723bbb008f5b73f2c1da2bc62c096f763792f8e2c0dd0a08"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-trigger/observer.json",
+          "bytes": 46986,
+          "sha256": "2da01d59d94ca4de46cf34910c5df295d5aac255a0f446eb2c7eeecc0ac6f911"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-trigger/stdout-stderr.log",
+        "bytes": 13812,
+        "sha256": "a8ca5079ca269183e57278cf0d2d23b19b22d2bd722a564743128c1506ee6370"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-mutant-trigger/command.json",
+        "bytes": 2887,
+        "sha256": "68fa91b0f05b13c93a97864e7a556398f9a6fee55bb97101ec5c94176bcbd2f1"
+      }
+    },
+    {
+      "phase": "p137-restored-trigger",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-restored-trigger.raw.json",
+      "exit": 0,
+      "durationMs": 9310,
+      "startedUtc": "2026-10-16T11:02:33.276822+00:00",
+      "endedUtc": "2026-10-16T11:02:42.597587+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-trigger/stdout-stderr.log",
+      "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "ownedProcess": {
+        "pid": 40764,
+        "ownedPgid": 40764,
+        "observedPgidAfterLaunch": 40764,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "--root",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout",
+          "tests/autoCompaction.test.ts",
+          "tests/surfaceCompaction.test.ts",
+          "tests/surfaceHistoryCompaction.test.ts",
+          "--reporter=default",
+          "--reporter=json",
+          "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-restored-trigger.raw.json"
+        ],
+        "startedUtc": "2026-10-16T11:02:33.276822+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH",
+          "AMC_P021_RUNTIME_OBSERVER_PATH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": true,
+      "artifacts": {
+        "rawProducer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/p137-restored-trigger.raw.json",
+          "bytes": 21141,
+          "sha256": "1cfb6aa24f26253ff91c706d4c3e644ce0da62dc755857cb18dc25b075a07174"
+        },
+        "rawSnapshot": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-trigger/raw.json",
+          "bytes": 21141,
+          "sha256": "1cfb6aa24f26253ff91c706d4c3e644ce0da62dc755857cb18dc25b075a07174"
+        },
+        "observer": {
+          "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-trigger/observer.json",
+          "bytes": 28789,
+          "sha256": "2d35d12e6d4cd09a8174ccd4e78f3e8e97e2da64102b7d4e5043deb8d2453e3c"
+        },
+        "reporter": {
+          "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+          "bytes": 2110,
+          "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+        }
+      },
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-trigger/stdout-stderr.log",
+        "bytes": 2190,
+        "sha256": "cb9b4d748fdfad9275c8bb6f3835ff6336a894722dee4af46c6c7504c23f4b38"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-restored-trigger/command.json",
+        "bytes": 2901,
+        "sha256": "426184a255941aa663e792500b5a309ecd1c7916374f76e332599b6816227dcb"
+      }
+    },
+    {
+      "phase": "p137-receipt-scope-d15",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-16-P1-37",
+      "exit": 0,
+      "durationMs": 186,
+      "startedUtc": "2026-10-16T11:03:34.845464+00:00",
+      "endedUtc": "2026-10-16T11:03:35.042608+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-receipt-scope-d15/stdout-stderr.log",
+      "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "ownedProcess": {
+        "pid": 40938,
+        "ownedPgid": 40938,
+        "observedPgidAfterLaunch": 40938,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs",
+          "--paths",
+          "qualification/2026-10-16-P1-37"
+        ],
+        "startedUtc": "2026-10-16T11:03:34.845464+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-receipt-scope-d15/stdout-stderr.log",
+        "bytes": 5,
+        "sha256": "fcf33dfbe13c2354bf0e1b063f9fb422747a46cee00b7420bceff2b81457b345"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-receipt-scope-d15/command.json",
+        "bytes": 1411,
+        "sha256": "26434936acbbe1f53d029aa868626d80ed7eb9de9888bb0ea69fe8e73c436d3d"
+      }
+    },
+    {
+      "phase": "p137-environment",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node -p 'JSON.stringify({node:process.version,abi:process.versions.modules,platform:process.platform,arch:process.arch})'",
+      "exit": 0,
+      "durationMs": 49,
+      "startedUtc": "2026-10-16T11:04:05.531966+00:00",
+      "endedUtc": "2026-10-16T11:04:05.590773+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-environment/stdout-stderr.log",
+      "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "ownedProcess": {
+        "pid": 41006,
+        "ownedPgid": 41006,
+        "observedPgidAfterLaunch": 41006,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "-p",
+          "JSON.stringify({node:process.version,abi:process.versions.modules,platform:process.platform,arch:process.arch})"
+        ],
+        "startedUtc": "2026-10-16T11:04:05.531966+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-environment/stdout-stderr.log",
+        "bytes": 67,
+        "sha256": "a9c6292c55071446f773657ce889638c87cd4681e40f903cbf3d934a69764aeb"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-environment/command.json",
+        "bytes": 1407,
+        "sha256": "d7d1a78377c0f7ce4f26543e3d8afc0aafc4919c8a2ed5fd7b418bb415c02c1c"
+      }
+    },
+    {
+      "phase": "p137-pnpm-version",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/bin/pnpm --version",
+      "exit": 0,
+      "durationMs": 179,
+      "startedUtc": "2026-10-16T11:04:12.324435+00:00",
+      "endedUtc": "2026-10-16T11:04:12.515336+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-pnpm-version/stdout-stderr.log",
+      "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+      "ownedProcess": {
+        "pid": 41028,
+        "ownedPgid": 41028,
+        "observedPgidAfterLaunch": 41028,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/bin/pnpm",
+          "--version"
+        ],
+        "startedUtc": "2026-10-16T11:04:12.324435+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof.",
+      "closedLogPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-pnpm-version/stdout-stderr.log",
+        "bytes": 8,
+        "sha256": "62c33a14fe98185100efaeadf9bc76d70d6b76f1c026b4f7ead06cd6d417aacf"
+      },
+      "recordPin": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-pnpm-version/command.json",
+        "bytes": 1171,
+        "sha256": "95f677907c82cd5179f1248e0487ac83263fbd6be4f9668cafc8a9419b3f959c"
+      }
+    }
+  ],
+  "preservedCompilerFailure": {
+    "phase": "p137-tests-typecheck",
+    "kind": "preserved-halted-attempt; no normal command.json was produced",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+    "exit": 2,
+    "durationMs": 37776,
+    "wrapperExit": 70,
+    "head": "bce7bbbb24a94b0a372036c054962cd50a9f7732",
+    "ownedProcess": {
+      "pid": 38063,
+      "ownedPgid": 38063,
+      "observedPgidAfterLaunch": 38063,
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.tests.json",
+        "--noEmit"
+      ],
+      "startedUtc": "2026-10-16T10:46:40.070752+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH"
+      ]
+    },
+    "closure": {
+      "exit": 2,
+      "processDurationMs": 37776,
+      "observations": [
+        {
+          "capturedUtc": "2026-10-16T10:47:17.846976+00:00",
+          "pgid": 38063,
+          "signal": 0,
+          "absentByESRCH": true,
+          "errno": 3
+        }
+      ],
+      "maxPollingSeconds": 5,
+      "pollIntervalSeconds": 0.05,
+      "signalsOtherThanZeroSent": false
+    },
+    "certificate": {
+      "path": "/private/tmp/p1-37-qualification-20261016/compiler-natural-closure.json",
+      "bytes": 4968,
+      "sha256": "a0d667b589c87a8237f40c820d82c8ae414235b2e7577c48a8c585b00537f3d4"
+    }
+  },
+  "boundary": "Normal rows preserve actual heads/argv/durations and owned lifecycle. The compiler child2/wrapper70 is one failed attempt. Direct read-only operator GH metadata and ordinary Git actions are recorded separately, not falsely attributed to the AMC private-HOME runner."
+}

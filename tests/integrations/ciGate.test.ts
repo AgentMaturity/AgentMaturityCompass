@@ -1,5 +1,47 @@
-import { describe, it, expect } from "vitest";
+import { spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { delimiter, dirname, join, resolve } from "node:path";
+import YAML from "yaml";
+import { afterAll, describe, it, expect } from "vitest";
 import { evaluateCIGate, generateGitHubAction, generateGitLabCI, generateConnectorConfig } from "../../src/integrations/ciGate.js";
+import { amcVersion } from "../../src/version.js";
+
+const roots: string[] = [];
+afterAll(() => { for (const root of roots) rmSync(root, { recursive: true, force: true }); });
+
+/** Runs generated CI shell in a fresh consumer repository, `amc` on PATH being this checkout's built CLI (dist/). */
+function runner() {
+  const root = realpathSync(mkdtempSync(join(tmpdir(), "amc-ci-gate-")));
+  roots.push(root);
+  const [repo, home, bin] = ["repo", "home", "bin"].map((dir) => join(root, dir));
+  for (const dir of [repo, home, bin]) mkdirSync(dir);
+  writeFileSync(join(bin, "amc"), `#!/bin/sh\nexec "${process.execPath}" "${resolve("dist/cli.js")}" "$@"\n`, { mode: 0o755 });
+  const [output, env, summary] = ["output", "env", "summary"].map((file) => join(root, file));
+  writeFileSync(env, "");
+  const keyValues = (text: string) => Object.fromEntries(text.split("\n").filter((line) => line.includes("="))
+    .map((line) => [line.slice(0, line.indexOf("=")), line.slice(line.indexOf("=") + 1)]));
+  return {
+    repo,
+    run(script: string) {
+      writeFileSync(output, "");
+      writeFileSync(summary, "");
+      const result = spawnSync("/bin/bash", ["--noprofile", "--norc", "-eo", "pipefail", "-c", script], {
+        cwd: repo, encoding: "utf8", timeout: 120_000,
+        env: { PATH: [bin, dirname(process.execPath), "/usr/bin", "/bin"].join(delimiter), HOME: home,
+          GITHUB_OUTPUT: output, GITHUB_ENV: env, GITHUB_STEP_SUMMARY: summary, ...keyValues(readFileSync(env, "utf8")) }
+      });
+      return { status: result.status, stdout: result.stdout, stderr: result.stderr,
+        outputs: keyValues(readFileSync(output, "utf8")), summary: readFileSync(summary, "utf8") };
+    }
+  };
+}
+const githubStep = (yaml: string, name: string) => {
+  const steps = (YAML.parse(yaml) as { jobs: { "amc-gate": { steps: Array<{ name: string; run?: string }> } } }).jobs["amc-gate"].steps;
+  const run = steps.find((step) => step.name === name)?.run;
+  if (!run) throw new Error(`no step ${name}`);
+  return run;
+};
 
 describe("CI Gate", () => {
   it("passes when score meets threshold", () => {
@@ -43,7 +85,6 @@ describe("GitHub Action Generator", () => {
   it("generates valid YAML with default config", () => {
     const yaml = generateGitHubAction({});
     expect(yaml).toContain("name: AMC Trust Gate");
-    expect(yaml).toContain("amc run --auto");
     expect(yaml).toContain("actions/checkout@v4");
     expect(yaml).toContain("60"); // default threshold
   });
@@ -63,7 +104,45 @@ describe("GitLab CI Generator", () => {
   it("generates valid config", () => {
     const yaml = generateGitLabCI({});
     expect(yaml).toContain("amc-gate");
-    expect(yaml).toContain("amc run --auto");
+  });
+});
+
+describe("generated CI templates: real flags and package, no evidence yet is never a score", { timeout: 120_000 }, () => {
+  it("install the checksum-verified release tarball and use only real commands", () => {
+    for (const yaml of [generateGitHubAction({}), generateGitLabCI({})]) {
+      expect(yaml).toContain(`VERSION="${amcVersion}"`);
+      expect(yaml).toContain("agent-maturity-compass-${VERSION}.tgz");
+      expect(yaml).toContain("sha256sum -c -");
+      expect(yaml).toContain("amc init --minimal --profile ci");
+      expect(yaml).not.toMatch(/@amc\/cli|--non-interactive|amc run --auto|integrityIndex/);
+    }
+  });
+
+  it("GitHub: a fresh repository initializes unattended and reports no evidence yet; a threshold then fails with that reason", () => {
+    const yaml = generateGitHubAction({ minScore: 60, agentId: "default" });
+    const ci = runner();
+    const init = ci.run(githubStep(yaml, "Initialize AMC workspace"));
+    expect(init.status, init.stderr).toBe(0);
+    expect(existsSync(join(ci.repo, ".amc"))).toBe(true);
+    const gate = ci.run(githubStep(yaml, "Run AMC assessment"));
+    expect(gate.status).toBe(1);
+    expect(gate.outputs).toEqual({ evidence: "none" });
+    expect(gate.summary).toContain("AMC: no evidence yet");
+    expect(gate.summary).toContain("no measured score to compare with the 60% threshold");
+    expect(gate.summary).not.toMatch(/Trust Score|\b0%/);
+    const open = ci.run(githubStep(generateGitHubAction({ minScore: 0, agentId: "default" }), "Run AMC assessment"));
+    expect(open.status, open.stderr).toBe(0);
+    expect(open.outputs).toEqual({ evidence: "none" });
+  });
+
+  it("GitLab: the init and assessment script lines report no evidence yet the same way", () => {
+    const script = (YAML.parse(generateGitLabCI({ minScore: 60 })) as { "amc-gate": { script: string[] } })["amc-gate"].script;
+    const ci = runner();
+    const result = ci.run(script.filter((line) => !/curl|sha256sum|npm i/.test(line)).join("\n"));
+    expect(result.status).toBe(1);
+    expect(result.stdout).toContain("AMC: no evidence yet");
+    expect(result.stdout).toContain("no measured score to compare with the 60% threshold");
+    expect(existsSync(join(ci.repo, "amc-report.json"))).toBe(true);
   });
 });
 

@@ -1,0 +1,9 @@
+{
+  "recordedAt": "2026-10-18T09:29:31.693Z",
+  "baselineRevision": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+  "candidateRevision": "0b9525b17f8a42ab0b4042f34cd3be21a1edf561",
+  "path": "tests/performance/sessionSpine.performance.test.ts",
+  "baselineSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+  "frozenCandidateSha256": "e75c8d81ea7c0abccbb5101f0d0251b9cea68bf1469e641b3779e536a514eb18",
+  "identical": true
+}

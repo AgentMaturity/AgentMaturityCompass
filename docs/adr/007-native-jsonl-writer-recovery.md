@@ -61,4 +61,4 @@ New scoped tests author actual killed writers and concurrent contenders, origina
 prefix and side-effect preservation, pending usage, state/configuration refusals,
 and public continuation. Authored tests are not results. Use the exact candidate,
 installed artifact and receipts in
-`AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume/` for what actually ran.
+[the writer-resume receipt folder](https://github.com/AgentMaturity/AgentMaturityCompass/tree/main/AMC_OS/RESEARCH/2026-09-10-native-jsonl-writer-resume) for what actually ran.

@@ -1,0 +1,508 @@
+{
+  "schemaVersion": 1,
+  "kind": "fresh-WIP-after-human-Dependabot-exclusion-and-G0-routing",
+  "capturedUtc": "2026-10-15T08:22:11.522635+00:00",
+  "authority": {
+    "humanInstruction": "Root relayed a new human instruction: exclude Dependabot PRs from WIP; only that hold is cleared.",
+    "authorityKind": "Fresh human direction in this task assignment, overriding the earlier no-exemption assumption only for Dependabot WIP accounting.",
+    "exclusionPredicate": "GraphQL author typeBot with login dependabot/dependabot[bot]/app/dependabot; other bots and human PRs remain counted.",
+    "noRepeatConfirmationNeeded": true,
+    "latestQualificationBaseProvidedByRoot": "559fafc4fb52e586606f5fdf471ce65f44c5cf58",
+    "baseMethod": "Parent-provided current qualification base; no new Git/ancestry/whole-tree verification here.",
+    "sourceOrTrackerPolicyEdited": false,
+    "allOtherInstructionsHoldsAndFreezeChecksPreserved": true
+  },
+  "decision": {
+    "repositoryWipHoldCleared": true,
+    "countedNonDependabotOpenPRs": 0,
+    "countedAwaitingReviewCandidates": 0,
+    "newlyEligibleG0Key": null,
+    "G0Conclusion": "The frozen plan/reservation/handled history establishes no remaining unqualified AND unowned AND unblocked G0 item to displace P1-01 now. Many G0 items remain unqualified, but are owned, explicitly skipped, human-held, dependency blocked or awaiting accepted-source selection. This is not proof no unrecorded work exists.",
+    "nextReadOnlyReadinessLead": "P1-01",
+    "conditionalG0Lead": "P0-57: if root separately resolves exact accepted candidate/ownership and normal freeze plus remaining prerequisites, earliest-open-gate precedence applies before G1. The WIP exclusion alone does not accomplish that.",
+    "runtimeAuthorized": false,
+    "qualifiedNextRuntimeKey": null,
+    "formalAcceptanceClosed": false,
+    "meaning": "Clear only the WIP reason for holding next-lane admission. P1-01 dependency/source/corpus/ownership reviews and any root runtime release still remain; no Done or dependencyReady inference."
+  },
+  "freshGitHubSnapshot": {
+    "repository": "AgentMaturity/AgentMaturityCompass",
+    "asOfUtc": "2026-10-15T08:20:43.586784+00:00",
+    "queryExit": 0,
+    "durationMs": 1158,
+    "openTotal": 13,
+    "paginationComplete": true,
+    "nonDraftTotal": 13,
+    "excludedDependabot": 13,
+    "countedNonDependabot": 0,
+    "countedPRs": [],
+    "excludedPRs": [
+      {
+        "number": 33,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/33",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "6887e8ebb8ab687930b08c86cc526c961cc89200",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 28,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/28",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "3972a7db41e3cf42e74e7ebc8257e838cd13d135",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 27,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/27",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "dd33198fa57262b0e0f60943265bf2430940f725",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 21,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/21",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "ce407e98715ac4c57cf0fdb8e95b52c1380f957e",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 20,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/20",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "d532051a6190f8fc061f74f914fb5b70e2cc4a74",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 19,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/19",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "7cf5803f54e085ca1726ef1a4ac8eda782f11765",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 17,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/17",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "61b207eecc41d4b1aaed053ad2daaa8d0ab355a4",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 8,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/8",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "48b8b9edcb1d0e2aaa07d97a527fb6e53cbfea7d",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 7,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/7",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "1c31cc8c98858192a36db7f55a1d6771a6eab686",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 6,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/6",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "be4778c0cff73c7bde936b1b0b6e20f007394994",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 5,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/5",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "737762d1c2de99b529b209c8474f41442986c283",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 4,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/4",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "38da0eef2bfdffad3bbebf1a7fb28321f0523298",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      },
+      {
+        "number": 3,
+        "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/3",
+        "author": {
+          "login": "dependabot",
+          "__typename": "Bot"
+        },
+        "isDraft": false,
+        "headRefOid": "4af80b2da042768295f57ded1f5583b9a3cb734d",
+        "reviewCount": 0,
+        "latestReviewCount": 0,
+        "reviewDecision": null,
+        "reason": "Excluded from WIP by the new human instruction; neither reviewed nor approved by this exclusion."
+      }
+    ],
+    "perEpic": {
+      "countedOpenPRs": 0,
+      "counts": "Every counted epic has0 open PRs because the counted repository PR set is empty.",
+      "mappingRequiredForCountedPRs": false,
+      "excludedBotEpics": "Not mapped; titles not used and project permission not requested.",
+      "scope": "Complete open PR snapshot for this repository, not unrelated repositories or private local branch ownership."
+    },
+    "policyComparison": {
+      "generalMaxPerEpic": 3,
+      "generalMaxAwaiting": 10,
+      "readinessRequiresEpicCurrentBelow": 3,
+      "readinessRequiresAwaitingCurrentBelow": 10,
+      "countedOpen": 0,
+      "countedAwaiting": 0,
+      "passesCurrentRepositoryWipNumerically": true
+    },
+    "reviewFactBoundary": "Excluded PRs still have zero visible recorded reviews. Exclusion does not create approval, merge/readiness or current dependency suitability."
+  },
+  "G0Check": {
+    "basis": "Frozen full57-row G0 routing396c2d... plus current pinned five exports/reservations and held P057 reconciliation397cbee...; no broad source re-audit or new priority invented.",
+    "checkedGroups": [
+      {
+        "keys": [
+          "P0-14",
+          "P0-35"
+        ],
+        "priority": "Urgent",
+        "whyNotEligibleUnowned": "Claude-reserved deployment scope; P0-14 tooling/default-passphrase-history and actual deployment prerequisites remain. D-03=C was answered, not re-opened."
+      },
+      {
+        "keys": [
+          "P0-37",
+          "P0-36",
+          "P0-38",
+          "P0-39",
+          "P0-40",
+          "GATE-G0"
+        ],
+        "priority": "Urgent",
+        "whyNotEligibleUnowned": "Actual key/provider revocation/distrust, advisory severity, credentials/publish/release/post-publish/gate-owner actions and dependencies remain."
+      },
+      {
+        "keys": [
+          "P1-52",
+          "P0-33"
+        ],
+        "priority": "Urgent",
+        "whyNotEligibleUnowned": "Source-quality ratchet and accepted-source/Claude ownership hold; prior required1269/2751 debt unwaived. D-11=A answered; bot WIP exclusion does not implement or adopt a baseline."
+      },
+      {
+        "keys": [
+          "P0-53",
+          "P0-55"
+        ],
+        "priority": "Urgent",
+        "whyNotEligibleUnowned": "E17/shared-source owner and signing/claim/issuer/dependency holds. Accepted A4 defaults do not approve P1-65 on current accepted base."
+      },
+      {
+        "keys": [
+          "P0-30"
+        ],
+        "priority": "Urgent",
+        "whyNotEligibleUnowned": "Previously handled bounded security lanes/root proof; held full-batch/runner/installed/formal limits remain. Not a new unowned unchanged re-run."
+      },
+      {
+        "keys": [
+          "P0-03",
+          "P0-26"
+        ],
+        "priority": "High",
+        "whyNotEligibleUnowned": "Cleanup agreement and thirty drop/floor decisions are human-held; P0-26 Claude-reserved. No deletion or unapproved drop."
+      },
+      {
+        "keys": [
+          "P0-28",
+          "P0-31",
+          "P0-32",
+          "P0-34"
+        ],
+        "priority": "High/Urgent",
+        "whyNotEligibleUnowned": "Reserved labels/docs/release/installed/Done-contract source and unresolved dependencies/receipt transfers. Normal pack/freeze/release gates persist."
+      },
+      {
+        "keys": [
+          "P0-19",
+          "P0-20",
+          "P0-52"
+        ],
+        "priority": "High",
+        "whyNotEligibleUnowned": "Accepted source transfers remain pending; no bot-rule implication."
+      },
+      {
+        "keys": [
+          "P0-29",
+          "P0-22"
+        ],
+        "priority": "High/Urgent",
+        "whyNotEligibleUnowned": "Explicit user skip38 successors and unresolved empty-result contract retained."
+      },
+      {
+        "keys": [
+          "P0-41"
+        ],
+        "priority": "Medium",
+        "whyNotEligibleUnowned": "Root-owned serial qualification lane. Earlier source-readiness-only text is historical and not asserted current here. This routing does not audit or relabel its latest actual packet."
+      },
+      {
+        "keys": [
+          "P0-56",
+          "P0-57",
+          "P0-58",
+          "P0-59",
+          "P0-60",
+          "P0-61",
+          "P0-62"
+        ],
+        "priority": "Not declared in recovered historical follow-up",
+        "whyNotEligibleUnowned": "Historical unregistered P0-39 follow-ups need current issue/status/ownership/source reconciliation; no invented priority/gate/due or new runtime clearance. P0-60 is human host-policy scope; P0-57 has a concrete conditional held-source lead."
+      }
+    ],
+    "handledSerialKeys": [
+      "P0-33",
+      "P0-29",
+      "P0-47",
+      "P0-48",
+      "P0-49",
+      "P0-50",
+      "P0-22",
+      "P0-23",
+      "P0-51",
+      "P0-46",
+      "P0-52",
+      "P0-54",
+      "P0-20",
+      "P0-27",
+      "P0-19",
+      "P0-24",
+      "P0-18",
+      "P0-30",
+      "P0-25",
+      "P0-21",
+      "P0-45",
+      "P0-11"
+    ],
+    "priorHandledMeaning": "Previously bounded/proposed/skipped handoffs are not formalDone. Their unresolved criteria stay open, but they are not automatically unowned new execution lanes.",
+    "P041HistoricalCaveat": "The earlier routing's planned/unexecuted P041 statements predate root's later serial work. This report uses ownership and the supplied latest base559fafc, not those old readiness statements as current runtime facts.",
+    "noG0ClosureRequiredForG1": "Plan169–174 allows later-gate work once unblocked and WIP permits. G0 precedence applies to an actually eligible owned assignment, not an automatic requirement to close the whole gate.",
+    "limits": "Historical P056–62 current states and any unrecorded owner changes were not newly qualified. If root supplies a concrete newly unblocked G0 scope, reassess before G1 activation."
+  },
+  "freezeAndHeldSource": {
+    "currentSelectedBaselinePin": {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    },
+    "freezeActive": true,
+    "declaredCounts": {
+      "cliCommandPaths": 1236,
+      "cliInventoryPaths": 1236,
+      "stationPacks": 41,
+      "stationPackQuestions": 632
+    },
+    "currentSelectedBaselineAllowsP165": false,
+    "countsMeaning": "Read JSON declarations only; no current freeze measurement was executed.",
+    "P057": "Prior held reconciliation was against33a. Future actual qualification must re-anchor to supplied current accepted559fafc and run normal freeze/complete gates. The source-selection/review and unapproved P165/held-baseline issues remain; no self-base, counts-only, missing-base or added-exception waiver.",
+    "retained": [
+      "All Claude/source ownership and pausedP2-02 holds.",
+      "P0-29 explicit skip, P0-22 empty contract unresolved, P0-52/P0-20/P0-19 transfer pending.",
+      "Written live-deploy-health skip untilP2-06; no deployment URL or permission inferred.",
+      "D02A/D03C/D06B/D11A and accepted A4 defaults remain answered.",
+      "Existing quality, full-suite, installed, hosted, Node24, expert, credential/publish and formal acceptance limits."
+    ]
+  },
+  "preservation": {
+    "priorWipReport": "dfa37bfd.../a0ab2b... retained byte-exact. It remains a historical snapshot/conservative interpretation before the new instruction.",
+    "priorRoutingReports": "396c2d... and929d916... retained; this new report applies the fresh limited WIP amendment without rewriting old evidence.",
+    "noHostedChanges": true,
+    "noSourceEdits": true
+  },
+  "inputPins": [
+    {
+      "path": "/Users/sid/Downloads/Agent contract.md",
+      "bytes": 25110,
+      "sha256": "4ecfb55d0f647305eaf87d8fc4fdb73c4386e513bdbe0370fa40dfb5c9a7c95f"
+    },
+    {
+      "path": "/Users/sid/Downloads/Issues.md",
+      "bytes": 38227,
+      "sha256": "e842d0f82dbbebec329a5de01d738b1068886d5cef13322bd10943e0b4e7c541"
+    },
+    {
+      "path": "/Users/sid/Downloads/Workstreams.md",
+      "bytes": 78486,
+      "sha256": "8e1ce12428c3ecfdae4f376d923ec260053c7e937df5527fe23b60da70aa0d04"
+    },
+    {
+      "path": "/Users/sid/Downloads/A4 · Forge.md",
+      "bytes": 47286,
+      "sha256": "621a5b9b4e1423cd107119b5db866f801f4fcfd2128556613ec8a21579110d65"
+    },
+    {
+      "path": "/Users/sid/Downloads/AMC Ready-to-Deploy Implementation Plan.md",
+      "bytes": 157127,
+      "sha256": "d15e063402e8cdcc66a9bf764c7364faef50fe1e91f1821cd798dda6218c26c0"
+    },
+    {
+      "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+      "bytes": 275376,
+      "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+    },
+    {
+      "path": "/private/tmp/amc-next-after-p0-41-readonly-routing-20261015.json",
+      "bytes": 84851,
+      "sha256": "396c2d76d5fac5f61851bf4091123581e7e0b34a5035565e25a8b3f0c665aa14"
+    },
+    {
+      "path": "/private/tmp/amc-g1-next-readonly-routing-20261015.json",
+      "bytes": 77917,
+      "sha256": "929d91632ce41446a7e47969d1ee5ae098b185358a0667564940255cf786028d"
+    },
+    {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015.json",
+      "bytes": 23469,
+      "sha256": "dfa37bfd359c951685d3931d4d5c368f144a51bd614114a0668c821f57ce0432"
+    },
+    {
+      "path": "/private/tmp/amc-current-wip-classification-readonly-20261015.md",
+      "bytes": 3136,
+      "sha256": "a0ab2b1ce90c4595e301ea66245eab0b6585a2cec70f5d21fb0ae28d243c0205"
+    },
+    {
+      "path": "/private/tmp/p0-57-held-candidate-readonly-reconciliation-20261015.json",
+      "bytes": 31285,
+      "sha256": "397cbee80d448a01932e98e019f6917dec46eb5ccc8c7b3cb94224beebb15fca"
+    },
+    {
+      "path": "/private/tmp/p0-57-held-candidate-readonly-reconciliation-20261015.md",
+      "bytes": 4960,
+      "sha256": "baded21e85003c3098edb14787bf704aa8ccf206379b0d79f9cb9401eef70011"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/scripts/freeze-baseline.json",
+      "bytes": 554,
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013"
+    }
+  ],
+  "queryArtifactPins": [
+    {
+      "path": "/private/tmp/amc-wip-after-dependabot-exclusion-readonly-20261015/command.json",
+      "bytes": 1517,
+      "sha256": "29232cb83f763c80fd087f5301c4be4d9582901b18cd793e962820c31c05fbab"
+    },
+    {
+      "path": "/private/tmp/amc-wip-after-dependabot-exclusion-readonly-20261015/stdout.json",
+      "bytes": 8139,
+      "sha256": "c958ba694361b5c1009ce976e4576dc5efcd00b5ab259582a14b4c7567829169"
+    },
+    {
+      "path": "/private/tmp/amc-wip-after-dependabot-exclusion-readonly-20261015/stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "performed": {
+    "freshReadOnlyGitHubQuery": 1,
+    "sourceOrTrackerEdit": false,
+    "productImportParserTestsOrExecution": false,
+    "GitMutation": false,
+    "hostedMutationsMessagesReviewsOrCI": false,
+    "credentialOrPermissionChanges": false,
+    "newFiles": "Only fresh private query retention and this new report pair."
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "runtimeAuthorized": false,
+  "inputVerification": {
+    "pinChecks": 16,
+    "allMatched": true
+  },
+  "allReadsFinishedAtUtc": "2026-10-15T08:24:01.921664+00:00",
+  "markdown": {
+    "path": "/private/tmp/amc-wip-after-dependabot-exclusion-readonly-20261015.md",
+    "bytes": 3011,
+    "sha256": "7582380d1d23c6c2fd54c1ab7ec982d26d51521dd1d23bebbb9b543393f6a80a"
+  }
+}

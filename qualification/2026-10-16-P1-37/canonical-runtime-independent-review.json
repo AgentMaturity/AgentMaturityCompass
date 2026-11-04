@@ -1,0 +1,422 @@
+{
+  "schema": "p137-canonical-runtime-independent-audit/1",
+  "result": "No contradiction found within the closed runtime and retained public subset.",
+  "sourceCommit": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+  "canonicalCommand": {
+    "phase": "p137-fresh-canonical",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout tests/autoCompaction.test.ts tests/surfaceCompaction.test.ts tests/surfaceHistoryCompaction.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-fresh-canonical.raw.json",
+    "exit": 0,
+    "durationMs": 9806,
+    "startedUtc": "2026-10-16T11:00:00.372337+00:00",
+    "endedUtc": "2026-10-16T11:00:10.191950+00:00",
+    "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/stdout-stderr.log",
+    "head": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+    "headAfter": "b8850be74eb342bb04dbc7dc3786a9393325f436",
+    "ownedProcess": {
+      "pid": 40300,
+      "ownedPgid": 40300,
+      "observedPgidAfterLaunch": 40300,
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "--root",
+        "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout",
+        "tests/autoCompaction.test.ts",
+        "tests/surfaceCompaction.test.ts",
+        "tests/surfaceHistoryCompaction.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "--outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p137-fresh-canonical.raw.json"
+      ],
+      "startedUtc": "2026-10-16T11:00:00.372337+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH",
+        "AMC_P021_RUNTIME_OBSERVER_PATH"
+      ]
+    },
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observed": true,
+    "artifacts": {
+      "rawProducer": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/p137-fresh-canonical.raw.json",
+        "bytes": 21170,
+        "sha256": "5488fb5ce414cbed9bb44fdade02e2a480ce571f46cda7f61e52f2f3d63dc755"
+      },
+      "rawSnapshot": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/raw.json",
+        "bytes": 21170,
+        "sha256": "5488fb5ce414cbed9bb44fdade02e2a480ce571f46cda7f61e52f2f3d63dc755"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/observer.json",
+        "bytes": 28789,
+        "sha256": "b5bbe7c7bba40f5d7aa03266de818126bfef8552de62a3138ceffd765148f7e6"
+      },
+      "reporter": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "bytes": 2110,
+        "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+      }
+    },
+    "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+  },
+  "canonicalGroupClosure": {
+    "exit": 0,
+    "processDurationMs": 9806,
+    "observations": [
+      {
+        "capturedUtc": "2026-10-16T11:00:10.181790+00:00",
+        "pgid": 40300,
+        "signal": 0,
+        "absentByESRCH": true,
+        "errno": 3
+      }
+    ],
+    "maxPollingSeconds": 5,
+    "pollIntervalSeconds": 0.05,
+    "signalsOtherThanZeroSent": false
+  },
+  "rawObserver": {
+    "testCount": 51,
+    "passed": 51,
+    "failed": 0,
+    "pending": 0,
+    "todo": 0,
+    "uniqueFileTitleCount": 51,
+    "files": [
+      {
+        "file": "autoCompaction.test.ts",
+        "cases": 31
+      },
+      {
+        "file": "surfaceCompaction.test.ts",
+        "cases": 6
+      },
+      {
+        "file": "surfaceHistoryCompaction.test.ts",
+        "cases": 14
+      }
+    ],
+    "exactCaseStatusMultiplicityMatch": true,
+    "unhandledErrors": [],
+    "tasksWithErrors": [],
+    "failedHooks": [],
+    "recordedHooks": {
+      "afterAll": 3,
+      "afterEach": 20,
+      "beforeEach": 14
+    },
+    "lateDiagnostics": [],
+    "snapshots": {
+      "added": 0,
+      "failure": false,
+      "filesAdded": 0,
+      "filesRemoved": 0,
+      "filesRemovedList": [],
+      "filesUnmatched": 0,
+      "filesUpdated": 0,
+      "matched": 0,
+      "total": 0,
+      "unchecked": 0,
+      "uncheckedKeysByFile": [],
+      "unmatched": 0,
+      "updated": 0,
+      "didUpdate": false
+    },
+    "originalManual20IdentitiesPreserved": true
+  },
+  "canonicalPublicEvidence": {
+    "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/public-evidence.json",
+    "bytes": 48514,
+    "sha256": "017453fd36fb7855a795874a9ab04f687396c874452108a5aba89e1096ebefe2"
+  },
+  "logMarkerMatchesExactEvidencePin": true,
+  "publicCrypto": {
+    "artifact": {
+      "path": "/private/tmp/p1-37-qualification-20261016/canonical-runtime-independent-audit/public-crypto-and-joins.json",
+      "bytes": 11380,
+      "sha256": "30c69dddb3bea0d3eeab9a629da778fc8ac9408fa570041277a50b132cd1feeb"
+    },
+    "retainedDigestSignatureCount": 15,
+    "verifiedDigestSignatures": 15,
+    "publicKey": {
+      "type": "ed25519",
+      "pemCanonical": true,
+      "pemSha256": "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00",
+      "spkiDerSha256": "7976a79fef6eef3f0df899bed65034802678c8615e63cacbb8076d6c93942f73"
+    },
+    "summary": {
+      "bytes": 272,
+      "sha256": "50d172d6a85a79eb75b3b383803dbaa3b6e60efcedf8f5b03ac3875906df4fbe",
+      "replacedBytes": 11052,
+      "replacementBytes": 272,
+      "savedBytes": 10780,
+      "assistantFencedSelfReported": true
+    },
+    "primarySources": 5,
+    "retainedSourcePayloadCount": 0,
+    "signedMeasurementRow": "c2d7bfeb-7e91-4a44-a65f-b92fcb99fdd7",
+    "signedSummarizerHeader": "830afb49-3d52-4357-97c0-9847829cd30d",
+    "signedSummaryRow": "9c387978-e7fc-419a-b755-9007637a545e",
+    "retainedSettlements": 7,
+    "nestedReceiptArithmetic": [
+      {
+        "id": "8b0b5a10-9c91-42b5-b992-2a69a02831e2",
+        "replacedBytes": 6000,
+        "replacementBytes": 199,
+        "savedBytes": 5801,
+        "sourceRowIds": [
+          "e98b1637-463f-47be-865b-fed677e56b16"
+        ],
+        "missingSourceRowIds": [
+          "e98b1637-463f-47be-865b-fed677e56b16"
+        ],
+        "measurementRowRetained": false,
+        "basisRowRetained": false
+      },
+      {
+        "id": "5bff6ec2-80ec-41c8-88ee-5fdc2e60db3c",
+        "replacedBytes": 5000,
+        "replacementBytes": 199,
+        "savedBytes": 4801,
+        "sourceRowIds": [
+          "795a76d1-eb9c-4998-94b0-63d86d699260"
+        ],
+        "missingSourceRowIds": [
+          "795a76d1-eb9c-4998-94b0-63d86d699260"
+        ],
+        "measurementRowRetained": false,
+        "basisRowRetained": true
+      }
+    ],
+    "independentChildCrosscheck": "The delegated read-only builtin-crypto check independently reported the same 15 signatures, 272-byte hash and arithmetic, five source/measurement/header joins and seven settlement joins, with no discrepancies."
+  },
+  "coldCli": {
+    "node": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "argv": [
+      "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli.js",
+      "agent-loop",
+      "verify",
+      "4b2da330-ad5c-485c-b5c6-4e9072ace45e",
+      "--json",
+      "--expect-monitor",
+      "6d333261bf9aefbefe1a8bebbd370a29ef5f585f1daf34b7a5f371b69ddd4d00"
+    ],
+    "cwd": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-agent-loop-FQyt5p",
+    "pid": 40314,
+    "naturalClose": {
+      "code": 0,
+      "signal": null
+    },
+    "spawnError": null,
+    "pidAbsent": true,
+    "probes": [
+      {
+        "elapsedMs": 0.09399999999914144,
+        "errno": "ESRCH"
+      }
+    ],
+    "inheritedProcessGroup": true,
+    "detached": false,
+    "stdout": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/cold-cli.stdout",
+      "bytes": 1605,
+      "sha256": "0297e372b0ff2d3a06a83891f9a7330f807d9501e16e2214f05fc868676ee36b"
+    },
+    "stderr": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/cold-cli.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "completeStdoutMatchesEmbeddedReport": true,
+    "separateObservationMatchesEmbeddedMetadata": true,
+    "allSevenRequestsReconstructedInColdAndApiReports": true,
+    "requestHeaderIds": [
+      "d3b3ce3e-3eb7-4cd1-a273-068a61ef5687",
+      "131e2b4b-0b73-46bb-9900-b06b2c4ab7d9",
+      "5396c643-c194-4d31-8282-e1468109ccc0",
+      "533752a7-9016-4749-a6ca-c1c39c81eab6",
+      "2cb8b0e3-7c70-4530-b845-bdf424773ec9",
+      "830afb49-3d52-4357-97c0-9847829cd30d",
+      "452cbc2e-a1a8-4378-93af-170459ccf0dc"
+    ],
+    "reportedActualByteDigestsEqualRecordedDigests": true,
+    "selectedInputCount": 7,
+    "selectedBeforeAfterAndCurrentHashesIdentitiesMatch": true,
+    "compiledBindingJoins": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli.js",
+        "bytes": 1054132,
+        "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/cli-agent-commands.js",
+        "bytes": 48429,
+        "sha256": "315b02f9a5ccda05bd37ccca6e1476e732774c5e8fe7110139c47cdaa81745e2"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/agent/runReport.js",
+        "bytes": 12428,
+        "sha256": "f8dc735b17d9e5c72ce17e4af03643cf97bbc6805f2942447f6636abec92c30a"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/session/surfaceCompactionValidation.js",
+        "bytes": 10826,
+        "sha256": "00943e902f6750499939a6abd6fd1e638799a6abea1b2d5d45bb16ec7bd47c96"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/dist/llm/request/deriveRequest.js",
+        "bytes": 6191,
+        "sha256": "a27e9757918026e86278652ead4caf3ab1ed80460833335c4ae54aab716edbd9"
+      }
+    ]
+  },
+  "sourceBinding": {
+    "artifact": {
+      "path": "/private/tmp/p1-37-qualification-20261016/fresh-source-binding.json",
+      "bytes": 19743,
+      "sha256": "58dd59d19da659aeaa7ac8b2b2897f8885f39a057ac8b2467b597370c395461c"
+    },
+    "frozenSourcePinCount": 57,
+    "allMatchedUnchangedRootCounterparts": true,
+    "publicInputsMatched": 7,
+    "nativeSource": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    },
+    "nativeFresh": {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 542184874,
+      "nlink": 1
+    },
+    "distinctNativeInodesAndSingleLinks": true,
+    "runner": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "bytes": 43,
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "dev": 16777231,
+      "inode": 539152709
+    },
+    "node": {
+      "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "bytes": 67024,
+      "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd",
+      "physicalPath": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "dev": 16777231,
+      "inode": 494874661,
+      "nlink": 1
+    },
+    "runnerProvenance": "R Vitest entry, explicit Q --root. Q tests resolve installed Q packages/config. Not a self-contained Q runner invocation.",
+    "noMutableQSourceReads": true,
+    "noCurrentQSourceCleanClaim": true
+  },
+  "evidencePins": [
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/command.json",
+      "bytes": 2894,
+      "sha256": "85f64c4c54d879304797c2a87f11c90e9bc390cd390a1f248d37d01136166b7b"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/owned-process.json",
+      "bytes": 912,
+      "sha256": "8b1f4bdc0a07fb88d18405a60949f720f34eb6c93e0ea106307b25b8eca4af47"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/owned-group-after-exit.json",
+      "bytes": 261,
+      "sha256": "ae8975554e99d88eabe06e01ac5b29f0769b75da8d50e6dc3984fed05e571253"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/raw.json",
+      "bytes": 21170,
+      "sha256": "5488fb5ce414cbed9bb44fdade02e2a480ce571f46cda7f61e52f2f3d63dc755"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/observer.json",
+      "bytes": 28789,
+      "sha256": "b5bbe7c7bba40f5d7aa03266de818126bfef8552de62a3138ceffd765148f7e6"
+    },
+    {
+      "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p137-fresh-canonical/stdout-stderr.log",
+      "bytes": 2150,
+      "sha256": "278ecf3719e0f89bcfe218fda51450487c0454940d302f25bf0371fcf593d789"
+    },
+    {
+      "path": "/private/tmp/p1-37-qualification-20261016/fresh-source-binding.json",
+      "bytes": 19743,
+      "sha256": "58dd59d19da659aeaa7ac8b2b2897f8885f39a057ac8b2467b597370c395461c"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/public-evidence.json",
+      "bytes": 48514,
+      "sha256": "017453fd36fb7855a795874a9ab04f687396c874452108a5aba89e1096ebefe2"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/cold-cli.stdout",
+      "bytes": 1605,
+      "sha256": "0297e372b0ff2d3a06a83891f9a7330f807d9501e16e2214f05fc868676ee36b"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/cold-cli.stderr",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p137-public-observation-cX6k5h/cold-cli-observation.json",
+      "bytes": 5748,
+      "sha256": "7651bef64717547be9c1015201a359d5b1d0cadb9946c57e30fea6a2be5a2b29"
+    }
+  ],
+  "limits": [
+    "The independent cryptographic check verifies signatures over15 retained 32-byte event digests. It does not recompute canonical row hash preimages or complete global/session/seal chains.",
+    "The public subset includes five source rows but no actual source blob payloads; two nested pruning source rows and other basis/measurement rows are absent. No successful fixture workspace is reopened.",
+    "All seven captured cold/API reconstruction statuses and producer byte digests agree, but complete request bytes are not retained for a new offline independent reconstruction.",
+    "The monitor PEM is a locally captured pre-request test anchor. It is not independent external authorship or real model/provider evidence; responses and usage are explicitly scripted.",
+    "The cold verifier receives the owned test passphrase and private HOME. This is not a public-only, locked-vault or zero-secret-read verification claim.",
+    "Nested closure is childPID-only; the root wrapper records owned outer PGID absence, not universal absence of detached descendants.",
+    "Q is deliberately being mutated for separate controls. This audit reads only frozen source pins/R counterparts and explicitly permitted immutable compiled/native Q files; it asserts no current Q source clean state.",
+    "The null-usage notice registration is a public class-boundary probe; the integrated missing-usage registration is an actual protocol refusal, not provider success.",
+    "No controls, full-suite, coverage, hosted, release or formalDone claim is made by this canonical-only audit. F37 remains skipped."
+  ],
+  "blockingFindings": [],
+  "allReadsFinished": true,
+  "allPrivateWritesFinished": true,
+  "formalAcceptanceClosed": false,
+  "productRuntimeNativeSqlNetworkExecuted": false,
+  "sourceOrRepositoryWrites": false,
+  "auditTools": "Python standard-library JSON/hash/file inspection and Node built-in crypto only; no AMC module import, native database operation or product command.",
+  "publicObservationSensitiveMarkerCheck": {
+    "checkedMarkerClasses": [
+      "owned test passphrase",
+      "synthetic credential",
+      "private-key delimiter"
+    ],
+    "found": false,
+    "boundary": "Specific test passphrase/fixed credential/private-key marker check only, not a universal secret scanner."
+  },
+  "privateOriginalAudit": {
+    "path": "/private/tmp/p1-37-qualification-20261016/canonical-runtime-independent-audit/review.json",
+    "bytes": 18207,
+    "sha256": "4602793a5013aa1e25314bff59b588d387829e7bd6e105e979f7d5bfef6304fd"
+  },
+  "projectionNote": "Only detector marker literals were replaced with class labels. Original audit is preserved privately and pinned. All actual runtime/crypto results and limits are unchanged."
+}

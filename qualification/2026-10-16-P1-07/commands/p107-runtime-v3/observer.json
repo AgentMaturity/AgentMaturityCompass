@@ -1,0 +1,36 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 3873,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts"
+  ],
+  "testCount": 1,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1134472039",
+      "name": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1134472039_0",
+      "name": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates",
+      "fullName": "binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

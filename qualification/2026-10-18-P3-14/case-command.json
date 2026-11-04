@@ -1,0 +1,13 @@
+{
+  "head": "21523daa2e879c6cad5782aab3195f093186c1c6",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14",
+  "cmd": "pnpm exec tsx /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/probe-governance.ts 21523daa2e879c6cad5782aab3195f093186c1c6",
+  "exit": 0,
+  "durationMs": 5514,
+  "node": "v22.23.3",
+  "statusBefore": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n",
+  "statusAfter": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n",
+  "rawLogSha256": "901c6b16c6425910665880937698dc1347be8fe34254e756eb5ce9ed557e64ea",
+  "probeSourceSha256": "597e01a5f000fb8ba098a8db66678a9033d0a5857c81e49d0798b5f43c082d11",
+  "reportSha256": "87e554a2bf8899e246d68670dc679785de1b68a9e70565598f8b32f927a70f6b"
+}

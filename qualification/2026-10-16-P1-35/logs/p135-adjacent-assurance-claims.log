@@ -1,0 +1,39 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+ ✓ tests/claims/claimAdapters.test.ts (39 tests) 12ms
+ ✓ tests/claims/claimLabels.test.ts (8 tests) 16ms
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > R2 reads unmarked dogfood metadata conservatively and preserves current marked rows
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-lhqu8V/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > R4 never promotes operator-chosen ATTESTED legacy provenance
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-L7MTgO/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > current public claim envelopes bypass the legacy classifier
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-YSA2RF/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance without an envelope classifies as R5 self-reported
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-ulJVKe/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > post-fix assurance lazy claim stays self-reported instead of using current observed fallback
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-kWLqkw/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-wGLNX5/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > an edited signed log line refuses further relabelling without changing originals
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-aScEGW/public-evidence.json
+
+stdout | tests/migration/legacyRelabel.test.ts > P1-35 synthetic migration source contracts > a tampered migration receipt signature refuses its log and any further append
+AMC_P135_LEGACY_PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-TZH5zg/public-evidence.json
+
+ ✓ tests/migration/legacyRelabel.test.ts (8 tests) 620ms
+ ✓ tests/assuranceReportProvenance.test.ts (8 tests) 927ms
+ ✓ tests/assuranceRunnerInconclusiveQualification.test.ts (15 tests) 1885ms
+
+ Test Files  5 passed (5)
+      Tests  78 passed (78)
+   Start at  22:08:26
+   Duration  4.20s (transform 4.55s, setup 111ms, import 6.73s, tests 3.46s, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p135-adjacent-assurance-claims.raw.json

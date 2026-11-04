@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:qualification /Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass
+> node scripts/check-qualification-receipts.mjs
+
+Qualification receipts valid: 12 receipt(s) under qualification.

@@ -1,0 +1,18 @@
+[
+  {
+    "number": 1,
+    "actualOriginalAndCurrentSourceExact": true,
+    "actualMutantHashMatchesFunctionBoundedRecipe": true,
+    "onlyActualPatchRemoval": "-      const ts = input.ts ?? Date.now();",
+    "onlyActualPatchAddition": "+      const ts = Date.now();",
+    "wholePrefixSuffixUnchangedByReconstruction": true
+  },
+  {
+    "number": 2,
+    "actualOriginalAndCurrentSourceExact": true,
+    "actualMutantHashMatchesFunctionBoundedRecipe": true,
+    "onlyActualPatchRemoval": "-      const ts = input.ts ?? Date.now();",
+    "onlyActualPatchAddition": "+      const ts = input.ts === undefined ? Date.now() : Math.min(input.ts, Date.now());",
+    "wholePrefixSuffixUnchangedByReconstruction": true
+  }
+]

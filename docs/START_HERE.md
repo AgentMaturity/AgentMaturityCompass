@@ -32,6 +32,10 @@ amc agent-loop verify <session-id>                        # the run prints the s
 [Quickstart](QUICKSTART.md#first-governed-turn-in-three-actions-keyless) for the
 measured timing of this path.
 
+For a credential-free baseline-versus-candidate comparison, run the source-checkout
+[deterministic improvement demo](DETERMINISTIC_IMPROVEMENT_DEMO.md). It exercises
+native trials and the promotion gate with synthetic data, never maturity evidence.
+
 For daily interactive use, run `amc agent-loop chat` with the same provider, model
 and credential reference. `--credentials-home` selects the shared skills directory
 at `<home>/skills` as well as the default credential-file location.

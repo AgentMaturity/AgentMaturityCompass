@@ -1,0 +1,999 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1518",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "reviewKind": "Independent read-only review of frozen actual v2 harness execution evidence",
+  "state": "BOUNDED_ACTUAL_EVIDENCE_CONSISTENT_WITH_STATED_LIMITS",
+  "blockingFindings": 0,
+  "findings": [],
+  "authorship": {
+    "originals": "Original Claude test, source, helper, configuration, assertions, setup guards, imports, fixture producers and deadlines remain unchanged.",
+    "preparation": "The separate1518 preparation and v2 correction were authored by another agent, with root and this reviewer performing static review. Frozen v1 input/reviews remain immutable.",
+    "execution": "Root authored the release and scheduling driver and performed the seven actual corpus commands. This review repeated no runtime.",
+    "review": "Independent byte, JSON, source-text, journal, count, assertion-cause and preservation reconciliation."
+  },
+  "actualAudit": {
+    "errors": [],
+    "commands": 7,
+    "caseExecutions": {
+      "numTotalTests": 301,
+      "numPassedTests": 298,
+      "numFailedTests": 3
+    },
+    "originalRegistrations": 43,
+    "distinctFileTitlePairs": 42,
+    "duplicateTitles": [
+      {
+        "title": "matched harness execution receipts a local successful command and oracle cannot imply an actual model call",
+        "multiplicity": 2
+      }
+    ],
+    "detachedLaunches": 242,
+    "uniqueRetainedChildPids": 242,
+    "usedFixedScripts": 18,
+    "allowedFixedScripts": 18,
+    "journalKinds": {
+      "ready": 14,
+      "installed": 14,
+      "process-exit": 7,
+      "detached-intent": 242,
+      "detached-return": 242,
+      "detached-close": 242,
+      "worker-stopped": 7,
+      "worker-stopped-forwarded": 7
+    },
+    "phases": [
+      {
+        "phase": "original43-baseline",
+        "passed": 43,
+        "failed": 0,
+        "exit": 0,
+        "outerPid": 5033,
+        "workerPid": 5036,
+        "detached": 34,
+        "checkpointSequences": [
+          105,
+          106
+        ],
+        "normalOuterAndInfrastructure": true,
+        "allDetachedClosedZeroNoSignalAndAbsent": true
+      },
+      {
+        "phase": "S7-M24-harness-secret-manifest-112-baseline",
+        "passed": 43,
+        "failed": 0,
+        "exit": 0,
+        "outerPid": 5181,
+        "workerPid": 5182,
+        "detached": 34,
+        "checkpointSequences": [
+          105,
+          106
+        ],
+        "normalOuterAndInfrastructure": true,
+        "allDetachedClosedZeroNoSignalAndAbsent": true
+      },
+      {
+        "phase": "S7-M24-harness-secret-manifest-112-mutant",
+        "passed": 41,
+        "failed": 2,
+        "exit": 1,
+        "outerPid": 5254,
+        "workerPid": 5255,
+        "detached": 38,
+        "checkpointSequences": [
+          117,
+          118
+        ],
+        "normalOuterAndInfrastructure": true,
+        "allDetachedClosedZeroNoSignalAndAbsent": true
+      },
+      {
+        "phase": "S7-M24-harness-secret-manifest-112-restored",
+        "passed": 43,
+        "failed": 0,
+        "exit": 0,
+        "outerPid": 5340,
+        "workerPid": 5341,
+        "detached": 34,
+        "checkpointSequences": [
+          105,
+          106
+        ],
+        "normalOuterAndInfrastructure": true,
+        "allDetachedClosedZeroNoSignalAndAbsent": true
+      },
+      {
+        "phase": "S7-M25-harness-fixture-tamper-248-baseline",
+        "passed": 43,
+        "failed": 0,
+        "exit": 0,
+        "outerPid": 5469,
+        "workerPid": 5470,
+        "detached": 34,
+        "checkpointSequences": [
+          105,
+          106
+        ],
+        "normalOuterAndInfrastructure": true,
+        "allDetachedClosedZeroNoSignalAndAbsent": true
+      },
+      {
+        "phase": "S7-M25-harness-fixture-tamper-248-mutant",
+        "passed": 42,
+        "failed": 1,
+        "exit": 1,
+        "outerPid": 5549,
+        "workerPid": 5550,
+        "detached": 34,
+        "checkpointSequences": [
+          105,
+          106
+        ],
+        "normalOuterAndInfrastructure": true,
+        "allDetachedClosedZeroNoSignalAndAbsent": true
+      },
+      {
+        "phase": "S7-M25-harness-fixture-tamper-248-restored",
+        "passed": 43,
+        "failed": 0,
+        "exit": 0,
+        "outerPid": 5623,
+        "workerPid": 5624,
+        "detached": 34,
+        "checkpointSequences": [
+          105,
+          106
+        ],
+        "normalOuterAndInfrastructure": true,
+        "allDetachedClosedZeroNoSignalAndAbsent": true
+      }
+    ],
+    "controls": [
+      {
+        "id": "S7-M24-harness-secret-manifest-112",
+        "sourceTarget": "src/benchmarks/harnessComparison.ts",
+        "counts": [
+          43,
+          41,
+          43
+        ],
+        "singleExactSourceDelta": true,
+        "compiledUntouched": true,
+        "sourceRestoredExact": true
+      },
+      {
+        "id": "S7-M25-harness-fixture-tamper-248",
+        "sourceTarget": "src/benchmarks/harnessComparison.ts",
+        "counts": [
+          43,
+          42,
+          43
+        ],
+        "singleExactSourceDelta": true,
+        "compiledUntouched": true,
+        "sourceRestoredExact": true
+      }
+    ],
+    "failures": [
+      {
+        "phase": "S7-M24-harness-secret-manifest-112-mutant",
+        "fullName": "matched harness execution receipts a manifest carrying an exact runtime value is refused before any output directory exists",
+        "message": "promise resolved \"{ schemaVersion: '2026-09-08', \u2026(11) }\" instead of rejecting",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/closure/tests/harnessComparison.test.ts",
+            "line": 152,
+            "column": 86
+          }
+        ],
+        "actualSummary": "Resolved redacted local harness report instead of rejection; the full actual resolved value is retained in the original reporter.",
+        "expected": "Error {\n  \"message\": \"rejected promise\",\n}",
+        "hooks": {
+          "afterEach": "pass"
+        }
+      },
+      {
+        "phase": "S7-M24-harness-secret-manifest-112-mutant",
+        "fullName": "matched harness execution receipts a manifest carrying a private key block is refused before any output directory exists",
+        "message": "promise resolved \"{ schemaVersion: '2026-09-08', \u2026(11) }\" instead of rejecting",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/closure/tests/harnessComparison.test.ts",
+            "line": 152,
+            "column": 86
+          }
+        ],
+        "actualSummary": "Resolved redacted local harness report instead of rejection; the full actual resolved value is retained in the original reporter.",
+        "expected": "Error {\n  \"message\": \"rejected promise\",\n}",
+        "hooks": {
+          "afterEach": "pass"
+        }
+      },
+      {
+        "phase": "S7-M25-harness-fixture-tamper-248-mutant",
+        "fullName": "matched harness execution receipts a target that rewrites its pinned fixture cannot produce a determinate result",
+        "message": "expected { id: 't1-fixture-success-r1', \u2026(17) } to match object { status: 'inconclusive', \u2026(2) }\n(23 matching properties omitted from actual)",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/closure/tests/harnessComparison.test.ts",
+            "line": 160,
+            "column": 30
+          }
+        ],
+        "actualSummary": "{\n  \"observedOutcome\": \"pass\",\n  \"status\": \"executed\",\n  \"verdict\": \"pass\",\n}",
+        "expected": "{\n  \"observedOutcome\": null,\n  \"status\": \"inconclusive\",\n  \"verdict\": null,\n}",
+        "hooks": {
+          "afterEach": "pass"
+        }
+      }
+    ],
+    "assertionBindings": [
+      {
+        "phase": "S7-M24-harness-secret-manifest-112-mutant",
+        "fullName": "matched harness execution receipts a manifest carrying an exact runtime value is refused before any output directory exists",
+        "structuredName": "AssertionError",
+        "rendering": "vitest-rejects-rewritten-stack",
+        "messageSha256": "682902172de7a156361c4c919af8f0089ace0d73af0841b95aea294ecfbb2408",
+        "renderedSha256": "ac74b23e1066b90f4db2cac21cb9097f1cce98ccb40d13cb2b0fea3dcc135aeb",
+        "originalSourceSha256": "1d549869339f05696b397462760e68a77cb4fc298c86fc7f4ecdf16a73fd7a4d",
+        "sourceSites": [
+          {
+            "file": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/closure/tests/harnessComparison.test.ts",
+            "line": 152,
+            "column": 86,
+            "text": "    await expect(context.run({ redactValues: [\"fixture-manifest-canary-55217741\"] })).rejects.toThrow(/secret-like material/);",
+            "lineSha256": "cfadf2f119ce6c79f876f4f9d4fc1295903326d70b563c61f9608a4a752670eb"
+          }
+        ]
+      },
+      {
+        "phase": "S7-M24-harness-secret-manifest-112-mutant",
+        "fullName": "matched harness execution receipts a manifest carrying a private key block is refused before any output directory exists",
+        "structuredName": "AssertionError",
+        "rendering": "vitest-rejects-rewritten-stack",
+        "messageSha256": "682902172de7a156361c4c919af8f0089ace0d73af0841b95aea294ecfbb2408",
+        "renderedSha256": "ac74b23e1066b90f4db2cac21cb9097f1cce98ccb40d13cb2b0fea3dcc135aeb",
+        "originalSourceSha256": "1d549869339f05696b397462760e68a77cb4fc298c86fc7f4ecdf16a73fd7a4d",
+        "sourceSites": [
+          {
+            "file": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/closure/tests/harnessComparison.test.ts",
+            "line": 152,
+            "column": 86,
+            "text": "    await expect(context.run({ redactValues: [\"fixture-manifest-canary-55217741\"] })).rejects.toThrow(/secret-like material/);",
+            "lineSha256": "cfadf2f119ce6c79f876f4f9d4fc1295903326d70b563c61f9608a4a752670eb"
+          }
+        ]
+      },
+      {
+        "phase": "S7-M25-harness-fixture-tamper-248-mutant",
+        "fullName": "matched harness execution receipts a target that rewrites its pinned fixture cannot produce a determinate result",
+        "structuredName": "AssertionError",
+        "rendering": "ordinary-assertion-stack",
+        "messageSha256": "2517535ed7dd5b0ffac92d40287d64717d43e88adf60c07d9f05f8ebef18a2fb",
+        "renderedSha256": "d293af1bb66c861eb380941e632f1217c72398d55b705c2b3b5aff54bd7d1b06",
+        "originalSourceSha256": "1d549869339f05696b397462760e68a77cb4fc298c86fc7f4ecdf16a73fd7a4d",
+        "sourceSites": [
+          {
+            "file": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/closure/tests/harnessComparison.test.ts",
+            "line": 160,
+            "column": 30,
+            "text": "    expect(report.trials[0]).toMatchObject({ status: \"inconclusive\", verdict: null, observedOutcome: null });",
+            "lineSha256": "77296b7540b0fcb3b97a6dfccfdd13d84f69c53523566ab160d716c9c63e0955"
+          }
+        ]
+      }
+    ],
+    "completedDriverOperations": [
+      [
+        "baseline"
+      ],
+      [
+        "matrix",
+        "0"
+      ],
+      [
+        "matrix",
+        "1"
+      ],
+      [
+        "finish"
+      ]
+    ]
+  },
+  "packetReconciliation": {
+    "errors": [],
+    "failedAssertionsExact": 3,
+    "phaseEntriesExact": 7,
+    "packetPin": {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.json",
+      "bytes": 72597,
+      "sha256": "de1a9ea9b169e10c44cc3e827c48b09a131191a2448b77744f3c8fc7ba04f3cb"
+    },
+    "markdownPin": {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.md",
+      "bytes": 1802,
+      "sha256": "afcc128b76fdcc594ddb2236fda60e02bf0700027e71ecb2046f4ca5a1c2a536"
+    }
+  },
+  "preservationAudit": {
+    "groups": {
+      "runtimeIndex": {
+        "count": 5042,
+        "mismatches": 0
+      },
+      "protected-pins-before.json": {
+        "count": 269,
+        "mismatches": 0
+      },
+      "prior-reference-pins-before.json": {
+        "count": 4223,
+        "mismatches": 0
+      },
+      "late-predecessor-pins.json": {
+        "count": 5,
+        "mismatches": 0
+      },
+      "runtime-release-pins-v2.json": {
+        "count": 4892,
+        "mismatches": 0
+      },
+      "runtime-input-pins-v2.json": {
+        "count": 29,
+        "mismatches": 0
+      },
+      "runtime-input-pins.json": {
+        "count": 19,
+        "mismatches": 0
+      },
+      "source-input-pins.json": {
+        "count": 22,
+        "mismatches": 0
+      },
+      "assertion-rendering-input-pins-v2.json": {
+        "count": 5,
+        "mismatches": 0
+      },
+      "v1-final-review-pins-v2.json": {
+        "count": 3,
+        "mismatches": 0
+      },
+      "rootAndPrivate": {
+        "source": 7739,
+        "dist": 4529,
+        "expectedFiles": 12268,
+        "actualPrivateFiles": 12268,
+        "privateManifestExact": true,
+        "rootHashMismatches": [],
+        "privateHashMismatches": [],
+        "physicalRootAliases": []
+      }
+    },
+    "closures": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/full-closure-final.json",
+          "bytes": 1399899,
+          "sha256": "dda63cf4e8b307c8297550cb97a0ff4fd6510321c4cd160e0a35317bc723d4d9"
+        },
+        "files": 12269,
+        "actualFiles": 12269,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/full-closure-final.json",
+          "bytes": 1400381,
+          "sha256": "8198cac2ab5fadefcb20247de3363e1df670a7b1692646853139725ca1fde6fd"
+        },
+        "files": 12273,
+        "actualFiles": 12273,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "actualFiles": 12269,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "actualFiles": 12269,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/full-closure-final.json",
+          "bytes": 1399887,
+          "sha256": "299b0969cccf57ccf3b1b7f1c3a7763366d190e889786f42b8b0881f55de0228"
+        },
+        "files": 12269,
+        "actualFiles": 12269,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0
+      }
+    ],
+    "dependencyLinks": {
+      "count": 307,
+      "mismatches": []
+    },
+    "privateCacheEntries": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/closure/node_modules/.vite",
+        "exists": false
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/closure/node_modules/.vite-temp",
+        "exists": true,
+        "isDirectory": true,
+        "isSymlink": false,
+        "mode": "0o755",
+        "uid": 501
+      }
+    ],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "nativeExact": true,
+    "activeMarkers": [],
+    "incompleteOrDeferred": [],
+    "errors": [],
+    "filesRead": 237913,
+    "elapsedSeconds": 32.74
+  },
+  "controlInterpretation": [
+    {
+      "id": "S7-M24-harness-secret-manifest-112",
+      "cause": "The exact manifest secret-refusal condition at product source112 is disabled. Both unchanged parameterized original assertions at tests/harnessComparison.test.ts152:86 expect rejection but receive completed redacted local harness reports.",
+      "actualEffectEvidence": "Mutant has38 approved actual target/oracle launch\u2192PID\u2192close records versus34 in baseline and restored. Serialized actual reports include the completed fixture-run artifacts/results. Local execution follows the original product path; this does not attest external model/comparator authority or genuine secret exposure.",
+      "masking": "The subsequent output-directory absence assertion at153 is not reached in either failed body. No independent retained output-directory re-read is claimed; original afterEach passes and may remove fixture roots.",
+      "assertionRendering": "Both failures are structured AssertionError/okfalse, while raw stack starts Error: because the real installed Vitest rejects matcher rewrites the stack. Exact raw/reporter tuples, two names and original assertion frames match. V2 correctly retains the direct failures without relaxing generic-error admission.",
+      "counts": [
+        43,
+        41,
+        43
+      ]
+    },
+    {
+      "id": "S7-M25-harness-fixture-tamper-248",
+      "cause": "The exact post-execution fixture-copy digest check at product source248 is disabled. The fixed target reads its context, chmods and rewrites workspace fixture.input; target/oracle complete. The unchanged assertion at160:30 receives executed/pass/pass instead of inconclusive/null/null.",
+      "scope": "The product separately resolves original source pins before this guard; this control concerns the per-trial working fixture copy, not alteration of the protected repository source fixture. Actual fixed target bytes and launch/close records are retained; no new product execution is inferred.",
+      "masking": "The reason-string assertion at161 is masked by160 failure. Original afterEach passes. No durable re-read of already-cleaned ephemeral fixture bytes or universal filesystem-effect proof is claimed.",
+      "counts": [
+        43,
+        42,
+        43
+      ]
+    }
+  ],
+  "observationMeaning": {
+    "positiveActivation": "Every phase has actual outer and original forks.js worker ready/installed journals with Node v22.23.3 and ABI127; invocation worker/pool IDs are real decimal strings. Nonces are distinct across all seven phases. No empty-log pass is used.",
+    "authoritativeLaunches": "All242 authoritative pre-intents map bijectively to actual child PID returns and actual close0/null records. All18 fixed source-derived script hashes are exercised. Recorded command/argv/cwd and exact seven product environment-key names match the original routes. This establishes those fixed local calls, not universal inherited-credential absence.",
+    "postTeardownIPC": "All seven original worker stopped checkpoints are healthy, fault latch false, followed by the unchanged forwarding call returning boolean true. Each checkpoint sequence follows all authoritative detached close records. This is observed send invocation/return after original teardown, not delivery or worker exit-code proof.",
+    "processAbsence": "Retained numerical group observations show empty members and killpg(actualPid,0) ESRCH for every observed detached group. Outer leaders are reaped with normal0/1 exit, no timeout/signal/action/error, and empty owned groups. The reviewer performs no process enumeration or signal.",
+    "infrastructure": "All raw and reporter counts/case multisets match with zero unhandled/file/suite/hook/pending/todo/known late shutdown or global-guard errors. Failed ancestor status alone is not classified as a hook error.",
+    "restoration": "Both source controls retain exact frozen mutant bytes/patches and a single assigned TS delta, untouched4529 compiled hashes, normal complete mutant receipts before persistent mutation resolution, exact restored manifests and green restored43. Final source and compiled copy equals prepared root12268 bytes. No control rerun or recovery was needed.",
+    "effectsAndRetention": "Journal/stream/reporter/raw/sidecar evidence is frozen and pinned. Original finally/afterEach semantics remain intact and can remove ephemeral trials. Absence or restoration does not imply universal fixture retention, arbitrary descendant tracking or recovery after SIGKILL.",
+    "instrumentation": "The private spawn and narrow IPC wrappers affect identity, timing and I/O. Their source and allowlist remain exactly the reviewed v1 bytes. Healthy forwarding is supported by the immutable wrapper source plus actual journal records."
+  },
+  "preservationMeaning": {
+    "allReferences": "5042 runtime-index references,4892 release references,269 protected pins,4223 prior references and all reviewed runtime/source/v1 inputs independently rehash exactly.",
+    "closures": "All17 actual finished predecessor source/dist closures are rehashed, including late completed1537 and S7; final private7739 source+4529 dist=12268 match root with distinct physical inodes. Native identity and307 ordinary dependency aliases match.",
+    "cacheScope": "Private .vite is absent; private .vite-temp is an owned physical directory with mode0755. Protected source/dist/config/native/prior exactness does not claim zero tool-cache writes. Root caches were not changed by this reviewer.",
+    "attribution": "Source58 and clean root Git attribution are retained from the frozen root receipt. This reviewer observes current exact bytes and runs no Git.",
+    "postControlFreeze": "Root separately reported a normal post-control freeze command in a new journal. That later command is outside this frozen1518 packet and is neither run nor classified by this review."
+  },
+  "reviewerObservation": {
+    "cacheStatAssumption": "An initial read-only audit assumed a private .vite directory, and stopped at a missing-path stat after its earlier comparisons. The namespace did not require that directory. A bounded read-only recheck handled actual cache absence explicitly and completed with zero mismatches. No producer, controller, test or product runtime was retried.",
+    "largeDisplay": "An early M24 error display was truncated while showing a large actual report. Subsequent bounded structured comparisons checked the complete raw/reporter data without relying on that truncated display."
+  },
+  "scopeLimits": [
+    "Seven corpus processes repeat43 original registrations for301 executions;298 pass and3 fail under private controls. There are42 distinct file/title pairs because one title has multiplicity2. Counter preserves both registrations. This is not301 unique tests.",
+    "Historical55 includes a separate12-case output-ownership corpus which was not run here. Old76-batch and historical41/55/53 equality are not asserted. Combined with separate25 S7 registrations this is68 registrations and67 file/title pairs, not an undifferentiated unique-test claim.",
+    "Actual local fixed Node scripts, SHA content pins and synthetic adapter observation fields establish local runner contracts only. No authenticated external comparator, genuine inference, performance superiority, full signatures, cold signed SQLite/history authority, OS sandbox or universal credential absence follows.",
+    "Observed fixed finite commands do not establish arbitrary descendants, universal child ABI/streams/effects, delivery/worker exit-code truth, all-fixture retention or arbitrary hard-kill recovery. No controller force-signal to detached target/oracle groups is recorded or added.",
+    "Normal Git/base freeze and required duplicate1269/dead-code2751 quality prerequisites remain unwaived. A nongit private copy is not real freeze qualification. No installed package, fullsuite, coverage, Node24, hosted, G0, release, formal Done, tracker or dependency closure is claimed."
+  ],
+  "operations": {
+    "readOnlyFilesystemJSONHashStat": true,
+    "sourceAndDiffTextReads": true,
+    "productImports": 0,
+    "sourceParsersTypechecks": 0,
+    "testsOrFingerprints": 0,
+    "nativeLoads": 0,
+    "processEnumerationOrSignals": 0,
+    "network": 0,
+    "GitCommands": 0,
+    "sourceOrPriorArtifactWrites": 0,
+    "writes": "Only this new write-once actual review JSON/Markdown pair."
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.json",
+      "bytes": 72597,
+      "sha256": "de1a9ea9b169e10c44cc3e827c48b09a131191a2448b77744f3c8fc7ba04f3cb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.md",
+      "bytes": 1802,
+      "sha256": "afcc128b76fdcc594ddb2236fda60e02bf0700027e71ecb2046f4ca5a1c2a536"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-proposal-20261015/controller-v2.py",
+      "bytes": 34118,
+      "sha256": "7872b0ea9b7a26f60e4b0418911be36f82bab6d5961b2e95c69cb2c28e82982a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-proposal-20261015/detached-spawn-observer.mjs",
+      "bytes": 9305,
+      "sha256": "3af3456dc6a2302b1ce076c26a0c680430440a3dceb9033481248aa742715537"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-proposal-20261015/observer-reporter.mjs",
+      "bytes": 2122,
+      "sha256": "a9e991c18cac8ea3117d4b2733332fac26a9bad3f0c1564a42c95b7ecf298498"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-proposal-20261015/fixed-script-allowlist.json",
+      "bytes": 10517,
+      "sha256": "b3df21f36227371093606abd91a2b7809fb49da4e02bf852fa9ebca3645877ff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-proposal-20261015/runtime-input-pins-v2.json",
+      "bytes": 5959,
+      "sha256": "9aa390dd8a44f0e5a1d0bb00b2422172c4b379f3d3a5f59cbd7f4f25155062f2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-proposal-20261015/assertion-rendering-input-pins-v2.json",
+      "bytes": 1215,
+      "sha256": "702358a25825c1fcda16190e1c15030bec7dbfb28382fc070b75fe50cd365b6e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-proposal-20261015/source-input-pins.json",
+      "bytes": 4985,
+      "sha256": "668c2677416483b25c34348fb380c743d5f8987f8856a3daa1bade0005c6c5f1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-proposal-20261015/setup-v2-artifact-index.json",
+      "bytes": 1083365,
+      "sha256": "b43f19434b7d41aafe3909a1b0638665f330b6f1a49c82aa41003969e28d926d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/runtime-release-pins-v2.json",
+      "bytes": 1171610,
+      "sha256": "b6e6d7e35a18817d7260eccae5ef0e84f680a5b9269936f51caef95c7577ac26"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/root-late-predecessor-closures-v2.json",
+      "bytes": 1062,
+      "sha256": "243b234bc7c0e0724e9247a4256c71334f699f4e34c0039a498da5792c7ec6ff"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/full-closure-prepared.json",
+      "bytes": 1399777,
+      "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/control-sequence-v2-complete.json",
+      "bytes": 186,
+      "sha256": "ce0987c88f7fa3a43502d549b0572cc1610cb09891ed622a82bcaf7098697100"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/setup-v2.json",
+      "bytes": 3862,
+      "sha256": "f7fdd6febdb68767b2b17220b208e37304bb07f285cb9656d129724676d4641a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-proposal-20261015/proposal-v2.json",
+      "bytes": 18708,
+      "sha256": "5128a074ea322c23d7e3121f92c57faf8a9fecc453bc7fbc6902540a48272d78"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/root-runtime-release-v2.json",
+      "bytes": 5186,
+      "sha256": "5d5b3426b8ec90e586e04d00213cc2a021fde220a86c37f7b35312b0360deea7"
+    },
+    {
+      "path": "/private/tmp/p0-30-1518-control-sequence-20261015.py",
+      "bytes": 3465,
+      "sha256": "57a7004b6d1b2abb8e85b89a404c74bd4e5b037c1768f3d385f16bc4c5d02909"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/control-sequence-v2.jsonl",
+      "bytes": 1897,
+      "sha256": "e9ecf3ef18d4b7af9d367194a01cb349e83c5f5edf16830df878d01e6ecfe75b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 20776,
+      "sha256": "884a9ab689f09e5faf2bccc4455869b5c1eeaa7ee418dc4e1c417b874a709bd8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/root-final-readonly-preservation-v2.json",
+      "bytes": 1657,
+      "sha256": "bb43c3c3acb0dbce59171b4956bff978acda12d2879152cae8545da71e85fcdc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/runtime-artifact-index-v2.json",
+      "bytes": 1257275,
+      "sha256": "7f09dcf59529480ff4402104666944ee3491fbf598230423dbda6ae4eb9e9e62"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/original43-baseline/command.json",
+      "bytes": 2993,
+      "sha256": "a82f99d7b645bb3aed6495f51725c82f82e9b07aff2803767af5cc5f50173a57"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/original43-baseline/summary.json",
+      "bytes": 22199,
+      "sha256": "dcaa8d05bfce08e80b9d5145dc98c530d08b56c1f8a08b18b19ee79088d99dbb"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/original43-baseline/raw-tests.json",
+      "bytes": 16469,
+      "sha256": "77e7f7b3bb5c04cc073c3a12afc2d47a8959f080116e14390a6267bbfce42fd5"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/original43-baseline/runtime-observer.json",
+      "bytes": 22190,
+      "sha256": "1f284d5512ed595b43abb0177e7bfa34c8353238c1472e8af3056310bd6cd43e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/original43-baseline/detached-observation.json",
+      "bytes": 126270,
+      "sha256": "0b2eb8dbbb0b1f0a6869c29940f2be1e087f2db414cf943309937eb0de7799ba"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/original43-baseline/runtime-resolved.json",
+      "bytes": 1154,
+      "sha256": "74c8bf7c3cec79db99176e17178096dba4d3426536bddf9e57bac63fd2914b9b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-baseline/command.json",
+      "bytes": 3233,
+      "sha256": "20e36d72b787343a80dcee084893ea7973d32592c40799b4044154b02d79ce75"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-baseline/summary.json",
+      "bytes": 22319,
+      "sha256": "eba88257179e8e755053cec52a049d828294b2465d8b38fe4b88979a6535ee21"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-baseline/raw-tests.json",
+      "bytes": 16469,
+      "sha256": "aa0bf91d9287a140985f0506a400d64d02b53528fdf31cf686fa2d7ed5bfb186"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-baseline/runtime-observer.json",
+      "bytes": 22190,
+      "sha256": "7a5e4ca3d8c1a62e57e89f903d09b944208148122e3fd9ae11399aae939eb390"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-baseline/detached-observation.json",
+      "bytes": 131790,
+      "sha256": "f51d1dbe4e8955447fd1bc3ff593664529de2c9b3ba8924f16972d13fa7d1eb3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-baseline/runtime-resolved.json",
+      "bytes": 1250,
+      "sha256": "476e26a147bb4b38e3aab9892f7134e8ef5e9ba65e92acdf8f170cb7cba70296"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-mutant/command.json",
+      "bytes": 3218,
+      "sha256": "34e235ddb959ab407f278bf4c1b78f947a8f62449c5c49134c060e0b505e1279"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-mutant/summary.json",
+      "bytes": 27016,
+      "sha256": "bf9a33813e83539842b45c8983f29dfbd1a922a7b7e960a73917da882bebef0a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-mutant/raw-tests.json",
+      "bytes": 19081,
+      "sha256": "46e2bc481578b1b1385f9356619b0a948e3cf22c78bb7876b3db3b1d76a7a25c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-mutant/runtime-observer.json",
+      "bytes": 68892,
+      "sha256": "a1ffff26936bdfcf73dadb621bad2689ca5851afd3bf482c29e759002789eb4f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-mutant/detached-observation.json",
+      "bytes": 146171,
+      "sha256": "9eba1ef4c798dfb04a79aedaeeac8742c05b1a7dfa50a00259a8fb3e9c393df3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-mutant/runtime-resolved.json",
+      "bytes": 1242,
+      "sha256": "c0adc6cfa65f67fc98817d358cd94e2110875ffe8ad623c28af7daf805ae020b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-restored/command.json",
+      "bytes": 3233,
+      "sha256": "1b5ffa0282347eacf693897fdeeca5facc947544471bd078ecda8c2da8543b53"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-restored/summary.json",
+      "bytes": 22311,
+      "sha256": "a19b7e70c13c177882c4dde3b58910fd247c8b8239eb02b466a1d248c210ff99"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-restored/raw-tests.json",
+      "bytes": 16461,
+      "sha256": "a08596a6a6247583359d92dcb33ad69020c445afd25015253f79e7a497828069"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-restored/runtime-observer.json",
+      "bytes": 22190,
+      "sha256": "bb53d2f14d7accd40afef5d556d195543da411399189b492c13e48a7dc7307fe"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-restored/detached-observation.json",
+      "bytes": 131790,
+      "sha256": "b91b0d8ccfea012c2d072a56d81d3a44d72113229c1cfd6c5e322795d8c48ab1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M24-harness-secret-manifest-112-restored/runtime-resolved.json",
+      "bytes": 1250,
+      "sha256": "c176b88092689564baa9f629f086568e6bc86d8977864685a55298f53788aedd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-baseline/command.json",
+      "bytes": 3223,
+      "sha256": "0a2bf6fd9fed011e62077987f0aea890d020b30bd845e6ba10163ec8b24717ad"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-baseline/summary.json",
+      "bytes": 22327,
+      "sha256": "f25bea4e74716ac70a6154f1417216d64dfe6dfb088db818f32c3c8deb17fdaa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-baseline/raw-tests.json",
+      "bytes": 16482,
+      "sha256": "5c641fb42ff8cdf88764b0c18399324138ecf140cab6f2fb72dd68b9243ac791"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-baseline/runtime-observer.json",
+      "bytes": 22190,
+      "sha256": "2beeec73248efb7d5b489931bf2b9dee4125ffe7694de5e8bd0693222204835a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-baseline/detached-observation.json",
+      "bytes": 131560,
+      "sha256": "ad4d97bc0b438a5079ab366f094606425ccb4e648c88290de449f2df7bbe1f41"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-baseline/runtime-resolved.json",
+      "bytes": 1246,
+      "sha256": "1b944988addd219f4e08a7392ff7037b0d9898ffa242e2547624f14844cec3f4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-mutant/command.json",
+      "bytes": 3207,
+      "sha256": "5fc040dbf80ce3d836c5cbac3abe37a85d6e5f148f71c2ea9c53a0e9701cc620"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-mutant/summary.json",
+      "bytes": 24269,
+      "sha256": "cdc83a7444b7f22b70b1540fefd7b37468e9d05467e0fa4e3845b47568e00e3a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-mutant/raw-tests.json",
+      "bytes": 17414,
+      "sha256": "1dd6dc2516eeda55f49848f6dfdf3ae7733798d6628a835ad1447d83955f7e8c"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-mutant/runtime-observer.json",
+      "bytes": 24186,
+      "sha256": "6ef7839cc677dc0306dbfae4c773339e9ceb19f2b8c4a17fd57761eba71e02ae"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-mutant/detached-observation.json",
+      "bytes": 131100,
+      "sha256": "34e3bf6e0e2ab08f7a89357e4b862632afd571f3ed124aad89a57afc73455608"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-mutant/runtime-resolved.json",
+      "bytes": 1238,
+      "sha256": "84c3e855addb505909cc3ace096969d4a673adcf13d006a401a6e06f0e4feab2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-restored/command.json",
+      "bytes": 3223,
+      "sha256": "ec1461fac9301e239ebf74573aa26f1971c1139c77435b75a73516616ef35a31"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-restored/summary.json",
+      "bytes": 22322,
+      "sha256": "dd74189d91e018e72b3966bfbdef72bf1f150b7614a175f080ddff9b5c02ec38"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-restored/raw-tests.json",
+      "bytes": 16476,
+      "sha256": "6976504e07521548cef1bb72243464b2dddede5a0530dcf928c15713e0f0463b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-restored/runtime-observer.json",
+      "bytes": 22190,
+      "sha256": "df5bbc7b2a855cf87bd74a6eb6cc254a972b292f14449f898feedaa5a4904871"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-restored/detached-observation.json",
+      "bytes": 131560,
+      "sha256": "6be854b5ee7ce2d1aac392d12da3de86beee9f13223898864c8245448d5c67fc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/phases/S7-M25-harness-fixture-tamper-248-restored/runtime-resolved.json",
+      "bytes": 1246,
+      "sha256": "bd968be628060108b7891189821973699692bba0d45d172b5c48c542e1147ab8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/S7-M24-harness-secret-manifest-112-matrix.json",
+      "bytes": 77178,
+      "sha256": "1bdf176c9a9d528c55bd2e7dae9cf5a757f287ef8f9e862e1dd60dade47c7fc3"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/S7-M24-harness-secret-manifest-112-source-change.json",
+      "bytes": 2005,
+      "sha256": "05d63541886de3373445999579a91a70cf185e3887489706c2cc3a1c95c5ae7e"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/S7-M25-harness-fixture-tamper-248-matrix.json",
+      "bytes": 74349,
+      "sha256": "1ea0540d643dc2dc2ee0419b84d87a49f8008ba135bbad06074ecac2c25b4357"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015/S7-M25-harness-fixture-tamper-248-source-change.json",
+      "bytes": 1941,
+      "sha256": "251b5b7cb7abe3a7d84c9edef7cf77b2eb3fea8f4efc36656f40b9d45f4d70d6"
+    }
+  ],
+  "capturedUtc": "2026-10-15T04:24:06.074155+00:00",
+  "allReadsFinishedUtc": "2026-10-15T04:24:06.074155+00:00"
+}

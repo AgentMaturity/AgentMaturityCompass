@@ -1,0 +1,300 @@
+
+ RUN  v4.1.11 /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-to2oNk/checkout
+
+stdout | tests/diagnostic/levelCumulative.test.ts > P1-07 cumulative gate graphs (synthetic inputs) > a later passing L3 cannot skip failed L2; the contiguous graph still has a positive
+AMC_P107_SYNTHETIC_GRAPH {"gap":{"level":1,"perLevel":[{"pass":true,"matchedEventIds":["synthetic-audit-0","synthetic-audit-1","synthetic-audit-2","synthetic-audit-3"],"reason":"gate level 1 satisfied","distinctSessions":2,"distinctDays":2,"level":1,"status":"pass"},{"pass":false,"matchedEventIds":[],"reason":"not evaluated at gate 2: L2 evidence map names unregistered or inadmissible emitters: tool-call-denied","distinctSessions":0,"distinctDays":0,"level":2,"status":"not_evaluated"},{"pass":true,"matchedEventIds":[],"reason":"gate level 3 satisfied","distinctSessions":0,"distinctDays":0,"level":3,"status":"pass"}]},"contiguous":{"level":1,"perLevel":[{"pass":true,"matchedEventIds":["synthetic-audit-0","synthetic-audit-2"],"reason":"gate level 1 satisfied","distinctSessions":2,"distinctDays":2,"level":1,"status":"pass"},{"pass":false,"matchedEventIds":[],"reason":"not evaluated at gate 2: L2 evidence map names unregistered or inadmissible emitters: tool-call-denied","distinctSessions":0,"distinctDays":0,"level":2,"status":"not_evaluated"},{"pass":true,"matchedEventIds":[],"reason":"gate level 3 satisfied","distinctSessions":0,"distinctDays":0,"level":3,"status":"pass"}]}}
+
+stdout | tests/diagnostic/levelCumulative.test.ts > P1-07 canonical map with synthetic unverified parser-built rows > independent allowed and denied literals across two synthetic days and sessions reach only L2
+AMC_P107_CANONICAL_PARSER_INPUT {"inputIds":["synthetic-audit-0","synthetic-audit-1","synthetic-audit-2","synthetic-audit-3"],"result":{"level":1,"perLevel":[{"pass":true,"matchedEventIds":[],"reason":"gate level 0 satisfied","distinctSessions":0,"distinctDays":0,"level":0,"status":"pass"},{"pass":true,"matchedEventIds":["synthetic-audit-0","synthetic-audit-2"],"reason":"gate level 1 satisfied","distinctSessions":2,"distinctDays":2,"level":1,"status":"pass"},{"pass":false,"matchedEventIds":[],"reason":"not evaluated at gate 2: L2 evidence map names unregistered or inadmissible emitters: tool-call-denied","distinctSessions":0,"distinctDays":0,"level":2,"status":"not_evaluated"},{"pass":false,"matchedEventIds":[],"reason":"not evaluated at gate 3: L3 not evaluable on runtime evidence: needs tool-interface reconstruction, per-step scope decisions and status-aware validation metrics","distinctSessions":0,"distinctDays":0,"level":3,"status":"not_evaluated"},{"pass":false,"matchedEventIds":[],"reason":"not evaluated at gate 4: L4 needs continuity, anchoring (P1-25, P1-26) and a sampling record; no registered emitter produces them yet","distinctSessions":0,"distinctDays":0,"level":4,"status":"not_evaluated"},{"pass":false,"matchedEventIds":[],"reason":"not evaluated at gate 5: L5 needs a scoped attestation signed by a key with purpose attestation in the pinned trust list (P0-09, P3-04); no registry issues one yet","distinctSessions":0,"distinctDays":0,"level":5,"status":"not_evaluated"}]}}
+
+ ✓ tests/diagnostic/fullDiagnostic.test.ts (12 tests) 20ms
+ ✓ tests/diagnosticQuestions7x.test.ts (56 tests) 27ms
+ ❯ tests/diagnostic/levelCumulative.test.ts (12 tests | 7 failed) 30ms
+     × a later passing L3 cannot skip failed L2; the contiguous graph still has a positive 6ms
+     × gate levels rather than array positions determine the contiguous result 1ms
+     × a missing lower gate stops advancement although later gates were evaluated 1ms
+     ✓ duplicate level declarations are refused 0ms
+     ✓ not_evaluated below a passing later gate stops the contiguous level 0ms
+     × independent allowed and denied literals across two synthetic days and sessions reach only L2 0ms
+     × missing denied evidence and independent session or day minima remain failures 1ms
+     × map binding ignores writer-selected tags above L1 and preserves a valid taggedRows index 0ms
+     ✓ trimmed duplicate question tags bind one supplied event once 0ms
+     ✓ canonical higher levels stay not_evaluated without inventing runtime emitters 11ms
+     × self-reported import and keyword input can earn L1 but cannot create higher map evidence 1ms
+     ✓ manual and dogfood audit lookalikes never become registered runtime support 0ms
+ ✓ tests/diagnostic/quickscoreShare.test.ts (8 tests) 38ms
+ ✓ tests/questionBank.test.ts (3 tests) 74ms
+stdout | tests/diagnostic/evidenceEmitterRegistry.test.ts > P1-07 emitter registry finite correspondence > the registry excludes seeder modules and synthetic claims and caps importers at L1
+AMC_P107_REGISTRY_EXCLUSIONS {"seeders":[],"synthetic":[]}
+
+ ❯ tests/diagnostic/evidenceEmitterRegistry.test.ts (9 tests | 1 failed) 13ms
+     × registered IDs are unique and keep both canonical tool-decision anchors 4ms
+     ✓ the registry excludes seeder modules and synthetic claims and caps importers at L1 1ms
+     ✓ every current module contains its exact quoted literal in this physical checkout 2ms
+     ✓ observed admission needs the exact shape, runtime producer and effective tier 0ms
+     ✓ import admission requires import provenance, matching metric key and SELF_REPORTED 0ms
+     ✓ requiresMeta means own-property presence without claiming delegation-scope validation 0ms
+     ✓ unknown audit shapes refuse while broad stdout admission does not authenticate a unique writer 0ms
+     ✓ known manual/import/dogfood and unbound ATTESTED markers cannot impersonate observed tool receipts 0ms
+     ✓ missing or unknown source defaults to runtime, and parsed import tests remain self-reported 0ms
+ ❯ tests/liveEvidenceProjection.test.ts (16 tests | 1 failed) 16ms
+     ✓ binds no unknown question id 1ms
+     ✓ every rule's OWN evidence can clear a gate of every question it binds 1ms
+     ✓ cannot reach L4 or L5 on harness evidence alone 0ms
+     ✓ binds an allowed call to the audit-trail and efficiency questions 0ms
+     ✓ evidences nothing for a guard the workspace does not compose 0ms
+     ✓ binds a PERMITTED call to the control that evaluated it 0ms
+     ✓ binds a denial to the question whose gate hint names that receipt 0ms
+     ✓ projects nothing for a deferred question, however the call goes 0ms
+     ✓ binds an unknown guard to nothing beyond the universal rules 0ms
+     ✓ returns each question at most once for one call 0ms
+     ✓ is deterministic and order-stable for the same call 0ms
+     ✓ carries a version, because the binding is a methodology claim 0ms
+     ✓ one run on one day reaches L1 and no further 1ms
+     ✓ L3 is not evaluated on the evidence the harness produces 0ms
+     ✓ never reaches L4 or L5, however much traffic there is 3ms
+     × L2 is evaluated only where an evidence map names an observed emitter 4ms
+ ✓ tests/spineEvidenceProjection.test.ts (9 tests) 9ms
+ ✓ tests/diagnosticResponseScoringParity.test.ts (791 tests) 93ms
+ ✓ tests/diagnostic/traceEvidenceMapper.test.ts (6 tests) 7ms
+stderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend another question's evidence at L0-L2
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L2).
+
+stderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend it at L3+ either, which was already true
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L4).
+
+stderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > cannot be turned off any more (P1-07)
+STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level
+
+ ✓ tests/evidenceGatingCorrection.test.ts (12 tests) 8ms
+ ✓ tests/antiGaming.test.ts (17 tests) 12ms
+ ✓ tests/diagnosticReportStatus.test.ts (7 tests) 38ms
+stdout | tests/diagnostic/runtimeEvidenceEndToEnd.test.ts > binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates
+PUBLIC_EVIDENCE /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p107-native-evidence-8AXR56/public-evidence.json
+
+ ✓ tests/publicMethodology.test.ts (4 tests) 413ms
+     ✓ binds the methodology manifest into diagnostic reports and markdown  327ms
+ ❯ tests/diagnostic/runtimeEvidenceEndToEnd.test.ts (1 test | 1 failed) 456ms
+   × binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates 452ms
+ ✓ tests/diagnosticReportProvenance.test.ts (4 tests) 941ms
+     ✓ rejects a report sealed by a DIFFERENT workspace's keys  331ms
+ ✓ tests/diagnosticAssuranceCoverage.test.ts (4 tests) 1297ms
+     ✓ resolveRunReport supports latest and unique run ID prefixes  351ms
+     ✓ assurance run verifies, patch history is tracked, and indices render markdown  400ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 10 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/liveEvidenceProjection.test.ts > what live scoring can honestly claim > L2 is evaluated only where an evidence map names an observed emitter
+AssertionError: expected [ 'AMC-2.15', 'AMC-OPDISC-6', …(1) ] to deeply equal [ 'AMC-2.15', 'AMC-5.29', …(2) ]
+
+- Expected
++ Received
+
+  [
+    "AMC-2.15",
+-   "AMC-5.29",
+    "AMC-OPDISC-6",
+    "AMC-SCI-2",
+  ]
+
+ ❯ tests/liveEvidenceProjection.test.ts:292:47
+    290|     const evaluated = questionBank.filter((q) => !q.gates[2]!.notEvalu…
+    291|
+    292|     expect(evaluated.map((q) => q.id).sort()).toEqual(["AMC-2.15", "AM…
+       |                                               ^
+    293|     for (const question of evaluated) {
+    294|       expect(question.gates[2]!.acceptedTrustTiers, question.id).toEqu…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/10]⎯
+
+ FAIL  tests/diagnostic/evidenceEmitterRegistry.test.ts > P1-07 emitter registry finite correspondence > registered IDs are unique and keep both canonical tool-decision anchors
+AssertionError: expected [ 'tool-call-allowed', …(9) ] to include 'tool-call-denied'
+ ❯ tests/diagnostic/evidenceEmitterRegistry.test.ts:28:61
+     26|     expect(ids.length).toBeGreaterThan(0); expect(ids.every(id => id.t…
+     27|     expect(new Set(ids).size).toBe(ids.length);
+     28|     expect(ids).toContain("tool-call-allowed"); expect(ids).toContain(…
+       |                                                             ^
+     29|   });
+     30|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/10]⎯
+
+ FAIL  tests/diagnostic/levelCumulative.test.ts > P1-07 cumulative gate graphs (synthetic inputs) > a later passing L3 cannot skip failed L2; the contiguous graph still has a positive
+AssertionError: expected [ [ 1, 'pass' ], …(2) ] to deeply equal [ [ 1, 'pass' ], [ 2, 'fail' ], …(1) ]
+
+- Expected
++ Received
+
+@@ -3,11 +3,11 @@
+      1,
+      "pass",
+    ],
+    [
+      2,
+-     "fail",
++     "not_evaluated",
+    ],
+    [
+      3,
+      "pass",
+    ],
+
+ ❯ tests/diagnostic/levelCumulative.test.ts:52:27
+     50|     const contiguous = evaluateLevels(graph, auditRows());
+     51|     console.log("AMC_P107_SYNTHETIC_GRAPH " + JSON.stringify({ gap, co…
+     52|     expect(statuses(gap)).toEqual([[1, "pass"], [2, "fail"], [3, "pass…
+       |                           ^
+     53|     expect(statuses(contiguous)).toEqual([[1, "pass"], [2, "pass"], [3…
+     54|     expect(contiguous.level).toBe(3);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/10]⎯
+
+ FAIL  tests/diagnostic/levelCumulative.test.ts > P1-07 cumulative gate graphs (synthetic inputs) > gate levels rather than array positions determine the contiguous result
+AssertionError: expected 1 to be 3 // Object.is equality
+
+- Expected
++ Received
+
+- 3
++ 1
+
+ ❯ tests/diagnostic/levelCumulative.test.ts:62:50
+     60|     const shuffled = { id: graph.id, gates: [gateAt(graph.gates, 3), g…
+     61|     expect(evaluateLevels(shuffled, rows)).toEqual(evaluateLevels(grap…
+     62|     expect(evaluateLevels(shuffled, rows).level).toBe(3);
+       |                                                  ^
+     63|   });
+     64|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/10]⎯
+
+ FAIL  tests/diagnostic/levelCumulative.test.ts > P1-07 cumulative gate graphs (synthetic inputs) > a missing lower gate stops advancement although later gates were evaluated
+AssertionError: expected [ [ 2, 'not_evaluated' ], …(1) ] to deeply equal [ [ 2, 'pass' ], [ 3, 'pass' ] ]
+
+- Expected
++ Received
+
+@@ -1,9 +1,9 @@
+  [
+    [
+      2,
+-     "pass",
++     "not_evaluated",
+    ],
+    [
+      3,
+      "pass",
+    ],
+
+ ❯ tests/diagnostic/levelCumulative.test.ts:69:28
+     67|     const noL1 = evaluateLevels({ id: graph.id, gates: graph.gates.fil…
+     68|     const noL2 = evaluateLevels({ id: graph.id, gates: graph.gates.fil…
+     69|     expect(statuses(noL1)).toEqual([[2, "pass"], [3, "pass"]]);
+       |                            ^
+     70|     expect(statuses(noL2)).toEqual([[1, "pass"], [3, "pass"]]);
+     71|     expect(noL1.level).toBe(0); expect(noL2.level).toBe(1);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/10]⎯
+
+ FAIL  tests/diagnostic/levelCumulative.test.ts > P1-07 canonical map with synthetic unverified parser-built rows > independent allowed and denied literals across two synthetic days and sessions reach only L2
+AssertionError: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/diagnostic/levelCumulative.test.ts:95:26
+     93|     console.log("AMC_P107_CANONICAL_PARSER_INPUT " + JSON.stringify({ …
+     94|     // First denied-entry-removal witness. This is a synthetic parser …
+     95|     expect(result.level).toBe(2);
+       |                          ^
+     96|     expect(statuses(result)).toEqual([[0, "pass"], [1, "pass"], [2, "p…
+     97|     expect(result.perLevel.find(row => row.level === 2)?.matchedEventI…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/10]⎯
+
+ FAIL  tests/diagnostic/levelCumulative.test.ts > P1-07 canonical map with synthetic unverified parser-built rows > missing denied evidence and independent session or day minima remain failures
+AssertionError: no denied: expected 'not_evaluated' to be 'fail' // Object.is equality
+
+Expected: "fail"
+Received: "not_evaluated"
+
+ ❯ tests/diagnostic/levelCumulative.test.ts:109:95
+    107|     for (const candidate of candidates) {
+    108|       expect(candidate.result.level, candidate.label).toBe(1);
+    109|       expect(candidate.result.perLevel.find(row => row.level === 2)?.s…
+       |                                                                                               ^
+    110|       expect(candidate.result.perLevel.find(row => row.level === 2)?.r…
+    111|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/10]⎯
+
+ FAIL  tests/diagnostic/levelCumulative.test.ts > P1-07 canonical map with synthetic unverified parser-built rows > map binding ignores writer-selected tags above L1 and preserves a valid taggedRows index
+AssertionError: expected 1 to be 2 // Object.is equality
+
+- Expected
++ Received
+
+- 2
++ 1
+
+ ❯ tests/diagnostic/levelCumulative.test.ts:116:56
+    114|   test("map binding ignores writer-selected tags above L1 and preserve…
+    115|     const untagged = auditRows(), retagged = auditRows({ meta: { quest…
+    116|     expect(evaluateLevels(question(), untagged).level).toBe(2);
+       |                                                        ^
+    117|     expect(evaluateLevels(question(), retagged).level).toBe(2);
+    118|     expect(evaluateLevels(question(), retagged, [])).toEqual(evaluateL…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/10]⎯
+
+ FAIL  tests/diagnostic/levelCumulative.test.ts > P1-07 canonical map with synthetic unverified parser-built rows > self-reported import and keyword input can earn L1 but cannot create higher map evidence
+AssertionError: expected 'not_evaluated' to be 'fail' // Object.is equality
+
+Expected: "fail"
+Received: "not_evaluated"
+
+ ❯ tests/diagnostic/levelCumulative.test.ts:157:68
+    155|       const result = evaluateLevels(question(), input);
+    156|       expect(result.level).toBe(1);
+    157|       expect(result.perLevel.find(row => row.level === 2)?.status).toB…
+       |                                                                    ^
+    158|       expect(result.perLevel.find(row => row.level === 3)?.status).toB…
+    159|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/10]⎯
+
+ FAIL  tests/diagnostic/runtimeEvidenceEndToEnd.test.ts > binds real allowed and denied native reads from two sealed sessions to the shipped AMC-5.29 gates
+AssertionError: expected [] to deeply equal [ …(4) ]
+
+- Expected
++ Received
+
+- [
+-   "760b2436-8383-4c66-96ce-3b2ca5071e50",
+-   "b943759c-5109-43cd-ad15-a8d80419ce02",
+-   "bd6d56b6-2ef1-4ecc-8fa6-8256d587b0e4",
+-   "f7145793-53c4-4dfa-b7ec-e4156c355353",
+- ]
++ []
+
+ ❯ tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:364:55
+    362|       expect(admission.filter((row) => row.auditType === "TOOL_CALL_DE…
+    363|       // First gate-mapping witness: exact independently selected nati…
+    364|       expect([...(l2?.matchedEventIds ?? [])].sort()).toEqual(audits.m…
+       |                                                       ^
+    365|       expect(admission.every((row) => row.emitterAdmitted && row.regis…
+    366|       expect(l1?.status).toBe("pass");
+ ❯ tests/diagnostic/runtimeEvidenceEndToEnd.test.ts:182:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/10]⎯
+
+
+ Test Files  4 failed | 13 passed (17)
+      Tests  10 failed | 961 passed (971)
+   Start at  23:46:01
+   Duration  4.35s (transform 13.93s, setup 441ms, import 22.45s, tests 3.49s, environment 1ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p107-m3.raw.json

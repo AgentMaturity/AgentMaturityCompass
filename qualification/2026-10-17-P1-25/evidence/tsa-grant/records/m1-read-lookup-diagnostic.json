@@ -1,0 +1,10 @@
+{
+  "at": "2026-10-16T22:58:23.264165+00:00",
+  "operation": "Read-only m1 tail lookup after printing all task errors/source frames/live patch",
+  "error": "KeyError: 'log'",
+  "cause": "Outcome command is a compact command view; actual log path is in frozen command.json.",
+  "sourceControlStateUnchanged": true,
+  "correctedRead": "Actual frozen command record log read in full now.",
+  "noRetrySignalRestoreOrQualificationCreditFromFailedRead": true,
+  "controlsMayContinueAfterActualFailureClassification": true
+}

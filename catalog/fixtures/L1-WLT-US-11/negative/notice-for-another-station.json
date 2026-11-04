@@ -1,0 +1,21 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L1-WLT-US-11",
+  "polarity": "negative",
+  "evidenceClass": "violation",
+  "setup": {
+    "harness": "incident_clocks",
+    "station": "health",
+    "events": [
+      {
+        "kind": "NOTIFIED",
+        "clock": "nydfs-500-17-notice",
+        "atHours": 1
+      }
+    ]
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "unknown_clock"
+  }
+}

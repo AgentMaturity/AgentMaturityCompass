@@ -1,0 +1,62 @@
+# Draft tracking only. This is not a signed review record or an admission result.
+station: governance
+packId: overlay.governance
+support: experimental
+review: pending
+promotion: none
+statusNote: "none — experimental, unreviewed"
+experts:
+  publicSectorAiGovernance: null
+  legalEthics: null
+  defenseCompliance: null
+partners:
+  governance.public-services: null
+  governance.law-rights-democracy: null
+  governance.defense: null
+sidPromotionDecision: null
+stewardship:
+  owner: null
+  funding: null
+  triageTargetDays: null
+  coverageDoc: docs/catalog/governance/README.md
+criteria:
+  - id: 1
+    name: Manifest and reproducible digest
+    status: not_evaluated
+    reason: Await the item-qualified catalog and admission evidence; this draft records no checker result.
+  - id: 2
+    name: Citations and legal review
+    status: not_met
+    reason: Primary texts were not read in this item and no independent legal reviewer or verified retrieval is supplied.
+  - id: 3
+    name: Applicability
+    status: not_evaluated
+    reason: Current taxonomy is used; mechanical predicate validation awaits the item checks and applicability remains an asserted scope.
+  - id: 4
+    name: Binding
+    status: not_evaluated
+    reason: Local fixtures do not establish live decision, activation, filing, routing or egress interception.
+  - id: 5
+    name: Tests
+    status: not_evaluated
+    reason: The final receipt must record actual fixture execution; no pass is inferred here.
+  - id: 6
+    name: Negative fixtures
+    status: not_evaluated
+    reason: Every required negative class needs its recorded execution and zero false passes.
+  - id: 7
+    name: Evidence contracts
+    status: not_evaluated
+    reason: A declared contract is not evidence that a deployment produced and bound the required observations.
+  - id: 8
+    name: Unknown facts fail closed
+    status: not_evaluated
+    reason: Unknown-fact compiler and evaluator results require the current source-qualified checks.
+  - id: 9
+    name: Independent human sign-offs
+    status: not_met
+    reason: D-14 has not named the three expert reviewers; no distinct human domain, legal and risk-owner sign-offs exist.
+  - id: 10
+    name: Partner and stewardship
+    status: not_met
+    reason: P1-29 has not supplied a partner per domain; owner, funding and triage commitments remain open.

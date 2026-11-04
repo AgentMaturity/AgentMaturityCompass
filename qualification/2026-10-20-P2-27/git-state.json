@@ -1,0 +1,61 @@
+{
+  "at": "2026-10-20T04:52:38.690383+00:00",
+  "head": "b2b512513eba8799b9050dbe13d178bfe448acef",
+  "branch": "codex/p2-27-solo-final",
+  "baseInt": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+  "statusPorcelain": " M CONTRIBUTING.md\n M README.md\n M docs/content/reddit-launch-drafts.md\n M docs/content/show-hn-draft.md\n M docs/internal/competitive-landscape.md\n M docs/internal/mirofish-simulation-council.md\n M website/i18n.js\n M website/index.html\n M website/lite.html\n M whitepaper/AMC_WHITEPAPER_v1.md\n",
+  "workingTreeLiterallyClean": false,
+  "allowedDifferences": "Exactly ten generated-count outputs regenerated to1884testfiles, deliberately uncommitted per brief; neither hidden nor discarded.",
+  "generatedCounts": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/CONTRIBUTING.md",
+      "sha256": "28f7784c52bd3c49e61814af75ea8ae8c78d6602804c7bb175086d4d9bf05427",
+      "bytes": 19504
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/README.md",
+      "sha256": "f27d616ba2a4e53c43fb9bd26cbcd245eb48a775f564606cb1cceacaf53c0e26",
+      "bytes": 63199
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/docs/content/reddit-launch-drafts.md",
+      "sha256": "57728d2e7573ab0213c1dc007a19e8c0dda4611d167c872d94c17df8040d73a0",
+      "bytes": 3075
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/docs/content/show-hn-draft.md",
+      "sha256": "946e1ba190aa415c533619454933ad2cbea51d8042bad6a21b7205f16c77811d",
+      "bytes": 1951
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/docs/internal/competitive-landscape.md",
+      "sha256": "39d978e7ccce3d371d3739f78df36a8fe61343ae7652f66d27de637e7d6817af",
+      "bytes": 3880
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/docs/internal/mirofish-simulation-council.md",
+      "sha256": "a66c360447c22c1f7b90e14acd578d0d41a2c81505e3a8e2e9bebe2b0fd779e0",
+      "bytes": 2489
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/website/i18n.js",
+      "sha256": "0713643d7434e8e9e0a29886cbf213ac95e46ff2ebf391c06be0fa64f0d3bb40",
+      "bytes": 44169
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/website/index.html",
+      "sha256": "9eccb1b8c354f67c3cc5461976f482a037ec7fbf3124d85ace9430dbd0c2cc17",
+      "bytes": 44277
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/website/lite.html",
+      "sha256": "50a8a7ed22dbd80653f7ecc8ac577c0afb6767f856e3858ebefb85041e6ea1b2",
+      "bytes": 11197
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-solo-20261020/whitepaper/AMC_WHITEPAPER_v1.md",
+      "sha256": "cffac1e70e679c3d596e2ee0b40192a5f1fb65f3b4101795a766de6ee807ecca",
+      "bytes": 108269
+    }
+  ]
+}

@@ -22,6 +22,8 @@
 export type SandboxBackendKind = "seatbelt" | "landlock" | "bwrap" | "none";
 
 export interface SandboxPolicy {
+  /** Already-scrubbed process output for an owning bounded job collector. */
+  readonly onOutput?: (stream: "stdout" | "stderr", text: string) => void;
   /**
    * Directories the command may write to. Everything else is read-only.
    *
@@ -47,6 +49,8 @@ export interface SandboxPolicy {
   readonly maxProcesses?: number;
   /** Receives every egress proxy decision before it takes effect; a throw denies that connection. */
   readonly onEgress?: (row: ShellEgressRow) => void;
+  /** Required with `allowHosts`: the workspace and agent each proxied connection is checked for (checkEgress). */
+  readonly egressScope?: { readonly workspace: string; readonly agentId: string };
 }
 
 /** One `NATIVE_SHELL_EGRESS` decision by the shell's egress proxy. */
@@ -55,6 +59,8 @@ export interface ShellEgressRow {
   readonly port: number;
   readonly decision: "allow" | "deny";
   readonly reason: string;
+  /** On the row a tunnel records once open: the checked address it reached. */
+  readonly connectedAddress?: string | null;
 }
 
 /**

@@ -1,0 +1,215 @@
+{
+  "capturedUtc": "2026-10-14T22:37:10.001728+00:00",
+  "source": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "workspace": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-18-current-qualification",
+  "initialClean": true,
+  "pins": [
+    {
+      "relativePath": "src/claims/evidenceProvenance.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+    },
+    {
+      "relativePath": "src/trust/trustList.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+      "bytes": 10386,
+      "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+    },
+    {
+      "relativePath": "src/trust/trustContext.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "bytes": 7037,
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991"
+    },
+    {
+      "relativePath": "src/trust/admission.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/admission.ts",
+      "bytes": 9401,
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989"
+    },
+    {
+      "relativePath": "src/trust/keyPurposes.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+      "bytes": 604,
+      "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd"
+    },
+    {
+      "relativePath": "src/crypto/keys.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+      "bytes": 9168,
+      "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+    },
+    {
+      "relativePath": "src/utils/json.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+    },
+    {
+      "relativePath": "src/ledger/ledger.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+      "bytes": 43792,
+      "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+    },
+    {
+      "relativePath": "src/ledger/ledgerConnection.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+      "bytes": 3137,
+      "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+    },
+    {
+      "relativePath": "src/ledger/trustTierValidation.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+      "bytes": 3447,
+      "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c"
+    },
+    {
+      "relativePath": "src/ingest/ingest.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+      "bytes": 10253,
+      "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5"
+    },
+    {
+      "relativePath": "src/eval/evalImporters.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+      "bytes": 70432,
+      "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8"
+    },
+    {
+      "relativePath": "src/eval/evalCli.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalCli.ts",
+      "bytes": 1521,
+      "sha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6"
+    },
+    {
+      "relativePath": "src/dogfood/maturityEvidence.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/dogfood/maturityEvidence.ts",
+      "bytes": 15973,
+      "sha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779"
+    },
+    {
+      "relativePath": "src/credentials/credentialsPaths.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+      "bytes": 4710,
+      "sha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0"
+    },
+    {
+      "relativePath": "tests/claims/evidenceProvenance.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/claims/evidenceProvenance.test.ts",
+      "bytes": 17646,
+      "sha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212"
+    },
+    {
+      "relativePath": "tests/evalImportTrust.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/evalImportTrust.test.ts",
+      "bytes": 5728,
+      "sha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4"
+    },
+    {
+      "relativePath": "tests/ingestAttestation.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/ingestAttestation.test.ts",
+      "bytes": 15700,
+      "sha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa"
+    },
+    {
+      "relativePath": "tests/trustTierWriteGuard.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/trustTierWriteGuard.test.ts",
+      "bytes": 5739,
+      "sha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62"
+    },
+    {
+      "relativePath": "tests/dogfoodMaturityEvidence.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/dogfoodMaturityEvidence.test.ts",
+      "bytes": 4544,
+      "sha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c"
+    },
+    {
+      "relativePath": "tests/externalEvidenceProfile.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+      "bytes": 7956,
+      "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+    },
+    {
+      "relativePath": "tests/externalEvidenceExport.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+      "bytes": 5707,
+      "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f"
+    },
+    {
+      "relativePath": "tests/compliance/evidenceBinding.test.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+      "bytes": 11569,
+      "sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a"
+    },
+    {
+      "relativePath": "src/compliance/complianceEngine.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/complianceEngine.ts",
+      "bytes": 14631,
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9"
+    },
+    {
+      "relativePath": "src/diagnostic/gates.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "relativePath": "src/outcomes/outcomeCli.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/outcomes/outcomeCli.ts",
+      "bytes": 5678,
+      "sha256": "38dcc1d75e13b884071feeb6019f8aa06bc5244a8c42db3f63b8e873b6a78b19"
+    },
+    {
+      "relativePath": "src/assurance/agentResponder.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/assurance/agentResponder.ts",
+      "bytes": 21889,
+      "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807"
+    },
+    {
+      "relativePath": "src/cli.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/cli.ts",
+      "bytes": 1064339,
+      "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+    },
+    {
+      "relativePath": "src/standard/externalEvidenceProfile.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/standard/externalEvidenceProfile.ts",
+      "bytes": 16961,
+      "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+    },
+    {
+      "relativePath": "docs/EVIDENCE_TRUST.md",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/docs/EVIDENCE_TRUST.md",
+      "bytes": 10946,
+      "sha256": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499"
+    },
+    {
+      "relativePath": "tests/helpers/trustContext.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/helpers/trustContext.ts",
+      "bytes": 4280,
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+    },
+    {
+      "relativePath": "tests/trust/trustFixtures.ts",
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+      "bytes": 2312,
+      "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d"
+    }
+  ],
+  "trackedManifest": {
+    "path": "/private/tmp/p0-18-initial-tracked-manifest-20261015.json",
+    "files": 7738,
+    "sha256": "cf8a134cfe5cae07dd8c500b8325ce50ce63ab2d5192d361f74f088ca03fcb71"
+  },
+  "scope": "Only NEW tests/claims/evidenceProvenanceQualification.test.ts, private controlled cryptographic/eval/seeder/S7/cold-CLI receipts and root-owned factual test-source count updates. Production, original tests, shared CLI, guards, archives, ratchets, held/paused work and all expert/ownership decisions stay unchanged. Real signed fixtures establish local integrity/admission behavior only, never truth, authenticated people or actual independent review.",
+  "holds": [
+    "Earlier P0-24 ISO/31 expert columns and other strict failures remain open",
+    "P0-19/P0-20/P0-52 source decisions remain pending",
+    "P0-29/P0-22 user skips remain unresolved",
+    "Hidden flag old spec 1.2.0 vs current 2.0.0 message; evidence-attestation vs independent-attestation purpose; no repair chosen",
+    "Reservation1496 and shared CLI1588, no absence-based ownership release",
+    "P0-51 issuer failures and 47 echo deferral remain open"
+  ]
+}

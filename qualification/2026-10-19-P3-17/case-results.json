@@ -1,0 +1,3893 @@
+{
+  "recordedAt": "2026-10-19T02:55:56.227Z",
+  "head": "7458c47c343d1b54921501a04e0be6f280a38963",
+  "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+  "before": {
+    "head": "7458c47c343d1b54921501a04e0be6f280a38963",
+    "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17",
+    "node": "v22.23.3",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-17",
+    "status": ""
+  },
+  "after": {
+    "head": "7458c47c343d1b54921501a04e0be6f280a38963",
+    "int": "dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+    "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-17",
+    "node": "v22.23.3",
+    "tmpdir": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p3-17",
+    "status": ""
+  },
+  "evidenceScope": "Native test-injected questionnaire admission plus separate synthetic protocols; all six cold-chain wrappers remain dependency-unavailable with no conversion or release. Local observations supply no production evidence, human review, legal applicability or live boundary enforcement.",
+  "compileAsOfScope": "Explicit input in the actual mobilityHarness source; not a serialized CompiledPlan field or legal date.",
+  "harnessSourceSha256": "9d7a4807d9df7720614e3d82fb90728afcaf4a050ec47b6a1a4ea4e3db5c691c",
+  "catalog": {
+    "id": "amc.catalog",
+    "version": "0.1.1",
+    "digest": "sha256:f73899d562733f9a903d796bcb9ee5f1a51b63efd401ba2c5c3cd7fc074650bc"
+  },
+  "plans": [
+    {
+      "profileId": "mobility-port-operations",
+      "compileAsOf": "2026-10-19T00:00:00.000Z",
+      "digest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "policyDigest": "sha256:d5e025ef039beeea84ad25df98e995b6e080e96f504e29a119e6657e605608f4",
+      "status": "ready",
+      "mobilityRequirements": [
+        {
+          "controlId": "L1-MOB-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:645f37ac95f1fddf948f19731c351ec7991dd8cb6a0d32c76c2bd80f6244a191",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: P2-27 lot fixture and release adapter are absent on this base. No independent cold-chain eligibility algorithm is supplied; no sensor calibration, continuous monitoring, named authority or statutory coverage is established.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"cold_chain_release\"]: true (value [\"cold_chain_release\",\"port_access\"], asserted)",
+            "predicate: entityTypes includesAny [\"port_facility_operator\",\"freight_logistics_operator\"]: true (value [\"freight_logistics_operator\",\"port_facility_operator\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": false (domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": false (useCases includesAny [\"cold_chain_release\"]: true (value [\"cold_chain_release\",\"port_access\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:fd5bb5106276924483d62e03de44872f88bce07e9e423413a102fd9aac1a8851",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: The named features and demographic changes are synthetic fixture data. No real applicant, protected-class inference, causal fairness conclusion, Fair Housing clause verification or complete adverse-notice obligation is established.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"tenant_screening\"]: false (value [\"cold_chain_release\",\"port_access\"], asserted)",
+            "predicate: entityTypes includesAny [\"housing_provider\"]: false (value [\"freight_logistics_operator\",\"port_facility_operator\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": false (domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"tenant_screening\"]: false (value [\"cold_chain_release\",\"port_access\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:4c4583127a70535c9dcd92a44d785fe6a29fbb0e9c759a2dd00da6166ee6b086",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: ISPS text and legal scope have not been read or reviewed for this draft. Level checks are local operator-policy behavior, not the complete facility/ship security plan, SSP content, Declaration of Security, drill, retention or physical access system.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"port_access\"]: true (value [\"cold_chain_release\",\"port_access\"], asserted)",
+            "predicate: entityTypes includesAny [\"port_facility_operator\"]: true (value [\"freight_logistics_operator\",\"port_facility_operator\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": false (domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": false (useCases includesAny [\"port_access\"]: true (value [\"cold_chain_release\",\"port_access\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:b38f1aac70df4e275aa54c0ffe46b599aa953874161ce55dfbf8964cd45da566",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: A synthetic human label is not a verified principal, independent review or safety authority. No live P2-26 change envelope, P1-78 approval flow, type approval, Annex I route or actual vehicle safety case is implemented.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"vehicle_safety_change\"]: false (value [\"cold_chain_release\",\"port_access\"], asserted)",
+            "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: false (value [\"freight_logistics_operator\",\"port_facility_operator\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"vehicle_safety_change\"]: false (value [\"cold_chain_release\",\"port_access\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:ce4484d02370caee06f2461a6cd9e795a28b53dd6e7666a9a330d44e81f14275",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: UN R156 primary text has not been read for this task. Local draft fields do not establish full SUMS, regulatory approval or operator signing authority. No private key is persisted, production trust context loaded, anti-rollback state installed, physical vehicle updated or inherited Technology command policy overridden.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"vehicle_ota_update\"]: false (value [\"cold_chain_release\",\"port_access\"], asserted)",
+            "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: false (value [\"freight_logistics_operator\",\"port_facility_operator\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"vehicle_ota_update\"]: false (value [\"cold_chain_release\",\"port_access\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c87f8dde7e7ce761a42cfd8e7c87c03965c272d89e683bddd0000c8758f4d8d1",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: The response budget and safe area are synthetic fixture parameters, not a verified legal deadline, ODD or safety case. No live driving loop, physical fallback, kill switch, production P2-26 wiring or real crash-reporting result is measured.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"vehicle_fallback_drill\"]: false (value [\"cold_chain_release\",\"port_access\"], asserted)",
+            "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: false (value [\"freight_logistics_operator\",\"port_facility_operator\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"vehicle_fallback_drill\"]: false (value [\"cold_chain_release\",\"port_access\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        }
+      ],
+      "technologyRequirements": []
+    },
+    {
+      "profileId": "mobility-tenant-screening",
+      "compileAsOf": "2026-10-19T00:00:00.000Z",
+      "digest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "policyDigest": "sha256:d5e025ef039beeea84ad25df98e995b6e080e96f504e29a119e6657e605608f4",
+      "status": "ready",
+      "mobilityRequirements": [
+        {
+          "controlId": "L1-MOB-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:645f37ac95f1fddf948f19731c351ec7991dd8cb6a0d32c76c2bd80f6244a191",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: P2-27 lot fixture and release adapter are absent on this base. No independent cold-chain eligibility algorithm is supplied; no sensor calibration, continuous monitoring, named authority or statutory coverage is established.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"cold_chain_release\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted)",
+            "predicate: entityTypes includesAny [\"port_facility_operator\",\"freight_logistics_operator\"]: false (value [\"housing_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": false (domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"cold_chain_release\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:fd5bb5106276924483d62e03de44872f88bce07e9e423413a102fd9aac1a8851",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: The named features and demographic changes are synthetic fixture data. No real applicant, protected-class inference, causal fairness conclusion, Fair Housing clause verification or complete adverse-notice obligation is established.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"tenant_screening\"]: true (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted)",
+            "predicate: entityTypes includesAny [\"housing_provider\"]: true (value [\"housing_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": false (domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": false (useCases includesAny [\"tenant_screening\"]: true (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:4c4583127a70535c9dcd92a44d785fe6a29fbb0e9c759a2dd00da6166ee6b086",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: ISPS text and legal scope have not been read or reviewed for this draft. Level checks are local operator-policy behavior, not the complete facility/ship security plan, SSP content, Declaration of Security, drill, retention or physical access system.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"port_access\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted)",
+            "predicate: entityTypes includesAny [\"port_facility_operator\"]: false (value [\"housing_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": false (domains includesAny [\"mobility.ports-logistics-cities\"]: true (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"port_access\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:b38f1aac70df4e275aa54c0ffe46b599aa953874161ce55dfbf8964cd45da566",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: A synthetic human label is not a verified principal, independent review or safety authority. No live P2-26 change envelope, P1-78 approval flow, type approval, Annex I route or actual vehicle safety case is implemented.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"vehicle_safety_change\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted)",
+            "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: false (value [\"housing_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"vehicle_safety_change\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:ce4484d02370caee06f2461a6cd9e795a28b53dd6e7666a9a330d44e81f14275",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: UN R156 primary text has not been read for this task. Local draft fields do not establish full SUMS, regulatory approval or operator signing authority. No private key is persisted, production trust context loaded, anti-rollback state installed, physical vehicle updated or inherited Technology command policy overridden.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"vehicle_ota_update\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted)",
+            "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: false (value [\"housing_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"vehicle_ota_update\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c87f8dde7e7ce761a42cfd8e7c87c03965c272d89e683bddd0000c8758f4d8d1",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: The response budget and safe area are synthetic fixture parameters, not a verified legal deadline, ODD or safety case. No live driving loop, physical fallback, kill switch, production P2-26 wiring or real crash-reporting result is measured.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], asserted)",
+            "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted)",
+            "predicate: useCases includesAny [\"vehicle_fallback_drill\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted)",
+            "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: false (value [\"housing_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"mobility.ports-logistics-cities\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"vehicle_fallback_drill\"]: false (value [\"consequential_decision_about_people\",\"tenant_screening\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:US"
+          ]
+        }
+      ],
+      "technologyRequirements": []
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "compileAsOf": "2026-10-19T00:00:00.000Z",
+      "digest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "policyDigest": "sha256:d5e025ef039beeea84ad25df98e995b6e080e96f504e29a119e6657e605608f4",
+      "status": "ready",
+      "mobilityRequirements": [
+        {
+          "controlId": "L1-MOB-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:645f37ac95f1fddf948f19731c351ec7991dd8cb6a0d32c76c2bd80f6244a191",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: P2-27 lot fixture and release adapter are absent on this base. No independent cold-chain eligibility algorithm is supplied; no sensor calibration, continuous monitoring, named authority or statutory coverage is established.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: useCases includesAny [\"cold_chain_release\"]: false (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted)",
+            "predicate: entityTypes includesAny [\"port_facility_operator\",\"freight_logistics_operator\"]: false (value [\"fleet_operator\",\"vehicle_software_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\",\"provider\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"cold_chain_release\"]: false (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:fd5bb5106276924483d62e03de44872f88bce07e9e423413a102fd9aac1a8851",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: The named features and demographic changes are synthetic fixture data. No real applicant, protected-class inference, causal fairness conclusion, Fair Housing clause verification or complete adverse-notice obligation is established.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: useCases includesAny [\"tenant_screening\"]: false (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted)",
+            "predicate: entityTypes includesAny [\"housing_provider\"]: false (value [\"fleet_operator\",\"vehicle_software_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\",\"provider\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"tenant_screening\"]: false (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:4c4583127a70535c9dcd92a44d785fe6a29fbb0e9c759a2dd00da6166ee6b086",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: ISPS text and legal scope have not been read or reviewed for this draft. Level checks are local operator-policy behavior, not the complete facility/ship security plan, SSP content, Declaration of Security, drill, retention or physical access system.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: useCases includesAny [\"port_access\"]: false (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted)",
+            "predicate: entityTypes includesAny [\"port_facility_operator\"]: false (value [\"fleet_operator\",\"vehicle_software_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\",\"provider\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"port_access\"]: false (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:b38f1aac70df4e275aa54c0ffe46b599aa953874161ce55dfbf8964cd45da566",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: A synthetic human label is not a verified principal, independent review or safety authority. No live P2-26 change envelope, P1-78 approval flow, type approval, Annex I route or actual vehicle safety case is implemented.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: useCases includesAny [\"vehicle_safety_change\"]: true (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted)",
+            "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: true (value [\"fleet_operator\",\"vehicle_software_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\",\"provider\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": false (domains includesAny [\"mobility.vehicles-aviation\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": false (useCases includesAny [\"vehicle_safety_change\"]: true (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:ce4484d02370caee06f2461a6cd9e795a28b53dd6e7666a9a330d44e81f14275",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: UN R156 primary text has not been read for this task. Local draft fields do not establish full SUMS, regulatory approval or operator signing authority. No private key is persisted, production trust context loaded, anti-rollback state installed, physical vehicle updated or inherited Technology command policy overridden.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: useCases includesAny [\"vehicle_ota_update\"]: true (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted)",
+            "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: true (value [\"fleet_operator\",\"vehicle_software_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\",\"provider\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": false (domains includesAny [\"mobility.vehicles-aviation\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": false (useCases includesAny [\"vehicle_ota_update\"]: true (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-MOB-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c87f8dde7e7ce761a42cfd8e7c87c03965c272d89e683bddd0000c8758f4d8d1",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+            "catalog: The response budget and safe area are synthetic fixture parameters, not a verified legal deadline, ODD or safety case. No live driving loop, physical fallback, kill switch, production P2-26 wiring or real crash-reporting result is measured.",
+            "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: useCases includesAny [\"vehicle_fallback_drill\"]: true (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted)",
+            "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: true (value [\"fleet_operator\",\"vehicle_software_provider\"], asserted)",
+            "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\",\"provider\"], asserted)",
+            "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": false (domains includesAny [\"mobility.vehicles-aviation\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": false (useCases includesAny [\"vehicle_fallback_drill\"]: true (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:mobility",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        }
+      ],
+      "technologyRequirements": [
+        {
+          "controlId": "L1-TECH-01",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:34a2b8d347144f6ac2104f9cede084ed61512c7eacf6d16f6742ff5814a17794",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: useCases includesAny [\"publishes_synthetic_content\"]: false (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [
+            "eu-ai-act-art50"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-02",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:f02b34503796f46c7f998bd191ba3378f962bfaf319bf8d236b9c2e88034eb00",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "catalog: CRA product scope, sector exclusions and reporting applicability require expert confirmation; the fixture's component match does not decide them.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "eu-cra-art14"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-03",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:e3e6df267428682720fbdba2894207c7423b46f745bbb32a57bb2cf834273dda",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-04",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:cada1632668eef6b3d0d589d06531ba6b57e958337e2d0c83a0446f25247abff",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "catalog: COPPA audience, personal-information and recipient scope require an explicit determination; a station tag is insufficient.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"EU\",\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"US\"]: true (value [\"EU\",\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "us-coppa-third-party-consent"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-05",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:c8cf568f0c40df9d3573b8a5a7fa8c563a32454b9dfa9672875962555a51c7f8",
+          "layer": 1,
+          "applicability": "not_applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US-CA\"]: false (value [\"EU\",\"US\"], asserted)",
+            "predicate: useCases includesAny [\"consequential_decision_about_people\"]: false (value [\"vehicle_fallback_drill\",\"vehicle_ota_update\",\"vehicle_safety_change\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": true (jurisdictions includesAny [\"US-CA\"]: false (value [\"EU\",\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": {
+            "reason": "applicability predicate is false",
+            "source": "predicate",
+            "exceptionId": null
+          },
+          "citationsInScope": [],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-06",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:82ab930253bf8a92755cc6aa9c9faf150594c04089821354d12b1d335d62f638",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "eu-ai-act-gpai"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-07",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:8d61132aee3b1d4dce9df6b67bd2c09c3338d5edb057ab53450e6e85adc56fbf",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"EU\"]: true (value [\"EU\",\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "eu-nis2-art23"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        },
+        {
+          "controlId": "L1-TECH-08",
+          "controlVersion": "0.1.0",
+          "controlDigest": "sha256:12be31422c4cd0485696e70128fc98020a20d51d5bd22f52916d08bfc81865a3",
+          "layer": 1,
+          "applicability": "applicable",
+          "reasons": [
+            "catalog: Experimental, unreviewed draft for technology.platforms-data; applicability facts are operator assertions and require a scoped legal determination.",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\",\"US-CA\",\"EU\"]: true (value [\"EU\",\"US\"], asserted)",
+            "predicate: stations includesAny [\"technology\"]: true (value [\"mobility\",\"technology\"], asserted)",
+            "predicate: domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted)",
+            "predicate: jurisdictions includesAny [\"US\"]: true (value [\"EU\",\"US\"], asserted)",
+            "exclusion \"The deployment is outside the Technology platforms-and-data domain; no legal applicability is inferred from a station name.\": false (domains includesAny [\"technology.platforms-data\"]: true (value [\"mobility.vehicles-aviation\",\"technology.platforms-data\"], asserted))",
+            "exclusion \"The deployment has no asserted nexus to this control's jurisdiction; unresolved jurisdiction is not treated as an exclusion or a pass.\": false (jurisdictions includesAny [\"US\"]: true (value [\"EU\",\"US\"], asserted))"
+          ],
+          "missingFacts": [],
+          "exclusion": null,
+          "citationsInScope": [
+            "technology-ftc-act-section5"
+          ],
+          "mandatory": true,
+          "support": "experimental",
+          "pulledInBy": [
+            "station:technology",
+            "jurisdiction:EU",
+            "jurisdiction:US"
+          ]
+        }
+      ]
+    }
+  ],
+  "mobilityGolden": {
+    "profile": "station-mobility",
+    "asOf": "2026-10-12T00:00:00Z",
+    "catalog": {
+      "id": "amc.catalog",
+      "version": "0.1.1",
+      "digest": "sha256:f73899d562733f9a903d796bcb9ee5f1a51b63efd401ba2c5c3cd7fc074650bc"
+    },
+    "status": "ready",
+    "digest": "sha256:bac4a305f80e366e4c08f00f411f4332f58c6e5dbffd69c7d901afe493136287",
+    "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430",
+    "mobilityRequirements": [
+      {
+        "controlId": "L1-MOB-01",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:645f37ac95f1fddf948f19731c351ec7991dd8cb6a0d32c76c2bd80f6244a191",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+          "catalog: P2-27 lot fixture and release adapter are absent on this base. No independent cold-chain eligibility algorithm is supplied; no sensor calibration, continuous monitoring, named authority or statutory coverage is established.",
+          "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: useCases includesAny [\"cold_chain_release\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)",
+          "predicate: entityTypes includesAny [\"port_facility_operator\",\"freight_logistics_operator\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"wealth.banking-finance-ops\"], reviewed))",
+          "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"cold_chain_release\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed))"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:mobility",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-MOB-02",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:fd5bb5106276924483d62e03de44872f88bce07e9e423413a102fd9aac1a8851",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+          "catalog: The named features and demographic changes are synthetic fixture data. No real applicant, protected-class inference, causal fairness conclusion, Fair Housing clause verification or complete adverse-notice obligation is established.",
+          "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: useCases includesAny [\"tenant_screening\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)",
+          "predicate: entityTypes includesAny [\"housing_provider\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"wealth.banking-finance-ops\"], reviewed))",
+          "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"tenant_screening\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed))"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:mobility",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-MOB-03",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:4c4583127a70535c9dcd92a44d785fe6a29fbb0e9c759a2dd00da6166ee6b086",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.ports-logistics-cities example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+          "catalog: ISPS text and legal scope have not been read or reviewed for this draft. Level checks are local operator-policy behavior, not the complete facility/ship security plan, SSP content, Declaration of Security, drill, retention or physical access system.",
+          "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: useCases includesAny [\"port_access\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)",
+          "predicate: entityTypes includesAny [\"port_facility_operator\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.ports-logistics-cities\"]: false (value [\"wealth.banking-finance-ops\"], reviewed))",
+          "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"port_access\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed))"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:mobility",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-MOB-04",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:b38f1aac70df4e275aa54c0ffe46b599aa953874161ce55dfbf8964cd45da566",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+          "catalog: A synthetic human label is not a verified principal, independent review or safety authority. No live P2-26 change envelope, P1-78 approval flow, type approval, Annex I route or actual vehicle safety case is implemented.",
+          "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: useCases includesAny [\"vehicle_safety_change\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)",
+          "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"wealth.banking-finance-ops\"], reviewed))",
+          "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"vehicle_safety_change\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed))"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:mobility",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-MOB-05",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:ce4484d02370caee06f2461a6cd9e795a28b53dd6e7666a9a330d44e81f14275",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+          "catalog: UN R156 primary text has not been read for this task. Local draft fields do not establish full SUMS, regulatory approval or operator signing authority. No private key is persisted, production trust context loaded, anti-rollback state installed, physical vehicle updated or inherited Technology command policy overridden.",
+          "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: useCases includesAny [\"vehicle_ota_update\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)",
+          "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"wealth.banking-finance-ops\"], reviewed))",
+          "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"vehicle_ota_update\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed))"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:mobility",
+          "jurisdiction:US"
+        ]
+      },
+      {
+        "controlId": "L1-MOB-06",
+        "controlVersion": "0.1.0",
+        "controlDigest": "sha256:c87f8dde7e7ce761a42cfd8e7c87c03965c272d89e683bddd0000c8758f4d8d1",
+        "layer": 1,
+        "applicability": "not_applicable",
+        "reasons": [
+          "catalog: Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name.",
+          "catalog: The response budget and safe area are synthetic fixture parameters, not a verified legal deadline, ODD or safety case. No live driving loop, physical fallback, kill switch, production P2-26 wiring or real crash-reporting result is measured.",
+          "catalog: Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced.",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: jurisdictions includesAny [\"US\",\"EU\"]: true (value [\"US\"], reviewed)",
+          "predicate: stations includesAny [\"mobility\"]: true (value [\"mobility\"], reviewed)",
+          "predicate: domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"wealth.banking-finance-ops\"], reviewed)",
+          "predicate: useCases includesAny [\"vehicle_fallback_drill\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed)",
+          "predicate: entityTypes includesAny [\"vehicle_software_provider\",\"fleet_operator\"]: false (value [\"non_bank_financial_institution\"], reviewed)",
+          "predicate: roles includesAny [\"provider\",\"deployer\"]: true (value [\"deployer\"], reviewed)",
+          "exclusion \"An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass.\": true (domains includesAny [\"mobility.vehicles-aviation\"]: false (value [\"wealth.banking-finance-ops\"], reviewed))",
+          "exclusion \"The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved.\": true (useCases includesAny [\"vehicle_fallback_drill\"]: false (value [\"payment_proposal\",\"reconciliation\"], reviewed))"
+        ],
+        "missingFacts": [],
+        "exclusion": {
+          "reason": "applicability predicate is false",
+          "source": "predicate",
+          "exceptionId": null
+        },
+        "citationsInScope": [],
+        "mandatory": true,
+        "support": "experimental",
+        "pulledInBy": [
+          "station:mobility",
+          "jurisdiction:US"
+        ]
+      }
+    ],
+    "priorHistoricalMobility": {
+      "profile": "station-mobility",
+      "status": "ready",
+      "digest": "sha256:59507360214ab7dceb296d4dfbb36992b31eb455d57d1cc219e77170fe5c0267",
+      "policyDigest": "sha256:a4ec23c2162efa58cb964383a8e9d25c45180eafaa1586bfa6203d38c4e13430"
+    },
+    "historicalArtifact": {
+      "path": "qualification/2026-10-18-P1-46/plan-digests.json",
+      "sha256": "7c6b9c45ff020d38049c4c7060e1f72ab91e779ca6173831235cf88068b1fef7",
+      "preserved": true
+    },
+    "note": "Separate regenerated Mobility-only P1-46 record; fleet composition is recorded in the three asserted profile rows. Inherited finance fixture labels are synthetic historical input, not human review or deployment facts. Original P1-46 packet and all other station records remain unchanged."
+  },
+  "cases": [
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/positive/evidence-valid.json",
+      "fixtureSha256": "e2ca5b15d66d11e266b527e572f5af69b6bba295abe7f99d46d56f1891a52ce0",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a59902835875a5b5264cd3d5c67c7aa5264f14a2f1009aa96335f59d8d4fa381"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/positive/oracle-cold-bound-disposition.json",
+      "fixtureSha256": "122127fa69a8602eb763ff3e2810cf12f5a866c08d01601d1372c63ea1c0a593",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "11d9b0a5cbb550a4b46e4be78b92176b0e9305e5749140ae85ac3e68b982471f"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "releasedLots": []
+      }
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/positive/oracle-cold-clean.json",
+      "fixtureSha256": "c0aa79650285971aa72a4b9c819b786c4a9aaf5a2a39bec375eb8db8d0a3de6f",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "11d9b0a5cbb550a4b46e4be78b92176b0e9305e5749140ae85ac3e68b982471f"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "releasedLots": []
+      }
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/evidence-contradictory.json",
+      "fixtureSha256": "e6dca432193602c5d13fee9a3439286ebca4a95aab9d7461b11fc9ccc5d72083",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "ceed34b9375a582407fc11b8f900657c2dbece9b99daf3ef6bb87b580049e41d"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "b448ec70ea02cebff5d221b8c7f7d7da59aba94390cbf9190b9a8aafb70abf37",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-01-questionnaire-1",
+              "sha256": "9e7948e1e396adee712a6b0c2810b8391483116041559ebb64a32bc9f568c6b7"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant another-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "81ee3ea2c1a58c7a20a09a9dc50dd2801761f39c092c78c5b376e62b42f220e7"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/evidence-empty.json",
+      "fixtureSha256": "8dfb5a756c5d65038a0b4f1a24b8122f9c6cbd5df49fce00044b84ea6839edfd",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "225085ded7557271637223c61ac4d47f5a64cc1c99f3d3ca7eb5401efbaef815"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/evidence-replayed.json",
+      "fixtureSha256": "dc3ed7f822bf13d365c001956f2f444c2815e69289cebb340fe2a842cec16f9a",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-01-questionnaire-1",
+              "sha256": "5884a3cef740cea4e3939e2fe3541de16ae9c17ae7c32fca7e5fcb3307fe04d0"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-MOB-01-questionnaire-receipt-1 was already used for another-control-and-deployment-window"
+          }
+        ],
+        "digest": "ef6fdd74153f120c75b9386b8ea6c0df3151999c044244893d4523ca57f98571"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/evidence-stale.json",
+      "fixtureSha256": "471140b941a44ca0e9feae026336037a01b039242edfdb104e5f91579ababed2",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-01-questionnaire-1",
+              "sha256": "bf7eaf313c13f6af8a347e3887c509612a02ce8e92b73c40250f363cffc3be9f"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T10:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "a57ea2d5cfb069b961ecce9e60cd8b93428f5f412ff980e91bbf146b18909ef8"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/evidence-violation.json",
+      "fixtureSha256": "e6bc88c77486b24d707cd196b4be207d6c02ba1cbe1117cd209da9669328b58a",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "38b443f1ad668e7142cb5e1135923e8575157ffaf538ec1d75d70a0e0d724eee"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/oracle-cold-excursion.json",
+      "fixtureSha256": "ed7ce0a44845a6414901306626820f89e2f3efe73905f5831401c7f10ffd3b01",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "11d9b0a5cbb550a4b46e4be78b92176b0e9305e5749140ae85ac3e68b982471f"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "releasedLots": []
+      }
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/oracle-cold-missing-sensors.json",
+      "fixtureSha256": "1f98bcf5ce6cf87adcd1b3f0ec331fbdc851f3655b7f4d123eddbc5dac3660c0",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "11d9b0a5cbb550a4b46e4be78b92176b0e9305e5749140ae85ac3e68b982471f"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "releasedLots": []
+      }
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/oracle-cold-stale-sensors.json",
+      "fixtureSha256": "11c321bca501312976f65bf8c94b578e87d7a5fe740573e1527bf2123916326d",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "11d9b0a5cbb550a4b46e4be78b92176b0e9305e5749140ae85ac3e68b982471f"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "releasedLots": []
+      }
+    },
+    {
+      "controlId": "L1-MOB-01",
+      "case": "L1-MOB-01/negative/oracle-cold-wrong-lot-disposition.json",
+      "fixtureSha256": "62fe028e012636cf89728fea4561627760a5d6e8665722ae9612c81cb1505b2e",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "11d9b0a5cbb550a4b46e4be78b92176b0e9305e5749140ae85ac3e68b982471f"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "dependency_unavailable",
+        "claimKind": "synthetic_example",
+        "releasedLots": []
+      }
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/positive/evidence-valid.json",
+      "fixtureSha256": "2ac9f20767dc0b8ebf307c4d8ea974c1bd9a966c01cf3687c043389389bfe291",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "d6dd2af433ad854eb5a192cb5faf23b1f85c03dc76c23b59fa52e9fa8ed70c31"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/positive/oracle-screening-permitted-pairs.json",
+      "fixtureSha256": "4a309a0e112cc9565ab3472cad598a3d9e7b0a6b5d55d0bab3aabea4395d11a9",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3f1670650a14ba9a3b5b86a1e88a099a1e3213002deecf9e704898e0c9b332de"
+      },
+      "expectedLocalOracle": {
+        "result": "pass",
+        "reasonCode": "paired_reasons_permitted"
+      },
+      "actualLocalOracle": {
+        "result": "pass",
+        "reasonCode": "paired_reasons_permitted",
+        "claimKind": "synthetic_example",
+        "noticeReleases": [
+          "pair-name-base",
+          "pair-name-counter",
+          "pair-zip-base",
+          "pair-zip-counter"
+        ],
+        "evaluatedPairs": [
+          "pair-name",
+          "pair-zip"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/evidence-contradictory.json",
+      "fixtureSha256": "49c52df0ea59a43cb35eb6f8c3b1bdb2da2057270075b63301e5c736fce79489",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "520be54c3c194541b08ab276fdc0c0e2f0a66bba33721c77eacc511facbc5be3"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "0f04d788da11b3517969b9d4eb2e516040d66ee4d3a53fe39e924bbf1e11efe7",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-02-questionnaire-1",
+              "sha256": "4035921a56c73b2421c89cf3504c92d38d8a41549954b76201bf2737577ba181"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant another-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "05b4696a20a0b2d461a0ffef1c15e400a05ad6b4fac92039f412b660dec03f0e"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/evidence-empty.json",
+      "fixtureSha256": "397a3bdc4bdaea6648c4d5f06e2e7d0dbd9922d4d30b87a6d55160be0ce1c4b7",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "ade7b231678df786eca7f045dfb897e9c45657e593825e61f30cd9613738adcf"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/evidence-replayed.json",
+      "fixtureSha256": "769cc48477ff8ad26da00a53b2dda49415a8121ddeb457d8b11df5098204f58b",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-02-questionnaire-1",
+              "sha256": "b37ceaf43878f8ede41861a7862f84a24a8f172dd8f1e670e3667bb8d6d5bf11"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-MOB-02-questionnaire-receipt-1 was already used for another-control-and-deployment-window"
+          }
+        ],
+        "digest": "36d30c2f7268f5fe8abd5d2602722c4dac54710a4349d1a2044819c164c585cf"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/evidence-stale.json",
+      "fixtureSha256": "f0cc575d93c6f67bfdc456ece00ef354d6174a440596766e75b5300723f5a158",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-02-questionnaire-1",
+              "sha256": "98273e35b8e21b9c3b3f1af11b5c11645508fe68759911798109b0cbc97d36fc"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T10:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "ba2d3c435cb33974d7b1b841b6725a60a73b0f2631b616f40466da75844fc955"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/evidence-violation.json",
+      "fixtureSha256": "420577712df07a5a5a65f48ffb616d86ac8dc29441bb5882553046cf32081019",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "be18d61d9a7ebd72a6e7c8470c7256c9a8d1d285159cf8540f4e30695ccffc15"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/oracle-screening-decision-difference.json",
+      "fixtureSha256": "2e8d79f00a93436fd4cad3adb5abe801b68edaf46971c6b113d9759506a26a94",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3f1670650a14ba9a3b5b86a1e88a099a1e3213002deecf9e704898e0c9b332de"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "paired_decision_difference"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "paired_decision_difference",
+        "claimKind": "synthetic_example",
+        "noticeReleases": [],
+        "evaluatedPairs": [
+          "pair-name"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/oracle-screening-inconsistent-pair.json",
+      "fixtureSha256": "bb5d004fe3ba8039da72901aff7efbf5ef6ddbe9bdbc954ee4ad8a5cb2e285ce",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3f1670650a14ba9a3b5b86a1e88a099a1e3213002deecf9e704898e0c9b332de"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "invalid_counterfactual_pair"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "invalid_counterfactual_pair",
+        "claimKind": "synthetic_example",
+        "noticeReleases": [],
+        "evaluatedPairs": []
+      }
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/oracle-screening-no-lineage.json",
+      "fixtureSha256": "fd0a80624b17d4db480da9eee54b99f3e9ba139465df2bfcfb5ff8a277ceda69",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3f1670650a14ba9a3b5b86a1e88a099a1e3213002deecf9e704898e0c9b332de"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "reason_lineage_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "reason_lineage_unavailable",
+        "claimKind": "synthetic_example",
+        "noticeReleases": [],
+        "evaluatedPairs": []
+      }
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/oracle-screening-proxy-lineage.json",
+      "fixtureSha256": "e906467db17d2bc2537e808682b548324e55762368e2e853911bc9b760e48718",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3f1670650a14ba9a3b5b86a1e88a099a1e3213002deecf9e704898e0c9b332de"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "proxy_reason_source"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "proxy_reason_source",
+        "claimKind": "synthetic_example",
+        "noticeReleases": [],
+        "evaluatedPairs": [
+          "pair-name",
+          "pair-zip"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-MOB-02",
+      "case": "L1-MOB-02/negative/oracle-screening-reason-difference.json",
+      "fixtureSha256": "37eb55a7856fc9bc3518ffa86a487d11b2815af7ff1c40c5a3fece2869b0c332",
+      "profileId": "mobility-tenant-screening",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "3f1670650a14ba9a3b5b86a1e88a099a1e3213002deecf9e704898e0c9b332de"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "paired_reasons_difference"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "paired_reasons_difference",
+        "claimKind": "synthetic_example",
+        "noticeReleases": [],
+        "evaluatedPairs": [
+          "pair-name"
+        ]
+      }
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/positive/evidence-valid.json",
+      "fixtureSha256": "1bfec6d22481169dfb3fc966c124fa8dddeb1c62f0f398f50eecdde5803a5cb4",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "d49f7b023eee9308782236b292e22552a8931483958013b59354e637ce306046"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/positive/oracle-port-level-1.json",
+      "fixtureSha256": "8ab743f3ad9417050ec0272105408b50bea013b49bd6cc1662db2742bc79272f",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "80a6e3a0591f12fa89040290389422249f3ef98be71e2f06601d6fc50727dbd4"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "current_level_authorized"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "current_level_authorized",
+        "claimKind": "synthetic_example",
+        "openedRequests": [
+          "access-request-1"
+        ],
+        "decisions": [
+          {
+            "requestId": "access-request-1",
+            "result": "allow",
+            "reasonCode": "current_level_authorized",
+            "level": 1,
+            "revision": 1
+          }
+        ],
+        "currentLevel": 1
+      }
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/positive/oracle-port-level-2.json",
+      "fixtureSha256": "ef2fd496b3f7cca139f4bd0874b65bb4705a044aa7d5d33e6c1a7e26468caba5",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "80a6e3a0591f12fa89040290389422249f3ef98be71e2f06601d6fc50727dbd4"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "current_level_authorized"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "current_level_authorized",
+        "claimKind": "synthetic_example",
+        "openedRequests": [
+          "access-request-1"
+        ],
+        "decisions": [
+          {
+            "requestId": "access-request-1",
+            "result": "allow",
+            "reasonCode": "current_level_authorized",
+            "level": 2,
+            "revision": 1
+          }
+        ],
+        "currentLevel": 2
+      }
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/positive/oracle-port-level-3.json",
+      "fixtureSha256": "147318f3bd2d70a9ee91c9aab708a6cd488232e3f57ed53e61d78e7876044262",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "80a6e3a0591f12fa89040290389422249f3ef98be71e2f06601d6fc50727dbd4"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "current_level_authorized"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "current_level_authorized",
+        "claimKind": "synthetic_example",
+        "openedRequests": [
+          "access-request-1"
+        ],
+        "decisions": [
+          {
+            "requestId": "access-request-1",
+            "result": "allow",
+            "reasonCode": "current_level_authorized",
+            "level": 3,
+            "revision": 1
+          }
+        ],
+        "currentLevel": 3
+      }
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/positive/oracle-port-raised-rechecked.json",
+      "fixtureSha256": "11a0289a6b2e153c66aba48ec5bd025de334cde4f2ce321646c8244c71b54ea7",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "80a6e3a0591f12fa89040290389422249f3ef98be71e2f06601d6fc50727dbd4"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "current_level_authorized"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "current_level_authorized",
+        "claimKind": "synthetic_example",
+        "openedRequests": [
+          "access-request-1"
+        ],
+        "decisions": [
+          {
+            "requestId": "access-request-1",
+            "result": "allow",
+            "reasonCode": "current_level_authorized",
+            "level": 2,
+            "revision": 2
+          }
+        ],
+        "currentLevel": 2
+      }
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/negative/evidence-contradictory.json",
+      "fixtureSha256": "2e63bf34336e703c4a8471a00d23878bfd3b95cd114fdc4345282a689c6e8de9",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "e6f95ccc5daf81911edd56d5a331c2f48a911c6e31f8263c6c00eddf48ab83cf"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "669550dfc4203109419ea07af776d07b9e1eb125842fe2396e89e16dc08e458f",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-03-questionnaire-1",
+              "sha256": "92c53f31e68b2c998861dbd314cf4244684d13bf1471159ae6462739920bbc79"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant another-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "dbc57453c21812cbb0f3dd08bb7146d1622ce53eef0116a95e332be458503d24"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/negative/evidence-empty.json",
+      "fixtureSha256": "ccf7bde8da7c1f3a8bc370a94b60b714532eaeffb1ecf298acbe2864676c3259",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "2ef7e49d09d5a89e8c3b15bfa4f640b326593910fc99e30e8eac1e04e697a4a5"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/negative/evidence-replayed.json",
+      "fixtureSha256": "7d536a6de9d94066332afce8c714ae527b503c8bfff88a793497c1069b8a3432",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-03-questionnaire-1",
+              "sha256": "3680b48c9f9cdfe898fcc7958f57bdd93ae6a3bef99356223e83bca0eb33f957"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-MOB-03-questionnaire-receipt-1 was already used for another-control-and-deployment-window"
+          }
+        ],
+        "digest": "be65c7fc700ffca8c29ec23351865e84da5f18a21641e78ac11fc85785169f42"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/negative/evidence-stale.json",
+      "fixtureSha256": "7b6b921ec8a8fee33728b22f747fc65a83ef470f0183102470641729c2e42e54",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-03-questionnaire-1",
+              "sha256": "321ac881177437863c5c7fc80746e178662aa5607843bb7cf687e37cc40e647d"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T10:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "65ce45d138eaca735d38bb17dd84c0ecb7c05fcbfcc7a41e2de523d5469357d9"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/negative/evidence-violation.json",
+      "fixtureSha256": "c5c8d3af94fdd65591c93b4a043ba086ec120853c97692a632ebdca04ae32050",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "778684c4990ae957d8ede52fa50c72734e4dc603f785130539feb6c5d5ef215c"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/negative/oracle-port-lower-authorization.json",
+      "fixtureSha256": "8384f4843d8c8a99b70b4bcc9509ed5e70b5bab3bfe5b39d26e2814b72e74abe",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "80a6e3a0591f12fa89040290389422249f3ef98be71e2f06601d6fc50727dbd4"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "authorization_level_too_low"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "authorization_level_too_low",
+        "claimKind": "synthetic_example",
+        "openedRequests": [],
+        "decisions": [
+          {
+            "requestId": "access-request-1",
+            "result": "deny",
+            "reasonCode": "authorization_level_too_low",
+            "level": 2,
+            "revision": 1
+          }
+        ],
+        "currentLevel": 2
+      }
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/negative/oracle-port-raised-without-recheck.json",
+      "fixtureSha256": "e5a8a9e9bd28e44efc574f7c1515ebfa6270679bae29ef20a881dfd420264b36",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "80a6e3a0591f12fa89040290389422249f3ef98be71e2f06601d6fc50727dbd4"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "security_level_changed"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "security_level_changed",
+        "claimKind": "synthetic_example",
+        "openedRequests": [],
+        "decisions": [
+          {
+            "requestId": "access-request-1",
+            "result": "deny",
+            "reasonCode": "security_level_changed",
+            "level": 2,
+            "revision": 2
+          }
+        ],
+        "currentLevel": 2
+      }
+    },
+    {
+      "controlId": "L1-MOB-03",
+      "case": "L1-MOB-03/negative/oracle-port-unknown-level.json",
+      "fixtureSha256": "abbd3d0040f5ce13c7d2ba8488bc831c9bfb96b25356557dabf264a50656cd4f",
+      "profileId": "mobility-port-operations",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "80a6e3a0591f12fa89040290389422249f3ef98be71e2f06601d6fc50727dbd4"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "current_level_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "current_level_unavailable",
+        "claimKind": "synthetic_example",
+        "openedRequests": [],
+        "decisions": [
+          {
+            "requestId": "access-request-1",
+            "result": "not_evaluated",
+            "reasonCode": "current_level_unavailable",
+            "level": null,
+            "revision": 0
+          }
+        ],
+        "currentLevel": null
+      }
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/positive/evidence-valid.json",
+      "fixtureSha256": "244ce616b5d398fdf359683fcfb1b32d93c4bd75d21ab2a3b70cc113c2cc2da3",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "0d728c6c79bde4f7d42150d49e7279d771c74c4479e1a57c341fc39cb081b5b9"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/positive/oracle-change-bound-approval.json",
+      "fixtureSha256": "96cc9435674b30313c195e545916b386a88db4e2a2640eca421d0047d1d0d291",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "552a7e625c991dda226d6e9d06a0b348549e1e1d5bab77b569cbfa555c48b858"
+      },
+      "expectedLocalOracle": {
+        "result": "pass",
+        "reasonCode": "change_records_bound"
+      },
+      "actualLocalOracle": {
+        "result": "pass",
+        "reasonCode": "change_records_bound",
+        "claimKind": "synthetic_example",
+        "mergeReleases": [
+          "sha256:9e4ec1a8afb0be08004a24ba2da12d046f2a947e53e01528f7b99d7ea78c9c1e"
+        ],
+        "changeDigest": "sha256:9e4ec1a8afb0be08004a24ba2da12d046f2a947e53e01528f7b99d7ea78c9c1e"
+      }
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/evidence-contradictory.json",
+      "fixtureSha256": "66ae3eddba6ba45cb4544838aac6149b1692cdc178c97f8a5afb384519d97e39",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "618e99652eb3a07273299990d89868dce24049a6652bbaaa390d69b022a66fec"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "8d7451008bd119900960687a3d3274962467be45105d69dd5a1a705a0a674ccc",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-04-questionnaire-1",
+              "sha256": "f366cbbd3e3792eddef0f95521f970f198371b189cb34bb987969a8abe3115eb"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant another-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "de39c254326b4c84129513d0591fd866a78647a1301ad71bcdfd6c0a2e47fd11"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/evidence-empty.json",
+      "fixtureSha256": "00433dd1996959146ea3764d65d8aff7720efcbd0c86014b2ee0ffa7b4eb55fd",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "07cc7170942c2da4c8bd0c52f0fa5cd9beec2f2fc0036ac2976d762f72161393"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/evidence-replayed.json",
+      "fixtureSha256": "b8092b2b21c15bfded951da9347da712e203352ded02bad739665b4e8176f29b",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-04-questionnaire-1",
+              "sha256": "4498c414efde0836511672f9cd0e5819be17f59766d6bba61ec65299a115bb00"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-MOB-04-questionnaire-receipt-1 was already used for another-control-and-deployment-window"
+          }
+        ],
+        "digest": "2c856f0335bb4b3abf8b7c9ddb84d2447ac98a646da66f693eaac88fd90ecc3a"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/evidence-stale.json",
+      "fixtureSha256": "cb665ae88decc29521be3aa389ae043f931ded187a3345d794dc0c20885e034f",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-04-questionnaire-1",
+              "sha256": "6679eba739b511ce2945a441dbdc7e85b572cc845a64f292987575b145c17b5b"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T10:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "d666704e761b671a868a6e3a89c937913b59d890ee0f505079f44ca7d141e8a0"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/evidence-violation.json",
+      "fixtureSha256": "3ba504e00f2e093c33dc52600686ed3837f0ba4d4870a737b53e5ce714c4d7d9",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "748c3c2cfee00d032b8411d2587fbe3547d2d3ff0914b4ac1c5e2f660b204f26"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/oracle-change-expired-approval.json",
+      "fixtureSha256": "e00a649647c4b88951de4d95c1fd875c4be4c23506b5cae432baa9b2ab8ebc58",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "552a7e625c991dda226d6e9d06a0b348549e1e1d5bab77b569cbfa555c48b858"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "approval_expired"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "approval_expired",
+        "claimKind": "synthetic_example",
+        "mergeReleases": [],
+        "changeDigest": "sha256:9e4ec1a8afb0be08004a24ba2da12d046f2a947e53e01528f7b99d7ea78c9c1e"
+      }
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/oracle-change-missing-analysis.json",
+      "fixtureSha256": "cc3c53bf098422fbd9fe14802b6a94cde1eda8595f8e012ffcb1703c4704a6d9",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "552a7e625c991dda226d6e9d06a0b348549e1e1d5bab77b569cbfa555c48b858"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "analysis_required"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "analysis_required",
+        "claimKind": "synthetic_example",
+        "mergeReleases": [],
+        "changeDigest": "sha256:9e4ec1a8afb0be08004a24ba2da12d046f2a947e53e01528f7b99d7ea78c9c1e"
+      }
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/oracle-change-missing-approval.json",
+      "fixtureSha256": "cfcd10dcb524e1fa0a67720c9352eb9fd9a0a5673bc07c68d04cedd15be13574",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "552a7e625c991dda226d6e9d06a0b348549e1e1d5bab77b569cbfa555c48b858"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "approval_required"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "approval_required",
+        "claimKind": "synthetic_example",
+        "mergeReleases": [],
+        "changeDigest": "sha256:9e4ec1a8afb0be08004a24ba2da12d046f2a947e53e01528f7b99d7ea78c9c1e"
+      }
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/oracle-change-unclassified.json",
+      "fixtureSha256": "e4fe30d20d43eab3c8b581d74e9e14e195d2aa8a91911377afb3108cdfe7f064",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "552a7e625c991dda226d6e9d06a0b348549e1e1d5bab77b569cbfa555c48b858"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "change_classification_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "change_classification_unavailable",
+        "claimKind": "synthetic_example",
+        "mergeReleases": [],
+        "changeDigest": "sha256:9e4ec1a8afb0be08004a24ba2da12d046f2a947e53e01528f7b99d7ea78c9c1e"
+      }
+    },
+    {
+      "controlId": "L1-MOB-04",
+      "case": "L1-MOB-04/negative/oracle-change-wrong-digest.json",
+      "fixtureSha256": "445c4e087e0a1ba115362974448f971f82bad224f38f35476c45d5c19c9910ac",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "552a7e625c991dda226d6e9d06a0b348549e1e1d5bab77b569cbfa555c48b858"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "change_digest_mismatch"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "change_digest_mismatch",
+        "claimKind": "synthetic_example",
+        "mergeReleases": [],
+        "changeDigest": "sha256:9e4ec1a8afb0be08004a24ba2da12d046f2a947e53e01528f7b99d7ea78c9c1e"
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/positive/evidence-valid.json",
+      "fixtureSha256": "0f6f37fea6ce126a6403d78efa04f17ca76f172c52fea65f8ec9485e3f800264",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "0ad1a05a3420b22807a15081da7d15009256a9ffe25830914b5215a0247183fe"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/positive/oracle-ota-trusted.json",
+      "fixtureSha256": "b830f0273417b375946a8639f6227d7c9093deb9f6c408fe05bb63700ed2dfe7",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "allow",
+        "reasonCode": "pinned_release_verified"
+      },
+      "actualLocalOracle": {
+        "result": "allow",
+        "reasonCode": "pinned_release_verified",
+        "claimKind": "synthetic_example",
+        "installedPackages": [
+          {
+            "vehicleId": "vehicle-1",
+            "fleetId": "fleet-1",
+            "packageId": "ota-package-1",
+            "targetVersion": "synthetic-1.1.0",
+            "payloadSha256": "ab8f234f2a632f1649ade22801cdcb183a7f70ee43ec6f214c76606458a9dd0e",
+            "verifiedMetadataDigest": "sha256:720dca69f5154fc507d143350f0e30114991b537e91c913ca7d33d7c9d5feb3a"
+          },
+          {
+            "vehicleId": "vehicle-2",
+            "fleetId": "fleet-1",
+            "packageId": "ota-package-1",
+            "targetVersion": "synthetic-1.1.0",
+            "payloadSha256": "ab8f234f2a632f1649ade22801cdcb183a7f70ee43ec6f214c76606458a9dd0e",
+            "verifiedMetadataDigest": "sha256:720dca69f5154fc507d143350f0e30114991b537e91c913ca7d33d7c9d5feb3a"
+          }
+        ],
+        "integrity": true,
+        "admission": {
+          "signature": "mobility-ota.sig",
+          "purpose": "release",
+          "keyId": "70eaf85143628c9c7d1ec08ed8063c8c0e35b1ccc0faf5721b845d236bf77509",
+          "status": "admitted",
+          "source": "trust-list",
+          "listId": "mobility-fixture-release",
+          "timeBasis": "claimed",
+          "detail": null
+        }
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/evidence-contradictory.json",
+      "fixtureSha256": "d44d83c2c25293bf1156ccd940ee23e00f9189a2024151ea47853de78be7f0e3",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "7c298a602772bf55e2515ba176b74b36fb81531d5de2ba937fb0873a8510a2ac"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "dd719d1389b029118174a1c698b411548ce114819cdd91feabc1a668484e45dc",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-05-questionnaire-1",
+              "sha256": "f2727a7b16ac3d1eacccc2b38767bd7380fdee24deb7a91a00ba94f255cb02bf"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant another-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "d442cfa7cbae2b3dfc7706042b97fb8a37890db37f96b3cac3d7f99c9f1ce8f0"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/evidence-empty.json",
+      "fixtureSha256": "6b7583344211090ded4d51420f061e336d368f824c3775a7df73cea581b5feb4",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "9798892d3b3d75f96ed8f4563880a97bc73a3acecb88d4d2b0bcfe479519722e"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/evidence-replayed.json",
+      "fixtureSha256": "32f3280f8103e8ce34f346513abac2f44e0ca7c40c2071f4d67ae318ec24dfe7",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-05-questionnaire-1",
+              "sha256": "34dd46cf4e9e50d2ccca4f95644e99823ec536876db216bdc07473d31eee86f7"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-MOB-05-questionnaire-receipt-1 was already used for another-control-and-deployment-window"
+          }
+        ],
+        "digest": "2ca109f318c2ee0c06e6a309d620403035ff714f1bc1991f1fd675018ea0b165"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/evidence-stale.json",
+      "fixtureSha256": "cf6a3b80039c1a2e38ebe3961874f207d45e8e70e0c618b1e09c908357f06742",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-05-questionnaire-1",
+              "sha256": "e1d7f62cf29cd49423edca5c14cf1e39aa40f5bfd77199b1cc7cba4dd9122c69"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T10:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "3b7cc4507d24c0229037cd5ec42e6812cf9658fab9424e1ad8da884b06ef52ee"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/evidence-violation.json",
+      "fixtureSha256": "2584f5f24ffb9b5ed6354ff8d213e9bf4a20f5a831ec7fc947008f2b716722a0",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "c3e2d0053e5a487c2975b89c9d43498d6207f1da13ddc06bfec05a4e1d3ebed0"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/oracle-ota-bad-content.json",
+      "fixtureSha256": "66fe9ac9b16f99de6f591b3109875d1b7dd2b79eeef53ccd4b53130cd3d5660f",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "payload_digest_mismatch"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "payload_digest_mismatch",
+        "claimKind": "synthetic_example",
+        "installedPackages": [],
+        "integrity": null,
+        "admission": null
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/oracle-ota-bad-signature.json",
+      "fixtureSha256": "8eaf0313a317a44f53faa04904909c40cd2b08bc2f0a51d19b8e84979c65460c",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signature_invalid"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signature_invalid",
+        "claimKind": "synthetic_example",
+        "installedPackages": [],
+        "integrity": false,
+        "admission": {
+          "signature": "mobility-ota.sig",
+          "purpose": "release",
+          "keyId": "c302dd8ebd4a87afd17f4319519e6a30b2114ee9c7cad166b04be5bdfd1718cf",
+          "status": "admitted",
+          "source": "trust-list",
+          "listId": "mobility-fixture-release",
+          "timeBasis": "claimed",
+          "detail": null
+        }
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/oracle-ota-incomplete-r156.json",
+      "fixtureSha256": "8756b38903c739fad34bfbb952b74cbaf3f414ebda783c5d92f1b970da95412d",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "update_records_incomplete"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "update_records_incomplete",
+        "claimKind": "synthetic_example",
+        "installedPackages": [],
+        "integrity": null,
+        "admission": null
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/oracle-ota-invalid-trust.json",
+      "fixtureSha256": "90d6b12f56d06810bbe670f6ae7f42dc8e87092904390c343c846940c96c24d3",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "trust_verification_failed"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "trust_verification_failed",
+        "claimKind": "synthetic_example",
+        "installedPackages": [],
+        "integrity": null,
+        "admission": null
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/oracle-ota-revoked-signer.json",
+      "fixtureSha256": "5c286787fb1790717231eca97ad22920901a5815de7ba7914746070d2b6f5a04",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signer_not_admitted"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signer_not_admitted",
+        "claimKind": "synthetic_example",
+        "installedPackages": [],
+        "integrity": true,
+        "admission": {
+          "signature": "mobility-ota.sig",
+          "purpose": "release",
+          "keyId": "446c4a96dd7915fd1b14a262b2780cf6538688460bf3d4ee722a2116d66c856f",
+          "status": "revoked",
+          "source": null,
+          "listId": "mobility-fixture-release",
+          "timeBasis": null,
+          "detail": "trust list mobility-fixture-release revoked this key at 2026-10-17T00:00:00.000Z (cessation)"
+        }
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/oracle-ota-trust-unavailable.json",
+      "fixtureSha256": "1306ba909ec0b2a19d1a35d3f2f4cd6139bbbe5f6261d0c22c2ad3f48c85350d",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "trust_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "trust_unavailable",
+        "claimKind": "synthetic_example",
+        "installedPackages": [],
+        "integrity": null,
+        "admission": null
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/oracle-ota-unknown-signer.json",
+      "fixtureSha256": "5bb126b095bb84ecf9fee048f78909cb5a9206e45bba916eca690e328fbd52e5",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signer_not_admitted"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signer_not_admitted",
+        "claimKind": "synthetic_example",
+        "installedPackages": [],
+        "integrity": true,
+        "admission": {
+          "signature": "mobility-ota.sig",
+          "purpose": "release",
+          "keyId": "32ffd19994bee13fe200fdcf20c648a81bf04c6eb48685686b843e647a287a1c",
+          "status": "not-pinned",
+          "source": null,
+          "listId": null,
+          "timeBasis": null,
+          "detail": "key 32ffd19994bee13fe200fdcf20c648a81bf04c6eb48685686b843e647a287a1c is not pinned for release by --pubkey or any trust list; pin it with --pubkey or add it to a signed trust list"
+        }
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/oracle-ota-unsigned.json",
+      "fixtureSha256": "8bacc85255ab3d794f3ef83b805f7b2f674601b4014f3e78144bea5c194afa26",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signature_invalid"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signature_invalid",
+        "claimKind": "synthetic_example",
+        "installedPackages": [],
+        "integrity": false,
+        "admission": {
+          "signature": "mobility-ota.sig",
+          "purpose": "release",
+          "keyId": "732462cd0913e9c7742667be29b6f2ee9b6b45306262482a29ac262a4a90acb8",
+          "status": "admitted",
+          "source": "trust-list",
+          "listId": "mobility-fixture-release",
+          "timeBasis": "claimed",
+          "detail": null
+        }
+      }
+    },
+    {
+      "controlId": "L1-MOB-05",
+      "case": "L1-MOB-05/negative/oracle-ota-wrong-purpose.json",
+      "fixtureSha256": "f805ae2f789be7482d5c9ca7b9d8fc5ecb0b71cb12047d625730e5648fd58e44",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+      },
+      "expectedLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signer_not_admitted"
+      },
+      "actualLocalOracle": {
+        "result": "deny",
+        "reasonCode": "signer_not_admitted",
+        "claimKind": "synthetic_example",
+        "installedPackages": [],
+        "integrity": true,
+        "admission": {
+          "signature": "mobility-ota.sig",
+          "purpose": "release",
+          "keyId": "bde09b1445cd7c2d5cd6fae31939567dac4b2b467ca395c0e2253f98897851d0",
+          "status": "wrong-purpose",
+          "source": null,
+          "listId": "mobility-fixture-release",
+          "timeBasis": null,
+          "detail": "trust list mobility-fixture-release pins this key for artifact-seal, not release"
+        }
+      }
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/positive/evidence-valid.json",
+      "fixtureSha256": "e553df559a01dc8c3accf4b231c59211c94ad5b25513cb5a55d02846acc8bc73",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "f2f62a5e572f75917e0508980e74507f3619cd4d16a164c1c182c7700c5a18d8"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/positive/oracle-fallback-boundary.json",
+      "fixtureSha256": "22da52d30a5b1787500ed9967255494902ae757f7365033fe87d8236f99f115e",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a87933b7581d59242330e6adab1467eea3f6491cdcf042e766c4e392fd039ba3"
+      },
+      "expectedLocalOracle": {
+        "result": "pass",
+        "reasonCode": "minimal_risk_reached"
+      },
+      "actualLocalOracle": {
+        "result": "pass",
+        "reasonCode": "minimal_risk_reached",
+        "claimKind": "synthetic_example",
+        "deploymentReleases": [
+          "vehicle-1"
+        ],
+        "reachedAt": "2026-10-18T11:59:59.000Z",
+        "deadlineAt": "2026-10-18T11:59:59.000Z",
+        "observedSamples": 2
+      }
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/positive/oracle-fallback-on-time.json",
+      "fixtureSha256": "3806ab1cce7ccd3e473cc2c0d8fdc8099f193ad17d96385a0b6bf6df76d6549f",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a87933b7581d59242330e6adab1467eea3f6491cdcf042e766c4e392fd039ba3"
+      },
+      "expectedLocalOracle": {
+        "result": "pass",
+        "reasonCode": "minimal_risk_reached"
+      },
+      "actualLocalOracle": {
+        "result": "pass",
+        "reasonCode": "minimal_risk_reached",
+        "claimKind": "synthetic_example",
+        "deploymentReleases": [
+          "vehicle-1"
+        ],
+        "reachedAt": "2026-10-18T11:59:58.000Z",
+        "deadlineAt": "2026-10-18T11:59:59.000Z",
+        "observedSamples": 2
+      }
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/negative/evidence-contradictory.json",
+      "fixtureSha256": "290ca330ab94ce58a705b392ee77c8e620baf225197361315c2dbb3b17ced534",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "contradictory"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "contradictory",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "df84f71e7f261d98203ff2f7cb8192817e87f91d0ccce8bfe6ef798473bec849"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/negative/evidence-cross-tenant.json",
+      "fixtureSha256": "d84d6de7066dc6e40caca8258ed0ae88211c817ca8ad8e028714c35590eb164c",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "cross_tenant"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "untrusted",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-06-questionnaire-1",
+              "sha256": "6f72c29972cbc4797b07e7d24caf40a16fa4a0b48f033833f3c6947096c5c449"
+            },
+            "reason": "cross_tenant",
+            "detail": "tenant another-tenant is not this evaluation's tenant"
+          }
+        ],
+        "digest": "bc17c01f30515ac14b8291be9952393ef995eaad8b631d698092b82b5b33db9d"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/negative/evidence-empty.json",
+      "fixtureSha256": "6f22fe45912bd30f8a705f5cda5df2091c5110f415a9b4f1041eacb916df8e15",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a24b092da30ed025be716e464805857c92a2476a10a48de796eb871d89efbc16"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/negative/evidence-replayed.json",
+      "fixtureSha256": "f171de66790b869f12509b52e18910be4a7c2da7e0df8043f82b5d5a3e7a2dfe",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "replayed"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-06-questionnaire-1",
+              "sha256": "952dc6d0c2366f556a206884eb24ada158a786d045274ae1e357c8f7e8ed5047"
+            },
+            "reason": "replayed",
+            "detail": "receipt:L1-MOB-06-questionnaire-receipt-1 was already used for another-control-and-deployment-window"
+          }
+        ],
+        "digest": "0316c08723b2fe6fbcbaeb30967be6b7f4b2cb0f1829ef4b12dd50a5406d6569"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/negative/evidence-stale.json",
+      "fixtureSha256": "122e91a9d87146e8ee1d3dc9e11b3c125fca26900024d60e2adf4aa608f60bfe",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "stale"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "stale",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [
+          {
+            "ref": {
+              "kind": "receipt",
+              "id": "L1-MOB-06-questionnaire-1",
+              "sha256": "b81f6e1045dd4a02cfdf2a2ab351a732d4e1c1d0892a49e7a4b6cdc542f604fb"
+            },
+            "reason": "stale",
+            "detail": "recorded 2026-09-12T10:00:00.000Z, more than 30 days before the window end"
+          }
+        ],
+        "digest": "5f1dbf33cb0fa3873538634c5117a4f57f678ab45b10d15301758910b5a920b5"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/negative/evidence-violation.json",
+      "fixtureSha256": "827b0daf7288bb9db03b5ebec69cae348d1f0c8f106a9415f7619d56d3869ad4",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "fail",
+        "reasonCode": null
+      },
+      "actualFixtureAdmission": {
+        "result": "fail",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "observed"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "13014a44b7bcf66699c8cfa16a3e5cad3e88ca514763350ada8bd1a6feb0dd51"
+      },
+      "expectedLocalOracle": null,
+      "actualLocalOracle": null
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/negative/oracle-fallback-late.json",
+      "fixtureSha256": "8493284904e1bbda27db0bf74dd65df8ce58d74c047062e0395bd9f8d81ad4b9",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a87933b7581d59242330e6adab1467eea3f6491cdcf042e766c4e392fd039ba3"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "minimal_risk_late"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "minimal_risk_late",
+        "claimKind": "synthetic_example",
+        "deploymentReleases": [],
+        "reachedAt": "2026-10-18T11:59:59.001Z",
+        "deadlineAt": "2026-10-18T11:59:59.000Z",
+        "observedSamples": 2
+      }
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/negative/oracle-fallback-not-reached.json",
+      "fixtureSha256": "eb2224636ae7dee42c41edd42d3a31018bf236bb4e00682359a69d859885108b",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a87933b7581d59242330e6adab1467eea3f6491cdcf042e766c4e392fd039ba3"
+      },
+      "expectedLocalOracle": {
+        "result": "fail",
+        "reasonCode": "minimal_risk_not_reached"
+      },
+      "actualLocalOracle": {
+        "result": "fail",
+        "reasonCode": "minimal_risk_not_reached",
+        "claimKind": "synthetic_example",
+        "deploymentReleases": [],
+        "reachedAt": null,
+        "deadlineAt": "2026-10-18T11:59:59.000Z",
+        "observedSamples": 2
+      }
+    },
+    {
+      "controlId": "L1-MOB-06",
+      "case": "L1-MOB-06/negative/oracle-fallback-undefined.json",
+      "fixtureSha256": "5538497d4fbdcfbeddb4376ea055f80d272b00cf5168d156a83e2947139e4258",
+      "profileId": "mobility-fleet-software",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "expectedFixtureAdmission": {
+        "result": "not_evaluated",
+        "reasonCode": "incomplete"
+      },
+      "actualFixtureAdmission": {
+        "result": "not_evaluated",
+        "evidence": "incomplete",
+        "enforcement": {
+          "state": "none"
+        },
+        "claimKind": "self_reported",
+        "rejected": [],
+        "digest": "a87933b7581d59242330e6adab1467eea3f6491cdcf042e766c4e392fd039ba3"
+      },
+      "expectedLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "minimal_risk_profile_unavailable"
+      },
+      "actualLocalOracle": {
+        "result": "not_evaluated",
+        "reasonCode": "minimal_risk_profile_unavailable",
+        "claimKind": "synthetic_example",
+        "deploymentReleases": [],
+        "reachedAt": null,
+        "deadlineAt": null,
+        "observedSamples": 2
+      }
+    }
+  ],
+  "production": [
+    {
+      "profileId": "mobility-port-operations",
+      "controlId": "L1-MOB-01",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "11d9b0a5cbb550a4b46e4be78b92176b0e9305e5749140ae85ac3e68b982471f"
+    },
+    {
+      "profileId": "mobility-port-operations",
+      "controlId": "L1-MOB-03",
+      "planDigest": "sha256:dc64dfe1ac144f135596644e06b0377bed6f0ef26a548ea80eaeeba1c0fcc7eb",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "80a6e3a0591f12fa89040290389422249f3ef98be71e2f06601d6fc50727dbd4"
+    },
+    {
+      "profileId": "mobility-tenant-screening",
+      "controlId": "L1-MOB-02",
+      "planDigest": "sha256:2314da87ed8f078c8fcfe25f13bbb0e33e9fcbeb5c1bceb7165ae3596ed18fe7",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "3f1670650a14ba9a3b5b86a1e88a099a1e3213002deecf9e704898e0c9b332de"
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "controlId": "L1-MOB-04",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "552a7e625c991dda226d6e9d06a0b348549e1e1d5bab77b569cbfa555c48b858"
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "controlId": "L1-MOB-05",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "992cdc89d23aec7cd64f9a4976b94427067e9071e1fb51bf26cfbd81fb56a8af"
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "controlId": "L1-MOB-06",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "a87933b7581d59242330e6adab1467eea3f6491cdcf042e766c4e392fd039ba3"
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "controlId": "L1-TECH-02",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "2c92a3aef8431a9ddce1b6b769b7ee9c92e6baa69b55896e31db40490ac31237"
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "controlId": "L1-TECH-03",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "bf8ac15d8fe2811cd648be01fe67e33b9ea16918e79a6559ccf05d8dfc294b13"
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "controlId": "L1-TECH-04",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "6ce735d21a13f15da6153330e19f8c15c088bb2395f471f29995cc7d6fbc0ca8"
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "controlId": "L1-TECH-06",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "2f43710057dee99075a0a5396759293d22a0e23711202aaa69246a0068feb137"
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "controlId": "L1-TECH-07",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "5f62ee2de75e60f9d4387ed5ef55810678a759b008a86ad77214ec25354b49b6"
+    },
+    {
+      "profileId": "mobility-fleet-software",
+      "controlId": "L1-TECH-08",
+      "planDigest": "sha256:838beba0c10870997d621cfc805daaf367b5f4f1df32edaf7c90e4506bd8baa8",
+      "result": "not_evaluated",
+      "evidence": "incomplete",
+      "enforcement": {
+        "state": "none"
+      },
+      "claimKind": "self_reported",
+      "admittedCount": 0,
+      "digest": "bf7495895352c7f7fe9ce0bb40d9e9d2d208fcbb621fa1e9c29c0604f4343971"
+    }
+  ]
+}

@@ -1,0 +1,1700 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssues": [
+    "AMC-1513",
+    "AMC-1519"
+  ],
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "reviewKind": "Independent read-only review of frozen actual execution evidence",
+  "state": "BOUNDED_ACTUAL_EVIDENCE_CONSISTENT_WITH_STATED_LIMITS",
+  "authorship": {
+    "preparation": "This reviewer authored the S7 preparation/controller. This is not an independent review of that preparation authorship.",
+    "execution": "Root authored the separate scheduling drivers/releases and performed actual execution. Original Claude tests and source remain exact.",
+    "currentReview": "Read-only independent reconciliation of raw/reporter/process/source/preservation artifacts; no execution was repeated."
+  },
+  "findings": [],
+  "blockingFindings": 0,
+  "actualAudit": {
+    "errors": [],
+    "commands": 45,
+    "corpusProcesses": 44,
+    "counts": {
+      "numTotalTests": 703,
+      "numPassedTests": 682,
+      "numFailedTests": 21
+    },
+    "uniqueOriginalCases": 25,
+    "distinctFailedOriginalCases": 14,
+    "phases": [
+      {
+        "phase": "original-pure-bwrap-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 1630
+      },
+      {
+        "phase": "S7-M01-bwrap-child-guard-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 1835
+      },
+      {
+        "phase": "S7-M01-bwrap-child-guard-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 17,
+        "failed": 4,
+        "exit": 1,
+        "pid": 1847
+      },
+      {
+        "phase": "S7-M01-bwrap-child-guard-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 1852
+      },
+      {
+        "phase": "S7-M02-bwrap-exit-before-child-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 1902
+      },
+      {
+        "phase": "S7-M02-bwrap-exit-before-child-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 20,
+        "failed": 1,
+        "exit": 1,
+        "pid": 1907
+      },
+      {
+        "phase": "S7-M02-bwrap-exit-before-child-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 1912
+      },
+      {
+        "phase": "S7-M03-bwrap-exit-dup-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2000
+      },
+      {
+        "phase": "S7-M03-bwrap-exit-dup-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 20,
+        "failed": 1,
+        "exit": 1,
+        "pid": 2010
+      },
+      {
+        "phase": "S7-M03-bwrap-exit-dup-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2018
+      },
+      {
+        "phase": "S7-M04-bwrap-exit-range-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2093
+      },
+      {
+        "phase": "S7-M04-bwrap-exit-range-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 20,
+        "failed": 1,
+        "exit": 1,
+        "pid": 2099
+      },
+      {
+        "phase": "S7-M04-bwrap-exit-range-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2104
+      },
+      {
+        "phase": "S7-M05-bwrap-nonobject-row-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2161
+      },
+      {
+        "phase": "S7-M05-bwrap-nonobject-row-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 20,
+        "failed": 1,
+        "exit": 1,
+        "pid": 2168
+      },
+      {
+        "phase": "S7-M05-bwrap-nonobject-row-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2178
+      },
+      {
+        "phase": "S7-M06-bwrap-child-positive-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2241
+      },
+      {
+        "phase": "S7-M06-bwrap-child-positive-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 19,
+        "failed": 2,
+        "exit": 1,
+        "pid": 2252
+      },
+      {
+        "phase": "S7-M06-bwrap-child-positive-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2258
+      },
+      {
+        "phase": "S7-M07-bpf-arch-check-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2310
+      },
+      {
+        "phase": "S7-M07-bpf-arch-check-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 19,
+        "failed": 2,
+        "exit": 1,
+        "pid": 2315
+      },
+      {
+        "phase": "S7-M07-bpf-arch-check-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2320
+      },
+      {
+        "phase": "S7-M08-bpf-x32-rule-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2416
+      },
+      {
+        "phase": "S7-M08-bpf-x32-rule-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 20,
+        "failed": 1,
+        "exit": 1,
+        "pid": 2423
+      },
+      {
+        "phase": "S7-M08-bpf-x32-rule-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2432
+      },
+      {
+        "phase": "S7-M09-bpf-io-uring-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2498
+      },
+      {
+        "phase": "S7-M09-bpf-io-uring-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 19,
+        "failed": 2,
+        "exit": 1,
+        "pid": 2517
+      },
+      {
+        "phase": "S7-M09-bpf-io-uring-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2522
+      },
+      {
+        "phase": "S7-M10-bpf-connect-baseline",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2659
+      },
+      {
+        "phase": "S7-M10-bpf-connect-mutant",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 20,
+        "failed": 1,
+        "exit": 1,
+        "pid": 2664
+      },
+      {
+        "phase": "S7-M10-bpf-connect-restored",
+        "file": "tests/bwrapBackendPure.test.ts",
+        "registered": 21,
+        "passed": 21,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2676
+      },
+      {
+        "phase": "original-scripted-native-verifier-baseline",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2731
+      },
+      {
+        "phase": "S7-M26-sdk-close-before-verify-753-baseline",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2810
+      },
+      {
+        "phase": "S7-M26-sdk-close-before-verify-753-mutant",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 3,
+        "failed": 1,
+        "exit": 1,
+        "pid": 2833
+      },
+      {
+        "phase": "S7-M26-sdk-close-before-verify-753-restored",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "exit": 0,
+        "pid": 2848
+      },
+      {
+        "phase": "S7-M27-sdk-trust-anchor-789-baseline",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "exit": 0,
+        "pid": 3449
+      },
+      {
+        "phase": "S7-M27-sdk-trust-anchor-789-mutant",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 2,
+        "failed": 2,
+        "exit": 1,
+        "pid": 3466
+      },
+      {
+        "phase": "S7-M27-sdk-trust-anchor-789-restored",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "exit": 0,
+        "pid": 3489
+      },
+      {
+        "phase": "S7-M28-sdk-trust-anchor-mismatch-only-789-baseline",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "exit": 0,
+        "pid": 3799
+      },
+      {
+        "phase": "S7-M28-sdk-trust-anchor-mismatch-only-789-mutant",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 3,
+        "failed": 1,
+        "exit": 1,
+        "pid": 3819
+      },
+      {
+        "phase": "S7-M28-sdk-trust-anchor-mismatch-only-789-restored",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "exit": 0,
+        "pid": 3833
+      },
+      {
+        "phase": "S7-M29-sdk-trust-anchor-missing-only-789-baseline",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "exit": 0,
+        "pid": 3948
+      },
+      {
+        "phase": "S7-M29-sdk-trust-anchor-missing-only-789-mutant",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 3,
+        "failed": 1,
+        "exit": 1,
+        "pid": 3969
+      },
+      {
+        "phase": "S7-M29-sdk-trust-anchor-missing-only-789-restored",
+        "file": "tests/nativeAgentClientVerify.test.ts",
+        "registered": 4,
+        "passed": 4,
+        "failed": 0,
+        "exit": 0,
+        "pid": 3992
+      }
+    ],
+    "controls": [
+      {
+        "index": 0,
+        "id": "S7-M01-bwrap-child-guard",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          17,
+          21
+        ],
+        "failedNames": [
+          "bwrapCommandExit duplicate child or exit rows are refused",
+          "bwrapCommandExit child pid 1.5 is refused",
+          "bwrapCommandExit child pid 12 is refused",
+          "bwrapCommandExit child pid 9007199254740992 is refused"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Removing duplicate-child and safe-integer clauses permits duplicate child, fractional, text '12', and unsafe-integer positive child IDs. The nonpositive guard remains. Duplicate-child failure at63:100 masks the subsequent duplicate-exit assertion in that case."
+      },
+      {
+        "index": 1,
+        "id": "S7-M02-bwrap-exit-before-child",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          20,
+          21
+        ],
+        "failedNames": [
+          "bwrapCommandExit an exit code without a preceding child pid is refused"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Exit-only still returns null through the final absent-child expression. The exit-before-later-child vector at59:79 returns0 and directly detects this missing ordering clause."
+      },
+      {
+        "index": 2,
+        "id": "S7-M03-bwrap-exit-dup",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          20,
+          21
+        ],
+        "failedNames": [
+          "bwrapCommandExit duplicate child or exit rows are refused"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Duplicate-child refusal passes; duplicate-exit assertion64:99 gets1 instead of null."
+      },
+      {
+        "index": 3,
+        "id": "S7-M04-bwrap-exit-range",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          20,
+          21
+        ],
+        "failedNames": [
+          "bwrapCommandExit exit code 256 is refused"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Exit256 returns256 at72:82. Other integer/type/range clauses remain."
+      },
+      {
+        "index": 4,
+        "id": "S7-M05-bwrap-nonobject-row",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          20,
+          21
+        ],
+        "failedNames": [
+          "bwrapCommandExit row [1] is refused"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Array [1] is ignored/admitted before completion at76:84. Primitive in-operator errors remain caught and return null; broader malformed-row admission is not established."
+      },
+      {
+        "index": 5,
+        "id": "S7-M06-bwrap-child-positive",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          19,
+          21
+        ],
+        "failedNames": [
+          "bwrapCommandExit child pid 0 is refused",
+          "bwrapCommandExit child pid -1 is refused"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Nonpositive integer child IDs0/-1 return0 at68:80; safe-integer/type refusal remains."
+      },
+      {
+        "index": 6,
+        "id": "S7-M07-bpf-arch-check",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          19,
+          21
+        ],
+        "failedNames": [
+          "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+          "linuxSocketDenyFilter arm64 uses its own socket numbers and kills the x64 ABI"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Both foreign-ABI first assertions29:46/40:46 return EPERM327681 instead of KILL2147483648. Later body syscall and allowed-call assertions are masked."
+      },
+      {
+        "index": 7,
+        "id": "S7-M08-bpf-x32-rule",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          20,
+          21
+        ],
+        "failedNames": [
+          "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Prior architecture and ordinary denial checks pass; first x32+41 at33:58 returns ALLOW2147418112 instead of EPERM327681. Later x32zero and ordinary allows are masked."
+      },
+      {
+        "index": 8,
+        "id": "S7-M09-bpf-io-uring",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          19,
+          21
+        ],
+        "failedNames": [
+          "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+          "linuxSocketDenyFilter arm64 uses its own socket numbers and kills the x64 ABI"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Both architecture loops first fail on io_uring425 at31:91/41:96 with ALLOW instead of EPERM after ordinary socket assertions passed. Later426/427 and subsequent body assertions are masked."
+      },
+      {
+        "index": 9,
+        "id": "S7-M10-bpf-connect",
+        "target": "src/sandbox/bwrapBackend.ts",
+        "counts": [
+          21,
+          20,
+          21
+        ],
+        "failedNames": [
+          "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "x64 connect42 first fails at31:91 after41/53 pass; later x64 vectors masked. Separate arm64 case passes."
+      },
+      {
+        "index": 12,
+        "id": "S7-M26-sdk-close-before-verify-753",
+        "target": "src/sdk/nativeAgentClient.ts",
+        "counts": [
+          4,
+          3,
+          4
+        ],
+        "failedNames": [
+          "native SDK cold verification admission a live client never runs or promotes verification before close"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Premature live verification resolves with a chosen workspace-key-consistency receipt at50:50. verifierRuns zero and subsequent explicit-close/postclose assertions51\u201354 are masked; afterEach closes normally."
+      },
+      {
+        "index": 13,
+        "id": "S7-M27-sdk-trust-anchor-789",
+        "target": "src/sdk/nativeAgentClient.ts",
+        "counts": [
+          4,
+          2,
+          4
+        ],
+        "failedNames": [
+          "native SDK cold verification admission an anchored receipt with a different expected fingerprint is refused",
+          "native SDK cold verification admission an anchored receipt with no expected fingerprint is refused"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Both mismatched e/f and missing null/f reported anchor fields resolve at69:50 when refusal is expected. Matching f/f and live-client guards pass. These fields and scope are chosen unsigned peer output."
+      },
+      {
+        "index": 14,
+        "id": "S7-M28-sdk-trust-anchor-mismatch-only-789",
+        "target": "src/sdk/nativeAgentClient.ts",
+        "counts": [
+          4,
+          3,
+          4
+        ],
+        "failedNames": [
+          "native SDK cold verification admission an anchored receipt with a different expected fingerprint is refused"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Only mismatch e/f loses refusal at69:50. Missing expected fingerprint, matching f/f and live-client cases remain passing."
+      },
+      {
+        "index": 15,
+        "id": "S7-M29-sdk-trust-anchor-missing-only-789",
+        "target": "src/sdk/nativeAgentClient.ts",
+        "counts": [
+          4,
+          3,
+          4
+        ],
+        "failedNames": [
+          "native SDK cold verification admission an anchored receipt with no expected fingerprint is refused"
+        ],
+        "sourceDeltaOnly": true,
+        "compiledUnchanged": true,
+        "causeAndMasking": "Only missing null/f loses refusal at69:50. Mismatch, matching f/f and live-client cases remain passing."
+      }
+    ],
+    "failures": [
+      {
+        "phase": "S7-M01-bwrap-child-guard-mutant",
+        "name": "bwrapCommandExit duplicate child or exit rows are refused",
+        "message": "expected +0 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 63,
+            "column": 100
+          }
+        ],
+        "rawPrefix": "AssertionError: expected +0 to be null",
+        "actual": "0",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M01-bwrap-child-guard-mutant",
+        "name": "bwrapCommandExit child pid 1.5 is refused",
+        "message": "expected +0 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 68,
+            "column": 80
+          }
+        ],
+        "rawPrefix": "AssertionError: expected +0 to be null",
+        "actual": "0",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M01-bwrap-child-guard-mutant",
+        "name": "bwrapCommandExit child pid 12 is refused",
+        "message": "expected +0 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 68,
+            "column": 80
+          }
+        ],
+        "rawPrefix": "AssertionError: expected +0 to be null",
+        "actual": "0",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M01-bwrap-child-guard-mutant",
+        "name": "bwrapCommandExit child pid 9007199254740992 is refused",
+        "message": "expected +0 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 68,
+            "column": 80
+          }
+        ],
+        "rawPrefix": "AssertionError: expected +0 to be null",
+        "actual": "0",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M02-bwrap-exit-before-child-mutant",
+        "name": "bwrapCommandExit an exit code without a preceding child pid is refused",
+        "message": "expected +0 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 59,
+            "column": 79
+          }
+        ],
+        "rawPrefix": "AssertionError: expected +0 to be null",
+        "actual": "0",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M03-bwrap-exit-dup-mutant",
+        "name": "bwrapCommandExit duplicate child or exit rows are refused",
+        "message": "expected 1 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 64,
+            "column": 99
+          }
+        ],
+        "rawPrefix": "AssertionError: expected 1 to be null",
+        "actual": "1",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M04-bwrap-exit-range-mutant",
+        "name": "bwrapCommandExit exit code 256 is refused",
+        "message": "expected 256 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 72,
+            "column": 82
+          }
+        ],
+        "rawPrefix": "AssertionError: expected 256 to be null",
+        "actual": "256",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M05-bwrap-nonobject-row-mutant",
+        "name": "bwrapCommandExit row [1] is refused",
+        "message": "expected +0 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 76,
+            "column": 84
+          }
+        ],
+        "rawPrefix": "AssertionError: expected +0 to be null",
+        "actual": "0",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M06-bwrap-child-positive-mutant",
+        "name": "bwrapCommandExit child pid 0 is refused",
+        "message": "expected +0 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 68,
+            "column": 80
+          }
+        ],
+        "rawPrefix": "AssertionError: expected +0 to be null",
+        "actual": "0",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M06-bwrap-child-positive-mutant",
+        "name": "bwrapCommandExit child pid -1 is refused",
+        "message": "expected +0 to be null",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 68,
+            "column": 80
+          }
+        ],
+        "rawPrefix": "AssertionError: expected +0 to be null",
+        "actual": "0",
+        "expected": "null"
+      },
+      {
+        "phase": "S7-M07-bpf-arch-check-mutant",
+        "name": "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+        "message": "expected 327681 to be 2147483648 // Object.is equality",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 29,
+            "column": 46
+          }
+        ],
+        "rawPrefix": "AssertionError: expected 327681 to be 2147483648 // Object.is equality",
+        "actual": "327681",
+        "expected": "2147483648"
+      },
+      {
+        "phase": "S7-M07-bpf-arch-check-mutant",
+        "name": "linuxSocketDenyFilter arm64 uses its own socket numbers and kills the x64 ABI",
+        "message": "expected 327681 to be 2147483648 // Object.is equality",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 40,
+            "column": 46
+          }
+        ],
+        "rawPrefix": "AssertionError: expected 327681 to be 2147483648 // Object.is equality",
+        "actual": "327681",
+        "expected": "2147483648"
+      },
+      {
+        "phase": "S7-M08-bpf-x32-rule-mutant",
+        "name": "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+        "message": "expected 2147418112 to be 327681 // Object.is equality",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 33,
+            "column": 58
+          }
+        ],
+        "rawPrefix": "AssertionError: expected 2147418112 to be 327681 // Object.is equality",
+        "actual": "2147418112",
+        "expected": "327681"
+      },
+      {
+        "phase": "S7-M09-bpf-io-uring-mutant",
+        "name": "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+        "message": "expected 2147418112 to be 327681 // Object.is equality",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 31,
+            "column": 91
+          }
+        ],
+        "rawPrefix": "AssertionError: expected 2147418112 to be 327681 // Object.is equality",
+        "actual": "2147418112",
+        "expected": "327681"
+      },
+      {
+        "phase": "S7-M09-bpf-io-uring-mutant",
+        "name": "linuxSocketDenyFilter arm64 uses its own socket numbers and kills the x64 ABI",
+        "message": "expected 2147418112 to be 327681 // Object.is equality",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 41,
+            "column": 96
+          }
+        ],
+        "rawPrefix": "AssertionError: expected 2147418112 to be 327681 // Object.is equality",
+        "actual": "2147418112",
+        "expected": "327681"
+      },
+      {
+        "phase": "S7-M10-bpf-connect-mutant",
+        "name": "linuxSocketDenyFilter x64 kills foreign ABIs and refuses socket, socketpair, connect, x32 and io_uring entry points",
+        "message": "expected 2147418112 to be 327681 // Object.is equality",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/bwrapBackendPure.test.ts",
+            "line": 31,
+            "column": 91
+          }
+        ],
+        "rawPrefix": "AssertionError: expected 2147418112 to be 327681 // Object.is equality",
+        "actual": "2147418112",
+        "expected": "327681"
+      },
+      {
+        "phase": "S7-M26-sdk-close-before-verify-753-mutant",
+        "name": "native SDK cold verification admission a live client never runs or promotes verification before close",
+        "message": "promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts",
+            "line": 50,
+            "column": 50
+          }
+        ],
+        "rawPrefix": "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "actual": "{\n  \"report\": {\n    \"ledgerErrors\": [],\n    \"ledgerOk\": true,\n    \"ok\": true,\n    \"requests\": [\n      {\n        \"headerEventId\": \"header-1\",\n        \"status\": \"reconstructed\",\n      },\n    ],\n    \"sessionChainErrors\": [],\n    \"sessionId\": \"verify-session\",\n    \"trustRoot\": {\n      \"anchored\": false,\n      \"expectedFingerprint\": null,\n      \"monitorFingerprint\": null,\n    },\n    \"unsignedRowIds\": [],\n  },\n  \"scope\": \"workspace-key-consistency\",\n  \"sessionId\": \"verify-session\",\n  \"state\": \"verified\",\n}",
+        "expected": "Error {\n  \"message\": \"rejected promise\",\n}"
+      },
+      {
+        "phase": "S7-M27-sdk-trust-anchor-789-mutant",
+        "name": "native SDK cold verification admission an anchored receipt with a different expected fingerprint is refused",
+        "message": "promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts",
+            "line": 69,
+            "column": 50
+          }
+        ],
+        "rawPrefix": "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "actual": "{\n  \"report\": {\n    \"ledgerErrors\": [],\n    \"ledgerOk\": true,\n    \"ok\": true,\n    \"requests\": [\n      {\n        \"headerEventId\": \"header-1\",\n        \"status\": \"reconstructed\",\n      },\n    ],\n    \"sessionChainErrors\": [],\n    \"sessionId\": \"verify-session\",\n    \"trustRoot\": {\n      \"anchored\": true,\n      \"expectedFingerprint\": \"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",\n      \"monitorFingerprint\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n    },\n    \"unsignedRowIds\": [],\n  },\n  \"scope\": \"externally-anchored\",\n  \"sessionId\": \"verify-session\",\n  \"state\": \"verified\",\n}",
+        "expected": "Error {\n  \"message\": \"rejected promise\",\n}"
+      },
+      {
+        "phase": "S7-M27-sdk-trust-anchor-789-mutant",
+        "name": "native SDK cold verification admission an anchored receipt with no expected fingerprint is refused",
+        "message": "promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts",
+            "line": 69,
+            "column": 50
+          }
+        ],
+        "rawPrefix": "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "actual": "{\n  \"report\": {\n    \"ledgerErrors\": [],\n    \"ledgerOk\": true,\n    \"ok\": true,\n    \"requests\": [\n      {\n        \"headerEventId\": \"header-1\",\n        \"status\": \"reconstructed\",\n      },\n    ],\n    \"sessionChainErrors\": [],\n    \"sessionId\": \"verify-session\",\n    \"trustRoot\": {\n      \"anchored\": true,\n      \"expectedFingerprint\": null,\n      \"monitorFingerprint\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n    },\n    \"unsignedRowIds\": [],\n  },\n  \"scope\": \"externally-anchored\",\n  \"sessionId\": \"verify-session\",\n  \"state\": \"verified\",\n}",
+        "expected": "Error {\n  \"message\": \"rejected promise\",\n}"
+      },
+      {
+        "phase": "S7-M28-sdk-trust-anchor-mismatch-only-789-mutant",
+        "name": "native SDK cold verification admission an anchored receipt with a different expected fingerprint is refused",
+        "message": "promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts",
+            "line": 69,
+            "column": 50
+          }
+        ],
+        "rawPrefix": "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "actual": "{\n  \"report\": {\n    \"ledgerErrors\": [],\n    \"ledgerOk\": true,\n    \"ok\": true,\n    \"requests\": [\n      {\n        \"headerEventId\": \"header-1\",\n        \"status\": \"reconstructed\",\n      },\n    ],\n    \"sessionChainErrors\": [],\n    \"sessionId\": \"verify-session\",\n    \"trustRoot\": {\n      \"anchored\": true,\n      \"expectedFingerprint\": \"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\",\n      \"monitorFingerprint\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n    },\n    \"unsignedRowIds\": [],\n  },\n  \"scope\": \"externally-anchored\",\n  \"sessionId\": \"verify-session\",\n  \"state\": \"verified\",\n}",
+        "expected": "Error {\n  \"message\": \"rejected promise\",\n}"
+      },
+      {
+        "phase": "S7-M29-sdk-trust-anchor-missing-only-789-mutant",
+        "name": "native SDK cold verification admission an anchored receipt with no expected fingerprint is refused",
+        "message": "promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "sites": [
+          {
+            "method": "",
+            "file": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/tests/nativeAgentClientVerify.test.ts",
+            "line": 69,
+            "column": 50
+          }
+        ],
+        "rawPrefix": "Error: promise resolved \"{ sessionId: 'verify-session', \u2026(3) }\" instead of rejecting",
+        "actual": "{\n  \"report\": {\n    \"ledgerErrors\": [],\n    \"ledgerOk\": true,\n    \"ok\": true,\n    \"requests\": [\n      {\n        \"headerEventId\": \"header-1\",\n        \"status\": \"reconstructed\",\n      },\n    ],\n    \"sessionChainErrors\": [],\n    \"sessionId\": \"verify-session\",\n    \"trustRoot\": {\n      \"anchored\": true,\n      \"expectedFingerprint\": null,\n      \"monitorFingerprint\": \"ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff\",\n    },\n    \"unsignedRowIds\": [],\n  },\n  \"scope\": \"externally-anchored\",\n  \"sessionId\": \"verify-session\",\n  \"state\": \"verified\",\n}",
+        "expected": "Error {\n  \"message\": \"rejected promise\",\n}"
+      }
+    ],
+    "completedOperations": [
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "0"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "1"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "2"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "3"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "4"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "5"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "6"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "7"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "8"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "9"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "baseline",
+          "2"
+        ]
+      },
+      {
+        "journal": "control-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "12"
+        ]
+      },
+      {
+        "journal": "continuation-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "13"
+        ]
+      },
+      {
+        "journal": "final-continuation-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "14"
+        ]
+      },
+      {
+        "journal": "final-continuation-sequence.jsonl",
+        "operation": [
+          "matrix",
+          "15"
+        ]
+      },
+      {
+        "journal": "final-continuation-sequence.jsonl",
+        "operation": [
+          "finish"
+        ]
+      }
+    ]
+  },
+  "preservationAudit": {
+    "groups": {
+      "runtimeIndex": {
+        "count": 4881,
+        "mismatches": 0
+      },
+      "protected-pins-before.json": {
+        "count": 269,
+        "mismatches": 0
+      },
+      "prior-reference-pins-before.json": {
+        "count": 4211,
+        "mismatches": 0
+      },
+      "late-predecessor-pins.json": {
+        "count": 10,
+        "mismatches": 0
+      },
+      "observer-input-pins.json": {
+        "count": 15,
+        "mismatches": 0
+      },
+      "runtime-release-pins.json": {
+        "count": 4403,
+        "mismatches": 0
+      },
+      "selected-source-pins.json": {
+        "count": 33,
+        "pairedPins": 66,
+        "mismatches": 0,
+        "shape": "Rows contain nested root/private pins; independently corrected and rechecked."
+      },
+      "rootAndPrivate": {
+        "source": 7739,
+        "dist": 4529,
+        "expectedFiles": 12268,
+        "actualPrivateFiles": 12268,
+        "privateManifestExact": true,
+        "rootHashMismatches": [],
+        "privateHashMismatches": [],
+        "physicalRootAliases": []
+      }
+    },
+    "closures": [
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/full-closure-final.json",
+          "bytes": 1399899,
+          "sha256": "dda63cf4e8b307c8297550cb97a0ff4fd6510321c4cd160e0a35317bc723d4d9"
+        },
+        "files": 12269,
+        "actualFiles": 12269,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "ccc5fad556024794dd5e14641a8816837996d34edfa70db4d5139b87b3698520"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015/full-closure-final.json",
+          "bytes": 1400381,
+          "sha256": "8198cac2ab5fadefcb20247de3363e1df670a7b1692646853139725ca1fde6fd"
+        },
+        "files": 12273,
+        "actualFiles": 12273,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "actualFiles": 12269,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015/full-closure-final.json",
+          "bytes": 1399901,
+          "sha256": "575442e7fb2ba4bd222eed18d0a7dd6b2cd3ac5823246fecfad58743860c52cf"
+        },
+        "files": 12269,
+        "actualFiles": 12269,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015/full-closure-final.json",
+          "bytes": 1399887,
+          "sha256": "299b0969cccf57ccf3b1b7f1c3a7763366d190e889786f42b8b0881f55de0228"
+        },
+        "files": 12269,
+        "actualFiles": 12269,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      },
+      {
+        "manifest": {
+          "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015/full-closure-final.json",
+          "bytes": 1399777,
+          "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+        },
+        "files": 12268,
+        "actualFiles": 12268,
+        "mismatches": 0,
+        "firstMismatches": []
+      }
+    ],
+    "dependencyLinks": {
+      "count": 307,
+      "mismatches": []
+    },
+    "privateCacheDirectories": [
+      {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/node_modules/.vite",
+        "isDirectory": true,
+        "isSymlink": false,
+        "mode": "0o700",
+        "uid": 501
+      },
+      {
+        "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/closure/node_modules/.vite-temp",
+        "isDirectory": true,
+        "isSymlink": false,
+        "mode": "0o700",
+        "uid": 501
+      }
+    ],
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "nativeMatches": true,
+    "activeMarkers": [],
+    "deferredOrIncomplete": [],
+    "errors": [],
+    "filesRead": 225490,
+    "elapsedSeconds": 28.13
+  },
+  "reviewerObservation": {
+    "initialShapeAssumption": "One reviewer audit initially treated33 selected-source rows as direct pins and reported KeyError(path). They are nested root/private pairs; all66 were then independently rehashed exact. This was a review-script shape assumption, not a product or evidence failure.",
+    "oversizedDisplay": "An initial metadata display was truncated after printing manifest keys; bounded reads and full computational comparisons were used afterward. No source/runtime command was retried."
+  },
+  "retainedSchedulerStops": [
+    {
+      "control": "M26",
+      "cause": "Root's first driver required literal AssertionError: in raw failure strings. Installed Vitest .rejects builds structured AssertionError then rewrites stack from a captured Error; raw Error: promise resolved ... instead of rejecting and __VITEST_REJECTS__ match the exact source50:50 assertion.",
+      "outcome": "Complete4\u21923\u21924 and source restoration preceded the stop. No completed control rerun."
+    },
+    {
+      "control": "M27",
+      "cause": "First continuation incorrectly bound anchor assertions to70:50. Unchanged actual source, structured stacks and raw stacks identify69:50.",
+      "outcome": "Complete4\u21922\u21924 and source restoration preceded the stop. Separate final continuation validates both saved M26 and M27 before only14,15,finish."
+    }
+  ],
+  "runtimeTruth": {
+    "fingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10",
+      "proof": "Retained process-only output; this review executed no fingerprint."
+    },
+    "normalOuterObservations": "All45 sidecars have exit0/1, no signal, timeout, execution error or forced action, leader reaped and owned group observed empty. All44 corpus streams and run-end reporters have zero unhandled/file/suite/hook/pending/todo/known late-close or global-guard diagnostics.",
+    "structuredAssertionBinding": "All21 failed cases have structured name AssertionError/okfalse and exact raw stack multiplicity/name/source binding. All14 controls have target-only exact TS changes, same registered cases, green baseline/restored and untouched4529 compiled hashes.",
+    "cleanupAndStreamsBoundary": "Retained outer stdout/stderr and own-group receipts are actual evidence. Original scripted peer cleanup remains source-derived plus successful hooks. Universal per-child exit/signal/ABI, detached descendants or all filesystem effects are not asserted.",
+    "sourceAttribution": "Current bytes match frozen source58 manifests. Root's clean Git status/source58 attribution is retained from its frozen receipt; this reviewer ran no Git."
+  },
+  "scopeLimits": [
+    "Original43-case harness and recipes10/11 are hard-refused and unrun in this namespace. Separate1518 observer proposal/review is not runtime clearance.",
+    "Pure21 executes a small generated-filter interpreter and constructed status rows; no Bubblewrap, kernel/seccomp/Linux confinement is qualified.",
+    "Scripted4 uses real local SDK/stdio/verifier subprocesses with chosen unsigned receipts. It does not sign evidence or prove genuine writer/SQLite cold reconstruction/history, independent key authority or external anchoring.",
+    "703 means repeat executions across25 original cases, not703 unique tests.14 controls and21 failed executions include14 distinct failed original cases. Historical41/55/53 and76-control batch equality is not claimed.",
+    "Normal Git/base freeze and required duplicate1269/dead-code2751 quality prerequisites remain unwaived. This private nongit copy is not real freeze qualification.",
+    "No fullsuite/coverage/Node24/pack/install/hosted/G0/release/Done/formal acceptance/dependency closure."
+  ],
+  "operations": {
+    "readOnlyFilesystemJSONHashStat": true,
+    "sourceTextReads": true,
+    "productImports": 0,
+    "parsersTypechecks": 0,
+    "testsOrFingerprints": 0,
+    "nativeLoads": 0,
+    "network": 0,
+    "GitCommands": 0,
+    "sourceMutations": 0,
+    "priorArtifactWrites": 0,
+    "writes": "Only this new write-once review JSON/Markdown pair."
+  },
+  "formalAcceptanceClosed": false,
+  "allReadsFinished": true,
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+      "bytes": 93748,
+      "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.md",
+      "bytes": 2351,
+      "sha256": "daba845d494f79278c4e07344a8096c5588078e6b387a60c0490e6aadf0e0a46"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/runtime-artifact-index.json",
+      "bytes": 1218493,
+      "sha256": "ac2a16d3be820bd26d047a91966b3d97f778311c629ba2bb9a616c6319409494"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/setup-artifact-index.json",
+      "bytes": 1076756,
+      "sha256": "60200fac4130e966ff970c585e981344112451cfa83fc5175b815e83126b3c68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/controller.py",
+      "bytes": 23206,
+      "sha256": "4825ccb7942833fe3ae026bab9595561efbe5717582e732c1117fdcf8dd4c20f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2043,
+      "sha256": "9ca713ba26d62f5e9529e85578f82ad3fa65ea0b20222cc6b4e717605dd8937f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/setup.json",
+      "bytes": 11225,
+      "sha256": "9d9559128888d4b39dcb65471f9ca5adc587b9f6aa32fbc41f3d447ee0d98dcc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/recipes.json",
+      "bytes": 22219,
+      "sha256": "ea3da3b1a2e425a2fc7f46c89b19c093444527803c470d1da0792081241f2c15"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 108747,
+      "sha256": "2bece2769f54688b65b3acf1cdac23ac1101867ef42c33ed78a52f18e88b7941"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/selected-source-pins.json",
+      "bytes": 22507,
+      "sha256": "60134394ad70442c2cf1fd38133f3f3f649ed2071b86e2201f4dc8405ba14c6b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/protected-pins-before.json",
+      "bytes": 58893,
+      "sha256": "cdce8ba5a7c996eb6fe5eb24ab035cbe1b30209cff02969ad7d23ac423e97991"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/prior-reference-pins-before.json",
+      "bytes": 1011824,
+      "sha256": "c13475844d603eeb9d5156bde25f57d2d8e096e2cc32b12547462316987f5ddd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/runtime-release-pins.json",
+      "bytes": 1055870,
+      "sha256": "7a2bca580ae77eb294f36c2b9da6dd000574322e8c7ebc7647974a2e5fe351bf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/prior-closures-prepared.json",
+      "bytes": 4169,
+      "sha256": "ef233719e7e08508adfb756a9dbb264981037d7340a064154ea4209e767f68cf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/full-closure-final.json",
+      "bytes": 1399777,
+      "sha256": "920049709983b6e0646f57bc891d002cc54ab651e3e890b85ba6d9df8caec3b2"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/root-final-readonly-preservation.json",
+      "bytes": 971,
+      "sha256": "5311d65192f04a938395ce73582f9a4cfddca8906f9ffbfe3e3bf88d77454da8"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/root-runtime-release.json",
+      "bytes": 2221,
+      "sha256": "56c1c2c25feb318d57f26896e77344da8e991c4ab08e196deb517b47f50590a2"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-control-sequence-20261015.py",
+      "bytes": 3336,
+      "sha256": "ca44739741411477081791f39f3a1f965e41f12977d25870b299c04029cec46c"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-continuation-sequence-20261015.py",
+      "bytes": 4486,
+      "sha256": "fb75a35ba3f81b1ede4bc404874063af48e28094d6ebfe122c290101bc402e2c"
+    },
+    {
+      "path": "/private/tmp/p0-30-S7-final-continuation-sequence-20261015.py",
+      "bytes": 4619,
+      "sha256": "fcd5fd4bcfe2c6729d5dfa25877218eaa62ef2c21a71166a57eba1dfeb7515a7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/M27-continuation-stop-root-classification.json",
+      "bytes": 2579,
+      "sha256": "f458ef6c1e908d1ec3c14c1f9fe3cc3ed16c4d55151792a6bf1c740e56ba3824"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/root-final-continuation-release.json",
+      "bytes": 3371,
+      "sha256": "6d98221b5b5eb5f6313f2d621eebdb8c6ae45821a760a020cd98bf3deb999393"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/final-continuation-sequence.jsonl",
+      "bytes": 1563,
+      "sha256": "1eaffdbc5f92c8ebb368bcdb9fa757a3aea709437576177c0ce77a5fc91dc239"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/M26-scheduler-stop-root-classification.json",
+      "bytes": 3426,
+      "sha256": "847bd668098801badb729df7b9d5e8255db7c750f13bdcf316ce1eb821b76baa"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/root-continuation-release.json",
+      "bytes": 3204,
+      "sha256": "8337cc2373256609d426170494f96f16e5e6f02d084c0219c14c5d2d8e7d2187"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/continuation-sequence.jsonl",
+      "bytes": 549,
+      "sha256": "870d1484c875cf2ba0011732b770511d0166758470f65b9e44490cb3cd1e927a"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/control-sequence.jsonl",
+      "bytes": 6209,
+      "sha256": "884afb216d2e634924d4dbead44d34affea0936f27d4e8fef09bc5c8e1bbaf65"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M01-bwrap-child-guard-matrix.json",
+      "bytes": 44045,
+      "sha256": "607fbe74cf61cd2670a103e4f59664752af8ec3be8a9ee813ff3984897875275"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M01-bwrap-child-guard-source-change.json",
+      "bytes": 1545,
+      "sha256": "6be9068e1c64de2c59988b26b9bdb0c754795a6a6b065f8a86cd6c8da5f6e4e9"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M02-bwrap-exit-before-child-matrix.json",
+      "bytes": 36124,
+      "sha256": "0a49d24493748a7f75946d73f69845d0721abde0d862d990eb461f7e77059e2b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M02-bwrap-exit-before-child-source-change.json",
+      "bytes": 1519,
+      "sha256": "3282ed9d84c1c557a751f4b6296a5f9e8361d2c2bf6fc3c992dbd66171ca7767"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M03-bwrap-exit-dup-matrix.json",
+      "bytes": 36008,
+      "sha256": "e0d1659b31d64cbda161dcdbebecc5ca8ac387bffc32ab6d649755567d0f2163"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M03-bwrap-exit-dup-source-change.json",
+      "bytes": 1503,
+      "sha256": "6398a7386883b8ff83fb371cf7c67b6ff0efa4c06b6396c355e3b3fa9b8ca25d"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M04-bwrap-exit-range-matrix.json",
+      "bytes": 36009,
+      "sha256": "4593ded1c65beefac3af892f0a37dedce2e479beb6427df3e39adecfb90c8b11"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M04-bwrap-exit-range-source-change.json",
+      "bytes": 1497,
+      "sha256": "7cee458dc98208ace814ee6b8dccdca7162ee612d98a30c5dd30d1cd6b6d3eaf"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M05-bwrap-nonobject-row-matrix.json",
+      "bytes": 36102,
+      "sha256": "16ca2b973fef898c875b2bd9e351bfbfa77a477b96d0e3e80e9a9e1c51abb556"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M05-bwrap-nonobject-row-source-change.json",
+      "bytes": 1559,
+      "sha256": "a28c300e40151726da32ee46baa152ddaf6cd26ac81ea68d6717ca5ac5481941"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M06-bwrap-child-positive-matrix.json",
+      "bytes": 38701,
+      "sha256": "0428cd27a1590ed36bca7f7dbaf563bbc77708cf135f92cbca06a05849c522f6"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M06-bwrap-child-positive-source-change.json",
+      "bytes": 1503,
+      "sha256": "c1949c3741e90cbd04ea4178aaba64f6c20cad2b5e2113c7c930ca9f8c93dba0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M07-bpf-arch-check-matrix.json",
+      "bytes": 38871,
+      "sha256": "4c4f0a9d3b7da010171f5d9c838116538dfc6e9d5d0f890bacfcdb7df90758f4"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M07-bpf-arch-check-source-change.json",
+      "bytes": 1501,
+      "sha256": "651c818cdae225b1c2ad4eea7be921df5c0503560035ff486a6d9aa1d009af82"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M08-bpf-x32-rule-matrix.json",
+      "bytes": 36154,
+      "sha256": "398e0b31ab8cce59deae01c57caed915d4fe0f210385530a3a3759967a3e9b09"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M08-bpf-x32-rule-source-change.json",
+      "bytes": 1557,
+      "sha256": "0892aa23b145162dadccd4a47f9d46c62ff93a78cc346b85d7f5205f81eedcbd"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M09-bpf-io-uring-matrix.json",
+      "bytes": 38768,
+      "sha256": "d3d5e06a5e117984b1bf045ed73588bbf9ea93187dab5bc99c9305ccda66f5ac"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M09-bpf-io-uring-source-change.json",
+      "bytes": 1427,
+      "sha256": "991c373d4bba874bfa261043f2ea9514a9be7635c4b9359d43e69c2816b3cc68"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M10-bpf-connect-matrix.json",
+      "bytes": 36010,
+      "sha256": "98b632dd5fa7c7e251ded55136589ec712286353157172ec5965c30b8cfd5244"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M10-bpf-connect-source-change.json",
+      "bytes": 1419,
+      "sha256": "ee41a65f2d1cf2c6fd4afaa746d68b23db6fed79cc0da1e9e4531a12356b5b4b"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M26-sdk-close-before-verify-753-matrix.json",
+      "bytes": 19323,
+      "sha256": "3ec802a925e1af34169466176f041a6131fe2a71c60e2cf7ea92c3fce333c3b1"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M26-sdk-close-before-verify-753-source-change.json",
+      "bytes": 1847,
+      "sha256": "c598e51182af47dbb2d5e4f85e82bd2fc002c0313d10e6ddb236bf5a89ea09d0"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M27-sdk-trust-anchor-789-matrix.json",
+      "bytes": 21277,
+      "sha256": "62b2d83ca4a7a6134ad0d476a7787de624c4faf837e621aa0cd033d13a6892fc"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M27-sdk-trust-anchor-789-source-change.json",
+      "bytes": 1823,
+      "sha256": "85f6daef1de61de8cffd93899ab29992484ac4e8ba3a3c2b802b6a49637e919f"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M28-sdk-trust-anchor-mismatch-only-789-matrix.json",
+      "bytes": 19384,
+      "sha256": "c600cbd1d134c81009a6b98cab378c91f0631373d2bc7668df0bfef824f39d22"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M28-sdk-trust-anchor-mismatch-only-789-source-change.json",
+      "bytes": 1833,
+      "sha256": "d44b325825e0afbeb0f4dd3c9dfe1393ca2d8d5b3b003e61787d38e0572032b7"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M29-sdk-trust-anchor-missing-only-789-matrix.json",
+      "bytes": 19395,
+      "sha256": "f60c1f4d1e38da2f5fd3c20e3c421cfecc9f6e21b625b4db6cd2b5304abedb48"
+    },
+    {
+      "path": "/private/tmp/p0-30-AMC-1513-1518-1519-qualification-20261015/S7-M29-sdk-trust-anchor-missing-only-789-source-change.json",
+      "bytes": 2007,
+      "sha256": "45e009b80bcf0c67179a3b7f5c1b53afc50734365aa8e8e8356e93cb0de21f3f"
+    }
+  ],
+  "capturedUtc": "2026-10-15T04:11:42.056411+00:00",
+  "allReadsFinishedUtc": "2026-10-15T04:11:42.056411+00:00"
+}

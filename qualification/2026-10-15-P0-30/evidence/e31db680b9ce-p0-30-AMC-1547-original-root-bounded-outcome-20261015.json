@@ -1,0 +1,413 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1547",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T01:59:41.554972+00:00",
+  "state": "BOUNDED_ORIGINAL_CONTROLS_REVIEWED_NEW_STORE_ROOT_SUPPLEMENT_NOT_YET_RUN",
+  "originalPacket": {
+    "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+    "bytes": 64984,
+    "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+  },
+  "originalReport": {
+    "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.md",
+    "bytes": 10127,
+    "sha256": "933a9fb3fb42918d3002162495e414d8a5672954a8e032d90e79337d7e3bb557"
+  },
+  "independentReview": {
+    "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.json",
+    "bytes": 74013,
+    "sha256": "c01c0422941c2e92bcc8bf6542c705cec07a63a43cc3940713902f60dae9d901"
+  },
+  "independentReviewMarkdown": {
+    "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.md",
+    "bytes": 4499,
+    "sha256": "f95fa75031d7dd80262f14a73a3cdc554deefe34bc8cf0096f8bd0cd44c5351b"
+  },
+  "actualBaseline": {
+    "numTotalTests": 170,
+    "numPassedTests": 170,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": true,
+    "exit": 0
+  },
+  "countingPrecision": {
+    "registeredParameterizedCases": 170,
+    "distinctRenderedFileTitleValues": 164,
+    "duplicateTitleReason": "Seven malformed erase option table rows share one title; each is separately registered. These are not 170 distinct literal test definitions."
+  },
+  "sourceControls": [
+    {
+      "id": "P30-1547-write-before-commit",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 55,
+          "numPassedTests": 55,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 55,
+          "numPassedTests": 42,
+          "numFailedTests": 13,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 55,
+          "numPassedTests": 55,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "classificationAndMasking": {
+        "classification": "Exact source publication-order sensitivity:10 direct assertions,2 wrapped inner assertions and1 body collision; not13 independent security assertions.",
+        "notes": [
+          "Actual 55 \u2192 42 \u2192 55, with zero pending/todo. The 13 failures split into ten direct AssertionErrors, two SpilledInputRetentionError wrappers retaining original nonempty-object admission assertions, and one original-body EEXIST. Fixed wrapper prose saying no object was published is not evidence: observed early publication contradicts it.",
+          "The commitment assertion at line 129 stops before commit at 133. Both synthetic admission-fault variants fail their inner assertion at 175 before the intended commit at 176 or throw at 177; their mismatch at 181 does not exercise the intended two fault timings. Attachment refusal line 367 stops before row comparison 368.",
+          "Encryption assertions at 72/93/104 stop before later ciphertext, retrieval and positive controls. At 115 the spy observes zero writes because publication preceded spy installation. Failed throw assertions at 122/130 mask later partial-file and owner-data checks. The linked-parent body raises EEXIST at 282 because prepare already created the root; linked-parent and exposed-directory guards are not reached. Intact baselines/restorations execute the complete controls."
+        ]
+      }
+    },
+    {
+      "id": "P30-1547-default-key",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 50,
+          "numPassedTests": 50,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 50,
+          "numPassedTests": 40,
+          "numFailedTests": 10,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 50,
+          "numPassedTests": 50,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "classificationAndMasking": {
+        "classification": "Ten direct original assertions demonstrate loss of writer-key refusal/retention semantics, with earlier policy validation still intact.",
+        "notes": [
+          "Actual 50 \u2192 40 \u2192 50, with zero pending/todo. Seven low-level cases first fail expected throws at 136, 144(two variants), 154, 180(two versions) and 201; later no-repair/no-object comparisons are masked. Signed operations policy checks still precede the mutated writerKey fallback.",
+          "Commitment line 224 sees a populated retained reference instead of null fields; later unretrievable, preview, object and key-snapshot checks at 226\u2013233 are masked. The unavailable-vault case still throws as required at 241, then finds an object at 242; later key/no-result assertions at 243\u2013244 are masked, so no accepted-operation or signed-result claim is made.",
+          "The unprovisioned attachment case sees no expected SpilledInputRetentionError at 343; its later no-row/no-object and provisioning/retry controls are masked. The fresh unprovisioned workspace is a same-process fixture, not a fully cold credential-absence process."
+        ]
+      }
+    },
+    {
+      "id": "P30-1547-skip-verify",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 25,
+          "numPassedTests": 21,
+          "numFailedTests": 4,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 25,
+          "numPassedTests": 25,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "classificationAndMasking": {
+        "classification": "Four direct original sweep assertions; ciphertext/missing diagnostics lost while direct inspection/retrieval and signed-reference authentication remain.",
+        "notes": [
+          "Actual 25 \u2192 21 \u2192 25, with zero pending/todo. This changes the verification sweep only: authenticateWithContext still checks reference shape, signature and session binding, but does not read ciphertext. Direct inspect/retrieve damage refusals before the failed checks still pass.",
+          "The tamper assertion at 276 sees sweep.ok=true and masks the event-ID comparison at 277. The deleted-object case passes direct missing and sweep.ok=true, then fails missing-ID at 302. Attachment line 289 gets no missing references instead of two, after actual export/erase and direct payload-missing refusal have passed.",
+          "Unsafe-parent direct commitment inspection remains tampered, but the sweep returns true at 477. Later error-ID comparisons at 478\u2013479, obstruction removal/missing-gap checks at 483\u2013487 and whole-ledger/session checks at 491\u2013493 are masked. This does not show direct retrieval accepted damaged bytes or row authentication was removed."
+        ]
+      }
+    },
+    {
+      "id": "P30-1547-dotdot-path",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 15,
+          "numPassedTests": 14,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "classificationAndMasking": {
+        "classification": "One direct original path-resolution grammar assertion, with first hostile-vector masking.",
+        "notes": [
+          "Actual 15 \u2192 14 \u2192 15, with zero pending/todo. The original assertion at 445 for amc-spill:v2:<session-hash>:../../../../etc/passwd receives a resolved path instead of null.",
+          "The first invalid-session-hash vector passes both checks. The second vector fails path resolution at 445 before its readSpilled invalid-locator check at 446 and before the remaining six vectors. This is one registered case; a resolved path string is not an observed external-file read, and remaining owner/type/link/stable-file defenses stay intact."
+        ]
+      }
+    },
+    {
+      "id": "P30-1547-export-unauthenticated",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 15,
+          "numPassedTests": 14,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "classificationAndMasking": {
+        "classification": "One direct final destination-absence assertion demonstrates side effects before an otherwise retained export refusal.",
+        "notes": [
+          "Actual 15 \u2192 14 \u2192 15, with zero pending/todo. Inventory remains not-ok at 96 and still distinguishes missing at 97 from tampered at 98. The required throw(/refused/) at 100 also passes. The sole failure at 101 observes that the destination exists instead of remaining absent.",
+          "Source creates destination/objects at 242\u2013243 before later ciphertext reinspection at 251\u2013255 rejects the changed object. No empty index, successful unauthenticated export, tampered ciphertext export or lost row authentication is inferred. There is no later assertion in this body; the separate held conflicting/unauthentic-row export-destination case remains absent."
+        ]
+      }
+    },
+    {
+      "id": "P30-1547-erase-scope",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 85,
+          "numPassedTests": 85,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 85,
+          "numPassedTests": 80,
+          "numFailedTests": 5,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 85,
+          "numPassedTests": 85,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "classificationAndMasking": {
+        "classification": "Four direct assertions plus one retained production audit-size Error; overscope response and progress semantics weakened without bypassing size or empty-scope controls.",
+        "notes": [
+          "Actual 85 \u2192 80 \u2192 85, with zero pending/todo. Incomplete-reference scope refusal at 109 no longer throws, but empty-scope refusal at 108 still passes; subsequent no-unlink/no-audit checks at 110\u2013111 are masked.",
+          "Lifecycle result.ok=false at 124 stops before its two-audit check and exact outcomes, preserved-other, audit-payload and ledger checks at 125\u2013137. Its removal spy at 120 requires the selected file still exist for each removal; after removing selected, attempted other removal can throw that spy assertion and be caught as a failed outcome. This case does not prove the other object was deleted.",
+          "Both CLI backends reach native invocation, history, closed-handle and audit-boundary checks, then line 259 gets two outcomes instead of one. File preservation at 260 and audit IDs/signatures/JSONL history at 261\u2013271 are masked. No unobserved later file/audit effect is inferred.",
+          "The retention aggregate-size refusal and unchanged bytes/no-intent checks at 141\u2013145 pass, then actual runRetention at 147 throws the existing signed-audit-size Error because the mutant selects too much. Later progress/exact per-locator audit assertions from 148 onward are masked. This is a retained production bound, not infrastructure, a bypass of the size check or an extra AssertionError."
+        ]
+      }
+    },
+    {
+      "id": "P30-1547-store-root",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "restored": {
+          "numTotalTests": 15,
+          "numPassedTests": 15,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "classificationAndMasking": {
+        "classification": "Bounded original-corpus survivor and missing parent/sibling coverage; not equivalence.",
+        "notes": [
+          "Actual 15 \u2192 15 \u2192 15, with zero failed/pending/todo. The current lifecycle corpus uses default object storage roots and never supplies a parent/sibling options.root. Its selected source/destination alias tests address transport roots, not the storage-root confinement guard.",
+          "The exact mutant still rejects the empty suffix(workspace itself). Passing this unchanged corpus provides no parent/sibling storage confinement evidence and does not establish equivalence. The separately proposed two-case supplement is not staged or executed."
+        ]
+      }
+    },
+    {
+      "id": "P30-1547-transport-dotdot",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "restored": {
+          "numTotalTests": 30,
+          "numPassedTests": 30,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "classificationAndMasking": {
+        "classification": "Bounded current-corpus survivor with unchanged upstream public-path constraints; historical equivalence is not inherited.",
+        "notes": [
+          "Actual 30 \u2192 30 \u2192 30, with zero failed/pending/todo. No current assertion was relaxed, and the historical equivalent label remains historical rather than a fresh global equivalence result.",
+          "Current source calls transportDirectory only through readTransportFile, using fixed index.json or a parseIndex-validated objectFile. The public objectFile is objects/<sha256(locator)>.blob and exact equality is required before reading. Realpath ownership, bounded single-link/NOFOLLOW/stable reads and signed-row authorization remain intact. This source58 public-path reasoning explains the bounded survivor without turning it into universal equivalence or conflating it with the store-root parent/sibling coverage gap."
+        ]
+      }
+    }
+  ],
+  "rootDirectChecks": {
+    "indexedReferencesRehashed": 2091,
+    "pinFailures": [],
+    "actualMutantFailures": {
+      "directAssertions": 30,
+      "wrappedInnerAssertions": 2,
+      "earlyPublicationBodyEEXIST": 1,
+      "retainedProductionAuditSizeBound": 1
+    },
+    "allEightActualRawCountsMatch": true
+  },
+  "preservation": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "completePrivateClosureFiles": 12268,
+    "newCasesStaged": 0,
+    "sourceRestoredExact": true,
+    "allCompiledBytesNeverChanged": true,
+    "protectedPins": 156,
+    "priorArtifactReferences": 1795,
+    "latePredecessorPins": 2,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "rootSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "rootGitStatus": "clean",
+    "allReferencedPriorArtifactsAndManifestListedActualClosuresRecheckedExact": true,
+    "configGuardsCriteriaSetupCleanupDeadlines": "Original source imports/config/global and per-file workspace guards/criteria/setup/cleanup unchanged. Source-mode one worker, no file parallelism, dual reporters. Original 30s cases, bundle 60s, tar 10s and image child 30s/32MiB unchanged."
+  },
+  "limits": [
+    "Eight exact recovered source recipes are freshly controlled; no held helper/test/runner is transferred or historical full-batch/Node25 result represented as current.",
+    "Original 15-case store-root corpus lacks parent/sibling negatives. Any survivor is bounded coverage debt, not equivalence. The separately proposed new two-case supplement is not staged or executed.",
+    "Historical transport-dotdot equivalent wording stays historical; current survival is classified from the actual corpus and is not automatically current equivalence.",
+    "Current lifecycle 15 remains distinct from held 19, and its missing conflicting/unauthentic export-destination case remains open.",
+    "No production/permanent test/helper/CLI/counter/guard/archive/dependency/native/root Git edit, compiler/build/import adapter or compiled mutation.",
+    "No whole cold/race/tenant/full P0-30/old batch/Node24/full suite/coverage/hosted/G0/release/Done or AMC1522/P0-32 dependency closure.",
+    "Real encryption, signed local rows, retained ciphertext and actual local unlink are measured only by reached original assertions. Existing node:fs short/stalled/racing I/O spies and admission callbacks are injected faults, not universal successful persistence proofs.",
+    "Lifecycle/CLI fixture ciphertext uses a known synthetic key distinct from workspace decryption material. Keyless inventory/transport flags remain not-decrypted/plaintextVerified=false; successful ciphertext checks are not plaintext decryption.",
+    "Attachment/inbox custom canned SSE/transport reconstructs local requests; no actual provider/model ability or real external network operation is qualified.",
+    "CLI 65 uses in-process Commander and captured IO, not full src/cli.ts, installed executable or a hosted service. Actual bundle tar operations and genuine local re-signing remain unchanged.",
+    "Existing local fixture trust or workspace-consistency-only monitor expectations are not independently pre-recorded external operator/person identity. Authentic signed rows are not whole-log chain/seal completeness or proof no omitted histories exist.",
+    "Original coldRows is a same-process reader. The image fixture is a genuine fresh child after writer.close, but an idle parent SQLite pool can remain. CLI snapshots exclude WAL/SHM; no universal physical-close/no-effects interval or repair of prior P0-27 mixed-parent SQLITE_CORRUPT cause is inferred.",
+    "Erase selection authenticates supplied references and records local intent/outcomes; final audit can fail after unlink. It is not remote/backups/subject deletion or all-or-nothing cross-store transaction proof."
+  ],
+  "next": "Separately reviewed new two-case storage-root read supplement. Original15 survivor remains immutable; no equivalence inherited.",
+  "formalAcceptanceClosed": false
+}

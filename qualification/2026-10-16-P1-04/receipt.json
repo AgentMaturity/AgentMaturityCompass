@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-04",
+  "date": "2026-10-16",
+  "commit": "8ac2f8c680ae1400d10faa2e55f983e4adfa611a",
+  "branch": "codex/p1-04-qualification",
+  "node": "22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS 26.6.2 (25G83), Darwin 25.6.0",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 50039
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions/idempotency.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-idempotency-original.producer.json",
+      "exit": 1,
+      "durationMs": 4890
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions/faultMatrix.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-fault-matrix-original.producer.json",
+      "exit": 0,
+      "durationMs": 10718
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions/reconcile.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-reconcile-original.producer.json",
+      "exit": 1,
+      "durationMs": 15011
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions/faultMatrix.test.ts tests/actions/reconcile.test.ts tests/actions/idempotency.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-three-suites-followup.producer.json",
+      "exit": 0,
+      "durationMs": 15379
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit",
+      "exit": 0,
+      "durationMs": 40737
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/actions --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-related-actions.producer.json",
+      "exit": 1,
+      "durationMs": 19610
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/baseline --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/baseline/vitest.config.ts tests/actions/idempotency.test.ts tests/actions/receiptStates.test.ts tests/actions/reconcileRedispatchMutation.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-mutations-baseline-cwd-fixed.producer.json",
+      "exit": 0,
+      "durationMs": 20225
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/reconcile-redispatch --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/reconcile-redispatch/vitest.config.ts tests/actions/reconcileRedispatchMutation.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-m1-redispatch-mutant.producer.json",
+      "exit": 1,
+      "durationMs": 3509
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/header-dropped --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/header-dropped/vitest.config.ts tests/actions/idempotency.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-m2-header-mutant.producer.json",
+      "exit": 1,
+      "durationMs": 4625
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/unknown-restart --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/unknown-restart/vitest.config.ts tests/actions/receiptStates.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-m3-unknown-restart-mutant.producer.json",
+      "exit": 1,
+      "durationMs": 16933
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/restored --config /private/tmp/p1-04-idempotency-qualification-20261016/mutation-copies/restored/vitest.config.ts tests/actions/idempotency.test.ts tests/actions/receiptStates.test.ts tests/actions/reconcileRedispatchMutation.test.ts --maxWorkers=1 --no-file-parallelism --cache=false --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-mutations-restored.producer.json",
+      "exit": 0,
+      "durationMs": 20653
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/typescript/bin/tsc -p tsconfig.json --noEmit",
+      "exit": 0,
+      "durationMs": 28301
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 1,
+      "durationMs": 260
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 224
+    },
+    {
+      "cmd": "pnpm run lint",
+      "exit": 0,
+      "durationMs": 3103
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1374
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --check",
+      "exit": 0,
+      "durationMs": 223
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/docs-drift-check.mjs",
+      "exit": 0,
+      "durationMs": 133
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/architecture-boundaries-check.mjs",
+      "exit": 0,
+      "durationMs": 1560
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs duplicates",
+      "exit": 1,
+      "durationMs": 481
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/source-quality.mjs dead-code",
+      "exit": 1,
+      "durationMs": 2936
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 52212
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-JoyZOQ/checkout --config /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-JoyZOQ/checkout/vitest.config.ts tests/actions/faultMatrix.test.ts tests/actions/reconcile.test.ts tests/actions/idempotency.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p104-fresh-clone-tests.producer.json",
+      "exit": 0,
+      "durationMs": 16883
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-04-idempotency-qualification-20261016/host-fingerprint.mjs",
+      "exit": 0,
+      "durationMs": 260
+    }
+  ],
+  "tests": {
+    "total": 226,
+    "passed": 223,
+    "failed": 3,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "8940e2d48bd6be52999dfb5d2e02bac35152868d853844825e9323af27f9d696"
+    },
+    {
+      "path": "evidence.json",
+      "sha256": "a0d32aa87e878f0c3999d5ba1941453d458b550aae8ff8a0e1de62139f19667c"
+    },
+    {
+      "path": "fault-matrix.json",
+      "sha256": "9042a55e022d9e8f556da1f243e54395d2b2bafce3f059e1f5f6ed2fc552b342"
+    }
+  ],
+  "notes": "Bounded source and qualification checkpoint; formal P1-04 acceptance remains open. The test total 226/223/3 refers only to related-actions. All 74 new cases pass, including a separate fresh-clone run. The original idempotency run had one diagnostic expectation error; the original reconciler run exposed pre-aborted settlement, repaired with one source guard. The same three held P1-02 failures remain. Private baseline and restored runs each pass 79/79. Intended mutants produce one redispatch body failure (actual effects 1 to 2), four carrier body failures (lost trusted header, HTTP 400, zero effects), and two transition body failures. Later masked assertions are uncredited. The initial count check fails before exact 1,661 to 1,664 generation and a passing recheck. Duplicates (1,268) and dead-code (2,731) each exit 1 and remain red; no six-repair inference is made. The prelaunch wrapper rejection, exit 70 for the wrong working directory before Popen, is separately retained; the corrected unique phase uses the unchanged harness. All 25 recorded child phases naturally close with normal exits 0/1 and positive owned-group ESRCH. Candidate 8ac2f8c6 matches the committed fresh clone; its build and resume checks pass. Clone tests explicitly borrow the pinned checkout runner. Public signature and oracle evidence uses local fixture trust. Session integration, native 30-second timeout expiry, Linux/hosted/both-OS qualification, full suite/global coverage, Node 24, PR, merge, release and Done remain open. Holds and freeze/coverage baselines are intact. See README and evidence for exact pins, audits and limits."
+}

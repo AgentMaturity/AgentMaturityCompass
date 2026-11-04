@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "graphify",
+    "query",
+    "tsaClient.ts",
+    "--budget",
+    "400"
+  ],
+  "cwd": "/Users/sid/AgentMaturityCompass",
+  "exit": 0,
+  "stdout": "No matching nodes found.\n",
+  "stderr": ""
+}

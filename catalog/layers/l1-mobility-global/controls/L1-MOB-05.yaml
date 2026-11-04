@@ -1,0 +1,127 @@
+# mobility.vehicles.signed-ota-only. Experimental and unreviewed; local synthetic results do not establish production enforcement.
+"id": "L1-MOB-05"
+"version": "0.1.0"
+"support": "experimental"
+"layer": 1
+"family": "vehicle-update-integrity"
+"stations":
+  - "mobility"
+"title": "Verify a synthetic OTA package through pinned native release trust"
+"statement": "Install a synthetic OTA package only after native pinned-purpose release signature verification, captured payload integrity and complete local draft update records succeed."
+"riskRationale": "A signer can be trusted without proving the presented payload, package context or signature; incomplete update records can hide an unsafe deployment."
+"mandatory": true
+"applicability":
+  "predicate":
+    "all":
+      - "fact": "stations"
+        "includesAny":
+          - "mobility"
+      - "fact": "domains"
+        "includesAny":
+          - "mobility.vehicles-aviation"
+      - "fact": "useCases"
+        "includesAny":
+          - "vehicle_ota_update"
+      - "fact": "entityTypes"
+        "includesAny":
+          - "vehicle_software_provider"
+          - "fleet_operator"
+      - "fact": "roles"
+        "includesAny":
+          - "provider"
+          - "deployer"
+  "reasons":
+    - "Experimental, unreviewed operator-policy draft for the asserted mobility.vehicles-aviation example scope. Entity, role and use-case facts are operator assertions; no legal applicability follows from the station name."
+    - "UN R156 primary text has not been read for this task. Local draft fields do not establish full SUMS, regulatory approval or operator signing authority. No private key is persisted, production trust context loaded, anti-rollback state installed, physical vehicle updated or inherited Technology command policy overridden."
+    - "Port status, physical asset or change authority, vehicle type approval, operating domain and safety case require manual expert determination; no unsupported native fact or riskClass surrogate is introduced."
+  "exclusions":
+    - "when":
+        "not":
+          "fact": "domains"
+          "includesAny":
+            - "mobility.vehicles-aviation"
+      "reason": "An explicitly different domain is outside this operator-policy draft; unknown scope is not treated as an exclusion or a pass."
+    - "when":
+        "not":
+          "fact": "useCases"
+          "includesAny":
+            - "vehicle_ota_update"
+      "reason": "The explicit deployment use-case set does not include this signature behavior; unknown use-case facts remain unresolved."
+"citations": []
+"binding":
+  "kind": "enforcement_point"
+  "points":
+    - "tool_pipeline"
+  "mechanism": "Target boundary: the governed tool pipeline. This experimental draft installs no production hook, physical tool or runtime guard. Only local synthetic reference behavior and actual native evidence admission are exercised; no speculative compiler parameter is supplied. UN R156 primary text has not been read for this task. Local draft fields do not establish full SUMS, regulatory approval or operator signing authority. No private key is persisted, production trust context loaded, anti-rollback state installed, physical vehicle updated or inherited Technology command policy overridden."
+  "parameters": []
+  "manualDuty": null
+"tests":
+  - "id": "L1-MOB-05-T1"
+    "type": "runtime_enforced"
+    "oracle":
+      "kind": "enforcement_receipt"
+      "observes": "Native signed-trust-list and release-purpose signature verification over actual captured metadata/payload bytes, external fixture root pins, matching fleet/model/version records and the in-memory installedPackages log."
+    "fixtures":
+      "positive":
+        - "L1-MOB-05/positive/evidence-valid.json"
+        - "L1-MOB-05/positive/oracle-ota-trusted.json"
+      "negative":
+        - "L1-MOB-05/negative/evidence-contradictory.json"
+        - "L1-MOB-05/negative/evidence-cross-tenant.json"
+        - "L1-MOB-05/negative/evidence-empty.json"
+        - "L1-MOB-05/negative/evidence-replayed.json"
+        - "L1-MOB-05/negative/evidence-stale.json"
+        - "L1-MOB-05/negative/evidence-violation.json"
+        - "L1-MOB-05/negative/oracle-ota-bad-content.json"
+        - "L1-MOB-05/negative/oracle-ota-bad-signature.json"
+        - "L1-MOB-05/negative/oracle-ota-incomplete-r156.json"
+        - "L1-MOB-05/negative/oracle-ota-invalid-trust.json"
+        - "L1-MOB-05/negative/oracle-ota-revoked-signer.json"
+        - "L1-MOB-05/negative/oracle-ota-trust-unavailable.json"
+        - "L1-MOB-05/negative/oracle-ota-unknown-signer.json"
+        - "L1-MOB-05/negative/oracle-ota-unsigned.json"
+        - "L1-MOB-05/negative/oracle-ota-wrong-purpose.json"
+    "passCriteria": "Synthetic fixture behavior only. Actual ephemeral signature integrity and native signer admission both succeed under a verified signed list with external root pins, no explicit signer pins, matching payload digest and complete local update fields. Unsigned, unknown/revoked/wrong-purpose signers, bad bytes/signature/trust or incomplete fields deny and install nothing. Missing trust is not evaluated. Separate native questionnaire evidence can never create a regulated pass; missing production evidence is not evaluated."
+    "attempts": 1
+"evidence":
+  - "id": "L1-MOB-05-E1"
+    "producer": "amc.questionnaire"
+    "bindingFields":
+      - "tenantId"
+      - "workspaceId"
+      - "deploymentId"
+      - "agentId"
+      - "controlId"
+      - "controlVersion"
+    "freshness":
+      "maxAgeDays": 30
+    "sampling":
+      "method": "all"
+      "ratePercent": null
+      "minItems": 1
+    "retention":
+      "mode": "regime_max"
+    "residency":
+      "mode": "inherit_deployment"
+"invalidatedBy":
+  - "model_version"
+  - "prompt_version"
+  - "tool_version"
+  - "policy_version"
+  - "deployment_version"
+"owner":
+  "role": "ciso"
+"clock": null
+"levels":
+  - "L1"
+"crosswalk": []
+"review":
+  "status": "pending"
+  "expert": null
+  "credential": null
+  "reviewedAt": null
+  "nextReview": null
+"provenance":
+  "draftedBy": "ai"
+  "draftedAt": "2026-10-19"
+  "approvedBy": null

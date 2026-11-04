@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { prepareRunHashSignature } from "../ledger/runHashSignature.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
 import type { RiskTier } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -235,7 +237,7 @@ function verifyAttestationSignature(workspace: string, attestation: SignedMcpSer
   if (digest !== attestation.attestationDigestSha256) {
     return false;
   }
-  return verifyHexDigestAny(digest, attestation.attestationSignature, getPublicKeyHistory(workspace, "auditor"));
+  return verifyCurrentPurposeCredentialSignature(workspace, "artifact-seal", Buffer.from(digest, "hex"), Buffer.from(attestation.attestationSignature, "base64"));
 }
 
 function networkPolicyRank(policy: McpServerAttestationNetworkPolicy): number {
@@ -312,7 +314,7 @@ export function createSignedMcpServerRiskAttestation(input: {
   return {
     ...payload,
     attestationDigestSha256: digest,
-    attestationSignature: signHexDigest(digest, getPrivateKeyPem(input.workspace, "auditor")),
+    attestationSignature: signHexDigest(digest, getSigningKey(input.workspace, "artifact-seal")),
     signer: "auditor",
     signedTs: Date.now(),
     metadataOnlyAccepted: false

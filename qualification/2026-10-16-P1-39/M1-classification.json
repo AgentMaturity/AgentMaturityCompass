@@ -1,0 +1,54 @@
+{
+  "operator": "skip-issuer-equality",
+  "rootOriginalFailuresAndPublicEvidenceRead": true,
+  "causalWitnessEstablished": true,
+  "unexplainedFailures": [],
+  "actualTotal": 81,
+  "actualPassed": 80,
+  "actualFailed": 1,
+  "failure": {
+    "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpOauth.test.ts",
+    "fullName": "P1-39 first local OAuth qualification refuses a literal issuer mismatch after a matching issuer positive",
+    "failureMessages": [
+      "AssertionError: expected false to be true // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpOauth.test.ts:220:31\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpOauth.test.ts:134:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout/tests/mcp/mcpOauth.test.ts:208:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+    ]
+  },
+  "publicSource": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p139-oauth-nRdBWZ/public-evidence.json",
+  "firstSensitiveFrame": "mcpOauth.test.ts220:31 mismatch.failed expectedtrue actualfalse",
+  "matchingPositiveReached": true,
+  "actualMetadataRequests": [
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    },
+    {
+      "method": "GET",
+      "path": "/.well-known/oauth-authorization-server/issuer/path",
+      "status": 200,
+      "authorizationPresent": false,
+      "requestEnded": true,
+      "requestComplete": true,
+      "requestClosed": true,
+      "responseFinished": true,
+      "responseClosed": true
+    }
+  ],
+  "maskedAfterFirstFailure": [
+    "line221 class refusal assertion",
+    "line222 fixed diagnostic assertion",
+    "later transcript assertion"
+  ],
+  "hooksPassed": 60,
+  "all32FixtureLifecycleRecordsClean": true,
+  "exit": 1,
+  "ownedPgid": 83666,
+  "ESRCH": true,
+  "noCompiledChildSensitivityClaim": true
+}

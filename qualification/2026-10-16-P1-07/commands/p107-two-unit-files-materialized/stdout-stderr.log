@@ -1,0 +1,21 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+stdout | tests/diagnostic/evidenceEmitterRegistry.test.ts > P1-07 emitter registry finite correspondence > the registry excludes seeder modules and synthetic claims and caps importers at L1
+AMC_P107_REGISTRY_EXCLUSIONS {"seeders":[],"synthetic":[]}
+
+ ✓ tests/diagnostic/evidenceEmitterRegistry.test.ts (9 tests) 8ms
+stdout | tests/diagnostic/levelCumulative.test.ts > P1-07 cumulative gate graphs (synthetic inputs) > a later passing L3 cannot skip failed L2; the contiguous graph still has a positive
+AMC_P107_SYNTHETIC_GRAPH {"gap":{"level":1,"perLevel":[{"pass":true,"matchedEventIds":["synthetic-audit-0","synthetic-audit-1","synthetic-audit-2","synthetic-audit-3"],"reason":"gate level 1 satisfied","distinctSessions":2,"distinctDays":2,"level":1,"status":"pass"},{"pass":false,"matchedEventIds":["synthetic-audit-0","synthetic-audit-1","synthetic-audit-2","synthetic-audit-3"],"reason":"failed gate 2: events=4/4, sessions=2/2, days=2/2, unmet=auditType:TOOL_CALL_DENIED","distinctSessions":2,"distinctDays":2,"level":2,"status":"fail"},{"pass":true,"matchedEventIds":[],"reason":"gate level 3 satisfied","distinctSessions":0,"distinctDays":0,"level":3,"status":"pass"}]},"contiguous":{"level":3,"perLevel":[{"pass":true,"matchedEventIds":["synthetic-audit-0","synthetic-audit-1","synthetic-audit-2","synthetic-audit-3"],"reason":"gate level 1 satisfied","distinctSessions":2,"distinctDays":2,"level":1,"status":"pass"},{"pass":true,"matchedEventIds":["synthetic-audit-0","synthetic-audit-1","synthetic-audit-2","synthetic-audit-3"],"reason":"gate level 2 satisfied","distinctSessions":2,"distinctDays":2,"level":2,"status":"pass"},{"pass":true,"matchedEventIds":[],"reason":"gate level 3 satisfied","distinctSessions":0,"distinctDays":0,"level":3,"status":"pass"}]}}
+
+stdout | tests/diagnostic/levelCumulative.test.ts > P1-07 canonical map with synthetic unverified parser-built rows > independent allowed and denied literals across two synthetic days and sessions reach only L2
+AMC_P107_CANONICAL_PARSER_INPUT {"inputIds":["synthetic-audit-0","synthetic-audit-1","synthetic-audit-2","synthetic-audit-3"],"result":{"level":2,"perLevel":[{"pass":true,"matchedEventIds":[],"reason":"gate level 0 satisfied","distinctSessions":0,"distinctDays":0,"level":0,"status":"pass"},{"pass":true,"matchedEventIds":["synthetic-audit-0","synthetic-audit-1","synthetic-audit-2","synthetic-audit-3"],"reason":"gate level 1 satisfied","distinctSessions":2,"distinctDays":2,"level":1,"status":"pass"},{"pass":true,"matchedEventIds":["synthetic-audit-0","synthetic-audit-1","synthetic-audit-2","synthetic-audit-3"],"reason":"gate level 2 satisfied","distinctSessions":2,"distinctDays":2,"level":2,"status":"pass"},{"pass":false,"matchedEventIds":[],"reason":"not evaluated at gate 3: L3 not evaluable on runtime evidence: needs tool-interface reconstruction, per-step scope decisions and status-aware validation metrics","distinctSessions":0,"distinctDays":0,"level":3,"status":"not_evaluated"},{"pass":false,"matchedEventIds":[],"reason":"not evaluated at gate 4: L4 needs continuity, anchoring (P1-25, P1-26) and a sampling record; no registered emitter produces them yet","distinctSessions":0,"distinctDays":0,"level":4,"status":"not_evaluated"},{"pass":false,"matchedEventIds":[],"reason":"not evaluated at gate 5: L5 needs a scoped attestation signed by a key with purpose attestation in the pinned trust list (P0-09, P3-04); no registry issues one yet","distinctSessions":0,"distinctDays":0,"level":5,"status":"not_evaluated"}]}}
+
+ ✓ tests/diagnostic/levelCumulative.test.ts (12 tests) 13ms
+
+ Test Files  2 passed (2)
+      Tests  21 passed (21)
+   Start at  23:17:10
+   Duration  269ms (transform 149ms, setup 38ms, import 220ms, tests 21ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p107-two-unit-files-materialized.raw.json

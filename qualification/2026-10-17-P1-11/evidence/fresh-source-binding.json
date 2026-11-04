@@ -1,0 +1,341 @@
+{
+  "schema": "p111-actual-fresh-source-binding/1",
+  "at": "2026-10-16T19:32:19.550341+00:00",
+  "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "freshRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout",
+  "sourceCommit": "a6909ac52ec7db1411696b82c4ef6c9cb61a89d2",
+  "bothTreesClean": true,
+  "bothIndexesEmpty": true,
+  "boundPaths": [
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "1078be7752f285a3656e0998948090479e15801825a435bfa467c75b886182b3"
+    },
+    {
+      "relativePath": "README.md",
+      "bytes": 59828,
+      "sha256": "cb79211631c823726db07275e9c4a54da15e9414a103e3ca6e87786631dd5333"
+    },
+    {
+      "relativePath": "catalog/producers.yaml",
+      "bytes": 2701,
+      "sha256": "592c640cfe12e0e843b98ec3c8035bb096011a965303a2f6fc175cfae6af6bd4"
+    },
+    {
+      "relativePath": "dist/catalog/evidence/admission.js",
+      "bytes": 5687,
+      "sha256": "949531e04cbbcb45e2f844e1c165b6b383584ae4c3e87b66d25abeec3d42d3ba"
+    },
+    {
+      "relativePath": "dist/catalog/evidence/dimensions.js",
+      "bytes": 5650,
+      "sha256": "9753fa6e1d82ac58cb6270233c7dc1e07324691c6b585598348976c6dc104ecd"
+    },
+    {
+      "relativePath": "dist/catalog/evidence/evaluate.js",
+      "bytes": 4952,
+      "sha256": "88b16ad93fc815e2b2388024cfa5a920f8c1b335a3f2d9c0df0a0830ed74a789"
+    },
+    {
+      "relativePath": "dist/catalog/evidence/mappingAdapter.js",
+      "bytes": 11831,
+      "sha256": "5e85fedd5bf95cda130fe3c21a278ed14156691e6219d5ca30c8d79db0ca8b40"
+    },
+    {
+      "relativePath": "dist/claims/eligibility/evaluate.js",
+      "bytes": 5715,
+      "sha256": "c68e95772bcb7636d61923df2b878ac169c6966222db7ce40f20bf4ab6bdd8b1"
+    },
+    {
+      "relativePath": "dist/claims/evidenceProvenance.js",
+      "bytes": 10031,
+      "sha256": "efb5e75b85bb53cea69ee1d3b6dca86f13137dfc8eaf363cd647e55eceb68668"
+    },
+    {
+      "relativePath": "dist/compliance/complianceEngine.js",
+      "bytes": 13856,
+      "sha256": "dfc0502219410fb933d712b0c483765d6e2f86847321407764307d983b31f45f"
+    },
+    {
+      "relativePath": "dist/compliance/coverageScorer.js",
+      "bytes": 1054,
+      "sha256": "90b3af96507f44bd6cd1bfbe6c75ab6e8a9f088af2c4b6f16dbbd8914c179e2c"
+    },
+    {
+      "relativePath": "docs/catalog/CONTROL_RECORD.md",
+      "bytes": 18696,
+      "sha256": "f6792b31f00ca3f1163a7f22df972cfe7815b734e1a728291fb4ccb2876cc7d9"
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "2f896b4707b0cb4af017d27b723c70363b6891bf3af4c2a16cc5db8b59e567aa"
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "a674917a0e51231f6d30243ff5256d3df04646e0f2695e987a341e4d14e248fd"
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "693eb25cc48264fe67af1ae27f4a13338005d29766a279876ed98036627dcb06"
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "5daf8197f27144a46a8abbdc813240316ca64a37d0d9eb3862a6bfe3c3bb6a3e"
+    },
+    {
+      "relativePath": "package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014"
+    },
+    {
+      "relativePath": "pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+    },
+    {
+      "relativePath": "qualification/receipt.schema.json",
+      "bytes": 2315,
+      "sha256": "adb2e62d05e91484cac7f12a31a4c3ccf0a5a1db7f07349c8828bfd9a298a7c6"
+    },
+    {
+      "relativePath": "scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "relativePath": "scripts/check-qualification-receipts.mjs",
+      "bytes": 6764,
+      "sha256": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48"
+    },
+    {
+      "relativePath": "scripts/gen-counts.mjs",
+      "bytes": 9141,
+      "sha256": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f"
+    },
+    {
+      "relativePath": "scripts/source-quality.mjs",
+      "bytes": 5010,
+      "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f"
+    },
+    {
+      "relativePath": "src/catalog/digest.ts",
+      "bytes": 2446,
+      "sha256": "fa5c0c2563faaf67480eb78fcfc08d55142c5d0bb2959ae21f93d9143c9dcde0"
+    },
+    {
+      "relativePath": "src/catalog/evidence/admission.ts",
+      "bytes": 6419,
+      "sha256": "1a32690d77143674f62c6c904c8b9ad1619bd2be594f2db187bb45aa60697fb7"
+    },
+    {
+      "relativePath": "src/catalog/evidence/dimensions.ts",
+      "bytes": 6684,
+      "sha256": "68e1c78a8ae69afda00af4f5f12d94af4cbae6570125d621463639f92117b326"
+    },
+    {
+      "relativePath": "src/catalog/evidence/evaluate.ts",
+      "bytes": 5232,
+      "sha256": "4162b553ec55044f64bfe5b39f32bf7b19f94880577eeae8b90717b197a080a4"
+    },
+    {
+      "relativePath": "src/catalog/evidence/mappingAdapter.ts",
+      "bytes": 13302,
+      "sha256": "42c738451e97d0a11475ea76eb63e68577f52364a3ef8606da750c3334c96dbd"
+    },
+    {
+      "relativePath": "src/catalog/evidence/signedResults.ts",
+      "bytes": 5028,
+      "sha256": "53238a8fa04748d2d6b2f3cfa717d4262ebc410358b7675752aed7344ab03030"
+    },
+    {
+      "relativePath": "src/catalog/evidence/types.ts",
+      "bytes": 4787,
+      "sha256": "29dac8ffaece05b415bbf2d8d2bcf70792ffd357abff6c6b94b029d660042201"
+    },
+    {
+      "relativePath": "src/catalog/schema.ts",
+      "bytes": 18576,
+      "sha256": "f732924cb9e730be512162d2ecf6e065807af0999d4305dda097559dc9081f58"
+    },
+    {
+      "relativePath": "src/catalog/types.ts",
+      "bytes": 7755,
+      "sha256": "f40e2faf3691870990e4a882b903b770fec5444c90263faf58b212e83ca8aa32"
+    },
+    {
+      "relativePath": "src/claims/eligibility/evaluate.ts",
+      "bytes": 5777,
+      "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0"
+    },
+    {
+      "relativePath": "src/claims/eligibility/types.ts",
+      "bytes": 3418,
+      "sha256": "4cfc64f7c7ad43b13f16ebae4c68c0ced2e652aa3cf2d9942e826067351c4eb6"
+    },
+    {
+      "relativePath": "src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+    },
+    {
+      "relativePath": "src/compliance/complianceEngine.ts",
+      "bytes": 14631,
+      "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9"
+    },
+    {
+      "relativePath": "src/compliance/coverageScorer.ts",
+      "bytes": 1081,
+      "sha256": "aca2f0a8eec10f68ef62fab1c907f5bbb9f40230bbd84112a8da5f2bf60d339c"
+    },
+    {
+      "relativePath": "src/compliance/evidenceBinding.ts",
+      "bytes": 5791,
+      "sha256": "e8756dd77213e02343c3eb3e68fc56ed59bf0cb44f605ead8d958cc49e2d8eec"
+    },
+    {
+      "relativePath": "src/utils/hash.ts",
+      "bytes": 259,
+      "sha256": "1507e34cf2dcc614e9b7bf05a790806a18ab878e8d282c16cb673718f92a6601"
+    },
+    {
+      "relativePath": "src/utils/json.ts",
+      "bytes": 540,
+      "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+    },
+    {
+      "relativePath": "src/version.ts",
+      "bytes": 337,
+      "sha256": "2e16763d1764e9426b7850201ac5e65ec93cd4a2e66ed70faebb25b2093e0593"
+    },
+    {
+      "relativePath": "tests/catalog/compiler/unknown.test.ts",
+      "bytes": 4348,
+      "sha256": "dd1a134cbbdcb3be429815e46536945da9ab1af1018a853ffde2349403a637be"
+    },
+    {
+      "relativePath": "tests/catalog/controlRecordSchema.test.ts",
+      "bytes": 7444,
+      "sha256": "2ed9f89524e62aade2446798a0ac7ec62a724153626106b24211acef770a0f9a"
+    },
+    {
+      "relativePath": "tests/catalog/evidence/decisive.test.ts",
+      "bytes": 18998,
+      "sha256": "db7c355932623e3babedc68e5ee3f6089df5bb6d05b2ee2636cb05d213e0f018"
+    },
+    {
+      "relativePath": "tests/compliance/complianceFailClosed.test.ts",
+      "bytes": 20978,
+      "sha256": "0f503d86bb822b93308a46144f8a107cf08e7084982e4f9d8dfcb91fbdf64297"
+    },
+    {
+      "relativePath": "tests/compliance/coverageScorer.test.ts",
+      "bytes": 1998,
+      "sha256": "81db0521e2e7366c967521057766ca48197a657da860424640e4dc0ee962627b"
+    },
+    {
+      "relativePath": "tests/compliance/evidenceBinding.test.ts",
+      "bytes": 11569,
+      "sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a"
+    },
+    {
+      "relativePath": "tests/setup/guardWorkspace.ts",
+      "bytes": 1894,
+      "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591"
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+      "bytes": 3675,
+      "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179"
+    },
+    {
+      "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+      "bytes": 1133,
+      "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4"
+    },
+    {
+      "relativePath": "tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "relativePath": "tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "relativePath": "vitest.config.ts",
+      "bytes": 1324,
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b"
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "9bc14ca1ad71e28b64885edac8901845f4d7fed479732900b960db5415f54961"
+    },
+    {
+      "relativePath": "website/index.html",
+      "bytes": 43520,
+      "sha256": "3671f39e44105f6d6a9da3bfa177494fdbc5bb01dcee19834053ebd8ba759e78"
+    },
+    {
+      "relativePath": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "de5b46b579c8015d525f0c747fc1be2e454ef0e767d6a581f5582fee7dc57b01"
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "51e23bfa50e64a81b91e5c55e9ab8d0cdcaba79c6f7a56f1c1965acece77acc9"
+    }
+  ],
+  "sourceCompiledPairs": [
+    "catalog/evidence/admission",
+    "catalog/evidence/evaluate",
+    "catalog/evidence/dimensions",
+    "catalog/evidence/mappingAdapter",
+    "claims/eligibility/evaluate",
+    "claims/evidenceProvenance",
+    "compliance/complianceEngine",
+    "compliance/coverageScorer"
+  ],
+  "allSourceFreshBytesEqual": true,
+  "nativePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 542501039,
+      "nlink": 1,
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1,
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-iqtnsd/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 543200130,
+      "nlink": 1,
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    }
+  ],
+  "threeNativeIdentitiesDistinct": true,
+  "sharedNodesRelinkedOrRebuilt": false,
+  "freshHelper": "p111-fresh-clean-source",
+  "freshHelperBoundary": "Frozen install/build/doctor and keyless signed one/cross-process two-turn checks only; no Vitest.",
+  "cohortBoundary": "Tests use explicit source roots. The unchanged source-literal census still reads borrowed R/src because cwd remains R."
+}

@@ -1,0 +1,271 @@
+{
+  "schemaVersion": 1,
+  "review": "P0-48 final bounded diff review",
+  "timestampUtc": "2026-10-14T14:42:14.681848+00:00",
+  "checkout": "/Users/sid/.codex/worktrees/p0-48-qualification/AgentMaturityCompass",
+  "branch": "codex/p0-48-current-qualification",
+  "observedHead": "c4be164ea12d358ea30451391a6df29429fc6a7e",
+  "acceptedBase": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "statusAtReview": "",
+  "verdict": "No concrete defect found in the bounded change.",
+  "checks": {
+    "exactly_three_scoped_source_paths": true,
+    "workflow_only_one_fail_fast_false_line": true,
+    "old_three_test_bodies_byte_identical": true,
+    "strict_job_failure_assertion": true,
+    "no_new_catch_or_try": true,
+    "protected_boundaries_unchanged": true,
+    "pipeline_run_blocks_identical_to_qualified": true,
+    "production_diff_empty": true,
+    "archive_diff_empty": true,
+    "final_test_typecheck_passed": true
+  },
+  "fileHashes": [
+    {
+      "path": ".github/workflows/ci.yml",
+      "before_sha256": "df7c6dd440e1e696bbea7fb13ce835b57b499c4b7afdfda1e5c95301f05f3092",
+      "after_sha256": "d2f28e21d3e7cd5f9867401b183ce7fa9a19c2a38b5e8cc1736411da85256bd6"
+    },
+    {
+      "path": "tests/reconciliationDefectsReleaseGate.test.ts",
+      "before_sha256": "3c2eb86cdb3ec4bd101ec1ed8ba9b16d49c9e4606bf3c462baddad7906f98179",
+      "after_sha256": "69d67bf9015fb918f577c1870649e296d3f79854f638e9c9aab648809c889397"
+    },
+    {
+      "path": ".changeset/p0-48-matrix-completion.md",
+      "before_sha256": null,
+      "after_sha256": "298eb0a9e87febeded85aed24c2e7072e2b153b7ed9044727acebac73df5c10e"
+    }
+  ],
+  "exactDiff": "diff --git a/.changeset/p0-48-matrix-completion.md b/.changeset/p0-48-matrix-completion.md\nnew file mode 100644\nindex 000000000..9bef6552d\n--- /dev/null\n+++ b/.changeset/p0-48-matrix-completion.md\n@@ -0,0 +1,5 @@\n+---\n+\"agent-maturity-compass\": patch\n+---\n+\n+Keep both supported Node CI jobs running when either job fails, so each result and its diagnostics can be inspected. Contributor tooling only; failures still fail their jobs.\ndiff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml\nindex faf724e45..be4931dba 100644\n--- a/.github/workflows/ci.yml\n+++ b/.github/workflows/ci.yml\n@@ -38,6 +38,7 @@ jobs:\n     runs-on: ubuntu-latest\n     timeout-minutes: 90\n     strategy:\n+      fail-fast: false\n       matrix:\n         node-version: [\"22\", \"24\"]\n     steps:\ndiff --git a/tests/reconciliationDefectsReleaseGate.test.ts b/tests/reconciliationDefectsReleaseGate.test.ts\nindex 4fe047e7f..94827fab5 100644\n--- a/tests/reconciliationDefectsReleaseGate.test.ts\n+++ b/tests/reconciliationDefectsReleaseGate.test.ts\n@@ -9,6 +9,7 @@ import { tmpdir } from \"node:os\";\n import { join, resolve } from \"node:path\";\n import { pathToFileURL } from \"node:url\";\n import { afterEach, describe, expect, test } from \"vitest\";\n+import YAML from \"yaml\";\n \n const root = resolve(process.env.AMC_RECONCILE_ROOT ?? join(import.meta.dirname, \"..\"));\n const scratch: string[] = [];\n@@ -35,3 +36,12 @@ describe(\"test typecheck stays a named release and CI step\", () => {\n     expect(text).toMatch(/- name: Typecheck tests\\n\\s+run: npm run typecheck:tests\\n/);\n   });\n });\n+\n+describe(\"P0-48 CI matrix completion\", () => {\n+  test(\"both supported Node jobs retain their results when a sibling fails\", () => {\n+    const workflow = YAML.parse(readFileSync(join(root, \".github\", \"workflows\", \"ci.yml\"), \"utf8\"));\n+    const job = workflow.jobs[\"build-test\"];\n+    expect(job.strategy).toMatchObject({ \"fail-fast\": false, matrix: { \"node-version\": [\"22\", \"24\"] } });\n+    expect([undefined, false]).toContain(job[\"continue-on-error\"]);\n+  });\n+});\n",
+  "changeset": "---\n\"agent-maturity-compass\": patch\n---\n\nKeep both supported Node CI jobs running when either job fails, so each result and its diagnostics can be inspected. Contributor tooling only; failures still fail their jobs.\n",
+  "parsedFinalWorkflowPolicy": [
+    {
+      "id": "ci",
+      "file": ".github/workflows/ci.yml",
+      "run": "mkdir -p tmp/ci-coverage\nnpm run test:coverage -- --exclude 'tests/performance/**' --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-coverage/tests.json 2>&1 | tee tmp/ci-coverage/tests.log | cut -c1-4096\n",
+      "shell": "bash",
+      "runner": "ubuntu-latest",
+      "timeout": 90,
+      "strategy": {
+        "fail-fast": false,
+        "matrix": {
+          "node-version": [
+            "22",
+            "24"
+          ]
+        }
+      },
+      "jobContinueOnError": null,
+      "stepsWithContinueOnError": [
+        {
+          "name": "Source duplication and reachability",
+          "value": true
+        }
+      ]
+    },
+    {
+      "id": "publish",
+      "file": ".github/workflows/npm-publish.yml",
+      "run": "mkdir -p tmp/ci-tests\nnpm test -- --reporter=default --reporter=json --reporter=hanging-process --outputFile.json=tmp/ci-tests/tests.json 2>&1 | tee tmp/ci-tests/tests.log | cut -c1-4096\n",
+      "shell": "bash",
+      "runner": "ubuntu-latest",
+      "timeout": 60,
+      "strategy": null,
+      "jobContinueOnError": null,
+      "stepsWithContinueOnError": []
+    }
+  ],
+  "oldAssertions": "Removing only the added YAML import and appended P0-48 describe block reproduces all three original tests byte for byte. The existing fake release-gate collection/catch behavior is unchanged. No old assertion or root mutation seam was altered.",
+  "errorIntegrity": "The new contract requires fail-fast:false and original22/24 matrix, accepting job continue-on-error only as undefined/boolean false. It adds no catch, allowed-failure or conditional required step. Source duplication and reachability continue-on-error:true remains inherited byte-for-byte from accepted main, separately owned P0-33 debt; it is not introduced by this change.",
+  "protectedBoundaries": [
+    {
+      "path": "scripts/freeze-baseline.json",
+      "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/check-freeze.mjs",
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+      "unchanged": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/per-file-coverage.mjs",
+      "sha256": "ce5b1fcaa4d81cfb7c14cd6fe3d9f26d0563f9ce7f19f9a746cdcf8b817cffb3",
+      "unchanged": true
+    },
+    {
+      "path": "scripts/quality/coverage-baseline.json",
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+      "unchanged": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+      "unchanged": true
+    },
+    {
+      "path": ".github/workflows/npm-publish.yml",
+      "sha256": "3c4bb58c740409850865514f3d07fe60efb115f471aa5aa2f307f28344e2f5f1",
+      "unchanged": true
+    },
+    {
+      "path": "tests/foreignSubagentRunner.test.ts",
+      "sha256": "446bee5c30d4cacecb7064896df3998eff21096c313b98f924fdc18123d2c7ed",
+      "unchanged": true
+    }
+  ],
+  "pipelineQualification": {
+    "path": "/private/tmp/p0-48-pipeline-qualification-20261014.json",
+    "sha256": "774bf86a9fda5b90dce71196436f32df353b7e038b76797c72c4bb57f76ae6e4",
+    "status": "passed",
+    "actualCases": 4,
+    "finalMatches": [
+      {
+        "workflow": "ci",
+        "run_sha256": "2750ed6df3ed949e0d5693ce0445c110fcff681411b15073ede797b1ec6fa180",
+        "run_and_shell_match_qualified": true
+      },
+      {
+        "workflow": "publish",
+        "run_sha256": "b70b384327eedd13ccdc30b802149066a93860b1fdfa81d573e44a19c0a29495",
+        "run_and_shell_match_qualified": true
+      }
+    ],
+    "proof": "Actual local controlled producers preserve all5,242,913 raw bytes/hash,4,096-byte console lines and exit0/17 in both exact run blocks. This does not qualify hosted matrix completion or execute real npm tests."
+  },
+  "actualExistingReports": [
+    {
+      "case": "matrix-regression-red",
+      "path": "/private/tmp/p0-48-matrix-regression-red-20261014.json",
+      "sha256": "30efbc889bb033ec8645a48edea23e2f725fb4fda3540b833ae576378a2f502f",
+      "counts": {
+        "success": false,
+        "numTotalTests": 4,
+        "numPassedTests": 3,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failed_assertions": [
+        "P0-48 CI matrix completion both supported Node jobs retain their results when a sibling fails"
+      ]
+    },
+    {
+      "case": "matrix-and-foreign-green",
+      "path": "/private/tmp/p0-48-matrix-and-foreign-green-20261014.json",
+      "sha256": "8ef385fe2767f4849b54d38ddfc8a8f9b0b1a8376279d8b3c872d4998e583106",
+      "counts": {
+        "success": true,
+        "numTotalTests": 16,
+        "numPassedTests": 16,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failed_assertions": []
+    },
+    {
+      "case": "matrix-final-green",
+      "path": "/private/tmp/p0-48-matrix-final-green-20261014.json",
+      "sha256": "9ff08118533187619d3e1cc82d82040fb96845657a6885509f74e96c3b16fa26",
+      "counts": {
+        "success": true,
+        "numTotalTests": 4,
+        "numPassedTests": 4,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "failed_assertions": []
+    },
+    {
+      "case": "fail-fast-true",
+      "path": "/private/tmp/p0-48-fail-fast-true-20261014.json",
+      "sha256": "e3bf7042c607f164332750e4d94b446aec65188430329d5b588fb9efa887202a",
+      "counts": {
+        "success": false,
+        "numTotalTests": 4,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 3,
+        "numTodoTests": 0
+      },
+      "failed_assertions": [
+        "P0-48 CI matrix completion both supported Node jobs retain their results when a sibling fails"
+      ]
+    },
+    {
+      "case": "continue-on-error-expression",
+      "path": "/private/tmp/p0-48-continue-on-error-expression-20261014.json",
+      "sha256": "6bd0873f50aaf4dc8e7d2cf46eeceb8ce6b7c6cfe5b98475488e9d47e3d5c623",
+      "counts": {
+        "success": false,
+        "numTotalTests": 4,
+        "numPassedTests": 0,
+        "numFailedTests": 1,
+        "numPendingTests": 3,
+        "numTodoTests": 0
+      },
+      "failed_assertions": [
+        "P0-48 CI matrix completion both supported Node jobs retain their results when a sibling fails"
+      ]
+    }
+  ],
+  "finalTypecheckAfterTightening": {
+    "name": "typecheck-tests-final",
+    "cmd": "npm run typecheck:tests",
+    "exit": 0,
+    "durationMs": 35833,
+    "startedUtc": "2026-10-14T14:38:36.743258+00:00",
+    "log": "/private/tmp/p0-48-typecheck-tests-final-20261014.log"
+  },
+  "rootRecordedChecks": [
+    {
+      "name": "build",
+      "exit": 0,
+      "startedUtc": "2026-10-14T14:34:05.725273+00:00",
+      "durationMs": 30038,
+      "log": "/private/tmp/p0-48-build-20261014.log"
+    },
+    {
+      "name": "lint",
+      "exit": 0,
+      "startedUtc": "2026-10-14T14:34:46.448704+00:00",
+      "durationMs": 4269,
+      "log": "/private/tmp/p0-48-lint-20261014.log"
+    },
+    {
+      "name": "docs",
+      "exit": 0,
+      "startedUtc": "2026-10-14T14:35:52.318416+00:00",
+      "durationMs": 511,
+      "log": "/private/tmp/p0-48-docs-20261014.log"
+    },
+    {
+      "name": "counts",
+      "exit": 0,
+      "startedUtc": "2026-10-14T14:35:52.319987+00:00",
+      "durationMs": 625,
+      "log": "/private/tmp/p0-48-counts-20261014.log"
+    },
+    {
+      "name": "freeze",
+      "exit": 0,
+      "startedUtc": "2026-10-14T14:35:52.318942+00:00",
+      "durationMs": 1778,
+      "log": "/private/tmp/p0-48-freeze-20261014.log"
+    }
+  ],
+  "D15": "The prior complete readonly needs-snapshot helper returns none for the bounded paths at accepted5ea; there is no relevant archive/manifest row or frozen witness. The diff changes no original archive, plan-edit manifest or live/archive read route. No D15 registration needed.",
+  "acceptanceLimits": [
+    "PR40 historical both-job completion remains unmet; a fresh pinned hosted Node22/24 result is still needed for current completion.",
+    "Focused correctness, parser/typecheck and pipeline proofs do not establish full correctness/coverage, CI green, release, deployment or npm publication.",
+    "Reviewer performed no source edit, new test/build/check run, CI trigger, tracker mutation or cross-session modification."
+  ]
+}

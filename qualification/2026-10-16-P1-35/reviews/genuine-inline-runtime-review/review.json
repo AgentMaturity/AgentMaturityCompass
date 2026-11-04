@@ -1,0 +1,261 @@
+{
+  "schema": "p135-genuine-inline-runtime-independent-review/1",
+  "allReadsFinished": true,
+  "blockers": [],
+  "conclusion": "Closed10/10 working-tree cohort corroborated by raw, observer and10publics. Genuine inline ledger now verifies; future canonical/fresh/control/fullP135 claims remain pending.",
+  "phase": {
+    "name": "p135-genuine-inline-qualified",
+    "tests": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0,
+    "unhandled": 0,
+    "fileAfterAll": "pass",
+    "exit": 0,
+    "durationMs": 3889,
+    "ownedPGID": 92983,
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "lateHits": [],
+    "rawSuiteCountMeaning": "3 is one file plus two describe suites, not three independent cohorts",
+    "wrapperCwdHead": "R@bf3b7766e7b2e70d8e72135773a5c0e612ae013d",
+    "actualTestRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+    "environment": "Inherited environment/private HOME; no isolation claim"
+  },
+  "testSource": {
+    "pin": {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+      "bytes": 43120,
+      "sha256": "c4fafd3e5a0e471d5652cffca85d1e9b7115daac3cdeec0619ab0b1ce0eec56f"
+    },
+    "originalEightBodiesExact": true,
+    "onlyDeltaFromSealedGenuine": "Fixture-only bundle maxEntryBytes derives largest already-verified raw candidate; safeTarArchive and4000000total unchanged",
+    "largestEntry": 3333257,
+    "nestedBundleTotalFromRootContentReview": 3891578,
+    "noDeadlineOrProductGuardChange": true
+  },
+  "publicReview": {
+    "fullyRead": 10,
+    "bodyErrors": 0,
+    "cleanupErrors": 0,
+    "allEnvironmentUnchanged": true,
+    "allOwnedVaultsLocked": true,
+    "allExactOwnedPoolsClosed": true,
+    "allSelectedNativeBeforeAfterExact": true,
+    "selectedSNativeInode": 542501039,
+    "directFixtureChildFlags": "false for synthetic; null for two genuine cases with delegated tar API, no individual tar PID claim"
+  },
+  "genuine": {
+    "ledger": {
+      "ok": true,
+      "errors": [],
+      "chain": {
+        "ok": true,
+        "errors": []
+      },
+      "governance": {
+        "ok": true,
+        "errors": []
+      },
+      "trustRoot": {
+        "anchored": true,
+        "monitorFingerprint": "28236b062e309c5643c2f65d1cf9c2261f4cbc682cf4590b5b87e8adeeceb6fe",
+        "expectedFingerprint": null,
+        "monitorAdmission": {
+          "signature": "ledger monitor key",
+          "purpose": "ledger-row",
+          "keyId": "28236b062e309c5643c2f65d1cf9c2261f4cbc682cf4590b5b87e8adeeceb6fe",
+          "status": "admitted",
+          "source": "explicit-key",
+          "listId": null,
+          "timeBasis": null,
+          "detail": null
+        }
+      },
+      "sessions": {
+        "open": [],
+        "released": [],
+        "interrupted": [],
+        "closed": []
+      }
+    },
+    "fixtureTrust": {
+      "source": "imported",
+      "oldMonitorId": "61ee1b7a33aa0a87cfbd7c838b1be3f0d63f095d4ebed734d4687150b790d392",
+      "oldAuditorId": "5f24420aaadad3cffe4aa83f98e8b2044c3aadf60300485725fe1eb633bd2142",
+      "currentMonitorId": "28236b062e309c5643c2f65d1cf9c2261f4cbc682cf4590b5b87e8adeeceb6fe",
+      "monitorHistoryVerified": true,
+      "auditorHistoryVerified": true,
+      "activePublicKeysAndVaultUnchanged": true,
+      "independentHistoricalProvenanceClaim": false
+    },
+    "events": 9,
+    "sessions": 2,
+    "allInlineNoPathsOrBlobRef": true,
+    "sessionHashes": {
+      "59afd382-c8fc-4ebc-9392-0d151b76abac": "336f31490e7998bd609c287e2f6a4c83a6e2ac30def539f7430147fca1d14ca5",
+      "legacy-seeded-maturity-session-1": "c39df22c26bf7d9e6021525061a08fa5e1f162d717f08d1bfeec64ca2046d599"
+    },
+    "sixRecordsByRule": {
+      "R1-assurance-canned-reply": 1,
+      "R2-dogfood-seeded": 1,
+      "R3-domain-report": 1,
+      "R4-operator-tier": 1,
+      "R5-no-claim-envelope": 2
+    },
+    "allLegacyKindsConservative": true,
+    "R2R4VerifiedAndTrusted": true,
+    "domainAutomaticVsExplicit": [
+      0,
+      1
+    ],
+    "unversionedSkips": [
+      {
+        "locator": "decoded-originals/passport.amcpass",
+        "reason": "records no AMC version or claim envelope, so 1.x and 1.2 cannot be told apart; readers print it self-reported"
+      },
+      {
+        "locator": "decoded-originals/trust-certificate.json",
+        "reason": "records no AMC version or claim envelope, so 1.x and 1.2 cannot be told apart; readers print it self-reported"
+      }
+    ],
+    "bundleBeforeAfter": {
+      "equal": true,
+      "integrityPass": true,
+      "legacyKind": "self_reported"
+    },
+    "encodedFixtureBytes": 773756,
+    "rawOriginalBytes": 4104713,
+    "encodedDecodedInstalledHashesRecheckedPostExit": true,
+    "physicalSQLiteSha256": "e7c3f5cc4bdb288cfdf2ced0828b8140316c82c85769bc24c6761443982bbc6e",
+    "receiptMetadata": [
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-XSsMZb/.amc/migrations/receipts/20261016T120000008Z.json",
+          "bytes": 1274,
+          "sha256": "cb667c41d1066823f4121251b57bb62e4495437f738f19542144029ec09c64fe"
+        },
+        "scanned": 8,
+        "relabelled": 6,
+        "lines": 6,
+        "metadataHeadAndDigestMatch": true,
+        "signatureDigestMatchesReceiptBytes": true,
+        "finishedAt": "2026-10-16T12:00:00.008Z"
+      },
+      {
+        "pin": {
+          "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p135-legacy-XSsMZb/.amc/migrations/receipts/20261016T120000011Z.json",
+          "bytes": 1274,
+          "sha256": "c6a0c1425d2909bf39bcf661243073a5a3337fabd17b3c912669cb0f83885648"
+        },
+        "scanned": 8,
+        "relabelled": 0,
+        "lines": 6,
+        "metadataHeadAndDigestMatch": true,
+        "signatureDigestMatchesReceiptBytes": true,
+        "finishedAt": "2026-10-16T12:00:00.011Z"
+      }
+    ],
+    "relabelLineCount": 6,
+    "chainHead": "6605c69d9c3ee0bf1aba66629f82e51729a8cf7db1cf70283626256d958271ef",
+    "originalsDigest": "b0d8a6658ae084c47bebd8f87d4ae0e8436875bfe342f9c91ab219453dc266c5",
+    "sameLogAndZeroNewRecordsRepeat": true,
+    "signatureVerificationCredit": "Actual passed product assertions/retained public true; reviewer independently checked hashes/chain/digest metadata only, no cryptographic re-execution. SignedDigest has no purpose field.",
+    "coreCorpusGaps": [
+      {
+        "step": "genuine-L3",
+        "reason": "Actual diagnostic does not have mean level exactly L3; original bytes and seal retained unchanged."
+      },
+      {
+        "step": "diagnostic-certificate",
+        "reason": "Natural exit 1; retained original streams; no success or retry claimed."
+      },
+      {
+        "step": "run.amccert",
+        "reason": "No output file was emitted."
+      }
+    ]
+  },
+  "noDecryptionBound": {
+    "supported": "All9 installed old snapshot events are recorded inline with null payload paths/ref; unchanged retention verifier hashes inline data then returns before blob loading. Exact opaque original container/SQLite bytes remain unchanged.",
+    "notClaimed": [
+      "No instrumented universal function-call trace across every dependency or bundle verifier",
+      "No old encrypted blob decryption/re-encryption qualification",
+      "No independent historical provenance from imported fixture anchors",
+      "No universal child/resource lifecycle or filesystem-isolation claim"
+    ],
+    "snapshotBoundary": "before-diagnostic-and-assurance; historical sourceAtClosure is not a live finalDB invariant"
+  },
+  "priorFailureAccounting": [
+    {
+      "phase": "p135-strict-synthetic-baseline",
+      "tests": 8,
+      "passed": 6,
+      "failed": 2,
+      "firstFrames": [
+        "legacyRelabel.test.ts:165:27 undefined R5 rule",
+        "legacyRelabel.test.ts:177:33 observed rather than self_reported"
+      ],
+      "meaning": "Strict original production gap; later assertions in each failing case masked."
+    },
+    {
+      "phase": "p135-genuine-integrated-baseline",
+      "tests": 10,
+      "passed": 9,
+      "failed": 1,
+      "firstFrames": [
+        "legacyRelabel.test.ts:533:31 verification.ok false"
+      ],
+      "meaning": "V3 final ledger had26missing blob failures; anchored/governance true; later strict anchoring/R2/R4 verified assertions masked. Prior record remains preserved."
+    },
+    {
+      "phase": "p135-genuine-inline-repaired",
+      "tests": 10,
+      "passed": 9,
+      "failed": 1,
+      "firstFrames": [
+        "safeTarArchive.ts:143:13 member exceeds3000000; fixtureTrust test205:58"
+      ],
+      "meaning": "Fixture-only setup refusal before historical verifier/scan; no semantic ledger credit. Separate admitted single helper limit derivation repaired this assumption."
+    }
+  ],
+  "currentStaticControlWitnessMap": [
+    {
+      "operator": "M1-promote-attested-legacy",
+      "currentPrimary": "legacyRelabel.test.ts:254 forbidden observed/independently_reviewed membership",
+      "precondition": "Nonnull classification at252; all finite input classifications gathered before assertions",
+      "maskedLater": "Exact R4kind/rule/tier and observed/hardened comparisons255-258",
+      "actualControlExecutedHere": false
+    },
+    {
+      "operator": "M2-rewrite-original-report",
+      "currentPrimary": [
+        "legacyRelabel.test.ts:308 synthetic changedOriginals==[]",
+        "legacyRelabel.test.ts:511 genuine installed changedOriginals==[]"
+      ],
+      "additionalPotentialSensitiveAssertions": [
+        "legacyRelabel.test.ts:374 log-tamper originals",
+        "legacyRelabel.test.ts:402 signature-tamper originals",
+        "genuine registered cleanup integrity check may also report changed installed original"
+      ],
+      "maskedLater": "Within a failed primary case, later dry-run/signature/digest/idempotence/verifier checks are masked. Preserve original body error with any cleanup error; do not require a particular total failure count.",
+      "actualControlExecutedHere": false
+    },
+    {
+      "operator": "M3-remove-canned-R1",
+      "currentPrimary": [
+        "legacyRelabel.test.ts:341 synthetic exact R1/R5 rule list",
+        "legacyRelabel.test.ts:439 genuine R1rule equality"
+      ],
+      "additionalPotentialSensitiveAssertions": [
+        "log-tamper fixture two-record positive prerequisite can fail as setup, not as tamper witness"
+      ],
+      "maskedLater": "Remaining synthetic main case expectations342-349 and genuine classifier lazy/R2-R5 assertions440-450 can be masked; collected observations do not replace assertions.",
+      "actualControlExecutedHere": false
+    }
+  ],
+  "remaining": "Canonical regression cohort, clean-source copy/freshQ, real source-control red/restores, current certificate follow-up and full spec/global quality acceptance are not supplied by this one phase. Knip finding remains held/unwaived; all other held decisions remain.",
+  "allReads": "Raw/observer/log/process records/current test delta and10public JSON fully read; prior failure reports read only as finite failure projections, rootv4 content review read; derived observation inspected without payload bodies; no private key/vault/blob body reads.",
+  "executionByReviewer": false,
+  "checkoutOrQMutationByReviewer": false
+}

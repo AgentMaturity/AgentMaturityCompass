@@ -1,0 +1,18 @@
+{
+  "name": "full-suite-final",
+  "head": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "headAfter": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "cmd": "npm test -- --maxWorkers=4 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final-report.json",
+  "exit": null,
+  "durationMs": 201278,
+  "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/full-suite-final.log",
+  "rawLogSha256": "6391617d9afa8e5267549050e8c6adce4bb57eb1fc4a21a88df52a88aaa553c5",
+  "rawLogBytes": 1337,
+  "jsonReportPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/full-suite-final-report.json",
+  "jsonReportSha256": null,
+  "statusAfterTests": null,
+  "generatedOutputsUnchangedByTests": true,
+  "generatedOutputsBackup": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/generated-counts-before-final-full-e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "exception": "KeyboardInterrupt()",
+  "originalRawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/full-suite-final.log"
+}

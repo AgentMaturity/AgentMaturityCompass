@@ -1,0 +1,64 @@
+[
+  {
+    "mutation": "marking-presence-only",
+    "file": "tests/catalog/stations/technology/markingVerifier.ts",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/catalog/stations/technology/fixtures.test.ts",
+      "-t",
+      "rejects stripped published bytes even when their marking wrapper is present"
+    ],
+    "exitCode": 1,
+    "expected": "targeted guard test fails",
+    "restoredExactly": true,
+    "restoredSha256": "8254c20cd4cfd3f086a0b8ceb1d1ecd31c119bbe3ad795b67352de59520b24fe"
+  },
+  {
+    "mutation": "cra-skip-aibom",
+    "file": "tests/catalog/stations/technology/craDrill.ts",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/catalog/stations/technology/fixtures.test.ts",
+      "-t",
+      "withholds the CRA drill result when its AIBOM is missing"
+    ],
+    "exitCode": 1,
+    "expected": "targeted guard test fails",
+    "restoredExactly": true,
+    "restoredSha256": "09349c47fd5aa6630bb2cf57a60c2d305315583e5a840d1d05d6d58ced052a79"
+  },
+  {
+    "mutation": "nis2-late-bypass",
+    "sourceHead": "a564e359cbbe1b0deb0c278124bc7401b5029944",
+    "file": "tests/catalog/stations/technology/nis2Drill.ts",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/catalog/stations/technology/fixtures.test.ts",
+      "--maxWorkers=1",
+      "-t",
+      "L1-TECH-07/negative/oracle-nis2-late.json: executes"
+    ],
+    "exitCode": 1,
+    "expected": "exactly one targeted assertion fails",
+    "targetedAssertionVerified": true,
+    "appliedReplacement": {
+      "before": "return packetTime <= addDuration(start, clock.deadline)\n    ? fixtureResult(\"pass\", \"warning_on_time\") : fixtureResult(\"fail\", \"warning_late\");",
+      "duringMutation": "return fixtureResult(\"pass\", \"warning_on_time\"); // MUTATION: bypass the NIS2 deadline guard."
+    },
+    "elapsedSeconds": 6.201,
+    "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-governance-20261018T093155Z/nis2-late-bypass.log",
+    "originalCopy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-governance-20261018T093155Z/nis2-late-bypass-original.txt",
+    "restoredExactly": true,
+    "sourceBeforeSha256": "0dafd84f6323a92d82cb2ff97d65626348e5c88a0a056644aa58f968b866db53",
+    "restoredSha256": "0dafd84f6323a92d82cb2ff97d65626348e5c88a0a056644aa58f968b866db53"
+  }
+]

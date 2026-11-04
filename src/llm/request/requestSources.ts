@@ -34,7 +34,7 @@ import { NativeAudioProvenanceError, validateNativeAudioProvenance } from "../..
 import { snapshotRecordedGeminiPart, type RecordedGeminiPart } from "../../session/geminiPartMeta.js";
 import { resolveSpilledInputPayload } from "../../session/spill/spillInput.js";
 import { parseRequestHeaderMeta } from "../../session/requestHeaderMeta.js";
-import { bindProviderToolNames } from "./providerToolNames.js";
+import { bindProviderToolNames, providerToolWireName } from "./providerToolNames.js";
 import { OLLAMA_CALL_KEY_PREFIX, readOllamaCallKey } from "../providers/ollamaToolIdentity.js";
 import type { EncodableMessage, EncodablePart, EncodableRequest, ToolSchema } from "./requestSpec.js";
 
@@ -295,6 +295,12 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
     if (row === undefined) {
       return failure("unreconstructable", `surface entry names event ${entry.sourceEventId}, which is not in this session`, notes);
     }
+    // A tool call the assembler dropped (cut off at max_tokens, or by the stream ending) is signed as an
+    // `assistant/block` for the record, but it never ran and has no call id: it is not history a model can be
+    // sent. Projecting it made every later request in the session unassemblable (PXA-01).
+    if (row.event_type === "assistant/block" && entry.part.kind === "tool_use" && String(metaOf(row).stopReason ?? "").startsWith("dropped:")) {
+      continue;
+    }
     const bytes = readInto(row);
     if (!Buffer.isBuffer(bytes)) {
       return bytes;
@@ -316,9 +322,43 @@ export function resolveRequestSources(input: RequestSourceInput): RequestSourceR
           `spilled ${entry.part.kind} ${row.id}: ${spilled.detail}`, notes);
       }
     }
-    const part = toPart(entry, row, content);
+    let part = toPart(entry, row, content);
     if ("error" in part) {
       return failure(entry.part.kind === "image" || entry.part.kind === "audio" ? "evidence-inconsistent" : "unreconstructable", part.error, notes);
+    }
+    // An operator alias may later be renamed or removed. Replay the original
+    // name only after resolving it against that earlier signed offered schema.
+    if (part.kind === "tool_use") {
+      const currentCanonicalName = part.toolName;
+      const providerName = metaOf(row).providerName as Record<string, unknown> | undefined;
+      if (providerName !== undefined) {
+        if (typeof providerName !== "object" || providerName === null || Array.isArray(providerName) || typeof providerName.wireName !== "string") {
+          return failure("evidence-inconsistent", "Historical provider tool identity lacks its original wire name", notes);
+        }
+        const preserveWire = providerName.wireName !== providerToolWireName(part.toolName)
+          || tools?.some(tool => tool.name === currentCanonicalName && tool.modelAlias !== undefined);
+        const original = typeof providerName.headerEventId === "string" ? byId.get(providerName.headerEventId) : undefined;
+        const header = original && parseRequestHeaderMeta(original.meta_json);
+        const offeredRow = header?.toolSchemaEventId ? byId.get(header.toolSchemaEventId) : undefined;
+        if (!original || original.event_type !== "request/header" || !header || !offeredRow || offeredRow.event_type !== "request/tools"
+            || providerName.version !== 1 || providerName.encoderId !== header.encoderId || providerName.encoderVersion !== header.encoderVersion
+            || input.events.indexOf(offeredRow) >= input.events.indexOf(original) || input.events.indexOf(original) >= input.events.indexOf(row)
+            || offeredRow.payload_sha256 !== header.toolSchemaSha256 || sha256Hex(bytes) !== row.payload_sha256
+            || row.event_type !== "tool/call" || entry.role !== "assistant") {
+          return failure("evidence-inconsistent", "Aliased historical call lacks its original signed request and offered schema", notes);
+        }
+        const offeredBytes = readInto(offeredRow); if (!Buffer.isBuffer(offeredBytes)) return offeredBytes;
+        const offered = parseToolSchemas(offeredBytes), canonicalName = part.toolName;
+        if (!offered || sha256Hex(offeredBytes) !== offeredRow.payload_sha256
+            || !offered.some(tool => tool.name === canonicalName && providerToolWireName(tool.name, tool.modelAlias) === providerName.wireName)
+            || bindProviderToolNames(offered).get(providerName.wireName) !== part.toolName) {
+          return failure("evidence-inconsistent", "Aliased historical call was not bound to its original offered canonical function", notes);
+        }
+        if (preserveWire) {
+          part = { ...part, providerWireName: providerName.wireName };
+          for (const id of [original.id, offeredRow.id]) if (!sourceEventIds.includes(id)) sourceEventIds.push(id);
+        }
+      }
     }
     if ("gemini" in part && part.gemini !== undefined) {
       const original = byId.get(part.gemini.headerEventId), header = original && parseRequestHeaderMeta(original.meta_json);
@@ -419,6 +459,7 @@ function parseToolSchemas(bytes: Buffer): readonly ToolSchema[] | null {
     if (
       typeof candidate.name !== "string" ||
       typeof candidate.description !== "string" ||
+      (candidate.modelAlias !== undefined && typeof candidate.modelAlias !== "string") ||
       typeof candidate.parameters !== "object" ||
       candidate.parameters === null ||
       Array.isArray(candidate.parameters)
@@ -427,6 +468,7 @@ function parseToolSchemas(bytes: Buffer): readonly ToolSchema[] | null {
     }
     tools.push({
       name: candidate.name,
+      ...(candidate.modelAlias === undefined ? {} : { modelAlias: candidate.modelAlias as string }),
       description: candidate.description,
       parameters: candidate.parameters as Record<string, unknown>
     });

@@ -1,0 +1,17 @@
+{
+  "prior": {
+    "root": "/Users/sid/.codex/worktrees/p0-19-qualification/AgentMaturityCompass",
+    "count": 2774,
+    "path": "/private/tmp/p0-27-runtime-compatibility-prior-full-dead-code-20261015.json",
+    "sha256": "13202fb70fc45b820e9468d9d3f6d709802627af75f43946f4b58cf08913c46d"
+  },
+  "candidate": {
+    "root": "/Users/sid/.codex/worktrees/p0-27-runtime-compatibility/AgentMaturityCompass",
+    "count": 2774,
+    "path": "/private/tmp/p0-27-runtime-compatibility-candidate-full-dead-code-20261015.json",
+    "sha256": "0a33d09f2f323f643e7d99c517a5d397ea72f1053d1c20395408328ca3449b0a"
+  },
+  "onlyPrior": [],
+  "onlyCandidate": [],
+  "summaryOnlyFirstAttempt": "The first comparison used missing findings fields in gate summaries; its empty arrays are not a full-set comparison. This diagnostic uses the unchanged exported actual collector and complete findings in two owned contexts. Normal gates stillfail, no waiver orsource-improvementclaim."
+}

@@ -1,4 +1,5 @@
 import type { AgentSession } from "../agent/agentSession.js";
+import { imageRowMatchesSource } from "../attachments/imageMetadataStrip.js";
 import { decodeNativeOrderedInput, materializeNativeInputParts, NATIVE_ORDERED_INPUT_FORMAT, type NativeInputPart } from "../attachments/nativeOrderedInput.js";
 import { readEventPayload } from "../session/eventPayload.js";
 import { readLoopInboxMeta } from "../session/loopEventMeta.js";
@@ -126,7 +127,7 @@ export function validateAcpOrderedHistory(workspace: string, events: readonly Ev
       if (part.type === "text") {
         if (row.event_type !== "user/message" || info.sourceInputIndex !== undefined || !bytes.equals(Buffer.from(part.text, "utf8"))) refuse("ordered-text-rewritten");
       } else if (row.event_type !== "user/attachment" || info.sourceInputIndex !== imageIndex++ || info.filename !== part.image.filename
-          || info.mimeType !== part.image.mediaType || info.bytes !== part.image.bytes.length || !bytes.equals(part.image.bytes)) refuse("ordered-image-rewritten");
+          || info.mimeType !== part.image.mediaType || !imageRowMatchesSource(info, part.image, bytes)) refuse("ordered-image-rewritten");
     }
   }
 }

@@ -121,6 +121,7 @@ Each projected row carries its signed source inbox event ID, format and
 zero-based `sourceContentIndex`. Images also retain their historical image-only
 `sourceInputIndex`, original MIME, byte length and SHA-256. Original binary bytes
 are never replaced by a UTF-8 representation in queued or signed image payloads.
+Each projected image row holds the original reduced to the segments and chunks that render it (every JPEG scan up to EOI, an allowlist of PNG, WebP and GIF chunks), so EXIF (GPS included), IPTC, XMP, comments and unknown chunks are removed; it refuses an image whose container cannot be parsed; the row records `sourceSha256` (the original) and `sentSha256` (the bytes the provider receives).
 The existing attachment scanner still inspects its own text view of those bytes;
 that view is not the image payload. Text uses exact UTF-8, including empty text.
 The ordinary surface projection and request-source resolver preserve signed row
@@ -164,7 +165,7 @@ public ACP, actual registered CLI, TypeScript/Python subprocess, cold SQLite/JSO
 and hostile-input/evidence scenarios. Untrusted peer fixtures test client edges
 only; they are never labelled native-runtime proof.
 
-Task21 evidence: `AMC_OS/RESEARCH/2026-09-10-native-ordered-image-input/`.
+Task21 evidence is an internal research record and is not published.
 Broader task09 full-goal work and all source/package/platform/provider/human/
 comparator/license/security/release gates remain open. Validation begins only
 after all full-goal implementation, at the authorized candidate/clone boundary.

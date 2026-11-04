@@ -1,0 +1,21 @@
+{
+  "capturedUtc": "2026-10-15T07:35:47.753980+00:00",
+  "parentSourceChecked": 8574,
+  "parentCompiledChecked": 4529,
+  "privateFilesChecked": 13104,
+  "native": {
+    "bytes": 1931552,
+    "device": 16777231,
+    "inode": 538905647,
+    "mode": 493,
+    "nlink": 1,
+    "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+  },
+  "targetSha256": "440b3fb3ecad99f95a0e1bc74c6cd4e6e70be88e651204e580bb04d2c80001f8",
+  "privateHashMapSha256": "1f14de48ee7e8223e453b04bb8afdaf9dfe7db9b0a2be28c78f838d433fa56e9",
+  "parentDelta": [],
+  "privateUnexpectedDelta": [],
+  "externalPinDelta": [],
+  "limits": "Tracked manifest bytes and owned group only; no universal cache/network/OS/detached-descendant isolation."
+}

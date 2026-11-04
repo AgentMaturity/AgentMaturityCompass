@@ -1,0 +1,34 @@
+{
+  "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "historicalTddSourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+  "historicalFinalRecordSha256": "4964f1b2b3b006f2eff8bdbcb94fd238c9816e910831cc21b349cf6ba08cf119",
+  "historicalStandardIndex": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/mutation-proof-history/20261018T113154490384Z-a7-index.json",
+    "sha256": "d681c848b004da7199829b994d28efd148946372a24e5058b5155e6b4bde68ec",
+    "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2"
+  },
+  "historicalPrecisionIndex": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/mutation-proof-history/20261018T113154490384Z-a7-precision.json",
+    "sha256": "964a13cc7bb6731d00ad35c500f71f9b973a8833873a31f8bfba663f9323e0f9",
+    "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2"
+  },
+  "sourceFiles": [
+    {
+      "path": "tests/catalog/stations/technology/fixtures.test.ts",
+      "historicalSha256": "2cb2c9152b12e225dd3a472beecdbd63a9efb8f84d5513fdf458704f9027c760",
+      "finalSha256": "2cb2c9152b12e225dd3a472beecdbd63a9efb8f84d5513fdf458704f9027c760",
+      "equal": true
+    },
+    {
+      "path": "tests/catalog/stations/technology/nis2Drill.ts",
+      "historicalSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+      "finalSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+      "equal": true
+    }
+  ],
+  "currentStandardIndexSha256": "706e4f0abffcd67a3d592f2fe61a92d2b86aed534272bb8a658d0c457f6d29b0",
+  "currentPrecisionProofSha256": "488120c65d0c6b48e107bd2614eea3a876844a0719ee60433bb21d039056623a",
+  "currentRestorationRecordSha256": "783fb630732ee19f233d74bd8ff24d6c2ee79d13cd94397f69640428101de588",
+  "currentFixtureTableSha256": "bcce4c1801707142b8b04468e0710bebc92700ce2dab11649e32a3d27b43150d",
+  "note": "Static source equality binds preserved historical TDD to unchanged helper/test bytes; fresh current-source mutation and restoration records supply current execution evidence. Historical execution pins are not rewritten."
+}

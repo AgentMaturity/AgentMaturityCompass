@@ -73,12 +73,31 @@ describe("Studio /api/v1 least-privilege authorization", () => {
     await expect(requestedRoles("/api/v1/runtime/runs", "POST")).resolves.toEqual(["OPERATOR", "OWNER"]);
     await expect(requestedRoles("/api/v1/tickets/issue", "POST")).resolves.toEqual(["APPROVER", "OWNER"]);
     await expect(requestedRoles("/api/v1/unknown/future-mutation", "PATCH")).resolves.toEqual(["OPERATOR", "OWNER"]);
+    // Security review 2026-10-31: minting an agent claim is an operator action; a VIEWER (this fixture's principal) is refused.
+    await expect(requestedRoles("/api/v1/score/trust/create-claim", "POST")).resolves.toEqual(["OPERATOR", "OWNER"]);
   });
 
   test("retains auditor verification and attestation without granting broad mutation access", async () => {
     await expect(requestedRoles("/api/v1/tickets/verify", "POST")).resolves.toEqual(["OPERATOR", "AUDITOR", "OWNER"]);
     await expect(requestedRoles("/api/v1/evidence/attest", "POST")).resolves.toEqual(["AUDITOR", "OWNER"]);
     await expect(requestedRoles("/api/v1/adapters/capability-receipts", "POST")).resolves.toEqual(["AUDITOR", "OWNER"]);
+  });
+
+  test("A4 role classes (P2-35 matrix rows; the A4 router re-runs them on live roles and adds membership and SoD)", async () => {
+    const p = "/api/v1/a4/projects/a4p_00000000000000000000000000000000";
+    const gate = `${p}/gates/a4gate_00000000000000000000000000000000`;
+    await expect(requestedRoles(`${p}/readiness`, "GET")).resolves.toEqual(HUMAN_ROLES);
+    await expect(requestedRoles(`${p}/comments`, "POST")).resolves.toEqual(HUMAN_ROLES);
+    await expect(requestedRoles(`${p}/presence`, "POST")).resolves.toEqual(HUMAN_ROLES);
+    await expect(requestedRoles(`${gate}/approve`, "POST")).resolves.toEqual(["APPROVER", "AUDITOR", "OWNER"]);
+    await expect(requestedRoles(`${gate}/deny`, "POST")).resolves.toEqual(["APPROVER", "AUDITOR", "OWNER"]);
+    await expect(requestedRoles(`${gate}/request-changes`, "POST")).resolves.toEqual(["APPROVER", "AUDITOR", "OWNER"]);
+    for (const tail of ["hold", "resume", "members", "gate-policy", "acknowledge", "stages/aspire/build", "stages/adapt/complete",
+      "stages/activate/complete", "releases", "stages/assemble/effects/build/open"]) {
+      await expect(requestedRoles(`${p}/${tail}`, "POST"), tail).resolves.toEqual(["OWNER"]);
+    }
+    await expect(requestedRoles("/api/v1/a4/projects", "POST")).resolves.toEqual(["OPERATOR", "OWNER"]);
+    await expect(requestedRoles(`${p}/stages/aspire/answers`, "POST")).resolves.toEqual(["OPERATOR", "OWNER"]);
   });
 
   test("fails closed for unsupported methods", async () => {

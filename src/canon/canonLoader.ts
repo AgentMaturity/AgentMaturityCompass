@@ -1,7 +1,10 @@
-import { join } from "node:path";
+import { join, relative } from "node:path";
 import YAML from "yaml";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
-import { signFileWithAuditor, verifySignedFileWithAuditor } from "../org/orgSigner.js";
+import { signSerializedPayloadWithAuditor } from "../org/orgSigner.js";
+import { withControlFileLock } from "../lifecycle/controlFileLock.js";
+import { captureOrgFiles, captureOrgPairs, assertOrgPairsCurrent, OrgPairsPublicationError, orgPairBytes, prepareOrgPairsAsync, type OrgPairsOptions, type OrgPairsSnapshot } from "../org/preparedOrgPairs.js";
+import { verifyAuditorSignatureBytes } from "../org/orgSignatureBytes.js";
 import { canonSchema, type CompassCanon } from "./canonSchema.js";
 import { builtInCanon } from "./canonBuiltin.js";
 import { loadInstalledPluginAssets } from "../plugins/pluginLoader.js";
@@ -96,12 +99,14 @@ export function saveCanon(workspace: string, canon: CompassCanon): {
   ensureDir(canonDir(workspace));
   const path = canonPath(workspace);
   const parsed = canonSchema.parse(canon);
-  writeFileAtomic(path, YAML.stringify(parsed), 0o644);
-  const sigPath = signFileWithAuditor(workspace, path);
-  return {
-    path,
-    sigPath
-  };
+  const bytes = Buffer.from(YAML.stringify(parsed)), previous = captureOrgPairs([path]), sigPath = `${path}.sig`;
+  const signature = JSON.stringify(signSerializedPayloadWithAuditor(workspace, bytes.toString("utf8")), null, 2);
+  return withControlFileLock({ root: join(workspace, ".amc"), name: "org-auditor-pairs", operation() {
+    assertOrgPairsCurrent(previous); const published: string[] = []; let attempted = relative(workspace, path);
+    try { writeFileAtomic(path, bytes, 0o644); published.push(attempted); attempted = relative(workspace, sigPath); writeFileAtomic(sigPath, signature, 0o644); }
+    catch (cause) { throw new OrgPairsPublicationError(Object.freeze(published), attempted, cause); }
+    return { path, sigPath };
+  } });
 }
 
 export function initCanon(workspace: string): {
@@ -125,7 +130,39 @@ export function loadCanon(workspace: string, opts?: { includePluginExtensions?: 
   const parsed = canonSchema.parse(YAML.parse(readUtf8(path)) as unknown);
   return opts?.includePluginExtensions === false ? parsed : withPluginExtensions(parsed, workspace);
 }
+/** Same-read body and signature view for the actual API getter; plugin vocabulary retains its existing merge. */
+export function readCanonForApi(workspace: string) {
+  const path = canonPath(workspace), sigPath = `${path}.sig`, body = orgPairBytes(captureOrgFiles([path]), path);
+  const parsed = body === null ? builtInCanon() : canonSchema.parse(YAML.parse(body.toString("utf8")) as unknown);
+  let verdict: { valid: boolean; reason: string | null } = { valid: false, reason: "file missing" }, signatureExists = false;
+  if (body !== null) {
+    signatureExists = pathExists(sigPath);
+    try { const sidecar = orgPairBytes(captureOrgFiles([sigPath]), sigPath); signatureExists = sidecar !== null;
+      verdict = sidecar === null ? { valid: false, reason: "signature missing" } : verifyAuditorSignatureBytes(workspace, "BUNDLE", body, sidecar); }
+    catch (error) { verdict = { valid: false, reason: String(error) }; }
+  }
+  return { canon: withPluginExtensions(parsed, workspace), signature: { ...verdict, signatureExists, path, sigPath } };
+}
+
+/** Internal actual pair plan; callers can retain the published-state gate for a later audit. */
+export function prepareCanonAsync(workspace: string, canon: CompassCanon, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const path = canonPath(workspace), parsed = canonSchema.parse(canon), bytes = Buffer.from(YAML.stringify(parsed));
+  return prepareOrgPairsAsync(workspace, [{ path, bytes }], options, previous ?? captureOrgPairs([path]));
+}
+export async function saveCanonAsync(workspace: string, canon: CompassCanon, options: OrgPairsOptions = {}) {
+  return (await prepareCanonAsync(workspace, canon, options)).publish()[0]!;
+}
+export async function initCanonAsync(workspace: string, options: OrgPairsOptions = {}, previous?: OrgPairsSnapshot) {
+  const canon = builtInCanon(), prepared = await prepareCanonAsync(workspace, canon, options, previous);
+  return { ...prepared.publish()[0]!, canon };
+}
 
 export function verifyCanonSignature(workspace: string) {
-  return verifySignedFileWithAuditor(workspace, canonPath(workspace));
+  const path = canonPath(workspace), sigPath = `${path}.sig`;
+  try {
+    const previous = captureOrgPairs([path]), body = orgPairBytes(previous, path), signature = orgPairBytes(previous, sigPath);
+    if (body === null) return { valid: false, signatureExists: false, reason: "file missing", path, sigPath };
+    if (signature === null) return { valid: false, signatureExists: false, reason: "signature missing", path, sigPath };
+    return { ...verifyAuditorSignatureBytes(workspace, "BUNDLE", body, signature), signatureExists: true, path, sigPath };
+  } catch (error) { return { valid: false, signatureExists: pathExists(sigPath), reason: String(error), path, sigPath }; }
 }

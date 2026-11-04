@@ -1,0 +1,8 @@
+{
+  "timeUtc": "2026-10-18T06:03:45.374088+00:00",
+  "pid": 21408,
+  "command": "node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/node_modules/.bin/vitest run --reporter=dot",
+  "signal": "SIGINT",
+  "reason": "Host load >270 on 12 logical CPUs; own11workers use <1CPU; preserve incomplete attempt and retry2workers",
+  "uptime": "11:33  up 46 days, 10:24, 2 users, load averages: 340.38 284.45 220.39"
+}

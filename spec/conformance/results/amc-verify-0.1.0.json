@@ -1,0 +1,452 @@
+{
+  "suiteVersion": "1.0.0",
+  "specVersion": "1.0",
+  "class": "verifier",
+  "fixtureSetDigest": "4a57aae5ac72e6a96c15ee6fc05ae00f4000a86c10fff7fe19b8abc8ffee24af",
+  "implementation": {
+    "name": "amc-verify",
+    "version": "0.1.0",
+    "vendor": null,
+    "repository": "https://github.com/AgentMaturity/AgentMaturityCompass",
+    "language": "TypeScript"
+  },
+  "environment": {
+    "os": "darwin 25.6.0",
+    "runtime": "node v22.23.3"
+  },
+  "runAt": "2026-10-27T19:02:50.303Z",
+  "cases": [
+    {
+      "id": "VER-001",
+      "normative": true,
+      "durationMs": 113,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-002",
+      "normative": true,
+      "durationMs": 111,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-003",
+      "normative": true,
+      "durationMs": 99,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-004",
+      "normative": true,
+      "durationMs": 89,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-005",
+      "normative": true,
+      "durationMs": 81,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-006",
+      "normative": true,
+      "durationMs": 78,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-007",
+      "normative": true,
+      "durationMs": 77,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-008",
+      "normative": true,
+      "durationMs": 75,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-009",
+      "normative": true,
+      "durationMs": 75,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-010",
+      "normative": true,
+      "durationMs": 75,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-011",
+      "normative": true,
+      "durationMs": 72,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-012",
+      "normative": true,
+      "durationMs": 72,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-013",
+      "normative": true,
+      "durationMs": 73,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-014",
+      "normative": true,
+      "durationMs": 73,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-015",
+      "normative": true,
+      "durationMs": 74,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-016",
+      "normative": true,
+      "durationMs": 134,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-017",
+      "normative": true,
+      "durationMs": 91,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-018",
+      "normative": true,
+      "durationMs": 81,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-019",
+      "normative": true,
+      "durationMs": 75,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-020",
+      "normative": true,
+      "durationMs": 74,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-021",
+      "normative": true,
+      "durationMs": 71,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-022",
+      "normative": true,
+      "durationMs": 77,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-023",
+      "normative": true,
+      "durationMs": 83,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-024",
+      "normative": true,
+      "durationMs": 71,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-025",
+      "normative": true,
+      "durationMs": 76,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-026",
+      "normative": true,
+      "durationMs": 84,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-027",
+      "normative": true,
+      "durationMs": 73,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-028",
+      "normative": true,
+      "durationMs": 74,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-029",
+      "normative": true,
+      "durationMs": 71,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-030",
+      "normative": true,
+      "durationMs": 74,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-031",
+      "normative": true,
+      "durationMs": 74,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-032",
+      "normative": true,
+      "durationMs": 75,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-033",
+      "normative": true,
+      "durationMs": 77,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-034",
+      "normative": true,
+      "durationMs": 82,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-035",
+      "normative": true,
+      "durationMs": 79,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-036",
+      "normative": true,
+      "durationMs": 79,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-037",
+      "normative": true,
+      "durationMs": 75,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-038",
+      "normative": true,
+      "durationMs": 83,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-039",
+      "normative": true,
+      "durationMs": 79,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-040",
+      "normative": true,
+      "durationMs": 77,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-041",
+      "normative": true,
+      "durationMs": 75,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-042",
+      "normative": true,
+      "durationMs": 79,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-043",
+      "normative": true,
+      "durationMs": 79,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-044",
+      "normative": true,
+      "durationMs": 77,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-045",
+      "normative": true,
+      "durationMs": 79,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-046",
+      "normative": true,
+      "durationMs": 86,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-047",
+      "normative": true,
+      "durationMs": 80,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-048",
+      "normative": true,
+      "durationMs": 81,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-049",
+      "normative": true,
+      "durationMs": 77,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-050",
+      "normative": true,
+      "durationMs": 83,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-051",
+      "normative": true,
+      "durationMs": 81,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-052",
+      "normative": true,
+      "durationMs": 84,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-053",
+      "normative": true,
+      "durationMs": 81,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-054",
+      "normative": true,
+      "durationMs": 81,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-055",
+      "normative": true,
+      "durationMs": 80,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-056",
+      "normative": true,
+      "durationMs": 83,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-057",
+      "normative": true,
+      "durationMs": 85,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-058",
+      "normative": true,
+      "durationMs": 81,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-059",
+      "normative": true,
+      "durationMs": 85,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-060",
+      "normative": true,
+      "durationMs": 76,
+      "outcome": "pass",
+      "diff": null
+    },
+    {
+      "id": "VER-061",
+      "normative": true,
+      "durationMs": 96,
+      "outcome": "pass",
+      "diff": null
+    }
+  ],
+  "summary": {
+    "normativePassed": 61,
+    "normativeTotal": 61
+  },
+  "conformant": true
+}

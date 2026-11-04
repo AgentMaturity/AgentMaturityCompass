@@ -1,0 +1,134 @@
+{
+  "issue": "P0-22",
+  "kind": "Independent read-only canonical bounded qualification review",
+  "reviewedAt": "2026-10-14T17:02:40.337891+00:00",
+  "directory": "/Users/sid/.codex/worktrees/p0-22-qualification/AgentMaturityCompass/qualification/2026-10-14-P0-22",
+  "measuredSource": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "observedHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "status": "PASS_AS_BOUNDED_UNRESOLVED_RECEIPT",
+  "actionableFindings": [],
+  "resolvedDuringReview": [
+    {
+      "item": "Actual coverage baseline was initially omitted from preservation pins",
+      "resolution": "Root added scripts/quality/coverage-baseline.json to preservation-check.json; current bytes/hash match accepted main exactly. The initial-source-inputs.json already carried this correct path. The final-source-manifest protected map is a subset and does not remove the complete preservation pin.",
+      "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da"
+    },
+    {
+      "item": "Fleet 800-line wording lacked counting convention",
+      "resolution": "Root now states the architecture ratchet counts fleet at800; scripts/architecture-boundaries-check.mjs:14-15 uses split(\"\\n\"). Final manifest correctly records799 under Python splitlines. No line budget was changed."
+    }
+  ],
+  "verified": {
+    "allCanonicalArtifactHashesMatch": true,
+    "artifactFiles": 42,
+    "allFilesAtMost1MiB": true,
+    "rawBoundedReportSha256": "5f519062d66f4f463a9b07c3da144b609f87ef522f6b3929ebf519314dbbc2b8",
+    "counts": {
+      "numTotalTests": 512,
+      "numPassedTests": 510,
+      "numFailedTests": 2,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "numFailedTestSuites": 2,
+      "numPendingTestSuites": 0
+    },
+    "snapshot": {
+      "added": 0,
+      "failure": false,
+      "filesAdded": 0,
+      "filesRemoved": 0,
+      "filesRemovedList": [],
+      "filesUnmatched": 0,
+      "filesUpdated": 0,
+      "matched": 23,
+      "total": 23,
+      "unchecked": 0,
+      "uncheckedKeysByFile": [],
+      "unmatched": 0,
+      "updated": 0,
+      "didUpdate": false
+    },
+    "onlyFailures": [
+      "passport search successful [] has no claim fields",
+      "leaderboard show successful [] has no claim fields"
+    ],
+    "literalEmptyArrayAssertionRemainsActive": "tests/cliClaimLabels.e2e.test.ts:265-279",
+    "userDisposition": "Leave this unresolved and continue after bounded qualification",
+    "actualRegisteredRecipeAttempts": 173,
+    "actualRecipeSuccesses": 126,
+    "actualNamedFixtureRefusals": 47,
+    "actualExit70": 0,
+    "actualSignals": 0,
+    "actualJournalRowsIncludingSetupAndExtraCases": 181,
+    "cliRawJournalHashesAndSummarizedOutcomesMatch": true,
+    "all13BuilderContractsAnd23FinalSnapshotsScoped": true,
+    "labCases": 49,
+    "allLabCasesPassed": true,
+    "sourceQuality": {
+      "duplicates": 1270,
+      "deadCode": 2784
+    },
+    "sourceQualityOutcome": "Both required commands failed; no waiver",
+    "sourceManifestInputHashesVerified": 38,
+    "protectedPathsEqualAcceptedMain": 15,
+    "coverageBaselinePreserved": true,
+    "fleetLineRatchet": 800,
+    "fleetLineSplitlines": 799,
+    "fleetGenericCap": 800,
+    "mutations": {
+      "installerDisabled": {
+        "total": 8,
+        "passed": 5,
+        "failed": 3
+      },
+      "initialQuickscoreArrayOnlyOmission": {
+        "total": 8,
+        "passed": 7,
+        "failed": 1,
+        "meaning": "Index inconsistency detection only"
+      },
+      "refinedScoreFailSecureArrayAndIndexOmission": {
+        "total": 8,
+        "passed": 7,
+        "failed": 1,
+        "meaning": "Actual keyword inventory assertion detects consistent omission"
+      },
+      "restoredFinalRegistry": {
+        "total": 8,
+        "passed": 8,
+        "failed": 0
+      },
+      "protectedSourceHashesAndRecordedReportsMatch": true,
+      "noProtectedSourceEditedForFaults": true
+    },
+    "mainClaudeHeadsTrackedStatusAndReservationsMatch": true,
+    "productionChangesFromIntegrationBaseOnly": [
+      "src/fleet/fleetScoring.ts",
+      "src/lab/cognitionLab.ts"
+    ]
+  },
+  "scopeAndCaveatsPreserved": [
+    "P0-22 remains unresolved, not Done/full qualification; two empty-array failures remain explicit and unwaived.",
+    "Only bounded Node22 execution: no full-suite/global-or-per-file-coverage/Node24/hosted-CI result is transferred from P0-50.",
+    "Actual173attempts include126 successful results and47 named fixture refusals; they are not173 successful claim-bearing outputs.",
+    "Intermediate ABI failure, filtered RED/GREEN pending counts and22-snapshot seeding are phase history; final report has0pending/todo and23matched snapshots.",
+    "Assurance renderer fixtures preserve supplied decision context; they do not themselves authenticate signatures. The industry test separately uses an actual signer.",
+    "Lab validates returned parseable matching records and raw normalized own scores; generic storage still skips unreadable/unparsable files. No new signature authentication or trust promotion is claimed.",
+    "Fleet legacy repair uses canonical formatter when member claim metadata is present; existing missing-map dash remains disclosed in fleet-legacy-repair.json and is not claimed repaired.",
+    "The architecture cap, freeze, eligibility adapters, source-quality gates, package/lock and actual coverage baseline remain preserved."
+  ],
+  "reviewedArtifacts": {
+    "README.md": "5f38072b126f4418d874aa2a8bc8a234cedaddbe4cc43b0f4bf1ab6ded536c42",
+    "receipt.json": "cb65871c332f44b55546ba81b0eadd48c981ec0303628f8aea127b58133c5816",
+    "preservation-check.json": "ed8cb66dec1125a5d93fb59cbe413a2e9f431fdf98ca85fa3f8d89e6c26d8221",
+    "final-source-manifest.json": "bdbda7927853e73ccb59a1c9a10e2ef47f5282e661ed3f87d8ab5659f76c4005",
+    "final-bounded-summary.json": "4c6cc570d0e467a88087ae0a60f026c0cf3510908465a1f67725aea84a695d0d",
+    "final-bounded-node22.json": "5f519062d66f4f463a9b07c3da144b609f87ef522f6b3929ebf519314dbbc2b8",
+    "strict-cli-summary.json": "4a38a721c0da0776df3bbc4107473bcc0d41dd2f4d3fda2937a87e0a0be151ca",
+    "refined-mutations.json": "f541f35f7268e4c282b0198e21551650d2b32e4b35270d7664d910ef8bd0e7d9",
+    "actual-mutations-initial.json": "ecf47435fa749e8626d26e9a7ec6f47a08b7307be2faa8189b3da98f748bae06",
+    "lab-final-guard-review.json": "bced0d018ec83c814c98408d3ff111966970714161e7ef608cc86e3bb86dd848",
+    "cli-acceptance-disposition.json": "fadca576cd50c33484dcd8531013053620008cba23fac9184e71347bd93c8c5b"
+  },
+  "operations": "Only read existing files, raw reports and Git objects. No source/checkout writes, tests, builds, installs, qualification reruns or hosted calls."
+}

@@ -112,6 +112,9 @@
         "session/resume",
         "session/release",
         "session/recovered",
+        "session/heartbeat",
+        "session/migration",
+        "tool/reconciled",
         "loop/inbox",
         "loop/cancel",
         "loop/veto",
@@ -156,13 +159,9 @@
       ]
     },
     "rationale": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "type": [
+        "string",
+        "null"
       ]
     },
     "rationaleChain": {

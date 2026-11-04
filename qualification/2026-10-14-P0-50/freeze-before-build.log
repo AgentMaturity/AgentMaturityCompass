@@ -1,0 +1,5 @@
+
+> agent-maturity-compass@1.2.0 check:freeze
+> node scripts/check-freeze.mjs
+
+Build first: dist/cli.js not found (pnpm run build).

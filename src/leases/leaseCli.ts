@@ -1,6 +1,7 @@
+import { issueLeaseForPrincipal } from "./leasePrincipal.js";
 import { issueLeaseToken } from "./leaseSigner.js";
 import { verifyLeaseToken } from "./leaseVerifier.js";
-import { loadLeaseRevocations, revokeLease, revokedLeaseIdSet, signLeaseRevocations, verifyLeaseRevocationsSignature } from "./leaseStore.js";
+import { bootstrapLeaseRevocations, revokeLease, revokeLeaseAsync, revokedLeaseIdSet, signLeaseRevocations, signLeaseRevocationsAsync, verifyLeaseRevocationsSignature } from "./leaseStore.js";
 import type { LeaseScope } from "./leaseSchema.js";
 
 export function parseLeaseTtlToMs(ttl: string): number {
@@ -34,6 +35,7 @@ export function issueLeaseForCli(params: {
   workspace: string;
   workspaceId?: string;
   agentId: string;
+  claimKind?: "synthetic_example";
   ttl: string;
   scopes: string;
   routes: string;
@@ -42,11 +44,17 @@ export function issueLeaseForCli(params: {
   tpm: number;
   maxCostUsdPerDay?: number | null;
   workOrderId?: string;
+  /**
+   * An authenticated session's principal (P1-78; A4 Assemble connect): when given, the lease is minted through
+   * issueLeaseForPrincipal, naming that users.yaml user or refusing (LeasePrincipalRefused) before anything is minted.
+   */
+  principalKey?: string | null;
 }): { token: string } {
-  const lease = issueLeaseToken({
+  const input = {
     workspace: params.workspace,
     workspaceId: params.workspaceId,
     agentId: params.agentId,
+    ...(params.claimKind === undefined ? {} : { claimKind: params.claimKind }),
     ttlMs: parseLeaseTtlToMs(params.ttl),
     scopes: parseLeaseScopes(params.scopes),
     routeAllowlist: parseStringList(params.routes),
@@ -55,7 +63,8 @@ export function issueLeaseForCli(params: {
     maxTokensPerMinute: params.tpm,
     maxCostUsdPerDay: params.maxCostUsdPerDay ?? null,
     workOrderId: params.workOrderId ?? null
-  });
+  };
+  const lease = params.principalKey === undefined ? issueLeaseToken(input) : issueLeaseForPrincipal({ ...input, principalKey: params.principalKey });
   return {
     token: lease.token
   };
@@ -87,12 +96,27 @@ export function verifyLeaseForCli(params: {
   };
 }
 
+function leaseExpiryForCli(params: Parameters<typeof revokeLeaseForCli>[0]): number | undefined {
+  let expiresTs: number | undefined;
+  if (params.token !== undefined) {
+    // Only a payload whose signature verified carries a usable expiry; an expired or already revoked lease still does.
+    const verified = verifyLeaseToken({ workspace: params.workspace, token: params.token });
+    if (!verified.ok && verified.error !== "lease expired" && verified.error !== "lease revoked") throw new Error(`--token does not verify: ${verified.error}`);
+    if (verified.payload?.leaseId !== params.leaseId) throw new Error("--token is not the lease named by --lease-id");
+    expiresTs = verified.payload.expiresTs;
+  }
+  return expiresTs;
+}
+
 export function revokeLeaseForCli(params: {
   workspace: string;
   leaseId: string;
   reason: string;
+  /** The lease itself: its signed expiry lets a later write prune the revocation once the lease has lapsed. */
+  token?: string;
 }): { leaseId: string } {
-  revokeLease(params.workspace, params.leaseId, params.reason);
+  const expiresTs = leaseExpiryForCli(params);
+  revokeLease(params.workspace, params.leaseId, params.reason, { expiresTs });
   return {
     leaseId: params.leaseId
   };
@@ -113,8 +137,9 @@ export function ensureLeaseRevocationStore(workspace: string): { signatureValid:
     // point -- signing here would launder content nobody has vouched for.
     return { signatureValid: false };
   }
-  // No store yet: bootstrap an empty one and sign it.
-  signLeaseRevocations(workspace);
+  // No store yet: bootstrap an empty one. The bootstrap re-checks absence under the lock and publishes only the
+  // default list, so a file dropped since the check above is left unsigned and reported invalid below.
+  bootstrapLeaseRevocations(workspace);
   return { signatureValid: verifyLeaseRevocationsSignature(workspace).valid };
 }
 
@@ -123,19 +148,39 @@ export function ensureLeaseRevocationStore(workspace: string): { signatureValid:
  *
  * This is the ONE deliberate path that signs over a failing signature --
  * `ensureLeaseRevocationStore` refuses to, precisely so that repair is a
- * reviewed human action rather than a side effect of issuing a lease. The
- * result reports what the operator just vouched for.
+ * reviewed human action rather than a side effect of issuing a lease. It signs
+ * only bytes whose sha256 is `reviewedDigestSha256`, the digest of the list the
+ * operator reviewed, and reports what was vouched for from those same bytes.
  */
-export function resignLeaseRevocationsForCli(workspace: string): {
+export function resignLeaseRevocationsForCli(workspace: string, reviewedDigestSha256: string): {
   wasValid: boolean;
   previousReason: string | null;
   revocationCount: number;
 } {
   const before = verifyLeaseRevocationsSignature(workspace);
-  signLeaseRevocations(workspace);
+  const signed = signLeaseRevocations(workspace, reviewedDigestSha256);
   return {
     wasValid: before.valid,
     previousReason: before.reason,
-    revocationCount: loadLeaseRevocations(workspace).revocations.length
+    revocationCount: signed.revocations.length
   };
+}
+
+
+export async function revokeLeaseForCliAsync(params: Parameters<typeof revokeLeaseForCli>[0] & { beforeSign?: () => void }) {
+  const fixed = { workspace: params.workspace, leaseId: params.leaseId, reason: params.reason, token: params.token };
+  const beforeSign = params.beforeSign, expiresTs = leaseExpiryForCli(fixed);
+  const completed = await revokeLeaseAsync(fixed.workspace, fixed.leaseId, fixed.reason, { expiresTs, beforeSign });
+  completed.assertCurrent();
+  return Object.freeze({ leaseId: fixed.leaseId, assertCurrent: completed.assertCurrent });
+}
+
+export async function resignLeaseRevocationsForCliAsync(workspace: string, reviewedDigestSha256: string,
+  opts: { beforeSign?: () => void } = {}) {
+  const beforeSign = opts.beforeSign;
+  const before = verifyLeaseRevocationsSignature(workspace);
+  const completed = await signLeaseRevocationsAsync(workspace, reviewedDigestSha256, { beforeSign });
+  completed.assertCurrent();
+  return Object.freeze({ wasValid: before.valid, previousReason: before.reason,
+    revocationCount: completed.store.revocations.length, assertCurrent: completed.assertCurrent });
 }

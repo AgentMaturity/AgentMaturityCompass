@@ -1,0 +1,79 @@
+{
+  "item": "P2-08",
+  "productH": "f6e80b150c57d53b746fcb34238bc7e6dd95f9da",
+  "historicalBatchPacket": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/provider-static-review/final-h-metadata-packet-v1/2026-10-20-P2-08-solo-final/mutation-results.json",
+    "sha256": "04934786803c2291a97b663bd2b431c06f1279c97eafde85b1b206128f1602bd",
+    "bytes": 24116
+  },
+  "historicalCredit": "Earlier publication experiment17 two HTTP assertion credits remain withdrawn; later approved callbacks do not retroactively restore them. Older packet is historical evidence, not a final-H run.",
+  "batches": [
+    {
+      "label": "packed-prefix guards",
+      "experiments": 2,
+      "evidence": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-packed-prefix-two-native-audit-v1.json",
+        "sha256": "50028b2001c68ae025e83db5b543c3329214cf95fc58e03cb9c5d17c08f848c5",
+        "bytes": 8326
+      },
+      "scope": "Actual isolated npm prefix guards; exact source restoration; separate batch."
+    },
+    {
+      "label": "approved authorization callbacks",
+      "experiments": 4,
+      "evidence": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-approved-callback-four-native-audit-v1.json",
+        "sha256": "f7d80a2075f1eda13ede0f5b1a50a2af886265968300e5936c64dc4060962a27",
+        "bytes": 8372
+      },
+      "scope": "One positive integration refusal and three post-sign authority-bypass probes; exact restore. No old withdrawn credit restored."
+    },
+    {
+      "label": "JSONL compatibility guards",
+      "experiments": 3,
+      "evidence": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-jsonl-three-mutation-audit-v1.json",
+        "sha256": "b90c1e2ffd558091eac4d7eb1eb8f211b801f17556990a8fbf11c3c906b29030",
+        "bytes": 2188
+      },
+      "scope": "Positive compatibility, bound admission component and unbound explicit distrust guards. Component loss does not by itself prove overall provider acceptance."
+    },
+    {
+      "label": "JSONL explicit-distrust scalar",
+      "experiments": 1,
+      "evidence": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/root-jsonl-explicit-distrust-scalar-audit-v1.json",
+        "sha256": "de7afd06aa7730fa53711d281d990065eb6d1b6690ec80345fd8f18df61d54dd",
+        "bytes": 1315
+      },
+      "scope": "Separate strengthened actual denied.ok=true witness; restored4/4."
+    },
+    {
+      "label": "legacy rows/session first-binding guards",
+      "experiments": 8,
+      "selectedFailedAssertionOccurrences": 16,
+      "baselinePassed": 74,
+      "restoredPassed": 74,
+      "evidence": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/acceptance-static-review/legacy-eight-native-independent-audit-v1/audit.json",
+        "sha256": "318a62600bab7c399b95e58dbfe158094f3b552f74a3817305b9b0c27e52b96d",
+        "bytes": 44155
+      },
+      "scope": "Actual rows, SQL/JSONL seals including empty sessions, partial shapes, checkpoint and read failure. Eight seal witnesses exercise one guard; no unique aggregate coverage claim."
+    },
+    {
+      "label": "CLI supported public-key contract",
+      "experiments": 2,
+      "failedAssertionOccurrences": 2,
+      "baselineWholePassed": 77,
+      "restoredWholePassed": 77,
+      "evidence": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-08/solo-20261020/cli-pubkey-two-guard-results-v1.json",
+        "sha256": "9ccb6cf63f1708029e9bad07f7b962402610165157bcb1fadaf204faab4af05e",
+        "bytes": 4388
+      },
+      "scope": "One actual P256 positive-integration refusal and one garbage-key flag-loader false acceptance; private/missing refusal calls remain positive controls, not separately killed guards."
+    }
+  ],
+  "limits": "Source-only development mutations restored exact bytes. Batches overlap and are not summed into unique coverage or final acceptance; raw reports stay external. Missing native unhandled counters remain unknown."
+}

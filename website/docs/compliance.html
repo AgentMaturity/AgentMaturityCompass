@@ -115,7 +115,7 @@ amc compliance report --framework EU_AI_ACT --window 30d --out reports/eu-ai-act
 amc compliance report --framework EU_AI_ACT
 
 <span class="comment"># Export compliance evidence binder</span>
-amc audit binder create --framework EU_AI_ACT</code></pre>
+amc audit binder create --scope workspace --out binder.amcaudit</code></pre>
 
       <div class="callout callout-teal">
         <strong>Important disclaimer</strong>
@@ -179,7 +179,7 @@ amc audit binder create --framework EU_AI_ACT</code></pre>
           <tr><td><strong>Art. 12</strong></td><td>Record-keeping</td><td>Transparency log, Merkle tree, signed evidence ledger.</td></tr>
           <tr><td><strong>Art. 13</strong></td><td>Transparency</td><td>Transparency reports, capability disclosures, output attestation.</td></tr>
           <tr><td><strong>Art. 14</strong></td><td>Human Oversight</td><td>Governor policies, approval workflows, escalation gates.</td></tr>
-          <tr><td><strong>Art. 15</strong></td><td>Accuracy, Robustness, Cybersecurity</td><td>142 assurance packs, calibration gap, adversarial robustness, incident-to-regression closure.</td></tr>
+          <tr><td><strong>Art. 15</strong></td><td>Accuracy, Robustness, Cybersecurity</td><td><!-- amc:count:assurancePacksRegistered -->143<!-- /amc:count --> registered assurance packs, calibration gap, adversarial robustness, incident-to-regression closure.</td></tr>
           <tr><td><strong>Art. 17</strong></td><td>Quality Management System</td><td>Continuous loop, drift alerts, scheduled assurance runs.</td></tr>
         </tbody>
       </table>
@@ -222,7 +222,7 @@ amc guide --compliance EU_AI_ACT  <span class="comment"># Map gaps to regulatory
         <div class="step-num">5</div>
         <div class="step-content">
           <h4>Export audit evidence</h4>
-          <pre><code>amc audit binder create --framework EU_AI_ACT  <span class="comment"># Generate compliance binder</span>
+          <pre><code>amc audit binder create --scope workspace --out binder.amcaudit  <span class="comment"># Generate compliance binder</span>
 amc bundle export                                <span class="comment"># Portable evidence bundle</span></code></pre>
         </div>
       </div>
@@ -347,8 +347,8 @@ amc domain report --domain environment --output env.md  <span class="comment"># 
       <!-- Audit Binder -->
       <h2 id="audit-binder">Audit Binder</h2>
       <p>Generate a portable, signed evidence package for auditors:</p>
-      <pre><code><span class="comment"># Create an audit binder for a specific framework</span>
-amc audit binder create --framework EU_AI_ACT
+      <pre><code><span class="comment"># Create a signed audit binder for the workspace</span>
+amc audit binder create --scope workspace --out binder.amcaudit
 
 <span class="comment"># List existing binders</span>
 amc audit binder list

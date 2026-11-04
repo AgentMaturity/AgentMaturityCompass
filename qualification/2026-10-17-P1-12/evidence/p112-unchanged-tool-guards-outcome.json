@@ -1,0 +1,123 @@
+{
+  "phase": "p112-unchanged-tool-guards",
+  "root": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+  "tests": {
+    "total": 24,
+    "passed": 24,
+    "failed": 0,
+    "skipped": 0
+  },
+  "hookTaskEntries": 2,
+  "individualHookValues": 2,
+  "orderedIdentities": [
+    [
+      "tests/toolPipeline.test.ts",
+      "a call traverses the full pipeline is denied, then proceeds once approval is granted"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a call traverses the full pipeline denies an unanswered approval rather than treating silence as yes"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a call traverses the full pipeline denies when approval is required and no answerer is composed at all"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a call traverses the full pipeline reports an unknown tool as a visibility denial, distinct from a policy one"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a guard cannot launder a denial by ordering stays denied no matter where a permissive guard is registered"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a guard cannot launder a denial by ordering is not overturned by an approval granted upstream"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a guard cannot launder a denial by ordering cannot be cleared by a post-execute filter"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "a guard cannot launder a denial by ordering lets a scoped guard deny what the global layer left alone"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "outcome fields are orthogonal reports a timeout AND an exit code, not one collapsed status"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "outcome fields are orthogonal keeps denial separate from exit status"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "outcome fields are orthogonal distinguishes a tool that threw from a tool that was denied"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "arguments are frozen cannot be mutated by a guard between the decision and the body"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "arguments are frozen is detached from the caller's object"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "arguments are frozen freezes nested structures, not just the top level"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "arguments are frozen refuses arguments JSON would silently mangle"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "restrictions narrow, never widen hides a globally registered tool from a restricted scope"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "restrictions narrow, never widen shows only what an allow-list names"
+    ],
+    [
+      "tests/toolPipeline.test.ts",
+      "restrictions narrow, never widen cannot re-admit a name the global layer denied"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "the runtime firewall as a tool guard blocks every call in a workspace with no signed policy"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "the runtime firewall as a tool guard lets calls through once a policy is signed"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "budgets as a tool guard denies the next execute at the limit, on the class that ran out"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "budgets as a tool guard never denies a SIMULATE call for budget"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "budgets as a tool guard denies EVERY class when the budgets config cannot be verified"
+    ],
+    [
+      "tests/toolPolicyGuards.test.ts",
+      "guards compose without either one weakening the other denies when either engine denies, and names which"
+    ]
+  ],
+  "taskErrors": [],
+  "rawObserverOrderedJoin": true,
+  "unhandledErrors": [],
+  "lateDiagnostics": [],
+  "command": {
+    "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/toolPipeline.test.ts tests/toolPolicyGuards.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p112-unchanged-tool-guards.raw.json",
+    "exit": 0,
+    "durationMs": 4236
+  },
+  "groupAbsentByESRCH": true,
+  "signalsOtherThanZeroSent": false,
+  "publicEvidencePaths": [],
+  "reuseBoundary": "Read-only import of the pinned existing ordered raw/observer/hook/late-error audit; only the finite cohort is selected here. No test execution or evidence rewriting."
+}

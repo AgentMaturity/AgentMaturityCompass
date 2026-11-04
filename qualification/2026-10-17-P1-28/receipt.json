@@ -1,0 +1,250 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-28",
+  "date": "2026-10-17",
+  "commit": "3b25c1d33febc1f7e3ecd5fdb3d7a9aaa02e28b4",
+  "branch": "codex/p1-28-qualification",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 1784
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run build",
+      "exit": 0,
+      "durationMs": 32387
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 2348
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 657
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 3593
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 839
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/oscalExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/grcEvidenceExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-helper-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 833
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 39929
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 4382
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/oscalExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/grcEvidenceExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-catalog-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 2143
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 1,
+      "durationMs": 707
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run gen-counts",
+      "exit": 0,
+      "durationMs": 722
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 717
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1915
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/oscalExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/grcEvidenceExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-profile-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 4056
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2307
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/oscalExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/grcEvidenceExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-schema-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 3606
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 35802
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/oscalExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/grcEvidenceExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-typed-schema-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 3688
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck",
+      "exit": 0,
+      "durationMs": 25906
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 313
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/oscalExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/grcEvidenceExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-common-cli-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 10576
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 36563
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/oscalExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/grcEvidenceExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-causal-mutation-red.raw.json",
+      "exit": 1,
+      "durationMs": 10874
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/oscalExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/grcEvidenceExport.test.ts /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass/tests/catalog/evidence/decisive.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-causal-restored-green.raw.json",
+      "exit": 0,
+      "durationMs": 10389
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1282
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass install --frozen-lockfile",
+      "exit": 0,
+      "durationMs": 21967
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run build",
+      "exit": 0,
+      "durationMs": 30057
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 3264
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 605
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 391
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1341
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1760
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass add -- CONTRIBUTING.md README.md docs/content/reddit-launch-drafts.md docs/content/show-hn-draft.md docs/exports/OSCAL.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md package.json pnpm-lock.yaml spec/vendor/oscal/1.2.3/LICENSE.md spec/vendor/oscal/1.2.3/README.md spec/vendor/oscal/1.2.3/oscal_assessment-results_schema.json spec/vendor/oscal/1.2.3/oscal_catalog_schema.json spec/vendor/oscal/1.2.3/oscal_profile_schema.json tests/oscalExport.test.ts website/i18n.js website/index.html website/lite.html whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 1,
+      "durationMs": 39
+    },
+    {
+      "cmd": "git -C /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass commit -m 'test(oscal): add schema and signed CLI export coverage'",
+      "exit": 0,
+      "durationMs": 53
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:clean-source -- --keep",
+      "exit": 0,
+      "durationMs": 47454
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-cXNDkX/checkout /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-cXNDkX/checkout/tests/oscalExport.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-cXNDkX/checkout/tests/grcEvidenceExport.test.ts /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-cXNDkX/checkout/tests/catalog/evidence/decisive.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-fresh-canonical-cohort.raw.json",
+      "exit": 0,
+      "durationMs": 11588
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p128-full-suite.raw.json",
+      "exit": 1,
+      "durationMs": 569175
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:qualification",
+      "exit": 0,
+      "durationMs": 1028
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1638
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 382
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 324
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:dead-code",
+      "exit": 1,
+      "durationMs": 3293
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p1-28-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 694
+    }
+  ],
+  "tests": {
+    "total": 70,
+    "passed": 70,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "f7bfe55ffd906599ded7f7c1e8596615ec644e7458b87a0d3660605ca3ef85ad"
+    },
+    {
+      "path": "ordered-case-audit.json",
+      "sha256": "322be3e75ace664511a404b0a7c8076cbb7120b290bd7bd7fbb434629fdbe35c"
+    }
+  ],
+  "notes": "Bounded OSCAL qualification only; complete P1-28 and plan acceptance remain open. The 70 unique cases passed in ordinary, restored and fresh runs; repetitions and earlier subset cohorts are not added. A converter mutation produced 65 passes and 5 semantic failures; the built CLI stayed original, so no mutant-CLI credit is claimed. The full suite had 25,207 cases: 25,188 passed and 19 failed. Its child exited 1 after 569175 ms; wrapper exit 70 and missing normal completion records remain failed evidence. The suite command row records that actual child result, not a fabricated normal wrapper record. Later explicit authorization permitted one signal-0 check, actual ESRCH, and two ordinary marker renames after full evidence checks. Recovery provides no suite pass. The README records all 19 failure dispositions. Quality remains RED at 2,710 dead-code and 1,268 duplicate findings, without waiver or baseline adoption. Earlier nonzero validation results remain listed. Ordinary git add exited 1 with ignored-parent advice; the subsequent complete nineteen-blob audit passed and an ordinary local commit exited 0, without force, retry or ignore changes. The wrapper cwd/HEAD belongs to the retained P1-09 root; explicit source bindings identify tested commit 3b25c1d33febc1f7e3ecd5fdb3d7a9aaa02e28b4. The clean-source check and canonical fresh cohort passed. Common fixture claims and local signatures do not establish available producers, external reviews or compliance; the planned P1-02 producer and pending review persist. The standalone sample attachment, formal dependencies, merge/release and all human holds remain open. F37, D15, P1-25 publication and P1-01 gaps are unchanged. No push, merge, release, reservation, freeze or quality policy change occurred. After the packet was written, qualification, freeze, counts and documentation checks passed; ordinary dead-code and duplicate checks still exited 1. Complete final finding arrays and every occurrence match the after-dependency reports; no quality waiver was adopted."
+}

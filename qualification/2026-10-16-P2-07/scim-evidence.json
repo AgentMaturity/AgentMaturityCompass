@@ -1,0 +1,84 @@
+{
+  "sourceCommit": "5d5604758d5a8cf5a519346c98318667b88059a2",
+  "canonicalTests": {
+    "total": 160,
+    "passed": 160,
+    "failed": 0,
+    "skipped": 0
+  },
+  "TDDTests": {
+    "total": 6,
+    "passed": 0,
+    "failed": 6,
+    "skipped": 0
+  },
+  "initialTests": {
+    "total": 160,
+    "passed": 160,
+    "failed": 0,
+    "skipped": 0
+  },
+  "repeatedRunsNotSummed": true,
+  "phases": {
+    "p207s-fresh-six-files": {
+      "tests": {
+        "total": 160,
+        "passed": 160,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout",
+      "hooksPassed": 28,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207s-filtered-remove-control": {
+      "tests": {
+        "total": 160,
+        "passed": 159,
+        "failed": 1,
+        "skipped": 0
+      },
+      "failures": [
+        {
+          "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout/tests/identity/scimHardening.test.ts",
+          "identity": "SCIM parser, filters and deprovisioning filtered removal revokes only the removed member's SCIM group grant",
+          "messages": [
+            "AssertionError: expected [ 'AUDITOR', 'VIEWER' ] to deeply equal [ 'AUDITOR' ]\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout/tests/identity/scimHardening.test.ts:337:33\n    at owned (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout/tests/identity/scimHardening.test.ts:57:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout/tests/identity/scimHardening.test.ts:326:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+          ]
+        }
+      ],
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout",
+      "hooksPassed": 28,
+      "unhandledErrors": [],
+      "lateHits": []
+    },
+    "p207s-filtered-remove-restored": {
+      "tests": {
+        "total": 160,
+        "passed": 160,
+        "failed": 0,
+        "skipped": 0
+      },
+      "failures": [],
+      "physicalTestRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout",
+      "hooksPassed": 28,
+      "unhandledErrors": [],
+      "lateHits": []
+    }
+  },
+  "canonicalPublic": [
+    "scim-public-active-false-existing-session.json",
+    "scim-public-user-patch-values-paths.json",
+    "scim-public-filtered-member-role-revocation.json",
+    "scim-public-group-patch-validation.json",
+    "scim-public-user-filter-contract.json",
+    "scim-public-patch-parser-wire-and-typed-contract.json"
+  ],
+  "sourceOnlyControl": true,
+  "compiledMutantCredit": false,
+  "qualityGreen": false,
+  "entireP207Complete": false,
+  "formalDone": false
+}

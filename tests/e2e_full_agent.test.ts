@@ -192,12 +192,11 @@ describe('E2E: ContentModerationBot AMC Assessment', () => {
       activeModules: [],
     });
     expect(report.framework).toBe('NIST_AI_RMF');
-    expect(typeof report.coveragePercent).toBe('number');
-    expect(report.coveragePercent).toBeGreaterThanOrEqual(0);
-    expect(report.coveragePercent).toBeLessThanOrEqual(100);
-    expect(Array.isArray(report.coveredControls)).toBe(true);
-    console.log(`\n📜 Compliance: NIST AI RMF coverage computed`);
-    console.log(`   Coverage: ${report.coveragePercent}%`);
+    // P1-53: passed questions no longer count as coverage; every control is not_evaluated.
+    expect(report.coveragePercent).toBe(0);
+    expect(report.coveredControls).toEqual([]);
+    expect(report.controls.every((c) => c.status === 'not_evaluated')).toBe(true);
+    console.log(`\n📜 Compliance: NIST AI RMF controls listed, none evaluated`);
   });
 
   /* ── Step 7: Knowledge Graph ──────────────────────────────────── */

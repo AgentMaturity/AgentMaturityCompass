@@ -1,4 +1,7 @@
+import type { DelegationChainView } from "../agent/delegationChain.js";
 import type { NativeValidationResult } from "../agent/nativeValidation.js";
+import type { AcpSessionUpdatePage } from "../acp/acpSessionUpdatePage.js";
+import type { ExecutionStatus } from "../execution/executionContract.js";
 
 /** Browser-safe contract. Workspace, credentials, process and grant selection stay server-owned. */
 export type NativeTaskProvider = "stub" | "openai" | "openai-responses" | "anthropic" | "deepseek" | "gemini" | "gemini-audio" | "ollama";
@@ -84,6 +87,7 @@ export interface NativeTaskApproval {
   readonly required: number; readonly received: number; readonly expiresTs: number;
 }
 export interface NativeTaskEvent {
+  /** Raw source sequence when NativeTaskPoll.page is present; legacy projected-update position otherwise. */
   readonly cursor: number; readonly kind: "user" | "assistant" | "tool" | "tool-update" | "plan";
   readonly text: string; readonly toolCallId?: string; readonly status?: string;
   /** Metadata derived from authenticated original payload bytes, not a draft or an upload receipt. */
@@ -91,9 +95,14 @@ export interface NativeTaskEvent {
   /** Output comes from the native authenticated committed-row projector; full verification is separate. */
   readonly evidence: "committed";
 }
+export type NativeTaskUsage = AcpSessionUpdatePage["state"]["usage"];
+export interface NativeTaskPlan {
+  readonly kind: "todo" | "plan"; readonly revision: number; readonly recordSha256: string; readonly text: string;
+  readonly evidence: "committed"; readonly scope: "current-record";
+}
 export interface NativeTaskHistory {
   readonly status: "not-started" | "authenticated" | "unavailable";
-  readonly backend: "sqlite" | "jsonl" | null;
+  readonly backend: "sqlite" | "jsonl" | "postgres" | null;
   readonly headEventHash: string | null;
   readonly eventCount: number;
   /** Metadata authentication is not a full run-verification or payload-access grant. */
@@ -107,11 +116,17 @@ export interface NativeTaskView {
   readonly validationSelection: NativeTaskValidationSelection | null;
   readonly validation: NativeValidationResult;
   readonly validationOutputs: readonly NativeTaskValidationOutput[];
+  /** Latest authenticated standing lists, separate from historical transcript and approvals. */
+  readonly plans?: readonly NativeTaskPlan[];
+  readonly usage?: NativeTaskUsage;
   readonly maxSteps: number; readonly maxTokens: number;
   readonly state: NativeTaskState; readonly createdAt: number; readonly updatedAt: number;
   readonly archived: boolean;
   readonly turnEndReason: string | null; readonly error: string | null;
-  readonly verification: "not-verified" | "workspace-key-consistency" | "externally-anchored" | "failed";
+  /** "anchored-prefix" (P0-14): anchored, but over a verified prefix; never the same state as "externally-anchored". */
+  readonly verification: "not-verified" | "workspace-key-consistency" | "externally-anchored" | "anchored-prefix" | "failed";
+  /** What an anchored verdict covers; null unless verification is "externally-anchored" or "anchored-prefix" (P0-14). */
+  readonly verificationScope: { readonly scope: "complete-ledger" | "verified-prefix"; readonly unfinalizedSessions: readonly string[] } | null;
   readonly approvals: readonly NativeTaskApproval[]; readonly approvalError: string | null;
   readonly nextCursor: number; readonly firstCursor: number; readonly droppedEvents: number;
   readonly canResume: boolean;
@@ -119,20 +134,31 @@ export interface NativeTaskView {
   /** Read-only eligibility, not an ownership grant or a completed recovery. */
   readonly recovery?: { readonly eligible: boolean; readonly state: "ready" | "interrupted" | "blocked"; readonly message: string } | null;
   readonly history: NativeTaskHistory;
+  /** The four execution phases (P2-13); null before a session exists and while no start was refused. */
+  readonly execution: ExecutionStatus | null;
+  /** The signed delegation chain this process's runtime lease binds (P2-25); null when its lease is v1 or none was minted. */
+  readonly delegation: DelegationChainView | null;
 }
-export interface NativeTaskPoll { readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean }
+interface NativeTaskPageOptions { readonly cursor?: string; readonly limit?: number }
+type NativeTaskPage = Omit<AcpSessionUpdatePage, "updates">;
+export interface NativeTaskPoll {
+  readonly task: NativeTaskView; readonly events: readonly NativeTaskEvent[]; readonly truncated: boolean;
+  readonly page?: NativeTaskPage;
+}
 export interface NativeTaskService {
   /** Studio's opt-in from its operator environment at start, as the child records it (--unsafe-unconfined-shell); absent means none (P0-06). */
   readonly shellOptIn?: "cli-flag" | null;
   configuration(actor: NativeTaskActor): Promise<NativeTaskConfiguration>;
   list(actor: NativeTaskActor, includeArchived?: boolean): readonly NativeTaskView[];
   start(actor: NativeTaskActor, input: NativeTaskStartRequest): Promise<NativeTaskView>;
-  poll(actor: NativeTaskActor, taskId: string, cursor?: number): NativeTaskPoll;
+  poll(actor: NativeTaskActor, taskId: string, cursor?: number | NativeTaskPageOptions): NativeTaskPoll;
   turn(actor: NativeTaskActor, taskId: string, input: NativeTaskTurn): Promise<NativeTaskView>;
   cancel(actor: NativeTaskActor, taskId: string, expectedRevision: number): NativeTaskView;
   release(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   resume(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
   verify(actor: NativeTaskActor, taskId: string, expectedRevision: number): Promise<NativeTaskView>;
+  /** fork (P2-13): the child task's own request ID, and the parent's current revision. */
+  fork(actor: NativeTaskActor, taskId: string, input: { readonly clientRequestId: string; readonly expectedRevision: number }): Promise<NativeTaskView>;
   archive(actor: NativeTaskActor, taskId: string, expectedRevision: number): NativeTaskView;
   close(): Promise<void>;
 }

@@ -1,3 +1,4 @@
+import { mean as statsMean, standardDeviation } from "../experiments/stats.js";
 import type {
   DiagnosticConfidenceSummary,
   DiagnosticReport,
@@ -218,7 +219,8 @@ export interface BuildMetricValidationInput {
   trustLabel: TrustLabel;
   integrityIndex: number;
   evidenceCoverage: number;
-  correlationRatio: number;
+  /** Null when no trace in the window carried a receipt (not measured); it adds no construct validity. */
+  correlationRatio: number | null;
   unsupportedClaimCount: number;
   layerScores: LayerScore[];
   questionScores: QuestionScore[];
@@ -1431,21 +1433,15 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function mean(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((sum, value) => sum + value, 0) / values.length;
+  return statsMean(values);
 }
 
 function stdDev(values: number[]): number {
-  if (values.length < 2) return 0;
-  const avg = mean(values);
-  const variance = values.reduce((sum, value) => sum + (value - avg) ** 2, 0) / (values.length - 1);
-  return Math.sqrt(variance);
+  return standardDeviation(values);
 }
 
+// Unlike bootstrap deltas in experiments/stats.ts, this is a normal mean interval, bounded to 0..100 and rounded to six decimals.
 function confidenceInterval(values: number[], level = 0.95): MetricValidationConfidenceInterval {
-  if (values.length === 0) {
-    return { level, lower: 0, upper: 0, marginOfError: 0 };
-  }
   const avg = mean(values);
   const z = level >= 0.99 ? 2.576 : 1.96;
   const margin = values.length >= 2 ? z * (stdDev(values) / Math.sqrt(values.length)) : 0;
@@ -1457,8 +1453,8 @@ function confidenceInterval(values: number[], level = 0.95): MetricValidationCon
   };
 }
 
-function reportOverallScore(report: Pick<DiagnosticReport, "layerScores">): number {
-  if (report.layerScores.length === 0) return 0;
+function reportOverallScore(report: Pick<DiagnosticReport, "layerScores">): number | null {
+  if (report.layerScores.length === 0) return null; // a run with no layer scores measured no score
   return mean(report.layerScores.map((layer) => clamp(layer.avgFinalLevel * 20, 0, 100)));
 }
 
@@ -10415,11 +10411,11 @@ function constructValidity(params: {
   questionScores: QuestionScore[];
   integrityIndex: number;
   evidenceCoverage: number;
-  correlationRatio: number;
+  correlationRatio: number | null;
   unsupportedClaimCount: number;
-}): number {
+}): number | null {
   const sampleSize = params.questionScores.length;
-  if (sampleSize === 0) return 0;
+  if (sampleSize === 0) return null; // no question scores: construct validity is not evaluated
   const evidenceLinkedRatio =
     params.questionScores.filter((score) => score.evidenceEventIds.length > 0).length / sampleSize;
   const averageConfidence = mean(params.questionScores.map((score) => clamp(score.confidence, 0, 1)));
@@ -10429,7 +10425,7 @@ function constructValidity(params: {
     averageConfidence * 0.25 +
     clamp(params.integrityIndex, 0, 1) * 0.2 +
     clamp(params.evidenceCoverage, 0, 1) * 0.15 +
-    clamp(params.correlationRatio, 0, 1) * 0.1 -
+    (params.correlationRatio === null ? 0 : clamp(params.correlationRatio, 0, 1)) * 0.1 - // not measured earns no credit
     unsupportedRate * 0.15;
   return Number(clamp(value, 0, 1).toFixed(6));
 }
@@ -10521,7 +10517,7 @@ type MetricRowStatusInput = Pick<MetricValidationRow,
   | "subtleMemoryJudgeAgreement0to1"
   | "subtleMemoryValidationPassRate0to1"
 > & {
-  ciWidth: number;
+  ciWidth: number | null; // null with no samples: no interval to measure
   thresholds: MetricValidationThresholdPolicy;
 };
 
@@ -10794,6 +10790,7 @@ type MetricRowBuildInput = Omit<MetricValidationRow,
 function statusForRow(params: MetricRowStatusInput): MetricValidationRow["status"] {
   if (
     params.sampleSize < params.thresholds.minSampleSize ||
+    params.constructValidity === null || // not evaluated never passes
     params.constructValidity < params.thresholds.minConstructValidity ||
     (params.counterfactualResponsiveness !== null &&
       params.counterfactualResponsiveness < params.thresholds.minCounterfactualResponsiveness) ||
@@ -10957,7 +10954,7 @@ function statusForRow(params: MetricRowStatusInput): MetricValidationRow["status
       params.subtleMemoryJudgeAgreement0to1 < params.thresholds.minSubtleMemoryJudgeAgreement0to1) ||
     (params.subtleMemoryValidationPassRate0to1 !== null &&
       params.subtleMemoryValidationPassRate0to1 < params.thresholds.minSubtleMemoryValidationPassRate0to1) ||
-    params.ciWidth > params.thresholds.maxConfidenceIntervalWidth
+    (params.ciWidth !== null && params.ciWidth > params.thresholds.maxConfidenceIntervalWidth)
   ) {
     return "fail";
   }
@@ -10972,10 +10969,12 @@ function warningsForRow(params: MetricRowWarningsInput): string[] {
   if (params.sampleSize < params.thresholds.minSampleSize) {
     warnings.push(`sample size ${params.sampleSize} below minimum ${params.thresholds.minSampleSize}`);
   }
-  if (params.constructValidity < params.thresholds.minConstructValidity) {
+  if (params.constructValidity === null) {
+    warnings.push("construct validity not evaluated: no question scores");
+  } else if (params.constructValidity < params.thresholds.minConstructValidity) {
     warnings.push(`construct validity ${params.constructValidity.toFixed(2)} below ${params.thresholds.minConstructValidity}`);
   }
-  if (params.ciWidth > params.thresholds.maxConfidenceIntervalWidth) {
+  if (params.ciWidth !== null && params.ciWidth > params.thresholds.maxConfidenceIntervalWidth) {
     warnings.push(`confidence interval width ${params.ciWidth.toFixed(2)} exceeds ${params.thresholds.maxConfidenceIntervalWidth}`);
   }
   if (
@@ -12383,9 +12382,9 @@ function stabilityForMetric(params: {
 }
 
 function buildRow(params: MetricRowBuildInput): MetricValidationRow {
-  const interval = confidenceInterval(params.values);
+  const interval = params.values.length === 0 ? null : confidenceInterval(params.values); // no samples: not evaluated
   const score = mean(params.values);
-  const testRetestStability = stabilityForMetric({
+  const testRetestStability = interval === null ? null : stabilityForMetric({ // no samples: no stability observation
     current: {
       agentId: params.agentId,
       score,
@@ -12394,7 +12393,7 @@ function buildRow(params: MetricRowBuildInput): MetricValidationRow {
     },
     previous: params.previousObservations
   });
-  const ciWidth = interval.upper - interval.lower;
+  const ciWidth = interval === null ? null : interval.upper - interval.lower;
   const status = statusForRow({
     sampleSize: params.values.length,
     constructValidity: params.constructValidity,
@@ -15578,12 +15577,10 @@ export function buildMetricValidationReport(
       subtleMemoryJudgeAgreement0to1: overallSubtleMemory.judgeAgreement0to1,
       subtleMemoryValidationPassRate0to1: overallSubtleMemory.validationPassRate0to1,
       subtleMemoryReportArtifactHashes: overallSubtleMemory.reportArtifactHashes,
-      previousObservations: priorReports.map((report) => ({
-        agentId: report.agentId,
-        score: reportOverallScore(report),
-        timestamp: report.ts,
-        runId: report.runId
-      })),
+      previousObservations: priorReports.flatMap((report) => {
+        const score = reportOverallScore(report);
+        return score === null ? [] : [{ agentId: report.agentId, score, timestamp: report.ts, runId: report.runId }];
+      }),
       thresholds
     })
   ];
@@ -16852,6 +16849,7 @@ export function buildMetricValidationReport(
   const warnings = [
     ...new Set(rows.flatMap((row) => row.warnings.map((warning) => `${row.metricId}: ${warning}`)))
   ];
+  if (input.correlationRatio === null) warnings.push("correlation ratio not measured (no receipted trace); it adds no construct validity");
   const generatedAt = new Date(input.ts).toISOString();
   const evalPack = buildMetricValidationEvalPack({
     agentId: input.agentId,

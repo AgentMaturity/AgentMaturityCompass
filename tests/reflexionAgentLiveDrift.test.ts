@@ -110,7 +110,7 @@ describe("runReflexionAgentLiveDrift", () => {
     // sorting them — so array order reaches the receipt hash. Collapsing these
     // files behind one factory must reproduce this byte for byte, or it has
     // changed published artifacts while claiming to be a refactor.
-    expect(sha256Hex(canonicalize(result))).toBe("46468a164a870e0a096cd823a38be7ead59e140938ca185bbeae2e4a0438a27d");
+    expect(sha256Hex(canonicalize(result))).toBe("2ff179bae7d393c4cd5a86e9a8962d5cca23a58ab4580b2c55dcda13668b12b0");
     expect(result.receipt.sourceRefs).toContain(sourceProof.sourceRefHash);
     expect(result.receipt.summary).toContain("Reflexion-agent evidence coverage=1");
     expect(result.rowProofs).toHaveLength(6);

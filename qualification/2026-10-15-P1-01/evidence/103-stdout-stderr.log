@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/private/tmp/p1-01-source-control-v2-prepared-20261015.py", line 188, in <module>
+    main()
+    ~~~~^^
+  File "/private/tmp/p1-01-source-control-v2-prepared-20261015.py", line 142, in main
+    results.append(child('mutant-compile', [NODE, 'node_modules/typescript/bin/tsc', '-p', 'tsconfig.json'], 0, root))
+                   ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/p1-01-source-control-v2-prepared-20261015.py", line 92, in child
+    require(pgid in (None, proc.pid) and absent and code == expected, 'Child result uncertain/unexpected: ' + phase)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/p1-01-source-control-v2-prepared-20261015.py", line 35, in require
+    raise RuntimeError(message)
+RuntimeError: Child result uncertain/unexpected: mutant-compile

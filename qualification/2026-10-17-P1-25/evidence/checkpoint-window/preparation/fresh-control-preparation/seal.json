@@ -1,0 +1,69 @@
+{
+  "schema": "p125k-fresh-control-preparation-seal/1",
+  "at": "2026-10-16T23:30:37.705184+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/OMIT-CHECKPOINT-EVENT.patch.txt",
+      "bytes": 692,
+      "sha256": "306cdbc514e272f0840850d28f82f2f9dff5c5c48311e596613292bbfbfea222"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/OMIT-REQUIRED-PENDING-REFUSAL.patch.txt",
+      "bytes": 656,
+      "sha256": "11d398c5b5ac9e64079e217bfb241be3ff0e5cb572405fe35a47cc6bb86b7b62"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/README.md",
+      "bytes": 3968,
+      "sha256": "99e510ac2761285c689a3e4705a3679b4b813d63569e0ffd5da6c1fd21124b1f"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/author-static-review.json",
+      "bytes": 661,
+      "sha256": "2bb4cf71f23ccb88cceb852877357013bdb8974020b17650ea5c55cc894e23e8"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/check-preservation.py.adaptation.patch.txt",
+      "bytes": 1150,
+      "sha256": "1de7011d6af37c881410356490d8c446d037a48a966d7b1ef8df2c189931d043"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/check-preservation.py.source.txt",
+      "bytes": 1462,
+      "sha256": "4f06779e8dad11811fc17976651b7d14938f1c093d4534a545f453241f404c7c"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/controls.json",
+      "bytes": 4228,
+      "sha256": "644668ce2e22a37ec353a2f05a8260bb4005abddc74c4d9b5cc6976ef64796cf"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/input-pins.json",
+      "bytes": 7015,
+      "sha256": "9bb73467e6acb0771cfdf646aeb0e915b1aa1abf048401294d942d42bef4b789"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/plan.json",
+      "bytes": 5079,
+      "sha256": "a3dd0fd3271907ee8c741cbc713455cbe899b283371e74d7dab3b383c2b1e7df"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control.py.adaptation.patch.txt",
+      "bytes": 13690,
+      "sha256": "0db855c28dda6225180663ca0b3b4512f13d0ac835ccc6d6c0e4b6c7e7548093"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control.py.source.txt",
+      "bytes": 19265,
+      "sha256": "7aecaaa15175013ccf6b2c4d2f54b6a4ca7921a3af407cfed57e0fcbf2c37be0"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7651,
+      "sha256": "87d2a39c245dd707529d645416f2e9beb93c6338c34fa868d1f19783e2e131fb"
+    }
+  ],
+  "executedImportedParsedCompiled": false,
+  "sourceIndexQaWrites": false,
+  "rootExactReviewAdmissionAndCopyRequired": true
+}

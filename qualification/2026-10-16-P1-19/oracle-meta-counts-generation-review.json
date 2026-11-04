@@ -1,0 +1,78 @@
+{
+  "capturedUtc": "2026-10-15T22:52:46.726634+00:00",
+  "files": [
+    {
+      "relativePath": "README.md",
+      "beforeSha256": "b01be3c5427362af3ce5a7fd5ce40525418f67cd693a6d4a1bf4e9b0298d76fe",
+      "bytes": 59828,
+      "sha256": "dde61133a882de2c1a5bfd3fe936529fdc6731076a393cb053516cec63068c1a",
+      "onlyExactTestFileCountDelta": true
+    },
+    {
+      "relativePath": "CONTRIBUTING.md",
+      "beforeSha256": "a6c037cd1d4e3ed1bb30ab2be804b9fec177da10a5cb037cd5e98f9639812841",
+      "bytes": 16220,
+      "sha256": "eb1178ec67cc7c3a2952a7285404aed69ff8abc612edaed0cbec627a602a33cb",
+      "onlyExactTestFileCountDelta": true
+    },
+    {
+      "relativePath": "website/index.html",
+      "beforeSha256": "b4aa8f4a85f1da0780a3b5b79a01131c93d492b0e070957e8e7f2bee33613138",
+      "bytes": 43520,
+      "sha256": "3dd2cb17bbba6cc69572fdcdd72d17ab6fe5184c0f29bee4c8dcd931c6b076a4",
+      "onlyExactTestFileCountDelta": true
+    },
+    {
+      "relativePath": "website/lite.html",
+      "beforeSha256": "34b1599a67adf7df8cfcdda12449acf2cd280daa9204a0e398d72b0c31a7bd67",
+      "bytes": 11197,
+      "sha256": "2aaaabcf08756ed1c7840feec211bef1c220d680b34f9f4ed877314a69f2e1f9",
+      "onlyExactTestFileCountDelta": true
+    },
+    {
+      "relativePath": "website/i18n.js",
+      "beforeSha256": "2ab9c7b1881c4b4fc478ee41fac9b513c9f18f69bb643220ffc991a47923dced",
+      "bytes": 44169,
+      "sha256": "c9d92217734286a75df14c64eb1921150ab7eda31854545ec88419e7cd9ec77a",
+      "onlyExactTestFileCountDelta": true
+    },
+    {
+      "relativePath": "docs/content/show-hn-draft.md",
+      "beforeSha256": "f9ffc3591360efb0c8883d1123bf1d03f2145f8d1a1eff0210d8201a13de7c65",
+      "bytes": 1951,
+      "sha256": "b2b659d6f50009b56cd7a10905b22ee542ccb1ac4a0b9a8cfae3a52ea6466492",
+      "onlyExactTestFileCountDelta": true
+    },
+    {
+      "relativePath": "docs/content/reddit-launch-drafts.md",
+      "beforeSha256": "d578ff0264fcea39734183b56bd8539b02a05b2a85ac2e1cf44934a73f88dfdd",
+      "bytes": 3075,
+      "sha256": "4cdf3ea7cc53d86f2b3d5c09132fd1235165a7f935a7f5cfcd1723d659399875",
+      "onlyExactTestFileCountDelta": true
+    },
+    {
+      "relativePath": "docs/internal/competitive-landscape.md",
+      "beforeSha256": "4623c66bc5ee6a1b68c24baa7e5878e26b05bb3001201f4d6412a4fc2389303b",
+      "bytes": 3880,
+      "sha256": "6f4a0af209490501133fcf8cd8e31aa88be2a3fc7232a17f65b8cf727ce452ed",
+      "onlyExactTestFileCountDelta": true
+    },
+    {
+      "relativePath": "docs/internal/mirofish-simulation-council.md",
+      "beforeSha256": "1038d17c84d5adeae35f4f1cc67e11ec03b0cdfcd2befed280debeb93e091d0e",
+      "bytes": 2489,
+      "sha256": "a4e29065c022b69e8a722c715e7f256e1b72bdc24666bb91a78a774d1e1150ba",
+      "onlyExactTestFileCountDelta": true
+    },
+    {
+      "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "beforeSha256": "f900ab60fcef222efb208a706913e25d2b22c483baf816fd2037eeda1cf8a181",
+      "bytes": 107509,
+      "sha256": "44987e4dca9d6872ac9c76ba2fb82646d6b042f3b3cbc7d7a9177b0f978a1cac",
+      "onlyExactTestFileCountDelta": true
+    }
+  ],
+  "approvedDelta": "1666 to1667 only, including comma/plain/URL-encoded badge forms",
+  "freezeContractChanged": false,
+  "firstComparisonRefusalPreserved": "counts-review-first-refusal.json"
+}

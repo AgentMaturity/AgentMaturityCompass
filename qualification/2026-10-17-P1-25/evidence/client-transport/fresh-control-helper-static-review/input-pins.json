@@ -1,0 +1,136 @@
+{
+  "schema": "p125c-helper-static-review-input-pins/1",
+  "count": 26,
+  "inputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/tsaClient.ts",
+      "bytes": 10927,
+      "sha256": "fc24b04be6ac0a2980425c763eaddd01320137e177d7bedfa7e8c99daa228387"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/audit-observed.py",
+      "bytes": 1453,
+      "sha256": "8171736e3f2ab5c29deee62e9117c0b949a5568fcd953eb5596060b93d972197"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/README.md",
+      "bytes": 3737,
+      "sha256": "23574d33c5145071c4fdfcc60f518211818fff330d3a7b757fefe69ff29c497d"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/author-static-review.json",
+      "bytes": 2599,
+      "sha256": "5205d987f5bbd69848d99df6dd6472222a88ed7e3867394e4811fc9f50be5d77"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/check-preservation.py",
+      "bytes": 1458,
+      "sha256": "f1ddbbf52151861d9a6c03417bba79b0e90b4713315030912641cc89d39076bb"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/check-preservation.py.adaptation.patch",
+      "bytes": 4399,
+      "sha256": "af0a15f71dfdd619ecbe9b1969278f22c37be0dd08c39ea951f3900fb0cd0870"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/controls.json",
+      "bytes": 4060,
+      "sha256": "469352701add22df95ffd784157decc215cc85a41e37491e2243f63fbe71b316"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/input-pins.json",
+      "bytes": 49879,
+      "sha256": "9639eaca3b6633a7981a37e4a942903358e4d8356bd7d4d8d87c84a9890657a0"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/plan.json",
+      "bytes": 7017,
+      "sha256": "49d1c3f7503e211cb309a45ee70510ac0bf64f521d07d8f59f057e4d1c5336b9"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/seal.json",
+      "bytes": 3261,
+      "sha256": "47e303ba47b4d74e500ae5bceed3eeabf8dd132933b70e744a396e4912126109"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/source-control.py",
+      "bytes": 15679,
+      "sha256": "cbd9282bad0a3154e36c6ce39649caced7b826d258a0344dfa92b7f0f2c3d579"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/source-control.py.adaptation.patch",
+      "bytes": 21030,
+      "sha256": "f914310b49b54e6480cb18e9bffed504c8881544c84513a93d0411889be1f0d9"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7130,
+      "sha256": "913440f79d62e944daaa154c269402c60af8d492fe3346bfafaad75e09a9626e"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/v2/README.md",
+      "bytes": 1644,
+      "sha256": "52059981a76ad29af415dd1d19ff8330ceecac3a4037ca76af01616768db34bf"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/v2/check-preservation.py",
+      "bytes": 1461,
+      "sha256": "f1364b0928eab148f2007846bf4300470adab125f9b80be7664e4d05d702bdb4"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/v2/check-preservation.py.patch",
+      "bytes": 499,
+      "sha256": "9fe0279b470c8a011aea56727785a8e7b4dffce7312393adc9e3e94376db2c18"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/v2/input-pins.json",
+      "bytes": 2520,
+      "sha256": "180821f5a0daead1f2ba5b038a4d8f0b7012bfcca0324b9297870b67b0b10749"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/v2/seal.json",
+      "bytes": 3847,
+      "sha256": "b64bc2597d50b061078254a7627b6d7473b788a0eebe48225d376db3a7e47851"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/v2/source-control.py",
+      "bytes": 15702,
+      "sha256": "205390ed3c4d2a6637ca0c39c29804d5c1051ea3ff1eb8da3d7d9346a578f961"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/fresh-control-preparation/v2/source-control.py.patch",
+      "bytes": 283,
+      "sha256": "5d77c54ff29d380b457da4721f956b94137fa172eb7984544f36a14f90c2e092"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/p125c-source-combined-outcome.json",
+      "bytes": 5432,
+      "sha256": "4f40f22dd614d169ff8f2e0b73dfc490c708fc8b82689ecf3862809d505d65ce"
+    },
+    {
+      "path": "/private/tmp/p1-25-client-qualification-20261017/protected-inputs.json",
+      "bytes": 32791,
+      "sha256": "72f2136f01136cbf0f606da50c28a2d6112be3503e8c96dfc4487d0d496e5286"
+    },
+    {
+      "path": "/private/tmp/p1-25-time-qualification-20261016/receipt-preparation/assemble-receipt.py",
+      "bytes": 21413,
+      "sha256": "28ddcb18ec76480886dc6856dee2a976adf15d2282c1b72d58c26ba22269a5c7"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/C1-certReq-false.patch",
+      "bytes": 412,
+      "sha256": "1bb9fbacc7dda0e6bcf46dc55991334aef50f813205005c599a79b108a48499b"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-contract/C2-ignore-response-MIME.patch",
+      "bytes": 648,
+      "sha256": "cda51cf7e9242a0acbdea9506e07096c43e3f65df545cec3b63f261384c8ed15"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/source-control.py",
+      "bytes": 5192,
+      "sha256": "4ba51e9887743f213c0a21b69366cb1f73e47d14ae66f4e4c553be63a7a7989f"
+    }
+  ]
+}

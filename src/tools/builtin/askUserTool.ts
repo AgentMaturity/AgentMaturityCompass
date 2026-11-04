@@ -25,7 +25,8 @@ import { writeFileAtomic } from "../../utils/fs.js";
  *   - is signed with the workspace AUDITOR key (the approvals role, not the
  *     monitor key the agent process signs its own records with),
  *   - names this question's id, digest and session, and
- *   - picks one of the offered choices when choices were offered.
+ *   - answers every question it asked, one selection unless multiSelect, and
+ *     only offered choices unless allowOther.
  * No answerer, a null answer, a thrown or timed-out answerer, or any record
  * that fails those checks is a failed call whose output carries no answer.
  * There is no default answerer and no code path that synthesizes one.
@@ -43,20 +44,46 @@ import { writeFileAtomic } from "../../utils/fs.js";
 const DEFAULT_TIMEOUT_MS = 15 * 60_000;
 const MAX_ANSWER_CHARS = 10_000;
 
-const argsSchema = z.object({
-  question: z.string().min(1).max(2_000),
-  choices: z.array(z.string().min(1).max(200)).min(2).max(10).optional()
+const MAX_QUESTIONS = 4;
+
+/** C0 (except tab and newline), DEL and C1: what a terminal reads as cursor and colour control. */
+const TERMINAL_CONTROLS = /[\x00-\x08\x0b-\x1f\x7f-\x9f]/;
+
+/** Shown, never interpreted: each control character as a visible `\uXXXX`. */
+export function escapeTerminalControls(text: string): string {
+  return text.replace(new RegExp(TERMINAL_CONTROLS.source, "g"), (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
+}
+
+// A question is shown to a person on a terminal; control characters could draw a fake prompt or signed decision there.
+const shown = (max: number) => z.string().min(1).max(max).refine((text) => !TERMINAL_CONTROLS.test(text), "must not contain terminal control characters");
+
+const itemSchema = z.object({
+  question: shown(2_000),
+  choices: z.array(shown(200)).min(2).max(10).optional(),
+  allowOther: z.boolean().optional(),
+  multiSelect: z.boolean().optional()
 }).strict();
 
+/** One question inline, or up to four in `questions`; either way one signed question and one signed answer. */
+const argsSchema = z.union([itemSchema, z.object({ questions: z.array(itemSchema).min(1).max(MAX_QUESTIONS) }).strict()]);
+
+export interface AskUserItem {
+  readonly question: string;
+  readonly choices: readonly string[] | null;
+  /** Free text is accepted alongside the choices. */
+  readonly allowOther: boolean;
+  /** More than one selection is accepted. */
+  readonly multiSelect: boolean;
+}
+
 export interface AskUserQuestionRecord {
-  readonly schemaVersion: "2026-10-03";
+  readonly schemaVersion: "2026-10-29";
   readonly kind: "amc.native.ask_user.question";
   readonly questionId: string;
   readonly sessionId: string;
   readonly agentId: string;
   readonly callId: string;
-  readonly question: string;
-  readonly choices: readonly string[] | null;
+  readonly questions: readonly AskUserItem[];
   readonly askedAt: number;
 }
 
@@ -70,7 +97,8 @@ export interface AskUserAnswerRecord {
   readonly questionId: string;
   readonly questionSha256: string;
   readonly sessionId: string;
-  readonly answer: string;
+  /** One list of selections per question, in question order. */
+  readonly answers: readonly (readonly string[])[];
   readonly answeredBy: string;
   readonly answeredAt: number;
 }
@@ -90,13 +118,13 @@ export function askUserAnswerDigest(record: AskUserAnswerRecord): string {
  * For the HUMAN-FACING surface only: sign what a person typed. The tool never
  * calls this.
  */
-export function signAskUserAnswer(workspace: string, question: AskUserQuestion, answer: string, answeredBy: string): SignedAskUserAnswer {
+export function signAskUserAnswer(workspace: string, question: AskUserQuestion, answers: readonly (readonly string[])[], answeredBy: string): SignedAskUserAnswer {
   const record: AskUserAnswerRecord = {
     kind: "amc.native.ask_user.answer",
     questionId: question.questionId,
     questionSha256: question.questionSha256,
     sessionId: question.sessionId,
-    answer,
+    answers,
     answeredBy,
     answeredAt: Date.now()
   };
@@ -106,15 +134,29 @@ export function signAskUserAnswer(workspace: string, question: AskUserQuestion, 
 /** The reason an answer is unusable, or null when it binds and verifies. */
 function answerProblem(workspace: string, question: AskUserQuestion, answer: SignedAskUserAnswer): string | null {
   const record = answer.record as Partial<AskUserAnswerRecord> | undefined;
-  if (!record || record.kind !== "amc.native.ask_user.answer" || typeof record.answer !== "string") return "the answer record is malformed";
+  if (!record || record.kind !== "amc.native.ask_user.answer" || !Array.isArray(record.answers)
+    || !record.answers.every((selected) => Array.isArray(selected) && selected.every((one) => typeof one === "string"))) return "the answer record is malformed";
   if (record.questionId !== question.questionId || record.questionSha256 !== question.questionSha256
     || record.sessionId !== question.sessionId) return "the answer is bound to a different question or session";
   if (!verifyRecord(workspace, { record, digestSha256: recordDigest(record), signature: answer.signature, signer: "auditor" }, "auditor")) {
     return "the answer's auditor signature does not verify";
   }
-  if (record.answer.length > MAX_ANSWER_CHARS) return "the answer exceeds the size limit";
-  if (question.choices && !question.choices.includes(record.answer)) return "the answer is not one of the offered choices";
+  if (record.answers.length !== question.questions.length) return `the answer covers ${record.answers.length} of ${question.questions.length} questions`;
+  if (record.answers.flat().reduce((total, one) => total + one.length, 0) > MAX_ANSWER_CHARS) return "the answer exceeds the size limit";
+  for (const [index, item] of question.questions.entries()) {
+    const selected = record.answers[index]!;
+    const which = question.questions.length === 1 ? "the answer" : `the answer to question ${index + 1}`;
+    if (selected.length === 0 || selected.some((one) => one.trim().length === 0)) return `${which} is empty`;
+    if (!item.multiSelect && selected.length !== 1) return `${which} has ${selected.length} selections; one was asked for`;
+    if (new Set(selected).size !== selected.length) return `${which} repeats a selection`;
+    if (item.choices && !item.allowOther && selected.some((one) => !item.choices!.includes(one))) return `${which} is not one of the offered choices`;
+  }
   return null;
+}
+
+function renderAnswer(question: AskUserQuestion, answers: readonly (readonly string[])[]): string {
+  if (question.questions.length === 1) return answers[0]!.join("\n");
+  return question.questions.map((item, index) => `${index + 1}. ${item.question}\n   ${answers[index]!.join("; ")}`).join("\n");
 }
 
 function awaitAnswer(answerer: AskUserAnswerer, question: AskUserQuestion, signal: AbortSignal): Promise<SignedAskUserAnswer | null> {
@@ -144,55 +186,103 @@ export function askUserTool(options: AskUserToolOptions): ToolDefinition {
       type: "object",
       properties: {
         question: { type: "string" },
-        choices: { type: "array", items: { type: "string" } }
+        choices: { type: "array", items: { type: "string" } },
+        allowOther: { type: "boolean" },
+        multiSelect: { type: "boolean" },
+        questions: {
+          type: "array",
+          maxItems: MAX_QUESTIONS,
+          description: "Several questions answered together; use instead of question/choices.",
+          items: {
+            type: "object",
+            properties: {
+              question: { type: "string" },
+              choices: { type: "array", items: { type: "string" } },
+              allowOther: { type: "boolean" },
+              multiSelect: { type: "boolean" }
+            },
+            required: ["question"],
+            additionalProperties: false
+          }
+        }
       },
-      required: ["question"],
       additionalProperties: false
     },
     body: receiptedBody("NATIVE_ASK_USER", options.record, async (execution, allow) => {
       const args = argsSchema.parse(execution.arguments);
-      if (execution.effectiveMode === "SIMULATE") return { output: "[amc: SIMULATE ask_user; no question asked]" };
+      const questions: AskUserItem[] = ("questions" in args ? args.questions : [args]).map((item) => ({
+        question: item.question, choices: item.choices ?? null, allowOther: item.allowOther ?? false, multiSelect: item.multiSelect ?? false
+      }));
+      if (execution.effectiveMode === "SIMULATE") return { ok: true, output: "[amc: SIMULATE ask_user; no question asked]" };
       const answerer = options.answerer;
       if (!answerer) throw new NativeToolRefusal("ask_user", "no human answerer is composed for this session; ask_user never auto-answers");
 
-      const sessionId = currentSession();
-      const dir = join(sessionRecordDir(execution.workspace, sessionId), "ask-user");
-      const record: AskUserQuestionRecord = {
-        schemaVersion: "2026-10-03",
-        kind: "amc.native.ask_user.question",
-        questionId: `q_${randomUUID()}`,
-        sessionId,
-        agentId: execution.agentId,
-        callId: execution.callId,
-        question: args.question,
-        choices: args.choices ?? null,
-        askedAt: Date.now()
-      };
-      const signedQuestion = writeSignedRecord(execution.workspace, join(dir, `${record.questionId}.question.json`), record, "monitor");
-      const question: AskUserQuestion = { ...record, questionSha256: signedQuestion.digestSha256 };
-
-      const timeout = AbortSignal.timeout(options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
-      const signal = execution.signal ? AbortSignal.any([execution.signal, timeout]) : timeout;
-      let given: SignedAskUserAnswer | null;
-      try {
-        // The answerer gets a copy, so it cannot change the question its answer is checked against.
-        given = await awaitAnswer(answerer, structuredClone(question), signal);
-      } catch (error: unknown) {
-        throw new Error(`ask_user: no answer (${error instanceof Error ? error.message : "answerer failed"})`);
-      }
-      if (!given) throw new Error("ask_user: no answer was given");
-      // Checked and used as one plain-data copy, so nothing the answerer handed
-      // back can read differently after it verified.
-      const answer = JSON.parse(JSON.stringify(given)) as SignedAskUserAnswer;
-      const problem = answerProblem(execution.workspace, question, answer);
-      if (problem) throw new NativeToolRefusal("ask_user", `${problem}; no answer is returned`);
-
-      const answerSha256 = recordDigest(answer.record);
-      allow({ questionId: record.questionId, questionSha256: question.questionSha256, answerSha256 });
-      writeFileAtomic(join(dir, `${record.questionId}.answer.json`), JSON.stringify({
-        record: answer.record, digestSha256: answerSha256, signature: answer.signature, signer: "auditor"
-      }, null, 2), 0o600);
-      return { output: `${answer.record.answer}\n[amc: signed answer to ${record.questionId}]` };
+      const asked = await askSignedHuman({ workspace: execution.workspace, sessionId: currentSession(), agentId: execution.agentId,
+        callId: execution.callId, questions, answerer, signal: execution.signal, timeoutMs: options.timeoutMs }, "ask_user");
+      allow({ questionId: asked.questionId, questionSha256: asked.questionSha256, answerSha256: asked.answerSha256, questionCount: questions.length });
+      return { ok: true, output: `${renderAnswer(asked.question, asked.answers)}\n[amc: signed answer to ${asked.questionId}]` };
     })
   });
+}
+
+export interface SignedHumanAnswer {
+  readonly questionId: string;
+  readonly questionSha256: string;
+  readonly answerSha256: string;
+  readonly question: AskUserQuestion;
+  readonly answers: readonly (readonly string[])[];
+}
+
+/**
+ * One signed question to the composed human answerer and its verified, signed
+ * answer, both written under the session's records. Shared by `ask_user` and
+ * MCP elicitation: no answer, a timeout or an unverifiable record throws, and
+ * nothing here can produce an answer the answerer did not sign.
+ */
+export async function askSignedHuman(input: {
+  readonly workspace: string; readonly sessionId: string; readonly agentId: string; readonly callId: string;
+  readonly questions: readonly AskUserItem[]; readonly answerer: AskUserAnswerer;
+  readonly signal?: AbortSignal | undefined; readonly timeoutMs?: number | undefined;
+}, tool: string): Promise<SignedHumanAnswer> {
+  // The same per-item caps ask_user's arguments get, whoever builds the question.
+  for (const item of input.questions) {
+    const parsed = itemSchema.safeParse({ question: item.question, ...(item.choices === null ? {} : { choices: item.choices }),
+      allowOther: item.allowOther, multiSelect: item.multiSelect });
+    if (!parsed.success) throw new NativeToolRefusal(tool, "a question or choice is empty, oversized or contains terminal control characters");
+  }
+  const dir = join(sessionRecordDir(input.workspace, input.sessionId), "ask-user");
+  const record: AskUserQuestionRecord = {
+    schemaVersion: "2026-10-29",
+    kind: "amc.native.ask_user.question",
+    questionId: `q_${randomUUID()}`,
+    sessionId: input.sessionId,
+    agentId: input.agentId,
+    callId: input.callId,
+    questions: input.questions,
+    askedAt: Date.now()
+  };
+  const signedQuestion = writeSignedRecord(input.workspace, join(dir, `${record.questionId}.question.json`), record, "monitor");
+  const question: AskUserQuestion = { ...record, questionSha256: signedQuestion.digestSha256 };
+
+  const timeout = AbortSignal.timeout(input.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const signal = input.signal ? AbortSignal.any([input.signal, timeout]) : timeout;
+  let given: SignedAskUserAnswer | null;
+  try {
+    // The answerer gets a copy, so it cannot change the question its answer is checked against.
+    given = await awaitAnswer(input.answerer, structuredClone(question), signal);
+  } catch (error: unknown) {
+    throw new Error(`${tool}: no answer (${error instanceof Error ? error.message : "answerer failed"})`);
+  }
+  if (!given) throw new Error(`${tool}: no answer was given`);
+  // Checked and used as one plain-data copy, so nothing the answerer handed
+  // back can read differently after it verified.
+  const answer = JSON.parse(JSON.stringify(given)) as SignedAskUserAnswer;
+  const problem = answerProblem(input.workspace, question, answer);
+  if (problem) throw new NativeToolRefusal(tool, `${problem}; no answer is returned`);
+
+  const answerSha256 = recordDigest(answer.record);
+  writeFileAtomic(join(dir, `${record.questionId}.answer.json`), JSON.stringify({
+    record: answer.record, digestSha256: answerSha256, signature: answer.signature, signer: "auditor"
+  }, null, 2), 0o600);
+  return { questionId: record.questionId, questionSha256: question.questionSha256, answerSha256, question, answers: answer.record.answers };
 }

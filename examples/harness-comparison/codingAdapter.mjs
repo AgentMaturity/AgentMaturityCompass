@@ -4,11 +4,14 @@ import { basename, dirname, join, resolve, sep } from "node:path";
 import { pathToFileURL } from "node:url";
 import { VERSION, captureCodingOutputSnapshot, invoke, putJson, readJson, seedRepository } from "./codingCommon.mjs";
 import { codingGateway } from "./codingGateway.mjs";
+import { runPiContained } from "./codingPiContainer.mjs";
 import { verifyInventory } from "./nativeCommon.mjs";
+import { ContainmentUnavailableError } from "./pilot/oracles/containedProbe.mjs";
 
 // No harness implementation is substituted here. All three branches launch
 // their inventory-pinned installed CLI, with their own native tool/runtime path.
-const [cliArg, workspaceArg, fixturePath, contextPath, inventoryPath] = process.argv.slice(2);
+// Pi runs only in a container (codingPiContainer.mjs) or is refused, never on the host.
+const [cliArg, workspaceArg, fixturePath, contextPath, inventoryPath, containmentPath] = process.argv.slice(2);
 const receipt = { schemaVersion: VERSION, kind: "local-coding", fixtureId: null, targetId: null,
   setup: [], execution: { started: false, exitCode: null, signal: null, truncated: false, timedOut: false },
   outputSnapshot: { schemaVersion: 1, path: "repo/solution.mjs", status: "not-captured", reason: "native-process-not-completed" },
@@ -82,27 +85,26 @@ async function amcBinding({ cli, root, control, env, lane, runSetup }) {
     "--approve-tools", "WRITE_LOW", "--approve-risk", "low", "--json"];
 }
 
-function piBinding({ control, env, lane }) {
-  const agentDir = join(control, "pi-agent"); mkdirSync(agentDir, { mode: 0o700 });
-  env.PI_CODING_AGENT_DIR = agentDir; env.PI_OFFLINE = "1"; env.PI_SKIP_VERSION_CHECK = "1";
-  env.CODING_GATEWAY_TOKEN = gateway.token;
-  putJson(join(agentDir, "models.json"), { providers: { "coding-local": {
+/** Pi's provider and settings files are written by the container's entry into its private tmpfs HOME. */
+function piBinding({ lane }) {
+  const models = { providers: { "coding-local": {
     baseUrl: `${gateway.origin}/v1`, api: "openai-completions", apiKey: "$CODING_GATEWAY_TOKEN", authHeader: true,
     compat: { supportsDeveloperRole: false, supportsReasoningEffort: false },
     models: [{ id: lane.model, name: lane.model, reasoning: false, input: ["text"],
       contextWindow: lane.settings.contextWindow ?? 32768, maxTokens: lane.settings.maxOutputTokens }]
-  } } });
-  putJson(join(agentDir, "settings.json"), { defaultProvider: "coding-local", defaultModel: lane.model,
+  } } };
+  const settings = { defaultProvider: "coding-local", defaultModel: lane.model,
     defaultThinkingLevel: "off", enableInstallTelemetry: false, compaction: { enabled: false },
-    retry: { enabled: false, maxRetries: 0, provider: { maxRetries: 0, timeoutMs: Math.min(lane.budgets.timeoutMs, 120000) } } });
+    retry: { enabled: false, maxRetries: 0, provider: { maxRetries: 0, timeoutMs: Math.min(lane.budgets.timeoutMs, 120000) } } };
   receipt.permissions = { tools: ["read", "write", "edit", "grep", "find", "ls"],
-    read: "Pi native filesystem tools; no repo-only read enforcement claimed", write: "disposable workspace requested; Pi tools are not an OS sandbox",
-    approval: "explicit unattended native filesystem-tool allowlist", sandbox: "none claimed",
+    read: "Pi native filesystem tools inside its container; the trial workspace is the only writable host mount", write: "the bind-mounted trial workspace only",
+    approval: "explicit unattended native filesystem-tool allowlist",
+    sandbox: "container: read-only root, no capabilities, non-root, network limited to the model gateway relay (pilot/container.mjs); the container runtime's isolation, not an AMC claim",
     discovery: "offline startup; extension/skill/prompt/theme/context-file discovery disabled",
     cost: "Pi catalog pricing defaults are not measured local inference cost" };
-  return ["--offline", "--print", "--mode", "json", "--provider", "coding-local", "--model", lane.model,
+  return { args: ["--offline", "--print", "--mode", "json", "--provider", "coding-local", "--model", lane.model,
     "--thinking", "off", "--tools", "read,write,edit,grep,find,ls", "--no-extensions", "--no-skills",
-    "--no-prompt-templates", "--no-themes", "--no-context-files", "--session-dir", join(agentDir, "sessions")];
+    "--no-prompt-templates", "--no-themes", "--no-context-files", "--session-dir", "/home/pilot/.pi-agent/sessions"], models, settings };
 }
 
 function dshBinding({ control, env, lane }) {
@@ -133,7 +135,7 @@ function dshBinding({ control, env, lane }) {
 }
 
 try {
-  if (process.argv.length !== 7) throw new Error("Expected CLI, workspace, fixture, context and inventory arguments");
+  if (process.argv.length !== 8) throw new Error("Expected CLI, workspace, fixture, context, inventory and containment arguments");
   workspace = realpathSync(workspaceArg); const cli = realpathSync(cliArg);
   context = readJson(contextPath); const fixture = readJson(fixturePath);
   receipt.fixtureId = fixture.id; receipt.targetId = context.target?.id;
@@ -173,9 +175,27 @@ try {
     if (failed(result)) throw new Error(`Coding setup did not complete: ${label}`);
   };
   const options = { cli, root, control, env, lane, runSetup };
-  const args = receipt.targetId === "amc" ? await amcBinding(options) : receipt.targetId === "pi" ? piBinding(options) : dshBinding(options);
-  receipt.setup.push({ label: "native-binding", args, configuration: "private per-launch files; secrets supplied only in child environment" });
-  const result = await invoke(cli, [...args, fixture.prompt], { cwd: workspace, env, timeoutMs: remaining(), signal: cancellation.signal });
+  let result;
+  if (receipt.targetId === "pi") {
+    const binding = piBinding(options);
+    receipt.setup.push({ label: "native-binding", args: binding.args, configuration: "provider settings in the container's private tmpfs HOME; the gateway token only in its environment" });
+    let containment;
+    try { containment = readJson(containmentPath).docker; } catch { containment = undefined; }
+    try {
+      result = await runPiContained({ containment, cli, workspace, args: binding.args, prompt: fixture.prompt, env: { CODING_GATEWAY_TOKEN: gateway.token },
+        gatewayPort: Number(new URL(gateway.origin).port), models: binding.models, settings: binding.settings, timeoutMs: remaining() });
+      receipt.containment = { status: "contained", image: containment.image, limits: result.limits, mounts: result.mounts,
+        claim: "Isolation is the container runtime's; it is not an AMC claim." };
+    } catch (error) {
+      if (!(error instanceof ContainmentUnavailableError)) throw error;
+      receipt.containment = { status: "unavailable", reason: error.message };
+      throw new Error(`not measured: containment unavailable: ${error.message}`);
+    }
+  } else {
+    const args = receipt.targetId === "amc" ? await amcBinding(options) : dshBinding(options);
+    receipt.setup.push({ label: "native-binding", args, configuration: "private per-launch files; secrets supplied only in child environment" });
+    result = await invoke(cli, [...args, fixture.prompt], { cwd: workspace, env, timeoutMs: remaining(), signal: cancellation.signal });
+  }
   receipt.execution = scrub({ started: true, ...result, requestedSignal });
   receipt.outputSnapshot = captureCodingOutputSnapshot(workspace, { secrets });
   if (failed(result) || requestedSignal) receipt.error = "Native coding task did not finish successfully; independent oracle must inspect actual outputs";

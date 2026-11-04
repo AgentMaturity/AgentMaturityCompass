@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { claimEnvelopeSchema } from "../../claims/eligibility/schemas.js";
 import { verifierReportSchema } from "../../trust/verifierReport.js";
-import { nonEmpty, sha256HexSchema } from "./common.js";
+import { isoTimeSchema, nonEmpty, sha256HexSchema } from "./common.js";
 import { A4_IDENTITY_CHECKS, A4_ITEM_STATUSES, A4_LANES, A4_READINESS_STATUSES } from "./a4Project.js";
 
 /** P2-22's blocker vocabulary verbatim plus the A4-only kinds (design §7 rule 3). */
@@ -61,7 +61,7 @@ export const a4ReadinessV1Schema = z.strictObject({
   selfApproved: z.boolean(),
   selfApprovalAllowed: z.boolean(),
   identityCheck: z.enum(A4_IDENTITY_CHECKS),
-  evaluatedAt: z.iso.datetime(),
+  evaluatedAt: isoTimeSchema,
   bindingDigest: sha256HexSchema,
   fullDigest: sha256HexSchema
 });

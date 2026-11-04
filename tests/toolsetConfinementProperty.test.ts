@@ -14,6 +14,7 @@ import {
 import { buildSeatbeltProfile } from "../src/sandbox/seatbeltBackend.js";
 import { agentToolset, checkToolsetReadiness } from "../src/agent/agentToolset.js";
 import { initWorkspace } from "../src/workspace.js";
+import { openLedger } from "../src/ledger/ledger.js";
 import { initBudgets } from "../src/budgets/budgets.js";
 import { writeRuntimeFirewallPolicy } from "../src/runtime/firewall.js";
 
@@ -65,6 +66,10 @@ function workspace(): string {
   process.env["AMC_VAULT_PASSPHRASE"] = PASS;
   const dir = tempDir("amc-confprop-ws-");
   initWorkspace({ workspacePath: dir, agentId: "payments-agent", trustBoundaryMode: "isolated" });
+  // P1-78: a toolset with no session writer records only into a session the ledger holds open.
+  const ledger = openLedger(dir);
+  ledger.startSession({ sessionId: "toolset-test-session", runtime: "amc", binaryPath: "test", binarySha256: "test" });
+  ledger.close();
   initBudgets(dir, "payments-agent");
   writeRuntimeFirewallPolicy({ workspace: dir, mode: "observe" });
   return dir;

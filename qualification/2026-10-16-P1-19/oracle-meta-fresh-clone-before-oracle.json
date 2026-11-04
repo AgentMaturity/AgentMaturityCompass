@@ -1,0 +1,111 @@
+{
+  "capturedUtc": "2026-10-15T22:56:00.619495+00:00",
+  "freshCheckout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout",
+  "head": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+  "clean": true,
+  "sourceManifestMatches": [
+    {
+      "path": ".changeset/finance-independent-oracle.md",
+      "bytes": 289,
+      "sha256": "9cd61cf5e9c34b489394425f8d7d4232b8e5b91e68c22dcd4f1a55f955a303be"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "bytes": 16220,
+      "sha256": "eb1178ec67cc7c3a2952a7285404aed69ff8abc612edaed0cbec627a602a33cb"
+    },
+    {
+      "path": "README.md",
+      "bytes": 59828,
+      "sha256": "dde61133a882de2c1a5bfd3fe936529fdc6731076a393cb053516cec63068c1a"
+    },
+    {
+      "path": "docs/LIGHTHOUSE_FINANCE_FIXTURE.md",
+      "bytes": 11481,
+      "sha256": "37e41257bae8be1e8ec1177dc8e3083f36d3eaf44af1a75645dafc2a206d893c"
+    },
+    {
+      "path": "docs/content/reddit-launch-drafts.md",
+      "bytes": 3075,
+      "sha256": "4cdf3ea7cc53d86f2b3d5c09132fd1235165a7f935a7f5cfcd1723d659399875"
+    },
+    {
+      "path": "docs/content/show-hn-draft.md",
+      "bytes": 1951,
+      "sha256": "b2b659d6f50009b56cd7a10905b22ee542ccb1ac4a0b9a8cfae3a52ea6466492"
+    },
+    {
+      "path": "docs/internal/competitive-landscape.md",
+      "bytes": 3880,
+      "sha256": "6f4a0af209490501133fcf8cd8e31aa88be2a3fc7232a17f65b8cf727ce452ed"
+    },
+    {
+      "path": "docs/internal/mirofish-simulation-council.md",
+      "bytes": 2489,
+      "sha256": "a4e29065c022b69e8a722c715e7f256e1b72bdc24666bb91a78a774d1e1150ba"
+    },
+    {
+      "path": "examples/lighthouse-finance/README.md",
+      "bytes": 2204,
+      "sha256": "4997a2c78ef77eadf16dadee40451f66f5016d4f1416ef8c7bb0c04d787a8406"
+    },
+    {
+      "path": "examples/lighthouse-finance/oracle.mjs",
+      "bytes": 21328,
+      "sha256": "cd745ddae7cce98a5285be95d4cce815f542d3c9f218e976be5c374d3b5f858f"
+    },
+    {
+      "path": "examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29832,
+      "sha256": "92b25937b06aef01367007961944d479cf6febad3e8b3da5d52094d8741ae869"
+    },
+    {
+      "path": "tests/helpers/financeOracleQualification.ts",
+      "bytes": 33264,
+      "sha256": "71a0979b2408cd6eb77261d184c2248387f5a938e0f95ef315ce465e511d9923"
+    },
+    {
+      "path": "tests/lighthouse/financeOracle.test.ts",
+      "bytes": 5398,
+      "sha256": "080f70bc5ce81013b55735343a3ed7a504a5649f911bc5d05e499af96d3c863d"
+    },
+    {
+      "path": "website/i18n.js",
+      "bytes": 44169,
+      "sha256": "c9d92217734286a75df14c64eb1921150ab7eda31854545ec88419e7cd9ec77a"
+    },
+    {
+      "path": "website/index.html",
+      "bytes": 43520,
+      "sha256": "3dd2cb17bbba6cc69572fdcdd72d17ab6fe5184c0f29bee4c8dcd931c6b076a4"
+    },
+    {
+      "path": "website/lite.html",
+      "bytes": 11197,
+      "sha256": "2aaaabcf08756ed1c7840feec211bef1c220d680b34f9f4ed877314a69f2e1f9"
+    },
+    {
+      "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+      "bytes": 107509,
+      "sha256": "44987e4dca9d6872ac9c76ba2fb82646d6b042f3b3cbc7d7a9177b0f978a1cac"
+    }
+  ],
+  "native": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "inode": 539175547,
+      "nlink": 1
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-UizbGn/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "inode": 541822567,
+      "nlink": 1
+    }
+  ],
+  "nextRun": "Pinned R Vitest entry; fresh root/config/source/default CLI; AMC_P119_ORACLE_CLI_PATH explicitly absent",
+  "independentRunnerClaim": false
+}

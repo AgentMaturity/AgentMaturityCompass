@@ -155,6 +155,11 @@ describe("Score Explainer — confidence intervals", () => {
 // ─── Benchmark comparison ───────────────────────────
 
 describe("Score Explainer — benchmark comparison", () => {
+  test("projects z scores heuristically rather than taking an empirical percentile rank", () => {
+    const q = makeQuestion("bm-heuristic", 3.5, 3.5, 0.8, 4);
+    expect(computeBenchmarkComparison(q, { mean: 3, median: 3, stdDev: 0.5 }).percentile).toBe(80);
+  });
+
   test("high score gets top category", () => {
     const q = makeQuestion("bm1", 4.5, 4.5, 0.9, 5);
     const comparison = computeBenchmarkComparison(q);
@@ -284,5 +289,17 @@ describe("Score Explainer — markdown", () => {
     expect(md).toContain("md-agent");
     expect(md).toContain("Layer Breakdown");
     expect(md).toContain("Overall Explanation");
+  });
+});
+
+
+describe("AXE-30 explanation interval compatibility", () => {
+  test("retains confidence-based heuristic width independently of the requested confidence level", () => {
+    const question = makeQuestion("heuristic", 3, 3, 0.6, 4);
+    const low = computeConfidenceInterval(question, 0.8);
+    const high = computeConfidenceInterval(question, 0.99);
+    expect(low).toEqual({ questionId: "heuristic", pointEstimate: 3, lowerBound: 2.4, upperBound: 3.6,
+      confidenceLevel: 0.8, evidenceQuality: "moderate", sampleSize: 4 });
+    expect(high).toEqual({ ...low, confidenceLevel: 0.99 });
   });
 });

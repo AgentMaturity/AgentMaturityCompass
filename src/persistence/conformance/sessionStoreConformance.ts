@@ -345,11 +345,13 @@ export const SESSION_STORE_CONFORMANCE_CASES: readonly ConformanceCase[] = [
       first.close();
 
       const second = ctx.open();
+      // A native row carries its envelope; the sample session holds seq 0..2 (an envelope-less one is refused at append).
       const resumed = second.appendSessionEvent({
         sessionId,
         runtime: "amc",
         eventType: "session/recovered",
-        meta: { note: "reopened" }
+        meta: embedEnvelope({ note: "reopened" }, { v: 1, sessionId, seq: 3, prevSessionEventHash: lastBefore.event_hash,
+          turn: null, step: null, surface: { op: "none" }, synthetic: false })
       });
       const rows = second.readAllEvents();
       const appended = rows.find((row) => row.id === resumed.id);
@@ -599,16 +601,18 @@ export interface BackendParityReport {
  * real assertion instead of a flaky one.
  */
 export function compareBackendDeterminism(
-  backends: readonly ConformanceBackend[]
+  backends: readonly ConformanceBackend[],
+  /** Per-run event ids, the same for every backend. A shared database (Postgres) refuses an id another chain holds. */
+  eventIds: readonly [string, string, string] = ["00000000-0000-4000-8000-000000000001", "00000000-0000-4000-8000-000000000002", "00000000-0000-4000-8000-000000000003"]
 ): BackendParityReport {
   const errors: string[] = [];
   const eventHashes: Record<string, readonly string[]> = {};
   // Pinned ids and timestamps: the hash pre-image includes both, so leaving
   // them to randomUUID/Date.now would make any comparison meaningless.
   const pinned = [
-    { id: "00000000-0000-4000-8000-000000000001", ts: 1_700_000_000_000, eventType: "session/open" as const },
-    { id: "00000000-0000-4000-8000-000000000002", ts: 1_700_000_000_001, eventType: "turn/start" as const },
-    { id: "00000000-0000-4000-8000-000000000003", ts: 1_700_000_000_002, eventType: "session/close" as const }
+    { id: eventIds[0], ts: 1_700_000_000_000, eventType: "session/open" as const },
+    { id: eventIds[1], ts: 1_700_000_000_001, eventType: "turn/start" as const },
+    { id: eventIds[2], ts: 1_700_000_000_002, eventType: "session/close" as const }
   ];
   const sessionId = "00000000-0000-4000-8000-0000000000ff";
 

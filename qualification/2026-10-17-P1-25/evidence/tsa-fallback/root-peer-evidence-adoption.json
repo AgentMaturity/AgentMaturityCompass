@@ -1,0 +1,29 @@
+{
+  "at": "2026-10-16T22:29:48.087228+00:00",
+  "sourceCommit": "d8b5c3250138a10078c21886642595f669c4a73c",
+  "reviews": [
+    {
+      "review": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/review.json",
+      "bytes": 12096,
+      "sha256": "c5e9b176598ccb3721c8970d60808ae97d965fa5e5c454625e340726f8a35f90",
+      "seal": "/private/tmp/p1-25-fallback-qualification-20261017/source-evidence-review/seal.json",
+      "sealSha256": "e985c10ab0ad45916ce1bade573463863a1c6414bd2f6b4837951a8b89bf7e12",
+      "rootFullReportRead": true,
+      "sealedOutputsRehashed": true,
+      "blockers": []
+    },
+    {
+      "review": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-runtime-review/review.json",
+      "bytes": 41823,
+      "sha256": "8547b43159a2b68e61abd481cc6d7ced4610dd3638d28747a064c4868d4c80a4",
+      "seal": "/private/tmp/p1-25-fallback-qualification-20261017/fresh-control-runtime-review/seal.json",
+      "sealSha256": "9f7fb01a039e6370223785e55d1949ee1ab63d79d016cc8b90a171fa528e03ff",
+      "rootFullReportRead": true,
+      "sealedOutputsRehashed": true,
+      "blockers": []
+    }
+  ],
+  "rootActualRuntimeLogsAndMasksRead": true,
+  "allHoldsRetained": true,
+  "boundary": "Adopts bounded actual evidence only; no whole issue, plan, F37, quality or release completion."
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "p126-test-peer-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/rfc9162.test.ts",
+      "bytes": 18552,
+      "sha256": "bd5b0eca45ad2ff59a19a50c9947225c316fbce078bad94d249cdd9981ea3999",
+      "readScope": "full candidate/author metadata read"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/legacyAmbiguity.test.ts",
+      "bytes": 3053,
+      "sha256": "6accfff0a621a3dac27bf63ad2cfcfdc18bfb0a8f99647a0f65fb2a5dc5f7349",
+      "readScope": "full candidate/author metadata read"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/README.md",
+      "bytes": 3295,
+      "sha256": "179756b9421ef55d9cd05f278c6c1cdb9374c0d224dfc35f842c307ceca57f0c",
+      "readScope": "full candidate/author metadata read"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/matrix.json",
+      "bytes": 6246,
+      "sha256": "06ffa5567a318d97578011a68376121d760222adb378fa4e06d24bc072c5a475",
+      "readScope": "full candidate/author metadata read"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/input-pins.json",
+      "bytes": 19519,
+      "sha256": "a80a4432a5651a5f088305d9161e2952d217f4722cbcb94e7c631e4dbb128b2b",
+      "readScope": "full pin metadata read and every row rehashed"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/author-review.json",
+      "bytes": 6869,
+      "sha256": "e093afb324f9dcec56456fd4ec90a52ddd9c66465fbfd643e076e409f3c112e9",
+      "readScope": "full candidate/author metadata read"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-design/seal.json",
+      "bytes": 2803,
+      "sha256": "d89c5bb154dfb07c06e7c91ba60eef4e6a6d80d7880994594f872cfc196fae89",
+      "readScope": "exact final author seal read"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/review.json",
+      "bytes": 11835,
+      "sha256": "c99fe5d6a78aa0146f0e7d34739478c52101ba4b43f3ca38ecee07b23ace94db",
+      "readScope": "full prior independent static contract/control record"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/controls.json",
+      "bytes": 5628,
+      "sha256": "ab18653c468145664a58bcb7e5ea80d9e9579fad72280e0ef2ece5d96ce2945b",
+      "readScope": "full prior independent static contract/control record"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/contract-review/seal.json",
+      "bytes": 1760,
+      "sha256": "f111f542ae2e25532feaa3295c92f198169b04c96e4b60b72d1a8ed54181989a",
+      "readScope": "full prior independent static contract/control record"
+    }
+  ]
+}

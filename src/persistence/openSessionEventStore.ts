@@ -21,6 +21,7 @@
 import { join } from "node:path";
 import { ensureDir, pathExists, readUtf8, writeFileAtomic } from "../utils/fs.js";
 import { JsonlSessionEventStore } from "./jsonl/jsonlSessionEventStore.js";
+import { PostgresSessionEventStore } from "./postgres/postgresSessionEventStore.js";
 import { SqliteSessionEventStore } from "./sqliteSessionEventStore.js";
 import type {
   SessionEventStore,
@@ -35,7 +36,7 @@ function markerPath(workspace: string): string {
 }
 
 function isBackendId(value: unknown): value is SessionStoreBackendId {
-  return value === "sqlite" || value === "jsonl";
+  return value === "sqlite" || value === "jsonl" || value === "postgres";
 }
 
 /** The backend this workspace has already committed to, if any. */
@@ -79,6 +80,23 @@ function pinBackend(workspace: string, backendId: SessionStoreBackendId): void {
         `two backends would write two disjoint hash chains. Export and re-import the session log to switch.`
     );
   }
+  writeMarker(workspace, backendId);
+}
+
+/**
+ * Move the pin from SQLite to Postgres. Only `migrateSqliteToPostgres` calls
+ * this, after it has copied the history and checked parity; it refuses any
+ * other switch, so mixed chains stay refused everywhere else.
+ */
+export function repinSqliteToPostgres(workspace: string): void {
+  const existing = readSessionStoreMarker(workspace);
+  if (existing !== null && existing !== "sqlite") {
+    throw new Error(`workspace session store is ${existing}; only a SQLite workspace can migrate to Postgres`);
+  }
+  writeMarker(workspace, "postgres");
+}
+
+function writeMarker(workspace: string, backendId: SessionStoreBackendId): void {
   ensureDir(join(workspace, ".amc"));
   writeFileAtomic(
     markerPath(workspace),
@@ -102,7 +120,28 @@ export function openSessionEventStore(
   if (options.readOnly !== true) {
     pinBackend(workspace, backendId);
   }
-  return backendId === "jsonl"
-    ? new JsonlSessionEventStore(workspace, options)
-    : new SqliteSessionEventStore(workspace, options);
+  if (backendId === "jsonl") return new JsonlSessionEventStore(workspace, options);
+  if (backendId === "postgres") return new PostgresSessionEventStore(workspace, options);
+  return new SqliteSessionEventStore(workspace, options);
+}
+
+/**
+ * JSONL declares `concurrentWriters: false` and its writer lock refuses a second
+ * writer, even in the same process. A caller that would open a second writer
+ * (an in-process delegate, a second ACP session) refuses up front with this,
+ * before opening anything, rather than failing midway on the lock.
+ */
+export class SessionStoreSingleWriterError extends Error {
+  /** The typed reason (P0-58). */
+  readonly code = "SESSION_STORE_SINGLE_WRITER";
+  constructor(needs: string) {
+    super(`${needs} needs a second session writer, but this workspace's session store is JSONL, which admits one session writer `
+      + "per workspace. Nothing was opened. Use a workspace on the default SQLite session store for this.");
+    this.name = "SessionStoreSingleWriterError";
+  }
+}
+
+/** Throws {@link SessionStoreSingleWriterError} when this workspace's session store is JSONL. */
+export function assertSecondSessionWriter(workspace: string, needs: string): void {
+  if (resolveSessionStoreBackend(workspace) === "jsonl") throw new SessionStoreSingleWriterError(needs);
 }

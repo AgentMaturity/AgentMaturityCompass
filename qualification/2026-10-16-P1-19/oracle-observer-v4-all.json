@@ -1,0 +1,136 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 4240,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts"
+  ],
+  "testCount": 10,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-1549412082",
+      "name": "tests/lighthouse/financeOracle.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1549412082_0",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_0",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a real completed journaled payment passes every mandatory oracle check",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a real completed journaled payment passes every mandatory oracle check",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_1",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a second real payment under another key and the same reference specifically fails no-duplicate",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a second real payment under another key and the same reference specifically fails no-duplicate",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_2",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers an actual post-authorization amount corruption specifically fails payload-bound",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers an actual post-authorization amount corruption specifically fails payload-bound",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_3",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a genuine provider-only commit has no matching completed AMC receipt",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a genuine provider-only commit has no matching completed AMC receipt",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_4",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a copied closed log with its final newline removed specifically fails txlog-chain",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a copied closed log with its final newline removed specifically fails txlog-chain",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_5",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers adapter stdout pass and verified flags cannot manufacture a receipt or trust anchor",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers adapter stdout pass and verified flags cannot manufacture a receipt or trust anchor",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_6",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers changing a genuine pre-dispatch argument preimage cannot preserve authorization",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers changing a genuine pre-dispatch argument preimage cannot preserve authorization",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_7",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a corrupted genuine decision signature is refused without re-signing authority",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a corrupted genuine decision signature is refused without re-signing authority",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_8",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers a genuine signed one-decision policy cannot weaken the external two-decision oracle profile",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers a genuine signed one-decision policy cannot weaken the external two-decision oracle profile",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1549412082_0_9",
+      "name": "tests/lighthouse/financeOracle.test.ts P1-19 finite independent oracle with genuine signed action producers unsupported case expectations fail inputs instead of being silently ignored",
+      "fullName": "P1-19 finite independent oracle with genuine signed action producers unsupported case expectations fail inputs instead of being silently ignored",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

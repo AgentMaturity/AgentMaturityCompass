@@ -1,0 +1,1030 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-30",
+  "oldIssue": "AMC-1508",
+  "slice": "NEW_ONE_CASE_OWNER_COOKIE_HTTP",
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "capturedUtc": "2026-10-15T01:34:19.999908+00:00",
+  "state": "BOUNDED_HTTP_BASELINE_AND_TWO_SOURCE_CONTROLS_COMPLETE",
+  "workspace": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+  "privateRoot": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015",
+  "construction": "Independent physical filesystem copy, not a Git clone.",
+  "byteExactAuthoredFixture": {
+    "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/closure/tests/portalHttpAttributionQualification.test.ts",
+    "bytes": 15407,
+    "sha256": "0ff0e03e04b0082bba938f4eee3dd1a39a6ab61b0647e88eb9b6dd1928c8be3e"
+  },
+  "initialBaseline": {
+    "counts": {
+      "numTotalTests": 1,
+      "numPassedTests": 1,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": true,
+      "exit": 0
+    },
+    "raw": {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/phases/actual-owner-cookie-http-baseline/raw-tests.json",
+      "bytes": 1025,
+      "sha256": "17cbfeaf46a758ad3b785910e399221e18d992ed8a71d79ee064ce0b84c8e5a4"
+    },
+    "command": {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/phases/actual-owner-cookie-http-baseline/command.json",
+      "bytes": 2119,
+      "sha256": "64da356378a8dfeeb7c230dcfd83f7a1f95999b381c8ef08c3aac3149b0963b1"
+    },
+    "effectObservation": {
+      "phase": "actual-owner-cookie-http-baseline",
+      "effect": {
+        "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/actual-owner-cookie-http-baseline.json",
+        "bytes": 7953,
+        "sha256": "b690f9f148d26126e224bf06663ed7f4b9cd5950c866d2c6a2ce37003c988374"
+      },
+      "workerRuntimeObserved": {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesABI": "127"
+      },
+      "rowCounts": {
+        "before": 2,
+        "afterForged": 2,
+        "afterHealthy": 3
+      },
+      "forgedStatus": 400,
+      "healthyStatus": 201,
+      "forgedSubmittedByInResponse": null,
+      "forgedInsertedRows": [],
+      "healthyInsertedRows": [
+        {
+          "id": "a88552c2-c90d-4231-b3a1-52e9de1ba9b4",
+          "name": "healthy-owner-job",
+          "type": "scan",
+          "status": "submitted",
+          "submitted_by": "portal-http-owner",
+          "payload": "{\"marker\":\"owned-local-http-control\",\"submittedBy\":\"nested-payload-is-data\"}",
+          "result": null,
+          "error": null,
+          "progress": 0,
+          "created_at": "2026-10-15T01:30:58.442Z",
+          "started_at": null,
+          "completed_at": null
+        }
+      ],
+      "priorRowValuesPreserved": true,
+      "healthyResponseAndStoredPrincipal": "portal-http-owner",
+      "auth": {
+        "credential": "real tracked LOCAL_USER OWNER session cookie only",
+        "tokenSha256": "bf8ac5970222b1e3b401efada7cfa1769d6f665bf2ba80b6782a60957f4b3c0d",
+        "usersSha256": "4213cbe15c8d986a05af176f5bb7ff9615821604d1183d6fe765633b28fb39b7",
+        "usersProductVerdict": {
+          "valid": true,
+          "signatureExists": true,
+          "reason": null,
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/actual-owner-cookie-http-baseline/amc-p030-portal-http-trUFlo/workspace/.amc/users.yaml",
+          "sigPath": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/actual-owner-cookie-http-baseline/amc-p030-portal-http-trUFlo/workspace/.amc/users.yaml.sig"
+        },
+        "independentUsersDigestMatches": true,
+        "independentUsersSignatureValid": true,
+        "independentSessionSignatureValid": true,
+        "tracked": {
+          "ok": true,
+          "error": null,
+          "authSource": "LOCAL_USER",
+          "userId": "3ddece74-f0ca-4b85-8779-c22573e7516b",
+          "username": "portal-http-owner",
+          "roles": [
+            "OWNER"
+          ]
+        }
+      },
+      "keyPinsBeforeArtifacts": {
+        "monitor": {
+          "spkiSha256": "66eeff3ac7bcb0b78be062b26cc40ab6f0b8772bddd6927806929147573449e3",
+          "pemSha256": "a0442d333604a3f1668985638a15e04932d4356e95fdbd9c9bfe9eed8ba24ca7"
+        },
+        "auditor": {
+          "spkiSha256": "3adb4863e7359e2bff674496a35732c88fb6fa57e3244c43f61fd54d3277dc88",
+          "pemSha256": "fe0c6192aead5d4cc97f4634a7506ad29ad9471abd2615eb55d69c5ca1355894"
+        },
+        "lease": {
+          "spkiSha256": "d2d9581227e2b2e44830f735e3db2e7783d57fe75eed7cca5268b51f1f5ccdd5",
+          "pemSha256": "e79e291e1af8079b5a1e0b61fb5816daf10098615350578144916954b8291143"
+        },
+        "session": {
+          "spkiSha256": "be3696a889bd20a7b1a2c6cef64e30cdc95bd2611c62781b481b31d6c800bd06",
+          "pemSha256": "c5d926043d6a6304abb8f26722387f6ccfa69cb111bbaa94f5c71b705ee819cc"
+        }
+      },
+      "publicFilesMatchBeforePins": {
+        "monitor": true,
+        "auditor": true,
+        "lease": true,
+        "session": true
+      },
+      "cleanup": {
+        "listenerClosed": true,
+        "productDbOpenAfterClose": false,
+        "sqlitePoolsClosed": true,
+        "vaultLocked": true,
+        "fixtureExistsAfterRemoval": false,
+        "envRestored": true
+      },
+      "errors": [],
+      "retentionLimits": [
+        "Final retained row arrays cover actual selected portal table values, not every filesystem side effect.",
+        "The effect file overwrites intermediate observations within one phase; final body is not an immutable temporal log.",
+        "Public fingerprints and hashes plus observed crypto booleans do not permit offline replay of deleted raw credentials or their entire policy validation."
+      ]
+    }
+  },
+  "controls": [
+    {
+      "id": "P30-1508-M2-portal-strict-schema-current-reanchored",
+      "provenance": "Current exact source/compiled reconstruction of a mutation described by the September reconciliation prose; no exact old helper bytes recovered or transferred.",
+      "sourceTarget": "src/api/productRouter.ts",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 1,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 1,
+          "numPassedTests": 0,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 1,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "failures": [
+        {
+          "name": "attributes a real OWNER-cookie portal submission and refuses a forged top-level submitter",
+          "kind": "AssertionError",
+          "firstLine": "AssertionError: {\"status\":201,\"body\":\"{\\\"ok\\\":true,\\\"data\\\":{\\\"id\\\":\\\"d5fc2acb-116e-4caa-8d5f-1b036d3ac69d\\\",\\\"name\\\":\\\"forged-top-level-job\\\",\\\"type\\\":\\\"scan\\\",\\\"status\\\":\\\"submitted\\\",\\\"submittedBy\\\":\\\"portal-http-owner\\\",\\\"payload\\\":{},\\\"error\\\":null,\\\"progress\\\":0,\\\"createdAt\\\":\\\"2026-10-15T01:31:27.400Z\\\",\\\"startedAt\\\":null,\\\"completedAt\\\":null}}\"}: expected 201 to be 400 // Object.is equality",
+          "locations": [
+            "portalHttpAttributionQualification.test.ts:222:57"
+          ],
+          "fullFailureMessageSha256": "93f390448f6cbb6ae90ae5865d6e04a398149238318603747ed91c98d70b8570",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/phases/P30-1508-M2-portal-strict-schema-current-reanchored-mutant/raw-tests.json",
+            "bytes": 1858,
+            "sha256": "81f4116a5f842570bd41d3f80a7e3d09fa1c4985a15afe3ba196faeb2c6ee8fc"
+          }
+        }
+      ],
+      "effects": {
+        "baseline": {
+          "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-baseline",
+          "effect": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-M2-portal-strict-schema-current-reanchored-baseline.json",
+            "bytes": 8115,
+            "sha256": "8cff81a279fc3875c2e7ff175257cc397b0f667f0367879dad47af52e6191239"
+          },
+          "workerRuntimeObserved": {
+            "version": "v22.23.3",
+            "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+            "modulesABI": "127"
+          },
+          "rowCounts": {
+            "before": 2,
+            "afterForged": 2,
+            "afterHealthy": 3
+          },
+          "forgedStatus": 400,
+          "healthyStatus": 201,
+          "forgedSubmittedByInResponse": null,
+          "forgedInsertedRows": [],
+          "healthyInsertedRows": [
+            {
+              "id": "7e120ec1-04dd-49b1-aad0-5f02658b4c27",
+              "name": "healthy-owner-job",
+              "type": "scan",
+              "status": "submitted",
+              "submitted_by": "portal-http-owner",
+              "payload": "{\"marker\":\"owned-local-http-control\",\"submittedBy\":\"nested-payload-is-data\"}",
+              "result": null,
+              "error": null,
+              "progress": 0,
+              "created_at": "2026-10-15T01:31:22.410Z",
+              "started_at": null,
+              "completed_at": null
+            }
+          ],
+          "priorRowValuesPreserved": true,
+          "healthyResponseAndStoredPrincipal": "portal-http-owner",
+          "auth": {
+            "credential": "real tracked LOCAL_USER OWNER session cookie only",
+            "tokenSha256": "0291f8ef9104cc1c5b5d11ff42f3f685aa245541a8a79ac414c3f7624d774071",
+            "usersSha256": "54b7125b4b097a979618993a5e51c13729c5490b386270d37b200b7e75705e64",
+            "usersProductVerdict": {
+              "valid": true,
+              "signatureExists": true,
+              "reason": null,
+              "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-M2-portal-strict-schema-current-reanchored-baseline/amc-p030-portal-http-DZXhEb/workspace/.amc/users.yaml",
+              "sigPath": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-M2-portal-strict-schema-current-reanchored-baseline/amc-p030-portal-http-DZXhEb/workspace/.amc/users.yaml.sig"
+            },
+            "independentUsersDigestMatches": true,
+            "independentUsersSignatureValid": true,
+            "independentSessionSignatureValid": true,
+            "tracked": {
+              "ok": true,
+              "error": null,
+              "authSource": "LOCAL_USER",
+              "userId": "eb2fed35-5d52-4389-8cfa-0c75b26821d1",
+              "username": "portal-http-owner",
+              "roles": [
+                "OWNER"
+              ]
+            }
+          },
+          "keyPinsBeforeArtifacts": {
+            "monitor": {
+              "spkiSha256": "80c5dc00812bba1490151fd4eb8ec9ee3291a0d67dd7700b5063a725db539be7",
+              "pemSha256": "e510ff5929b69f26deeb7b769ac5d8791b9acebada8b38f7a79c374b490bd3d1"
+            },
+            "auditor": {
+              "spkiSha256": "a24d631bf5538f76e0ac52b8d11b5b4e5c421606d3df5772e7e6d8d88ca5f27a",
+              "pemSha256": "0d47f71fdc5a44e9ee6759d0e78f988f20539f3c95c6941f5d0dedf5a5ec8aa1"
+            },
+            "lease": {
+              "spkiSha256": "f7b876eeb84e5a5bfb97ac686eaeac23efb04918e4840fdc5fbf9cb7cdc43442",
+              "pemSha256": "0c7c17e0719ffeb3dd2507de0d5741ef3ad09304ead1483020b8afb68b726c3a"
+            },
+            "session": {
+              "spkiSha256": "a4922698efe1266285548c3411e4d4fa642b12652e70bf5f5742f8a8c3ce2f9b",
+              "pemSha256": "26ffb7c8565dfe0137d0ce5ef70309b58a73af5edb6e3a4f0a06d8d4049456b0"
+            }
+          },
+          "publicFilesMatchBeforePins": {
+            "monitor": true,
+            "auditor": true,
+            "lease": true,
+            "session": true
+          },
+          "cleanup": {
+            "listenerClosed": true,
+            "productDbOpenAfterClose": false,
+            "sqlitePoolsClosed": true,
+            "vaultLocked": true,
+            "fixtureExistsAfterRemoval": false,
+            "envRestored": true
+          },
+          "errors": [],
+          "retentionLimits": [
+            "Final retained row arrays cover actual selected portal table values, not every filesystem side effect.",
+            "The effect file overwrites intermediate observations within one phase; final body is not an immutable temporal log.",
+            "Public fingerprints and hashes plus observed crypto booleans do not permit offline replay of deleted raw credentials or their entire policy validation."
+          ]
+        },
+        "mutant": {
+          "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-mutant",
+          "effect": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-M2-portal-strict-schema-current-reanchored-mutant.json",
+            "bytes": 9100,
+            "sha256": "05f6b93e0157dbc82b26f44a570ac0a0753783bc36a6d47ccc3cb5d52a271351"
+          },
+          "workerRuntimeObserved": {
+            "version": "v22.23.3",
+            "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+            "modulesABI": "127"
+          },
+          "rowCounts": {
+            "before": 2,
+            "afterForged": 3,
+            "afterHealthy": 4
+          },
+          "forgedStatus": 201,
+          "healthyStatus": 201,
+          "forgedSubmittedByInResponse": "portal-http-owner",
+          "forgedInsertedRows": [
+            {
+              "id": "d5fc2acb-116e-4caa-8d5f-1b036d3ac69d",
+              "name": "forged-top-level-job",
+              "type": "scan",
+              "status": "submitted",
+              "submitted_by": "portal-http-owner",
+              "payload": "{}",
+              "result": null,
+              "error": null,
+              "progress": 0,
+              "created_at": "2026-10-15T01:31:27.400Z",
+              "started_at": null,
+              "completed_at": null
+            }
+          ],
+          "healthyInsertedRows": [
+            {
+              "id": "de2a77b7-67a7-4ef8-94a2-fce3326aa80e",
+              "name": "healthy-owner-job",
+              "type": "scan",
+              "status": "submitted",
+              "submitted_by": "portal-http-owner",
+              "payload": "{\"marker\":\"owned-local-http-control\",\"submittedBy\":\"nested-payload-is-data\"}",
+              "result": null,
+              "error": null,
+              "progress": 0,
+              "created_at": "2026-10-15T01:31:27.404Z",
+              "started_at": null,
+              "completed_at": null
+            }
+          ],
+          "priorRowValuesPreserved": true,
+          "healthyResponseAndStoredPrincipal": "portal-http-owner",
+          "auth": {
+            "credential": "real tracked LOCAL_USER OWNER session cookie only",
+            "tokenSha256": "bdd74e48b68bc301c42801f6efca2cf6dd989facc47e2b01d4a53cef788a3b08",
+            "usersSha256": "c6254e06c54d10a4f78e109729f0adecf68c5886b9dea9ec1920165dfc54921d",
+            "usersProductVerdict": {
+              "valid": true,
+              "signatureExists": true,
+              "reason": null,
+              "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-M2-portal-strict-schema-current-reanchored-mutant/amc-p030-portal-http-SCriOM/workspace/.amc/users.yaml",
+              "sigPath": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-M2-portal-strict-schema-current-reanchored-mutant/amc-p030-portal-http-SCriOM/workspace/.amc/users.yaml.sig"
+            },
+            "independentUsersDigestMatches": true,
+            "independentUsersSignatureValid": true,
+            "independentSessionSignatureValid": true,
+            "tracked": {
+              "ok": true,
+              "error": null,
+              "authSource": "LOCAL_USER",
+              "userId": "f07003a7-d8d4-4f1b-9af1-d4f35824d75d",
+              "username": "portal-http-owner",
+              "roles": [
+                "OWNER"
+              ]
+            }
+          },
+          "keyPinsBeforeArtifacts": {
+            "monitor": {
+              "spkiSha256": "90c9ac1eec4e2564c0a3a5543a8dd21d1066f220df10eac479da48d695902bb3",
+              "pemSha256": "77367ef0d649d6b2af91e4581a92f3a20260b7eb70d7bc02686ea8ec540fdbd1"
+            },
+            "auditor": {
+              "spkiSha256": "bba90228ea4a05c17a7c0d775a62fb5a7c39cd40afc384eca466bc1e3fc4abcb",
+              "pemSha256": "18fe6a04f1cf3af73218c3c61f3995d15c63a32ea88e0371da98a12fc0452949"
+            },
+            "lease": {
+              "spkiSha256": "d776730789df4d946a55a07b6271bac5ad6f1d33f8185ed9a6f10da74da9f579",
+              "pemSha256": "a95e032b29ca63b13bb49b0bc0318901b43ba844a3c3f90901f932a839a7d86f"
+            },
+            "session": {
+              "spkiSha256": "fb3381900b072b978226edd76925dffe4d800e30b843d5a842cfc61643aa8e88",
+              "pemSha256": "877e83faf70f8515e4aecc67ac4b555d6767195ed8c3b1179c7178429b0cfe60"
+            }
+          },
+          "publicFilesMatchBeforePins": {
+            "monitor": true,
+            "auditor": true,
+            "lease": true,
+            "session": true
+          },
+          "cleanup": {
+            "listenerClosed": true,
+            "productDbOpenAfterClose": false,
+            "sqlitePoolsClosed": true,
+            "vaultLocked": true,
+            "fixtureExistsAfterRemoval": false,
+            "envRestored": true
+          },
+          "errors": [],
+          "retentionLimits": [
+            "Final retained row arrays cover actual selected portal table values, not every filesystem side effect.",
+            "The effect file overwrites intermediate observations within one phase; final body is not an immutable temporal log.",
+            "Public fingerprints and hashes plus observed crypto booleans do not permit offline replay of deleted raw credentials or their entire policy validation."
+          ]
+        },
+        "restored": {
+          "phase": "P30-1508-M2-portal-strict-schema-current-reanchored-restored",
+          "effect": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-M2-portal-strict-schema-current-reanchored-restored.json",
+            "bytes": 8115,
+            "sha256": "7da949682b33fbb367b72106dd52c6e5a435c61c487ed5262ca1849c2ec07636"
+          },
+          "workerRuntimeObserved": {
+            "version": "v22.23.3",
+            "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+            "modulesABI": "127"
+          },
+          "rowCounts": {
+            "before": 2,
+            "afterForged": 2,
+            "afterHealthy": 3
+          },
+          "forgedStatus": 400,
+          "healthyStatus": 201,
+          "forgedSubmittedByInResponse": null,
+          "forgedInsertedRows": [],
+          "healthyInsertedRows": [
+            {
+              "id": "b474ce54-bf94-41aa-935e-94462a6e016e",
+              "name": "healthy-owner-job",
+              "type": "scan",
+              "status": "submitted",
+              "submitted_by": "portal-http-owner",
+              "payload": "{\"marker\":\"owned-local-http-control\",\"submittedBy\":\"nested-payload-is-data\"}",
+              "result": null,
+              "error": null,
+              "progress": 0,
+              "created_at": "2026-10-15T01:31:33.046Z",
+              "started_at": null,
+              "completed_at": null
+            }
+          ],
+          "priorRowValuesPreserved": true,
+          "healthyResponseAndStoredPrincipal": "portal-http-owner",
+          "auth": {
+            "credential": "real tracked LOCAL_USER OWNER session cookie only",
+            "tokenSha256": "2c4b51386ce3f944b2c9f3352efe8777684c0d61df115639593105a9f52b6856",
+            "usersSha256": "570d83cf7a6cb84964ac3fda9d0762e741d15a8cf9d22fa436183ea854518c0e",
+            "usersProductVerdict": {
+              "valid": true,
+              "signatureExists": true,
+              "reason": null,
+              "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-M2-portal-strict-schema-current-reanchored-restored/amc-p030-portal-http-qmeIWg/workspace/.amc/users.yaml",
+              "sigPath": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-M2-portal-strict-schema-current-reanchored-restored/amc-p030-portal-http-qmeIWg/workspace/.amc/users.yaml.sig"
+            },
+            "independentUsersDigestMatches": true,
+            "independentUsersSignatureValid": true,
+            "independentSessionSignatureValid": true,
+            "tracked": {
+              "ok": true,
+              "error": null,
+              "authSource": "LOCAL_USER",
+              "userId": "cadaabec-978a-44ef-a304-8114d7b30c8c",
+              "username": "portal-http-owner",
+              "roles": [
+                "OWNER"
+              ]
+            }
+          },
+          "keyPinsBeforeArtifacts": {
+            "monitor": {
+              "spkiSha256": "d4af542dc4b8df6dbaa02999ce5ed9d8e7be09711914a64f15c0c2627bb73096",
+              "pemSha256": "1917b03ec526b5d100395dbf25848a9b62b8432f5491c9c31cb879d85319879d"
+            },
+            "auditor": {
+              "spkiSha256": "6f475c719cf4fb1ec41b21fe830f801c7285a93ac9daa415bb4fbff80b552707",
+              "pemSha256": "8354cfeb4787b6f244f8b62f726fdb5d2044c3f1d904e58cdba132e8f8800b07"
+            },
+            "lease": {
+              "spkiSha256": "d2876b958d082a31b10570a9a12d503500a892dbc3e0e9e8603c704f5a22f3cd",
+              "pemSha256": "ab967975b989a6e68d7541fe214c8ed1d0268050fa0a2e45f60205fbcd624d96"
+            },
+            "session": {
+              "spkiSha256": "7c13a60765e406bc29acd7be84d4be51cf7e2979ab59e7b60539f9011082a8b5",
+              "pemSha256": "f5d9fb8d5b1354e46ddc6c20507800a2abf60b94300743adf4ac761eb5e7f35d"
+            }
+          },
+          "publicFilesMatchBeforePins": {
+            "monitor": true,
+            "auditor": true,
+            "lease": true,
+            "session": true
+          },
+          "cleanup": {
+            "listenerClosed": true,
+            "productDbOpenAfterClose": false,
+            "sqlitePoolsClosed": true,
+            "vaultLocked": true,
+            "fixtureExistsAfterRemoval": false,
+            "envRestored": true
+          },
+          "errors": [],
+          "retentionLimits": [
+            "Final retained row arrays cover actual selected portal table values, not every filesystem side effect.",
+            "The effect file overwrites intermediate observations within one phase; final body is not an immutable temporal log.",
+            "Public fingerprints and hashes plus observed crypto booleans do not permit offline replay of deleted raw credentials or their entire policy validation."
+          ]
+        }
+      },
+      "sourceRestoredExact": true,
+      "allCompiledBytesNeverChanged": true,
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/P30-1508-M2-portal-strict-schema-current-reanchored-matrix.json",
+        "bytes": 8635,
+        "sha256": "e3fc8c735629994abb19c047f771b3d219d70d9b7c2503f07348d62f347e6563"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/P30-1508-M2-portal-strict-schema-current-reanchored-source-change.json",
+        "bytes": 1196,
+        "sha256": "74261553ba6a1b6b1207924b774887d97f518a80c0d903b706faf102921db3c4"
+      },
+      "meaning": "Removing strict schema accepts and strips the top-level field. Actual cookie HTTP creates a row, but submitted_by remains portal-http-owner. This is literal strict400 contract failure, not a forged principal."
+    },
+    {
+      "id": "P30-1508-submittedby-from-body",
+      "provenance": "Exact historical full-batch recipe, read without execution.",
+      "sourceTarget": "src/api/productRouter.ts",
+      "counts": {
+        "baseline": {
+          "numTotalTests": 1,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        },
+        "mutant": {
+          "numTotalTests": 1,
+          "numPassedTests": 0,
+          "numFailedTests": 1,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": false,
+          "exit": 1
+        },
+        "restored": {
+          "numTotalTests": 1,
+          "numPassedTests": 1,
+          "numFailedTests": 0,
+          "numPendingTests": 0,
+          "numTodoTests": 0,
+          "success": true,
+          "exit": 0
+        }
+      },
+      "failures": [
+        {
+          "name": "attributes a real OWNER-cookie portal submission and refuses a forged top-level submitter",
+          "kind": "AssertionError",
+          "firstLine": "AssertionError: {\"status\":201,\"body\":\"{\\\"ok\\\":true,\\\"data\\\":{\\\"id\\\":\\\"87358dfd-dca4-4d52-9b28-67fec360bf4c\\\",\\\"name\\\":\\\"forged-top-level-job\\\",\\\"type\\\":\\\"scan\\\",\\\"status\\\":\\\"submitted\\\",\\\"submittedBy\\\":\\\"different-forged-owner\\\",\\\"payload\\\":{},\\\"error\\\":null,\\\"progress\\\":0,\\\"createdAt\\\":\\\"2026-10-15T01:33:20.320Z\\\",\\\"startedAt\\\":null,\\\"completedAt\\\":null}}\"}: expected 201 to be 400 // Object.is equality",
+          "locations": [
+            "portalHttpAttributionQualification.test.ts:222:57"
+          ],
+          "fullFailureMessageSha256": "0dd31cdd230ab9d8bab1f65ea8aef4b92a18a3c4f829f5de4e1773527ec7a116",
+          "retainedTrace": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/phases/P30-1508-submittedby-from-body-mutant/raw-tests.json",
+            "bytes": 1864,
+            "sha256": "f3ee97eea80a72d8e3f85d6308189f786976f6d1a22fce75c43b6c1b9be33df0"
+          }
+        }
+      ],
+      "effects": {
+        "baseline": {
+          "phase": "P30-1508-submittedby-from-body-baseline",
+          "effect": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-submittedby-from-body-baseline.json",
+            "bytes": 7989,
+            "sha256": "5155731a2f2629e650fe9f7507e322bda1a9197cc662c953e8eb89a71de1d70d"
+          },
+          "workerRuntimeObserved": {
+            "version": "v22.23.3",
+            "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+            "modulesABI": "127"
+          },
+          "rowCounts": {
+            "before": 2,
+            "afterForged": 2,
+            "afterHealthy": 3
+          },
+          "forgedStatus": 400,
+          "healthyStatus": 201,
+          "forgedSubmittedByInResponse": null,
+          "forgedInsertedRows": [],
+          "healthyInsertedRows": [
+            {
+              "id": "33f360c1-e755-43bd-b21a-960231734f1e",
+              "name": "healthy-owner-job",
+              "type": "scan",
+              "status": "submitted",
+              "submitted_by": "portal-http-owner",
+              "payload": "{\"marker\":\"owned-local-http-control\",\"submittedBy\":\"nested-payload-is-data\"}",
+              "result": null,
+              "error": null,
+              "progress": 0,
+              "created_at": "2026-10-15T01:33:15.343Z",
+              "started_at": null,
+              "completed_at": null
+            }
+          ],
+          "priorRowValuesPreserved": true,
+          "healthyResponseAndStoredPrincipal": "portal-http-owner",
+          "auth": {
+            "credential": "real tracked LOCAL_USER OWNER session cookie only",
+            "tokenSha256": "c3b736e147a61db198e407c64d7932ea9f32318f7c5d2367926cfd5d44eb2ff3",
+            "usersSha256": "c48c88252a7f5be333f55a8aed817fda3c3ed68418b0241ca9ea22a604acee2b",
+            "usersProductVerdict": {
+              "valid": true,
+              "signatureExists": true,
+              "reason": null,
+              "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-submittedby-from-body-baseline/amc-p030-portal-http-fpLZMw/workspace/.amc/users.yaml",
+              "sigPath": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-submittedby-from-body-baseline/amc-p030-portal-http-fpLZMw/workspace/.amc/users.yaml.sig"
+            },
+            "independentUsersDigestMatches": true,
+            "independentUsersSignatureValid": true,
+            "independentSessionSignatureValid": true,
+            "tracked": {
+              "ok": true,
+              "error": null,
+              "authSource": "LOCAL_USER",
+              "userId": "f504fd67-9304-4df3-97d7-b836462d65f4",
+              "username": "portal-http-owner",
+              "roles": [
+                "OWNER"
+              ]
+            }
+          },
+          "keyPinsBeforeArtifacts": {
+            "monitor": {
+              "spkiSha256": "f76074273d81c06aca8512152ab16b5a2fa97a80bd38da669739413bf142760e",
+              "pemSha256": "f8f213f007e7649edb8dbda83fe4c72d4a5a149ca4096ce6423596ae9ea7d892"
+            },
+            "auditor": {
+              "spkiSha256": "b1298773a346bdedd775ffaf200bea19aae4bdd19fc481f3c22eabb88321cd06",
+              "pemSha256": "babcabdcdf70d7b65b853eeb4ebaa2daf983d86856054f2090d4480e4761ebd4"
+            },
+            "lease": {
+              "spkiSha256": "342cae16e8039ab0db73ce0ba7a56dae9b48061c49c724494a75fb90bc551c9b",
+              "pemSha256": "3387cba0eac51ba34c4dc9a74020e7a406119f66f53a5dbbcb710edec7f206a0"
+            },
+            "session": {
+              "spkiSha256": "c00b1933e10d88a6eb3975962ffa3c192ff125d655f93cf07b65ec38cf918289",
+              "pemSha256": "d3af6337d52d24fb05eef185d681f9a3da1ea76bd378f548473379fcbd848a1b"
+            }
+          },
+          "publicFilesMatchBeforePins": {
+            "monitor": true,
+            "auditor": true,
+            "lease": true,
+            "session": true
+          },
+          "cleanup": {
+            "listenerClosed": true,
+            "productDbOpenAfterClose": false,
+            "sqlitePoolsClosed": true,
+            "vaultLocked": true,
+            "fixtureExistsAfterRemoval": false,
+            "envRestored": true
+          },
+          "errors": [],
+          "retentionLimits": [
+            "Final retained row arrays cover actual selected portal table values, not every filesystem side effect.",
+            "The effect file overwrites intermediate observations within one phase; final body is not an immutable temporal log.",
+            "Public fingerprints and hashes plus observed crypto booleans do not permit offline replay of deleted raw credentials or their entire policy validation."
+          ]
+        },
+        "mutant": {
+          "phase": "P30-1508-submittedby-from-body-mutant",
+          "effect": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-submittedby-from-body-mutant.json",
+            "bytes": 8989,
+            "sha256": "c4614de7fa04920df55b817b94bce9ff562a9ee5a5c88be9440666070b82944d"
+          },
+          "workerRuntimeObserved": {
+            "version": "v22.23.3",
+            "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+            "modulesABI": "127"
+          },
+          "rowCounts": {
+            "before": 2,
+            "afterForged": 3,
+            "afterHealthy": 4
+          },
+          "forgedStatus": 201,
+          "healthyStatus": 201,
+          "forgedSubmittedByInResponse": "different-forged-owner",
+          "forgedInsertedRows": [
+            {
+              "id": "87358dfd-dca4-4d52-9b28-67fec360bf4c",
+              "name": "forged-top-level-job",
+              "type": "scan",
+              "status": "submitted",
+              "submitted_by": "different-forged-owner",
+              "payload": "{}",
+              "result": null,
+              "error": null,
+              "progress": 0,
+              "created_at": "2026-10-15T01:33:20.320Z",
+              "started_at": null,
+              "completed_at": null
+            }
+          ],
+          "healthyInsertedRows": [
+            {
+              "id": "c115823c-705b-421c-b2e4-084efb9bd329",
+              "name": "healthy-owner-job",
+              "type": "scan",
+              "status": "submitted",
+              "submitted_by": "portal-http-owner",
+              "payload": "{\"marker\":\"owned-local-http-control\",\"submittedBy\":\"nested-payload-is-data\"}",
+              "result": null,
+              "error": null,
+              "progress": 0,
+              "created_at": "2026-10-15T01:33:20.324Z",
+              "started_at": null,
+              "completed_at": null
+            }
+          ],
+          "priorRowValuesPreserved": true,
+          "healthyResponseAndStoredPrincipal": "portal-http-owner",
+          "auth": {
+            "credential": "real tracked LOCAL_USER OWNER session cookie only",
+            "tokenSha256": "42b508be08a0958a8412526a45eada6a507e17f36adc01165bf233d2c2f606b4",
+            "usersSha256": "a1fd617db46e8b4ecda4b92f107bc094fd7153f41b68f56667c94e9e62490382",
+            "usersProductVerdict": {
+              "valid": true,
+              "signatureExists": true,
+              "reason": null,
+              "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-submittedby-from-body-mutant/amc-p030-portal-http-kH3iOU/workspace/.amc/users.yaml",
+              "sigPath": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-submittedby-from-body-mutant/amc-p030-portal-http-kH3iOU/workspace/.amc/users.yaml.sig"
+            },
+            "independentUsersDigestMatches": true,
+            "independentUsersSignatureValid": true,
+            "independentSessionSignatureValid": true,
+            "tracked": {
+              "ok": true,
+              "error": null,
+              "authSource": "LOCAL_USER",
+              "userId": "84774002-ba1a-4932-aa89-23557fe1199a",
+              "username": "portal-http-owner",
+              "roles": [
+                "OWNER"
+              ]
+            }
+          },
+          "keyPinsBeforeArtifacts": {
+            "monitor": {
+              "spkiSha256": "7d8b2c1385ce2b52ba8e3c32e2d7f7442e779d4267720162fdfc45d248777fdc",
+              "pemSha256": "69182b15a45906999c08b202b61bf02e081cfc5c063ff512a3682815275d0238"
+            },
+            "auditor": {
+              "spkiSha256": "9ef9b797ae0651c23a7d50ea1e51e53f4d7b6be23cffc88aecaf972b82ff84e2",
+              "pemSha256": "052d50c9b246057e333231e133953b8e4d17f515812985c45bcd00e56e1decd5"
+            },
+            "lease": {
+              "spkiSha256": "82e94f22fc264f4eba1037bc3c18d8df7a505e44dcfd21140a566dde5fe54de9",
+              "pemSha256": "52f4cd8d6de4be0f47a7138c1d8f1d3de06aae451575d1d934c807066962f487"
+            },
+            "session": {
+              "spkiSha256": "eb58983aa11e23c16e9ef292b90316969021197073b94bcc6c32a69962504be5",
+              "pemSha256": "0514e88327822b50f84909c31cc84f819d78c21bee037a1ca31fdf76e7c8753d"
+            }
+          },
+          "publicFilesMatchBeforePins": {
+            "monitor": true,
+            "auditor": true,
+            "lease": true,
+            "session": true
+          },
+          "cleanup": {
+            "listenerClosed": true,
+            "productDbOpenAfterClose": false,
+            "sqlitePoolsClosed": true,
+            "vaultLocked": true,
+            "fixtureExistsAfterRemoval": false,
+            "envRestored": true
+          },
+          "errors": [],
+          "retentionLimits": [
+            "Final retained row arrays cover actual selected portal table values, not every filesystem side effect.",
+            "The effect file overwrites intermediate observations within one phase; final body is not an immutable temporal log.",
+            "Public fingerprints and hashes plus observed crypto booleans do not permit offline replay of deleted raw credentials or their entire policy validation."
+          ]
+        },
+        "restored": {
+          "phase": "P30-1508-submittedby-from-body-restored",
+          "effect": {
+            "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/effects/P30-1508-submittedby-from-body-restored.json",
+            "bytes": 7989,
+            "sha256": "039d6408990e03df98bf368bb91414c0b0231a9749f7aead13eb22b8e495210c"
+          },
+          "workerRuntimeObserved": {
+            "version": "v22.23.3",
+            "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+            "modulesABI": "127"
+          },
+          "rowCounts": {
+            "before": 2,
+            "afterForged": 2,
+            "afterHealthy": 3
+          },
+          "forgedStatus": 400,
+          "healthyStatus": 201,
+          "forgedSubmittedByInResponse": null,
+          "forgedInsertedRows": [],
+          "healthyInsertedRows": [
+            {
+              "id": "3aec03cf-9ad3-40af-9bbf-070e6fc283c4",
+              "name": "healthy-owner-job",
+              "type": "scan",
+              "status": "submitted",
+              "submitted_by": "portal-http-owner",
+              "payload": "{\"marker\":\"owned-local-http-control\",\"submittedBy\":\"nested-payload-is-data\"}",
+              "result": null,
+              "error": null,
+              "progress": 0,
+              "created_at": "2026-10-15T01:33:25.841Z",
+              "started_at": null,
+              "completed_at": null
+            }
+          ],
+          "priorRowValuesPreserved": true,
+          "healthyResponseAndStoredPrincipal": "portal-http-owner",
+          "auth": {
+            "credential": "real tracked LOCAL_USER OWNER session cookie only",
+            "tokenSha256": "4d9c84ad1d1bda542a5f3fe5d616e75823435d50c6815ec5101ff9930771219b",
+            "usersSha256": "8478af4f2fd092a026fdb3dbca7e48762bda17fd4ec4f057a0d468d9bac7f737",
+            "usersProductVerdict": {
+              "valid": true,
+              "signatureExists": true,
+              "reason": null,
+              "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-submittedby-from-body-restored/amc-p030-portal-http-QhxiOn/workspace/.amc/users.yaml",
+              "sigPath": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/tmp/P30-1508-submittedby-from-body-restored/amc-p030-portal-http-QhxiOn/workspace/.amc/users.yaml.sig"
+            },
+            "independentUsersDigestMatches": true,
+            "independentUsersSignatureValid": true,
+            "independentSessionSignatureValid": true,
+            "tracked": {
+              "ok": true,
+              "error": null,
+              "authSource": "LOCAL_USER",
+              "userId": "55a3e106-7279-4133-bdd7-5233360cb37f",
+              "username": "portal-http-owner",
+              "roles": [
+                "OWNER"
+              ]
+            }
+          },
+          "keyPinsBeforeArtifacts": {
+            "monitor": {
+              "spkiSha256": "97b2e9a5c396b8429caec1ece3b73300d63815b2e80b21c986728eef8285e39f",
+              "pemSha256": "a77e429ad9caa94770042cc80aabdc74c42987b75fc426d5762be1c925796236"
+            },
+            "auditor": {
+              "spkiSha256": "3a5352a254fb1eaabd36fa404860c241f1c91a481bb3109da6edd4959e8b64d0",
+              "pemSha256": "f9055ad3a284c1a5a73c6fa96ee9010deff6838311951fcd87a7edc13dd60d3b"
+            },
+            "lease": {
+              "spkiSha256": "bb2ea0cd223163c4c478abed1d2123a328db7407f41026085ce879d587c32c62",
+              "pemSha256": "f52c9c22582e6632116d0a24eca3960c7b4e3d8cd47405c36491e4c69d2a7297"
+            },
+            "session": {
+              "spkiSha256": "1db7ffaeb6cfa8931300101e353f0b1c060177cf31c0d74cfbdd5054950a3382",
+              "pemSha256": "b19bc59a21128b28e39ae74f8fed3df335eb8bab7545676b7436fb5cebc1572d"
+            }
+          },
+          "publicFilesMatchBeforePins": {
+            "monitor": true,
+            "auditor": true,
+            "lease": true,
+            "session": true
+          },
+          "cleanup": {
+            "listenerClosed": true,
+            "productDbOpenAfterClose": false,
+            "sqlitePoolsClosed": true,
+            "vaultLocked": true,
+            "fixtureExistsAfterRemoval": false,
+            "envRestored": true
+          },
+          "errors": [],
+          "retentionLimits": [
+            "Final retained row arrays cover actual selected portal table values, not every filesystem side effect.",
+            "The effect file overwrites intermediate observations within one phase; final body is not an immutable temporal log.",
+            "Public fingerprints and hashes plus observed crypto booleans do not permit offline replay of deleted raw credentials or their entire policy validation."
+          ]
+        }
+      },
+      "sourceRestoredExact": true,
+      "allCompiledBytesNeverChanged": true,
+      "matrix": {
+        "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/P30-1508-submittedby-from-body-matrix.json",
+        "bytes": 8370,
+        "sha256": "32953f1da8c15e2f6b5963a23301df6436aea9016a5ea6bb1fc367557273856e"
+      },
+      "sourceChange": {
+        "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/P30-1508-submittedby-from-body-source-change.json",
+        "bytes": 1163,
+        "sha256": "4713bd9eb40e306f313370f6ba634e64c94288f2449642a856ebffd55605ae81"
+      },
+      "meaning": "The separate exact historical body composite actually stores different-forged-owner for the submitted top-level value. Healthy second request remains portal-http-owner; both response and full selected row observations precede the first status assertion."
+    }
+  ],
+  "formalAndCausalBoundary": "One new private case, repeated across seven processes. It is separate from original Portal21, four current source reconstructions and the exact historical composite. HTTP only measures M2 and that composite; no M1/M3/M4 cookie/RBAC guard claim.",
+  "runtime": {
+    "workerObservations": [
+      {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesABI": "127"
+      },
+      {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesABI": "127"
+      },
+      {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesABI": "127"
+      },
+      {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesABI": "127"
+      },
+      {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesABI": "127"
+      },
+      {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesABI": "127"
+      },
+      {
+        "version": "v22.23.3",
+        "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+        "modulesABI": "127"
+      }
+    ],
+    "scope": "Each of the seven actual test effect records directly prints version, executable and ABI 127; no unobserved per-worker ABI is invented.",
+    "environment": "Own allowlisted credential-free launch environment with phase-specific private 0700 HOME/AMC_HOME/TMPDIR and fresh absolute effect path. The fixture generates local credentials and stubs them only inside its isolated worker. Actual 127.0.0.1 loopback is permitted; no blanket external-network isolation claim."
+  },
+  "cryptoAndAuthBoundary": "Public fixture role-key hashes are recorded in code order before createVault signs artifacts. Nodecrypto independently verifies users digest signature and actual session payload bytes; product APIs verify users configuration and tracked LOCAL_USER identity, and the actual server consumes the OWNER cookie. This is selected cryptographic observation, not an independent full session-token decoder/policy validator, human identity, issuer truth or external person. Final hash-only records and deleted raw credentials cannot be crypto-replayed offline; overwritten intermediate effect states are not immutable chronology.",
+  "effectsAndCleanup": "All seven retained final effects contain both actual HTTP responses, three full selected portal row arrays, actual public-key-match/auth crypto observations, modes, listener, errors and normal cleanup. Mutant later assertions are masked by the first forged400 check, but both requests and row arrays were already collected. Only portal table projections and selected setup/cleanup facts are measured, not universal filesystem effects, concurrency or tenant isolation.",
+  "preservation": {
+    "sourceFiles": 7739,
+    "compiledFiles": 4529,
+    "newPrivateCase": 1,
+    "completePrivateClosureFiles": 12269,
+    "sourceRestoredExact": true,
+    "allCompiledBytesNeverChanged": true,
+    "fixtureCriteriaSetupCleanupUnchanged": true,
+    "configGuardsDeadlines": "Normal source-mode Vitest, file alone/maxWorkers1, dual default+JSON reporters, authored 45s case and 10s HTTP request timeout unchanged.",
+    "protectedPins": 92,
+    "priorArtifactReferences": 1680,
+    "authorReviewPins": 5,
+    "latePredecessorPins": 2,
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "rootSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "rootGitStatus": "clean",
+    "allPreviousPacketsAndClosuresImmutable": true
+  },
+  "setupChronology": {
+    "frozenReport": {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/setup-prepared.json",
+      "bytes": 3057,
+      "sha256": "4339b4cf3ea2aa5ce2c47a8b7a4cf1ec0acc4e6dc861103bc0583287306df4aa"
+    },
+    "frozenMarkdown": {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/setup-prepared.md",
+      "bytes": 1758,
+      "sha256": "5466d6454315787b23a9a7e1ddfa7cce79f0b43ffbd2e8ef1bcd789522b0db64"
+    },
+    "frozenIndex": {
+      "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/index/setup-artifact-index.json",
+      "bytes": 412898,
+      "sha256": "32f540eb9a862b3947e285e889da74c4ac4784bc6af646e84cca76b9639a0913"
+    }
+  },
+  "limits": [
+    "No production, permanent test, original21, helper, shared CLI, guard, counter, archive, dependency, native, root Git or prior packet edit.",
+    "No held22 test/helper/runner transfer, compiler/build/import adapter, dist mutation or expectation relaxation.",
+    "Current strict 400 refusal still differs from historical wording that suggested storing authenticated principal for a supplied top-level submittedBy. No specification/policy choice or source repair was made.",
+    "Local source-mode OWNER-cookie boundary only; no browser, hosted/installed service, CSRF, other roles/credentials/routes, race/tenant, universal no-effects, full P0-30/old batch, Node24, full suite, coverage, G0, release or Done acceptance."
+  ],
+  "frozenJournal": {
+    "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/commands-frozen.jsonl",
+    "bytes": 17093,
+    "sha256": "c0b884463d1cb08ae5f93b501ce88e3dbd8281ce15d3fdfbcf55053c93b48e88"
+  },
+  "semanticClassification": {
+    "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/semantic-classification.json",
+    "bytes": 78459,
+    "sha256": "cc57d3bfb86c88e277b191c770c8cad1adfe51e49a548909664002b5cb6c93dd"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015/artifact-index.json",
+    "bytes": 434796,
+    "sha256": "c81e5ade81ec393a0cc32a16c771b6cf2a4302c3cdba32d401442ad0023ee556"
+  },
+  "allRuntimeAndLiveReadsFinished": true
+}

@@ -1,0 +1,118 @@
+{
+  "baseline": {
+    "head": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/publicDocsGraph.test.ts",
+      "--maxWorkers=1",
+      "--reporter=verbose",
+      "--reporter=json",
+      "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/report.json"
+    ],
+    "exit": 1,
+    "durationMs": 1470,
+    "totals": {
+      "numTotalTests": 6,
+      "numPassedTests": 5,
+      "numFailedTests": 1,
+      "numPendingTests": 0
+    },
+    "failureMessages": [
+      [
+        "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    ],
+    "sourceStatusAfter": "",
+    "artifacts": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/raw.log",
+        "sha256": "145619f0a64200474e2ff9774a27107ed30ebe0e61a30e930091ddb9e2ffa2ad",
+        "bytes": 1951
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/report.json",
+        "sha256": "aad80b2235e9dec484d93c3813a50414d0b8560cd49bad82974ad321043ab1a8",
+        "bytes": 3971
+      }
+    ]
+  },
+  "completeNormalizedComparison": {
+    "candidateHead": "b2b512513eba8799b9050dbe13d178bfe448acef",
+    "baselineHead": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+    "scope": "Complete native failed-assertion name/message arrays; only the two known clone path prefixes normalized",
+    "candidateFailures": [
+      {
+        "name": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "messages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      }
+    ],
+    "baselineFailures": [
+      {
+        "name": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "messages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      }
+    ],
+    "exactNormalizedArraysEqual": true
+  },
+  "scope": "The original comparison remains historical. The completed H2 focused149 comparison independently matches the complete clean-int assertion name and ordered failureMessages after only literal clone-root replacement; both exits remain 1. No future Q2 full nonpass is preclassified.",
+  "historicalComparisonProductHead": "b2b512513eba8799b9050dbe13d178bfe448acef",
+  "landingComparison": {
+    "scope": "Exact complete native focused assertion comparison; only literal clone-root prefix replacement",
+    "candidate": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-focused149-v1/summary.json",
+      "sha256": "961f1894ce715e9ad6d9819fe679caea8dd623c6ede4457f908670c6646109c9",
+      "bytes": 173149
+    },
+    "candidateReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/landing-product-focused149-v1/report.json",
+      "sha256": "e7fdc40728e2ccd627eb63bfc68140a5b7845592b7b695df83e7c2204e9c48e0",
+      "bytes": 1762342
+    },
+    "baselineSummary": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/summary.json",
+      "sha256": "c112d79eeaec4e9d03205041e8b01c6115365fa58160b32b00d0d8cf6e72cb08",
+      "bytes": 2510
+    },
+    "baselineReport": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/baseline-public-docs-graph-v1/report.json",
+      "sha256": "aad80b2235e9dec484d93c3813a50414d0b8560cd49bad82974ad321043ab1a8",
+      "bytes": 3971
+    },
+    "baselineInt": "8d884d3ea986f707059a0dc3184dcebae21d2a7b",
+    "candidateHead": "ae2d3a72ce3353967bc0717ba09d4eeab078f7d2",
+    "candidateExit": 1,
+    "baselineExit": 1,
+    "selected149PathsVerified": true,
+    "candidateFailures": [
+      {
+        "fullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "failureMessages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE_ROOT>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      }
+    ],
+    "baselineFailures": [
+      {
+        "fullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "failureMessages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE_ROOT>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      }
+    ],
+    "exactCompleteOrderedFailureMessagesEqual": true,
+    "classification": "same baseline docs failure; both native exits remain 1; no green qualification or unrelated failure waiver",
+    "evidence": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/focused149-exact-int-baseline-comparison-h2-v1.json",
+      "sha256": "69f004d9f848027985977f2ac31d748fbf42ae9200bda38c494805f43e4781f5",
+      "bytes": 3670
+    },
+    "state": "completed_exact_native_arrays_match_baseline_failure"
+  }
+}

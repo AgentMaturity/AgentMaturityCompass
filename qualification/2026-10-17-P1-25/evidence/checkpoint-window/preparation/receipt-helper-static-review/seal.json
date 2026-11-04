@@ -1,0 +1,34 @@
+{
+  "schema": "p125k-private-receipt-helper-independent-static-review-seal/1",
+  "at": "2026-10-16T23:48:50.134345+00:00",
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v4/assemble-extension.py.source.txt",
+    "bytes": 32762,
+    "sha256": "e3a7f161979310df0e0908023d54f4ad9b4529961b1bb03eea64bb2d52e8b197"
+  },
+  "preferredAuthorSeal": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v4/seal.json",
+    "bytes": 2204,
+    "sha256": "1122eb25dfcc5a30ea82f5a0177cb2711d17e61b8ea31306859af2e8a0ac340a"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-helper-static-review/review.json",
+      "bytes": 9031,
+      "sha256": "09c9cdf02bdc50af5663ff19807516385a76a6d0ba9d6993f0838df9264d9559"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-helper-static-review/input-pins.json",
+      "bytes": 17331,
+      "sha256": "c0e15d217da5164b8385628164eb44febb4889d0dd3cd2142d083961fde4dbc8"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-helper-static-review/README.md",
+      "bytes": 984,
+      "sha256": "891890972aa8db05bedb5d308e9e3570374ae3709b31e371453387060ac7b416"
+    }
+  ],
+  "blockers": [],
+  "staticOnly": true,
+  "noExecutionOrCheckoutWrites": true
+}

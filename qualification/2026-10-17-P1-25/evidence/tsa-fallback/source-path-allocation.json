@@ -1,0 +1,23 @@
+{
+  "schema": "p125f-root-source-path-allocation/1",
+  "at": "2026-10-16T22:11:39.014821+00:00",
+  "sourceHead": "a0cfbc280f2b11207205541ba89112c125c29895",
+  "sourceBranch": "codex/p1-25-fallback-qualification",
+  "exactNewTestPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaFallback.test.ts",
+  "scopeSnapshotSha256": "904dbb37976003293763a78496c76db8c2f8bc8fe5b5df9ad7b00ac8f58de38c",
+  "finite182Roots364Absences15Histories": true,
+  "rootWholeCandidateAndActualFlowRead": true,
+  "candidateSha256": "3f3eb0f312d18eef34d9625fe725b385ad29ff9d2042c533a1a41acdb2c1c5a0",
+  "candidate45Rebind": "43 current exact;2 own committed metadata successors explicitly admitted, original oldREADME/receipt privately and historically exact. Source/runtime inputs unchanged.",
+  "sourceOnlyNewTestFile": true,
+  "all128ProtectedAndSevenNativePinsExact": true,
+  "heldR18RowsIndexHeadExact": true,
+  "hostedWip": 0,
+  "allPrChangedPathsIncludingDependabotChecked": true,
+  "freezeExit": 0,
+  "d15": "none",
+  "actualBaselineVerifier17Passed": true,
+  "prospectiveCombined21NotYetExecuted": true,
+  "allHoldsRetained": true,
+  "metadataSuccessorsNotYetAllocated": true
+}

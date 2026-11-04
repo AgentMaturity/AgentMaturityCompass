@@ -1,0 +1,21 @@
+{
+  "id": "Q13-render",
+  "root": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--restored/Q13-render-p041-45J2Fw/fixture",
+  "home": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--restored/Q13-render-p041-45J2Fw/home",
+  "temporary": "/private/tmp/p0-41-causal-qualification-v2-20261015/cli-artifacts/P041-M2-vacuous-file-pass--restored/Q13-render-p041-45J2Fw/tmp",
+  "envKeys": [
+    "GIT_CONFIG_GLOBAL",
+    "GIT_CONFIG_NOSYSTEM",
+    "GIT_TERMINAL_PROMPT",
+    "HOME",
+    "LANG",
+    "LC_ALL",
+    "PATH",
+    "TMPDIR"
+  ],
+  "scriptBytes": 23978,
+  "scriptSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+  "borrowedModules": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules",
+  "preserved": true,
+  "artifactMode": "required by later qualification runner; optional for ordinary test invocation"
+}

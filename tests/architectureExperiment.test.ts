@@ -1,4 +1,5 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
+import * as stats from "../src/experiments/stats.js";
 import {
   createArchitectureSpec,
   createProbe,
@@ -447,5 +448,30 @@ describe("quickArchitectureComparison", () => {
     });
 
     expect(result.report.totalProbes).toBe(2);
+  });
+});
+
+
+describe("AXE-30 architecture interval admission", () => {
+  test.each(["dimension", "overall"] as const)("refuses an insufficient %s interval from the shared estimator", (scope) => {
+    const probes = [0, 1].map((index) => createProbe({
+      category: "fixture", promptText: "fixture",
+      measureDimension: scope === "dimension" ? "same-dimension" : `dimension-${index}`,
+    }));
+    const experiment = createArchitectureExperiment({
+      name: "Insufficient upstream interval", baselineSpec: makeSpec(),
+      candidateSpec: makeSpec({ artifactSha256: "b".repeat(64) }), probes,
+    });
+    const baseline = simulateProbeOutcomes(experiment.baselineSpec, probes, 42);
+    const candidate = simulateProbeOutcomes(experiment.candidateSpec, probes, 43);
+    const estimator = vi.spyOn(stats, "bootstrapDifferenceCI").mockReturnValue({
+      status: "insufficient", interval: null, reason: `insufficient ${scope} observations`,
+    });
+    try {
+      expect(() => analyzeArchitectureExperiment(experiment, baseline, candidate))
+        .toThrow(`insufficient ${scope} observations`);
+    } finally {
+      estimator.mockRestore();
+    }
   });
 });

@@ -1,3 +1,4 @@
+import { mean } from "../experiments/stats.js";
 import type {
   ConfidenceDriftEntry,
   ConfidenceDriftReport,
@@ -53,8 +54,7 @@ function computeAverageConfidence(entries: ConfidenceDriftEntry[], count: number
     return null;
   }
 
-  const sum = taken.reduce((acc, entry) => acc + entry.confidence, 0);
-  return sum / taken.length;
+  return mean(taken.map((entry) => entry.confidence));
 }
 
 function computeLastAverageConfidence(entries: ConfidenceDriftEntry[], count: number): number | null {
@@ -69,8 +69,7 @@ function computeLastAverageConfidence(entries: ConfidenceDriftEntry[], count: nu
     return null;
   }
 
-  const sum = taken.reduce((acc, entry) => acc + entry.confidence, 0);
-  return sum / taken.length;
+  return mean(taken.map((entry) => entry.confidence));
 }
 
 export function trackConfidenceDrift(

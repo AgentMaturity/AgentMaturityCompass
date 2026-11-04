@@ -1,0 +1,37 @@
+{
+  "startedUtc": "2026-10-15T06:44:39.789746+00:00",
+  "pid": 23577,
+  "sessionLeaderExpected": 23577,
+  "observedPgidAfterLaunch": 23577,
+  "ownedPgid": 23577,
+  "cwd": "/private/tmp/p0-11-causal-qualification-20261015/closure",
+  "argv": [
+    "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+    "run",
+    "tests/threatModelMap.test.ts",
+    "--cache=false",
+    "--maxWorkers=1",
+    "--no-file-parallelism",
+    "--reporter=default",
+    "--reporter=json",
+    "--reporter=/private/tmp/p0-11-causal-qualification-20261015/driver/observer-reporter.mjs",
+    "--outputFile.json=/private/tmp/p0-11-causal-qualification-20261015/phases/L1-optional-historical-literal-whole-branch-removal--baseline/raw.json"
+  ],
+  "environmentKeys": [
+    "AMC_P021_RUNTIME_OBSERVER_PATH",
+    "GIT_NO_LAZY_FETCH",
+    "HOME",
+    "NODE_ENV",
+    "NO_COLOR",
+    "PATH",
+    "TMPDIR"
+  ],
+  "environmentPolicy": "Explicit small allowlist; no OS or universal network isolation.",
+  "borrowedDependencies": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/node_modules",
+  "node": {
+    "path": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+    "bytes": 67024,
+    "sha256": "d358db924f68e1f8736e38fc4adbdd9b06c2a4db3e8c683d4719032bd71be8fd"
+  }
+}

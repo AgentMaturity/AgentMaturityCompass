@@ -1,0 +1,1043 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 28776,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockSurfaces.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentEvidencePacket.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/mcpServer.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/regulatoryClocks.test.ts"
+  ],
+  "testCount": 68,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1780715540",
+      "name": "tests/incidentClockEvents.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1780715540_0",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_0",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events persists a genuine signed row and verifies after closing and reopening SQLite",
+      "fullName": "stored signed incident clock events persists a genuine signed row and verifies after closing and reopening SQLite",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_1",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events trigger then notified 'before due'",
+      "fullName": "stored signed incident clock events trigger then notified 'before due'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_2",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events trigger then notified 'at due'",
+      "fullName": "stored signed incident clock events trigger then notified 'at due'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_3",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events trigger then notified 'after due'",
+      "fullName": "stored signed incident clock events trigger then notified 'after due'",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_4",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events rejects a pre-creation notice even when its trigger has not started, with no appended row",
+      "fullName": "stored signed incident clock events rejects a pre-creation notice even when its trigger has not started, with no appended row",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_5",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events rejects a trigger before creation without appending",
+      "fullName": "stored signed incident clock events rejects a trigger before creation without appending",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_6",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events accepts exactly five minutes skew and refuses one millisecond more",
+      "fullName": "stored signed incident clock events accepts exactly five minutes skew and refuses one millisecond more",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_7",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events refuses invalid event { kind: 'NOTIFIED', …(1) }",
+      "fullName": "stored signed incident clock events refuses invalid event { kind: 'NOTIFIED', …(1) }",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_8",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events refuses invalid event { triggerOrClockId: 'UNKNOWN_TRIGGER' }",
+      "fullName": "stored signed incident clock events refuses invalid event { triggerOrClockId: 'UNKNOWN_TRIGGER' }",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_9",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events refuses invalid event { recordedBy: ' ' }",
+      "fullName": "stored signed incident clock events refuses invalid event { recordedBy: ' ' }",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_10",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events refuses invalid event { ts: NaN }",
+      "fullName": "stored signed incident clock events refuses invalid event { ts: NaN }",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_11",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events refuses a notice before its actual trigger and a second notice",
+      "fullName": "stored signed incident clock events refuses a notice before its actual trigger and a second notice",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_12",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events earlier genuine trigger claims may bring a deadline forward, never postpone it",
+      "fullName": "stored signed incident clock events earlier genuine trigger claims may bring a deadline forward, never postpone it",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_13",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events live SQL append-only guards reject UPDATE and DELETE",
+      "fullName": "stored signed incident clock events live SQL append-only guards reject UPDATE and DELETE",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_14",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events cold edited timestamp is refused by event id after valid original signature proof",
+      "fullName": "stored signed incident clock events cold edited timestamp is refused by event id after valid original signature proof",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected [Function] to throw an error",
+          "actual": "undefined",
+          "expected": "null",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected:\nnull\n\n+ Received:\nundefined",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:227:105\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:222:99\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+              "line": 227,
+              "column": 105
+            },
+            {
+              "method": "withFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+              "line": 222,
+              "column": 99
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_15",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events editing signed station cannot hide a corrupt row from its original station query",
+      "fullName": "stored signed incident clock events editing signed station cannot hide a corrupt row from its original station query",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected [Function] to throw an error",
+          "actual": "undefined",
+          "expected": "null",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected:\nnull\n\n+ Received:\nundefined",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:238:105\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:231:98\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+              "line": 238,
+              "column": 105
+            },
+            {
+              "method": "withFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+              "line": 231,
+              "column": 98
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_16",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events authentic other-station rows remain independent and wrong trust keys refuse",
+      "fullName": "stored signed incident clock events authentic other-station rows remain independent and wrong trust keys refuse",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "message": "expected [Function] to throw an error",
+          "actual": "undefined",
+          "expected": "null",
+          "showDiff": true,
+          "operator": "strictEqual",
+          "diff": "- Expected:\nnull\n\n+ Received:\nundefined",
+          "name": "AssertionError",
+          "ok": false,
+          "stack": "AssertionError: expected [Function] to throw an error\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1552:16)\n    at Proxy.<anonymous> (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/expect/dist/index.js:1156:15)\n    at Proxy.methodWrapper (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/chai/index.js:1700:25)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:247:110\n    at withFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:123:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts:241:93\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)",
+          "stacks": [
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+              "line": 247,
+              "column": 110
+            },
+            {
+              "method": "withFixture",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+              "line": 123,
+              "column": 5
+            },
+            {
+              "method": "",
+              "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockEvents.test.ts",
+              "line": 241,
+              "column": 93
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_0_17",
+      "name": "tests/incidentClockEvents.test.ts stored signed incident clock events listing serializes operator and server times plus local-trust and applicability limits",
+      "fullName": "stored signed incident clock events listing serializes operator and server times plus local-trust and applicability limits",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1780715540_1",
+      "name": "tests/incidentClockEvents.test.ts US financial clock literals at a fixed date",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_1_0",
+      "name": "tests/incidentClockEvents.test.ts US financial clock literals at a fixed date 'nydfs-500-17-notice' has an independent literal due-date expectation",
+      "fullName": "US financial clock literals at a fixed date 'nydfs-500-17-notice' has an independent literal due-date expectation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_1_1",
+      "name": "tests/incidentClockEvents.test.ts US financial clock literals at a fixed date 'nydfs-500-17-extortion-notice' has an independent literal due-date expectation",
+      "fullName": "US financial clock literals at a fixed date 'nydfs-500-17-extortion-notice' has an independent literal due-date expectation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_1_2",
+      "name": "tests/incidentClockEvents.test.ts US financial clock literals at a fixed date 'nydfs-500-17-extortion-explanation' has an independent literal due-date expectation",
+      "fullName": "US financial clock literals at a fixed date 'nydfs-500-17-extortion-explanation' has an independent literal due-date expectation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_1_3",
+      "name": "tests/incidentClockEvents.test.ts US financial clock literals at a fixed date 'glba-314-4j-ftc-notice' has an independent literal due-date expectation",
+      "fullName": "US financial clock literals at a fixed date 'glba-314-4j-ftc-notice' has an independent literal due-date expectation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_1_4",
+      "name": "tests/incidentClockEvents.test.ts US financial clock literals at a fixed date 'bsa-1020-320-sar-filing' has an independent literal due-date expectation",
+      "fullName": "US financial clock literals at a fixed date 'bsa-1020-320-sar-filing' has an independent literal due-date expectation",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_1_5",
+      "name": "tests/incidentClockEvents.test.ts US financial clock literals at a fixed date wealth lists five, technology excludes SAR, health excludes the five and sources remain experimental",
+      "fullName": "US financial clock literals at a fixed date wealth lists five, technology excludes SAR, health excludes the five and sources remain experimental",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1780715540_1_6",
+      "name": "tests/incidentClockEvents.test.ts US financial clock literals at a fixed date station and ISO parsing reject an unknown station and a timezone-free timestamp",
+      "fullName": "US financial clock literals at a fixed date station and ISO parsing reject an unknown station and a timezone-free timestamp",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1149915105",
+      "name": "tests/incidentClockSurfaces.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentClockSurfaces.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1149915105_0",
+      "name": "tests/incidentClockSurfaces.test.ts P1-17 actual incident-clock surfaces",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1149915105_0_0",
+      "name": "tests/incidentClockSurfaces.test.ts P1-17 actual incident-clock surfaces the compiled CLI lists a genuinely signed fixed-date stored incident and its verified clock events as JSON",
+      "fullName": "P1-17 actual incident-clock surfaces the compiled CLI lists a genuinely signed fixed-date stored incident and its verified clock events as JSON",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1149915105_0_1",
+      "name": "tests/incidentClockSurfaces.test.ts P1-17 actual incident-clock surfaces the actual HTTP route returns 200/201/400/404 over owned loopback and persists a genuine event without a fabricated principal",
+      "fullName": "P1-17 actual incident-clock surfaces the actual HTTP route returns 200/201/400/404 over owned loopback and persists a genuine event without a fabricated principal",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1149915105_0_2",
+      "name": "tests/incidentClockSurfaces.test.ts P1-17 actual incident-clock surfaces the genuine MCP SDK client lists and invokes the read-only clock tool with conservative claims and natural transport closure",
+      "fullName": "P1-17 actual incident-clock surfaces the genuine MCP SDK client lists and invokes the read-only clock tool with conservative claims and natural transport closure",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1898690228",
+      "name": "tests/incidentEvidencePacket.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/incidentEvidencePacket.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1898690228_0",
+      "name": "tests/incidentEvidencePacket.test.ts human oversight record",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_0_0",
+      "name": "tests/incidentEvidencePacket.test.ts human oversight record signs a record tied to the incident hash and verifies with the matching public key",
+      "fullName": "human oversight record signs a record tied to the incident hash and verifies with the matching public key",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_0_1",
+      "name": "tests/incidentEvidencePacket.test.ts human oversight record cannot be backdated past the incident timestamp",
+      "fullName": "human oversight record cannot be backdated past the incident timestamp",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_0_2",
+      "name": "tests/incidentEvidencePacket.test.ts human oversight record a stored record whose reviewedTs was edited to precede the incident fails verification",
+      "fullName": "human oversight record a stored record whose reviewedTs was edited to precede the incident fails verification",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_0_3",
+      "name": "tests/incidentEvidencePacket.test.ts human oversight record a validly signed but backdated record is rejected by the verifier itself",
+      "fullName": "human oversight record a validly signed but backdated record is rejected by the verifier itself",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_0_4",
+      "name": "tests/incidentEvidencePacket.test.ts human oversight record a record for a different incident hash is rejected",
+      "fullName": "human oversight record a record for a different incident hash is rejected",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_0_5",
+      "name": "tests/incidentEvidencePacket.test.ts human oversight record requires a reviewer and a rationale",
+      "fullName": "human oversight record requires a reviewer and a rationale",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_0_6",
+      "name": "tests/incidentEvidencePacket.test.ts human oversight record append-only JSONL file round-trips and chains records",
+      "fullName": "human oversight record append-only JSONL file round-trips and chains records",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1898690228_1",
+      "name": "tests/incidentEvidencePacket.test.ts incident evidence packet",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_1_0",
+      "name": "tests/incidentEvidencePacket.test.ts incident evidence packet lists missing evidence explicitly when nothing beyond the incident exists",
+      "fullName": "incident evidence packet lists missing evidence explicitly when nothing beyond the incident exists",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_1_1",
+      "name": "tests/incidentEvidencePacket.test.ts incident evidence packet includes supplied evidence verbatim and drops the corresponding missing items",
+      "fullName": "incident evidence packet includes supplied evidence verbatim and drops the corresponding missing items",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_1_2",
+      "name": "tests/incidentEvidencePacket.test.ts incident evidence packet an oversight record that fails verification is reported, not silently accepted",
+      "fullName": "incident evidence packet an oversight record that fails verification is reported, not silently accepted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_1_3",
+      "name": "tests/incidentEvidencePacket.test.ts incident evidence packet lists unverified clock sources and overdue clocks",
+      "fullName": "incident evidence packet lists unverified clock sources and overdue clocks",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_1_4",
+      "name": "tests/incidentEvidencePacket.test.ts incident evidence packet renders Markdown with the missing list and the clock table",
+      "fullName": "incident evidence packet renders Markdown with the missing list and the clock table",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1898690228_1_5",
+      "name": "tests/incidentEvidencePacket.test.ts incident evidence packet a packet generated before the incident timestamp is rejected",
+      "fullName": "incident evidence packet a packet generated before the incident timestamp is rejected",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-845928068",
+      "name": "tests/mcpServer.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/mcpServer.test.ts",
+      "state": "pass",
+      "hooks": {
+        "beforeAll": "pass",
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-845928068_0",
+      "name": "tests/mcpServer.test.ts MCP_TOOL_METADATA",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_0_0",
+      "name": "tests/mcpServer.test.ts MCP_TOOL_METADATA exports 11 tools",
+      "fullName": "MCP_TOOL_METADATA exports 11 tools",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_0_1",
+      "name": "tests/mcpServer.test.ts MCP_TOOL_METADATA all tool names start with amc_",
+      "fullName": "MCP_TOOL_METADATA all tool names start with amc_",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_0_2",
+      "name": "tests/mcpServer.test.ts MCP_TOOL_METADATA all tool descriptions include (read-only)",
+      "fullName": "MCP_TOOL_METADATA all tool descriptions include (read-only)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_0_3",
+      "name": "tests/mcpServer.test.ts MCP_TOOL_METADATA tool metadata has required fields",
+      "fullName": "MCP_TOOL_METADATA tool metadata has required fields",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-845928068_1",
+      "name": "tests/mcpServer.test.ts MCP config IDE entries",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_1_0",
+      "name": "tests/mcpServer.test.ts MCP config IDE entries config command outputs valid JSON with --json flag",
+      "fullName": "MCP config IDE entries config command outputs valid JSON with --json flag",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-845928068_2",
+      "name": "tests/mcpServer.test.ts validateWorkspace",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_2_0",
+      "name": "tests/mcpServer.test.ts validateWorkspace rejects non-AMC directory",
+      "fullName": "validateWorkspace rejects non-AMC directory",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_2_1",
+      "name": "tests/mcpServer.test.ts validateWorkspace accepts valid AMC workspace",
+      "fullName": "validateWorkspace accepts valid AMC workspace",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-845928068_3",
+      "name": "tests/mcpServer.test.ts format normalization",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_3_0",
+      "name": "tests/mcpServer.test.ts format normalization accepts md, markdown, and json as format values",
+      "fullName": "format normalization accepts md, markdown, and json as format values",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-845928068_4",
+      "name": "tests/mcpServer.test.ts CLI registration",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_4_0",
+      "name": "tests/mcpServer.test.ts CLI registration registerMcpCommands attaches to program without error",
+      "fullName": "CLI registration registerMcpCommands attaches to program without error",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_4_1",
+      "name": "tests/mcpServer.test.ts CLI registration registerTransparencyReportCommands attaches to existing transparency command",
+      "fullName": "CLI registration registerTransparencyReportCommands attaches to existing transparency command",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-845928068_4_2",
+      "name": "tests/mcpServer.test.ts CLI registration registerTransparencyReportCommands creates transparency command if missing",
+      "fullName": "CLI registration registerTransparencyReportCommands creates transparency command if missing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1979398280",
+      "name": "tests/regulatoryClocks.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-NwvEUF/checkout/tests/regulatoryClocks.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1979398280_0",
+      "name": "tests/regulatoryClocks.test.ts regulatory clock table",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_0_0",
+      "name": "tests/regulatoryClocks.test.ts regulatory clock table has at least 6 instruments, each with url + retrievedAt or verified:false",
+      "fullName": "regulatory clock table has at least 6 instruments, each with url + retrievedAt or verified:false",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_0_1",
+      "name": "tests/regulatoryClocks.test.ts regulatory clock table clock ids are unique and every clock names at least one station",
+      "fullName": "regulatory clock table clock ids are unique and every clock names at least one station",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_0_2",
+      "name": "tests/regulatoryClocks.test.ts regulatory clock table health station surfaces HIPAA and EU AI Act clocks",
+      "fullName": "regulatory clock table health station surfaces HIPAA and EU AI Act clocks",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1979398280_1",
+      "name": "tests/regulatoryClocks.test.ts due-date arithmetic from a fixed trigger",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_1_0",
+      "name": "tests/regulatoryClocks.test.ts due-date arithmetic from a fixed trigger hours add exactly",
+      "fullName": "due-date arithmetic from a fixed trigger hours add exactly",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_1_1",
+      "name": "tests/regulatoryClocks.test.ts due-date arithmetic from a fixed trigger calendar days add exactly across a month boundary",
+      "fullName": "due-date arithmetic from a fixed trigger calendar days add exactly across a month boundary",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_1_2",
+      "name": "tests/regulatoryClocks.test.ts due-date arithmetic from a fixed trigger work days skip Saturday and Sunday (UTC)",
+      "fullName": "due-date arithmetic from a fixed trigger work days skip Saturday and Sunday (UTC)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_1_3",
+      "name": "tests/regulatoryClocks.test.ts due-date arithmetic from a fixed trigger months add a calendar month and clamp the day",
+      "fullName": "due-date arithmetic from a fixed trigger months add a calendar month and clamp the day",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_1_4",
+      "name": "tests/regulatoryClocks.test.ts due-date arithmetic from a fixed trigger rejects non-positive or non-integer amounts",
+      "fullName": "due-date arithmetic from a fixed trigger rejects non-positive or non-integer amounts",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1979398280_2",
+      "name": "tests/regulatoryClocks.test.ts attachRegulatoryClocks on a health incident",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_2_0",
+      "name": "tests/regulatoryClocks.test.ts attachRegulatoryClocks on a health incident lists HIPAA individual notice and EU AI Act clocks with computed due dates",
+      "fullName": "attachRegulatoryClocks on a health incident lists HIPAA individual notice and EU AI Act clocks with computed due dates",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_2_1",
+      "name": "tests/regulatoryClocks.test.ts attachRegulatoryClocks on a health incident the awareness trigger defaults to incident.createdTs and can be overridden",
+      "fullName": "attachRegulatoryClocks on a health incident the awareness trigger defaults to incident.createdTs and can be overridden",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_2_2",
+      "name": "tests/regulatoryClocks.test.ts attachRegulatoryClocks on a health incident a trigger earlier than the incident timestamp is rejected",
+      "fullName": "attachRegulatoryClocks on a health incident a trigger earlier than the incident timestamp is rejected",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_2_3",
+      "name": "tests/regulatoryClocks.test.ts attachRegulatoryClocks on a health incident clocks whose trigger has not happened are NOT_STARTED with no due date",
+      "fullName": "attachRegulatoryClocks on a health incident clocks whose trigger has not happened are NOT_STARTED with no due date",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_2_4",
+      "name": "tests/regulatoryClocks.test.ts attachRegulatoryClocks on a health incident a chained trigger starts the dependent clock",
+      "fullName": "attachRegulatoryClocks on a health incident a chained trigger starts the dependent clock",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1979398280_3",
+      "name": "tests/regulatoryClocks.test.ts overdue detection",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_3_0",
+      "name": "tests/regulatoryClocks.test.ts overdue detection is PENDING before the deadline, DUE_SOON inside the window, OVERDUE after it",
+      "fullName": "overdue detection is PENDING before the deadline, DUE_SOON inside the window, OVERDUE after it",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_3_1",
+      "name": "tests/regulatoryClocks.test.ts overdue detection a satisfied clock is SATISFIED even after the deadline, but not if satisfied late",
+      "fullName": "overdue detection a satisfied clock is SATISFIED even after the deadline, but not if satisfied late",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1979398280_3_2",
+      "name": "tests/regulatoryClocks.test.ts overdue detection a satisfaction timestamp before the trigger is rejected",
+      "fullName": "overdue detection a satisfaction timestamp before the trigger is rejected",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

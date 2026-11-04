@@ -1,0 +1,11 @@
+{
+  "argv": [
+    "git",
+    "commit",
+    "-m",
+    "test(time): qualify offline TSA fallback and refusal continuation"
+  ],
+  "exit": 0,
+  "stdout": "[codex/p1-25-fallback-qualification d8b5c3250] test(time): qualify offline TSA fallback and refusal continuation\n 11 files changed, 306 insertions(+), 15 deletions(-)\n create mode 100644 tests/time/tsaFallback.test.ts\n",
+  "stderr": ""
+}

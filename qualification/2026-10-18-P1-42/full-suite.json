@@ -1,0 +1,109 @@
+{
+ "command": "npx vitest run --reporter=json",
+ "commit": "2d02681e6 (before the second int merge)",
+ "durationSeconds": 3222,
+ "numTotalTests": 25092,
+ "numPassedTests": 25026,
+ "numFailedTests": 59,
+ "numPendingTests": 7,
+ "numTotalTestSuites": 5259,
+ "failedFiles": {
+  "tests/amc1471ApprovalDelivery.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/amc1473SignedControlLifecycle.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/amc1477ObserveOnlyRollout.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/assuranceLab.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/assuranceRunNoSign.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load; passes alone (366/366 with the other two)"
+  },
+  "tests/cliDelegateFlag.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/connectHookCli.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load; passes alone (366/366 with the other two)"
+  },
+  "tests/doctorFreshInstallBoundary.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/dogfoodMaturityEvidence.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/llmRuntimeDispatch.test.ts": {
+   "failed": 2,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/nativeBudgets.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/publicDocsArtifact.test.ts": {
+   "failed": 1,
+   "classification": "also failing on int, outside P1-42"
+  },
+  "tests/publicDocsGraph.test.ts": {
+   "failed": 1,
+   "classification": "also failing on int, outside P1-42"
+  },
+  "tests/releaseEngineeringPack.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/releaseSecretScanCoverage.test.ts": {
+   "failed": 2,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/sessionStoreConformance.test.ts": {
+   "failed": 8,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/studioNativeTaskService.test.ts": {
+   "failed": 3,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/assurance/industryPackFailClosed.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load; passes alone (366/366 with the other two)"
+  },
+  "tests/keys/atomicRotation.test.ts": {
+   "failed": 1,
+   "classification": "timed out under load (vitest 'STACK_TRACE_ERROR' or killed child); imports no module P1-42 changes"
+  },
+  "tests/piAi/piAiAdapterContract.test.ts": {
+   "failed": 20,
+   "classification": "@earendil-works/pi-ai is not installed in this worktree's node_modules (int added the devDependency after the worktree's install); unrelated to P1-42"
+  },
+  "tests/piAi/piAiCli.test.ts": {
+   "failed": 2,
+   "classification": "@earendil-works/pi-ai is not installed in this worktree's node_modules (int added the devDependency after the worktree's install); unrelated to P1-42"
+  },
+  "tests/piAi/piAiDerivation.test.ts": {
+   "failed": 4,
+   "classification": "@earendil-works/pi-ai is not installed in this worktree's node_modules (int added the devDependency after the worktree's install); unrelated to P1-42"
+  },
+  "tests/piAi/piAiLoader.test.ts": {
+   "failed": 1,
+   "classification": "@earendil-works/pi-ai is not installed in this worktree's node_modules (int added the devDependency after the worktree's install); unrelated to P1-42"
+  },
+  "tests/performance/sessionSpine.performance.test.ts": {
+   "failed": 2,
+   "classification": "throughput floor missed under machine load"
+  }
+ },
+ "note": "Local macOS arm64 under heavy load from other sessions (load average up to 400 earlier in the day). The release gate's own full-suite step was killed at its 900 s limit, so this plain run is the full-suite record."
+}

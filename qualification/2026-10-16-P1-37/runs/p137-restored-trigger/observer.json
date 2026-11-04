@@ -1,0 +1,666 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 40764,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/autoCompaction.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/surfaceCompaction.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/surfaceHistoryCompaction.test.ts"
+  ],
+  "testCount": 51,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1152033327",
+      "name": "tests/autoCompaction.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/autoCompaction.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1152033327_0",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_0",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence uses the exact threshold at 7000 measured prompt tokens",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence uses the exact threshold at 7000 measured prompt tokens",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_1",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence uses the exact threshold at 7999 measured prompt tokens",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence uses the exact threshold at 7999 measured prompt tokens",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_2",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence uses the exact threshold at 8000 measured prompt tokens",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence uses the exact threshold at 8000 measured prompt tokens",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_3",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence prunes only old results at 8500, protects the recent two before counts and records the next measured effect",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence prunes only old results at 8500, protects the recent two before counts and records the next measured effect",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_4",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence orders eligible large outputs by measured bytes then original order, leaving small and recent outputs intact",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_5",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence retains the actual encrypted spill object and measures the signed preview rather than full-output tokens",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence retains the actual encrypted spill object and measures the signed preview rather than full-output tokens",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_6",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence does not compact with unset and reports unmeasured usage only when enabled",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence does not compact with unset and reports unmeasured usage only when enabled",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_7",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence does not compact with null and reports unmeasured usage only when enabled",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence does not compact with null and reports unmeasured usage only when enabled",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_8",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence refuses a successful provider finish without usage before the integrated compactor hook",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence refuses a successful provider finish without usage before the integrated compactor hook",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_9",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence reports null usage without edits at the public AutoCompactor class boundary over a genuine signed step end",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence reports null usage without edits at the public AutoCompactor class boundary over a genuine signed step end",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_10",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence caps successful compaction boundaries at three in one turn and resets the count on the next turn",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence caps successful compaction boundaries at three in one turn and resets the count on the next turn",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_11",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence uses a real no-tools summary request at the next high boundary, preserves user authority and exports public signed evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_0_12",
+      "name": "tests/autoCompaction.test.ts automatic compaction: synthetic provider usage, real signed loop evidence replays a genuine manual v1 receipt and reconstructs a later real request",
+      "fullName": "automatic compaction: synthetic provider usage, real signed loop evidence replays a genuine manual v1 receipt and reconstructs a later real request",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1152033327_1",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_0",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds requires a trigger on an otherwise complete synthetic v2 structural negative",
+      "fullName": "automatic compaction admission and measurement bounds requires a trigger on an otherwise complete synthetic v2 structural negative",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_1",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds fills literal defaults and freezes the declared policy",
+      "fullName": "automatic compaction admission and measurement bounds fills literal defaults and freezes the declared policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_2",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses zero window instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses zero window instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_3",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses negative window instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses negative window instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_4",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses unsafe window instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses unsafe window instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_5",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses low threshold instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses low threshold instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_6",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses high threshold instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses high threshold instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_7",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses NaN threshold instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses NaN threshold instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_8",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses zero recent steps instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses zero recent steps instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_9",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses fractional recent steps instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses fractional recent steps instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_10",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses excessive recent steps instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses excessive recent steps instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_11",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses zero prune size instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses zero prune size instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_12",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses excessive prune size instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses excessive prune size instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_13",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses zero per-turn limit instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses zero per-turn limit instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_14",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses excessive per-turn limit instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses excessive per-turn limit instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_15",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds refuses non-boolean summary instead of silently changing policy",
+      "fullName": "automatic compaction admission and measurement bounds refuses non-boolean summary instead of silently changing policy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_16",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds threads CLI options without ignoring flags that lack a context window",
+      "fullName": "automatic compaction admission and measurement bounds threads CLI options without ignoring flags that lack a context window",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1152033327_1_17",
+      "name": "tests/autoCompaction.test.ts automatic compaction admission and measurement bounds uses disjoint input/cache counts, not output counts or payload-byte estimates",
+      "fullName": "automatic compaction admission and measurement bounds uses disjoint input/cache counts, not output counts or payload-byte estimates",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1324214161",
+      "name": "tests/surfaceCompaction.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/surfaceCompaction.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1324214161_0",
+      "name": "tests/surfaceCompaction.test.ts a compaction replaces a tool result on the surface",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1324214161_0_0",
+      "name": "tests/surfaceCompaction.test.ts a compaction replaces a tool result on the surface shrinks the projection",
+      "fullName": "a compaction replaces a tool result on the surface shrinks the projection",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1324214161_0_1",
+      "name": "tests/surfaceCompaction.test.ts a compaction replaces a tool result on the surface grows the log rather than editing it",
+      "fullName": "a compaction replaces a tool result on the surface grows the log rather than editing it",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1324214161_0_2",
+      "name": "tests/surfaceCompaction.test.ts a compaction replaces a tool result on the surface leaves the per-session hash chain intact",
+      "fullName": "a compaction replaces a tool result on the surface leaves the per-session hash chain intact",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1324214161_0_3",
+      "name": "tests/surfaceCompaction.test.ts a compaction replaces a tool result on the surface puts the replacement text on the surface, and it is a logged row",
+      "fullName": "a compaction replaces a tool result on the surface puts the replacement text on the surface, and it is a logged row",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1324214161_1",
+      "name": "tests/surfaceCompaction.test.ts compaction refuses what it cannot do honestly",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1324214161_1_0",
+      "name": "tests/surfaceCompaction.test.ts compaction refuses what it cannot do honestly refuses a tool result that was never recorded",
+      "fullName": "compaction refuses what it cannot do honestly refuses a tool result that was never recorded",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1324214161_1_1",
+      "name": "tests/surfaceCompaction.test.ts compaction refuses what it cannot do honestly refuses a replacement that is not smaller",
+      "fullName": "compaction refuses what it cannot do honestly refuses a replacement that is not smaller",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1558546393",
+      "name": "tests/surfaceHistoryCompaction.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-geYj62/checkout/tests/surfaceHistoryCompaction.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1558546393_0",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_0",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction measures current authenticated bytes, preserves the origin and reconstructs both cutoffs",
+      "fullName": "origin-addressed native compaction measures current authenticated bytes, preserves the origin and reconstructs both cutoffs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_1",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction refuses invented savings, invalid ranges, excessive summaries and in-flight mutation before an append",
+      "fullName": "origin-addressed native compaction refuses invented savings, invalid ranges, excessive summaries and in-flight mutation before an append",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_2",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction summarizes an exact contiguous range atomically and refuses its removed origins",
+      "fullName": "origin-addressed native compaction summarizes an exact contiguous range atomically and refuses its removed origins",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_3",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction preserves successful tool-result identity and removes completed pairs only together",
+      "fullName": "origin-addressed native compaction preserves successful tool-result identity and removes completed pairs only together",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_4",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction rejects altered origin commitments, basis and actual byte counts on replay",
+      "fullName": "origin-addressed native compaction rejects altered origin commitments, basis and actual byte counts on replay",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_5",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction retains origins through explicit release/resume and refuses parent origins in a lineage-only fork",
+      "fullName": "origin-addressed native compaction retains origins through explicit release/resume and refuses parent origins in a lineage-only fork",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_6",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction native operator compaction reopens the exact listed head and signs release for the next chat turn",
+      "fullName": "origin-addressed native compaction native operator compaction reopens the exact listed head and signs release for the next chat turn",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_7",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction native operator validation refuses a bad range before writer acquisition",
+      "fullName": "origin-addressed native compaction native operator validation refuses a bad range before writer acquisition",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_8",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction refuses an invalid recorded backend rather than inspecting fallback SQLite: {malformed",
+      "fullName": "origin-addressed native compaction refuses an invalid recorded backend rather than inspecting fallback SQLite: {malformed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_9",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction refuses an invalid recorded backend rather than inspecting fallback SQLite: {\"v\":2,\"backend\":\"sqlite\"}",
+      "fullName": "origin-addressed native compaction refuses an invalid recorded backend rather than inspecting fallback SQLite: {\"v\":2,\"backend\":\"sqlite\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_10",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction refuses an invalid recorded backend rather than inspecting fallback SQLite: {\"v\":1,\"backend\":\"unknown\"}",
+      "fullName": "origin-addressed native compaction refuses an invalid recorded backend rather than inspecting fallback SQLite: {\"v\":1,\"backend\":\"unknown\"}",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_11",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction refuses selector not-a-backend against recorded SQLite before returning a compaction snapshot",
+      "fullName": "origin-addressed native compaction refuses selector not-a-backend against recorded SQLite before returning a compaction snapshot",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_12",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction refuses selector jsonl against recorded SQLite before returning a compaction snapshot",
+      "fullName": "origin-addressed native compaction refuses selector jsonl against recorded SQLite before returning a compaction snapshot",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1558546393_0_13",
+      "name": "tests/surfaceHistoryCompaction.test.ts origin-addressed native compaction refuses a backend-marker change during authenticated measurement instead of publishing a stale snapshot",
+      "fullName": "origin-addressed native compaction refuses a backend-marker change during authenticated measurement instead of publishing a stale snapshot",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "beforeEach": "pass",
+        "afterEach": "pass"
+      },
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

@@ -1,0 +1,1541 @@
+{
+  "date": "2026-10-15",
+  "issue": "P0-18",
+  "reviewer": "independent read-only crypto runtime review",
+  "findings": [],
+  "result": "No actionable findings within the declared14-case local cryptographic/cold-reader scope. Whole P0-18 acceptance is not established.",
+  "authorReceipt": {
+    "path": "/private/tmp/p0-18-crypto-qualification-20261015.json",
+    "bytes": 153041,
+    "sha256": "8b60d2f3e6dc904c12348ead337fc0dfa28e65a4d15b995e45705c83afae6986"
+  },
+  "authorNotes": {
+    "path": "/private/tmp/p0-18-crypto-qualification-20261015.md",
+    "bytes": 3510,
+    "sha256": "0eaf1cf6607f6f9bb37270556dd2378b50e5daff96b3eefdc221f2b173f5cdaf"
+  },
+  "artifactIndex": {
+    "path": "/private/tmp/p0-18-crypto-qualification-20261015/artifact-index.json",
+    "bytes": 82284,
+    "sha256": "29fcbb8566ae10857597b78304fbb518b325da1ee426c016331cc9ac72fbfbb1"
+  },
+  "artifactsRehashed": 374,
+  "hashMismatches": [],
+  "largePrivateReferences": {
+    "count": 12,
+    "largestBytes": 6197471,
+    "canonicalTreatment": "Reference-only; no authorization to copy these larger-than1MiB private effects/manifests into canonical files."
+  },
+  "source": {
+    "measuredCommit": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+    "test": {
+      "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/claims/evidenceProvenanceQualification.test.ts",
+      "bytes": 26678,
+      "sha256": "ce2e8353fd3925d41b38b1790887d921c25aa922e7795aaadfee6335b1f4c494"
+    },
+    "lines": 346,
+    "protected32Exact": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+        "bytes": 12211,
+        "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustList.ts",
+        "bytes": 10386,
+        "sha256": "d18996f3d8bdeee4e5d2cd6ecd81ddff3e168c6fe3035019bfbed70d0c185fb7"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+        "bytes": 7037,
+        "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/admission.ts",
+        "bytes": 9401,
+        "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/trust/keyPurposes.ts",
+        "bytes": 604,
+        "sha256": "525e2f0d8b01b34891a1693f6f770b70c14819cb15c60f6f25589c35027253bd"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/crypto/keys.ts",
+        "bytes": 9168,
+        "sha256": "66677a7d91a36a53e9f304024a2f7d87bda3cde747eefbadaf51c6694980b47c"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/utils/json.ts",
+        "bytes": 540,
+        "sha256": "1b3239527397d76db88147827d7bddb6259d18f2a5798597279419b090d9688b"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledger.ts",
+        "bytes": 43792,
+        "sha256": "67128b560786c6df45e0145f02964d855cc41174521f50c493c487a4bce6fb14"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/ledgerConnection.ts",
+        "bytes": 3137,
+        "sha256": "49a4aec4b727055760717a4edc2360cb2267491922e7788dabf0cc43e0ec6854"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ledger/trustTierValidation.ts",
+        "bytes": 3447,
+        "sha256": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/ingest/ingest.ts",
+        "bytes": 10253,
+        "sha256": "7c3a64aae2b6c61c63e001547b2f4274bf5b2e133b977aec8b841f62bfec14c5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+        "bytes": 70432,
+        "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/eval/evalCli.ts",
+        "bytes": 1521,
+        "sha256": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/dogfood/maturityEvidence.ts",
+        "bytes": 15973,
+        "sha256": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/credentials/credentialsPaths.ts",
+        "bytes": 4710,
+        "sha256": "e7eab84d9be8fc7018e80c1d3831702accfa112c7582a70a2a3109694bc575c0"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/claims/evidenceProvenance.test.ts",
+        "bytes": 17646,
+        "sha256": "e569221799c6a5b5198f88919e57b81996f30ec5dd952f133172a77c8bea2212"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/evalImportTrust.test.ts",
+        "bytes": 5728,
+        "sha256": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/ingestAttestation.test.ts",
+        "bytes": 15700,
+        "sha256": "216bdc61130878be53a1f4f34be16a5ef06bb07e0875d3ddd02f66ccf82a69aa"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/trustTierWriteGuard.test.ts",
+        "bytes": 5739,
+        "sha256": "6dc75c6c3b45b329f5c88db18db702b40848df9638cbc73add14e288e949cf62"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/dogfoodMaturityEvidence.test.ts",
+        "bytes": 4544,
+        "sha256": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceProfile.test.ts",
+        "bytes": 7956,
+        "sha256": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/externalEvidenceExport.test.ts",
+        "bytes": 5707,
+        "sha256": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/compliance/evidenceBinding.test.ts",
+        "bytes": 11569,
+        "sha256": "413979d7258ec7327bbedbbd43066d2f4a58066041a9a4a5dd133fee97526c9a"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/compliance/complianceEngine.ts",
+        "bytes": 14631,
+        "sha256": "3dccb33e14dd789d8e66b8da30b5a391b491ce37b8488aef8021949c7b6c8ad9"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+        "bytes": 9684,
+        "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/outcomes/outcomeCli.ts",
+        "bytes": 5678,
+        "sha256": "38dcc1d75e13b884071feeb6019f8aa06bc5244a8c42db3f63b8e873b6a78b19"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/assurance/agentResponder.ts",
+        "bytes": 21889,
+        "sha256": "2ecae97e66119ce66902c8d93d0edd8ab2e750b795658046bd5c0e8048f9d807"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/cli.ts",
+        "bytes": 1064339,
+        "sha256": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/src/standard/externalEvidenceProfile.ts",
+        "bytes": 16961,
+        "sha256": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/docs/EVIDENCE_TRUST.md",
+        "bytes": 10946,
+        "sha256": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/helpers/trustContext.ts",
+        "bytes": 4280,
+        "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec"
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p0-18-qualification/AgentMaturityCompass/tests/trust/trustFixtures.ts",
+        "bytes": 2312,
+        "sha256": "da8626dc36baf6756414f921450228cf780327e6dd24793a2e35c1de16fdb61d"
+      }
+    ],
+    "authorizedCountOnlyChanges": [
+      {
+        "path": "CONTRIBUTING.md",
+        "countOnly1637to1638": true,
+        "beforeSha256": "ba2d1f54f67fe94c2fc8b5507510f6e5a52bebb2d106ef2e577519600e1ed933",
+        "afterSha256": "2ae376f727529f6abbf50f9408f8779f80904b2623a8c75e63d587c173b02d30"
+      },
+      {
+        "path": "README.md",
+        "countOnly1637to1638": true,
+        "beforeSha256": "c53c6ea477e2a5edc9099cdd46d883e9ec519efc6c748ce8f9c18c756274161d",
+        "afterSha256": "7392b86cc5e6cf87af92844ccdb26f8f3c2624f15395c103943b5d4c1883d571"
+      },
+      {
+        "path": "docs/content/reddit-launch-drafts.md",
+        "countOnly1637to1638": true,
+        "beforeSha256": "26374366a8cdf1c1f8936442b6d502375e1bd07fdc8c3045fbc08ad628516c7a",
+        "afterSha256": "be20e1587ec1dd68fc5abf840d72a32bc601ab46a8e5d48a116add489121983f"
+      },
+      {
+        "path": "docs/content/show-hn-draft.md",
+        "countOnly1637to1638": true,
+        "beforeSha256": "13bd3e85bef3fb4c45de988cf9a37268955fc425798faa366d2d47d713fc3d75",
+        "afterSha256": "0db24b5557da28661ab90dbcfc66e1f4fdcb7e6efdd2165e31515015bd22909f"
+      },
+      {
+        "path": "docs/internal/competitive-landscape.md",
+        "countOnly1637to1638": true,
+        "beforeSha256": "588af022cf907d72731e68f907cbf203f1b7a40cd03cf9c7fac6292abfc7213b",
+        "afterSha256": "1e1565b2f0757e0919aa7d08ba1eeb2b26b84be155d6887b10176b9ae335ba16"
+      },
+      {
+        "path": "docs/internal/mirofish-simulation-council.md",
+        "countOnly1637to1638": true,
+        "beforeSha256": "b179c4ecd44c4d461e8891d868569aa9e1fe2d23f84c20628fffe445b5d1c3ed",
+        "afterSha256": "038cc4f3da14e644df517b050afecd6ebe28c5d76968af53830e88972e363ada"
+      },
+      {
+        "path": "website/i18n.js",
+        "countOnly1637to1638": true,
+        "beforeSha256": "4be226ac51815404d5bf8861802a81e49e0b62cb135071fb6e78a9cce7258fc0",
+        "afterSha256": "8a28dfc7b31a09c02c571396209d16bbd5afb3422347b11e5ca5fcf0beb0caab"
+      },
+      {
+        "path": "website/index.html",
+        "countOnly1637to1638": true,
+        "beforeSha256": "2ae0119d4c2227eb0ec71d1b489958c593b9286ebb6874c02d200dc518d5ecc8",
+        "afterSha256": "bbe59e5e408932707027e6aa9463b9018b928811bf15a80d803c4acdaa719f3d"
+      },
+      {
+        "path": "website/lite.html",
+        "countOnly1637to1638": true,
+        "beforeSha256": "608ca03ba2118b2181d69f4e549448b726fdb2eb5028d85d45f8a3c71580c381",
+        "afterSha256": "5e0deb4c273468279fd05f87f4cfbbba97439345651b10aa6c1d723315862519"
+      },
+      {
+        "path": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "countOnly1637to1638": true,
+        "beforeSha256": "ba9309480f27f7d9003b926e371e711164d274e053dc2c492d1c1701486eba67",
+        "afterSha256": "00605e079be76e620c61295ce7d4f0ac6f50e731334d577d6915f859dba57fec"
+      }
+    ],
+    "initialPrivateTrackedFiles": 7738,
+    "privateTrackedExactBeforeAfter": true,
+    "privateCompiledFiles": 4529,
+    "privateCompiledExactEveryRestoration": true,
+    "liveCompiledExactBeforeAfter": true,
+    "native": {
+      "abi": "127",
+      "bytesAndInodeExact": true,
+      "nlink": 1,
+      "recordedSelect": 1
+    }
+  },
+  "actualPhases": [
+    {
+      "phase": "crypto-first",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "durationMs": 8454,
+      "failedNames": [],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-first-20261015.json",
+        "bytes": 6179,
+        "sha256": "44d700a10e213f867edf8c8398a873841dacc7fdede5296d8233c0955c1883d6"
+      }
+    },
+    {
+      "phase": "crypto-private-baseline",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "durationMs": 7414,
+      "failedNames": [],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-private-baseline-20261015.json",
+        "bytes": 6164,
+        "sha256": "95468f12ceb40bcd8f0143c90a52add73c16875b698c665d8bca0f784ceafdff"
+      }
+    },
+    {
+      "phase": "crypto-legacy-cap-mutant",
+      "passed": 13,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "exit": 1,
+      "durationMs": 7042,
+      "failedNames": [
+        "P0-18 actual pinned ingestion and cold provenance readers local legacy, unverified and synthetic projections never gain provenance credit"
+      ],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-legacy-cap-mutant-20261015.json",
+        "bytes": 7475,
+        "sha256": "312acf7957e673da87561f8f2ab5bae7f94159978c392da26e569a557964efbf"
+      }
+    },
+    {
+      "phase": "crypto-legacy-cap-restored",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "durationMs": 7187,
+      "failedNames": [],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-legacy-cap-restored-20261015.json",
+        "bytes": 6160,
+        "sha256": "994ad5057bc86cdcb7e47ea5addc62461310edbbe85fea6ab8f71b353db5a9b7"
+      }
+    },
+    {
+      "phase": "crypto-unpin-refusal-baseline",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "durationMs": 7252,
+      "failedNames": [],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-unpin-refusal-baseline-20261015.json",
+        "bytes": 6157,
+        "sha256": "91e06b13bd03b50a21ac677341d24ee5d57ad5897264c3599bc90b5c8a7c6888"
+      }
+    },
+    {
+      "phase": "crypto-unpin-refusal-mutant",
+      "passed": 13,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "exit": 1,
+      "durationMs": 7354,
+      "failedNames": [
+        "P0-18 actual pinned ingestion and cold provenance readers a real signed list with unpinned admission cannot confer ATTESTED"
+      ],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-unpin-refusal-mutant-20261015.json",
+        "bytes": 7459,
+        "sha256": "8ee50f117dcde082cdf929efcb3dd483e6f6b149289f01624b75c589c5f85f45"
+      }
+    },
+    {
+      "phase": "crypto-unpin-refusal-restored",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "durationMs": 7325,
+      "failedNames": [],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-unpin-refusal-restored-20261015.json",
+        "bytes": 6168,
+        "sha256": "af0dcb73114da7a7050fdd426b052c02412e1fcd146d8fef8f6c5bb6bb7055e2"
+      }
+    },
+    {
+      "phase": "crypto-agent-binding-baseline",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "durationMs": 7563,
+      "failedNames": [],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-agent-binding-baseline-20261015.json",
+        "bytes": 6159,
+        "sha256": "603ea6da42effb78b7a59bf4e96ce37f44bf00e2f2a1acdb553223d934fe0cbb"
+      }
+    },
+    {
+      "phase": "crypto-agent-binding-mutant",
+      "passed": 13,
+      "failed": 1,
+      "pending": 0,
+      "todo": 0,
+      "exit": 1,
+      "durationMs": 7574,
+      "failedNames": [
+        "P0-18 actual pinned ingestion and cold provenance readers a genuine signature binds agent, session, payload, original ID and recorded time"
+      ],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-agent-binding-mutant-20261015.json",
+        "bytes": 7505,
+        "sha256": "ec6ed29384ddff206e4bcac42933ec0e91106d4b95ec7d2aa379d41fb5c0ec88"
+      }
+    },
+    {
+      "phase": "crypto-agent-binding-restored",
+      "passed": 14,
+      "failed": 0,
+      "pending": 0,
+      "todo": 0,
+      "exit": 0,
+      "durationMs": 8051,
+      "failedNames": [],
+      "raw": {
+        "path": "/private/tmp/p0-18-crypto-agent-binding-restored-20261015.json",
+        "bytes": 6172,
+        "sha256": "c6841113b684418c18bb9af9a86fc7c589c1314033941d3d02473a2b4af3db95"
+      }
+    }
+  ],
+  "uniqueCases": [
+    "P0-18 actual pinned ingestion and cold provenance readers a genuinely signed loaded list and bound ingest copy survive a cold reader",
+    "P0-18 actual pinned ingestion and cold provenance readers a default signed list without its separate root pin refuses",
+    "P0-18 actual pinned ingestion and cold provenance readers a genuine foreign-root signature cannot admit its carried root",
+    "P0-18 actual pinned ingestion and cold provenance readers parseable post-signature list tamper refuses",
+    "P0-18 actual pinned ingestion and cold provenance readers genuine own-key signatures fail both the actual writer and bound local cold projections",
+    "P0-18 actual pinned ingestion and cold provenance readers a real signed list with wrong-purpose admission cannot confer ATTESTED",
+    "P0-18 actual pinned ingestion and cold provenance readers a real signed list with revoked admission cannot confer ATTESTED",
+    "P0-18 actual pinned ingestion and cold provenance readers a real signed list with expired admission cannot confer ATTESTED",
+    "P0-18 actual pinned ingestion and cold provenance readers a real signed list with unpinned admission cannot confer ATTESTED",
+    "P0-18 actual pinned ingestion and cold provenance readers a genuine key B signature claiming pinned key A refuses",
+    "P0-18 actual pinned ingestion and cold provenance readers a genuine signature binds agent, session, payload, original ID and recorded time",
+    "P0-18 actual pinned ingestion and cold provenance readers actual duplicate copies count once in both orders and only in the signed-time window",
+    "P0-18 actual pinned ingestion and cold provenance readers actual inline elevated-producer refusal preserves the measured rows and files",
+    "P0-18 actual pinned ingestion and cold provenance readers local legacy, unverified and synthetic projections never gain provenance credit"
+  ],
+  "sameFixture": {
+    "pin": {
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/fixture/fixture.json",
+      "bytes": 152178,
+      "sha256": "2e8845f4f17516dd9281e1c4400de00a245ce068ee8a3d73587613ee840e95fb"
+    },
+    "namesAndAssertionsSameAcross10Executions": true,
+    "storedRows": 8,
+    "canonicalDigestRecomputed": "4a76581dc56a71d4e02c82b8015d0ce1c663b17167c43ee90ccde07dc5512375",
+    "decodedDigestBytes": 32,
+    "decodedSignatureBytes": 64,
+    "publicPinsMatchPersistedFiles": true,
+    "spkiPemFingerprintHashesRecomputed": true,
+    "retainedIndependentNodeCryptoProof": {
+      "signedProof": {
+        "valid": true,
+        "missing-root": true,
+        "foreign-root": true,
+        "tamper": false,
+        "wrong-purpose": true,
+        "revoked": true,
+        "expired": true,
+        "unpinned": true,
+        "own": true
+      },
+      "digest": "4a76581dc56a71d4e02c82b8015d0ce1c663b17167c43ee90ccde07dc5512375",
+      "independentDigest": "4a76581dc56a71d4e02c82b8015d0ce1c663b17167c43ee90ccde07dc5512375",
+      "plaintextPayloadHash": "db9b2eb087735a3d8a8f9c230d9bb6fe0c04eea2b44274bcccb1ca0a5bcbca57",
+      "attesterSignatureValid": true,
+      "digestTextSignatureValid": false,
+      "forgedValidUnderB": true,
+      "forgedValidUnderA": false
+    },
+    "cryptoReviewScope": "Reviewed actual Node crypto source/check results and recomputed hashes independently; no new Ed25519/product execution or test rerun."
+  },
+  "effectReview": {
+    "readOnlyIntervals": 140,
+    "finishedChildProcessesObserved": 141,
+    "allStoredRowsUnchanged": true,
+    "allWorkspaceChangesOnlyWALSHM": true,
+    "fixtureChanges": [
+      {
+        "phase": "first",
+        "scenario": "initialize",
+        "changedPaths": [
+          "fixture.json",
+          "homes",
+          "homes/expired",
+          "homes/expired/trust",
+          "homes/expired/trust/amc-trust-list.json",
+          "homes/expired/trust/trust-roots.json",
+          "homes/foreign-root",
+          "homes/foreign-root/trust",
+          "homes/foreign-root/trust/amc-trust-list.json",
+          "homes/foreign-root/trust/trust-roots.json",
+          "homes/missing-root",
+          "homes/missing-root/trust",
+          "homes/missing-root/trust/amc-trust-list.json",
+          "homes/own",
+          "homes/own/trust",
+          "homes/own/trust/amc-trust-list.json",
+          "homes/own/trust/trust-roots.json",
+          "homes/revoked",
+          "homes/revoked/trust",
+          "homes/revoked/trust/amc-trust-list.json",
+          "homes/revoked/trust/trust-roots.json",
+          "homes/tamper",
+          "homes/tamper/trust",
+          "homes/tamper/trust/amc-trust-list.json",
+          "homes/tamper/trust/trust-roots.json",
+          "homes/unpinned",
+          "homes/unpinned/trust",
+          "homes/unpinned/trust/amc-trust-list.json",
+          "homes/unpinned/trust/trust-roots.json",
+          "homes/valid",
+          "homes/valid/trust",
+          "homes/valid/trust/amc-trust-list.json",
+          "homes/valid/trust/trust-roots.json",
+          "homes/wrong-purpose",
+          "homes/wrong-purpose/trust",
+          "homes/wrong-purpose/trust/amc-trust-list.json",
+          "homes/wrong-purpose/trust/trust-roots.json",
+          "input.txt",
+          "own-public-pins-before-attestation.json",
+          "public-pins-before-signatures.json",
+          "workspace",
+          "workspace/.amc",
+          "workspace/.amc/.action-policy-writer-locks",
+          "workspace/.amc/action-policy.yaml",
+          "workspace/.amc/action-policy.yaml.sig",
+          "workspace/.amc/adapters.yaml",
+          "workspace/.amc/adapters.yaml.sig",
+          "workspace/.amc/agent.config.yaml",
+          "workspace/.amc/agent.config.yaml.sig",
+          "workspace/.amc/agents",
+          "workspace/.amc/amc.config.yaml",
+          "workspace/.amc/amc.config.yaml.sig",
+          "workspace/.amc/assurance",
+          "workspace/.amc/assurance/certificates",
+          "workspace/.amc/assurance/policy.yaml",
+          "workspace/.amc/assurance/policy.yaml.sig",
+          "workspace/.amc/assurance/runs",
+          "workspace/.amc/assurance/waivers",
+          "workspace/.amc/audit",
+          "workspace/.amc/audit/binders",
+          "workspace/.amc/audit/binders/cache",
+          "workspace/.amc/audit/binders/exports",
+          "workspace/.amc/audit/maps",
+          "workspace/.amc/audit/maps/active.yaml",
+          "workspace/.amc/audit/maps/active.yaml.sig",
+          "workspace/.amc/audit/maps/builtin.yaml",
+          "workspace/.amc/audit/maps/builtin.yaml.sig",
+          "workspace/.amc/audit/policy.yaml",
+          "workspace/.amc/audit/policy.yaml.sig",
+          "workspace/.amc/audit/requests",
+          "workspace/.amc/audit/requests/closed",
+          "workspace/.amc/audit/requests/open",
+          "workspace/.amc/bench",
+          "workspace/.amc/bench/comparisons",
+          "workspace/.amc/bench/exports",
+          "workspace/.amc/bench/imports",
+          "workspace/.amc/bench/imports/benches",
+          "workspace/.amc/bench/imports/cache",
+          "workspace/.amc/bench/policy.yaml",
+          "workspace/.amc/bench/policy.yaml.sig",
+          "workspace/.amc/blob-keys",
+          "workspace/.amc/blob-keys/current.json",
+          "workspace/.amc/blob-keys/current.json.sig",
+          "workspace/.amc/blobs",
+          "workspace/.amc/blobs/blob_addhm56hmg4pxwsdyzr6orbxoy.blob",
+          "workspace/.amc/blobs/blob_ahtyztcomosnqsq34cyeaxxn5a.blob",
+          "workspace/.amc/blobs/blob_h3w56xl4u2nhaxuvtrx5nv7tpe.blob",
+          "workspace/.amc/blobs/blob_l2gpzicj7uxelkk5czghnqhuqy.blob",
+          "workspace/.amc/blobs/index.jsonl",
+          "workspace/.amc/blobs/index.jsonl.sig",
+          "workspace/.amc/bridge.yaml",
+          "workspace/.amc/bridge.yaml.sig",
+          "workspace/.amc/budgets.yaml",
+          "workspace/.amc/budgets.yaml.sig",
+          "workspace/.amc/bundles",
+          "workspace/.amc/canon",
+          "workspace/.amc/canon/canon.yaml",
+          "workspace/.amc/canon/canon.yaml.sig",
+          "workspace/.amc/cgx",
+          "workspace/.amc/cgx/policy.yaml",
+          "workspace/.amc/cgx/policy.yaml.sig",
+          "workspace/.amc/context-graph.json",
+          "workspace/.amc/current-agent",
+          "workspace/.amc/diagnostic",
+          "workspace/.amc/diagnostic/bank",
+          "workspace/.amc/diagnostic/bank/bank.yaml",
+          "workspace/.amc/diagnostic/bank/bank.yaml.sig",
+          "workspace/.amc/eval-harness.yaml",
+          "workspace/.amc/evidence.sqlite",
+          "workspace/.amc/fleet.yaml",
+          "workspace/.amc/fleet.yaml.sig",
+          "workspace/.amc/forecast",
+          "workspace/.amc/forecast/policy.yaml",
+          "workspace/.amc/forecast/policy.yaml.sig",
+          "workspace/.amc/gateway.yaml",
+          "workspace/.amc/gateway.yaml.sig",
+          "workspace/.amc/guardrails.yaml",
+          "workspace/.amc/keys",
+          "workspace/.amc/keys/auditor_ed25519.pub",
+          "workspace/.amc/keys/auditor_history.json",
+          "workspace/.amc/keys/lease_ed25519.pub",
+          "workspace/.amc/keys/lease_history.json",
+          "workspace/.amc/keys/monitor_ed25519.pub",
+          "workspace/.amc/keys/monitor_history.json",
+          "workspace/.amc/keys/session_ed25519.pub",
+          "workspace/.amc/keys/session_history.json",
+          "workspace/.amc/mechanic",
+          "workspace/.amc/mechanic/profiles.yaml",
+          "workspace/.amc/mechanic/profiles.yaml.sig",
+          "workspace/.amc/mechanic/targets.yaml",
+          "workspace/.amc/mechanic/targets.yaml.sig",
+          "workspace/.amc/mechanic/tuning.yaml",
+          "workspace/.amc/mechanic/tuning.yaml.sig",
+          "workspace/.amc/model-taxonomy.yaml",
+          "workspace/.amc/model-taxonomy.yaml.sig",
+          "workspace/.amc/ops-policy.yaml",
+          "workspace/.amc/ops-policy.yaml.sig",
+          "workspace/.amc/prompt",
+          "workspace/.amc/prompt-addendum.md",
+          "workspace/.amc/prompt/lint",
+          "workspace/.amc/prompt/lint/agents",
+          "workspace/.amc/prompt/packs",
+          "workspace/.amc/prompt/packs/agents",
+          "workspace/.amc/prompt/policy.yaml",
+          "workspace/.amc/prompt/policy.yaml.sig",
+          "workspace/.amc/prompt/snapshots",
+          "workspace/.amc/prompt/snapshots/agents",
+          "workspace/.amc/reports",
+          "workspace/.amc/runs",
+          "workspace/.amc/targets",
+          "workspace/.amc/targets/default.target.json",
+          "workspace/.amc/tools.yaml",
+          "workspace/.amc/tools.yaml.sig",
+          "workspace/.amc/transparency",
+          "workspace/.amc/transparency/log.jsonl",
+          "workspace/.amc/transparency/log.seal.json",
+          "workspace/.amc/transparency/log.seal.sig",
+          "workspace/.amc/transparency/merkle",
+          "workspace/.amc/transparency/merkle/current.root.json",
+          "workspace/.amc/transparency/merkle/current.root.sig",
+          "workspace/.amc/transparency/merkle/frontier.json",
+          "workspace/.amc/transparency/merkle/leaves.jsonl",
+          "workspace/.amc/transparency/merkle/roots.jsonl",
+          "workspace/.amc/trust.yaml",
+          "workspace/.amc/trust.yaml.sig",
+          "workspace/.amc/vault.amcvault",
+          "workspace/.amc/vault.amcvault.meta.json"
+        ],
+        "initializer": true
+      },
+      {
+        "phase": "first",
+        "scenario": "positive",
+        "changedPaths": [
+          "workspace/.amc/evidence.sqlite-shm",
+          "workspace/.amc/evidence.sqlite-wal"
+        ],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "first",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "positive",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "private-baseline",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "positive",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-mutant",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "positive",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "legacy-cap-restored",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "positive",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-baseline",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "positive",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-mutant",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "positive",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "unpin-refusal-restored",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "positive",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-baseline",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "positive",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-mutant",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "positive",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "missing-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "foreign-root",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "tamper",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "own",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "wrong-purpose",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "revoked",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "expired",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "unpinned",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "forged",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "binding",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "dedup",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "guard",
+        "changedPaths": [],
+        "initializer": false
+      },
+      {
+        "phase": "agent-binding-restored",
+        "scenario": "legacy",
+        "changedPaths": [],
+        "initializer": false
+      }
+    ],
+    "firstReadonlyCreatesSidecars": true,
+    "parentObserverStreamWritesOutsideMeasuredChildInterval": true,
+    "inlineGuardControl": "Two actual initializer writer attempts use inline harmless payloads; four preexisting evidence rows and complete measured workspace snapshots match after each refusal. No non-inline/all-failed-write claim.",
+    "ownKeyScope": "Monitor/auditor genuine signatures are recorded; actual writers store SELF_REPORTED. ATTESTED own-key reader inputs are explicit bound in-memory projections, not stored records."
+  },
+  "causalVerdicts": {
+    "legacy-cap": "Only legacyObserved becomes OBSERVED; intended assertion fails13/14, restores14/14.",
+    "unpin-refusal": "Valid signature remains but absent attester entry is semantically admitted by private guard bypass; only unpinned case reads ATTESTED, fails13/14, restores14/14.",
+    "agent-binding": "Only projected other-agent input becomes ATTESTED; session/payload/original/time projections remain SELF_REPORTED, intended binding assertion fails13/14, restores14/14."
+  },
+  "observerChronology": {
+    "broadMetadataPreparationFailure": {
+      "path": "/private/tmp/p0-18-crypto-qualification-20261015/prepare-observer-failure.json",
+      "bytes": 3792,
+      "sha256": "05a323ab1e16df7205829434b021d48925464e4b908cea048ce841d4091fb74e"
+    },
+    "cause": "Actual initial live old7738 exact observer met root-authorized10factual count-document changes. Private7738source stayed exact; compiled manifest capture happened after private baseline and before mutants.",
+    "authoredNoIndexWhitespaceObserver": {
+      "exit": 1,
+      "stdout": "",
+      "stderr": "",
+      "meaning": "No whitespace diagnostics. No-index different-file exit1 is retained; root ordinary staged source whitespace is separate."
+    },
+    "notProductFailuresOrMutationKills": true
+  },
+  "reviewLimits": [
+    "All keys and inputs are locally generated/operator-authored fixtures. Signatures/admission do not prove authenticated people, external independent review or content truth.",
+    "attestedBy/statement are unsigned recorded labels. Their changed-label positive case is a local projection.",
+    "Default signed-list root pinning, purpose, now-validity/revocation and own-key exclusion are exercised; not all issuer-admission precedence/allow-flag variants or prior P0-51 failures.",
+    "Dedup uses distinct locally supplied copy times; filtering applies to signed original time for attested copies. Original SELF_REPORTED row passes through outside that window. No authenticated-clock claim.",
+    "No full ledger/session seal verification, lifecycle/race/cross-store atomicity, transport/API/auth/browser, Node24/full-suite/coverage/hosted/release/G0/Done acceptance.",
+    "Importer/seeder/S7 component results, strict purpose/version drifts, normal static/freeze/source-quality evidence and earlier holds remain separate. Root-reported static summaries were not rerun by this reviewer.",
+    "All repository/source/fixture/canonical inputs were read-only during this review. Only this independent review JSON and Markdown were written."
+  ],
+  "allLiveSourceReadsComplete": true
+}

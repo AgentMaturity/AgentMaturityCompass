@@ -1,6 +1,7 @@
 import { z } from "zod";
+import { isCanonicalSignatureBase64 } from "../../utils/json.js";
 
-export const blobIndexRowSchema = z.object({
+const blobIndexV1RowSchema = z.object({
   v: z.literal(1),
   ts: z.number().int(),
   blobId: z.string().min(1),
@@ -16,9 +17,13 @@ export const blobIndexRowSchema = z.object({
   hash: z.string().length(64)
 });
 
+const hex = z.string().regex(/^[0-9a-f]{64}$/);
+const blobIndexV2RowSchema = z.strictObject({ ...blobIndexV1RowSchema.omit({ hash: true }).shape, v: z.literal(2),
+  ts: z.number().int().positive().safe(), prev: z.union([hex, z.literal("")]), payloadSha256: hex, authoritySha256: hex, hash: hex });
+export const blobIndexRowSchema = z.discriminatedUnion("v", [blobIndexV1RowSchema, blobIndexV2RowSchema]);
 export type BlobIndexRow = z.infer<typeof blobIndexRowSchema>;
 
-export const blobIndexSignatureSchema = z.object({
+const blobIndexV1SignatureSchema = z.object({
   v: z.literal(1),
   ts: z.number().int(),
   // The signed value. Each index row hashes its predecessor, so this chain head
@@ -30,6 +35,9 @@ export const blobIndexSignatureSchema = z.object({
   signer: z.literal("auditor")
 });
 
+const blobIndexV2SignatureSchema = z.strictObject({ ...blobIndexV1SignatureSchema.shape, v: z.literal(2),
+  authoritySha256: hex, lastHash: hex, signature: z.string().refine(isCanonicalSignatureBase64) });
+export const blobIndexSignatureSchema = z.discriminatedUnion("v", [blobIndexV1SignatureSchema, blobIndexV2SignatureSchema]);
 export type BlobIndexSignature = z.infer<typeof blobIndexSignatureSchema>;
 
 export const blobKeyCurrentSchema = z.object({

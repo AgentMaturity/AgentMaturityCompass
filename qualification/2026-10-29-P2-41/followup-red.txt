@@ -1,0 +1,232 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-w6-p2-41
+
+ ❯ tests/a4/scenario13TamperedRecord.test.ts (9 tests | 8 failed) 15572ms
+     × a deleted member row fails verification and blocks readiness and the API 1542ms
+     × an altered member role fails verification and blocks readiness and the API 1524ms
+     × a deleted evidence ref fails verification and blocks readiness and the API 1488ms
+     × an altered evidence ref digest fails verification and blocks readiness and the API 1473ms
+     × an altered revision spec fails verification and blocks readiness and the API 2026ms
+     × a head row that no longer parses answers the verdict and a fixed message, never its parse issue 2046ms
+     × GET …/verify reports the problems to a verified member only; a non-member is 403 1817ms
+     × when the member rows fail, GET …/verify refuses a non-privileged reader with the fixed verdict 1795ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 8 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/a4/scenario13TamperedRecord.test.ts > scenario: tampered record > a deleted member row fails verification and blocks readiness and the API
+AssertionError: expected [ Array(1) ] to deeply equal { status: 'BLOCKED', …(1) }
+
+- Expected:
+{
+  "reasonCodes": [
+    "A4_INTEGRITY_FAILED",
+  ],
+  "status": "BLOCKED",
+}
+
++ Received:
+[
+  "A4_SIDE_ROW_MISMATCH a4_members [\"a4p_fdf6dd257fb44484c65ddc9aec151841\",1]",
+]
+
+ ❯ blocked tests/a4/scenario13TamperedRecord.test.ts:53:29
+     51| function blocked(reply: Awaited<ReturnType<A4Project["get"]>>): void {
+     52|   expect(refusal(reply)).toEqual([409, "A4_INTEGRITY_FAILED"]);
+     53|   expect(reply.body.detail).toEqual(VERDICT);
+       |                             ^
+     54|   expect(JSON.stringify(reply.body)).not.toMatch(/a4_|LOCAL_USER|SIDE_…
+     55| }
+ ❯ tests/a4/scenario13TamperedRecord.test.ts:79:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/8]⎯
+
+ FAIL  tests/a4/scenario13TamperedRecord.test.ts > scenario: tampered record > an altered member role fails verification and blocks readiness and the API
+AssertionError: expected [ Array(1) ] to deeply equal { status: 'BLOCKED', …(1) }
+
+- Expected:
+{
+  "reasonCodes": [
+    "A4_INTEGRITY_FAILED",
+  ],
+  "status": "BLOCKED",
+}
+
++ Received:
+[
+  "A4_SIDE_ROW_MISMATCH a4_members [\"a4p_1468933aeaabde931b7c0a48d2b15d81\",1]",
+]
+
+ ❯ blocked tests/a4/scenario13TamperedRecord.test.ts:53:29
+     51| function blocked(reply: Awaited<ReturnType<A4Project["get"]>>): void {
+     52|   expect(refusal(reply)).toEqual([409, "A4_INTEGRITY_FAILED"]);
+     53|   expect(reply.body.detail).toEqual(VERDICT);
+       |                             ^
+     54|   expect(JSON.stringify(reply.body)).not.toMatch(/a4_|LOCAL_USER|SIDE_…
+     55| }
+ ❯ tests/a4/scenario13TamperedRecord.test.ts:79:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/8]⎯
+
+ FAIL  tests/a4/scenario13TamperedRecord.test.ts > scenario: tampered record > a deleted evidence ref fails verification and blocks readiness and the API
+AssertionError: expected [ Array(1) ] to deeply equal { status: 'BLOCKED', …(1) }
+
+- Expected:
+{
+  "reasonCodes": [
+    "A4_INTEGRITY_FAILED",
+  ],
+  "status": "BLOCKED",
+}
+
++ Received:
+[
+  "A4_SIDE_ROW_MISMATCH a4_evidence_refs [\"a4p_a8cf1f27bd007942842586f04a8e6626\",18]",
+]
+
+ ❯ blocked tests/a4/scenario13TamperedRecord.test.ts:53:29
+     51| function blocked(reply: Awaited<ReturnType<A4Project["get"]>>): void {
+     52|   expect(refusal(reply)).toEqual([409, "A4_INTEGRITY_FAILED"]);
+     53|   expect(reply.body.detail).toEqual(VERDICT);
+       |                             ^
+     54|   expect(JSON.stringify(reply.body)).not.toMatch(/a4_|LOCAL_USER|SIDE_…
+     55| }
+ ❯ tests/a4/scenario13TamperedRecord.test.ts:79:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/8]⎯
+
+ FAIL  tests/a4/scenario13TamperedRecord.test.ts > scenario: tampered record > an altered evidence ref digest fails verification and blocks readiness and the API
+AssertionError: expected [ Array(1) ] to deeply equal { status: 'BLOCKED', …(1) }
+
+- Expected:
+{
+  "reasonCodes": [
+    "A4_INTEGRITY_FAILED",
+  ],
+  "status": "BLOCKED",
+}
+
++ Received:
+[
+  "A4_SIDE_ROW_MISMATCH a4_evidence_refs [\"a4p_807011ebc68b435ee805851b9866ed38\",18]",
+]
+
+ ❯ blocked tests/a4/scenario13TamperedRecord.test.ts:53:29
+     51| function blocked(reply: Awaited<ReturnType<A4Project["get"]>>): void {
+     52|   expect(refusal(reply)).toEqual([409, "A4_INTEGRITY_FAILED"]);
+     53|   expect(reply.body.detail).toEqual(VERDICT);
+       |                             ^
+     54|   expect(JSON.stringify(reply.body)).not.toMatch(/a4_|LOCAL_USER|SIDE_…
+     55| }
+ ❯ tests/a4/scenario13TamperedRecord.test.ts:79:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/8]⎯
+
+ FAIL  tests/a4/scenario13TamperedRecord.test.ts > scenario: tampered record > an altered revision spec fails verification and blocks readiness and the API
+AssertionError: expected [ Array(1) ] to deeply equal { status: 'BLOCKED', …(1) }
+
+- Expected:
+{
+  "reasonCodes": [
+    "A4_INTEGRITY_FAILED",
+  ],
+  "status": "BLOCKED",
+}
+
++ Received:
+[
+  "A4_SIDE_ROW_MISMATCH a4_revisions [\"a4p_e5d7b5d13ac66067b0f0f3fa7a8a2f1d\",4]",
+]
+
+ ❯ blocked tests/a4/scenario13TamperedRecord.test.ts:53:29
+     51| function blocked(reply: Awaited<ReturnType<A4Project["get"]>>): void {
+     52|   expect(refusal(reply)).toEqual([409, "A4_INTEGRITY_FAILED"]);
+     53|   expect(reply.body.detail).toEqual(VERDICT);
+       |                             ^
+     54|   expect(JSON.stringify(reply.body)).not.toMatch(/a4_|LOCAL_USER|SIDE_…
+     55| }
+ ❯ tests/a4/scenario13TamperedRecord.test.ts:79:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/8]⎯
+
+ FAIL  tests/a4/scenario13TamperedRecord.test.ts > scenario: tampered record > a head row that no longer parses answers the verdict and a fixed message, never its parse issue
+AssertionError: expected undefined to deeply equal { status: 'BLOCKED', …(1) }
+
+- Expected:
+{
+  "reasonCodes": [
+    "A4_INTEGRITY_FAILED",
+  ],
+  "status": "BLOCKED",
+}
+
++ Received:
+undefined
+
+ ❯ blocked tests/a4/scenario13TamperedRecord.test.ts:53:29
+     51| function blocked(reply: Awaited<ReturnType<A4Project["get"]>>): void {
+     52|   expect(refusal(reply)).toEqual([409, "A4_INTEGRITY_FAILED"]);
+     53|   expect(reply.body.detail).toEqual(VERDICT);
+       |                             ^
+     54|   expect(JSON.stringify(reply.body)).not.toMatch(/a4_|LOCAL_USER|SIDE_…
+     55| }
+ ❯ tests/a4/scenario13TamperedRecord.test.ts:88:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/8]⎯
+
+ FAIL  tests/a4/scenario13TamperedRecord.test.ts > scenario: tampered record > GET …/verify reports the problems to a verified member only; a non-member is 403
+AssertionError: expected [ Array(1) ] to deeply equal { status: 'BLOCKED', …(1) }
+
+- Expected:
+{
+  "reasonCodes": [
+    "A4_INTEGRITY_FAILED",
+  ],
+  "status": "BLOCKED",
+}
+
++ Received:
+[
+  "A4_SIDE_ROW_MISMATCH a4_evidence_refs [\"a4p_41168dea53d314a2a1355ed0cae44579\",18]",
+]
+
+ ❯ blocked tests/a4/scenario13TamperedRecord.test.ts:53:29
+     51| function blocked(reply: Awaited<ReturnType<A4Project["get"]>>): void {
+     52|   expect(refusal(reply)).toEqual([409, "A4_INTEGRITY_FAILED"]);
+     53|   expect(reply.body.detail).toEqual(VERDICT);
+       |                             ^
+     54|   expect(JSON.stringify(reply.body)).not.toMatch(/a4_|LOCAL_USER|SIDE_…
+     55| }
+ ❯ tests/a4/scenario13TamperedRecord.test.ts:111:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/8]⎯
+
+ FAIL  tests/a4/scenario13TamperedRecord.test.ts > scenario: tampered record > when the member rows fail, GET …/verify refuses a non-privileged reader with the fixed verdict
+AssertionError: expected [ 403, 'A4_NOT_A_MEMBER' ] to deeply equal [ 409, 'A4_INTEGRITY_FAILED' ]
+
+- Expected
++ Received
+
+  [
+-   409,
+-   "A4_INTEGRITY_FAILED",
++   403,
++   "A4_NOT_A_MEMBER",
+  ]
+
+ ❯ blocked tests/a4/scenario13TamperedRecord.test.ts:52:26
+     50| /** The fixed integrity refusal: 409, the verdict as detail, and nothi…
+     51| function blocked(reply: Awaited<ReturnType<A4Project["get"]>>): void {
+     52|   expect(refusal(reply)).toEqual([409, "A4_INTEGRITY_FAILED"]);
+       |                          ^
+     53|   expect(reply.body.detail).toEqual(VERDICT);
+     54|   expect(JSON.stringify(reply.body)).not.toMatch(/a4_|LOCAL_USER|SIDE_…
+ ❯ tests/a4/scenario13TamperedRecord.test.ts:117:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/8]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  8 failed | 1 passed (9)
+   Start at  09:10:38
+   Duration  22.03s (transform 5.14s, setup 32ms, import 6.28s, tests 15.57s, environment 0ms)
+

@@ -1,0 +1,1058 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 96629,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/sourceQuality.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+    "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts"
+  ],
+  "testCount": 85,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "505390785",
+      "name": "tests/assuranceReportProvenance.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceReportProvenance.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "505390785_0",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "505390785_0_0",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate rendered pack claims reflect sealVerified=true without reviewer promotion",
+      "fullName": "assurance report provenance gate rendered pack claims reflect sealVerified=true without reviewer promotion",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "505390785_0_1",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate rendered pack claims reflect sealVerified=false without reviewer promotion",
+      "fullName": "assurance report provenance gate rendered pack claims reflect sealVerified=false without reviewer promotion",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "505390785_0_2",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate empty and inconclusive-only assurance reports cannot render a passing claim",
+      "fullName": "assurance report provenance gate empty and inconclusive-only assurance reports cannot render a passing claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "505390785_0_3",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate a genuine signed report contributes its scores and tier",
+      "fullName": "assurance report provenance gate a genuine signed report contributes its scores and tier",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "505390785_0_4",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate a fabricated report contributes nothing, whatever it claims",
+      "fullName": "assurance report provenance gate a fabricated report contributes nothing, whatever it claims",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "505390785_0_5",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate editing one field of a signed report voids the whole report",
+      "fullName": "assurance report provenance gate editing one field of a signed report voids the whole report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "505390785_0_6",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate an unsigned report is not scoreable evidence",
+      "fullName": "assurance report provenance gate an unsigned report is not scoreable evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "505390785_0_7",
+      "name": "tests/assuranceReportProvenance.test.ts assurance report provenance gate a report outside the window is ignored quietly — absent, not fraudulent",
+      "fullName": "assurance report provenance gate a report outside the window is ignored quietly — absent, not fraudulent",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-12725287",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/assuranceRunnerInconclusiveQualification.test.ts",
+      "state": "pass",
+      "hooks": {
+        "beforeAll": "pass",
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-12725287_0",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_0",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts tool-call-only replies are recorded as exact unscored inconclusive scenarios",
+      "fullName": "P0-19 actual local runner inconclusive contracts tool-call-only replies are recorded as exact unscored inconclusive scenarios",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_1",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+      "fullName": "P0-19 actual local runner inconclusive contracts responses retain canonical call digests and counts without disclosing calls in ledger payload",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_2",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts genuine rows, session seal, report and persisted v1 signatures verify under before-captured public keys",
+      "fullName": "P0-19 actual local runner inconclusive contracts genuine rows, session seal, report and persisted v1 signatures verify under before-captured public keys",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_3",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts records artifact validity separately from insufficient measurement and verifies after the producer sealed",
+      "fullName": "P0-19 actual local runner inconclusive contracts records artifact validity separately from insufficient measurement and verifies after the producer sealed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_4",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+      "fullName": "P0-19 actual local runner inconclusive contracts a genuine measured signed run remains VALID and verification-passed for stored consumers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_5",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings",
+      "fullName": "P0-19 actual local runner inconclusive contracts actual persisted v1 run is insufficient, carries inconclusive rows and has no findings",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_6",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying pass and restores exact report bytes",
+      "fullName": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying pass and restores exact report bytes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_7",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score100 and restores exact report bytes",
+      "fullName": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score100 and restores exact report bytes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_8",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score5 and restores exact report bytes",
+      "fullName": "P0-19 actual local runner inconclusive contracts refuses an inconclusive stored row carrying score5 and restores exact report bytes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_9",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts real text measurements retain pass/fail counts, plain-text digests and nonempty failure findings",
+      "fullName": "P0-19 actual local runner inconclusive contracts real text measurements retain pass/fail counts, plain-text digests and nonempty failure findings",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_10",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts actual direct red-team tool replies preserve unsigned-local inconclusive parity",
+      "fullName": "P0-19 actual local runner inconclusive contracts actual direct red-team tool replies preserve unsigned-local inconclusive parity",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_11",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts a genuine measured failure is a VALID artifact without turning its failed findings into a pass",
+      "fullName": "P0-19 actual local runner inconclusive contracts a genuine measured failure is a VALID artifact without turning its failed findings into a pass",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_12",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts a genuine signed tool-only artifact is VALID while remaining insufficient and unscored",
+      "fullName": "P0-19 actual local runner inconclusive contracts a genuine signed tool-only artifact is VALID while remaining insufficient and unscored",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_13",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts a real completion seal-update fault retains the SQLite error without persisting a success report",
+      "fullName": "P0-19 actual local runner inconclusive contracts a real completion seal-update fault retains the SQLite error without persisting a success report",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-12725287_0_14",
+      "name": "tests/assuranceRunnerInconclusiveQualification.test.ts P0-19 actual local runner inconclusive contracts a real late Markdown-write failure preserves its error and the already-sealed session without abort or reseal",
+      "fullName": "P0-19 actual local runner inconclusive contracts a real late Markdown-write failure preserves its error and the already-sealed session without abort or reseal",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1859829661",
+      "name": "tests/sourceQuality.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/sourceQuality.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1859829661_0",
+      "name": "tests/sourceQuality.test.ts real source quality scanners",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1859829661_0_0",
+      "name": "tests/sourceQuality.test.ts real source quality scanners detects an orphaned source file and accepts its reachable counterpart",
+      "fullName": "real source quality scanners detects an orphaned source file and accepts its reachable counterpart",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1859829661_0_1",
+      "name": "tests/sourceQuality.test.ts real source quality scanners keeps the explicitly invoked Playwright config reachable without hiding adjacent orphans",
+      "fullName": "real source quality scanners keeps the explicitly invoked Playwright config reachable without hiding adjacent orphans",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1859829661_0_2",
+      "name": "tests/sourceQuality.test.ts real source quality scanners detects real duplicated code and accepts a single copy",
+      "fullName": "real source quality scanners detects real duplicated code and accepts a single copy",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1859829661_0_3",
+      "name": "tests/sourceQuality.test.ts real source quality scanners keeps symbol identity while ignoring shifted line numbers",
+      "fullName": "real source quality scanners keeps symbol identity while ignoring shifted line numbers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1859829661_0_4",
+      "name": "tests/sourceQuality.test.ts real source quality scanners refuses missing scan evidence",
+      "fullName": "real source quality scanners refuses missing scan evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "799953315",
+      "name": "tests/claims/claimAdapters.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimAdapters.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "799953315_0",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_0",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters TrustTier OBSERVED -> observed",
+      "fullName": "tier adapters TrustTier OBSERVED -> observed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_1",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters TrustTier OBSERVED_HARDENED -> observed",
+      "fullName": "tier adapters TrustTier OBSERVED_HARDENED -> observed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_2",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters TrustTier ATTESTED -> self_reported",
+      "fullName": "tier adapters TrustTier ATTESTED -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_3",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters TrustTier SELF_REPORTED -> self_reported",
+      "fullName": "tier adapters TrustTier SELF_REPORTED -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_4",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters TrustTier OBSERVED -> observed",
+      "fullName": "tier adapters TrustTier OBSERVED -> observed",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_5",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters TrustTier ATTESTED -> self_reported",
+      "fullName": "tier adapters TrustTier ATTESTED -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_6",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters TrustTier SELF_REPORTED -> self_reported",
+      "fullName": "tier adapters TrustTier SELF_REPORTED -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_7",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters TrustTier UNVERIFIED -> self_reported",
+      "fullName": "tier adapters TrustTier UNVERIFIED -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_8",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters ClaimTier USER_VERIFIED -> self_reported",
+      "fullName": "tier adapters ClaimTier USER_VERIFIED -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_9",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters ClaimTier DERIVED -> self_reported",
+      "fullName": "tier adapters ClaimTier DERIVED -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_10",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters ClaimTier HYPOTHESIS -> self_reported",
+      "fullName": "tier adapters ClaimTier HYPOTHESIS -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_11",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters ClaimTier SESSION_LOCAL -> self_reported",
+      "fullName": "tier adapters ClaimTier SESSION_LOCAL -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_12",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters ClaimTier REFERENCE_ONLY -> self_reported",
+      "fullName": "tier adapters ClaimTier REFERENCE_ONLY -> self_reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_13",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters uppercase status PASS maps as documented",
+      "fullName": "tier adapters uppercase status PASS maps as documented",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_14",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters uppercase status FAIL maps as documented",
+      "fullName": "tier adapters uppercase status FAIL maps as documented",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_15",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters uppercase status NOT_EVALUATED maps as documented",
+      "fullName": "tier adapters uppercase status NOT_EVALUATED maps as documented",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_16",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters uppercase status SATISFIED maps as documented",
+      "fullName": "tier adapters uppercase status SATISFIED maps as documented",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_17",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters uppercase status PARTIAL maps as documented",
+      "fullName": "tier adapters uppercase status PARTIAL maps as documented",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_18",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters uppercase status MISSING maps as documented",
+      "fullName": "tier adapters uppercase status MISSING maps as documented",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_19",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters uppercase status UNKNOWN maps as documented",
+      "fullName": "tier adapters uppercase status UNKNOWN maps as documented",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_20",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters uppercase status NOT_EVALUATED maps as documented",
+      "fullName": "tier adapters uppercase status NOT_EVALUATED maps as documented",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_21",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters unknown stored status COMPLIANT is not evaluated",
+      "fullName": "tier adapters unknown stored status COMPLIANT is not evaluated",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_22",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters unknown stored status partial is not evaluated",
+      "fullName": "tier adapters unknown stored status partial is not evaluated",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_23",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters unknown stored status __proto__ is not evaluated",
+      "fullName": "tier adapters unknown stored status __proto__ is not evaluated",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_0_24",
+      "name": "tests/claims/claimAdapters.test.ts tier adapters unknown stored status constructor is not evaluated",
+      "fullName": "tier adapters unknown stored status constructor is not evaluated",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "799953315_1",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_0",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters a valid, claim-ready observed diagnostic keeps its real level",
+      "fullName": "envelope adapters a valid, claim-ready observed diagnostic keeps its real level",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_1",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters a LOW TRUST run does not pass and says why",
+      "fullName": "envelope adapters a LOW TRUST run does not pass and says why",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_2",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters a self-reported-only run does not pass and says why",
+      "fullName": "envelope adapters a self-reported-only run does not pass and says why",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_3",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters a run with no accepted evidence does not pass and says why",
+      "fullName": "envelope adapters a run with no accepted evidence does not pass and says why",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_4",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters a run that crossed its trust boundary does not pass and says why",
+      "fullName": "envelope adapters a run that crossed its trust boundary does not pass and says why",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_5",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters a run whose evidence chain did not verify does not pass and says why",
+      "fullName": "envelope adapters a run whose evidence chain did not verify does not pass and says why",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_6",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters a claim-ready run with contradictions does not pass",
+      "fullName": "envelope adapters a claim-ready run with contradictions does not pass",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_7",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters an UNSIGNED run is untrusted",
+      "fullName": "envelope adapters an UNSIGNED run is untrusted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_8",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters INVALID and UNRELIABLE runs are untrusted",
+      "fullName": "envelope adapters INVALID and UNRELIABLE runs are untrusted",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_9",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters a diagnostic with no observed coverage is self-reported",
+      "fullName": "envelope adapters a diagnostic with no observed coverage is self-reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_10",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters self-assessment answers are capped and never pass a regulated control",
+      "fullName": "envelope adapters self-assessment answers are capped and never pass a regulated control",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_11",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters synthetic examples are labelled and carry no level",
+      "fullName": "envelope adapters synthetic examples are labelled and carry no level",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_12",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters path presence is a weak method",
+      "fullName": "envelope adapters path presence is a weak method",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "799953315_1_13",
+      "name": "tests/claims/claimAdapters.test.ts envelope adapters legacy 1.x results are self-reported",
+      "fullName": "envelope adapters legacy 1.x results are self-reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1998873630",
+      "name": "tests/claims/claimLabels.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/claims/claimLabels.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1998873630_0",
+      "name": "tests/claims/claimLabels.test.ts renderClaimLabel",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1998873630_0_0",
+      "name": "tests/claims/claimLabels.test.ts renderClaimLabel label per kind",
+      "fullName": "renderClaimLabel label per kind",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1998873630_0_1",
+      "name": "tests/claims/claimLabels.test.ts renderClaimLabel every reason code has one fixed sentence",
+      "fullName": "renderClaimLabel every reason code has one fixed sentence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1998873630_0_2",
+      "name": "tests/claims/claimLabels.test.ts renderClaimLabel the five surface formats carry the same words",
+      "fullName": "renderClaimLabel the five surface formats carry the same words",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1998873630_0_3",
+      "name": "tests/claims/claimLabels.test.ts renderClaimLabel studio output escapes HTML",
+      "fullName": "renderClaimLabel studio output escapes HTML",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1998873630_0_4",
+      "name": "tests/claims/claimLabels.test.ts renderClaimLabel the legend explains every kind, dimension and not evaluated in each format",
+      "fullName": "renderClaimLabel the legend explains every kind, dimension and not evaluated in each format",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1998873630_1",
+      "name": "tests/claims/claimLabels.test.ts schemas",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1998873630_1_0",
+      "name": "tests/claims/claimLabels.test.ts schemas every envelope round-trips",
+      "fullName": "schemas every envelope round-trips",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1998873630_1_1",
+      "name": "tests/claims/claimLabels.test.ts schemas unknown keys and invalid kinds are rejected",
+      "fullName": "schemas unknown keys and invalid kinds are rejected",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1998873630_1_2",
+      "name": "tests/claims/claimLabels.test.ts schemas the Studio console badge prints the server's label and the same legend (P0-23)",
+      "fullName": "schemas the Studio console badge prints the server's label and the same legend (P0-23)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "1266807446",
+      "name": "tests/migration/legacyRelabel.test.ts",
+      "fullName": null,
+      "filepath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-zHuSw6/checkout/tests/migration/legacyRelabel.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1266807446_0",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_0",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+      "fullName": "P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_1",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+      "fullName": "P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_2",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+      "fullName": "P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_3",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+      "fullName": "P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_4",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+      "fullName": "P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_5",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "fullName": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_6",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "fullName": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_7",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+      "fullName": "P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1266807446_1",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_1_0",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+      "fullName": "P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_1_1",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+      "fullName": "P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

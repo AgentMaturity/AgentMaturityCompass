@@ -1,0 +1,191 @@
+{
+  "integrationCommit": "83641bceb68659737d7678daeff3fbb2728e2301",
+  "mergeCommit": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "overlayFailuresResolvedByAssertionUpdates": [
+    "tests/compilerStationDefaults.test.ts exact Technology8-ID expectation",
+    "tests/starterProfiles.test.ts and docs/sdk/TYPESCRIPT_SDK.md exact missing-fact list adds domains"
+  ],
+  "fullSuiteAtFinalSource": "Required once at a7e6 by latest user instruction; not run yet. Cancelled nonfinal e4bb attempt has no measured totals.",
+  "humanReview": "none; experimental and unreviewed",
+  "protectedPaths": "No own diff against int under src/domains, catalog compiler/governance, schema, loader, validator, operating profiles, protected runtime or jurisdiction paths.",
+  "finalSource": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+  "finalCatalogDigest": "sha256:8626c07e015cd4f1ca10dc0b65129a6b623d55148443bfe802815f2f84ec6b52",
+  "supportingDrillCorrection": "NIS2 local warning drill retains six synthetic fixtures. The a7e6 two-file correction rejects timestamps finer than milliseconds before Date.parse for awareness and packet, with three truncation regression vectors and valid 0/1/2/3-digit boundary cases. Missing production evidence remains not_evaluated.",
+  "finalFixtureCounts": {
+    "envelopes": 82,
+    "localOracleCases": 26
+  },
+  "releaseNotesGeneration": "New landing check requires generated release-notes blocks to include this minor changeset; notes regenerated and committed before final qualification. No migration item required for minor.",
+  "finalCatalogVersion": "0.1.1",
+  "historicalInitialChecks": {
+    "sourceHead": "dc416268dd2b0e30433b2d17aaba5e80b101f7f1",
+    "mergeCommit": "4d601b331c86a5b5fdd26d12910897e9f5ffc93c",
+    "catalogCurrencyInitial": {
+      "exit": 0,
+      "controls": 70,
+      "errors": 0,
+      "warnings": 0,
+      "reverifyItemsOpen": 15,
+      "reviewRecords": 0
+    },
+    "catalogChangelogInitial": {
+      "exit": 1,
+      "code": "GOV_CHANGELOG_ENTRY_COUNT",
+      "resolution": "One own appended draft entry will name the final catalog digest and all eight added controls; no review records or promotion."
+    }
+  },
+  "recordedAtUtc": "2026-10-18T10:13:40.290Z",
+  "previousArtifact": {
+    "sourceHead": "b37f2630b74084282abccb777f41f275813e4103",
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/scope-audit-history/2026-10-18T10-13-40.290Z-b37f2630b74084282abccb777f41f275813e4103-89f2121bf2f0-governance-integration.json",
+    "sha256": "89f2121bf2f0b2b1cbeddef52f0d0253981663d946f4f6763ee2abb1c44369e0",
+    "preservedByteExact": true
+  },
+  "d15": {
+    "paths": [
+      "qualification/2026-10-18-P2-30/final-scope-audit.json",
+      "qualification/2026-10-18-P2-30/catalog-governance-integration.json"
+    ],
+    "result": "none"
+  },
+  "currentFormalChecks": {
+    "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+    "state": "running_parent_owned_not_claimed_complete"
+  },
+  "historicalPrePrecisionChecks": {
+    "sourceHead": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+    "path": "qualification/2026-10-18-P2-30/checks/pre-precision-post-governance-results.json",
+    "sha256": "87112b72304bdfa11012d7f1117bc0fe9a4281f67ad4b85f2d6f8b81bf1449b7",
+    "requiredCheckCount": 21,
+    "requiredPassed": 21,
+    "requiredFailed": [],
+    "excludedPreparatoryRecords": [
+      "counts-before-regeneration",
+      "gen-counts"
+    ],
+    "qualificationAtCurrentSource": false
+  },
+  "cancelledNonfinalFullSuite": {
+    "sourceHead": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+    "state": "cancelled_nonfinal_no_totals",
+    "metadataPath": "qualification/2026-10-18-P2-30/checks/pre-precision-full-suite-final.json",
+    "metadataSha256": "6bc46404387f53eb0f1155128b9120890303264650f249f9091fc585fe9860bd",
+    "interruptionPath": "qualification/2026-10-18-P2-30/checks/pre-precision-interruption.json",
+    "interruptionSha256": "02bfaa22dc4e3874d59e5c6b6fc8e51e50fd0e878361dbc6d2bc7705965a1879",
+    "durationMs": 201278,
+    "outerPythonExit": 2,
+    "npmExit": null,
+    "vitestExit": null,
+    "totals": null,
+    "rawLogPath": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/checks/pre-precision-e4bbdb66/full-suite-final.log",
+    "rawLogSha256": "6391617d9afa8e5267549050e8c6adce4bb57eb1fc4a21a88df52a88aaa553c5",
+    "claim": "Root cancelled this e4bb attempt after the precision finding. KeyboardInterrupt was recorded; npm exit and Vitest totals were not captured. It does not satisfy the final a7e6 measured full-run requirement."
+  },
+  "finalFixtureEvidence": {
+    "path": "qualification/2026-10-18-P2-30/oracles/fixture-results.json",
+    "sha256": "bc63d119740c98bb7dd1394d3c62ee73fab45c6db8e0e3703612de31c7b47451",
+    "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+    "freshStandardMutationProofs": 3,
+    "separatePrecisionMutationProof": "qualification/2026-10-18-P2-30/oracles/nis2-precision-mutation.json",
+    "restoredGreenTestsPassed": 135
+  },
+  "sourceEquivalence": "qualification/2026-10-18-P2-30/checks/baseline-p1-10f/final-candidate-equivalence.json",
+  "scopeAudit": "qualification/2026-10-18-P2-30/final-scope-audit.json",
+  "latestIntBaselineEvidence": {
+    "sourceHead": "83641bceb68659737d7678daeff3fbb2728e2301",
+    "state": "two_unchanged_isolated_probes_completed",
+    "evidenceDirectory": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f",
+    "probes": [
+      {
+        "name": "publicDocsGraph",
+        "sourceHead": "83641bceb68659737d7678daeff3fbb2728e2301",
+        "receipt": "qualification/2026-10-18-P2-30/checks/baseline-p1-10f/publicDocsGraph-receipt.json",
+        "receiptSha256": "aa7973c706f3494c4814dbaf801f80006db47bba3a948c14458d03eb6570c423",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/publicDocsGraph.test.ts",
+          "--maxWorkers=1",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/publicDocsGraph-report.json"
+        ],
+        "nodeVersion": "v22.23.3",
+        "startedAtUtc": "2026-10-18T09:58:06.049649+00:00",
+        "finishedAtUtc": "2026-10-18T09:58:08.236254+00:00",
+        "exitCode": 1,
+        "totals": {
+          "tests": 6,
+          "passed": 5,
+          "failed": 1,
+          "pending": 0
+        },
+        "failedAssertions": [
+          "AMC public Docs graph every local guide edge resolves to another promoted guide"
+        ],
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/publicDocsGraph.log",
+        "logSha256": "b9b111c8319413814aced7e81c41c1680d79d39d3a8031a6b9e7b82ba7b1ac4c",
+        "report": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/publicDocsGraph-report.json",
+        "reportSha256": "57817a006c82e574940db57fb9ba38f58d79c5c8715a9c39c91b07908d791b02",
+        "baselineSourceStatusBefore": "",
+        "baselineSourceStatusAfter": ""
+      },
+      {
+        "name": "sessionSpine-performance",
+        "sourceHead": "83641bceb68659737d7678daeff3fbb2728e2301",
+        "receipt": "qualification/2026-10-18-P2-30/checks/baseline-p1-10f/sessionSpine-performance-receipt.json",
+        "receiptSha256": "af19cc8cf39f0f68cb994477405c9bef7c74226aaaa3e09dd7237bf75850b386",
+        "command": [
+          "pnpm",
+          "exec",
+          "vitest",
+          "run",
+          "tests/performance/sessionSpine.performance.test.ts",
+          "--maxWorkers=1",
+          "--reporter=default",
+          "--reporter=json",
+          "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/sessionSpine-performance-report.json"
+        ],
+        "nodeVersion": "v22.23.3",
+        "startedAtUtc": "2026-10-18T09:58:08.399510+00:00",
+        "finishedAtUtc": "2026-10-18T09:59:09.146995+00:00",
+        "exitCode": 1,
+        "totals": {
+          "tests": 2,
+          "passed": 1,
+          "failed": 1,
+          "pending": 0
+        },
+        "failedAssertions": [
+          "session spine throughput blob-backed content events sustain the floor and do not degrade super-linearly"
+        ],
+        "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/sessionSpine-performance.log",
+        "logSha256": "af63736fb459c9b19136d49c2964775ec84b366cd4a45016f6fec9f851158023",
+        "report": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/sessionSpine-performance-report.json",
+        "reportSha256": "b4d32268bf19983ae39c5ad6e6eb9c1228145af94af557e72aa56c6c82c041b5",
+        "baselineSourceStatusBefore": "",
+        "baselineSourceStatusAfter": ""
+      }
+    ],
+    "performance": {
+      "contentEventsPerSecond": 60.08354466677053,
+      "requiredExclusiveMinimum": 150,
+      "controlPlanePassed": true,
+      "cause": "No host-load or P2-30 causation asserted."
+    },
+    "mcpEdge": {
+      "source": "MCP_SERVER",
+      "href": "MCP_INDUSTRY_PACKS.md",
+      "target": "MCP_INDUSTRY_PACKS"
+    },
+    "claim": "Both unchanged isolated probes failed on clean int83641 with the recorded totals. No current-int full suite was run. The new final-candidate-equivalence artifact links their bounded input comparison to a7e6 without rewriting the original e4bb comparison."
+  },
+  "metadataRefreshedAtUtc": "2026-10-18T10:14:08.377Z",
+  "metadataBeforeLatestBaselineRefresh": {
+    "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/scope-audit-history/2026-10-18T10-14-08.377Z-a7e6be69f149bfdeb2845077f3412092443ad6b2-0fc9d08bf1eb-catalog-governance-integration.json",
+    "sha256": "0fc9d08bf1ebbc034fecbba622806dc3ead22492e49bed5f840a76b194e5c0da",
+    "preservedByteExact": true
+  }
+}

@@ -1,0 +1,312 @@
+{
+  "schema": "p125w-control-helper-independent-static-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/source-control.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/source-control.py.source.txt",
+      "bytes": 21942,
+      "sha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32",
+      "dev": 16777231,
+      "inode": 543750104,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/v1-to-v2.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/v1-to-v2.patch.txt",
+      "bytes": 1027,
+      "sha256": "460f904efcb583232f249b0b75cd95858848ef798fe08c5b7a902c547eece8ad",
+      "dev": 16777231,
+      "inode": 543750105,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/README.md",
+      "bytes": 1419,
+      "sha256": "57f6897e9e13140f13a137642351a12ddab44451ad09599953ca7835f9afbcd5",
+      "dev": 16777231,
+      "inode": 543750106,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/input-pins.json",
+      "bytes": 2012,
+      "sha256": "08f6e51aff8883331f2085c8da6c364fb31553b1e92992368a5075afe60b4303",
+      "dev": 16777231,
+      "inode": 543750107,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/author-static-review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/author-static-review.json",
+      "bytes": 2521,
+      "sha256": "2eb213325d2beef788e6b8be7b6640c83ed8b2c1433dfcf8749f7754141bdefc",
+      "dev": 16777231,
+      "inode": 543750108,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control.py.source.txt",
+      "bytes": 21957,
+      "sha256": "2a7181aca9d9f3c76889b460495c426d3969f1e05279c400ab1c9414da775137",
+      "dev": 16777231,
+      "inode": 543743090,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/seal.json",
+      "bytes": 4490,
+      "sha256": "9e2ac66f8b40ae69d2cfd8fff967a57b37bbbd3e80ef6d1427206a111fd6867c",
+      "dev": 16777231,
+      "inode": 543748061,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/README.md",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/README.md",
+      "bytes": 7070,
+      "sha256": "90c500e6f66d789cb502feb3a535e9100332769da7037a9d705c6f0236ed43af",
+      "dev": 16777231,
+      "inode": 543748058,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 78069,
+      "sha256": "f84cd7442210621575ebb659e8fb783fc5764dea3222b7aa5bdccefc0473b725",
+      "dev": 16777231,
+      "inode": 543741688,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/protected-inputs.json",
+      "bytes": 73883,
+      "sha256": "d5e42ca4121f2cb2b098303d1e79e8645ba02045bd012c466a0b55ec5a0e62ca",
+      "dev": 16777231,
+      "inode": 543741190,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-LOWER-BOUND-SELECTION.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-LOWER-BOUND-SELECTION.patch.txt",
+      "bytes": 418,
+      "sha256": "3fb680e293fb0011ca12bd6b689f40163d585812b4cd66ce5d1fb0d114957e71",
+      "dev": 16777231,
+      "inode": 543742987,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-TOLERANCE-CONTRIBUTION.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-TOLERANCE-CONTRIBUTION.patch.txt",
+      "bytes": 756,
+      "sha256": "ac8aae830ca233586d291e0bd3b0f636e8a0000ebdf8126a0f19070f1d5e94da",
+      "dev": 16777231,
+      "inode": 543742988,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/controls.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/controls.json",
+      "bytes": 5499,
+      "sha256": "20328ea86febed06507f121d56d4dc28b4389acbb494298367d73e828f53ff78",
+      "dev": 16777231,
+      "inode": 543742989,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/input-pins.json",
+      "bytes": 5543,
+      "sha256": "7f676063bf84714159ed542c467ccd6c575a88f51358f11b21a08bf9773523ed",
+      "dev": 16777231,
+      "inode": 543748059,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control-v2-adaptation.patch.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-control-v2-adaptation.patch.txt",
+      "bytes": 22127,
+      "sha256": "d1354afcd7e227cc9f6b93892d9d156010819df785ae30dd63b778971e6824f1",
+      "dev": 16777231,
+      "inode": 543743091,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/source-pinset.json",
+      "bytes": 6867,
+      "sha256": "68e48c9fa34740becdd93ff48cbabd548674a4064479a3ed2d2a8836f8292606",
+      "dev": 16777231,
+      "inode": 543742990,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/static-review.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/static-review.json",
+      "bytes": 3493,
+      "sha256": "f486b5e9c0ddd2aecc7b926507d3ad9c14c5c54661a8d9c4da7021f0359c59ec",
+      "dev": 16777231,
+      "inode": 543748060,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/root-candidate-read.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/root-candidate-read.json",
+      "bytes": 766,
+      "sha256": "7252d7c8f156263aa761f363e037372c2e1652773d615e918e5480ac8ea8fbe9",
+      "dev": 16777231,
+      "inode": 543741351,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/README.md",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/README.md",
+      "bytes": 4294,
+      "sha256": "df44429f93ab0071cd7edeabf1ec34164e9133b5b0682eca868e59188fc69f18",
+      "dev": 16777231,
+      "inode": 543729291,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/matrix.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/matrix.json",
+      "bytes": 4138,
+      "sha256": "b06211705c317ad84cbe07707b9f5141f20c737dcf5f61bbbdd11232c5314286",
+      "dev": 16777231,
+      "inode": 543729290,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/seal.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/seal.json",
+      "bytes": 3262,
+      "sha256": "e0ee965ad1ac607320c2c37ba9bd274422e53300cdbe2572ec0b829b2acb9301",
+      "dev": 16777231,
+      "inode": 543729294,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543727816,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.py",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.py",
+      "bytes": 19281,
+      "sha256": "585b761a615a4fed59c1961ccd15b353728b73ab8c583dc5d83cbc4df89f6f27",
+      "dev": 16777231,
+      "inode": 543730118,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-pinset.json",
+      "bytes": 7651,
+      "sha256": "87d2a39c245dd707529d645416f2e9beb93c6338c34fa868d1f19783e2e131fb",
+      "dev": 16777231,
+      "inode": 543658547,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-m1-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-m1-outcome.json",
+      "bytes": 9571,
+      "sha256": "72b4b7323fa3f16ea203057bda4a9d7038e42436c7a1d97b842b5276e87bd9fe",
+      "dev": 16777231,
+      "inode": 543731267,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/m1-classification.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/m1-classification.json",
+      "bytes": 1935,
+      "sha256": "38a94b1f8fc857e0e1adad6886daeccf10d8993e154102dd4e11721acf4472a8",
+      "dev": 16777231,
+      "inode": 543731299,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-fresh-canonical-corrected-path-outcome.json",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/p125k-fresh-canonical-corrected-path-outcome.json",
+      "bytes": 5930,
+      "sha256": "7769033d3aa5eae403e69239a501de9db75ee251c3c26176aa3a15bea48ee91d",
+      "dev": 16777231,
+      "inode": 543730145,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+      "bytes": 21005,
+      "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+      "dev": 16777231,
+      "inode": 542461050,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+      "bytes": 3278,
+      "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+      "dev": 16777231,
+      "inode": 542461052,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/seal.json",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/seal.json",
+      "bytes": 2709,
+      "sha256": "672b18d7f71dd946a91ee0acd772cf70c99eac096dcc2a6477b8364095e103c0",
+      "dev": 16777231,
+      "inode": 543750109,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/tsaTestFixture.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/tsaTestFixture.ts.source.txt",
+      "bytes": 24967,
+      "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c",
+      "dev": 16777231,
+      "inode": 543741685,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/original-own-source/checkpointWindow.test.ts.source.txt",
+      "bytes": 22649,
+      "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+      "dev": 16777231,
+      "inode": 543741686,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "bytes": 25255,
+      "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+      "dev": 16777231,
+      "inode": 543658575,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543658576,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 34
+}

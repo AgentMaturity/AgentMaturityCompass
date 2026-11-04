@@ -1,0 +1,76 @@
+
+ RUN  v4.1.11 /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts (119 tests | 3 failed | 116 skipped) 18ms
+     × rejects a NIS2 24-hour clock as a substitute for the CRA clock 7ms
+     × withholds marking results when image or audio bytes are empty 2ms
+     × records each refused device attempt when policy is missing and executes nothing 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > rejects a NIS2 24-hour clock as a substitute for the CRA clock
+AssertionError: expected 'pass' to be 'not_evaluated' // Object.is equality
+
+Expected: "not_evaluated"
+Received: "pass"
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:110:27
+    108|     if (!spec || spec.kind !== "cra") throw new Error("no positive CRA…
+    109|     const result = runTechnologyOracle({ ...spec, input: { ...spec.inp…
+    110|     expect(result.result).toBe("not_evaluated");
+       |                           ^
+    111|     expect(result.reasonCode).toBe("cra_clock_missing");
+    112|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > withholds marking results when image or audio bytes are empty
+AssertionError: image: expected 'allow' to be 'not_evaluated' // Object.is equality
+
+Expected: "not_evaluated"
+Received: "allow"
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:120:95
+    118|     for (const kind of ["image", "audio"]) {
+    119|       const assets = spec.input.assets.map((asset) => asset.kind === k…
+    120|       expect(runTechnologyOracle({ ...spec, input: { ...spec.input, as…
+       |                                                                                               ^
+    121|     }
+    122|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  tests/catalog/stations/technology/fixtures.test.ts > Technology draft fixtures through the actual compiled platform-agent plan > records each refused device attempt when policy is missing and executes nothing
+AssertionError: expected [] to deeply equal [ { command: 'set_mode', …(1) }, …(1) ]
+
+- Expected
++ Received
+
+- [
+-   {
+-     "command": "set_mode",
+-     "decision": "deny",
+-   },
+-   {
+-     "command": "unlock",
+-     "decision": "deny",
+-   },
+- ]
++ []
+
+ ❯ tests/catalog/stations/technology/fixtures.test.ts:131:29
+    129|     expect(result.result).toBe("not_evaluated");
+    130|     expect(result.executed).toEqual([]);
+    131|     expect(result.receipts).toEqual(spec.input.commands.map((command) …
+       |                             ^
+    132|   });
+    133|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 116 skipped (119)
+   Start at  10:04:39
+   Duration  4.79s (transform 3.14s, setup 83ms, import 4.38s, tests 18ms, environment 0ms)
+

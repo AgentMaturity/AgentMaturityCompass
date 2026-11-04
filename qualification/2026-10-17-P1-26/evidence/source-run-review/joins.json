@@ -1,0 +1,129 @@
+{
+  "schema": "p126-source-run-independent-joins/1",
+  "phases": [
+    {
+      "phase": "p126-unchanged-transparency",
+      "testFiles": [
+        {
+          "path": "tests/sessionAnchorOfflineProof.test.ts",
+          "passed": 22,
+          "failed": 0
+        },
+        {
+          "path": "tests/transparencyMerkleFailLoud.test.ts",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "path": "tests/transparencyMerkleIncremental.test.ts",
+          "passed": 12,
+          "failed": 0
+        }
+      ],
+      "tests": {
+        "total": 41,
+        "passed": 41,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "orderedIdentityCount": 41,
+      "orderedIdentityCompactJsonSha256": "14c833c8e330cde56d46de45316f38e5cba142f2a7dd3b7aaea319b38d5d3d38",
+      "rawObserverOutcomeOrderedJoin": true,
+      "uniqueObserverTaskIds": 52,
+      "allTaskStates": "pass",
+      "hookTaskEntries": 44,
+      "individualHookValues": 44,
+      "hookKinds": {
+        "afterAll": 3,
+        "afterEach": 41
+      },
+      "allHookValues": "pass",
+      "rawFileMessages": [],
+      "rawFailureMessages": [],
+      "taskErrors": [],
+      "unhandledErrors": [],
+      "outerLogLateDiagnostics": [],
+      "publicEvidencePaths": [],
+      "command": {
+        "exit": 0,
+        "durationMs": 8451,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/transparencyMerkleIncremental.test.ts tests/transparencyMerkleFailLoud.test.ts tests/sessionAnchorOfflineProof.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p126-unchanged-transparency.raw.json",
+        "ownedPid": 31229,
+        "ownedPgid": 31229,
+        "observedGroupESRCH": true,
+        "nonzeroSignalsSent": false
+      },
+      "boundary": "Actual process records, not a fresh probe or universal descendant/cleanup/environment/native-load proof."
+    },
+    {
+      "phase": "p126-source-combined",
+      "testFiles": [
+        {
+          "path": "tests/sessionAnchorOfflineProof.test.ts",
+          "passed": 22,
+          "failed": 0
+        },
+        {
+          "path": "tests/transparencyMerkleFailLoud.test.ts",
+          "passed": 7,
+          "failed": 0
+        },
+        {
+          "path": "tests/transparencyMerkleIncremental.test.ts",
+          "passed": 12,
+          "failed": 0
+        },
+        {
+          "path": "tests/transparency/legacyAmbiguity.test.ts",
+          "passed": 2,
+          "failed": 0
+        },
+        {
+          "path": "tests/transparency/rfc9162.test.ts",
+          "passed": 11,
+          "failed": 0
+        }
+      ],
+      "tests": {
+        "total": 54,
+        "passed": 54,
+        "failed": 0,
+        "skipped": 0,
+        "todo": 0
+      },
+      "orderedIdentityCount": 54,
+      "orderedIdentityCompactJsonSha256": "75c9699ecc8d6ab327a77895ea3fe687b1059c8111b84915cf6cea38e4fd5f6f",
+      "rawObserverOutcomeOrderedJoin": true,
+      "uniqueObserverTaskIds": 69,
+      "allTaskStates": "pass",
+      "hookTaskEntries": 46,
+      "individualHookValues": 46,
+      "hookKinds": {
+        "afterAll": 5,
+        "afterEach": 41
+      },
+      "allHookValues": "pass",
+      "rawFileMessages": [],
+      "rawFailureMessages": [],
+      "taskErrors": [],
+      "unhandledErrors": [],
+      "outerLogLateDiagnostics": [],
+      "publicEvidencePaths": [],
+      "command": {
+        "exit": 0,
+        "durationMs": 8348,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/transparency/rfc9162.test.ts tests/transparency/legacyAmbiguity.test.ts tests/transparencyMerkleIncremental.test.ts tests/transparencyMerkleFailLoud.test.ts tests/sessionAnchorOfflineProof.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p126-source-combined.raw.json",
+        "ownedPid": 31799,
+        "ownedPgid": 31799,
+        "observedGroupESRCH": true,
+        "nonzeroSignalsSent": false
+      },
+      "boundary": "Actual process records, not a fresh probe or universal descendant/cleanup/environment/native-load proof."
+    }
+  ],
+  "unchanged41IdentitiesExactInCombined": true,
+  "noSummedPassCount": true
+}

@@ -1,3 +1,5 @@
+import { assertOwnerMode } from "../mode/mode.js";
+import { cgxInitForApiAsync, cgxBuildForApiAsync, cgxPolicyApplyForApiAsync, cgxPolicyForApiAsync } from "./cgxApi.js";
 import {
   cgxBuildForApi,
   cgxInitForApi,
@@ -8,10 +10,6 @@ import {
   cgxVerifyForApi
 } from "./cgxApi.js";
 import type { CgxPolicy } from "./cgxSchema.js";
-
-export function cgxInitCli(workspace: string) {
-  return cgxInitForApi(workspace);
-}
 
 export function cgxBuildCli(params: {
   workspace: string;
@@ -57,4 +55,9 @@ export function cgxPolicyApplyCli(params: {
   policy: CgxPolicy;
 }) {
   return cgxPolicyApplyForApi(params);
+}
+
+export async function cgxInitCliAsync(workspace: string) { return cgxInitForApiAsync(workspace, { beforePublish: () => assertOwnerMode(workspace, "cgx init") }); }
+export async function cgxBuildCliAsync(params: Parameters<typeof cgxBuildCli>[0]) {
+  const own = { ...params }; return cgxBuildForApiAsync({ workspace: own.workspace, scope: own.scope, targetId: own.id }, { beforePublish: () => assertOwnerMode(own.workspace, "cgx build") });
 }

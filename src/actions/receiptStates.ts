@@ -4,6 +4,7 @@
  */
 import { z } from "zod";
 import { authorizationRecordV1Schema } from "../contracts/v1/authorizationRecord.js";
+import { isoTimeSchema } from "../contracts/v1/common.js";
 import { ACTION_CLASSES } from "../governor/actionCatalog.js";
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
@@ -64,7 +65,9 @@ export const actionIntentV1Schema = z.strictObject({
   sessionId: nonEmpty.nullable(),
   callId: nonEmpty,
   owner: z.strictObject({ pid: z.number().int(), hostname: z.string() }),
-  startedAt: z.iso.datetime()
+  startedAt: z.iso.datetime(),
+  /** From a v2 lease (P2-25): the signed delegation chain the call ran under, its delegate's SPIFFE ID and the principal. */
+  delegation: z.strictObject({ chainDigest: sha256, spiffeId: nonEmpty.nullable(), principal: nonEmpty }).optional()
 });
 export type ActionIntentV1 = Readonly<z.infer<typeof actionIntentV1Schema>>;
 
@@ -93,7 +96,7 @@ export const actionReceiptV1Schema = z.strictObject({
   /** `completed` only. */
   outcomeDigest: sha256.nullable(),
   externalRef: z.string().nullable(),
-  at: z.iso.datetime(),
+  at: isoTimeSchema,
   prevReceiptDigest: sha256.nullable()
 });
 export type ActionReceiptV1 = Readonly<z.infer<typeof actionReceiptV1Schema>>;

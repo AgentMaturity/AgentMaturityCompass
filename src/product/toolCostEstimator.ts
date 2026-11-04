@@ -7,7 +7,8 @@ import { MODEL_PRICING as SHARED_MODEL_PRICING } from './modelPricing.js';
 export interface CostEstimate {
   toolName: string;
   estimatedTokens: number;
-  estimatedCost: number;
+  /** Null when the explicitly selected model has no indicative pricing. */
+  estimatedCost: number | null;
   currency: 'USD';
   model?: string;
 }
@@ -21,10 +22,10 @@ export interface ModelPricing {
 
 export interface BatchCostEstimate {
   totalTokens: number;
-  totalCost: number;
+  totalCost: number | null;
   currency: 'USD';
   breakdown: CostEstimate[];
-  budgetRemaining?: number;
+  budgetRemaining?: number | null;
 }
 
 /* ── Model pricing registry ──────────────────────────────────────── */
@@ -40,7 +41,7 @@ export function registerModelPricing(pricing: ModelPricing): void {
 }
 
 export function getModelPricing(model: string): ModelPricing | undefined {
-  return customPricing.get(model) ?? MODEL_PRICING[model];
+  return customPricing.get(model) ?? (Object.hasOwn(MODEL_PRICING, model) ? MODEL_PRICING[model] : undefined);
 }
 
 export function listModels(): string[] {
@@ -65,14 +66,15 @@ export function estimateCost(toolName: string, args: Record<string, unknown>, mo
   const argSize = JSON.stringify(args).length;
   const argTokens = Math.ceil(argSize / 4);
 
-  if (model) {
+  if (model !== undefined) {
     const pricing = getModelPricing(model);
+    const estimatedTokens = argTokens + 100; // base overhead
     if (pricing) {
-      const estimatedTokens = argTokens + 100; // base overhead
       const inputCost = (argTokens / 1000) * pricing.inputPer1kTokens;
       const outputCost = (100 / 1000) * pricing.outputPer1kTokens;
       return { toolName, estimatedTokens, estimatedCost: inputCost + outputCost, currency: 'USD', model };
     }
+    return { toolName, estimatedTokens, estimatedCost: null, currency: 'USD', model };
   }
 
   const info = TOOL_COST_TABLE[toolName] ?? DEFAULT_TOOL_COST;
@@ -90,13 +92,14 @@ export function estimateBatchCost(
 ): BatchCostEstimate {
   const breakdown = calls.map(c => estimateCost(c.toolName, c.args, model));
   const totalTokens = breakdown.reduce((s, e) => s + e.estimatedTokens, 0);
-  const totalCost = breakdown.reduce((s, e) => s + e.estimatedCost, 0);
+  const totalCost = breakdown.reduce<number | null>((sum, estimate) =>
+    sum === null || estimate.estimatedCost === null ? null : sum + estimate.estimatedCost, 0);
   return {
     totalTokens,
     totalCost,
     currency: 'USD',
     breakdown,
-    budgetRemaining: budget !== undefined ? budget - totalCost : undefined,
+    budgetRemaining: budget !== undefined ? totalCost === null ? null : budget - totalCost : undefined,
   };
 }
 
@@ -105,11 +108,9 @@ export function estimateBatchCost(
 export function compareModelCosts(
   calls: Array<{ toolName: string; args: Record<string, unknown> }>,
   models: string[],
-): Record<string, { totalCost: number; totalTokens: number }> {
-  const result: Record<string, { totalCost: number; totalTokens: number }> = {};
-  for (const model of models) {
+): Record<string, { totalCost: number | null; totalTokens: number }> {
+  return Object.fromEntries(models.map(model => {
     const est = estimateBatchCost(calls, model);
-    result[model] = { totalCost: est.totalCost, totalTokens: est.totalTokens };
-  }
-  return result;
+    return [model, { totalCost: est.totalCost, totalTokens: est.totalTokens }];
+  }));
 }

@@ -1,0 +1,243 @@
+{
+  "schema": "p107-two-unit-static-review-pins/1",
+  "at": "2026-10-16T17:45:49.416017+00:00",
+  "inputs": [
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P1-07.md",
+      "bytes": 16067,
+      "sha256": "59ee0fa85c0bb14c39eb9cecdecfd66df9ec64a44c1f9c0c42764a2e45692236"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/README.md",
+      "bytes": 2734,
+      "sha256": "3cdccfe4e278e8e94b106309a5441282ae9de9918e42c37afb3045ce0f6c83ff"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/ownership-facts.json",
+      "bytes": 148634,
+      "sha256": "e6dea5ea0da45d5d74ac86d118bb29ca823a839981668db306dba806446224ba"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/ownership-admission/seal.json",
+      "bytes": 2250,
+      "sha256": "462af5a5bbb29031a7475ad23bf535bec8a6345fccd446f60a70d672bd5dcf7e"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/graph-navigation.json",
+      "bytes": 458,
+      "sha256": "9f022cf3b537c5917b2c45a3c70c3a2adc7095a80d861a579be020540b39999b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/levelSemantics.ts",
+      "bytes": 12367,
+      "sha256": "5c1181a4a5f6d5a4b1431e8eaa64cbdf5590fdae9b5e8e789137db7adacfa841"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceEmitters.ts",
+      "bytes": 12985,
+      "sha256": "f9c7282aa9cd83ad310dc6fdf45b78122a7887c44759cd2a5a66046780d82309"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/evidenceMaps/index.ts",
+      "bytes": 3431,
+      "sha256": "1c44acb695d77c665925ddb9e09a2d649571378c66af50518b098b75c8ae56ec"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/gates.ts",
+      "bytes": 9684,
+      "sha256": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/questionBank.ts",
+      "bytes": 287500,
+      "sha256": "b807d554c4808f5cf743450982ea0deed188ce630b182be25a03218e58ad664a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/questionSets.ts",
+      "bytes": 20170,
+      "sha256": "41882ed3b783f64ede11a5f361b68e07bab30b51f5bd81754ed6befd7c75dffa"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/runner.ts",
+      "bytes": 93321,
+      "sha256": "7e07cb0b29a19e9629838303b601663feaea6854703c5edc49fa77e60abb3ecd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/claims/evidenceProvenance.ts",
+      "bytes": 12211,
+      "sha256": "0cb32b77a73ca2d1dadc4a1a783fdb3f6edd4664ea52e988c49d30e5826fb3ee"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/evidenceEvent.ts",
+      "bytes": 2639,
+      "sha256": "7ce34caf58283938fea6343768cc519a108da9932a99fad63a2e055ccba1c97a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/contracts/v1/common.ts",
+      "bytes": 796,
+      "sha256": "968ad85a0fa59a226e22371f7d8917cfe9fe493690f8c2a2a52a9200637b6f00"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/types.ts",
+      "bytes": 124482,
+      "sha256": "6e5abc85a0b0299b8ecdcd7137e8d7f6fa9178c082bad84a8b7e00b335fd32af"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/tools/toolEvidence.ts",
+      "bytes": 6941,
+      "sha256": "c0453fde0f6b1f29cc9847120735ff241eacf876228c291f7291e377682e1162"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/liveEvidenceProjection.ts",
+      "bytes": 8812,
+      "sha256": "e0acf7be8b03ac8ad9abb59c94b0e9c5b2fdd957c153f7a72454cb7a24b675fd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/diagnostic/spineEvidenceProjection.ts",
+      "bytes": 12816,
+      "sha256": "88ee4fd094014affe150bb6a5422806389ee1366455ecbbbb6ba03f0da9c2684"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/eval/evalImporters.ts",
+      "bytes": 70432,
+      "sha256": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/artifact/artifactProvenance.ts",
+      "bytes": 22483,
+      "sha256": "94ea29bec2715dc19c15632428790e6ffd624e3ff1b22929b6fb5d6f32be7ef4"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/scripts/check-gate-reachability.mjs",
+      "bytes": 9077,
+      "sha256": "e98e01722fd4cafcde62f49859d4ebf8ac6935c74a37343f3d8e9aa2921323ff"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/antiGaming.test.ts",
+      "bytes": 10023,
+      "sha256": "c5e70a5f43aa752951fea0986fd968dc9478d988db515a7ca7f9edd17eb9f7b0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/questionBank.test.ts",
+      "bytes": 1661,
+      "sha256": "819e864bb0a79353b8fb2999fccf1aa10d4e172a42e3ec0d3fd9022d67b997bc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/evidenceGatingCorrection.test.ts",
+      "bytes": 9177,
+      "sha256": "a011916db822f3cbcd46139655c9cfe180a881edb966d2c944e30c21c25cfa7d"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/liveEvidenceProjection.test.ts",
+      "bytes": 13578,
+      "sha256": "55add524d7bf97f8df043f6e5a5f48d8ee004521c2137070fbdd839b9fd9bb99"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/spineEvidenceProjection.test.ts",
+      "bytes": 7475,
+      "sha256": "ae4e3281620d152a4772a0fa0f5957dfef00a4708bd1ab568e6a1102406d9341"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/spineProjectionEndToEnd.test.ts",
+      "bytes": 6031,
+      "sha256": "2dbaebb3a27798cc8059c5ac3d58760f16a7522c2a2a916aeffe0f82c6ecff75"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/README.md",
+      "bytes": 7743,
+      "sha256": "692024f095dbfab6baad25ce61283468f6622c86fbed55113d74bd5304de319d"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/matrix.json",
+      "bytes": 7164,
+      "sha256": "0a5593b6b8f9874193afc7f24eeb2a30dbadbe504c71220e4b95e263fa165a0c"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/pins.json",
+      "bytes": 7118,
+      "sha256": "fce1918e384549940b7c2911d372596927c35fdc2152591750e5d3dce7529314"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-design/seal.json",
+      "bytes": 825,
+      "sha256": "7895e1122e7db943afd43677066a6ef225bf934e6b7dd154dd44c3efeb954407"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/root-pre-admission.json",
+      "bytes": 11039,
+      "sha256": "af7af383d9b9e0d29d66dc4024056736b9d583b51286fb4de7d8c53f1ba262f4"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/branch-preparation.json",
+      "bytes": 300,
+      "sha256": "5923bb45776d29cd2670b0179725c3f6323f3db5fad5339017b7fd6c7720172b"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.json",
+      "bytes": 504,
+      "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tsconfig.tests.json",
+      "bytes": 300,
+      "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/utils/time.ts",
+      "bytes": 759,
+      "sha256": "620fc738ab7832545965978942eb5e067ad69c9d25cd4b1e76c27c4d6a67c009"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/levelCumulative.test.ts",
+      "bytes": 10722,
+      "sha256": "1265e5715bd3ceb3c342c44e3a65681f8d32d74dd962ede9e7f64c8227575c78"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/evidenceEmitterRegistry.test.ts",
+      "bytes": 10448,
+      "sha256": "01ba46f55bf1135306e8e55d9b8c41a4b106ced58aa3a9a5463557fede001061"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/README.md",
+      "bytes": 4298,
+      "sha256": "4bee2587f54827eadfd4fd3bba6489f464146d58fe3debe2ba6a7b0b244c3033"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/input-pins.json",
+      "bytes": 8673,
+      "sha256": "863614bffaf94c39c8e46a6a52ca7a1beef5fe3a80f79be7156a6d51cab400f6"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-proposal/seal.json",
+      "bytes": 1692,
+      "sha256": "2eb18533ccd1d58aebfee0ae5529ef8182f31aaed6b76b91eb43941bca5f1b02"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/operators.json",
+      "bytes": 2410,
+      "sha256": "af520a085f57d1d0ad644a0a32cba474286a76d8c336f6ee151862c7e295748a"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/review.json",
+      "bytes": 6410,
+      "sha256": "73a74d109912fd76b961b20e0246f311d083339c70c357ccdd38a73e11243dd0"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/control-design/seal.json",
+      "bytes": 593,
+      "sha256": "943280286ec9ea8b5dd6fc936ef94b1b0a29cc9090b0920046d966e34e20dbf4"
+    }
+  ],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-static-review/review.json",
+      "bytes": 4576,
+      "sha256": "26ac56b67f9716e5e02034f43e0c5e4fb10f0f9568d33e57ae75a2b337abd685"
+    },
+    {
+      "path": "/private/tmp/p1-07-gate-qualification-20261016/test-static-review/README.md",
+      "bytes": 1712,
+      "sha256": "c7670d18d17f93af1fca9f14325fd7eee7590770d8cc15b400c906f7926f43be"
+    }
+  ]
+}

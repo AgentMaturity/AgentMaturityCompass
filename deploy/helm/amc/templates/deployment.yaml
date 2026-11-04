@@ -1,3 +1,9 @@
+{{- if ne (int .Values.replicaCount) 1 }}
+{{- fail "replicaCount must be 1: the AMC workspace (SQLite ledger on a ReadWriteOnce volume) has a single writer" }}
+{{- end }}
+{{- if and .Values.image.requireDigest (not .Values.image.digest) }}
+{{- fail "image.requireDigest is true but image.digest is empty: deploy by sha256 digest" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,23 +12,28 @@ metadata:
     {{- include "amc.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  # Recreate: a rolling update would run two pods against one workspace.
+  strategy:
+    type: Recreate
   selector:
     matchLabels:
       app.kubernetes.io/name: {{ include "amc.name" . }}
       app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       labels:
-        app.kubernetes.io/name: {{ include "amc.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
         {{- include "amc.labels" . | nindent 8 }}
     spec:
+      # Studio never calls the Kubernetes API, and the token mount would nest inside /run/secrets (/var/run -> /run).
       serviceAccountName: {{ include "amc.serviceAccountName" . }}
+      automountServiceAccountToken: false
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: amc-studio
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{- if .Values.image.digest }}{{ .Values.image.repository }}@{{ .Values.image.digest }}{{- else }}{{ .Values.image.repository }}:{{ .Values.image.tag }}{{- end }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-lc"]
           args:
@@ -30,6 +41,9 @@ spec:
               if [ "${AMC_BOOTSTRAP:-1}" = "1" ]; then
                 amc bootstrap --workspace {{ .Values.workspace.mountPath }};
               fi;
+              {{- if .Values.ledgerEncryption.enabled }}
+              sh /opt/amc-chart/ledger-encryption.sh {{ .Values.workspace.mountPath }} {{ .Values.keyProvider.provider }} {{ .Values.ledgerEncryption.keyRef | squote }} || exit 1;
+              {{- end }}
               exec amc studio start --workspace {{ .Values.workspace.mountPath }} --bind ${AMC_BIND:-0.0.0.0} --port ${AMC_STUDIO_PORT:-3212}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -45,8 +59,18 @@ spec:
               value: /run/secrets/amc_owner_username
             - name: AMC_BOOTSTRAP_OWNER_PASSWORD_FILE
               value: /run/secrets/amc_owner_password
+            {{- if .Values.notary.enabled }}
             - name: AMC_NOTARY_AUTH_SECRET_FILE
               value: /run/secrets/amc_notary_auth_secret
+            {{- end }}
+            {{- if .Values.keyProvider.credentialSecret.name }}
+            - name: {{ include "amc.keyProviderCredentialEnv" . }}
+              value: /run/secrets/amc_key_provider_credential
+            {{- end }}
+            {{- range $name, $value := .Values.keyProvider.env }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
           ports:
             - name: studio
               containerPort: {{ .Values.service.port }}
@@ -54,31 +78,52 @@ spec:
               containerPort: {{ .Values.service.gatewayPort }}
             - name: proxy
               containerPort: {{ .Values.service.proxyPort }}
+            {{- if .Values.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+            {{- end }}
+          # startup covers `amc bootstrap`; readiness gates traffic on signed-policy
+          # trust and ledger reachability; liveness only checks the process answers.
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: studio
+            periodSeconds: 10
+            failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /readyz
               port: studio
-            initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /healthz
               port: studio
-            initialDelaySeconds: 20
             periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 6
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: workspace
               mountPath: {{ .Values.workspace.mountPath }}
+            - name: amc-home-state
+              mountPath: {{ .Values.amcHomeState.mountPath }}
             - name: secrets
               mountPath: /run/secrets
               readOnly: true
             - name: tmp
               mountPath: /tmp
+            {{- if .Values.ledgerEncryption.enabled }}
+            - name: ledger-encryption
+              mountPath: /opt/amc-chart
+              readOnly: true
+            {{- end }}
       {{- if .Values.notary.enabled }}
         - name: amc-notary
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{- if .Values.image.digest }}{{ .Values.image.repository }}@{{ .Values.image.digest }}{{- else }}{{ .Values.image.repository }}:{{ .Values.image.tag }}{{- end }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["amc"]
           args: ["notary", "start", "--notary-dir", "/data/notary", "--workspace", "{{ .Values.workspace.mountPath }}"]
@@ -126,20 +171,33 @@ spec:
           {{- else }}
           emptyDir: {}
           {{- end }}
+        # P1-08 anti-rollback marks and key-set recovery copies; see amcHomeState in values.yaml.
+        - name: amc-home-state
+          {{- if .Values.amcHomeState.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "amc.fullname" . }}-state
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+        # Secrets are created out of band (see docs/KUBERNETES_HELM_DEPLOYMENT.md);
+        # the chart only references them, so no default value can be rendered.
         - name: secrets
-          secret:
-            secretName: {{ .Values.bootstrap.vaultPassphraseSecret.name }}
-            items:
-              - key: {{ .Values.bootstrap.vaultPassphraseSecret.key }}
-                path: amc_vault_passphrase
-              - key: {{ .Values.bootstrap.ownerUsernameSecret.key }}
-                path: amc_owner_username
-              - key: {{ .Values.bootstrap.ownerPasswordSecret.key }}
-                path: amc_owner_password
-              - key: {{ .Values.notary.passphraseSecret.key }}
-                path: amc_notary_passphrase
-              - key: {{ .Values.notary.authSecret.key }}
-                path: amc_notary_auth_secret
+          projected:
+            sources:
+              {{- $refs := list (list .Values.bootstrap.vaultPassphraseSecret "amc_vault_passphrase") (list .Values.bootstrap.ownerUsernameSecret "amc_owner_username") (list .Values.bootstrap.ownerPasswordSecret "amc_owner_password") }}
+              {{- if .Values.notary.enabled }}
+              {{- $refs = concat $refs (list (list .Values.notary.passphraseSecret "amc_notary_passphrase") (list .Values.notary.authSecret "amc_notary_auth_secret")) }}
+              {{- end }}
+              {{- if .Values.keyProvider.credentialSecret.name }}
+              {{- $refs = append $refs (list .Values.keyProvider.credentialSecret "amc_key_provider_credential") }}
+              {{- end }}
+              {{- range $refs }}
+              - secret:
+                  name: {{ (index . 0).name }}
+                  items:
+                    - key: {{ (index . 0).key }}
+                      path: {{ index . 1 }}
+              {{- end }}
         {{- if .Values.notary.enabled }}
         - name: notary
           {{- if .Values.notary.persistence.enabled }}
@@ -151,3 +209,8 @@ spec:
         {{- end }}
         - name: tmp
           emptyDir: {}
+        {{- if .Values.ledgerEncryption.enabled }}
+        - name: ledger-encryption
+          configMap:
+            name: {{ include "amc.fullname" . }}-ledger-encryption
+        {{- end }}

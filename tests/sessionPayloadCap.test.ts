@@ -16,6 +16,7 @@ import { sessionPayloadCap } from "../src/session/sessionPayloadCap.js";
 import { SpilledInputRetentionError } from "../src/session/spill/spillInput.js";
 import { extractSpillRef } from "../src/session/spill/spillTypes.js";
 import { loadOpsPolicy } from "../src/ops/policy.js";
+import { paddedPng } from "./helpers/paddedPng.js";
 
 const roots: string[] = [], writers = new Set<SessionService>();
 afterEach(() => {
@@ -31,8 +32,8 @@ function opened() {
   writer.open({ agentId: "default", harnessVersion: "cap-fixture", compositionDigest: "cap-fixture", policyDigest: "cap-fixture" });
   return { root, writer, cap: sessionPayloadCap(root) };
 }
-/** A PNG header followed by zeros: valid enough for the media sniff, sized exactly as the case needs. */
-function png(bytes: number): Buffer { const out = Buffer.alloc(bytes); PNG.copy(out); return out; }
+/** A well-formed PNG padded inside its container, sized exactly as the case needs. */
+function png(bytes: number): Buffer { return paddedPng(PNG, bytes); }
 
 describe("session payload cap", () => {
   test("the cap is the signed ops-policy value the ledger applies", () => {

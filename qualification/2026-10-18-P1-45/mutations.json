@@ -1,0 +1,162 @@
+{
+ "ranAt": "2026-10-18T05:22:35Z",
+ "mutations": [
+  {
+   "id": "M1-crosswalk-copy",
+   "guard": "a result for one framework never sets another (engine evidence binding)",
+   "file": "src/compliance/evidenceBinding.ts",
+   "test": "tests/crosswalkNoAutoPass.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  1 failed | 1 passed (2)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  2 passed (2)"
+   },
+   "killed": true
+  },
+  {
+   "id": "M2-unknown-weight",
+   "guard": "UNKNOWN earns 0 (restore the pre-S6 0.25)",
+   "file": "src/compliance/coverageScorer.ts",
+   "test": "tests/compliance/coverageScorer.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  2 failed | 5 passed (7)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  7 passed (7)"
+   },
+   "killed": true
+  },
+  {
+   "id": "M3-blank-control-id",
+   "guard": "a row without a control id throws",
+   "file": "src/compliance/coverageScorer.ts",
+   "test": "tests/compliance/coverageScorer.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  3 failed | 4 passed (7)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  7 passed (7)"
+   },
+   "killed": true
+  },
+  {
+   "id": "M4-equivalent-signoff",
+   "guard": "equivalent needs a sign-off id",
+   "file": "src/compliance/mappingSchema.ts",
+   "test": "tests/crosswalkRelations.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  2 failed | 12 passed (14)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  14 passed (14)"
+   },
+   "killed": true
+  },
+  {
+   "id": "M5-data-registry-logic",
+   "guard": "builtInMappings.ts stays data (planner's 60-line function)",
+   "file": "src/compliance/builtInMappings.ts",
+   "test": "tests/builtInMappingsDataOnly.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  1 failed | 2 passed (3)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  3 passed (3)"
+   },
+   "alsoUnderMutation": {
+    "command": "node scripts/architecture-boundaries-check.mjs",
+    "exit": 0,
+    "tail": [
+     "}"
+    ]
+   },
+   "killed": true
+  },
+  {
+   "id": "M6-vacuous-denylist",
+   "guard": "every no-audit requirement can fail",
+   "file": "src/compliance/builtInMappings.ts",
+   "test": "tests/mappingSources.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  1 failed | 14 passed (15)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  15 passed (15)"
+   },
+   "killed": true
+  },
+  {
+   "id": "M7-title-claims-unquoted",
+   "guard": "a title's time limit is quoted or marked not quoted",
+   "file": "src/compliance/frameworks/controls/usStateAiLaws.ts",
+   "test": "tests/frameworksControls.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  1 failed | 26 passed (27)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  27 passed (27)"
+   },
+   "killed": true
+  },
+  {
+   "id": "M8-http-source",
+   "guard": "control sources are https on the shared official host list",
+   "file": "src/compliance/frameworks/controls/nis2.ts",
+   "test": "tests/frameworksControls.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  1 failed | 26 passed (27)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  27 passed (27)"
+   },
+   "killed": true
+  },
+  {
+   "id": "M9-iso42005-descope",
+   "guard": "ISO/IEC 42005 names classify as descoped, never as a family",
+   "file": "src/compliance/frameworks.ts",
+   "test": "tests/frameworksControls.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  1 failed | 26 passed (27)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  27 passed (27)"
+   },
+   "killed": true
+  },
+  {
+   "id": "M10-report-experimental-label",
+   "guard": "markdown reports say mappings are experimental",
+   "file": "src/compliance/complianceReport.ts",
+   "test": "tests/complianceReportReadability.test.ts",
+   "mutated": {
+    "exit": 1,
+    "summary": "Test Files  1 failed (1) / Tests  1 failed | 3 passed (4)"
+   },
+   "restored": {
+    "exit": 0,
+    "summary": "Test Files  1 passed (1) / Tests  4 passed (4)"
+   },
+   "killed": true
+  }
+ ]
+}

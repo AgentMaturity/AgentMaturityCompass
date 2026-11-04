@@ -1,0 +1,19 @@
+Graph: graphify-out/graph.json (36459 nodes) | Traversal: BFS depth=2 | Start: ['CLI'] | 9 nodes found
+
+NODE CLI [src=docs/APPROVALS.md loc=L24 community=Approvals]
+NODE Approvals [src=docs/APPROVALS.md loc=L1 community=Approvals]
+NODE APPROVALS.md [src=docs/APPROVALS.md loc=L1 community=Approvals]
+NODE Audit Events [src=docs/APPROVALS.md loc=L110 community=Approvals]
+NODE Failure and Remediation [src=docs/APPROVALS.md loc=L88 community=Approvals]
+NODE Flow [src=docs/APPROVALS.md loc=L12 community=Approvals]
+NODE Lifecycle Delivery [src=docs/APPROVALS.md loc=L62 community=Approvals]
+NODE Security Guarantees [src=docs/APPROVALS.md loc=L100 community=Approvals]
+NODE Studio and API [src=docs/APPROVALS.md loc=L42 community=Approvals]
+EDGE Approvals --contains [EXTRACTED]--> CLI at=docs/APPROVALS.md:L24
+EDGE APPROVALS.md --contains [EXTRACTED]--> Approvals at=docs/APPROVALS.md:L1
+EDGE Approvals --contains [EXTRACTED]--> Security Guarantees at=docs/APPROVALS.md:L100
+EDGE Approvals --contains [EXTRACTED]--> Audit Events at=docs/APPROVALS.md:L110
+EDGE Approvals --contains [EXTRACTED]--> Flow at=docs/APPROVALS.md:L12
+EDGE Approvals --contains [EXTRACTED]--> Studio and API at=docs/APPROVALS.md:L42
+EDGE Approvals --contains [EXTRACTED]--> Lifecycle Delivery at=docs/APPROVALS.md:L62
+EDGE Approvals --contains [EXTRACTED]--> Failure and Remediation at=docs/APPROVALS.md:L88

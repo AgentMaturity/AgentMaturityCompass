@@ -1,0 +1,95 @@
+[
+  {
+    "mutation": "marking-presence-only",
+    "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "file": "tests/catalog/stations/technology/markingVerifier.ts",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/catalog/stations/technology/fixtures.test.ts",
+      "--maxWorkers=1",
+      "-t",
+      "rejects stripped published bytes even when their marking wrapper is present"
+    ],
+    "exitCode": 1,
+    "expected": "exactly one targeted assertion fails",
+    "targetedAssertionVerified": true,
+    "appliedReplacement": {
+      "before": "return key !== undefined && verify(null, Buffer.from(signedMessage(kind, bytes)), key, marking.signature);",
+      "duringMutation": "return marking !== null; // MUTATION: accept present marking without issuer or byte verification."
+    },
+    "elapsedSeconds": 4.551,
+    "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/marking-presence-only.log",
+    "originalCopy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/marking-presence-only-original.txt",
+    "restoredExactly": true,
+    "sourceBeforeSha256": "5201ea2ecf47e9c6e163d70564e7d9b92b6a2b6decab1816b4e0a55eae1ce2c4",
+    "restoredSha256": "5201ea2ecf47e9c6e163d70564e7d9b92b6a2b6decab1816b4e0a55eae1ce2c4",
+    "nodeVersion": "v22.23.3",
+    "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+    "logSha256": "47c3780e8536ce40868929839fc5aba2ed7215639d5ada0fe89caed3d7c1ece5"
+  },
+  {
+    "mutation": "cra-skip-aibom",
+    "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "file": "tests/catalog/stations/technology/craDrill.ts",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/catalog/stations/technology/fixtures.test.ts",
+      "--maxWorkers=1",
+      "-t",
+      "withholds the CRA drill result when its AIBOM is missing"
+    ],
+    "exitCode": 1,
+    "expected": "exactly one targeted assertion fails",
+    "targetedAssertionVerified": true,
+    "appliedReplacement": {
+      "before": "if (input.aibom === null) return fixtureResult(\"not_evaluated\", \"aibom_missing\");",
+      "duringMutation": "if (input.aibom === null) return fixtureResult(\"pass\", \"packet_on_time\"); // MUTATION: bypass the AIBOM prerequisite."
+    },
+    "elapsedSeconds": 3.96,
+    "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/cra-skip-aibom.log",
+    "originalCopy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/cra-skip-aibom-original.txt",
+    "restoredExactly": true,
+    "sourceBeforeSha256": "09349c47fd5aa6630bb2cf57a60c2d305315583e5a840d1d05d6d58ced052a79",
+    "restoredSha256": "09349c47fd5aa6630bb2cf57a60c2d305315583e5a840d1d05d6d58ced052a79",
+    "nodeVersion": "v22.23.3",
+    "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+    "logSha256": "e419706ba03abcc76b41899473fb8bda7f96fdedee9df5c67f00c312cf394ed3"
+  },
+  {
+    "mutation": "nis2-late-bypass",
+    "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+    "file": "tests/catalog/stations/technology/nis2Drill.ts",
+    "command": [
+      "pnpm",
+      "exec",
+      "vitest",
+      "run",
+      "tests/catalog/stations/technology/fixtures.test.ts",
+      "--maxWorkers=1",
+      "-t",
+      "L1-TECH-07/negative/oracle-nis2-late.json: executes"
+    ],
+    "exitCode": 1,
+    "expected": "exactly one targeted assertion fails",
+    "targetedAssertionVerified": true,
+    "appliedReplacement": {
+      "before": "return packetTime <= addDuration(start, clock.deadline)\n    ? fixtureResult(\"pass\", \"warning_on_time\") : fixtureResult(\"fail\", \"warning_late\");",
+      "duringMutation": "return fixtureResult(\"pass\", \"warning_on_time\"); // MUTATION: bypass the NIS2 deadline guard."
+    },
+    "elapsedSeconds": 3.21,
+    "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/nis2-late-bypass.log",
+    "originalCopy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/nis2-late-bypass-original.txt",
+    "restoredExactly": true,
+    "sourceBeforeSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+    "restoredSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+    "nodeVersion": "v22.23.3",
+    "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+    "logSha256": "88c55520c3732412216755f5a703eeb179f165039e9c638ef2a04ee9f19f6cda"
+  }
+]

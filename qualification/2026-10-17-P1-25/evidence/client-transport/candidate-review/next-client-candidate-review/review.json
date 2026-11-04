@@ -1,0 +1,143 @@
+{
+  "schema": "p125-client-candidate-independent-static-review/1",
+  "at": "2026-10-16T21:27:53.470872+00:00",
+  "verdict": "No concrete static blocker found in the sealed eleven-case candidate against the bounded real DER and local raw HTTP contract. Root must close P1-26 and separately admit, compile and execute it.",
+  "blockers": [],
+  "concreteFixesRequested": [],
+  "allReadsFinished": true,
+  "candidate": {
+    "pin": {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/tsaClient.test.ts",
+      "bytes": 15569,
+      "sha256": "2e70ff1d331f9ec7263dc437119ce9ab505fc1e39c5fbbb27592569cad6c1cb8",
+      "readScope": "full315-line source read"
+    },
+    "authorSeal": {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/next-client-test-design/seal.json",
+      "bytes": 1558,
+      "sha256": "006a2d8cc3c702c6681ea079c49a4a10092df0e309f0cc6f2a3ccd0f43d4788e",
+      "readScope": "full author seal"
+    },
+    "prospectiveTarget": "tests/time/tsaClient.test.ts",
+    "staticLiteralBodyCount": 11,
+    "families": "Three DER bodies and eight raw HTTP bodies; invalid-input/status rows are data within those bodies.",
+    "inventory": [
+      {
+        "name": "encodes the full SHA-256 request, captured positive nonce and literal certReq true",
+        "line": 187
+      },
+      {
+        "name": "inserts the independent literal policy OID without changing the required fields",
+        "line": 197
+      },
+      {
+        "name": "rejects invalid digest strings beside a real valid request",
+        "line": 204
+      },
+      {
+        "name": "POSTs the real request with exact headers/path/body and returns only raw reply bytes",
+        "line": 211
+      },
+      {
+        "name": "normalizes response MIME case and parameters",
+        "line": 228
+      },
+      {
+        "name": "refuses configured URL credentials before a second request reaches the listener",
+        "line": 236
+      },
+      {
+        "name": "refuses finite non-200 statuses before MIME admission",
+        "line": 249
+      },
+      {
+        "name": "refuses a same-listener redirect without requesting its target",
+        "line": 263
+      },
+      {
+        "name": "refuses wrong response MIME after the adjacent real positive",
+        "line": 275
+      },
+      {
+        "name": "returns exactly 65536 bytes and refuses a finite 65537-byte reply",
+        "line": 286
+      },
+      {
+        "name": "uses the unchanged 10000 ms client default against an owned stalled response",
+        "line": 300
+      }
+    ],
+    "matrixNamesAndLinesExact": true,
+    "executed": false,
+    "allocated": false
+  },
+  "pins": {
+    "authorInputsVerified": 45,
+    "authorOutputsVerified": 6,
+    "allBytesAndSha256Exact": true,
+    "verifiedInputRows": "verified-author-inputs.json",
+    "currentSourceLimits": "Runtime/source input bytes match the author pins. Root reports P1-26 metadata staged at partial HEAD97317212147109c4836a408c82067c2ff3c75ee0; this review neither demands whole-tree cleanliness nor treats that metadata state as a client source checkpoint. No fresh Git query was made."
+  },
+  "derReview": {
+    "oracle": "The test assembles complete expected wire hex independently of production DER encoders/readers. Only the actual returned nonce value is inserted; fixed version, SHA-256 OID/NULL, raw digest, policy, integer sign padding and BOOLEAN remain literal.",
+    "independentLiteralLengths": {
+      "withoutPolicy": 70,
+      "withPolicy": 76,
+      "outerContentWithoutPolicy": 68,
+      "outerContentWithPolicy": 74
+    },
+    "nonce": "The regex requires exactly16 lowercase hex digits with the magnitude high bit set. The expected INTEGER is020900 followed by the8 nonce bytes. This checks the captured relation and positive minimal sign-padding, not entropy or nonce uniqueness.",
+    "digestAndPolicy": "The32-byte digest is represented as raw hex bytes, not UTF8 hex text. Optional policy1.2.3.4.1 uses the literal06042a030401. Five malformed digest strings follow a real positive; no malformed-policy contract is invented."
+  },
+  "apiAndTypeReview": {
+    "imports": "Prospective ../../src imports resolve within the actual S/Q tests/time location. Built-in HTTP/net/fs/performance and existing Vitest only; no new package, mock, any, cast or source/parser/compiler execution.",
+    "calls": "Every postTimestampQuery call passes undefined timeoutMs and an explicit owned workspace. This preserves the source10000ms default and avoids unscoped cwd inference.",
+    "staticTypes": "IncomingHttpHeaders, ServerResponse, Socket and AddressInfo uses fit the current Node/TypeScript API shapes; Error.code is narrowed through the in-operator before comparison. Compilation remains unobserved.",
+    "authority": "Raw HTTP replies are synthetic public bytes, not CMS tokens, configured grants, AttestedTime, signed trust lists or public TSA evidence."
+  },
+  "httpReview": {
+    "positive": "A real exact127.0.0.1 ephemeral listener receives actual generated request bytes. The first transport body checks exact method, path/query, Host, Content-Type, Accept, Content-Length and body before treating the raw reply as complete.",
+    "refusals": "Adjacent positives precede credentials, statuses201/500 with wrong MIME, same-listener302, wrong MIME, and65537-byte refusal. Exactly65536 bytes have a real positive. The redirect target is owned and local; no external address is supplied.",
+    "normalization": "The mixed-case MIME plus parameter is compatible with the source split/trim/lowercase path. Status precedence matches the current response branch.",
+    "guardBoundary": "The explicit temporary workspace starts without .amc. Real checkScopedEgress remains enabled; no active policy/registry/key/vault fixture, invalid-workspace negative, registry deletion, environment opt-out, DNS mock, raw-array TCP, Unix-socket tunnel or TLS change is introduced.",
+    "credentialBoundary": "Both userinfo values are synthetic constants. Normal rejection uses the fixed source error and zero additional request count. An independent scoped URL refusal remains in the product, so this is not a claim that one guard is the only barrier."
+  },
+  "resourceReview": {
+    "acquisition": "The server object and persistent error/connection/close observers exist before workspace/listen setup. Each socket close promise is attached at connection; request/response close and error observers attach synchronously at request acquisition.",
+    "setupFailures": "Bind errors reject the listen promise while the server error observer records the same object. Primary errors are not duplicated into cleanup when identity matches. If no listener started, the closure assertion permits that state; any actually listening server is closed in finally.",
+    "finiteFlow": "Finite replies have accurate Content-Length and Connection:close and call end. Request bodies are synthetic finite generated requests. The end handler catches reply/handler failure and attempts a finite500/end while retaining both original and reply errors. No asynchronous callback promise is left unhandled.",
+    "finally": "After the awaited client/body outcome, one ordinary server.close stops accepting and waits for active peers. Then all previously registered request/response/socket close promises are awaited and terminal facts asserted. No destroy, closeAllConnections, retry, fake timer or forced signal is used.",
+    "capAndStall": "Oversize and stalled routes alone permit ECONNRESET/EPIPE to be marked expected peer-abort errors. Those error objects remain in the owned records. Unexpected codes/owners remain cleanup failures. Response close is always required; finite responses require end plus finish unless that explicit peer-abort route applies; stall requires no response end/finish.",
+    "bodyAndCleanupErrors": "If cleanup is clean, the same caught primary value is rethrown. Actual additional cleanup errors produce AggregateError with the primary first; cleanup-only failures also fail. The owned temporary root is removed only in finally and removal errors are retained.",
+    "runtimeLimit": "The client does not expose ClientRequest, and static review cannot guarantee runtime closure or every possible server/worker/native handle. Actual peer terminal states, cleanup assertions and natural frozen-process closure are still required. No universal isolation or native/key erasure claim is made."
+  },
+  "defaultTimeoutReview": {
+    "literalDefaultMs": 10000,
+    "vitestDefaultMs": 30000,
+    "test": "The fixture receives the real request but emits no response headers/body/end. The client default AbortSignal must produce AbortError/ABORT_ERR; actual elapsed time is reported through performance.now in a finally continuation.",
+    "noDeadlineChange": "No supplied shorter timeout, per-test timeout override, fake clock, sleep race, timeout extension or environment change.",
+    "limit": "The test records actual elapsed time without a scheduler threshold. Source binding, default argument, abort category and runtime measurement must be assessed together. It does not cover DNS resolution, configured fallback or total-operation bounds."
+  },
+  "controls": [
+    {
+      "id": "C1-certReq-false",
+      "recipe": "next-client-contract/controls.json",
+      "positiveLine": 191,
+      "intendedPrimaryLine": 193,
+      "assertion": "Literal0101ff follows the complete non-bit DER prefix.",
+      "masking": "Earlier nonce/prefix failure would mask193. Once193fails, later full-hex assertion is masked; the policy body may be separately sensitive. Actual identities/counts are not predicted."
+    },
+    {
+      "id": "C2-ignore-response-MIME",
+      "recipe": "next-client-contract/controls.json",
+      "positiveLine": 278,
+      "promiseCallLine": 280,
+      "matcherLine": 281,
+      "assertion": "Wrong-MIME promise must reject after a real positive and before request-count assertions.",
+      "masking": "Actual stack may identify the call or chained matcher. Clean cleanup preserves the primary error object; real cleanup errors aggregate with primary first. Later count assertions are masked after refusal failure. No fabricated cleanup error or outcome credit."
+    }
+  ],
+  "wholeIssueBoundary": "The existing verifier17/old47 checkpoint remains unchanged. Genuine matching-nonce grants, requestTimestamp fallback, required-time sealing, checkpoints, issuance, signed trust admission, HTTPS/DNS, interoperability, public TSA, package/library approval, full suite/globalquality and whole P1-25/plan remain open. F37 and every held/Claude/reservation/archive/public-entry boundary remain intact.",
+  "adoption": "Root must finish its P1-26 metadata, rebind actual source/ownership, and perform its ordinary hosted/WIP/all-path,D15,freeze and exact allocation before copying. No missing decision is worked around and no new human hold is invented. Future copied source evidence must use inert filenames or the established lossless JSON representation.",
+  "execution": "Static source, literal-byte arithmetic, API/control/lifecycle review and local pin comparisons only. No source/test/checkouts/index/QA modification, product/parser/compiler/test/helper/native/SQL/network/process probe, Git mutation, allocation or Claude contact."
+}

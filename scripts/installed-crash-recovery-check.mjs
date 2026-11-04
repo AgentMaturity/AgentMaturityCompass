@@ -15,7 +15,7 @@ import { runOwnedCommand } from "./lib/ownedProcessCommand.mjs";
 
 const { values } = parseArgs({ options: Object.fromEntries(["artifact", "artifact-sha256", "cli-sha256", "source", "source-tree", "out", "npm"].map(name => [name, { type: "string" }])) });
 for (const key of ["artifact", "artifact-sha256", "cli-sha256", "source", "source-tree", "out"]) assert.ok(values[key], `--${key} is required`);
-assert.match(process.version, /^v22\./, "qualification requires Node 22");
+assert.match(process.version, /^v2[24]\./, "qualification requires Node 22 or 24");
 assert.notEqual(process.platform, "win32", "this acceptance runner requires POSIX process-group cleanup");
 for (const key of ["artifact-sha256", "cli-sha256"]) assert.match(values[key], /^[a-f0-9]{64}$/);
 assert.match(values.source, /^[a-f0-9]{40}$/);
@@ -67,7 +67,8 @@ const receipt = {
   limits: ["Explicit deterministic stub provider and operator-trusted local stdio MCP tool; no live model or OS sandbox claim.",
     "Monitor pin is captured locally before execution; it proves workspace-key consistency, not independent trust anchoring.",
     "Artifact/source build correspondence is supplied by the release receipt; this runner independently pins artifact, installed CLI, and committed orchestration bytes.",
-    "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts."]
+    "Private fixture credentials and raw workspace evidence remain under the mode-0700 output directory; publish only reviewed redacted receipts.",
+    "EXECUTE is reached under an owner-signed Action Policy waiver (READ_ONLY and WRITE_LOW: tier SELF_REPORTED, no evidence gates, run-integrity threshold 0 over the baseline run 02-initialize sealed, no sandbox for low/medium). It proves the governed EXECUTE, signed-approval and crash-recovery path, not the agent's maturity or trust; the waiver's activation is the CONFIG_RESIGNED audit row named in check owner-signed-run-integrity-waiver."]
 };
 const save = () => writeFileSync(join(root, "receipt.json"), scrub(JSON.stringify(receipt, null, 2)) + "\n");
 const check = (name, details = {}) => { receipt.checks.push({ name, ok: true, ...details }); save(); };
@@ -146,8 +147,36 @@ try {
   config.expectedCatalogDigest = catalog.digest; config.grants = [{ name: "append_once", actionClass: "WRITE_LOW" }];
   writeFileSync(configPath, JSON.stringify(config, null, 2) + "\n");
   const toolsPath = join(workspace, ".amc", "tools.yaml"), toolsConfig = YAML.parse(readFileSync(toolsPath, "utf8"));
-  toolsConfig.tools.allowedTools = [{ name: toolName, actionClass: "WRITE_LOW" }];
+  // Deferred MCP tools need native tool_search (READ_ONLY) signed beside the grant (d6441c858).
+  toolsConfig.tools.allowedTools = [{ name: toolName, actionClass: "WRITE_LOW" }, { name: "tool_search", actionClass: "READ_ONLY" }];
   writeFileSync(toolsPath, JSON.stringify(toolsConfig, null, 2) + "\n"); await command("07-tools-sign", ["tools", "sign", "--json"]);
+  // AXR-02: the default signed Action Policy runs a fresh agent's EXECUTE as SIMULATE until its latest trusted run reaches
+  // integrity 0.6. The baseline run 02-initialize sealed measures nothing (integrity ~0), so the owner signs a waiver for
+  // READ_ONLY and WRITE_LOW only: no evidence gates, tier SELF_REPORTED, run-integrity threshold 0, no sandbox for
+  // low/medium. Every decision under it names the waiver. It proves the governed EXECUTE path, not maturity.
+  const policyPath = join(workspace, ".amc", "action-policy.yaml"), policy = YAML.parse(readFileSync(policyPath, "utf8"));
+  for (const rule of policy.actions) {
+    if (rule.actionClass !== "READ_ONLY" && rule.actionClass !== "WRITE_LOW") continue;
+    Object.assign(rule, { minEffectiveQuestionLevels: {}, requireAssurancePacks: {}, requireTrustTierAtLeast: "SELF_REPORTED",
+      requireRunIntegrityAtLeast: 0, allowExecute: true, requireExecTicket: false });
+  }
+  policy.riskTierDefaults.low.requireSandboxForExecute = false; policy.riskTierDefaults.medium.requireSandboxForExecute = false;
+  writeFileSync(policyPath, JSON.stringify(policy, null, 2) + "\n");
+  const resigned = await command("07b-policy-owner-waiver-sign", ["fix-signatures"]);
+  const resignAudit = /Audit event: (\S+)/.exec(String(resigned))?.[1] ?? null;
+  assert.ok(resignAudit, "fix-signatures must re-sign the edited policy and record CONFIG_RESIGNED"); // G4: the waiver's activation row
+  const waiverDecisions = {};
+  for (const action of ["READ_ONLY", "WRITE_LOW"]) {
+    const governed = await command(`07c-governor-check-${action}`, ["governor", "check", "--agent", "default", "--action", action, "--risk", "med", "--mode", "execute"]);
+    assert.equal(governed.effectiveMode, "EXECUTE", governed.reasons.join(" "));
+    const waived = governed.reasons.find(reason => reason.startsWith("RUN INTEGRITY WAIVED:")); assert.ok(waived, "the decision must name the owner waiver");
+    const condition = governed.conditionResults.find(row => row.conditionId === "run-integrity");
+    // G1: a waiver still needs the sealed, anchored baseline run 02-initialize published.
+    assert.equal(condition?.expected, 0); assert.equal(typeof condition?.actual, "number", "a sealed, anchored baseline run must exist (02-initialize)");
+    waiverDecisions[action] = { waived, runIntegrity: condition.actual };
+  }
+  check("owner-signed-run-integrity-waiver", { classes: ["READ_ONLY", "WRITE_LOW"], requireRunIntegrityAtLeast: 0, trustTier: "SELF_REPORTED",
+    sandboxForLowMedium: false, policySha256: sha(readFileSync(policyPath)), configResignedAuditEventId: resignAudit, decisions: waiverDecisions });
   monitor = sha(readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub")));
   writeFileSync(join(root, "private", "pre-execution-monitor.pub"), readFileSync(join(workspace, ".amc", "keys", "monitor_ed25519.pub")));
   env.AMC_EXPECTED_MONITOR_FINGERPRINT = monitor; process.env.AMC_EXPECTED_MONITOR_FINGERPRINT = monitor;
@@ -157,26 +186,53 @@ try {
     mcpConfig: configPath, mcpConfigSha256: sha(readFileSync(configPath)), maxTokens: 128, maxSteps: 3, timeoutMs: 60_000, env };
   const firstClient = await start(options), session = await firstClient.newSession(); sessionId = session.sessionId;
   const initialOwner = owner().current, note = `installed-crash-${runId}`;
-  const turn = session.prompt(note), turnSettlement = turn.result.then(result => ({ result }), error => ({ error: String(error) }));
+  // The owner reviews and approves each call through the signed approval CLI; --approve-tools gates every call.
   let poll = 0;
-  const pending = await until("signed approval", async () => {
-    const listing = await command(`08-pending-${++poll}`, ["approvals", "list", "--agent", "default", "--status", "pending", "--json"]);
-    assert.equal(listing.integrity.valid, true); return listing.requests[0];
-  });
-  const approvalId = pending.approvalRequestId;
-  const review = await command("09-review", ["approvals", "show", "--agent", "default", approvalId]);
-  assert.equal(review.status, "PENDING");
-  for (const field of ["requestIntegrity", "chainIntegrity", "contextIntegrity"]) assert.equal(review[field].valid, true);
-  assert.equal(review.request.toolName, toolName); assert.equal(review.request.requiredApprovals, 1);
-  assert.equal(lines(effectsPath).length, 0);
-  await command("10-approve", ["approvals", "approve", "--agent", "default", approvalId, "--mode", "execute", "--reason", "Explicit local crash-recovery acceptance",
-    "--username", login.username, "--user-id", login.userId, "--roles", login.roles.join(","), "--session-token-file", tokenFile, "--expect-request-digest", review.requestDigestSha256]);
+  const approveNext = async (step, expectedTool) => {
+    const pending = await until(`signed approval for ${expectedTool}`, async () => {
+      const listing = await command(`08-${step}-pending-${++poll}`, ["approvals", "list", "--agent", "default", "--status", "pending", "--json"]);
+      assert.equal(listing.integrity.valid, true); return listing.requests[0];
+    });
+    const approvalId = pending.approvalRequestId;
+    const review = await command(`09-${step}-review`, ["approvals", "show", "--agent", "default", approvalId]);
+    assert.equal(review.status, "PENDING");
+    for (const field of ["requestIntegrity", "chainIntegrity", "contextIntegrity"]) assert.equal(review[field].valid, true);
+    assert.equal(review.request.toolName, expectedTool); assert.equal(review.request.requiredApprovals, 1);
+    // G8: each approval is about an EXECUTE request, so the APPROVE_EXECUTE recorded below decides an EXECUTE call.
+    assert.equal(review.request.requestedMode, "EXECUTE"); assert.equal(review.request.effectiveMode, "EXECUTE");
+    assert.equal(lines(effectsPath).length, 0);
+    await command(`10-${step}-approve`, ["approvals", "approve", "--agent", "default", approvalId, "--mode", "execute", "--reason", "Explicit local crash-recovery acceptance",
+      "--username", login.username, "--user-id", login.userId, "--roles", login.roles.join(","), "--session-token-file", tokenFile, "--expect-request-digest", review.requestDigestSha256]);
+    return approvalId;
+  };
+  // Real deferred discovery through the stub's {"tool","arguments"} directives: search, activate, then call.
+  const discover = async (step, args) => {
+    const turn = session.prompt(JSON.stringify({ tool: "tool_search", arguments: args }));
+    await approveNext(step, "tool_search");
+    const done = await turn.result;
+    assert.equal(done.state, "completed");
+    const outputs = done.updates.filter(({ update }) => update.sessionUpdate === "tool_call_update");
+    assert.equal(outputs.length, 1, `${step}: one tool result`); assert.equal(outputs[0].update.status, "completed");
+    const text = outputs[0].update.content[0].content.text;
+    // AXR-02 under the owner-signed waiver: a SIMULATE result means the waiver did not take effect.
+    assert.ok(!text.startsWith("SIMULATE "), `${step}: tool_search ran as SIMULATE under the signed Action Policy (AXR-02): ${text}`);
+    return JSON.parse(text);
+  };
+  const found = (await discover("search", { query: "append approved acceptance note" })).tools.find(tool => tool.name === toolName);
+  assert.ok(found, "tool_search must discover the granted MCP tool");
+  const { activation } = await discover("activate", { activate: { name: toolName, schemaDigestSha256: found.schemaDigestSha256 } });
+  assert.equal(activation.name, toolName);
+  check("deferred-mcp-tool-discovered-and-activated-through-tool-search", { toolName, schemaDigestSha256: found.schemaDigestSha256, loadoutRevision: activation.revision });
+  const turn = session.prompt(JSON.stringify({ tool: toolName, arguments: { text: note } })), turnSettlement = turn.result.then(result => ({ result }), error => ({ error: String(error) }));
+  const approvalId = await approveNext("effect", toolName);
   await until("durable real effect before ACK", () => lines(processLog).some(row => row.kind === "effect-durable-ack-withheld" && row.runId === runId));
   const effectsBefore = readFileSync(effectsPath), effectRows = lines(effectsPath);
   assert.equal(effectRows.length, 1); assert.equal(effectRows[0].text, note); assert.equal(effectRows[0].runId, runId);
+  // Two discovery calls with results, then the effect call with none.
   const before = history(), calls = before.events.filter(row => row.event_type === "tool/call");
-  assert.equal(calls.length, 1); assert.equal(before.events.filter(row => row.event_type === "tool/result").length, 0);
-  const callId = JSON.parse(calls[0].meta_json).toolCallId;
+  assert.equal(calls.length, 3); assert.equal(before.events.filter(row => row.event_type === "tool/result").length, 2);
+  assert.equal(JSON.parse(calls[2].meta_json).toolName, toolName);
+  const callId = JSON.parse(calls[2].meta_json).toolCallId;
   const capturedOwner = owner().current;
   assert.equal(capturedOwner.pid, initialOwner.pid); assert.equal(capturedOwner.token, initialOwner.token);
   const eventsPath = join(workspace, ".amc", "jsonl", "events.jsonl"), prefix = readFileSync(eventsPath);
@@ -194,7 +250,7 @@ try {
   assert.deepEqual(readFileSync(eventsPath).subarray(0, prefix.length), prefix); assert.deepEqual(readFileSync(effectsPath), effectsBefore);
   const recovered = history(), unknown = recovered.events.filter(row => row.event_type === "tool/result" && JSON.parse(row.meta_json).outcome === "TOOL_OUTCOME_UNKNOWN");
   assert.equal(unknown.length, 1); assert.equal(JSON.parse(unknown[0].meta_json).toolCallId, callId);
-  assert.equal(recovered.events.filter(row => row.event_type === "request/header").length, 1);
+  assert.equal(recovered.events.filter(row => row.event_type === "request/header").length, 5);
   const spentAfter = await command("12-budget-after-resume", ["budgets", "status", "--agent", "default"]);
   assert.deepEqual(spentAfter.usage.daily, spentBefore.usage.daily);
   check("resume-preserves-original-prefix-uncertain-outcome-and-reservation", { unknownToolOutcomes: 1, automaticModelCalls: 0, effectCount: 1 });
@@ -203,14 +259,14 @@ try {
   const verified = await resumed.closeAndVerify(); assert.equal(verified.report.ok, true);
   const final = Native.loadSessionEventHistory({ workspace, sessionId, agentId: "default", expectedMonitorFingerprint: monitor, verifyPayloads: true, requireSealed: true });
   assert.equal(final.events.filter(row => row.event_type === "session/open").length, 1);
-  assert.equal(final.events.filter(row => row.event_type === "request/header").length, 2);
-  assert.equal(final.events.filter(row => row.event_type === "tool/call").length, 1);
+  assert.equal(final.events.filter(row => row.event_type === "request/header").length, 6);
+  assert.equal(final.events.filter(row => row.event_type === "tool/call").length, 3);
   assert.deepEqual(readFileSync(effectsPath), effectsBefore);
   const cold = await command("13-cold-native-verification", ["agent-loop", "verify", sessionId, "--json", "--expect-monitor", monitor]); assert.equal(cold.ok, true);
   const ledger = await command("14-cold-ledger-verification", ["session", "verify", "--json", "--expect-monitor", monitor]); assert.equal(ledger.ok, true); assert.deepEqual(ledger.errors, []);
   const finalBudget = await command("15-final-budget", ["budgets", "status", "--agent", "default"]);
   assert.equal(finalBudget.usage.daily.toolPending.WRITE_LOW, 1);
-  check("new-explicit-turn-without-side-effect-replay-and-cold-verification", { finalModelCalls: 2, finalToolCalls: 1, effectCount: 1,
+  check("new-explicit-turn-without-side-effect-replay-and-cold-verification", { finalModelCalls: 6, finalToolCalls: 3, effectCount: 1,
     pendingWriteLow: 1, payloads: final.verification.payloads, historySha256: final.historySha256 });
   receipt.ok = true;
 } catch (error) { receipt.error = scrub(error.stack ?? String(error)); process.exitCode = 1; }

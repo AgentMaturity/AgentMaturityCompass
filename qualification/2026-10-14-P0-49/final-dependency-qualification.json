@@ -1,0 +1,476 @@
+{
+  "kind": "fresh actual Node24 P0-49 production dependency audit and accepted-main D-15 manifest component checks",
+  "fixture": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+  "currentHead": "c4be164ea12d358ea30451391a6df29429fc6a7e",
+  "acceptedBase": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "P047ComparisonRef": "71ed73e5886bc957130f9712985281d1b1149fca",
+  "node": "v24.21.0",
+  "pnpm": "10.33.0",
+  "gitNoLazyFetch": true,
+  "initialGitStatus": "",
+  "inputComparisons": [
+    {
+      "path": "package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": true
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "d03bdcfad97c928e1f415057176f1b5ec6ea9c03",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "d03bdcfad97c928e1f415057176f1b5ec6ea9c03",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "d03bdcfad97c928e1f415057176f1b5ec6ea9c03"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": true
+    },
+    {
+      "path": "scripts/snapshot-plan-edit.mjs",
+      "sha256": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "faaab384dc50a76235046ee869e68975f272bf2c",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "faaab384dc50a76235046ee869e68975f272bf2c",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "faaab384dc50a76235046ee869e68975f272bf2c"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": true
+    },
+    {
+      "path": "tests/helpers/landedSource.ts",
+      "sha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "4af907a9228f72a997edcb919038bada64dcc226",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "4af907a9228f72a997edcb919038bada64dcc226",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "4af907a9228f72a997edcb919038bada64dcc226"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": true
+    },
+    {
+      "path": "tests/helpers/packageEntries.ts",
+      "sha256": "1bcada34e53fb15466bc7da1cee95114ed074763085e1866f259d96939c0cedf",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "370c39d382c1c850f635a2562a78896093bc59ae",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "370c39d382c1c850f635a2562a78896093bc59ae",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "370c39d382c1c850f635a2562a78896093bc59ae"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": true
+    },
+    {
+      "path": "tests/planEditsManifest.test.ts",
+      "sha256": "e04d2f1d073440fac52ca990965fcae2772fbf9a6ade236cfe9dbbdf8c488d63",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "23c590cc501d882fb307c051da4f432210c2c6f3",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "89093ca7a7eeecda5f50dd235655225a79720f5a",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "23c590cc501d882fb307c051da4f432210c2c6f3"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": false
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "sha256": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "d84e3abecfc8c41b8d9a1e4674102b2bf7dc1a66",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "1b7bef966de9d30e229cd6f8c762e0adde5a0dc3",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "d84e3abecfc8c41b8d9a1e4674102b2bf7dc1a66"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": false
+    },
+    {
+      "path": "unused-code/plan-edits/README.md",
+      "sha256": "713815b36d9b347a701f0275e041987d049c434760313f8a55da096809e63d91",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "6c2a7b4cfc71ff249981147637ae0b95c7029cae",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "6c2a7b4cfc71ff249981147637ae0b95c7029cae",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "6c2a7b4cfc71ff249981147637ae0b95c7029cae"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+      "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "dcc0e0dac48087deae560f7122686b04a44daef2",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "dcc0e0dac48087deae560f7122686b04a44daef2",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "dcc0e0dac48087deae560f7122686b04a44daef2"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": true
+    },
+    {
+      "path": "unused-code/plan-edits/P0-09/package.json.landed",
+      "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+      "gitObjects": {
+        "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c": "6c779f7e1d134fa34c68a6e190e1e4e6db3c7458",
+        "71ed73e5886bc957130f9712985281d1b1149fca": "6c779f7e1d134fa34c68a6e190e1e4e6db3c7458",
+        "c4be164ea12d358ea30451391a6df29429fc6a7e": "6c779f7e1d134fa34c68a6e190e1e4e6db3c7458"
+      },
+      "equalAcceptedBase": true,
+      "equalP047": true
+    }
+  ],
+  "archiveOrigins": [
+    {
+      "manifestEntry": {
+        "path": "package.json",
+        "issue": "P0-09",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-09/package.json.landed",
+        "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc"
+      },
+      "archiveSha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+      "baseFileSha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+      "byteEqualBaseFile": true,
+      "baseFileGitBlob": "6c779f7e1d134fa34c68a6e190e1e4e6db3c7458",
+      "currentArchiveGitBlob": "6c779f7e1d134fa34c68a6e190e1e4e6db3c7458",
+      "baseIsAncestorExitCode": 0,
+      "archiveOriginCommits": [
+        {
+          "commit": "b8417acb08250b169044139be072b1db671076ef",
+          "isAncestorExitCode": 0
+        }
+      ]
+    },
+    {
+      "manifestEntry": {
+        "path": "pnpm-lock.yaml",
+        "issue": "P0-49",
+        "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+        "archivePath": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+        "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
+      },
+      "archiveSha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "baseFileSha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+      "byteEqualBaseFile": true,
+      "baseFileGitBlob": "dcc0e0dac48087deae560f7122686b04a44daef2",
+      "currentArchiveGitBlob": "dcc0e0dac48087deae560f7122686b04a44daef2",
+      "baseIsAncestorExitCode": 0,
+      "archiveOriginCommits": [
+        {
+          "commit": "7c1afe4930db1b0d7997eb7860645e59433e8e42",
+          "isAncestorExitCode": 0
+        }
+      ]
+    }
+  ],
+  "gitShallow": "false",
+  "productionSourceComparison": {
+    "equalAcceptedBase": true,
+    "equalP047": false,
+    "differentP047SourcePaths": [
+      "src/claims/evidenceProvenance.ts",
+      "src/llm/adapter/llmRuntime.ts"
+    ]
+  },
+  "priorReportsReused": false,
+  "work": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z",
+  "sourceHashesBefore": {
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "pnpm-workspace.yaml": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+    "scripts/snapshot-plan-edit.mjs": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+    "tests/helpers/landedSource.ts": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+    "tests/helpers/packageEntries.ts": "1bcada34e53fb15466bc7da1cee95114ed074763085e1866f259d96939c0cedf",
+    "tests/planEditsManifest.test.ts": "e04d2f1d073440fac52ca990965fcae2772fbf9a6ade236cfe9dbbdf8c488d63",
+    "unused-code/plan-edits/manifest.json": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+    "unused-code/plan-edits/README.md": "713815b36d9b347a701f0275e041987d049c434760313f8a55da096809e63d91",
+    "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+    "unused-code/plan-edits/P0-09/package.json.landed": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc"
+  },
+  "phases": [
+    {
+      "label": "production-audit",
+      "argv": [
+        "pnpm",
+        "audit",
+        "--prod",
+        "--audit-level=moderate",
+        "--json"
+      ],
+      "startedAt": "2026-10-14T14:50:10.063268+00:00",
+      "endedAt": "2026-10-14T14:50:10.902239+00:00",
+      "durationSeconds": 0.839,
+      "exitCode": 0,
+      "stdout": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/production-audit.stdout",
+      "stdoutSha256": "c30e0af322a954d2a84a0b344aa586a7c82f6b8b477eaff81df8ddc26cc2f5f9",
+      "stderr": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/production-audit.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "installed-production-graph",
+      "argv": [
+        "pnpm",
+        "list",
+        "--prod",
+        "--depth",
+        "Infinity",
+        "--json"
+      ],
+      "startedAt": "2026-10-14T14:50:10.903335+00:00",
+      "endedAt": "2026-10-14T14:50:11.206987+00:00",
+      "durationSeconds": 0.304,
+      "exitCode": 0,
+      "stdout": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/installed-production-graph.stdout",
+      "stdoutSha256": "ed4060d1e72ad0e76f10f0a326139ba352dda7b497e01a23c3abea2f64a84f95",
+      "stderr": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/installed-production-graph.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "label": "manifest-whole16",
+      "argv": [
+        "/opt/homebrew/opt/node@24/bin/node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/planEditsManifest.test.ts",
+        "--reporter=default",
+        "--reporter=json",
+        "--outputFile.json=/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/manifest-whole16.json"
+      ],
+      "startedAt": "2026-10-14T14:50:11.208852+00:00",
+      "endedAt": "2026-10-14T14:50:14.714570+00:00",
+      "durationSeconds": 3.506,
+      "exitCode": 0,
+      "stdout": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/manifest-whole16.stdout",
+      "stdoutSha256": "0ba53f2a690fa4581d5adaf99f3d936115bbcb609274c41377c9a36f3619feeb",
+      "stderr": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/manifest-whole16.stderr",
+      "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "status": "DEPENDENCY_COMPONENT_QUALIFIED",
+  "rawAuditResult": {
+    "actions": [],
+    "advisories": {},
+    "muted": [],
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0
+      },
+      "dependencies": 192,
+      "devDependencies": 0,
+      "optionalDependencies": 0,
+      "totalDependencies": 192
+    }
+  },
+  "auditMetadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "dependencies": 192,
+    "devDependencies": 0,
+    "optionalDependencies": 0,
+    "totalDependencies": 192
+  },
+  "advisoryCount": 0,
+  "auditProductionZeroExit": true,
+  "installedDependencyChain": {
+    "sdk": {
+      "version": "1.32.1",
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/.pnpm/@modelcontextprotocol+sdk@1.32.1_zod@4.4.3/node_modules/@modelcontextprotocol/sdk"
+    },
+    "express": {
+      "version": "5.2.1",
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/.pnpm/express@5.2.1/node_modules/express"
+    },
+    "proxyAddr": {
+      "version": "2.0.8",
+      "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/node_modules/.pnpm/proxy-addr@2.0.8/node_modules/proxy-addr"
+    }
+  },
+  "installedProductionGraphUniqueNodes": 160,
+  "directProductionDependencies": 8,
+  "packageProxyAddrOverride": "^2.0.8",
+  "actualManifestReport": {
+    "path": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/manifest-whole16.json",
+    "sha256": "a30e91a81ae0d69504b13b56115996ff0af46e712e3666002f2242658095e71c",
+    "success": true,
+    "numTotalTests": 15,
+    "numPassedTests": 15,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "actualManifestCases": [
+    {
+      "fullName": "committed plan-edits manifest (D-15) validates: schema, sorted unique paths, archives under plan-edits/<issue>/, archive sha256, 40-hex base",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "committed plan-edits manifest (D-15) archives equal the blob at an ancestor baseCommit, or the pinned build for dist/ outputs",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "committed plan-edits manifest (D-15) rejects malformed manifests",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "landedSource helper returns live bytes for an unregistered path and archive bytes for a registered one",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "landedSource helper normalizes ./, backslashes and absolute paths before the lookup",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "landedSource helper throws when an archive no longer matches its manifest sha256",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "scripts/snapshot-plan-edit.mjs archives the base bytes, not the working tree, and writes a sorted manifest the helper accepts",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "scripts/snapshot-plan-edit.mjs refuses a path that is already registered and prints the existing entry",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "scripts/snapshot-plan-edit.mjs refuses a bad issue key, a path outside the repository and a path absent at the base",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "scripts/snapshot-plan-edit.mjs archives package.json at the base, so the package-entries pin keeps reading the landed manifest",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "scripts/snapshot-plan-edit.mjs runs when invoked through a symlinked script path",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "scripts/snapshot-plan-edit.mjs fails provenance, not skips, when a baseCommit is not an ancestor of HEAD",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "scripts/snapshot-plan-edit.mjs warns when the manifest has uncommitted entries from another issue",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "scripts/snapshot-plan-edit.mjs pinned build outputs under dist/ registering a source also archives its pinned build outputs from disk",
+      "status": "passed",
+      "failureMessages": []
+    },
+    {
+      "fullName": "scripts/snapshot-plan-edit.mjs pinned build outputs under dist/ refuses a rebuilt output that no longer matches its pin and writes nothing",
+      "status": "passed",
+      "failureMessages": []
+    }
+  ],
+  "sourceHashesAfter": {
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+    "pnpm-workspace.yaml": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+    "scripts/snapshot-plan-edit.mjs": "a4d4cf2e5e2acf468497e9a751184ecba306b22d4229d6f8d3eefed66b6dfb68",
+    "tests/helpers/landedSource.ts": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+    "tests/helpers/packageEntries.ts": "1bcada34e53fb15466bc7da1cee95114ed074763085e1866f259d96939c0cedf",
+    "tests/planEditsManifest.test.ts": "e04d2f1d073440fac52ca990965fcae2772fbf9a6ade236cfe9dbbdf8c488d63",
+    "unused-code/plan-edits/manifest.json": "d83be1102ae95082028ab3bd1e35de8f36d83a5e7ddebb4278b7fd7a616ecb21",
+    "unused-code/plan-edits/README.md": "713815b36d9b347a701f0275e041987d049c434760313f8a55da096809e63d91",
+    "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+    "unused-code/plan-edits/P0-09/package.json.landed": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc"
+  },
+  "sourceUnchanged": true,
+  "finalHead": "c4be164ea12d358ea30451391a6df29429fc6a7e",
+  "finalGitStatus": "",
+  "privateRawCopies": [
+    {
+      "path": "/private/tmp/p0-49-final-dependency-production-audit-stdout-20261014.log",
+      "sha256": "c30e0af322a954d2a84a0b344aa586a7c82f6b8b477eaff81df8ddc26cc2f5f9",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/production-audit.stdout"
+    },
+    {
+      "path": "/private/tmp/p0-49-final-dependency-production-audit-stderr-20261014.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/production-audit.stderr"
+    },
+    {
+      "path": "/private/tmp/p0-49-final-dependency-installed-production-graph-stdout-20261014.log",
+      "sha256": "ed4060d1e72ad0e76f10f0a326139ba352dda7b497e01a23c3abea2f64a84f95",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/installed-production-graph.stdout"
+    },
+    {
+      "path": "/private/tmp/p0-49-final-dependency-installed-production-graph-stderr-20261014.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/installed-production-graph.stderr"
+    },
+    {
+      "path": "/private/tmp/p0-49-final-dependency-manifest-whole16-stdout-20261014.log",
+      "sha256": "0ba53f2a690fa4581d5adaf99f3d936115bbcb609274c41377c9a36f3619feeb",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/manifest-whole16.stdout"
+    },
+    {
+      "path": "/private/tmp/p0-49-final-dependency-manifest-whole16-stderr-20261014.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/manifest-whole16.stderr"
+    },
+    {
+      "path": "/private/tmp/p0-49-final-dependency-manifest-16-20261014.json",
+      "sha256": "a30e91a81ae0d69504b13b56115996ff0af46e712e3666002f2242658095e71c",
+      "source": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/manifest-whole16.json"
+    }
+  ],
+  "limits": [
+    "Dependency qualification and accepted-main15-case manifest component only; no whole suite, coverage, hosted CI, release or publication claim.",
+    "Accepted-main compiled snapshot future/nonancestor provenance guard gap remains. Passing current15cases and verifying the two real source archives does not integrate the stronger P0-47 guard/test changes.",
+    "No production, package, lock, dependency, test or archive changes; no reinstall. No candidate/root worktree actions or cleanup of preexisting artifacts."
+  ],
+  "countCorrection": {
+    "originalInstructionExpectedCases": 16,
+    "actualAcceptedMainCases": 15,
+    "correctedRequirement": "Every existing accepted-main case must pass;15/15success with0failed/pending/todo satisfies that requirement.",
+    "parentCorrection": "My16instruction incorrectly carried P047's added compiled-ancestry test across scopes. Current P049 qualification requires every existing case, so15/15success0pending is the correct pass; record the instruction/count correction explicitly, without adding a test or inventing waiver.",
+    "classification": "Correction of mistaken expected count to actual unchanged source; no test addition, skipped case or waiver.",
+    "originalRawPhaseLabel": "manifest-whole16",
+    "rawPhaseLabelNote": "Historical driver label preserves the initially mistaken expectation. The actual raw JSON reports15total,15passed. No report bytes were altered."
+  },
+  "originalExpected16PredicatePassed": false,
+  "allExistingManifestCasesPassed": true,
+  "dependencyCountMeasures": {
+    "auditMetadataProductionDependencies": 192,
+    "auditMetadataTotalDependencies": 192,
+    "pnpmListUniqueNameVersionPathNodes": 160,
+    "directProductionDependencies": 8,
+    "sameMeasure": false,
+    "explanation": "The audit response counts192production dependency entries; the separately retained pnpm-list tree exposes160unique(name,version,path) nodes. No equality between those measures is required or claimed."
+  }
+}

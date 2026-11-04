@@ -6,11 +6,11 @@ export default defineConfig({
     testTimeout: 30_000,
     include: ["tests/**/*.test.ts"],
     globalSetup: ["tests/setup/repoWorkspaceGuard.global.ts"],
-    setupFiles: ["tests/setup/guardWorkspace.ts", "tests/setup/repoWorkspaceGuard.ts"],
+    setupFiles: ["tests/setup/vaultPassphrase.ts", "tests/setup/guardWorkspace.ts", "tests/setup/repoWorkspaceGuard.ts"],
     coverage: {
       provider: "v8",
       reporter: ["text", "html", "json-summary"],
-      include: ["src/**/*.ts"],
+      include: ["src/**/*.ts", "packages/verifier/src/**/*.ts"],
       exclude: ["tests/**", "src/console/**", "src/dashboard/**"],
       /**
        * Enforced floor, set just below the measured baseline so a real
@@ -25,7 +25,8 @@ export default defineConfig({
        * 80% target in the engineering standards is the destination, not the
        * current state, and pretending otherwise is what left the gate at zero.
        */
-      thresholds: {
+      // CI shards (AMC_COVERAGE_SHARD=1) each hold a quarter of the coverage; build-test merges them and checks once.
+      thresholds: process.env.AMC_COVERAGE_SHARD === "1" ? undefined : {
         lines: 65,
         functions: 75,
         branches: 59,

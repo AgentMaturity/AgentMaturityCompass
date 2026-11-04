@@ -1,0 +1,655 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-25",
+  "source": "2d552741d727aaf3a26759b9df9343f7804d157a",
+  "codeSource": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "reviewKind": "Independent read-only review of frozen bounded actual qualification",
+  "state": "BOUNDED_EVIDENCE_CONSISTENT_FORMAL_ACCEPTANCE_OPEN",
+  "blockingEvidenceFindings": 0,
+  "findings": [],
+  "authorship": "This reviewer did not author or execute P0-25 qualification. No current or historical product command was rerun.",
+  "actualAudit": {
+    "errors": [],
+    "separateTestRuns": [
+      {
+        "phase": "original-citations-mapping",
+        "registered": 32,
+        "passed": 32,
+        "raw": {
+          "path": "/private/tmp/p0-25-original-citations-mapping-20261015.json",
+          "bytes": 10220,
+          "sha256": "f9250d40691dfeb47f8186d21710526563f456ed088d07235bbe1b19f3fec2ce"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-25-qualification-20261015/observers/original-citations-mapping.json",
+          "bytes": 15507,
+          "sha256": "face22b6fd610d8ed0dd32e94854b5c21ff4121da8d13afe62715146171df5ee"
+        },
+        "fileCounts": {
+          "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/checkCitationsCli.test.ts": 9,
+          "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/citations/lintCitations.test.ts": 21,
+          "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/compliance/mappingPackRefs.test.ts": 2
+        },
+        "observerPid": 7637,
+        "recordedInfrastructureErrors": 0,
+        "names": [
+          "check-citations CLI uses the linter's rule names, tolerance and burn-down issues",
+          "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+          "check-citations CLI exits 0 below the baseline and suggests --update-baseline",
+          "check-citations CLI exits 1 on a zero-tolerance finding even when the baseline lists it",
+          "check-citations CLI refuses --update-baseline without --reason",
+          "check-citations CLI rejects an unknown flag",
+          "check-citations CLI writes current ratcheted counts and the reason with --update-baseline --reason",
+          "check-citations CLI refuses a baseline entry with counts but no issue key or reason",
+          "check-citations CLI prints a JSON summary with per-rule totals",
+          "lintCitations fixtures covers the thirteen issue fixtures",
+          "lintCitations fixtures complete record on an official host with statusType supervisory-guidance",
+          "lintCitations fixtures SR 11-7 reference whose record is in-force",
+          "lintCitations fixtures SR 11-7 record repealed with supersededBy us-sr-26-2",
+          "lintCitations fixtures malformed ATLAS id AML.T48",
+          "lintCitations fixtures prompt injection labelled AML.T0048",
+          "lintCitations fixtures NIST GOVERN 9.9 with a filled reference table",
+          "lintCitations fixtures ISO/IEC 42001 A.5 labelled AI policy",
+          "lintCitations fixtures mapping packId pii_detection_leakage",
+          "lintCitations fixtures related.packs host_hardening",
+          "lintCitations fixtures statusType binding",
+          "lintCitations fixtures superseded record without supersededBy",
+          "lintCitations fixtures url on a host outside the shared list",
+          "lintCitations fixtures record with neither retrievedAt nor contentSha256",
+          "lintCitations fixtures names the replacement when a citation is superseded",
+          "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+          "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+          "lintCitations fixtures flags a citation that must resolve but matches no catalogue record",
+          "shared official host list contains every register host and every pack-catalogue host",
+          "shared official host list is the list the pack catalogue validates against",
+          "framework reference tables records where each filled table came from",
+          "built-in compliance mapping pack references every requires_assurance_pack packId is a registered assurance pack id (exact match)",
+          "built-in compliance mapping pack references every related.packs entry resolves after ignoring case, - and _"
+        ]
+      },
+      {
+        "phase": "release-executor-contracts",
+        "registered": 22,
+        "passed": 22,
+        "raw": {
+          "path": "/private/tmp/p0-25-release-executor-contracts-20261015.json",
+          "bytes": 8707,
+          "sha256": "7fceee2436c1b18c27ab8016a00d8bffa5ee5f304c51a7e6acd496bc8a5c0b12"
+        },
+        "observer": {
+          "path": "/private/tmp/p0-25-qualification-20261015/observers/release-executor-contracts.json",
+          "bytes": 11918,
+          "sha256": "a5452d57d332269d5472f0f4fe2e89fd9dfea808abf9a96592bdf90307ba49ee"
+        },
+        "fileCounts": {
+          "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/tests/releaseGateExecution.test.ts": 22
+        },
+        "observerPid": 7863,
+        "recordedInfrastructureErrors": 0,
+        "names": [
+          "release gate execution and qualification scope fails release qualification when the real lint step fails",
+          "release gate execution and qualification scope fails release qualification when strict package lint fails",
+          "release gate execution and qualification scope fails release qualification when the citation check fails, after build",
+          "release gate execution and qualification scope blocks qualification on unresolved source-duplicates findings",
+          "release gate execution and qualification scope blocks qualification on unresolved source-dead-code findings",
+          "release gate execution and qualification scope executes packed acceptance once after build without another build or tracked inventory write",
+          "release gate execution and qualification scope marks every quick omission while preserving the process result contract",
+          "release gate execution and qualification scope does not equate an omitted live check with complete qualification in full mode",
+          "release gate execution and qualification scope never invokes build-dependent consumers after build failure, even with a stale CLI present",
+          "release gate execution and qualification scope fails the gate when installed evidence fails even if every other registered check passed",
+          "release gate execution and qualification scope rejects successful CLI exit without an actual inventory artifact",
+          "release gate execution and qualification scope rejects successful Vitest exit with a missing JSON report",
+          "release gate execution and qualification scope rejects successful Vitest exit with a malformed JSON report",
+          "release gate execution and qualification scope rejects successful Vitest exit with a failed JSON report",
+          "release gate execution and qualification scope rejects successful Vitest exit with a skipped JSON report",
+          "release gate execution and qualification scope rejects successful Vitest exit with a some-pending JSON report",
+          "release gate execution and qualification scope rejects successful Vitest exit with a todo JSON report",
+          "release gate execution and qualification scope rejects successful Vitest exit with a invalid-count JSON report",
+          "release gate execution and qualification scope rejects successful Vitest exit with a suite-error JSON report",
+          "release gate execution and qualification scope rejects successful Vitest exit with a file-error JSON report",
+          "release gate execution and qualification scope does not let a successful JSON report override Vitest process failure",
+          "release gate execution and qualification scope retains separate full-suite reports so a later run cannot reuse a stale report"
+        ]
+      }
+    ],
+    "collector": {
+      "directAndNpmExact": true,
+      "ok": true,
+      "errors": 0,
+      "ratcheted": 623,
+      "baseline": 623,
+      "findingCounts": {
+        "CIT004": 620,
+        "CIT002": 3
+      },
+      "zeroToleranceFindings": 0,
+      "overBaselineCount": 0,
+      "belowBaselineCount": 0,
+      "CIT002Findings": [
+        {
+          "rule": "CIT002",
+          "file": "src/domains/industryPackAudit.ts",
+          "location": "anchors[2].iso A.5",
+          "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"Internal organization & AI policy\")",
+          "zeroTolerance": false
+        },
+        {
+          "rule": "CIT002",
+          "file": "src/domains/industryPackAudit.ts",
+          "location": "anchors[8].iso A.5",
+          "message": "ISO/IEC 42001 A.5 must not be labelled as AI policy (label \"AI policy\")",
+          "zeroTolerance": false
+        },
+        {
+          "rule": "CIT002",
+          "file": "src/score/crossFrameworkMapping.ts",
+          "location": "MITRE_ATLAS AML.T0019",
+          "message": "atlas id \"AML.T0019\" is not in the reference table",
+          "zeroTolerance": false
+        }
+      ]
+    },
+    "realCLIRefusals": [
+      {
+        "phase": "cli-unknown-flag",
+        "exit": 1,
+        "observed": "unknown argument \"--frobnicate\""
+      },
+      {
+        "phase": "cli-update-without-reason",
+        "exit": 1,
+        "observed": "--update-baseline requires --reason"
+      },
+      {
+        "phase": "cli-reason-without-update",
+        "exit": 1,
+        "observed": "--reason is only valid with --update-baseline"
+      }
+    ],
+    "runtime": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10",
+      "cwd": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass",
+      "sqliteSelected": 1,
+      "native": {
+        "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "device": 16777231,
+        "inode": 538593142,
+        "nlink": 1
+      },
+      "boundary": "Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference."
+    },
+    "commands": [
+      {
+        "phase": "install",
+        "exit": 0,
+        "durationMs": 4866
+      },
+      {
+        "phase": "build",
+        "exit": 0,
+        "durationMs": 30611
+      },
+      {
+        "phase": "runtime-fingerprint",
+        "exit": 0,
+        "durationMs": 132
+      },
+      {
+        "phase": "normal-freeze",
+        "exit": 0,
+        "durationMs": 1356
+      },
+      {
+        "phase": "original-citations-mapping",
+        "exit": 0,
+        "durationMs": 2094
+      },
+      {
+        "phase": "actual-collector-json",
+        "exit": 0,
+        "durationMs": 421
+      },
+      {
+        "phase": "actual-package-command",
+        "exit": 0,
+        "durationMs": 397
+      },
+      {
+        "phase": "release-executor-contracts",
+        "exit": 0,
+        "durationMs": 537
+      },
+      {
+        "phase": "cli-unknown-flag",
+        "exit": 1,
+        "durationMs": 258
+      },
+      {
+        "phase": "cli-update-without-reason",
+        "exit": 1,
+        "durationMs": 185
+      },
+      {
+        "phase": "cli-reason-without-update",
+        "exit": 1,
+        "durationMs": 177
+      },
+      {
+        "phase": "final-normal-freeze",
+        "exit": 0,
+        "durationMs": 1227
+      }
+    ],
+    "historicalReuse": {
+      "source": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+      "cases": 30,
+      "currentSubsetExact": true,
+      "phases": [
+        {
+          "phase": "resolver-baseline",
+          "passed": 30,
+          "failed": 0,
+          "exit": 0,
+          "failures": []
+        },
+        {
+          "phase": "resolver-mutant",
+          "passed": 26,
+          "failed": 4,
+          "exit": 1,
+          "failures": [
+            {
+              "name": "lintCitations fixtures mapping packId pii_detection_leakage",
+              "firstLine": "AssertionError: expected [] to deeply equal [ { rule: 'CIT003', \u2026(1) } ]",
+              "site": "at /private/tmp/p0-24-citation-causal-20261015/closure/tests/citations/lintCitations.test.ts:53:17"
+            },
+            {
+              "name": "lintCitations fixtures related.packs host_hardening",
+              "firstLine": "AssertionError: expected [] to deeply equal [ { rule: 'CIT003', \u2026(1) } ]",
+              "site": "at /private/tmp/p0-24-citation-causal-20261015/closure/tests/citations/lintCitations.test.ts:53:17"
+            },
+            {
+              "name": "lintCitations fixtures suggests the registered id for a near-miss pack reference",
+              "firstLine": "TypeError: Cannot read properties of undefined (reading 'message')",
+              "site": "at /private/tmp/p0-24-citation-causal-20261015/closure/tests/citations/lintCitations.test.ts:71:20"
+            },
+            {
+              "name": "lintCitations fixtures accepts a related.packs entry that matches after ignoring case, - and _",
+              "firstLine": "AssertionError: expected [] to deeply equal [ StringContaining{\u2026} ]",
+              "site": "at /private/tmp/p0-24-citation-causal-20261015/closure/tests/citations/lintCitations.test.ts:84:44"
+            }
+          ]
+        },
+        {
+          "phase": "resolver-restored",
+          "passed": 30,
+          "failed": 0,
+          "exit": 0,
+          "failures": []
+        },
+        {
+          "phase": "ratchet-baseline",
+          "passed": 30,
+          "failed": 0,
+          "exit": 0,
+          "failures": []
+        },
+        {
+          "phase": "ratchet-mutant",
+          "passed": 29,
+          "failed": 1,
+          "exit": 1,
+          "failures": [
+            {
+              "name": "check-citations CLI exits 1 when a ratcheted count rises above its baseline",
+              "firstLine": "AssertionError: expected +0 to be 1 // Object.is equality",
+              "site": "at /private/tmp/p0-24-citation-causal-20261015/closure/tests/citations/checkCitationsCli.test.ts:41:18"
+            }
+          ]
+        },
+        {
+          "phase": "ratchet-restored",
+          "passed": 30,
+          "failed": 0,
+          "exit": 0,
+          "failures": []
+        }
+      ]
+    },
+    "formalGaps": {
+      "expertRows": 31,
+      "emptyExpertCells": 31,
+      "ISOEntries": 0,
+      "ISOSource": null,
+      "registerHosts": 57,
+      "sharedHosts": 65,
+      "registerSubset": true,
+      "literalOneListAllThree": false
+    }
+  },
+  "preservationAudit": {
+    "groups": {
+      "artifactIndex": {
+        "count": 137,
+        "mismatches": []
+      },
+      "readinessDirectPins": {
+        "count": 43,
+        "mismatches": []
+      },
+      "trackedSource": {
+        "count": 7888,
+        "mismatches": []
+      },
+      "compiledOutput": {
+        "count": 4529,
+        "mismatches": []
+      },
+      "compiledFileSet": {
+        "expected": 4529,
+        "actual": 4529,
+        "exact": true
+      },
+      "historicalProtectedCurrentEquivalence": {
+        "count": 2471,
+        "mismatches": []
+      },
+      "historicalBuiltCurrentEquivalence": {
+        "count": 4529,
+        "mismatches": []
+      }
+    },
+    "native": {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 538593142,
+      "nlink": 1
+    },
+    "nativeMatches": true,
+    "p030Native": {
+      "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "device": 16777231,
+      "inode": 537685380,
+      "nlink": 1
+    },
+    "nativePhysicalDistinct": true,
+    "frozenJournal": {
+      "rows": 12,
+      "packetExact": true,
+      "originalJournalExact": true,
+      "uniquePhases": 12
+    },
+    "errors": [],
+    "filesRead": 12513,
+    "elapsedSeconds": 1.12
+  },
+  "meaning": {
+    "currentCollector": "Two actual recorded processes run the current built collector: direct Node and the real npm package script. Their complete JSON outputs are byte-equivalent after npm's command banner is removed. Both exit0 with oktrue/errors0,ratcheted623/baseline623.623 is permitted baseline findings, not623 blocking command errors. Independent arithmetic finds zero zero-tolerance findings, zero over/under entries and3CIT002+620CIT004 findings.",
+    "original32": "This is one actual unchanged Vitest invocation with21 linter cases (including13 issue fixtures),9 in-process main/CLI contracts using supported injected findings and temporary baseline fixtures, plus2 mappings against actual registered assurance-pack IDs. Metadata/schema/official-host syntax and mapping resolution do not establish legal or expert truth.",
+    "separate22": "This second actual Vitest invocation executes22 original release-gate contracts using the supported injected execute function. Their fixture dist/cli.js says never executed; fake full-suite and gate step results are written by the executor. Citation needs-build/failure and build-failure blocking are real orchestration assertions, not actual complete release/pack/install/live/hosted gate execution.",
+    "realCLIRefusals": "Three separate actual npm processes return1 for unknown flag, update without reason, and reason without update. These are intended argument parser refusals, not test case counts or citation-data failures. No reasoned update of the real project baseline ran; unchanged tests do update and remove private fixture baselines.",
+    "normalPrerequisites": "Retained logs/journal record a normal frozen-lockfile pnpm install with package lifecycle scripts, fresh build, two ordinary check:freeze passes and a fresh owned Node22/native in-memory SELECT1. No agent ignore-scripts, lowered guard/baseline/floor or replacement freeze command is recorded. Both freeze streams contain the normal success/counts and no degraded/missing-base notices.",
+    "runtimeLimits": "Fingerprint establishes the observed source-install process using Node22.23.3,ABI127 and its own native file. It does not establish Node24, other-child ABI, deployed or installed-package acceptance. Current normal source install/build is distinct from the22 injected gate contracts."
+  },
+  "historicalReuseInterpretation": {
+    "measuredSource": "75cbdf8a1b83ed6b3851ecce3a069940352a40cd",
+    "oldThirtyOnly": true,
+    "oldResolver": [
+      30,
+      26,
+      30
+    ],
+    "oldRatchet": [
+      30,
+      29,
+      30
+    ],
+    "sourceEquivalence": "Current2471 protected inputs and all4529 freshly built compiled files rehash equal the frozen original causal inputs. Original30 case names are exactly a subset of current32; the2 mapping cases were not under those old mutations. Source/test/config/package/guard/baseline preservation supports reuse, not fresh execution relabelling.",
+    "resolverCause": "Replacing only the compiled resolvesPackId return with true removes the expected CIT003 findings. Four failed bodies comprise3 AssertionErrors (two refusal fixtures at53:17 and mixed normalized reference assertion84:44) plus1 downstream TypeError at old original tests/citations/lintCitations.test.ts71:20 when finding.message is read from undefined. That access happens before its expect receives an argument; the later message check is masked. This is not4 AssertionErrors, nor an import/setup failure.",
+    "ratchetCause": "Replacing only n>b with false&&n>b lets the original main routine accept2 CIT004 fixture findings against baseline1. Original CLI assertion41:18 expects1 and gets0; later summary/text assertions in that body are masked. Zero-tolerance/parser/other cases remain passed in the old raw.",
+    "adaptation": "Historical private tests/setup retain only documented source-to-dist import-prefix substitutions; original assertions/fixtures remain unchanged. Old compiled mutation/restoration remains at75cb. No new2d552/source58 kill or all32-under-mutation claim follows.",
+    "limits": "Historical observer/cleanup bounds remain those of the frozen old receipt. This review reconciles retained raw counts/causes and input equivalence; it does not manufacture a new causal trial or erase the historical metadata observer correction."
+  },
+  "processAndPreservationLimits": {
+    "environment": "Both current wrappers copy os.environ, then set private HOME, prepend Node22 PATH, set GIT_NO_LAZY_FETCH, and the observed wrapper adds its reporter output variable. This is inherited environment, not clean-room/credential/network/OS isolation.",
+    "wrapper": "The retained wrappers use subprocess.run with combined stdout/stderr and record exit/time/HEAD afterward. They add no timeout/new-session/owned-group close proof; command completion is not universal descendant cleanup.",
+    "observer": "Run-end reporter retains exact original task errors/hooks/unhandled state before global teardown. Combined post-exit stream checks known late-close/global-guard banners. No universal teardown, all-filesystem-effect or child/ABI absence proof is claimed; reporter PID is recorded but wrappers do not independently record a Popen PID binding.",
+    "preservation": "All137 indexed references,43 direct readiness pins,7888 pre-existing tracked file bytes and4529 compiled paths/files rehash exactly. The frozen12-row journal equals packet and original retained journal; no append occurred. P0-25 native inode538593142 differs from unchanged P0-30 inode537685380, with matching expected bytes and nlink1.",
+    "sourceAttribution": "Recorded command HEADs and clean Git status are retained source attribution. This reviewer verifies current expected bytes and performs no Git command. Canonical metadata being prepared separately is outside this immutable packet.",
+    "cache": "Private HOME/store/dependency/tool caches are not comprehensively indexed. Protected byte preservation is not a claim of zero cache or all-filesystem writes."
+  },
+  "knownAcceptanceGaps": [
+    {
+      "area": "Ratcheted data debt",
+      "status": "Open",
+      "evidence": "CIT0023 and CIT004620 remain exactly at the unchanged baseline. A passing ratchet does not resolve those findings."
+    },
+    {
+      "area": "Strict ISO",
+      "status": "Open",
+      "evidence": "Frozen separate P0-24 strict result remains23/22/1 and the A.5 policy pair criterion remains RED. Current ISO AnnexA table has source:null and0 entries; its empty membership check is not expert acceptance."
+    },
+    {
+      "area": "Expert review",
+      "status": "Open",
+      "evidence": "Current correction log has31 rows with31 empty expert/credential/date cells. Its text explicitly marks all rows experimental/unapproved. No named expert, licensed clause selection or current-law/source-provenance review occurred."
+    },
+    {
+      "area": "Literal shared list",
+      "status": "Open",
+      "evidence": "The linter and pack schema share SHARED_OFFICIAL_HOSTS (65 entries); the register source/checker copies or reads its separate JSON policy.officialHosts (57 entries). Actual tests establish subset and pack-schema identity, not one literal shared list across all3."
+    },
+    {
+      "area": "Whole acceptance",
+      "status": "Unqualified",
+      "evidence": "Current fullsuite/typecheck:tests/lint/coverage/Node24/hosted CI/PR+mergedSHA/release/G0/Done/formal dependencies and held source-quality duplicate1269/dead2751 prerequisites remain unwaived. The real source build is not the entire required gate."
+    }
+  ],
+  "operations": {
+    "readOnlyFilesystemJSONHashStat": true,
+    "sourceTextReads": true,
+    "productImports": 0,
+    "productParsersTypechecks": 0,
+    "testsOrRuntime": 0,
+    "nativeLoads": 0,
+    "network": 0,
+    "GitCommands": 0,
+    "sourceOrPriorArtifactWrites": 0,
+    "writes": "Only this separate write-once review JSON/Markdown pair."
+  },
+  "allReadsFinished": true,
+  "formalAcceptanceClosed": false,
+  "inputPins": [
+    {
+      "path": "/private/tmp/p0-25-bounded-qualification-20261015.json",
+      "bytes": 18330,
+      "sha256": "7575816b0d993a8327039bbe9d904271d1e2c5937d91d27f03e83ab2d2c36ae6"
+    },
+    {
+      "path": "/private/tmp/p0-25-bounded-qualification-20261015.md",
+      "bytes": 1657,
+      "sha256": "127aa641678340f621d9aae4d90bdf9234602f55aa42b0639cd3ce7c79bca796"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/artifact-index.json",
+      "bytes": 29617,
+      "sha256": "c652dff2952703b79bde504c8367be90cc67201dd5535d6ea910ba58ff134127"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/commands-frozen.jsonl",
+      "bytes": 5193,
+      "sha256": "86928a5b4b6a07e8bc86abc1d1c495cdc3a696c1886137e255bd834610bbfcdc"
+    },
+    {
+      "path": "/private/tmp/p0-25-commands-20261015.jsonl",
+      "bytes": 5193,
+      "sha256": "86928a5b4b6a07e8bc86abc1d1c495cdc3a696c1886137e255bd834610bbfcdc"
+    },
+    {
+      "path": "/private/tmp/p0-25-run-command-20261015.py",
+      "bytes": 993,
+      "sha256": "9822de470a6fa193ba0e5ef5953a077398e900fbee501c34f2d7b27227b769ff"
+    },
+    {
+      "path": "/private/tmp/p0-25-run-observed-command-20261015.py",
+      "bytes": 1109,
+      "sha256": "99773d05f0bd08da323f2f8091759b8d41905b105624050b2abe995f5f29ab0d"
+    },
+    {
+      "path": "/private/tmp/p0-25-freeze-qualified-evidence-20261015.py",
+      "bytes": 8547,
+      "sha256": "1687db8722a06703e4164b06d4111ec489245a479ccd01f5e3f60543ccd62670"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/observer-reporter.mjs",
+      "bytes": 2116,
+      "sha256": "64f0e53143d830ba3fc1551620ad474bbd4275f2c835bd69d112f9c93bd2a23a"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/runtime-fingerprint.cjs",
+      "bytes": 1147,
+      "sha256": "17b66bccbbf372329ef07a234c56bf51b1aa58370491ac1c2333c4fc455341d5"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/initial-preflight.json",
+      "bytes": 11548,
+      "sha256": "602146f605b4b03751d2e9536eeb4234ada5e6eb7bc580d5053398eb82b63d38"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/tracked-source-before.json",
+      "bytes": 939037,
+      "sha256": "6beffe1d202907603061308c7dd151221c58df45a5003272c3619b62ccb79259"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/compiled-after-build.json",
+      "bytes": 485185,
+      "sha256": "7f28d22ed2d0256c7eb9ebba6aa26528c46836a41d78bc6d95037f18a96752e4"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/final-source-and-reuse-preservation.json",
+      "bytes": 2180,
+      "sha256": "3330f956401eeb479edc69c4f3ab004cf98e2c82467642b79d8ee99e2f5e0bc1"
+    },
+    {
+      "path": "/private/tmp/p0-25-readonly-readiness-20261015.json",
+      "bytes": 23647,
+      "sha256": "7ea93dd1ec1fed290b1b7e701ae7c3e4a44f7a8631c45dc86a3b898d73e83b95"
+    },
+    {
+      "path": "/private/tmp/p0-25-corpus-propagation-readonly-supplement-20261015.json",
+      "bytes": 22880,
+      "sha256": "0b31e2d70d53599b929f06390fd173a64d6402d449ad5c3f995119396ae7d82b"
+    },
+    {
+      "path": "/private/tmp/p0-24-citation-causal-qualification-20261015.json",
+      "bytes": 61638,
+      "sha256": "a05fb74b1c7e19e93f862187ed09cf2cb4be49a8179522343d0b3aa06999ef54"
+    },
+    {
+      "path": "/private/tmp/p0-24-citations-qualification-20261015.json",
+      "bytes": 70317,
+      "sha256": "44c070e64894c54560de42727c233aaaebf695f280bcc06b6de035b18f2c492f"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/scripts/check-freeze.mjs",
+      "bytes": 9946,
+      "sha256": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-25-qualification/AgentMaturityCompass/src/compliance/regulatory/index.ts",
+      "bytes": 4475,
+      "sha256": "f3a8e6a852ebe14ae32c1923c918f423c05da6d09a63a98f2c23f55157a24f29"
+    },
+    {
+      "path": "/private/tmp/p0-25-install-20261015.log",
+      "bytes": 2709,
+      "sha256": "bbb3b802f9a94dd928b12dcde8ed9efecbfbc15c7aa0a5a214bfb008e5ece06c"
+    },
+    {
+      "path": "/private/tmp/p0-25-build-20261015.log",
+      "bytes": 945,
+      "sha256": "50a18823ef2a7c7828525e911dd4fee2a00f6339d79b3a0331af78babeaabb45"
+    },
+    {
+      "path": "/private/tmp/p0-25-runtime-fingerprint-20261015.log",
+      "bytes": 737,
+      "sha256": "7af2b89f6fa5e6895130c66049ba9b3d1c2ac968c563638aa1b6dc46678a878a"
+    },
+    {
+      "path": "/private/tmp/p0-25-normal-freeze-20261015.log",
+      "bytes": 263,
+      "sha256": "62e8483a26078e5c5ca829ce0be4c640b67cbbdd87d47fda80a4bd8d5402bcde"
+    },
+    {
+      "path": "/private/tmp/p0-25-original-citations-mapping-20261015.log",
+      "bytes": 519,
+      "sha256": "16c02be51040858b2b5745d5d19cc02211af2eb932f6aeda5e94ab33faa248be"
+    },
+    {
+      "path": "/private/tmp/p0-25-actual-collector-json-20261015.log",
+      "bytes": 170681,
+      "sha256": "dde3bd869c7d2ad044fd5c435e5035713e0d07e987b6b699977d925bedfc5110"
+    },
+    {
+      "path": "/private/tmp/p0-25-actual-package-command-20261015.log",
+      "bytes": 170772,
+      "sha256": "295b1b187a5c887c085b00af08a970627db1bec09587b908c83e08e97ddbba3e"
+    },
+    {
+      "path": "/private/tmp/p0-25-release-executor-contracts-20261015.log",
+      "bytes": 392,
+      "sha256": "229086382cfd8366fb30821c3b0e4785ad4ad3f35c7e387f208c782b319f834d"
+    },
+    {
+      "path": "/private/tmp/p0-25-cli-unknown-flag-20261015.log",
+      "bytes": 228,
+      "sha256": "118600b01abf1f156a260ff505e2b33c1bfdb75bd9098f236c27c54ce2a64792"
+    },
+    {
+      "path": "/private/tmp/p0-25-cli-update-without-reason-20261015.log",
+      "bytes": 246,
+      "sha256": "ad39e1e7ae9da59b2ff8e582ba3423c8a2b1dd2811fd32cb5fa31c7662fbe725"
+    },
+    {
+      "path": "/private/tmp/p0-25-cli-reason-without-update-20261015.log",
+      "bytes": 257,
+      "sha256": "7df94903fdbcd419d864eb2d602e0efe2a8557d9bb33d2f20bebef43eaf4e01d"
+    },
+    {
+      "path": "/private/tmp/p0-25-final-normal-freeze-20261015.log",
+      "bytes": 263,
+      "sha256": "62e8483a26078e5c5ca829ce0be4c640b67cbbdd87d47fda80a4bd8d5402bcde"
+    },
+    {
+      "path": "/private/tmp/p0-25-original-citations-mapping-20261015.json",
+      "bytes": 10220,
+      "sha256": "f9250d40691dfeb47f8186d21710526563f456ed088d07235bbe1b19f3fec2ce"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/observers/original-citations-mapping.json",
+      "bytes": 15507,
+      "sha256": "face22b6fd610d8ed0dd32e94854b5c21ff4121da8d13afe62715146171df5ee"
+    },
+    {
+      "path": "/private/tmp/p0-25-release-executor-contracts-20261015.json",
+      "bytes": 8707,
+      "sha256": "7fceee2436c1b18c27ab8016a00d8bffa5ee5f304c51a7e6acd496bc8a5c0b12"
+    },
+    {
+      "path": "/private/tmp/p0-25-qualification-20261015/observers/release-executor-contracts.json",
+      "bytes": 11918,
+      "sha256": "a5452d57d332269d5472f0f4fe2e89fd9dfea808abf9a96592bdf90307ba49ee"
+    }
+  ],
+  "capturedUtc": "2026-10-15T04:47:18.415114+00:00",
+  "allReadsFinishedUtc": "2026-10-15T04:47:18.415114+00:00"
+}

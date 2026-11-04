@@ -1,0 +1,16 @@
+{
+  "fixtureVersion": 1,
+  "controlId": "L0-LOG-03",
+  "polarity": "negative",
+  "evidenceClass": "unknown_hold",
+  "setup": {
+    "harness": "deletion_gate",
+    "executor": "layer0-fixture",
+    "target": "logs",
+    "holds": "corrupt"
+  },
+  "expected": {
+    "result": "deny",
+    "reasonCode": "signature_invalid"
+  }
+}

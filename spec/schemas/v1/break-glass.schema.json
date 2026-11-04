@@ -1,0 +1,184 @@
+{
+  "$id": "https://agentmaturity.co/spec/schemas/v1/break-glass.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activatedBy": {
+      "additionalProperties": false,
+      "properties": {
+        "roles": {
+          "items": {
+            "enum": [
+              "OWNER",
+              "AUDITOR",
+              "APPROVER",
+              "OPERATOR",
+              "VIEWER",
+              "AGENT"
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "userId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "userId",
+        "roles"
+      ],
+      "type": "object"
+    },
+    "approval": {
+      "additionalProperties": false,
+      "properties": {
+        "agentId": {
+          "minLength": 1,
+          "type": "string"
+        },
+        "approvalRequestId": {
+          "pattern": "^apprreq_[a-f0-9]{32}$",
+          "type": "string"
+        },
+        "requestBindingDigest": {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "agentId",
+        "approvalRequestId",
+        "requestBindingDigest"
+      ],
+      "type": "object"
+    },
+    "breakGlassId": {
+      "pattern": "^bg_[a-f0-9]{24}$",
+      "type": "string"
+    },
+    "incidentId": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "postHocReviewDueAt": {
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+      "type": "string"
+    },
+    "prevBreakGlassDigest": {
+      "anyOf": [
+        {
+          "pattern": "^[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "const": "GENESIS",
+          "type": "string"
+        }
+      ]
+    },
+    "reason": {
+      "minLength": 10,
+      "type": "string"
+    },
+    "schema": {
+      "const": "amc.break-glass/v1",
+      "type": "string"
+    },
+    "scope": {
+      "additionalProperties": false,
+      "properties": {
+        "actionClasses": {
+          "items": {
+            "enum": [
+              "READ_ONLY",
+              "WRITE_LOW",
+              "WRITE_HIGH",
+              "DEPLOY",
+              "SECURITY",
+              "FINANCIAL",
+              "NETWORK_EXTERNAL",
+              "DATA_EXPORT",
+              "IDENTITY"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "agentIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "controlIds": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "toolNames": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "type": "array"
+        },
+        "workspaceId": {
+          "minLength": 1,
+          "type": "string"
+        }
+      },
+      "required": [
+        "workspaceId",
+        "agentIds",
+        "toolNames",
+        "actionClasses",
+        "controlIds"
+      ],
+      "type": "object"
+    },
+    "window": {
+      "additionalProperties": false,
+      "properties": {
+        "notAfter": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        },
+        "notBefore": {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string"
+        }
+      },
+      "required": [
+        "notBefore",
+        "notAfter"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema",
+    "breakGlassId",
+    "activatedBy",
+    "reason",
+    "scope",
+    "window",
+    "incidentId",
+    "postHocReviewDueAt",
+    "prevBreakGlassDigest",
+    "approval"
+  ],
+  "title": "AMC Break-Glass Record",
+  "type": "object"
+}

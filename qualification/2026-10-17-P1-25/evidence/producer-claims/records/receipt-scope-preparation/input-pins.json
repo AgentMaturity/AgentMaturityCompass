@@ -1,0 +1,113 @@
+{
+  "schema": "p125pc-receipt-scope-readonly-input-pins/1",
+  "inputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/observations.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/observations.json",
+      "bytes": 5967109,
+      "sha256": "d66a4151e36ea60b89d661d42c212e8d82e1f5d0c73b26383a1ed6320862061a",
+      "dev": 16777231,
+      "inode": 543908978,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/review.json",
+      "bytes": 19235,
+      "sha256": "103e3ce10dc1eaa7c66a81fc23c915ac12a603bc9da1ec288b1297dd479c5f9a",
+      "dev": 16777231,
+      "inode": 543909112,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/seal.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-scope-preparation/seal.json",
+      "bytes": 2895,
+      "sha256": "0f3480b8ac9eb37fef35631fcca14fda1d2d37e2b12f73509863f5ead29c18ba",
+      "dev": 16777231,
+      "inode": 543909116,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/runtime-protected-inputs.json",
+      "bytes": 90612,
+      "sha256": "42bfd4e5565b5d3757d8c14d39b504188ab8a30ec2b19c1bfe71750a47194c59",
+      "dev": 16777231,
+      "inode": 543919887,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/fresh-source-binding.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/fresh-source-binding.json",
+      "bytes": 127548,
+      "sha256": "9aa8dc730a6daaffbaef8f24bf12c9595a4d07c721841fb27a6d874b2cc12980",
+      "dev": 16777231,
+      "inode": 543990375,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/source-checkpoint.json",
+      "bytes": 453,
+      "sha256": "6173074e96a07158d14eea016d3c0d55e1b704d564bb76aed9f159c7f92b8b6f",
+      "dev": 16777231,
+      "inode": 543926767,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-producer-qualification-20261017/preservation-after-controls.json",
+      "physicalPath": "/private/tmp/p1-25-producer-qualification-20261017/preservation-after-controls.json",
+      "bytes": 1794,
+      "sha256": "f731abdeab10d226cfdef73a4dbe25a47684d98e126502678310f112f6f47a41",
+      "dev": 16777231,
+      "inode": 543998885,
+      "nlink": 1
+    },
+    {
+      "relativePath": "qualification/2026-10-17-P1-25/README.md",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "exists": true,
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/README.md",
+      "symlink": false,
+      "regular": true,
+      "directory": false,
+      "dev": 16777231,
+      "inode": 543134232,
+      "nlink": 1,
+      "bytes": 39139,
+      "sha256": "aba7856d4dd7af0f69ef520cc3c0acb801c4d49c93ab4fe680573fe97483a80b"
+    },
+    {
+      "relativePath": "qualification/2026-10-17-P1-25/receipt.json",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "exists": true,
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/receipt.json",
+      "symlink": false,
+      "regular": true,
+      "directory": false,
+      "dev": 16777231,
+      "inode": 543134235,
+      "nlink": 1,
+      "bytes": 525598,
+      "sha256": "63877e73c81c7888b702d47acf3777279e3002ba26db2a38dfbf0d68e50e51df"
+    },
+    {
+      "relativePath": "qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "exists": true,
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-25/assembly-inputs.json",
+      "symlink": false,
+      "regular": true,
+      "directory": false,
+      "dev": 16777231,
+      "inode": 543134234,
+      "nlink": 1,
+      "bytes": 877972,
+      "sha256": "b6ccb30242fd6f54ae7490d5d382cd093c0862575c5c88a43deb0996eb069cb0"
+    }
+  ],
+  "count": 10,
+  "all175PlusThirteenNativeExpectedActualPhysicalRowsRetainedInPrivateObservations": true,
+  "noMissingReservationPathRead": true
+}

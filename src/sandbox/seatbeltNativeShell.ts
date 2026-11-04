@@ -4,7 +4,7 @@ import { join, resolve } from "node:path";
 import { runProcess } from "../exec/runProcess.js";
 import { admitWritableDirectory, within } from "./bwrapBackend.js";
 import { startShellEgressProxy, type ShellEgressProxy } from "./egress/shellEgressProxy.js";
-import { PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
+import { PROCESS_LIMIT_LIMITATION, ROOT_PROCESS_LIMIT_LIMITATION, processLimit, withProcessLimit } from "./processCap.js";
 import { realOrLiteral, sbplString } from "./seatbeltBackend.js";
 import type { SandboxBackend, SandboxOutcome, SandboxPolicy } from "./sandboxTypes.js";
 
@@ -92,13 +92,19 @@ export function buildSeatbeltShellProfile(input: SeatbeltShellProfileInput): str
     "(allow signal (target pgrp))",
     "(deny process-info* (target others))",
     `(deny process-exec ${LAUNCHERS.map(path => `(literal "${path}")`).join(" ")})`,
+    ";; Host state outside the write grants: named POSIX shared memory and System V IPC outlive the shell and reach other processes. The kernel still lets a System V segment be created; attaching it is denied.",
+    "(deny ipc-posix-shm-write-create ipc-posix-shm-write-data ipc-posix-shm-write-unlink)",
+    "(deny ipc-sysv*)",
+    ";; Kernel driver user clients (power management, displays, devices) are host state too; registry reads stay open.",
+    "(deny iokit-open)",
     ""
   ].join("\n");
 }
 
 const LIMITATIONS = [
   "Reads outside the deny-list stay open: the command can read any other file your user can.",
-  "Mach lookups are limited to the temp-directory helper, logging, notifications and user and group lookups; tools that need another system service (the keychain, certificate trust through trustd, LaunchServices) fail.",
+  "Mach lookups are limited to the temp-directory helper, logging, notifications and user and group lookups; tools that need another system service fail closed: keychain lookups (`security`, keychain credential helpers), Security.framework certificate trust through trustd, and LaunchServices.",
+  "Named POSIX shared memory cannot be created or written and IOKit user clients cannot be opened. System V shared memory segments can still be created, empty, but not attached, written or removed from inside; POSIX semaphores and IOKit registry reads stay available.",
   "sandbox-exec is deprecated by Apple; the profile is checked on the macOS versions AMC's CI runs, not on every release.",
   "This confines a shell subprocess, not AMC or worker-thread Code Mode.",
   "Hard-link creation is denied and existing hard-link aliases and special files in write grants are refused; concurrent trusted host writers are outside this subprocess boundary.",
@@ -120,6 +126,7 @@ export function seatbeltNativeShell(): SandboxBackend {
       if (!command.length || command.some(argument => argument.includes("\0"))) return declined("Invalid confined command.");
       if (!Number.isFinite(policy.timeoutMs) || policy.timeoutMs <= 0) return declined("A positive finite shell deadline is required.");
       if (policy.allowHosts && !policy.onEgress) return declined("A shell egress allowlist requires an egress audit recorder.");
+      if (policy.allowHosts && !policy.egressScope) return declined("A shell egress allowlist requires the call's workspace and agent for egress checks.");
       if (policy.signal?.aborted) return { ...declined("The shell was cancelled before launch."), cancelled: true };
       let launcher: string | undefined;
       let proxy: ShellEgressProxy | undefined;
@@ -144,13 +151,16 @@ export function seatbeltNativeShell(): SandboxBackend {
         const home = realOrLiteral(homedir());
         const denied = [...MACOS_SECRET_PATHS.map(path => realOrLiteral(join(home, path))), ...(policy.readDeny ?? []).map(realOrLiteral)];
         const env: Record<string, string> = { PATH: process.env["PATH"] ?? "/usr/bin:/bin", HOME: privateTmp, TMPDIR: privateTmp, LANG: "en_US.UTF-8" };
-        if (policy.allowHosts && policy.onEgress) {
-          proxy = await startShellEgressProxy({ allowHosts: policy.allowHosts, record: policy.onEgress });
+        if (policy.allowHosts && policy.onEgress && policy.egressScope) {
+          proxy = await startShellEgressProxy({ allowHosts: policy.allowHosts, record: policy.onEgress, ...policy.egressScope });
           for (const name of ["HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY"]) env[name] = env[name.toLowerCase()] = proxy.url;
+          // Node's fetch ignores the proxy variables unless told to read them; it would connect directly and be denied.
+          env["NODE_USE_ENV_PROXY"] = "1";
         }
         const profilePath = join(launcher, "profile.sb");
         writeFileSync(profilePath, buildSeatbeltShellProfile({ workspace, writableRoots, privateTmp, denied, proxyPort: proxy?.port ?? null }), { mode: 0o600 });
         const limit = policy.maxProcesses === undefined ? null : processLimit(policy.maxProcesses);
+        const capped = limit !== null && process.geteuid?.() !== 0 ? limit : null; // the kernel exempts root from RLIMIT_NPROC
         const probe = join(launcher, "probe");
         const marker = join(privateTmp, MARKER);
         launched = true;
@@ -159,6 +169,7 @@ export function seatbeltNativeShell(): SandboxBackend {
             ...(limit === null ? command : withProcessLimit(limit, command))],
           cwd: workspace, env, stdin: "ignore", stdout: "capture", stderr: "capture", maxCaptureBytes: 64_000,
           scrubValues: [...(policy.scrubValues ?? []), ...(proxy ? [proxy.token] : [])], graceMs: 2_000, timeoutMs: policy.timeoutMs,
+          ...(policy.onOutput ? { onOutput: policy.onOutput } : {}),
           ...(policy.signal ? { signal: policy.signal } : {})
         }).done;
         // A profile sandbox-exec refused never reaches the wrapper, so no marker covers that case too.
@@ -173,9 +184,9 @@ export function seatbeltNativeShell(): SandboxBackend {
           ...(applied ? { enforcement: {
             boundary: "macos-seatbelt" as const, hostWrites: "declared-roots-only" as const, reads: "open-except-denylist" as const,
             network: proxy ? "proxy-allowlist" as const : "denied" as const, allowHosts: [...(policy.allowHosts ?? [])],
-            processLimit: limit === null ? null : { mechanism: "rlimit-nproc" as const, max: limit },
+            processLimit: capped === null ? null : { mechanism: "rlimit-nproc" as const, max: capped },
             readonlyRoots: ["/"], privateWritableRoots: [privateTmp, "/dev/null"], launcherStatus: "command-exited" as const,
-            sourcePolicySha256: policy.sourcePolicySha256 ?? null, limitations: [...LIMITATIONS, ...(limit === null ? [] : [PROCESS_LIMIT_LIMITATION])]
+            sourcePolicySha256: policy.sourcePolicySha256 ?? null, limitations: [...LIMITATIONS, ...(limit === null ? [] : [capped !== null ? PROCESS_LIMIT_LIMITATION : ROOT_PROCESS_LIMIT_LIMITATION])]
           } } : {})
         };
       } catch {

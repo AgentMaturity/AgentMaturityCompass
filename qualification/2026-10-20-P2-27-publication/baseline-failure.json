@@ -1,0 +1,159 @@
+{
+  "status": "classification_of_saved_native_artifacts_only",
+  "candidateArtifacts": {
+    "report": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/publication-product-focused-v1/report.json",
+      "bytes": 1952865,
+      "sha256": "d7be42f82df13ce984209b5279ec43ea25c3c939d055c33e7634204e486dcb59"
+    },
+    "raw": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/publication-validation/publication-product-focused-v1/raw.log",
+      "bytes": 959893,
+      "sha256": "914848ddbe00bc1d692dd67652ddd12139e3c94ca723de0e6eb125f01972805c"
+    }
+  },
+  "candidateTopLevel": {
+    "numTotalTestSuites": 599,
+    "numPassedTestSuites": 597,
+    "numFailedTestSuites": 2,
+    "numPendingTestSuites": 0,
+    "numTotalTests": 5040,
+    "numPassedTests": 5039,
+    "numFailedTests": 1,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "snapshot": {
+      "added": 0,
+      "failure": false,
+      "filesAdded": 0,
+      "filesRemoved": 0,
+      "filesRemovedList": [],
+      "filesUnmatched": 0,
+      "filesUpdated": 0,
+      "matched": 4,
+      "total": 4,
+      "unchecked": 0,
+      "uncheckedKeysByFile": [],
+      "unmatched": 0,
+      "updated": 0,
+      "didUpdate": false
+    },
+    "startTime": 1792482994100,
+    "success": false
+  },
+  "assertionNonpasses": [
+    {
+      "candidate": {
+        "file": "<CLONE_ROOT>/tests/publicDocsGraph.test.ts",
+        "nativeFullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "normalizedFullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+        "status": "failed",
+        "failureMessages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-publication-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ],
+        "normalizedFailureMessages": [
+          "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE_ROOT>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+        ]
+      },
+      "owner": "candidate until fixed or exactly classified",
+      "causalWaiver": false,
+      "baselineMatches": [
+        {
+          "file": "<CLONE_ROOT>/tests/publicDocsGraph.test.ts",
+          "nativeFullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+          "normalizedFullName": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+          "status": "failed",
+          "failureMessages": [
+            "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ],
+          "normalizedFailureMessages": [
+            "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at <CLONE_ROOT>/tests/publicDocsGraph.test.ts:70:21\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file://<CLONE_ROOT>/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+          ]
+        }
+      ],
+      "classification": "same_baseline_failure"
+    }
+  ],
+  "suiteOrCollectionRecords": [],
+  "skipPendingTodoRecordsRequireSeparateSourceEnvironmentProof": [],
+  "baselineCaptureProofs": {
+    "tests/publicDocsGraph.test.ts": {
+      "report": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/report.json",
+        "bytes": 3972,
+        "sha256": "853d83a0d05698ed31aba6405532fb22025517774cf528086dc6db6f9f1190c6"
+      },
+      "raw": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/raw.log",
+        "bytes": 1985,
+        "sha256": "63693fd0e6d6ad175a6fcfa91bc86a1ef47359f98d67c4993b0533f06416f2ff"
+      },
+      "statusBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/status-before.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "statusAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/status-after.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "headBefore": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/head-before.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "headAfter": {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/head-after.stdout",
+        "bytes": 41,
+        "sha256": "e25123fbeb1dc0bd73ed45a6f4578c9867c8e653bf05ef05c2189d3cfe55e7d7"
+      },
+      "command": [
+        "pnpm",
+        "exec",
+        "vitest",
+        "run",
+        "tests/publicDocsGraph.test.ts",
+        "--maxWorkers=1",
+        "--reporter=verbose",
+        "--reporter=json",
+        "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-27/solo-20261020/landing-validation/baseline-after-final-q2/q2-failed-file-02-v1/report.json"
+      ],
+      "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-27-int-baseline-20261020",
+      "exitCode": 1,
+      "nativeFileAlonePassed": false,
+      "sourceEnvironmentProof": [],
+      "nativeTopLevel": {
+        "numTotalTestSuites": 2,
+        "numPassedTestSuites": 0,
+        "numFailedTestSuites": 2,
+        "numPendingTestSuites": 0,
+        "numTotalTests": 6,
+        "numPassedTests": 5,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0,
+        "snapshot": {
+          "added": 0,
+          "failure": false,
+          "filesAdded": 0,
+          "filesRemoved": 0,
+          "filesRemovedList": [],
+          "filesUnmatched": 0,
+          "filesUpdated": 0,
+          "matched": 0,
+          "total": 0,
+          "unchecked": 0,
+          "uncheckedKeysByFile": [],
+          "unmatched": 0,
+          "updated": 0,
+          "didUpdate": false
+        },
+        "startTime": 1792476318135,
+        "success": false
+      }
+    }
+  },
+  "baselineCaptureErrors": {},
+  "truth": "Only literal clone-root prefix normalization is allowed. File-alone pass is context evidence, not a causal waiver. Unmatched or nonexact failures remain owned/unresolved. No test was run by this helper."
+}

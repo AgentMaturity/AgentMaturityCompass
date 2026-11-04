@@ -1,0 +1,871 @@
+{
+  "schemaVersion": 1,
+  "key": "P0-41",
+  "kind": "READONLY_ACTUAL_EVIDENCE_REVIEW",
+  "decision": "BOUNDED_NEW_CORPUS_AND_SIX_PHASE_EVIDENCE_VERIFIED_WITH_LIMITS",
+  "formalAcceptanceClosed": false,
+  "done": false,
+  "dependencyReady": false,
+  "runtimeAuthorizedByReview": false,
+  "findings": [],
+  "blockingFindings": [],
+  "reviewRole": "Independent review of root-produced execution and preservation evidence. This reviewer authored the inert fixture and its one-expectation v2 correction, so this is not an independent review of fixture authorship. A separate peer performed the frozen fixture and v2 failure/setup static reviews.",
+  "reviewedPacket": {
+    "path": "/private/tmp/p0-41-bounded-qualification-20261015.json",
+    "bytes": 36601,
+    "sha256": "7a61cc8015d362cf12e856f9e2870a63c17058b89d7aeaa42eb27ba82754198d"
+  },
+  "source": {
+    "qualification": "33a8e20bf340f2f9c717bb813f95de3b648a4ad4",
+    "production": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+    "newFixtureSha256": "21da24dd0de6d5d0d3acb3e7dbd0a30e7edb7ef6220e091abb75344006c4199a"
+  },
+  "actualPhases": {
+    "phaseCount": 6,
+    "executions": 162,
+    "passed": 153,
+    "failed": 9,
+    "distinctFailingNames": 8,
+    "allRawObserverStreamAndRecipeChecksPassed": true,
+    "phases": [
+      {
+        "phase": "P041-M1-missing-source-zero--baseline",
+        "total": 27,
+        "passed": 27,
+        "failed": 0,
+        "pending": 0,
+        "pid": 29951,
+        "exit": 0,
+        "durationMs": 5244,
+        "targetSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+        "groupAbsentByESRCH": true,
+        "failures": []
+      },
+      {
+        "phase": "P041-M1-missing-source-zero--mutant",
+        "total": 27,
+        "passed": 19,
+        "failed": 8,
+        "pending": 0,
+        "pid": 30391,
+        "exit": 1,
+        "durationMs": 5059,
+        "targetSha256": "3bae4d74178f588d98b1d960582b15e5754b80b9c0114bb83e15dc1781273ee6",
+        "groupAbsentByESRCH": true,
+        "failures": [
+          {
+            "name": "P041 supplied-input and genuine local Git qualification Q2 missing evidence stays null before any status or current-value assertions",
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 248,
+                "column": 27
+              }
+            ]
+          },
+          {
+            "name": "P041 supplied-input and genuine local Git qualification Q4 absent registered report, workflow and JSON inputs remain pending",
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 277,
+                "column": 37
+              }
+            ]
+          },
+          {
+            "name": "P041 supplied-input and genuine local Git qualification Q6a an empty assertion list stays null before later nonvacuity checks",
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 300,
+                "column": 25
+              }
+            ]
+          },
+          {
+            "name": "P041 supplied-input and genuine local Git qualification Q6c duplicate matching report paths refuse rather than double count",
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 325,
+                "column": 54
+              }
+            ]
+          },
+          {
+            "name": "P041 supplied-input and genuine local Git qualification Q7b absent, unknown, conflicting and unsupported YAML jobs remain pending",
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 355,
+                "column": 92
+              }
+            ]
+          },
+          {
+            "name": "P041 supplied-input and genuine local Git qualification Q8a a dated sourced manual zero is measured while malformed provenance refuses",
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 370,
+                "column": 53
+              }
+            ]
+          },
+          {
+            "name": "P041 supplied-input and genuine local Git qualification Q8b registered JSON zero, escaped pointers, absence and malformed values stay distinct",
+            "message": "expected +0 to be null",
+            "actual": "0",
+            "expected": "null",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 392,
+                "column": 92
+              }
+            ]
+          },
+          {
+            "name": "P041 supplied-input and genuine local Git qualification Q9b genuine CLI JSON returns 15 rows, declared seven and fourteen pending values",
+            "message": "expected [] to have a length of 14 but got +0",
+            "actual": "0",
+            "expected": "14",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 415,
+                "column": 65
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "phase": "P041-M1-missing-source-zero--restored",
+        "total": 27,
+        "passed": 27,
+        "failed": 0,
+        "pending": 0,
+        "pid": 30835,
+        "exit": 0,
+        "durationMs": 5104,
+        "targetSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+        "groupAbsentByESRCH": true,
+        "failures": []
+      },
+      {
+        "phase": "P041-M2-vacuous-file-pass--baseline",
+        "total": 27,
+        "passed": 27,
+        "failed": 0,
+        "pending": 0,
+        "pid": 31343,
+        "exit": 0,
+        "durationMs": 5328,
+        "targetSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+        "groupAbsentByESRCH": true,
+        "failures": []
+      },
+      {
+        "phase": "P041-M2-vacuous-file-pass--mutant",
+        "total": 27,
+        "passed": 26,
+        "failed": 1,
+        "pending": 0,
+        "pid": 31786,
+        "exit": 1,
+        "durationMs": 5052,
+        "targetSha256": "440b3fb3ecad99f95a0e1bc74c6cd4e6e70be88e651204e580bb04d2c80001f8",
+        "groupAbsentByESRCH": true,
+        "failures": [
+          {
+            "name": "P041 supplied-input and genuine local Git qualification Q6a an empty assertion list stays null before later nonvacuity checks",
+            "message": "expected 1 to be null",
+            "actual": "1",
+            "expected": "null",
+            "frames": [
+              {
+                "method": "",
+                "file": "/private/tmp/p0-41-causal-qualification-v2-20261015/source/tests/p041ProgramMetricsQualification.test.ts",
+                "line": 300,
+                "column": 25
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "phase": "P041-M2-vacuous-file-pass--restored",
+        "total": 27,
+        "passed": 27,
+        "failed": 0,
+        "pending": 0,
+        "pid": 32237,
+        "exit": 0,
+        "durationMs": 5115,
+        "targetSha256": "e7f77e3924d722b384cdd3cee169e83539eb83a3345c0e8fbcbe7228060bdbf9",
+        "groupAbsentByESRCH": true,
+        "failures": []
+      }
+    ]
+  },
+  "retainedChildren": {
+    "phases": [
+      {
+        "phase": "P041-M1-missing-source-zero--baseline",
+        "retainedChildren": 173,
+        "gitChildren": 148,
+        "cliChildren": 25,
+        "cliExit0": 10,
+        "cliExit1": 15,
+        "ownedGitFixtures": 15
+      },
+      {
+        "phase": "P041-M1-missing-source-zero--mutant",
+        "retainedChildren": 173,
+        "gitChildren": 148,
+        "cliChildren": 25,
+        "cliExit0": 10,
+        "cliExit1": 15,
+        "ownedGitFixtures": 15
+      },
+      {
+        "phase": "P041-M1-missing-source-zero--restored",
+        "retainedChildren": 173,
+        "gitChildren": 148,
+        "cliChildren": 25,
+        "cliExit0": 10,
+        "cliExit1": 15,
+        "ownedGitFixtures": 15
+      },
+      {
+        "phase": "P041-M2-vacuous-file-pass--baseline",
+        "retainedChildren": 173,
+        "gitChildren": 148,
+        "cliChildren": 25,
+        "cliExit0": 10,
+        "cliExit1": 15,
+        "ownedGitFixtures": 15
+      },
+      {
+        "phase": "P041-M2-vacuous-file-pass--mutant",
+        "retainedChildren": 173,
+        "gitChildren": 148,
+        "cliChildren": 25,
+        "cliExit0": 10,
+        "cliExit1": 15,
+        "ownedGitFixtures": 15
+      },
+      {
+        "phase": "P041-M2-vacuous-file-pass--restored",
+        "retainedChildren": 173,
+        "gitChildren": 148,
+        "cliChildren": 25,
+        "cliExit0": 10,
+        "cliExit1": 15,
+        "ownedGitFixtures": 15
+      }
+    ],
+    "totalRetainedChildren": 1038,
+    "actualCliChildren": 150,
+    "inputSnapshotsChecked": 4386,
+    "commitRecordsChecked": 144,
+    "distinctGitObjectIdsVerifiedOffline": 226,
+    "q12dProductRefusals": [
+      {
+        "phase": "P041-M1-missing-source-zero--baseline",
+        "case": "Q12d",
+        "gitStatus": 1,
+        "productPid": 30269,
+        "productStatus": 1,
+        "productRefusalObserved": true
+      },
+      {
+        "phase": "P041-M1-missing-source-zero--mutant",
+        "case": "Q12d",
+        "gitStatus": 1,
+        "productPid": 30709,
+        "productStatus": 1,
+        "productRefusalObserved": true
+      },
+      {
+        "phase": "P041-M1-missing-source-zero--restored",
+        "case": "Q12d",
+        "gitStatus": 1,
+        "productPid": 31155,
+        "productStatus": 1,
+        "productRefusalObserved": true
+      },
+      {
+        "phase": "P041-M2-vacuous-file-pass--baseline",
+        "case": "Q12d",
+        "gitStatus": 1,
+        "productPid": 31667,
+        "productStatus": 1,
+        "productRefusalObserved": true
+      },
+      {
+        "phase": "P041-M2-vacuous-file-pass--mutant",
+        "case": "Q12d",
+        "gitStatus": 1,
+        "productPid": 32121,
+        "productStatus": 1,
+        "productRefusalObserved": true
+      },
+      {
+        "phase": "P041-M2-vacuous-file-pass--restored",
+        "case": "Q12d",
+        "gitStatus": 1,
+        "productPid": 32562,
+        "productStatus": 1,
+        "productRefusalObserved": true
+      }
+    ],
+    "allIntentResultStreamSnapshotAndGitObjectChecksPassed": true,
+    "offlineMethod": "Read retained loose Git objects with Python standard-library zlib; verify SHA1 object IDs, declared byte lengths, commit parents and tree/blob membership. No Git process or product import was invoked by this reviewer.",
+    "boundaries": "144 commit records are not 144 distinct commit IDs. Local Git structure and synthetic declarations do not prove signatures, approved merges, authenticity or real gap closure."
+  },
+  "preservation": {
+    "indexes": [
+      {
+        "path": "/private/tmp/p0-41-v2-runtime-artifact-index-20261015.json",
+        "bytes": 2804349,
+        "sha256": "19b6889b28923d952fea18e6f680064adc5a583f5218f7261a9324bed2796836",
+        "refsChecked": 9455,
+        "uniquePaths": 9455,
+        "mismatches": []
+      },
+      {
+        "path": "/private/tmp/p0-41-v1-runtime-artifact-index-20261015.json",
+        "bytes": 465452,
+        "sha256": "ac23c7341ac53efdb8872eaa5bb36cd3d15888fa499b67303287c7172a71fc3c",
+        "refsChecked": 1578,
+        "uniquePaths": 1578,
+        "mismatches": []
+      }
+    ],
+    "setupArtifactPinsChecked": 82,
+    "externalPlanPinsChecked": 119,
+    "parentAndCopyManifestCounts": {
+      "tracked-source-before.json": 8574,
+      "compiled-after-build.json": 4529
+    },
+    "privatePhysicalManifestEntriesChecked": 13103,
+    "separateOverlayChecked": 1,
+    "privateRegularTotalChecked": 13104,
+    "allSingleLinkDistinctInodesAndExactBytes": true,
+    "nativeExact": {
+      "bytes": 1931552,
+      "device": 16777231,
+      "inode": 538905647,
+      "mode": 493,
+      "nlink": 1,
+      "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560"
+    },
+    "borrowedLinkExact": true,
+    "v1ActiveHaltedPreserved": true,
+    "v2MarkersAbsent": true
+  },
+  "originalCommands": {
+    "journalCount": 13,
+    "phases": [
+      "install",
+      "build",
+      "runtime-fingerprint",
+      "initial-normal-freeze",
+      "metrics-check",
+      "metrics-json",
+      "metrics-markdown",
+      "metrics-default",
+      "no-fabrication",
+      "architecture",
+      "docs-drift",
+      "counts",
+      "final-normal-freeze"
+    ],
+    "allExit0AndOwnedGroupESRCH": true,
+    "originalMetricCliCommands": 4,
+    "sourceMetricSummary": {
+      "metrics": 15,
+      "historicalCritical": 7,
+      "pendingNull": 14,
+      "funded": true,
+      "markdownDefaultByteEqual": true,
+      "online": false
+    },
+    "nativeFingerprint": {
+      "node": "v22.23.3",
+      "executable": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+      "modulesABI": "127",
+      "napi": "10",
+      "cwd": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass",
+      "sqliteSelected": 1,
+      "native": {
+        "path": "/Users/sid/.codex/worktrees/p0-41-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+        "bytes": 1931552,
+        "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+        "device": 16777231,
+        "inode": 538905647,
+        "nlink": 1
+      },
+      "boundary": "Fresh owned source-install native load and in-memory query. No shared native rebuild, product model call, OS isolation or per-other-child ABI inference."
+    },
+    "originalWrapper": {
+      "path": "/private/tmp/p0-41-run-command-prepared-20261015.py",
+      "bytes": 10488,
+      "sha256": "e1dc7f607d992d38b94ab8b12218de579bc1d58f2adee77a0d788190c345bbbe"
+    },
+    "commandAndLogPins": [
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-install/stdout-stderr.log",
+        "bytes": 2707,
+        "sha256": "9dda4b35f581ab6f183760abaf8d573d0e512ff67d55ba74f18f1763816fa686"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-install/command.json",
+        "bytes": 1274,
+        "sha256": "00e6c660febd7a087defc57b93cc19cf3a188c131faa1568529c5560c2ed957d"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-install/owned-process.json",
+        "bytes": 479,
+        "sha256": "fe3452425e0cfecaf831b993836615b1fd03686829f5b8c70e04a570e9112fbe"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-install/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "196b8f81af968da3f1ccb1150b4646aa3f57a7d62e22a90e797be27e95133512"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-build/stdout-stderr.log",
+        "bytes": 945,
+        "sha256": "c9a2b39730721a7b9743caa605585fa92aaf3532cc27ddf563d69e5104837121"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-build/command.json",
+        "bytes": 1113,
+        "sha256": "69c71f0b447054ec4a994cc52ad908859fd2b3699c937bdfbf285bfbcd278c6f"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-build/owned-process.json",
+        "bytes": 397,
+        "sha256": "dd98141e97e362caf7b55e94d310e996c51e802a89a16639847d01184e073d8d"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-build/owned-group-after-exit.json",
+        "bytes": 262,
+        "sha256": "6ff5505abb70db9777bbf1191e72e39fbda141e07f45c86373be3266f6b016e3"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-runtime-fingerprint/stdout-stderr.log",
+        "bytes": 737,
+        "sha256": "3f8668cfb5490c6aff31d4106cfb52ed81385e463dea5f5199999a7df20a221d"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-runtime-fingerprint/command.json",
+        "bytes": 1308,
+        "sha256": "89b3bdab5e0fb24b848414dfe6e57c20961dd977c15da484b1976df3eaed1814"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-runtime-fingerprint/owned-process.json",
+        "bytes": 480,
+        "sha256": "b60f6c19160b3b8ae44c235d22bba3c29153cd429a96205d59c59a627fb72a90"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-runtime-fingerprint/owned-group-after-exit.json",
+        "bytes": 260,
+        "sha256": "1a07fae13ffbb5caae3643e5d5205addbcc717c4f6e95698d7c3e0972ff8be0c"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-initial-normal-freeze/stdout-stderr.log",
+        "bytes": 263,
+        "sha256": "66f18d92264af7d54d0362d036f3959473aa8a5594aad12d88f6c5513283ae42"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-initial-normal-freeze/command.json",
+        "bytes": 1158,
+        "sha256": "e89f52a637dcd6ecc9940e679855757475b8a23a9e00336a8719e7ce441dc8a8"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-initial-normal-freeze/owned-process.json",
+        "bytes": 404,
+        "sha256": "74cc4b32793288c7e9aa0202c0704012c16d2997a77ddfcfb2b0222cc0adc084"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-initial-normal-freeze/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "86d5c8d087c700efa57dfc4a59ca9f28b44a69b444d2c2030901b6fb30cb28d6"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-check/stdout-stderr.log",
+        "bytes": 100,
+        "sha256": "b35388db3d01a849fe1eeedcc49c2ba633eaf7a8fdb5979cd489d3e986d87b65"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-check/command.json",
+        "bytes": 1239,
+        "sha256": "4eac22e76facc7055ebfef9e2a62a3e83a7b6d0e500fd9e3ebd9847300818b28"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-check/owned-process.json",
+        "bytes": 453,
+        "sha256": "619e3c368f7665c0e7cff08bfbdf2e5aa594364c94dff7afb3eab4f233004dba"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-check/owned-group-after-exit.json",
+        "bytes": 260,
+        "sha256": "5b6c5aba814e89afea1e0efc429a011a2f3d55c18dbb273cac390599eb27d1f0"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-json/stdout-stderr.log",
+        "bytes": 8108,
+        "sha256": "578b4143dd843907e4b6d33237c3daaf6ed9488f9b30952efe6c16fa8d398cd1"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-json/command.json",
+        "bytes": 1234,
+        "sha256": "1d425885f2e115f5ee29bb81bae1063f5fb735c90634cd8811a4988e15d838d9"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-json/owned-process.json",
+        "bytes": 452,
+        "sha256": "f711e0240e03969948e092a2216d3e94a06578ee75e855c2e5d8bf246a2e0add"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-json/owned-group-after-exit.json",
+        "bytes": 259,
+        "sha256": "329e93a0290b16e381df2b2a543e7080dba3ba27d35d5635037d52dcc5819d1e"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-markdown/stdout-stderr.log",
+        "bytes": 2530,
+        "sha256": "8118473ba866ba1bc682186e560c5eb813106507e27d7cc79a42ee34b66844d5"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-markdown/command.json",
+        "bytes": 1250,
+        "sha256": "e3bf07b47f50bbec9e7a123a44d82e80276716178d937ab76310819c03f643cd"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-markdown/owned-process.json",
+        "bytes": 456,
+        "sha256": "bc47ff6144e9b557a34fa4bddcdf747b41e58414a93849c21c81fe57104a8bac"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-markdown/owned-group-after-exit.json",
+        "bytes": 259,
+        "sha256": "f5d1764a65fa4ce8dda7faa7c464eceac4f9130cc0ee6d7eb288bc1a30855dec"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-default/stdout-stderr.log",
+        "bytes": 2530,
+        "sha256": "8118473ba866ba1bc682186e560c5eb813106507e27d7cc79a42ee34b66844d5"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-default/command.json",
+        "bytes": 1224,
+        "sha256": "ec7cc77f423234d75d92e092b517a5c6938f0216db31e08ab3dbf8f7b4d97214"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-default/owned-process.json",
+        "bytes": 442,
+        "sha256": "a087ffe8cfc6d03108b70a94452abec617ef304a1bba89b8508465486eb96590"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-metrics-default/owned-group-after-exit.json",
+        "bytes": 260,
+        "sha256": "12161e8e8c158dd86e31438dbcd9bf994529e1085f3222bc9ab55eb163dc47d7"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-no-fabrication/stdout-stderr.log",
+        "bytes": 281,
+        "sha256": "85f7c0bd8d0e1d12ede76963a7bd383ba52caf455c3fa5bb48386f219f083cb8"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-no-fabrication/command.json",
+        "bytes": 1160,
+        "sha256": "e9396e00d67ce723edf9cd7a5f8f56e72575c8857e094f44c0e2c1a6d4d3783c"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-no-fabrication/owned-process.json",
+        "bytes": 412,
+        "sha256": "c5ed4d88d54243394e221bb009d2ea60b3e8839497554337c404ed717e3d0d25"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-no-fabrication/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "35e3e9c6bb4fb2254f69bccbdf8403348b0ee53f4c19f161db7628679a156191"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-architecture/stdout-stderr.log",
+        "bytes": 95608,
+        "sha256": "8a659c9246ff6c3c7d9d4bdb7b7a27d7701088498555eedba748685bfdf1aacc"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-architecture/command.json",
+        "bytes": 1174,
+        "sha256": "1af0b6d5e958ccd806385a88209d8304b161f536d753f5e65e7ad49a3790f88c"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-architecture/owned-process.json",
+        "bytes": 421,
+        "sha256": "4158edca2ea369f7990dd6e1b4e1e9753b9879f56afeac330781398c74d3c7e2"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-architecture/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "11d495c11e527328fdfef33b2d9e1a600f4edfa5f435ef764754412a047b2b3e"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-docs-drift/stdout-stderr.log",
+        "bytes": 200,
+        "sha256": "59a62b4c9fdbd408bc5a24a8067df7b78f5da4d8f93d952a1552aa6c7846dcc0"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-docs-drift/command.json",
+        "bytes": 1143,
+        "sha256": "6aa638e5566595f2002163ec5c4b09d15b080a6ab7ff84c95c25391e258afa64"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-docs-drift/owned-process.json",
+        "bytes": 408,
+        "sha256": "1b9a970250b7bcef673de5a4fb9ee927144bd8fdd5c38cb36434689beb2507e7"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-docs-drift/owned-group-after-exit.json",
+        "bytes": 260,
+        "sha256": "d815fb58ac542308b8e33f59223017ad046ff97f261d7cb140252c7ec1d92063"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-counts/stdout-stderr.log",
+        "bytes": 234,
+        "sha256": "4bb36a5508d26f6485a424c3d6ce326df5fa7515d332926b0446b49a63f7129b"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-counts/command.json",
+        "bytes": 1127,
+        "sha256": "369f8acdec5b43e301ef91ef3cc3d99a3fbdee0ca520bdd9dc840a506d72daf2"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-counts/owned-process.json",
+        "bytes": 404,
+        "sha256": "1ffcf0eb5a3bf5661e525af0d1f38d29b22ccfcca34ad27354af19852a3275c5"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-counts/owned-group-after-exit.json",
+        "bytes": 260,
+        "sha256": "b203cded8eb5c2fa89b547877e3fc26a564c0ffbf45e011fcbdf402b62053ee6"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-final-normal-freeze/stdout-stderr.log",
+        "bytes": 263,
+        "sha256": "66f18d92264af7d54d0362d036f3959473aa8a5594aad12d88f6c5513283ae42"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-final-normal-freeze/command.json",
+        "bytes": 1154,
+        "sha256": "c5460d0d3c8796880af02aff637e385b363aa8dc90f582c5dc87558f51cea8f1"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-final-normal-freeze/owned-process.json",
+        "bytes": 404,
+        "sha256": "e6564c57009a9605f736843989ff1c16e8b1d60804e5404b32cfe75d21adb3c1"
+      },
+      {
+        "path": "/private/tmp/p0-41-qualification-20261015/command-final-normal-freeze/owned-group-after-exit.json",
+        "bytes": 261,
+        "sha256": "bbb9e4596908ebacc117f3f870d03c065e6657994028f4461a8ac777666aa26f"
+      }
+    ]
+  },
+  "finalMetadata": {
+    "boundedPacket": {
+      "path": "/private/tmp/p0-41-bounded-qualification-20261015.json",
+      "bytes": 36601,
+      "sha256": "7a61cc8015d362cf12e856f9e2870a63c17058b89d7aeaa42eb27ba82754198d"
+    },
+    "packetPrivateRefsChecked": 20,
+    "protectedRefMetadataChecked": [
+      {
+        "path": "/Users/sid/AgentMaturityCompass/.git/HEAD",
+        "bytes": 21,
+        "sha256": "28d25bf82af4c0e2b72f50959b2beb859e3e60b9630a5e8c603dad4ddb2b6e80"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass/.git/packed-refs",
+        "bytes": 31332,
+        "sha256": "9ffd762aec0dff1288e7311ec2562d2bb7e7a315734a59df2662439731d451f8"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass/.git/refs/heads/pending-main-442cd919",
+        "bytes": 41,
+        "sha256": "1e4f158ba80ffa65dfa9d7add9b932d683dbd1c9f6b6ca42edf9697c29800622"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/.git/HEAD",
+        "bytes": 20,
+        "sha256": "00538b73553b5cf55b3f98c500eb245919f183832040bce112f778fcc7876a28"
+      },
+      {
+        "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/clone/.git/refs/heads/int",
+        "bytes": 41,
+        "sha256": "e62e0a6c1241fddb1ec9a3a3ebf4e88bd170cfcd52588d97878c8333286da259"
+      }
+    ],
+    "refsUnchanged": {
+      "claude": "990cb586fb481bb7db75977a4e5d332c6fd1ddb4",
+      "held": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+      "primary": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c"
+    },
+    "v1OnlyBaselineAndMarkersRetained": true,
+    "v1TargetAndFixtureExact": true,
+    "originalJournalByteEqualFrozen": true,
+    "originalJournal": {
+      "path": "/private/tmp/p0-41-commands-20261015.jsonl",
+      "bytes": 15558,
+      "sha256": "a39835c4d8a574a293a43a7355415baf6981d080cb0fdf430ef094270e5d1e33"
+    },
+    "allRootPacketScopeAndCountFieldsRead": true
+  },
+  "causalMeaning": [
+    "M1 replaces only pending() with measured0 in the private program script. Eight named cases fail at their original body assertions: seven null expectations receive0; the CLI JSON null-row count receives0 instead of14. This is sensitivity to the single pending-value control, not eight independent product defects.",
+    "M2 removes only the nonvacuity/nonpassing-assertion terms while retaining file status, failed file/assertion and missing-match branches. Only Q6a fails at300:25 with1 instead ofnull. Other assertion-list variants in that case are masked by the first failure; no measured sensitivity for those variants is inferred.",
+    "Exact original/mutant files and before/after phase target hashes bind both changes to scripts/program-metrics.mjs. All six processes load the same27 named cases in fresh outer processes; CLI snapshots bind the actual copied script to the phase target hash. No compiler/dist mutation, product source repair or production adoption occurred.",
+    "Both restored phases pass27/27. The same source/data/config/guards/helper/fixture bytes are retained; parent and private source/dist hashes and native identity are exact at the final read."
+  ],
+  "masking": [
+    {
+      "control": "M1",
+      "case": "Q2",
+      "frame": "248:27",
+      "observed": "0 versus null",
+      "limit": "First null assertion precedes status/current/source/asOf and later14-row checks; all those later assertions are masked in this mutant case."
+    },
+    {
+      "control": "M1",
+      "case": "Q4",
+      "frame": "277:37",
+      "observed": "0 versus null for first claim-kind row",
+      "limit": "OS and JSON loop iterations after the first null assertion are masked."
+    },
+    {
+      "control": "M1",
+      "case": "Q6a",
+      "frame": "300:25",
+      "observed": "0 versus null",
+      "limit": "Later surface metadata and omitted/skipped/todo/pending assertion-list variants are masked."
+    },
+    {
+      "control": "M1",
+      "case": "Q6c",
+      "frame": "325:54",
+      "observed": "0 versus null",
+      "limit": "The invalid result and duplicate diagnostic assertions already pass; the mutation does not demonstrate acceptance of duplicate reports."
+    },
+    {
+      "control": "M1",
+      "case": "Q7b",
+      "frame": "355:92",
+      "observed": "0 versus null on first absent-job variant",
+      "limit": "Remaining unknown/conflicting/include/exclude/dynamic YAML variants are masked in this mutant case."
+    },
+    {
+      "control": "M1",
+      "case": "Q8a",
+      "frame": "370:53",
+      "observed": "0 versus null after first malformed-source entry",
+      "limit": "Valid sourced manual0 and the invalid-provenance error already pass. Later malformed/missing/duplicate variants are masked; this is a pending-value failure, not loss of the provenance error."
+    },
+    {
+      "control": "M1",
+      "case": "Q8b",
+      "frame": "392:92",
+      "observed": "0 versus null on first undefined-pointer value",
+      "limit": "Valid registered JSON0 passes first. Later null/nonfinite/type/invalid-pointer cases are masked."
+    },
+    {
+      "control": "M1",
+      "case": "Q9b",
+      "frame": "415:65",
+      "observed": "0 null rows versus14",
+      "limit": "The actual CLI succeeds with valid15 rows and Critical7 before the pending-row count fails."
+    },
+    {
+      "control": "M2",
+      "case": "Q6a",
+      "frame": "300:25",
+      "observed": "1 versus null",
+      "limit": "Only the empty-assertion witness is reached in the failing case. Separate failed-file precedence and duplicate-result cases pass; they are not M2 causal witnesses."
+    }
+  ],
+  "v1Preservation": {
+    "counts": {
+      "total": 27,
+      "passed": 26,
+      "failed": 1,
+      "pending": 0
+    },
+    "firstError": "Q12d fixture precondition expected128 but retained native git cat-file -e returned1; original frame508:94.",
+    "followingProductRefusal": "Masked and not executed in v1. The one expectation is corrected to numeric nonzero in v2 while retaining null error/signal and the exact subsequent CLI refusal.",
+    "noMutantOrRestorationClaim": true,
+    "originalSourceAndFixtureExact": true,
+    "activeAndHaltedPreserved": true,
+    "separateDataset": "The failed original baseline is not a restored run and is not combined with the162 corrected-case repeats as one189-case corpus."
+  },
+  "observedFunctionalScope": [
+    "The27 new tests cover supplied register, Plan-table, report/YAML/manual/JSON and local Git behaviors. Intact/restored runs exercise15 IDs,90 target cells, owners,26 gap rows, historical Critical7 and14 pending rows.",
+    "Each of six phases has15 owned Git fixtures and173 retained children:148 requested native Git commands and25 product CLI calls, with10 CLI exits0 and15 exits1. All observed child results have null error/signal and match retained raw streams, argv/cwd and selected input snapshots.",
+    "All six corrected Q12d cases proceed past the native Git absence precondition and execute the exact product closing-evidence refusal. Missing/untracked evidence, zero/nonexistent SHA and real sibling nonancestor refuse; the real-ancestor synthetic declaration passes structural checks and counts6. Offline object traversal independently confirms the retained local ancestry and tree membership.",
+    "The dirty gap file cannot override committed open rows. Committed JSON0 is read despite a dirty999 copy and then a deleted working file. Funded/singleMaintainer rendering and escaping are exercised only in synthetic fixture data.",
+    "The13 original root commands comprise installation, build, fingerprint, two normal freezes, four metric CLI modes and four additional guards. They are not13 metric CLI calls. All13 exits and owned-group ESRCH checks are valid; both normal freezes retain1236/1236/41/632.",
+    "The source CLI prints15 supplied registrations, historical Critical7,14 null pending rows and funded targets; explicit/default markdown bytes match. This does not measure actual program outcomes."
+  ],
+  "limitations": [
+    "This review performs only standard-library reads, hashes, metadata checks and offline Git-object calculations. It does not import or rerun any product/test, parser/typechecker/compiler, native module, Git executable or network operation.",
+    "The original wrapper inherits environment with private HOME and Node22 PATH. The causal launcher records8 keys and fixture children another8 keys; private HOME/TMP paths are retained as metadata while inherited PATH and credential values are not serialized. No universal OS, network, cache, process-descendant or environment confinement follows.",
+    "The run-end observer precedes global teardown. Actual outer exits, retained full streams, zero hook/file/suite/unhandled errors and known late-diagnostic checks plus owned-group positive ESRCH support normal completion only. These are not universal hard-kill or detached-family guarantees.",
+    "The parent native fingerprint records Node22.23.3/ABI127 and a real owned SQLite selection; the native file remains exact inode538905647. This is not an ABI measurement for every fixture child or Node24.",
+    "The source/dist physical manifest has13,103 entries; the separately pinned new fixture adds one for13,104 regular files. Borrowed parent dependencies are not a separate install and the physical causal copy is not a Git clone. Owned synthetic Git histories are separate genuine local repositories.",
+    "The2,804,349-byte runtime index and4,232,642-byte physical manifest stay private unsplit references. No canonical copy, cap exception, product/source body transfer or new packet enactment is approved here.",
+    "Some retained JS inputs use explicit tags for undefined/nonfinite values. This review verifies the recorded procedure and assertions, not a universal independent replay of every supplied JavaScript input.",
+    "Historical tests/programMetrics.test.ts remains absent. The private27-case corpus is new and is not adopted permanent regression coverage.",
+    "Local commits and shape/ancestry checks do not establish receipt signatures, truthful closure, approved merge, independent identity or external verification. No --online cadence, current world measurement, Monday posting, D01 target choice, release, G0, tracker Done, formal dependency closure, full suite, coverage, lint, tests typecheck, Node24 or hosted CI is established.",
+    "Inherited1269-duplicate/2751-dead-code debt, held/paused ownership, unresolved successors and review-capacity holds remain unwaived. No P057/P101 activation or new work admission follows."
+  ],
+  "allReadsFinished": true,
+  "performed": {
+    "repositoryOrInputWrites": false,
+    "productRuntime": false,
+    "gitExecution": false,
+    "network": false,
+    "onlyNewReviewPairWritten": true
+  }
+}

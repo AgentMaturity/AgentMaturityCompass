@@ -1,0 +1,13 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass
+
+ ✓ tests/planEditsManifest.test.ts (15 tests) 3202ms
+     ✓ archives equal the blob at an ancestor baseCommit, or the pinned build for dist/ outputs  1470ms
+     ✓ refuses a bad issue key, a path outside the repository and a path absent at the base  387ms
+
+ Test Files  1 passed (1)
+      Tests  15 passed (15)
+   Start at  20:20:11
+   Duration  3.32s (transform 18ms, setup 19ms, import 15ms, tests 3.20s, environment 0ms)
+
+JSON report written to /Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-final-dependency-20261014T145010Z/manifest-whole16.json

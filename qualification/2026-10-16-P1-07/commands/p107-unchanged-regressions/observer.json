@@ -1,0 +1,852 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 99240,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/antiGaming.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/evidenceGatingCorrection.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/liveEvidenceProjection.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/questionBank.test.ts",
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/spineEvidenceProjection.test.ts"
+  ],
+  "testCount": 57,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "-262439604",
+      "name": "tests/antiGaming.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/antiGaming.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-262439604_0",
+      "name": "tests/antiGaming.test.ts anti-gaming: strict evidence binding",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_0_0",
+      "name": "tests/antiGaming.test.ts anti-gaming: strict evidence binding STRICT_EVIDENCE_BINDING=false no longer turns binding off, and says so once (P1-07)",
+      "fullName": "anti-gaming: strict evidence binding STRICT_EVIDENCE_BINDING=false no longer turns binding off, and says so once (P1-07)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_0_1",
+      "name": "tests/antiGaming.test.ts anti-gaming: strict evidence binding selectRelevantEvents returns question-tagged evidence when available",
+      "fullName": "anti-gaming: strict evidence binding selectRelevantEvents returns question-tagged evidence when available",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_0_2",
+      "name": "tests/antiGaming.test.ts anti-gaming: strict evidence binding L3+ selection does not fallback when strict mode is enabled",
+      "fullName": "anti-gaming: strict evidence binding L3+ selection does not fallback when strict mode is enabled",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_0_3",
+      "name": "tests/antiGaming.test.ts anti-gaming: strict evidence binding L0-L2 selection no longer borrows another question's evidence",
+      "fullName": "anti-gaming: strict evidence binding L0-L2 selection no longer borrows another question's evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_0_4",
+      "name": "tests/antiGaming.test.ts anti-gaming: strict evidence binding L3+ selection does not fall back when the removed opt-out is set (P1-07)",
+      "fullName": "anti-gaming: strict evidence binding L3+ selection does not fall back when the removed opt-out is set (P1-07)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_0_5",
+      "name": "tests/antiGaming.test.ts anti-gaming: strict evidence binding missing questionId binding does not inflate scoring to level 3+",
+      "fullName": "anti-gaming: strict evidence binding missing questionId binding does not inflate scoring to level 3+",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-262439604_1",
+      "name": "tests/antiGaming.test.ts anti-gaming: conservative trust parsing",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_1_0",
+      "name": "tests/antiGaming.test.ts anti-gaming: conservative trust parsing unknown trust metadata defaults to SELF_REPORTED",
+      "fullName": "anti-gaming: conservative trust parsing unknown trust metadata defaults to SELF_REPORTED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_1_1",
+      "name": "tests/antiGaming.test.ts anti-gaming: conservative trust parsing invalid metadata defaults to SELF_REPORTED",
+      "fullName": "anti-gaming: conservative trust parsing invalid metadata defaults to SELF_REPORTED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_1_2",
+      "name": "tests/antiGaming.test.ts anti-gaming: conservative trust parsing known trust metadata is preserved for fresh runtime evidence",
+      "fullName": "anti-gaming: conservative trust parsing known trust metadata is preserved for fresh runtime evidence",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_1_3",
+      "name": "tests/antiGaming.test.ts anti-gaming: conservative trust parsing ATTESTED without a verifiable third-party attestation reads SELF_REPORTED (P0-18)",
+      "fullName": "anti-gaming: conservative trust parsing ATTESTED without a verifiable third-party attestation reads SELF_REPORTED (P0-18)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_1_4",
+      "name": "tests/antiGaming.test.ts anti-gaming: conservative trust parsing stale OBSERVED evidence degrades to SELF_REPORTED, never to ATTESTED",
+      "fullName": "anti-gaming: conservative trust parsing stale OBSERVED evidence degrades to SELF_REPORTED, never to ATTESTED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_1_5",
+      "name": "tests/antiGaming.test.ts anti-gaming: conservative trust parsing stale OBSERVED_HARDENED evidence degrades to OBSERVED",
+      "fullName": "anti-gaming: conservative trust parsing stale OBSERVED_HARDENED evidence degrades to OBSERVED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_1_6",
+      "name": "tests/antiGaming.test.ts anti-gaming: conservative trust parsing stale ATTESTED evidence degrades to SELF_REPORTED",
+      "fullName": "anti-gaming: conservative trust parsing stale ATTESTED evidence degrades to SELF_REPORTED",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_1_7",
+      "name": "tests/antiGaming.test.ts anti-gaming: conservative trust parsing evidence newer than 90 days does not degrade",
+      "fullName": "anti-gaming: conservative trust parsing evidence newer than 90 days does not degrade",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-262439604_2",
+      "name": "tests/antiGaming.test.ts anti-gaming: mustNotInclude trust filtering",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_2_0",
+      "name": "tests/antiGaming.test.ts anti-gaming: mustNotInclude trust filtering mustNotInclude audit checks ignore excluded audits outside accepted trust tiers",
+      "fullName": "anti-gaming: mustNotInclude trust filtering mustNotInclude audit checks ignore excluded audits outside accepted trust tiers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_2_1",
+      "name": "tests/antiGaming.test.ts anti-gaming: mustNotInclude trust filtering mustNotInclude text checks ignore excluded text outside accepted trust tiers",
+      "fullName": "anti-gaming: mustNotInclude trust filtering mustNotInclude text checks ignore excluded text outside accepted trust tiers",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-262439604_2_2",
+      "name": "tests/antiGaming.test.ts anti-gaming: mustNotInclude trust filtering mustNotInclude audit checks still block when excluded audit is in accepted trust tier",
+      "fullName": "anti-gaming: mustNotInclude trust filtering mustNotInclude audit checks still block when excluded audit is in accepted trust tier",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {
+        "afterEach": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1351520424",
+      "name": "tests/evidenceGatingCorrection.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/evidenceGatingCorrection.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1351520424_0",
+      "name": "tests/evidenceGatingCorrection.test.ts required evidence types are required",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_0_0",
+      "name": "tests/evidenceGatingCorrection.test.ts required evidence types are required refuses a level when a named type is absent",
+      "fullName": "required evidence types are required refuses a level when a named type is absent",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_0_1",
+      "name": "tests/evidenceGatingCorrection.test.ts required evidence types are required names which types are missing, so the gap is actionable",
+      "fullName": "required evidence types are required names which types are missing, so the gap is actionable",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_0_2",
+      "name": "tests/evidenceGatingCorrection.test.ts required evidence types are required passes when every named type is present",
+      "fullName": "required evidence types are required passes when every named type is present",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_0_3",
+      "name": "tests/evidenceGatingCorrection.test.ts required evidence types are required still counts thresholds independently of the type requirement",
+      "fullName": "required evidence types are required still counts thresholds independently of the type requirement",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_0_4",
+      "name": "tests/evidenceGatingCorrection.test.ts required evidence types are required leaves a gate that names no types alone",
+      "fullName": "required evidence types are required leaves a gate that names no types alone",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1351520424_1",
+      "name": "tests/evidenceGatingCorrection.test.ts evidence counts only toward its own question",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_1_0",
+      "name": "tests/evidenceGatingCorrection.test.ts evidence counts only toward its own question does not lend another question's evidence at L0-L2",
+      "fullName": "evidence counts only toward its own question does not lend another question's evidence at L0-L2",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_1_1",
+      "name": "tests/evidenceGatingCorrection.test.ts evidence counts only toward its own question does not lend it at L3+ either, which was already true",
+      "fullName": "evidence counts only toward its own question does not lend it at L3+ either, which was already true",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_1_2",
+      "name": "tests/evidenceGatingCorrection.test.ts evidence counts only toward its own question returns evidence tagged to the question itself",
+      "fullName": "evidence counts only toward its own question returns evidence tagged to the question itself",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_1_3",
+      "name": "tests/evidenceGatingCorrection.test.ts evidence counts only toward its own question cannot be turned off any more (P1-07)",
+      "fullName": "evidence counts only toward its own question cannot be turned off any more (P1-07)",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1351520424_2",
+      "name": "tests/evidenceGatingCorrection.test.ts a failed gate says what actually failed",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_2_0",
+      "name": "tests/evidenceGatingCorrection.test.ts a failed gate says what actually failed names an unmet mustInclude requirement instead of failing silently",
+      "fullName": "a failed gate says what actually failed names an unmet mustInclude requirement instead of failing silently",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_2_1",
+      "name": "tests/evidenceGatingCorrection.test.ts a failed gate says what actually failed says so when no evidence sits at the required trust tier",
+      "fullName": "a failed gate says what actually failed says so when no evidence sits at the required trust tier",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1351520424_3",
+      "name": "tests/evidenceGatingCorrection.test.ts the methodology version records the change",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1351520424_3_0",
+      "name": "tests/evidenceGatingCorrection.test.ts the methodology version records the change is past r223, because scores moved",
+      "fullName": "the methodology version records the change is past r223, because scores moved",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-865520851",
+      "name": "tests/liveEvidenceProjection.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/liveEvidenceProjection.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-865520851_0",
+      "name": "tests/liveEvidenceProjection.test.ts the projection only names questions that exist",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_0_0",
+      "name": "tests/liveEvidenceProjection.test.ts the projection only names questions that exist binds no unknown question id",
+      "fullName": "the projection only names questions that exist binds no unknown question id",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-865520851_1",
+      "name": "tests/liveEvidenceProjection.test.ts the projection is not decoration",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_1_0",
+      "name": "tests/liveEvidenceProjection.test.ts the projection is not decoration every rule's OWN evidence can clear a gate of every question it binds",
+      "fullName": "the projection is not decoration every rule's OWN evidence can clear a gate of every question it binds",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_1_1",
+      "name": "tests/liveEvidenceProjection.test.ts the projection is not decoration cannot reach L4 or L5 on harness evidence alone",
+      "fullName": "the projection is not decoration cannot reach L4 or L5 on harness evidence alone",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-865520851_2",
+      "name": "tests/liveEvidenceProjection.test.ts what a governed call evidences",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_2_0",
+      "name": "tests/liveEvidenceProjection.test.ts what a governed call evidences binds an allowed call to the audit-trail and efficiency questions",
+      "fullName": "what a governed call evidences binds an allowed call to the audit-trail and efficiency questions",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_2_1",
+      "name": "tests/liveEvidenceProjection.test.ts what a governed call evidences evidences nothing for a guard the workspace does not compose",
+      "fullName": "what a governed call evidences evidences nothing for a guard the workspace does not compose",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_2_2",
+      "name": "tests/liveEvidenceProjection.test.ts what a governed call evidences binds a PERMITTED call to the control that evaluated it",
+      "fullName": "what a governed call evidences binds a PERMITTED call to the control that evaluated it",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_2_3",
+      "name": "tests/liveEvidenceProjection.test.ts what a governed call evidences binds a denial to the question whose gate hint names that receipt",
+      "fullName": "what a governed call evidences binds a denial to the question whose gate hint names that receipt",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_2_4",
+      "name": "tests/liveEvidenceProjection.test.ts what a governed call evidences projects nothing for a deferred question, however the call goes",
+      "fullName": "what a governed call evidences projects nothing for a deferred question, however the call goes",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_2_5",
+      "name": "tests/liveEvidenceProjection.test.ts what a governed call evidences binds an unknown guard to nothing beyond the universal rules",
+      "fullName": "what a governed call evidences binds an unknown guard to nothing beyond the universal rules",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-865520851_3",
+      "name": "tests/liveEvidenceProjection.test.ts the projection cannot inflate event counts",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_3_0",
+      "name": "tests/liveEvidenceProjection.test.ts the projection cannot inflate event counts returns each question at most once for one call",
+      "fullName": "the projection cannot inflate event counts returns each question at most once for one call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_3_1",
+      "name": "tests/liveEvidenceProjection.test.ts the projection cannot inflate event counts is deterministic and order-stable for the same call",
+      "fullName": "the projection cannot inflate event counts is deterministic and order-stable for the same call",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-865520851_4",
+      "name": "tests/liveEvidenceProjection.test.ts the projection declares its version",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_4_0",
+      "name": "tests/liveEvidenceProjection.test.ts the projection declares its version carries a version, because the binding is a methodology claim",
+      "fullName": "the projection declares its version carries a version, because the binding is a methodology claim",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-865520851_5",
+      "name": "tests/liveEvidenceProjection.test.ts what live scoring can honestly claim",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_5_0",
+      "name": "tests/liveEvidenceProjection.test.ts what live scoring can honestly claim one run on one day reaches L1 and no further",
+      "fullName": "what live scoring can honestly claim one run on one day reaches L1 and no further",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_5_1",
+      "name": "tests/liveEvidenceProjection.test.ts what live scoring can honestly claim L3 is not evaluated on the evidence the harness produces",
+      "fullName": "what live scoring can honestly claim L3 is not evaluated on the evidence the harness produces",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_5_2",
+      "name": "tests/liveEvidenceProjection.test.ts what live scoring can honestly claim never reaches L4 or L5, however much traffic there is",
+      "fullName": "what live scoring can honestly claim never reaches L4 or L5, however much traffic there is",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-865520851_5_3",
+      "name": "tests/liveEvidenceProjection.test.ts what live scoring can honestly claim L2 is evaluated only where an evidence map names an observed emitter",
+      "fullName": "what live scoring can honestly claim L2 is evaluated only where an evidence map names an observed emitter",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "-1092621859",
+      "name": "tests/questionBank.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/questionBank.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "-1092621859_0",
+      "name": "tests/questionBank.test.ts question bank",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1092621859_0_0",
+      "name": "tests/questionBank.test.ts question bank has exactly 244 questions",
+      "fullName": "question bank has exactly 244 questions",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1092621859_0_1",
+      "name": "tests/questionBank.test.ts question bank has expected layer distribution 19/23/95/55/52",
+      "fullName": "question bank has expected layer distribution 19/23/95/55/52",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "-1092621859_0_2",
+      "name": "tests/questionBank.test.ts question bank each question has six options levels 0..5 and six gates",
+      "fullName": "question bank each question has six options levels 0..5 and six gates",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "file",
+      "id": "554823240",
+      "name": "tests/spineEvidenceProjection.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/spineEvidenceProjection.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "554823240_0",
+      "name": "tests/spineEvidenceProjection.test.ts a scope-verified delegation is evidence for AMC-2.15",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "554823240_0_0",
+      "name": "tests/spineEvidenceProjection.test.ts a scope-verified delegation is evidence for AMC-2.15 binds the question the bank's own labels describe",
+      "fullName": "a scope-verified delegation is evidence for AMC-2.15 binds the question the bank's own labels describe",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "554823240_0_1",
+      "name": "tests/spineEvidenceProjection.test.ts a scope-verified delegation is evidence for AMC-2.15 emits one audit row and one stdout row, and no more",
+      "fullName": "a scope-verified delegation is evidence for AMC-2.15 emits one audit row and one stdout row, and no more",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "554823240_0_2",
+      "name": "tests/spineEvidenceProjection.test.ts a scope-verified delegation is evidence for AMC-2.15 records the packet and the scope that were actually in force",
+      "fullName": "a scope-verified delegation is evidence for AMC-2.15 records the packet and the scope that were actually in force",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "554823240_1",
+      "name": "tests/spineEvidenceProjection.test.ts what does not qualify",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "554823240_1_0",
+      "name": "tests/spineEvidenceProjection.test.ts what does not qualify evidences nothing when no scope was declared",
+      "fullName": "what does not qualify evidences nothing when no scope was declared",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "554823240_1_1",
+      "name": "tests/spineEvidenceProjection.test.ts what does not qualify evidences nothing when the scope names every action class",
+      "fullName": "what does not qualify evidences nothing when the scope names every action class",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "554823240_1_2",
+      "name": "tests/spineEvidenceProjection.test.ts what does not qualify emits no stdout row when the child produced nothing",
+      "fullName": "what does not qualify emits no stdout row when the child produced nothing",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "554823240_1_3",
+      "name": "tests/spineEvidenceProjection.test.ts what does not qualify keeps the killed candidates as data, with what each would need",
+      "fullName": "what does not qualify keeps the killed candidates as data, with what each would need",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "554823240_2",
+      "name": "tests/spineEvidenceProjection.test.ts the ceiling that makes this safe",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "554823240_2_0",
+      "name": "tests/spineEvidenceProjection.test.ts the ceiling that makes this safe cannot carry a question above L2, whatever it emits",
+      "fullName": "the ceiling that makes this safe cannot carry a question above L2, whatever it emits",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "554823240_2_1",
+      "name": "tests/spineEvidenceProjection.test.ts the ceiling that makes this safe clears L1's own requirements when it should",
+      "fullName": "the ceiling that makes this safe clears L1's own requirements when it should",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

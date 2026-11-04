@@ -1,0 +1,31 @@
+{
+  "mutation": "nis2-precision-bypass",
+  "file": "tests/catalog/stations/technology/nis2Drill.ts",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/catalog/stations/technology/fixtures.test.ts",
+    "--maxWorkers=1",
+    "-t",
+    "binds the NIS2 local warning to its own clock, incident, UTC awareness and typed draft fields"
+  ],
+  "appliedReplacement": {
+    "before": "const utcTimestamp = z.iso.datetime().refine((value) => !/\\.\\d{4,}Z$/.test(value));",
+    "duringMutation": "const utcTimestamp = z.iso.datetime();"
+  },
+  "expected": "exactly one targeted assertion fails",
+  "sourceHead": "b88f0fb934605ba528ad517eef797a5b891ee843",
+  "nodeVersion": "v22.23.3",
+  "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+  "exitCode": 1,
+  "elapsedSeconds": 4.74,
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/nis2-precision-bypass.log",
+  "logSha256": "663dc2b1746e1b0058b5c6508ffc6bd36d4360bd0d1be90813680440f58c80f3",
+  "originalCopy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-p1-42-20261018T113154490384Z/nis2-precision-bypass-original.txt",
+  "sourceBeforeSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+  "restoredSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+  "restoredExactly": true,
+  "targetedAssertionVerified": true
+}

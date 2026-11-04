@@ -1,0 +1,84 @@
+{
+  "source": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "base": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "capturedUtc": "2026-10-14T20:13:28.641854+00:00",
+  "files": {
+    "CONTRIBUTING.md": {
+      "sha256": "64cef514b2c440fc367ad69c29ea0102a65b4ee2a56e48d8bf9228e010975d58",
+      "bytes": 16220
+    },
+    "README.md": {
+      "sha256": "9bd1548e8774f68a19464a8868cf269650d928a1afc252a4f33c089e7e98b13f",
+      "bytes": 59828
+    },
+    "docs/content/reddit-launch-drafts.md": {
+      "sha256": "d27f8f9a2b5b47c8a8d5b06eadaf519602ebc750776ecf225cf93e755c90d134",
+      "bytes": 3075
+    },
+    "docs/content/show-hn-draft.md": {
+      "sha256": "7127ec8ac89c1cdda9c0c27f0a6f37e3f0c6f49b84d6a7095010070fca8625c9",
+      "bytes": 1951
+    },
+    "docs/internal/competitive-landscape.md": {
+      "sha256": "cab0233a5b917a6bd8f5143a95601da21ebcbae41b4b03d1e3c6030771bb4e67",
+      "bytes": 3880
+    },
+    "docs/internal/mirofish-simulation-council.md": {
+      "sha256": "c56ddfcca9a7c8c00f732044cdbddf443495178cf8c83a6f54a852d21c512e6f",
+      "bytes": 2489
+    },
+    "tests/industryPackAuditReaderQualification.test.ts": {
+      "sha256": "57920ea38d71e41b1317dba365098202f2cb5aeae15dd6337ae1d551e15e1775",
+      "bytes": 15703
+    },
+    "tests/industryPackAuditSigningQualification.test.ts": {
+      "sha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7",
+      "bytes": 14300
+    },
+    "website/i18n.js": {
+      "sha256": "2be5ab26b51ecbc9e2620c7237159e985b5a671d3e3783cbb6f28d20cfefe9d6",
+      "bytes": 44169
+    },
+    "website/index.html": {
+      "sha256": "20818a2ad58552072bdb27b657521dae6be1852a997a203c4bce9b33b3f847fa",
+      "bytes": 43520
+    },
+    "website/lite.html": {
+      "sha256": "d4e414c6a3e750ba8791bbbef602cd4b1229beee69a7aff9b7e31c1642481af1",
+      "bytes": 11197
+    },
+    "whitepaper/AMC_WHITEPAPER_v1.md": {
+      "sha256": "2150366f02215721803c070e9a66eeb69d90022f907378e4b8ab380a9e0778f0",
+      "bytes": 107509
+    }
+  },
+  "protectedEqualBase": {
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/cli-trust-flags.ts": "fe92104ef1561ca0d45c0b9db46c346a0fc9f77e1e11d428c22205300739a081",
+    "src/cli/claimOutput.ts": "1abdc50016d1b45d4cfc1b50217e715194133256cb4427823a89793045437686",
+    "src/cli/claimLabelHooks.ts": "d139a1fa4cf327e82f9e97c45ba1474d4dde6fd89aeb177cbc62d1fbbec7d03d",
+    "src/cli/resultCommandRegistry.ts": "f6b13a9f99a3df16a41bc260b99c9130f8d3d3d0bbc3ef9c6e28bfb9ab2ff406",
+    "src/studio/studioServer.ts": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+    "src/audit/auditApi.ts": "371901e70b53f446f5dfd1f0abc1d8c0e9dceee231eb656a46f0f20a770b803a",
+    "src/audit/auditCli.ts": "dae8d57ffdecd6726d27fa5751337727ce52d4da465cf5a76d066c67d5cc27ee",
+    "src/audit/binderVerifier.ts": "b7efcef92effb50588606e9a95d1bcc28b2e0de34a1a59b556194cca7fee7e7a",
+    "src/audit/binderSigner.ts": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+    "src/crypto/signing/signerVault.ts": "ae59a131cbd76f813d8160356bd73f62b1830321e34153fd2fb9e92cecd3bcaa",
+    "src/domains/industryPackAudit.ts": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+    "src/domains/domainApplyCli.ts": "e381955cf4f1ac136c86d39be33eac29e47c6a8cb83f9781c4abdd78c9d8d84b",
+    "tests/industryPackAudit.test.ts": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+    "tests/auditBinderComplianceMaps.test.ts": "e8c7e4c506ad37d35ec5d58565573610beb9ec1d20c63e81c16b273e3258de51",
+    "tests/planEditsManifest.test.ts": "e86550ef5de6de0167fae124ac40019bd76381ef7cd71f51e3fd0df60e38b27d",
+    "tests/privateModuleHelperVisibility.test.ts": "682c8c0317ddf4327746fa9f8801cc43574b6016c21b4f4cd79329b0c0eb15a3",
+    "scripts/check-freeze.mjs": "b0890f1b851dd48a182dc242320d0f29cf308b13728a217ca76ca1c7f39c77b1",
+    "scripts/freeze-baseline.json": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+    "scripts/check-qualification-receipts.mjs": "1517cc5a1cba408bd8eafe7e693c1a408fd8fd0b9de4acd9bbb7de85e3d17b48",
+    "scripts/gen-counts.mjs": "12e6c6ae75bf35763756ba1c95b65bcfd76eb5507cc08d708dfbfb76653fe02f",
+    "docs/program/metrics.json": "541373a8e5ddb8ba1dfe4581f72d371afa7cdc4885ad25077def2ed85e8955ed",
+    "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+    "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e"
+  },
+  "allProductionScriptsArchivesDependenciesUnchanged": true,
+  "archiveTreeSha256": "bce3cf2432cdc5cb375a6b1511ecd81679befc06b945042255a3b19fed79a882",
+  "bounds": "Two new tests plus ten factual inventory markers only; no production repair or guard/floor waiver. Rejected wrapper removed, reviewed shared-CLI one-line proposal is pending human transfer. Earlier command sourceHEAD values remain preserved; source bytes are equal for production/gate inputs."
+}

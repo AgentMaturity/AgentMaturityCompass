@@ -1,0 +1,61 @@
+### npm run -s build (exit 0)
+bundle-kernel: dist/kernel/amcRuntime.js 386 KB, 17 packages inlined: @amc/cordis, @amc/cordis-plugin-group, @amc/cordis-plugin-hmr, @amc/cordis-plugin-include, @amc/cordis-plugin-loader, @amc/cordis-plugin-timer, @amc/core, @amc/cosmokit, @amc/schemastery, @babel/code-frame, @babel/helper-validator-identifier, chokidar, js-tokens, js-yaml, picocolors, picomatch, readdirp
+
+### npm run -s typecheck (exit 0)
+
+### npm run -s typecheck:tests (exit 0)
+
+### npm run -s lint (exit 0)
+Lint contract passed: three unsafe patterns rejected; safe counterparts accepted.
+check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 21; 16 random marker(s); 0 pending entries.
+
+### npm run -s check:gates (exit 0)
+| L5 | 0 | 0 | 264 |
+
+11 registered emitters, 4 evidence maps, 285 literal audit emissions classified, 9 evaluated gate requirements checked.
+check:gates: every evaluated gate requirement has a registered, non-synthetic emitter.
+
+### npm run -s check:dead-code (exit 0)
+{"scan":"dead-code","baseline":2569,"current":2621,"new":0,"stale":0,"accepted":52}
+No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped
+
+### npm run -s check:duplicates (exit 0)
+{"scan":"duplicates","baseline":1058,"current":1313,"new":0,"stale":0,"accepted":255}
+No source-quality baseline at origin/main (merge-base 5ea5e866a42a): one-time bootstrap, base check skipped
+
+### npm run -s check:counts (exit 0)
+Published source counts match the repository; this check does not execute tests.
+
+### npm run -s check:api-ref (exit 0)
+docs/API_REFERENCE.md matches the source.
+
+### npm run -s check:docs-drift (exit 0)
+Docs drift check passed (342 files scanned; truth claims and commands checked in 265 public files; 5 logged exceptions).
+
+### npm run -s check:citations (exit 0)
+  CIT002 framework-id: findings=3 zero-tolerance=0 baseline=3
+  CIT003 pack-reference: findings=0 zero-tolerance=0 baseline=0
+  CIT004 record-incomplete: findings=591 zero-tolerance=0 baseline=591
+  CIT005 status-type: findings=0 zero-tolerance=0 baseline=0
+
+### npm run -s check:no-fabrication (exit 0)
+check-no-fabrication: passed; allowlisted findings R1 0, R2 0, R3 304, R4 21; 16 random marker(s); 0 pending entries.
+
+### npm run -s check:freeze (exit 1)
+Freeze exception P2-09d is not in the base baseline's allowedExceptionKeys (P0-02, P0-12, P0-13, P0-14, P0-26, P1-04, P1-08, P1-10, P1-15, P1-16, P1-17, P1-28, P1-40, P1-42, P1-43, P1-44, P1-45, P1-46); a PR cannot authorize itself.
+Freeze exception P2-23 is not in the base baseline's allowedExceptionKeys (P0-02, P0-12, P0-13, P0-14, P0-26, P1-04, P1-08, P1-10, P1-15, P1-16, P1-17, P1-28, P1-40, P1-42, P1-43, P1-44, P1-45, P1-46); a PR cannot authorize itself.
+Freeze exception P3-14 is not in the base baseline's allowedExceptionKeys (P0-02, P0-12, P0-13, P0-14, P0-26, P1-04, P1-08, P1-10, P1-15, P1-16, P1-17, P1-28, P1-40, P1-42, P1-43, P1-44, P1-45, P1-46); a PR cannot authorize itself.
+Freeze exception P2-30 is not in the base baseline's allowedExceptionKeys (P0-02, P0-12, P0-13, P0-14, P0-26, P1-04, P1-08, P1-10, P1-15, P1-16, P1-17, P1-28, P1-40, P1-42, P1-43, P1-44, P1-45, P1-46); a PR cannot authorize itself.
+
+### node scripts/gen-procurement-clauses.mjs --check (exit 0)
+Procurement clauses match the library (/Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-w6-p3-19/docs/PROCUREMENT_CLAUSES.md).
+
+### npm run -s build:pages (exit 0)
+Pages artifact built: /Users/sid/AgentMaturityCompass-worktrees/s442cd919/work/amc-w6-p3-19/tmp/pages-site (217 public guides)
+
+### npx vitest run --maxWorkers=2  tests/citationMetadata.test.ts tests/crossSurfaceBrandIdentity.test.ts tests/docsTruthReset.test.ts tests/genCountsSemantics.test.ts tests/pagesWorkflowRuntime.test.ts tests/procurementClauses.test.ts tests/publicBrandSystem.test.ts tests/publicDistributionTruth.test.ts tests/publicDocsArtifact.test.ts tests/publicDocsGraph.test.ts tests/publicQuestionCountDrift.test.ts tests/publicStatsDrift.test.ts tests/publicTypographyArtifact.test.ts tests/regulatedExamples.test.ts tests/websiteAccessibility.test.ts  (exit 0)
+      Tests  113 passed (113)
+   Start at  08:57:07
+   Duration  56.82s (transform 655ms, setup 280ms, import 898ms, tests 108.76s, environment 1ms)
+
+

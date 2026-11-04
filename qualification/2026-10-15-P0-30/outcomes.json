@@ -1,0 +1,702 @@
+{
+  "schemaVersion": 1,
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "mode": "Bounded issue outcomes; no old issue or formal gate closure",
+  "outcomes": [
+    {
+      "oldIssue": "AMC-1525",
+      "counting": "62 original +2 loaded-list; readonly10 subset",
+      "meaningAndResidual": "Five current guard sensitivities; original full62 cold44/3/15 remains partial; P1-08 anti-rollback/anchor open.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1525-root-bounded-outcome-20261015.json",
+        "bytes": 4725,
+        "sha256": "a02ab2de674341d1b40dfa88f3a364e2bf55c062ed7555dbc2e9b5de2ec36f0f"
+      },
+      "state": "Five distinct current guard mutations produced guard-specific behavioral assertion failures and passing restorations. Default signed-list delegation was separately exercised on two genuine portable artifacts.",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-qualification-20261015.json",
+          "bytes": 95234,
+          "sha256": "30117576890238946b4a001d6214c378dd8483cb737167a4982f27c4ebcc052d"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-independent-review-20261015.json",
+          "bytes": 51121,
+          "sha256": "8a6b6c4d284d9db20d00a650c1e2c392f749f8d64123138beb6f2edb1a1c687d"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-qualification-20261015.json",
+          "bytes": 21149,
+          "sha256": "e3bb16af1d94f4a6d8d7ba5c29710ca19dccd5b2de02b33fa397edb9469714ad"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1525-cold-guard-independent-review-20261015.json",
+          "bytes": 16062,
+          "sha256": "ea08bd72cab138cf8bdcc1bdbeb003ae36ada72fecfdc093d4334e5dd6104646"
+        },
+        {
+          "path": "/private/tmp/p0-30-portable-delegation-qualification-20261015.json",
+          "bytes": 66869,
+          "sha256": "3f8e97550ba11716f63e34bce9157e17dc20e6b96a32a239b585977871217ceb"
+        }
+      ],
+      "residuals": {
+        "residuals": [
+          "Old held 76-entry runner/batch was not transferred or rerun; missing held guard-test file remains absent.",
+          "Full P0-30 acceptance, reusable runner, full suite, Node24, coverage, hosted CI, release and issue Done are not established.",
+          "Key-history anti-rollback and independent revocation anchoring remain P1-08.",
+          "The ordinary P0-30 baseline freeze check passed. Prior unresolved freeze exceptions, inherited duplicate/dead findings and ownership holds remain unresolved."
+        ],
+        "counting": "The supplemental ten cases are a subset of the original 62, not ten new distinct cases. Two private loaded-list cases are separate. Guard failure totals may overlap by case and are not distinct-case counts. Original generators create fresh random keys and times per run; only separately documented fixed-effect probes reuse identical fixtures."
+      }
+    },
+    {
+      "oldIssue": "AMC-1542",
+      "counting": "35 original +7 new; writer10 subset",
+      "meaningAndResidual": "Seven distinct guards; shared-reader repeated. Publication/crash/races/rollback/stale wire-docs open.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1542-root-bounded-outcome-20261015.json",
+        "bytes": 6424,
+        "sha256": "81218e954ed7c1e7932a87019e047d6ead68ccce092f4d89ea8ce32fa365e377"
+      },
+      "state": "BOUNDED CURRENT-SOURCE QUALIFICATION COMPLETE; FORMAL ACCEPTANCE REMAINS OPEN",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-qualification-20261015.json",
+          "bytes": 142868,
+          "sha256": "662259e4a654d757576bb3fe70c75a820bcc302469ef0b6f3cbb5776c8b8280f"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-core-independent-review-20261015.json",
+          "bytes": 66381,
+          "sha256": "58bf7220d3e6139c0f96c8b4a5987413c74b687fbd09db89f4259a3178975ad2"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-qualification-20261015.json",
+          "bytes": 8254,
+          "sha256": "f45962ff6d63a7e05610eaecd839ec6c6fbfe6847ca73bd16c30eb38b2a72ee8"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-independent-review-20261015.json",
+          "bytes": 69989,
+          "sha256": "694f13036a023f239565f9e9c6b9309c07b1821d9016152c065ff5c458ccb45f"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-qualification-20261015.json",
+          "bytes": 67992,
+          "sha256": "f742eb98000b34cc74e4933798ffc2f02d23580d422d9f53dead91c4e533dbdc"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1542-consumer-guard-independent-review-20261015.json",
+          "bytes": 128759,
+          "sha256": "96d92711ed37a6f581e8af72e4f74b5c210a3c7e13a57642c5606ba6aae718a1"
+        }
+      ],
+      "residuals": {
+        "remainingOpen": [
+          "Prepared-signature publication guard is absent from current and observed held source; no nonexistent-guard mutation or production publication fix was adopted.",
+          "Two-file publication/crash window, five verify-then-reload race windows, anchored rollback/deleting both files/P1-08 migration and stale wire/docs wording remain outside these static-state results.",
+          "Held runner, held consumers and newer P1-08 layout, held writer/bootstrap additions and source ownership reservations remain untransferred and unwaived.",
+          "Synthetic local role keys establish operational test artifacts, not independent people/external authority/claim truth. Cleaned hash-only crypto inputs cannot support offline replay.",
+          "No full old76batch, fresh literal Git clone, full suite, Node24, coverage, hosted CI, G0 release or Done acceptance. Inherited duplication/dead-code failures and earlier freeze/qualification debt remain."
+        ]
+      }
+    },
+    {
+      "oldIssue": "AMC-1546",
+      "counting": "20 binding +10 scopes",
+      "meaningAndResidual": "20-17-20 and20-13-20; two auth recipes not all scope/class helpers. Missing heldHTTP22/named HTTP test.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1546-root-bounded-outcome-20261015.json",
+        "bytes": 3727,
+        "sha256": "31452abfac3cecd9fd890e292190b74f05d4e0c8fca1b9b835834e784c47b5da"
+      },
+      "state": "BOUNDED CURRENT-SOURCE QUALIFICATION COMPLETE; NO FORMAL CLOSURE",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1546-qualification-20261015.json",
+          "bytes": 31431,
+          "sha256": "7f3268cc7bdbe333255c956631e6ed55df9fc536b1976de17fe5248c6f3e0275"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1546-independent-review-20261015.json",
+          "bytes": 71686,
+          "sha256": "b451c922527b0f89e5ca509ebf52f984ee9c5e167ebe7266e07b5ba26c5f7349"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "Synthetic diagnostic/action-policy fixtures establish local enforcement, not measured maturity, external operators or independent receipt/identity attestation. Raw fixture crypto preimages are cleaned, with no offline replay claim.",
+          "Absent held HTTP22 corpus, held source/runner and ownership scopes stay untransferred. No production/permanent test/config/counter/doc/tracker/Git edit.",
+          "No literal fresh clone, full oldbatch, full suite, Node24, coverage, hosted CI, G0 release or Done acceptance. All earlier qualification/freeze/publication/ownership debt remains."
+        ],
+        "counting": "30 unique original cases. The two20-case mutation matrices reuse the binding subset; they do not add40 unique cases. TokenScopes10 is formal baseline coverage, not causal qualification of scopeRefusal/agentExecuteClassCheck by these two recipes."
+      }
+    },
+    {
+      "oldIssue": "AMC-1508",
+      "counting": "21 original +1 HTTP",
+      "meaningAndResidual": "Five original controls and two genuine-cookie controls. Strict400 vs old override-spec wording unresolved; tenant/identity/hash-only limits.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1508-root-bounded-outcome-20261015.json",
+        "bytes": 5348,
+        "sha256": "f77edf3cbd0cf06da801b6feb7506600d8e65d242a2e10c23a8a7d1bd75e61de"
+      },
+      "state": "BOUNDED ORIGINAL AND ACTUAL-COOKIE HTTP QUALIFICATION COMPLETE; FORMAL SPECIFICATION DISCREPANCY REMAINS OPEN",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-qualification-20261015.json",
+          "bytes": 39183,
+          "sha256": "6b847d4156cfbb76674d38faccd6e2a998adcba5fed5b9aa355181f3f5f0c08e"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-independent-review-20261015.json",
+          "bytes": 51693,
+          "sha256": "d5ce510d9104e795d1d5a06d3defe85997c246c6ff9601871aad194848072f47"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-http-qualification-20261015.json",
+          "bytes": 48220,
+          "sha256": "f33581d913273e0ae0b2cf5048b35850df6a9429581959d5e1a8bca8bc313c3a"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-http-independent-review-20261015.json",
+          "bytes": 40800,
+          "sha256": "81005e5a842229a19c8c2a708a3c8dd95381c9d4834d5b7eace48b0e58152cfd"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1508-original-root-bounded-outcome-20261015.json",
+          "bytes": 3499,
+          "sha256": "55df46871e685b2fad9e6bd4d5300db57c0136e76ccd621961acca23f26a010d"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "Current strict400 refusal conflicts with old override wording; no specification/policy decision, source repair or formalDone closure was made.",
+          "Local synthetic OWNER identity is not an independently authenticated person/external authority. Product verdict supplies selected identity/policy claims; crypto procedure does not independently decode/revalidate every credential policy field.",
+          "Cleanup removes raw crypto/session preimages. Fingerprints/hashes and runtime booleans do not permit offline replay; within-phase effect overwrites are not immutable intermediate history. Missing marker timestamp was not replaced by an invented chronology.",
+          "Selected row facts do not prove universal filesystem no-effects, tenant/race/CSRF/browser/hosted/installed/provider behavior. M1/M3/M4 seam-specific guard meanings are not generalized to all real HTTPcredentials.",
+          "No literal freshclone, full old76batch, wholeP030, Node24/fullsuite/coverage/hostedCI/G0/release/Done claim. Earlier ownership/quality/freeze/publication debt remains."
+        ]
+      }
+    },
+    {
+      "oldIssue": "AMC-1547",
+      "counting": "170 registrations/164 titles +2 new",
+      "meaningAndResidual": "Six sensitive original guards; store15/transport30 survive. New store2-0-2 repeats same guard. Transport not global equivalent; export-destination gap,1522P032.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1547-root-bounded-outcome-20261015.json",
+        "bytes": 19549,
+        "sha256": "2c953b1122230676fd099d29d5a3b50b75aa47abc85f95f41d66c776f5dd597e"
+      },
+      "state": "BOUNDED_ORIGINAL_AND_NEW_STORAGE_ROOT_CONTROLS_INDEPENDENTLY_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-qualification-20261015.json",
+          "bytes": 64984,
+          "sha256": "95ce35557de81d207491d14282ba9dc3383c58caabe433f40fb5f2e55a722faf"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.json",
+          "bytes": 74013,
+          "sha256": "c01c0422941c2e92bcc8bf6542c705cec07a63a43cc3940713902f60dae9d901"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-original-root-bounded-outcome-20261015.json",
+          "bytes": 21183,
+          "sha256": "e31db680b9cef8c184e0c237dc40429df3131ff34900062573780d219af3faf7"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-qualification-20261015.json",
+          "bytes": 10348,
+          "sha256": "9ef02732d6e61939bcebeb072aab5ee7d7e64d385878fcfeecbb87f129ca1a56"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-independent-review-20261015.json",
+          "bytes": 42074,
+          "sha256": "957a68e6f6d51b9b36453dad8ec57d2819b72044ff8bcdce7f1e16ec56a9df28"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-store-root-independent-review-20261015.md",
+          "bytes": 3445,
+          "sha256": "be9a561c0ddb444f3977f90f474b528daae64d020b95058e8cb4b679c4be33a4"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1547-independent-review-20261015.md",
+          "bytes": 4499,
+          "sha256": "f95fa75031d7dd80262f14a73a3cdc554deefe34bc8cf0096f8bd0cd44c5351b"
+        }
+      ],
+      "residuals": {
+        "open": [
+          "Transport-dotdot original30survivor remains bounded with unchanged upstream public path constraints; no universal equivalence.",
+          "Missing separate current conflicting/unauthentic export-destination case is not filled by damaged-ciphertext directory effect.",
+          "AMC1522 belongs P0-32; no closure here.",
+          "Full old runner/batch, Node24, full suite/coverage/hosted/G0/formalDone and earlier ownership/freeze/quality debt remain open."
+        ],
+        "counting": "Original170registered cases and new2registered cases are separate corpora, not a combined172-case test run. The 2-case control repeats the same source guard previously surviving original15, so no extra distinct guard is counted."
+      }
+    },
+    {
+      "oldIssue": "AMC-1534",
+      "counting": "25 native +9 separateCLI +1 newrace",
+      "meaningAndResidual": "Compare25-23-25; original transaction25 survives; newrace1-0-1 signed pending2. No retroactive kill or every-schedule/P027-cause proof.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1534-root-bounded-outcome-20261015.json",
+        "bytes": 5122,
+        "sha256": "2ec1d662a36bf59efc610fab049eb7341b4539e61f1472545cec808fc809aad6"
+      },
+      "state": "BOUNDED_ORIGINAL_AND_NEW_TWO_PROCESS_SUPPLEMENT_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-original-root-bounded-outcome-20261015.json",
+          "bytes": 9932,
+          "sha256": "24ab520bb55d0cf5a3dcb32f96beded84ade91117767a15a9bbc837f482c9aff"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-race-qualification-20261015.json",
+          "bytes": 12191,
+          "sha256": "388932daefcc227c4a99c7a8227751a6f356c7b9744fdfeca4aa8074f791760c"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-race-independent-review-20261015.json",
+          "bytes": 71494,
+          "sha256": "e108c318dfb6ef91a5d2fb2dfc923ab68dc6cf37a7501240176e4cb23b3226ac"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-race-public-crypto-review-20261015.json",
+          "bytes": 111829,
+          "sha256": "54500c03c7a0aaf6d4467ff774519369efa262c85a6e0a370eaf2b7b61751dff"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-qualification-20261015.json",
+          "bytes": 15816,
+          "sha256": "748c1796cdfd0f3bb843f04e5fb33f55d26786e4d96b8f072db96b601be5580b"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.json",
+          "bytes": 42050,
+          "sha256": "006a1c53d540a376c6da1dbc255c22646f71d727045b573d83b62048dc832286"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1534-independent-review-20261015.md",
+          "bytes": 3841,
+          "sha256": "43a07d35d1ba7650cdfcd767e9c1d1276fa681c13b11d58e66c6939bb9838107"
+        }
+      ],
+      "residuals": {
+        "open": [
+          "Original25 transaction-removal coverage gap remains a fixed-corpus result, now supplemented by one separate bounded race witness.",
+          "No every-schedule proof, provider execution, hardware identity, whole-cold P0-27 cause repair or external authority claim.",
+          "Current exact-source required duplicates1269/dead2751 failures remain unwaived.",
+          "No old full batch, whole P0-30, full suite/coverage/Node24/hosted/G0/release/Done or dependency closure."
+        ],
+        "counting": "Original25, separately runCLI9 and newone scenario are separate corpora. Original no-transaction survivor is unchanged; the new causal witness does not retroactively turn it into a kill. Held27/historical26 and old76 batch are distinct. Four new executions/24children/9reservations are not additional unique cases."
+      }
+    },
+    {
+      "oldIssue": "AMC-1529",
+      "counting": "16 original; lifetime6 subset",
+      "meaningAndResidual": "Bytes16-13-16; lifetime6-5-6; no Docker/log probe; wildcard listener and original child/pool limitations.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1529-root-bounded-outcome-20261015.json",
+        "bytes": 4972,
+        "sha256": "667c8d82405551d9d4a38a56c0806c9b813dbc11f3fa3918cb8147ffe9bc8274"
+      },
+      "state": "BOUNDED_ORIGINAL_NOTARY_CONTROLS_INDEPENDENTLY_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1529-qualification-20261015.json",
+          "bytes": 18352,
+          "sha256": "b163c11f374ac9c9fff4e307f2ee6b0b4889b8b0ce47f4dee7780a162d6858ff"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.json",
+          "bytes": 45719,
+          "sha256": "17bffa7e4fa36debc8ef8c33274e6b3288f0b24936cc705c7862ff89dfd8b884"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1529-independent-review-20261015.md",
+          "bytes": 3548,
+          "sha256": "5ff84489b3fe964b2f05fa4a993b2f7f2a7f198ebdff70c6abf301c006627bee"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "Original16 cases are distinct from82 repeated executions; lifetime reuses6. Four failed assertions are not four new tests.",
+          "Real local SOFTWARE Ed25519/HMAC and pinned local policy are fixture authority, not hardware/provider or independently accredited external identity.",
+          "Original deliberate0.0.0.0 listener with127requests and sync bridge remain. No blanket network isolation, retained whole internal-child streams or P0-27 cold corruption-cause repair.",
+          "Compose/Caddy is configuration inspection only. No container, pack/install, old batch, full P0-30, full suite/coverage/Node24/hosted/release/G0/Done.",
+          "Exact-source required duplicate1269/dead2751 failures remain unwaived.",
+          "Protected source/dist/native/prior evidence preservation does not mean absence of tool cache writes."
+        ]
+      }
+    },
+    {
+      "oldIssue": "AMC-1537",
+      "counting": "11 source +8 source +2 mixed-built",
+      "meaningAndResidual": "Pin11-5-11; installed UNEXECUTED behind normal pack/base-freeze and unwaived duplicates1269/dead2751; not measured failedpack.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1537-source-root-bounded-outcome-20261015.json",
+        "bytes": 3772,
+        "sha256": "312608c0a901d7a6902bba24ad455f1a3b7e5646d09e3221752136c8270efaee"
+      },
+      "state": "BOUNDED_ORIGINAL_SOURCE_AND_BUILT_COMPANION_REVIEWED_INSTALLED_ACCEPTANCE_OPEN",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1537-source-qualification-20261015.json",
+          "bytes": 22735,
+          "sha256": "01d0925418ca9ae46c177728693c8c1f7ffa417bce7ce00ab98fed851efaa0fd"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1537-source-independent-review-20261015.json",
+          "bytes": 71191,
+          "sha256": "33b0fe9a535dd39f2d4ed53cbc84a36868a45088ae2a39a812c165ca5eda8aec"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1537-source-independent-review-20261015.md",
+          "bytes": 2781,
+          "sha256": "c1478cec1ae29dd0b07b203a8d8c2dac88feb83e8c79bc27fcf814cd6d88aa7b"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "Per-worker/service loaded-native/ABI/PIDs are not independently recorded bytheseoriginaltests. Launcherfingerprint22.23.3/127andpinnednativeidentityareseparatefacts.",
+          "No OSconfinement, externallyaccreditedidentity, genuineinstalledlivepolicychange, attemptedproviderwrite, all-effectsabsence, P027corruptioncauserepair, oldbatch/fullP030/fullsuite/coverage/Node24/hosted/release/G0/Done/dependencyclosure."
+        ],
+        "installedAcceptance": "OPEN_UNEXECUTED: normal outerpack/release/fullGit-basefreeze prerequisites unwaived. Required duplicate1269/dead2751 failures are exact-source reusedevidence, not a new actualpackfailure. No agenthookshortcut/fakeGit/floorwaiver/newskip or installedobserverrun. Existingunmodifiedinternalpackrecursionmechanics are allowed onlyinsidefullnormaloutergate, neveragentfallback."
+      }
+    },
+    {
+      "oldIssue": "AMC-1516",
+      "counting": "44 original;9 guards/10 IDs",
+      "meaningAndResidual": "M17b alias; M11 emitted-JS only with actual tsc2/TS2345; M12 later branch masked; mapping10 overlaps1517.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1516-root-bounded-outcome-20261015.json",
+        "bytes": 27855,
+        "sha256": "b06ae049c0268c7fcb9b6cbb6ef85497c453201e70f911558724077f33206629"
+      },
+      "state": "Nine distinct guards produced intended runtime failures and passing restorations; ten historical IDs retained with one duplicate alias.",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1516-qualification-20261015.json",
+          "bytes": 103946,
+          "sha256": "6c093e937c06c1c7a81161dfdbe32027424c29f483cd864c2d4cb177f7b31c5e"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1516-independent-review-20261015.json",
+          "bytes": 91692,
+          "sha256": "264a473f739447a651c4094291f1c0c003167dbdeed910b49e1cc6dd9e1e8aed"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1516-M11-root-emitted-diff-review-20261015.json",
+          "bytes": 2685,
+          "sha256": "53dcd0bfdb63a6f740c04d45bd6e644bd08537ec9a7a0034ece433d835b8cdf5"
+        }
+      ],
+      "residuals": {
+        "limits": [
+          "M11 is emitted-JavaScript runtime sensitivity only: actual mutant tsc exit2/TS2345 is retained, with independently verified sole guard deletion plus formatting. Two stopped compiler/observer attempts remain unqualified. Normal source and restored compilation are separate.",
+          "M11 tests permissive direct-JavaScript authority input; no claim that the normal strict authority loader accepted imported evidence.",
+          "M12 first lower-declaration assertion fails; its later SELF_REPORTED branch is not independently killed.",
+          "M15 fails with unchanged-validator refusal of malformed Unicode; M16 fails with Date.toISOString RangeError. Neither demonstrates accepted unsafe output.",
+          "M17 isolated duration loss and M19 isolated timestamp loss have separate measured assertions; M17b reuses the exact M17 execution, not an additional distinct kill.",
+          "M18 qualifies the requested caller-redaction notice, not exhaustive secret scanning.",
+          "The current 44 original cases overlap later mapping/callback corpora; repeated B/M/R executions and duplicate IDs are not added as distinct cases.",
+          "No source repair, original test/helper/guard edit, held runner transfer, full suite, Node24, coverage, hosted CI, release or Done follows.",
+          "Freeze/quality findings, historical strict failures, missing held scopes and ownership decisions remain preserved."
+        ]
+      }
+    },
+    {
+      "oldIssue": "AMC-1519",
+      "counting": "4 scripted original",
+      "meaningAndResidual": "Four S7 guard controls; review now supplied. Unsigned peer fields not genuine signed-ledger/cold-anchor proof.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-S7-remaining-root-bounded-outcome-20261015.json",
+        "bytes": 3626,
+        "sha256": "74d41ce4683ddf901e8c1d0748e9c37bbfa23edf80ff449b3b624e27b8856ab5"
+      },
+      "packet": {
+        "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+        "bytes": 93748,
+        "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+      },
+      "state": "BOUNDED_PURE_AND_SCRIPTED_CONTROLS_INDEPENDENTLY_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+          "bytes": 93748,
+          "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+        },
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.json",
+          "bytes": 64027,
+          "sha256": "11f526f619618436b275b5f8e179b9d2612a660db98b14e19931ba62d991d913"
+        },
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.md",
+          "bytes": 2823,
+          "sha256": "74b98e466700d00ffef66f14245e5712ddb8f08836cf1183c041450dcaaf04fe"
+        }
+      ],
+      "controls": [
+        {
+          "id": "S7-M26-sdk-close-before-verify-753",
+          "counts": [
+            4,
+            3,
+            4
+          ],
+          "meaning": "Premature live verification expected rejection fails; verifierRuns0 and later explicit-close checks are masked. Original afterEach still closes. Scripted receipt is not a genuine ledger."
+        },
+        {
+          "id": "S7-M27-sdk-trust-anchor-789",
+          "counts": [
+            4,
+            2,
+            4
+          ],
+          "meaning": "Both mismatched and missing expected-anchor rows resolve when refusal is required. Chosen unsigned peer fields are not cryptographic anchor evidence."
+        },
+        {
+          "id": "S7-M28-sdk-trust-anchor-mismatch-only-789",
+          "counts": [
+            4,
+            3,
+            4
+          ],
+          "meaning": "Only the reported mismatch row loses refusal; missing expected-anchor row retains its guard. Matching f/f positive remains."
+        },
+        {
+          "id": "S7-M29-sdk-trust-anchor-missing-only-789",
+          "counts": [
+            4,
+            3,
+            4
+          ],
+          "meaning": "Only the missing expected-anchor row loses refusal; mismatch remains guarded. No independently authenticated monitor or genuine cold history is produced."
+        }
+      ]
+    },
+    {
+      "oldIssue": "AMC-1517",
+      "counting": "13 original +3 new",
+      "meaningAndResidual": "Three13-12-13; M23original13survives/newgetter3-2-3; ordinary2benign; old equivalence not inherited; mapping10 overlaps1516.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1517-root-bounded-outcome-20261015.json",
+        "bytes": 5250,
+        "sha256": "3d3aadb0ee62746f5cde5bc8f62b0f6b43fb1da1784f27c51253ffbfead683c8"
+      },
+      "state": "All four distinct guards show current sensitivity within the declared corpora. The closed disjunct is necessary for the public-getter witness; its historical global-equivalence reason does not cover this supported input. The existing production guard protects this case, so this is a private removed-guard failure rather than a new production failure.",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-qualification-20261015.json",
+          "bytes": 189825,
+          "sha256": "300ef90a081ff8303ee74f760c5ccb2457a7d5c6e159d13a3b26107722f31c36"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-original-independent-review-20261015.json",
+          "bytes": 54043,
+          "sha256": "8b26547d4bd22cd3aac98eab4ffdd7668c01a8c3f98b1d0c74b4cbe017645fb3"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-supplement-independent-review-20261015.json",
+          "bytes": 82486,
+          "sha256": "7e23a25c052a393c8f26163066a1e72d570aad9c5f8dd5d8be9c680bfae3fe58"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-lifecycle-static-review-20261015.json",
+          "bytes": 23017,
+          "sha256": "84ae6261b55be5d3b6399aad71eec563156325fe4ff427964369f40011e93337"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1517-reentrant-static-review-20261015.json",
+          "bytes": 4208,
+          "sha256": "2febb1a895c5d0bfcc4638581c62a4a7fcb981967613cb98c589f1c1cc6e5fd2"
+        }
+      ],
+      "residuals": {
+        "residuals": [
+          "No permanent source/test transfer, original helper/guard edit, whole held batch rerun, full suite, Node24, coverage, hosted CI, upstream Pi conformance, real HTTP/tenant qualification, release or Done.",
+          "Ordinary baseline freeze passed; prior unresolved freeze exceptions, inherited duplicate/dead quality findings, paused work and ownership decisions remain unresolved."
+        ],
+        "counting": "Sixteen distinct cases in this old-issue qualification: thirteen original plus three private. Ten mapping cases overlap AMC-1516; repeated B/M/R runs and cross-issue corpora are not summed as distinct cases."
+      }
+    },
+    {
+      "oldIssue": "AMC-1513",
+      "counting": "21 pure original",
+      "meaningAndResidual": "Ten S7 pure controls; review now supplied. Status/BPF model not real Linux/bwrap/kernel/seccomp confinement.",
+      "formalAcceptanceClosed": false,
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-S7-remaining-root-bounded-outcome-20261015.json",
+        "bytes": 3626,
+        "sha256": "74d41ce4683ddf901e8c1d0748e9c37bbfa23edf80ff449b3b624e27b8856ab5"
+      },
+      "packet": {
+        "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+        "bytes": 93748,
+        "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+      },
+      "state": "BOUNDED_PURE_AND_SCRIPTED_CONTROLS_INDEPENDENTLY_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-qualification-20261015.json",
+          "bytes": 93748,
+          "sha256": "de37df04ef959c53b764f2dd7cdaa87d9e231cf430959307d67da0d3a4decb94"
+        },
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.json",
+          "bytes": 64027,
+          "sha256": "11f526f619618436b275b5f8e179b9d2612a660db98b14e19931ba62d991d913"
+        },
+        {
+          "path": "/private/tmp/p0-30-S7-remaining-independent-review-20261015.md",
+          "bytes": 2823,
+          "sha256": "74b98e466700d00ffef66f14245e5712ddb8f08836cf1183c041450dcaaf04fe"
+        }
+      ],
+      "controls": [
+        {
+          "id": "S7-M01-bwrap-child-guard",
+          "counts": [
+            21,
+            17,
+            21
+          ],
+          "meaning": "Duplicate-child refusal fails before the duplicate-exit assertion in that body. Fractional, text and unsafe-integer positive child IDs also fail; nonpositive guard remains."
+        },
+        {
+          "id": "S7-M02-bwrap-exit-before-child",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Exit-only refusal remains null at final return; the exit-before-later-child order assertion detects the missing preceding-child guard."
+        },
+        {
+          "id": "S7-M03-bwrap-exit-dup",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Duplicate-child refusal passes first; duplicate-exit refusal then fails. Distinct from removal of the preceding-child guard."
+        },
+        {
+          "id": "S7-M04-bwrap-exit-range",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Out-of-range256 exit receipt is admitted; other integer/type/range clauses remain."
+        },
+        {
+          "id": "S7-M05-bwrap-nonobject-row",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Array row is admitted/ignored before final receipt; primitive in-operator exceptions still return null via unchanged catch. Do not infer all malformed rows admitted."
+        },
+        {
+          "id": "S7-M06-bwrap-child-positive",
+          "counts": [
+            21,
+            19,
+            21
+          ],
+          "meaning": "Nonpositive integer child IDs0/-1 are admitted; safe-integer/type refusal remains."
+        },
+        {
+          "id": "S7-M07-bpf-arch-check",
+          "counts": [
+            21,
+            19,
+            21
+          ],
+          "meaning": "Both foreign-architecture first verdicts fail. Later syscall loops and allowed calls in those two bodies are masked."
+        },
+        {
+          "id": "S7-M08-bpf-x32-rule",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "Prior architecture and ordinary-denial loop checks pass; first x32 verdict fails, masking later x32/allowed assertions."
+        },
+        {
+          "id": "S7-M09-bpf-io-uring",
+          "counts": [
+            21,
+            19,
+            21
+          ],
+          "meaning": "Both supported-architecture denial loops fail first at io_uring425 after ordinary socket checks. Later426/427 and other assertions are masked."
+        },
+        {
+          "id": "S7-M10-bpf-connect",
+          "counts": [
+            21,
+            20,
+            21
+          ],
+          "meaning": "x64 connect42 first fails after41/53 pass, masking later x64 checks; separate arm64 case remains unchanged."
+        }
+      ]
+    },
+    {
+      "oldIssue": "AMC-1518",
+      "counting": "43 registrations / 42 file-title pairs; seven corpus processes,301 executions,242 approved detached launches",
+      "meaningAndResidual": "Original43 passes. Secret guard43\u219241\u219243; fixture-tamper43\u219242\u219243. Three direct original assertions; output-directory/reason checks masked. Instrumented fixed local Node targets/oracles, not authenticated external comparator/model or universal process/secret proof.",
+      "formalAcceptanceClosed": false,
+      "state": "BOUNDED_ORIGINAL43_AND_TWO_SOURCE_CONTROLS_INDEPENDENTLY_REVIEWED",
+      "evidencePins": [
+        {
+          "path": "/private/tmp/p0-30-AMC-1518-detached-qualification-20261015.json",
+          "bytes": 72597,
+          "sha256": "de1a9ea9b169e10c44cc3e827c48b09a131191a2448b77744f3c8fc7ba04f3cb"
+        },
+        {
+          "path": "/private/tmp/p0-30-AMC-1518-detached-independent-review-20261015.json",
+          "bytes": 45705,
+          "sha256": "ceccfc66186d40dbd107ff69b1b38802990c78932de3699065e240dd38f4c9fe"
+        }
+      ],
+      "rootOutcome": {
+        "path": "/private/tmp/p0-30-AMC-1518-detached-root-bounded-outcome-20261015.json",
+        "bytes": 4737,
+        "sha256": "72f49e80f2a8a0231faf4895d8d41d5d6c0ec32c8913e0b45af2cfb93f5664ca"
+      }
+    }
+  ],
+  "counting": [
+    "Do not synthesize global unique-case/killed/survived/equivalent totals by summing BMR runs, subsets, aliases or shared files.",
+    "1525 readonly10 subset62; loaded2 separate; partial44/3/15 retained.",
+    "1516 M17b exact alias; mapping10 overlaps1517.",
+    "1517 original13/new3 separate; ordinary2 benign and originalM23 survivor unchanged.",
+    "1542 writer10 subset35; shared-reader7 repeated not eighth guard; reporter repeats/126observations not new cases.",
+    "1508 original21/HTTP1 separate; current reconstructions and exact historical composite keep provenance.",
+    "1547 170registrations/164rendered titles; supplement2 repeats same sourceguard.",
+    "1534 original25/CLI9/new1 separate;4runs/24children/9reservations not extra definitions.",
+    "1529 lifetime6 subset16;82 executions not82 unique tests.",
+    "1537 pin11 repeats source11; original8 and built2 separate; no installed cases.",
+    "S7 pure21+scripted4=25 original;14controls/703executions not703 unique; harness43 excluded from that S7 lane. A separately reviewed harness lane now records43registrations/42file-title pairs and301repeated executions; do not count it as part of the25."
+  ]
+}

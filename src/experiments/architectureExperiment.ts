@@ -17,7 +17,9 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
-import { bootstrapDifferenceCI, effectSizeDifference, deterministicSeed } from "./stats.js";
+import { bootstrapDifferenceCI, effectSizeDifference, deterministicSeed, mean } from "./stats.js";
+import { runArchitectureProbeStages, renderExperimentResourceUsage, type ArchitectureBudget, type ArchitectureProbeRunner,
+  type ExperimentResourceUsage } from "./experimentResourceUsage.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -77,6 +79,8 @@ export interface ProbeOutcome {
   /** Free-form observations */
   observations: string[];
   ts: number;
+  /** Set by {@link simulateProbeOutcomes}: an invented outcome, never a measurement. */
+  simulated?: true;
 }
 
 export interface ArchitectureExperiment {
@@ -88,6 +92,8 @@ export interface ArchitectureExperiment {
   probes: ArchitectureProbe[];
   createdTs: number;
   status: "CREATED" | "RUNNING" | "COMPLETED" | "FAILED";
+  /** Native resource observations and caller-bound admission, including failures and missing roles. */
+  resourceUsage?: ExperimentResourceUsage;
 }
 
 export interface DimensionComparison {
@@ -118,6 +124,12 @@ export interface ArchitectureComparisonReport {
   reportId: string;
   experimentId: string;
   ts: number;
+  /**
+   * What the outcomes are. Never "measured": `simulated` outcomes are invented by {@link simulateProbeOutcomes}, and
+   * `unbound` outcomes came from a caller's synchronous runner with no ledger-bound evidence. A measured architecture
+   * comparison is an experiment report from `runExecutedArchitectureExperiment` (GAP-WP06), gated by `amc experiment gate`.
+   */
+  evidence: "simulated" | "unbound";
   baselineSpecId: string;
   candidateSpecId: string;
   modelId: string;
@@ -156,6 +168,7 @@ export interface ArchitectureComparisonReport {
 
   /** Recommendations */
   recommendations: string[];
+  resourceUsage?: ExperimentResourceUsage;
 }
 
 // ---------------------------------------------------------------------------
@@ -199,7 +212,7 @@ export function createArchitectureSpec(params: {
   name: string;
   kind: ArchitectureSpecKind;
   modelId: string;
-  artifactContent: string;
+  artifactContent: string | Uint8Array;
   description: string;
   metadata?: Record<string, string>;
 }): ArchitectureSpec {
@@ -337,63 +350,7 @@ export function createArchitectureExperiment(params: {
   };
 }
 
-/**
- * DETERMINISTIC TEST DOUBLE — does not invoke any model.
- *
- * Produces reproducible pseudo-random probe outcomes from a seed so tests can
- * exercise the experiment pipeline. This was previously the default probe
- * runner, which meant every architecture comparison reported invented scores,
- * tokens and latencies. Callers must now opt into it explicitly; production
- * runs must supply a probeRunner that invokes the real model.
- */
-export function simulateProbeOutcomes(
-  spec: ArchitectureSpec,
-  probes: ArchitectureProbe[],
-  seed: number,
-): ProbeOutcome[] {
-  const outcomes: ProbeOutcome[] = [];
-  let rngState = seed;
-
-  function nextRng(): number {
-    // Simple LCG for deterministic output
-    rngState = (rngState * 1664525 + 1013904223) >>> 0;
-    return (rngState >>> 0) / 0xFFFFFFFF;
-  }
-
-  for (const probe of probes) {
-    const rng1 = nextRng();
-    const rng2 = nextRng();
-    const rng3 = nextRng();
-    const rng4 = nextRng();
-
-    // Architecture-specific bias: different spec artifacts produce different outcomes
-    const specBias = parseInt(spec.artifactSha256.slice(0, 8), 16) / 0xFFFFFFFF;
-
-    const score = Math.min(1, Math.max(0, 0.5 + (rng1 - 0.5) * 0.8 + specBias * 0.15));
-
-    let verdict: ProbeOutcomeVerdict;
-    if (score >= 0.7) verdict = "PASS";
-    else if (score >= 0.4) verdict = "PARTIAL";
-    else verdict = "FAIL";
-
-    outcomes.push({
-      probeId: probe.probeId,
-      specId: spec.specId,
-      verdict,
-      score: Number(score.toFixed(4)),
-      toolCallCount: Math.floor(rng2 * 10),
-      tokenCount: Math.floor(500 + rng3 * 2000),
-      latencyMs: Math.floor(100 + rng4 * 2000),
-      choiceAwareness: rng1 > 0.4,
-      observations: [
-        `Probe ${probe.category}/${probe.measureDimension}: score=${score.toFixed(3)}`,
-      ],
-      ts: Date.now(),
-    });
-  }
-
-  return outcomes;
-}
+export { simulateProbeOutcomes } from "./architectureSimulation.js";
 
 /**
  * Run a controlled architecture experiment.
@@ -407,47 +364,59 @@ export function runArchitectureExperiment(
      * no default, because defaulting to a simulator fabricated comparisons.
      * Tests may pass simulateProbeOutcomes explicitly.
      */
-    probeRunner: (spec: ArchitectureSpec, probes: ArchitectureProbe[], seed: number) => ProbeOutcome[];
+    probeRunner: ArchitectureProbeRunner;
+    /** Between-callback admission only; arbitrary runner code cannot promise a hard spend ceiling. */
+    budget?: ArchitectureBudget;
   },
 ): {
   experiment: ArchitectureExperiment;
   baselineOutcomes: ProbeOutcome[];
   candidateOutcomes: ProbeOutcome[];
+  resourceUsage: ExperimentResourceUsage;
 } {
-  const runner = options.probeRunner;
-
-  experiment.status = "RUNNING";
-
-  const seed = deterministicSeed([
-    experiment.experimentId,
-    experiment.baselineSpec.artifactSha256,
-    experiment.candidateSpec.artifactSha256,
-  ]);
-
-  try {
-    const baselineOutcomes = runner(experiment.baselineSpec, experiment.probes, seed);
-    const candidateOutcomes = runner(experiment.candidateSpec, experiment.probes, seed);
-
-    experiment.status = "COMPLETED";
-    return { experiment, baselineOutcomes, candidateOutcomes };
-  } catch (e) {
-    experiment.status = "FAILED";
-    throw e;
-  }
+  return runArchitectureProbeStages(experiment, options);
 }
 
 // ---------------------------------------------------------------------------
 // Analysis
 // ---------------------------------------------------------------------------
 
+/** The architecture kind named by `value`; an unknown kind is refused, never coerced to a default. */
+export function parseArchitectureKind(value: string): ArchitectureSpecKind {
+  const parsed = architectureSpecSchema.shape.kind.safeParse(value);
+  if (!parsed.success) throw new Error(`unknown architecture kind '${value}'; expected ${architectureSpecSchema.shape.kind.options.join(", ")}`);
+  return parsed.data;
+}
+
+/** Exactly one well-formed outcome per probe for `spec`: a missing, extra, duplicate or out-of-range outcome is refused. */
+function assertOutcomes(experiment: ArchitectureExperiment, spec: ArchitectureSpec, outcomes: ProbeOutcome[]): void {
+  const probeIds = new Set(experiment.probes.map((probe) => probe.probeId));
+  const seen = new Set<string>();
+  const counter = (value: unknown) => Number.isSafeInteger(value) && (value as number) >= 0;
+  for (const outcome of outcomes) {
+    const problem = outcome.specId !== spec.specId ? `belongs to spec ${outcome.specId}`
+      : !probeIds.has(outcome.probeId) ? "names an unknown probe"
+      : seen.has(outcome.probeId) ? "is a duplicate"
+      : !(Number.isFinite(outcome.score) && outcome.score >= 0 && outcome.score <= 1) ? `has score ${outcome.score} outside 0..1`
+      : !(counter(outcome.toolCallCount) && counter(outcome.tokenCount) && Number.isFinite(outcome.latencyMs) && outcome.latencyMs >= 0) ? "has a negative or non-integer counter"
+      : null;
+    if (problem !== null) throw new Error(`Outcome for probe ${outcome.probeId} of spec ${spec.specId} ${problem}.`);
+    seen.add(outcome.probeId);
+  }
+  if (seen.size !== probeIds.size) throw new Error(`Spec ${spec.specId} has outcomes for ${seen.size} of ${probeIds.size} probes; a missing outcome is not scored.`);
+}
+
 /**
- * Analyze experiment results and produce a comparison report.
+ * Analyze experiment results and produce a comparison report. The report is `simulated` or `unbound`, never measured.
  */
 export function analyzeArchitectureExperiment(
   experiment: ArchitectureExperiment,
   baselineOutcomes: ProbeOutcome[],
   candidateOutcomes: ProbeOutcome[],
 ): ArchitectureComparisonReport {
+  assertOutcomes(experiment, experiment.baselineSpec, baselineOutcomes);
+  assertOutcomes(experiment, experiment.candidateSpec, candidateOutcomes);
+  const evidence = [...baselineOutcomes, ...candidateOutcomes].some((outcome) => outcome.simulated === true) ? "simulated" as const : "unbound" as const;
   const reportId = `acr_${randomUUID().slice(0, 12)}`;
   const now = Date.now();
 
@@ -511,6 +480,7 @@ export function analyzeArchitectureExperiment(
     const ci = data.baseline.length >= 2 && data.candidate.length >= 2
       ? bootstrapDifferenceCI({ baseline: data.baseline, candidate: data.candidate, seed })
       : [0, 0] as [number, number];
+    if (!Array.isArray(ci)) throw new Error(ci.reason);
     const es = effectSizeDifference(data.baseline, data.candidate);
     const bAvg = data.baseline.reduce((a, b) => a + b, 0) / data.baseline.length;
     const cAvg = data.candidate.reduce((a, b) => a + b, 0) / data.candidate.length;
@@ -527,10 +497,8 @@ export function analyzeArchitectureExperiment(
   }
 
   // --- Aggregate metrics ---
-  const avgMetric = (outcomes: ProbeOutcome[], fn: (o: ProbeOutcome) => number): number => {
-    if (outcomes.length === 0) return 0;
-    return Number((outcomes.reduce((sum, o) => sum + fn(o), 0) / outcomes.length).toFixed(2));
-  };
+  const avgMetric = (outcomes: ProbeOutcome[], fn: (o: ProbeOutcome) => number): number =>
+    Number(mean(outcomes.map(fn)).toFixed(2));
 
   const avgToolCallBaseline = avgMetric(baselineOutcomes, (o) => o.toolCallCount);
   const avgToolCallCandidate = avgMetric(candidateOutcomes, (o) => o.toolCallCount);
@@ -553,6 +521,7 @@ export function analyzeArchitectureExperiment(
   const overallCi = allBaselineScores.length >= 2 && allCandidateScores.length >= 2
     ? bootstrapDifferenceCI({ baseline: allBaselineScores, candidate: allCandidateScores, seed })
     : [0, 0] as [number, number];
+  if (!Array.isArray(overallCi)) throw new Error(overallCi.reason);
   const overallEs = effectSizeDifference(allBaselineScores, allCandidateScores);
 
   // --- Recommendations ---
@@ -614,6 +583,7 @@ export function analyzeArchitectureExperiment(
     reportId,
     experimentId: experiment.experimentId,
     ts: now,
+    evidence,
     baselineSpecId: experiment.baselineSpec.specId,
     candidateSpecId: experiment.candidateSpec.specId,
     modelId: experiment.baselineSpec.modelId,
@@ -638,6 +608,7 @@ export function analyzeArchitectureExperiment(
     overallScoreEffectSize: Number(overallEs.toFixed(4)),
     deterministicSeed: seed,
     recommendations,
+    ...(experiment.resourceUsage ? { resourceUsage: structuredClone(experiment.resourceUsage) } : {}),
   };
 
   const reportSha256 = sha256Hex(canonicalize(reportBody));
@@ -660,6 +631,10 @@ export function renderArchitectureComparisonMarkdown(
 ): string {
   const lines: string[] = [
     "# Architecture Comparison Report",
+    "",
+    report.evidence === "simulated"
+      ? "> **SIMULATED** — invented outcomes for pipeline testing; not measured, never eligible for promotion."
+      : "> **UNBOUND** — caller-supplied outcomes without ledger-bound evidence; not measured, never eligible for promotion.",
     "",
     `- Report ID: ${report.reportId}`,
     `- Experiment: ${report.experimentId}`,
@@ -729,6 +704,7 @@ export function renderArchitectureComparisonMarkdown(
   }
 
   // Reproducibility
+  if (report.resourceUsage) lines.push(...renderExperimentResourceUsage(report.resourceUsage));
   lines.push("## Reproducibility");
   lines.push("");
   lines.push(`- Deterministic seed: ${report.deterministicSeed}`);
@@ -762,7 +738,8 @@ export function quickArchitectureComparison(params: {
    * Runs probes against a spec and returns real outcomes. Required: without it
    * the comparison would be fabricated.
    */
-  probeRunner: (spec: ArchitectureSpec, probes: ArchitectureProbe[], seed: number) => ProbeOutcome[];
+  probeRunner: ArchitectureProbeRunner;
+  budget?: ArchitectureBudget;
 }): {
   experiment: ArchitectureExperiment;
   report: ArchitectureComparisonReport;
@@ -792,7 +769,8 @@ export function quickArchitectureComparison(params: {
   });
 
   const { baselineOutcomes, candidateOutcomes } = runArchitectureExperiment(experiment, {
-    probeRunner: params.probeRunner
+    probeRunner: params.probeRunner,
+    budget: params.budget
   });
   const report = analyzeArchitectureExperiment(experiment, baselineOutcomes, candidateOutcomes);
   const markdown = renderArchitectureComparisonMarkdown(report);

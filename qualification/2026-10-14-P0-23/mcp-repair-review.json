@@ -1,0 +1,910 @@
+{
+  "issue": "P0-23",
+  "review": "independent read-only source and saved evidence review",
+  "atUtc": "2026-10-14T17:26:52.535738+00:00",
+  "head": "a4822f4a829b7724f1213f464d98ace6f6c978e5",
+  "worktree": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass",
+  "decision": "No actionable findings in the bounded MCP repair or badge projection tests",
+  "findings": [],
+  "reviewedRepair": {
+    "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/mcp/mcpClaimOutput.ts",
+    "sha256": "5585b461f2abe8e240cb5547e422e81e1eb758bb887119f22250bdc4aaf644ac",
+    "bytes": 2089
+  },
+  "reviewedTests": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/mcpClaimLabels.test.ts",
+      "sha256": "eccea41c533bfa66365c1a745cb3451da2a049f9ac04df8fca3fc55a43d6d1fc",
+      "bytes": 19288
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/tests/claimBadge.test.ts",
+      "sha256": "39c58ec2a1969c44b33bef597da2afcef2f2291cca2b59127212e3143d3e87bc",
+      "bytes": 4274
+    }
+  ],
+  "sourceInputs": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/mcp/mcpClaimOutput.ts",
+      "sha256": "5585b461f2abe8e240cb5547e422e81e1eb758bb887119f22250bdc4aaf644ac",
+      "bytes": 2089,
+      "equalsHeadBytes": false,
+      "headBlob": "2aa2444c8d8aa5463e3e7a502dde7ff7b60c578e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/mcp/amcMcpServer.ts",
+      "sha256": "03515f4a5f48efbef749316fdbd0b8c2e239c876fc95050e3e5ec6a0cef9241a",
+      "bytes": 31445,
+      "equalsHeadBytes": true,
+      "headBlob": "2740b26866ee44e09e5428886fad4212f4f096ae"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/adapters/results.ts",
+      "sha256": "ce2b501208ca030e371bb1fb453d851b2e80556dc53ff5cc84ef1c24710e8e3b",
+      "bytes": 9797,
+      "equalsHeadBytes": true,
+      "headBlob": "f9993b2dd4980debcc721da495fb4a3b502c8b50"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/adapters.ts",
+      "sha256": "c7b666c37c3b7348164002ccb2ad21a85c16d60e92d50ec6a417436ef279c497",
+      "bytes": 8482,
+      "equalsHeadBytes": true,
+      "headBlob": "6093414342c245b1128ce13b659f7c1fd0de6e93"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/evaluate.ts",
+      "sha256": "cf92cf3ffd0961579a12ec04006e9fd110ef45018a17c60edd53af064d4388b0",
+      "bytes": 5777,
+      "equalsHeadBytes": true,
+      "headBlob": "f91a4e2b4084241120f0a02163cc1f926f456093"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/claims/eligibility/render.ts",
+      "sha256": "274b20ebbef6a2a3746ef88ceea552a2717a94e61b264698e6a4afd48791b1da",
+      "bytes": 7029,
+      "equalsHeadBytes": true,
+      "headBlob": "359560c9aa5d63bddc8e9d03a66ca4aec6ff7edb"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/diagnostic/reportSeal.ts",
+      "sha256": "890711c710ce278edef9081355417474cdfe7ae281c562d1d277a64e48d80c4f",
+      "bytes": 1471,
+      "equalsHeadBytes": true,
+      "headBlob": "96eebf423f7de2a4ca715b4be0d847087df30dfd"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/diagnostic/runReportResolution.ts",
+      "sha256": "892b489a786d45e238c71615db3000cb48f922013d9cefbe26d9e41208f3d39f",
+      "bytes": 4495,
+      "equalsHeadBytes": true,
+      "headBlob": "a1212248cad5dbc002c5ab6d420aee854411626a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/domains/domainEvidence.ts",
+      "sha256": "964e0eccddeced986aa6e6f68358cb6e30ecf1b6901edc7761a11566d90c545a",
+      "bytes": 1660,
+      "equalsHeadBytes": true,
+      "headBlob": "f355f0fbd10040b584765a55689889c8e62aac91"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/console/assets/components/claimBadge.js",
+      "sha256": "b3e4f55239a8aa58a4abf203c1b408015a2bcf1c3408c634d46b08706eb0f2ca",
+      "bytes": 4533,
+      "equalsHeadBytes": true,
+      "headBlob": "b97e733a6b30c398c25267cc4e6be0e0cfb8f7c0"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/index.ts",
+      "sha256": "9ec1d2668cf1b023443d038c16e9e35d72ab2ab26b6a97d993c5f383c23b9f9f",
+      "bytes": 19070,
+      "equalsHeadBytes": true,
+      "headBlob": "4ab8c976b28dc1941188c4d0f80a0592f029db2e"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/accessPolicy.ts",
+      "sha256": "3472bd7573ee644aea651fbc44e5890a7abbb8e3fc299f57450e32a6ff445bde",
+      "bytes": 8057,
+      "equalsHeadBytes": true,
+      "headBlob": "4bde7602a982982e270b71f903e7ad38cc2d18b2"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/api/resultRouteRegistry.ts",
+      "sha256": "466ccfc1d33f3c5de97414d9b0bb58b7bedd5bf3f356548dde55eada665954ec",
+      "bytes": 13528,
+      "equalsHeadBytes": true,
+      "headBlob": "50316b894c5124249ff60d762c70ccaff28a7f16"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/studio/studioServer.ts",
+      "sha256": "d66f0174521b03f92414f837423fa8d242b2be82af1d83f425b47796276134bf",
+      "bytes": 323521,
+      "equalsHeadBytes": true,
+      "headBlob": "5655e5793632ff9674ef377c0f66583a0734b8cc"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/studio/studioClaimOutput.ts",
+      "sha256": "c29e8ca0cc2e7fbe6ff6748c385def883fcb92dcc7962d53881f1beb13d53ac7",
+      "bytes": 2969,
+      "equalsHeadBytes": true,
+      "headBlob": "b54294fb1e35ba8dc7accbbd533eaea82d05a446"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/src/studio/openapi.ts",
+      "sha256": "610849db134d01c2f9a2a55381757905ce6f0917e6a549a2008ba8181265f33f",
+      "bytes": 93763,
+      "equalsHeadBytes": true,
+      "headBlob": "7bfac97d2e0a4e3a2acf36f5f5a3a066900121ba"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/website/openapi.yaml",
+      "sha256": "0090187e7f9be1cdfe0eb6829b789c101533ef9b9e14097a6b47c95becefdbf6",
+      "bytes": 514686,
+      "equalsHeadBytes": true,
+      "headBlob": "3f3304ad041bacc8f228e9fb9d321df8eefa7b03"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "bytes": 8631,
+      "equalsHeadBytes": true,
+      "headBlob": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "bytes": 155432,
+      "equalsHeadBytes": true,
+      "headBlob": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-23-qualification/AgentMaturityCompass/vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "bytes": 1324,
+      "equalsHeadBytes": true,
+      "headBlob": "e72e9654a9d602319c28febb5893da12eb5438b8"
+    }
+  ],
+  "staticIntegrityChecks": {
+    "withClaimFunctionBytesEqualHead": true,
+    "unboundClaimFunctionBytesEqualHead": true,
+    "toolFactoryInventoryAndOriginalResultTextProducerSourceBytesEqualHead": true,
+    "consoleRendererBytesEqualHead": true,
+    "repairSourceMatchesSavedSdkReceipt": true,
+    "repairSourceMatchesMutationRestoredHash": true,
+    "otherReviewedInputsUnchanged": true,
+    "reviewedInputCount": 20,
+    "unchangedInputCount": 19
+  },
+  "reasoning": [
+    "agentRunClaim uses the existing run resolver, computes sealVerified with the existing canonical hash/auditor-public-key-history verifier, and passes that actual boolean to envelopeForStoredRun. It no longer reaches the raw diagnostic adapter through loadDomainEvidence.",
+    "The canonical stored-run adapter treats 1.1.1 or absent/unparsable old version metadata as legacy self-reported; current verified reports retain their established claim; current unverified VALID reports are evaluated as INVALID and explicitly self-reported. Resolution/shape/verification errors are caught and yield a not-evaluated unbound claim.",
+    "The diagnostic stored-run path supplies neither approved independent reviewer state nor a pinned reviewer issuer. The canonical eligibility decision requires both, so an auditor seal alone does not promote the result to independently_reviewed.",
+    "withClaim remains byte-identical: original first text block stays intact, canonical label remains a separate second text block, and structuredContent still merges supplied result fields with canonical claim fields. amcMcpServer is byte-identical, preserving factory/tool inventory and original text producers.",
+    "The latest saved standard-parser run genuinely passes every 23 existing SDK case with zero failures, pending, todo. It checks exact 11 default tools, original ten successful tool outputs, legacy parity, current sealed/unsealed controls, licensed own-key refusals, unpaid refusal, missing/empty controls and the incident extension.",
+    "The actual shared-helper mutation removes text labels and structuredContent while preserving original result text; its saved run has 16 genuine failures of 23, zero pending/todo. Restored source hash matches the reviewed source, and the later 23-case standard-parser run is green.",
+    "The badge tests invoke the real HTML string renderer for four explicit canonical helper projections, neutral not-evaluated reasons, legacy wording, tooltip/attribute escaping and the shared legend. Their own comment truthfully labels reviewer/independence values as projections, not attestations."
+  ],
+  "evidence": [
+    {
+      "scope": "original real SDK RED",
+      "report": {
+        "path": "/private/tmp/p0-23-mcp-sdk-first-red-20261014.actual.json",
+        "sha256": "ef57c89df47f2ad24e89c8235740786f2e0a985e77c1f68693f2f072b98d83e3",
+        "bytes": 2308
+      },
+      "counts": {
+        "success": false,
+        "numTotalTests": 2,
+        "numPassedTests": 1,
+        "numFailedTests": 1,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "title": "discovers the exact 11 default tools with A4 preview disabled",
+          "status": "passed"
+        },
+        {
+          "title": "a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+          "status": "failed"
+        }
+      ],
+      "log": {
+        "path": "/private/tmp/p0-23-mcp-sdk-first-red-20261014.log",
+        "sha256": "332f8381a5c77a15a3c13eafa285c1f0c7fb4b13351950ad05ebc52471944280",
+        "bytes": 81
+      },
+      "command": {
+        "name": "mcp-sdk-first-red",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-first-red-20261014.actual.json",
+        "exit": 1,
+        "durationMs": 4959,
+        "startedUtc": "2026-10-14T17:00:55.251929+00:00",
+        "log": "/private/tmp/p0-23-mcp-sdk-first-red-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    },
+    {
+      "scope": "phase name RED but actual GREEN",
+      "report": {
+        "path": "/private/tmp/p0-23-mcp-sdk-red-diff-20261014.actual.json",
+        "sha256": "2beafdc9383e587f55b72ff8d3fede921cfc8e86dbfd40c23eb992a9f825b543",
+        "bytes": 1412
+      },
+      "counts": {
+        "success": true,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "title": "discovers the exact 11 default tools with A4 preview disabled",
+          "status": "passed"
+        },
+        {
+          "title": "a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+          "status": "passed"
+        }
+      ],
+      "log": {
+        "path": "/private/tmp/p0-23-mcp-sdk-red-diff-20261014.log",
+        "sha256": "529f27d20ae5c328e232cfad7dab378d611bd8e647f418cfd860a29802dbf263",
+        "bytes": 645
+      },
+      "command": {
+        "name": "mcp-sdk-red-diff",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-red-diff-20261014.actual.json",
+        "exit": 0,
+        "durationMs": 4094,
+        "startedUtc": "2026-10-14T17:01:44.930772+00:00",
+        "log": "/private/tmp/p0-23-mcp-sdk-red-diff-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    },
+    {
+      "scope": "unchanged two-case GREEN",
+      "report": {
+        "path": "/private/tmp/p0-23-mcp-sdk-two-case-green-20261014.actual.json",
+        "sha256": "810a2a2ef7664f7efb6d412ffd31c5996067afd86c966bb5a36d68d9dfa1dcb5",
+        "bytes": 1412
+      },
+      "counts": {
+        "success": true,
+        "numTotalTests": 2,
+        "numPassedTests": 2,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "title": "discovers the exact 11 default tools with A4 preview disabled",
+          "status": "passed"
+        },
+        {
+          "title": "a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+          "status": "passed"
+        }
+      ],
+      "log": {
+        "path": "/private/tmp/p0-23-mcp-sdk-two-case-green-20261014.log",
+        "sha256": "33d1df7d5a0df9cba1a4433250c932af93bd7d2616a67937c6d8aa859552b649",
+        "bytes": 651
+      },
+      "command": {
+        "name": "mcp-sdk-two-case-green",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-two-case-green-20261014.actual.json",
+        "exit": 0,
+        "durationMs": 3743,
+        "startedUtc": "2026-10-14T17:02:20.554029+00:00",
+        "log": "/private/tmp/p0-23-mcp-sdk-two-case-green-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    },
+    {
+      "scope": "expanded21/23; two corrected fixture errors",
+      "report": {
+        "path": "/private/tmp/p0-23-mcp-sdk-expanded-first-20261014.actual.json",
+        "sha256": "8d10d9f5c34321dc78860228561e146cf0e4b27d1ebf03d40f3e6fff1e9c5f7b",
+        "bytes": 10534
+      },
+      "counts": {
+        "success": false,
+        "numTotalTests": 23,
+        "numPassedTests": 21,
+        "numFailedTests": 2,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "title": "discovers the exact 11 default tools with A4 preview disabled",
+          "status": "passed"
+        },
+        {
+          "title": "a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_agents returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_quickscore returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_get_guide returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_check_compliance returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_transparency_report returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_score_sector_pack returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_score_agent returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_evidence returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_query_diagnostic returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_get_recommendations returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "a current transparency run with checked seal true preserves its own claim",
+          "status": "passed"
+        },
+        {
+          "title": "a current transparency run with checked seal false preserves its own claim",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID __proto__",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID constructor",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID toString",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID hasOwnProperty",
+          "status": "passed"
+        },
+        {
+          "title": "an unpaid pack request remains an access refusal without an invented result",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_evidence keeps an empty workspace result not evaluated",
+          "status": "passed"
+        },
+        {
+          "title": "amc_query_diagnostic keeps an empty workspace result not evaluated",
+          "status": "passed"
+        },
+        {
+          "title": "a missing agent response is an error, not successful claim coverage",
+          "status": "passed"
+        },
+        {
+          "title": "the incident-clock extension returns a regulated not-evaluated claim separately",
+          "status": "failed"
+        }
+      ],
+      "log": {
+        "path": "/private/tmp/p0-23-mcp-sdk-expanded-first-20261014.log",
+        "sha256": "b0e6239e2cc295f0030cbfefb5f7c044fe43650f3de3f8cfd7b126b933daaa34",
+        "bytes": 5272
+      },
+      "command": {
+        "name": "mcp-sdk-expanded-first",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-expanded-first-20261014.actual.json",
+        "exit": 1,
+        "durationMs": 7284,
+        "startedUtc": "2026-10-14T17:07:46.873391+00:00",
+        "log": "/private/tmp/p0-23-mcp-sdk-expanded-first-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    },
+    {
+      "scope": "expanded23-case GREEN",
+      "report": {
+        "path": "/private/tmp/p0-23-mcp-sdk-expanded-fixture-corrected-20261014.actual.json",
+        "sha256": "1378c34960f1d04350080c43a77151de681f2cf912866767ade9d3cadfb73829",
+        "bytes": 8340
+      },
+      "counts": {
+        "success": true,
+        "numTotalTests": 23,
+        "numPassedTests": 23,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "title": "discovers the exact 11 default tools with A4 preview disabled",
+          "status": "passed"
+        },
+        {
+          "title": "a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_agents returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_quickscore returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_get_guide returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_check_compliance returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_transparency_report returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_score_sector_pack returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_score_agent returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_evidence returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_query_diagnostic returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_get_recommendations returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "a current transparency run with checked seal true preserves its own claim",
+          "status": "passed"
+        },
+        {
+          "title": "a current transparency run with checked seal false preserves its own claim",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID __proto__",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID constructor",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID toString",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID hasOwnProperty",
+          "status": "passed"
+        },
+        {
+          "title": "an unpaid pack request remains an access refusal without an invented result",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_evidence keeps an empty workspace result not evaluated",
+          "status": "passed"
+        },
+        {
+          "title": "amc_query_diagnostic keeps an empty workspace result not evaluated",
+          "status": "passed"
+        },
+        {
+          "title": "a missing agent response is an error, not successful claim coverage",
+          "status": "passed"
+        },
+        {
+          "title": "the incident-clock extension returns a regulated not-evaluated claim separately",
+          "status": "passed"
+        }
+      ],
+      "log": {
+        "path": "/private/tmp/p0-23-mcp-sdk-expanded-fixture-corrected-20261014.log",
+        "sha256": "a91954efc318532ab495c7bfe9830eec4618a67185a223eed2f5215ee6a85315",
+        "bytes": 3643
+      },
+      "command": {
+        "name": "mcp-sdk-expanded-fixture-corrected",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-expanded-fixture-corrected-20261014.actual.json",
+        "exit": 0,
+        "durationMs": 7578,
+        "startedUtc": "2026-10-14T17:09:50.362711+00:00",
+        "log": "/private/tmp/p0-23-mcp-sdk-expanded-fixture-corrected-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    },
+    {
+      "scope": "latest standard SDK parser23-case GREEN",
+      "report": {
+        "path": "/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.actual.json",
+        "sha256": "78f7fa862fffafe82f89460bc2f24fa3d031e99759d3a1b4a015246cd98cbb78",
+        "bytes": 8347
+      },
+      "counts": {
+        "success": true,
+        "numTotalTests": 23,
+        "numPassedTests": 23,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "title": "discovers the exact 11 default tools with A4 preview disabled",
+          "status": "passed"
+        },
+        {
+          "title": "a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_agents returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_quickscore returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_get_guide returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_check_compliance returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_transparency_report returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_score_sector_pack returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_score_agent returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_evidence returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_query_diagnostic returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "amc_get_recommendations returns actual canonical claim fields",
+          "status": "passed"
+        },
+        {
+          "title": "a current transparency run with checked seal true preserves its own claim",
+          "status": "passed"
+        },
+        {
+          "title": "a current transparency run with checked seal false preserves its own claim",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID __proto__",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID constructor",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID toString",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID hasOwnProperty",
+          "status": "passed"
+        },
+        {
+          "title": "an unpaid pack request remains an access refusal without an invented result",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_evidence keeps an empty workspace result not evaluated",
+          "status": "passed"
+        },
+        {
+          "title": "amc_query_diagnostic keeps an empty workspace result not evaluated",
+          "status": "passed"
+        },
+        {
+          "title": "a missing agent response is an error, not successful claim coverage",
+          "status": "passed"
+        },
+        {
+          "title": "the incident-clock extension returns a regulated not-evaluated claim separately",
+          "status": "passed"
+        }
+      ],
+      "log": {
+        "path": "/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.log",
+        "sha256": "ce80ed973873ccd6cbef2cd90f3a491858275033968e9924a1b95faa80adda2b",
+        "bytes": 3638
+      },
+      "command": {
+        "name": "mcp-sdk-standard-parser-green",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run tests/mcpClaimLabels.test.ts --reporter=verbose --reporter=json --outputFile=/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.actual.json",
+        "exit": 0,
+        "durationMs": 7706,
+        "startedUtc": "2026-10-14T17:23:30.041062+00:00",
+        "log": "/private/tmp/p0-23-mcp-sdk-standard-parser-green-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    },
+    {
+      "scope": "actual renderer projections; no browser",
+      "report": {
+        "path": "/private/tmp/p0-23-badge-component-contracts-20261014.json",
+        "sha256": "428078981c7cfca0a07fcb00df79173506177311bcb8ef6712701256bbdb972c",
+        "bytes": 4224
+      },
+      "counts": {
+        "success": true,
+        "numTotalTests": 9,
+        "numPassedTests": 9,
+        "numFailedTests": 0,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "title": "prints the canonical synthetic_example label, all dimensions and legend link",
+          "status": "passed"
+        },
+        {
+          "title": "prints the canonical self_reported label, all dimensions and legend link",
+          "status": "passed"
+        },
+        {
+          "title": "prints the canonical observed label, all dimensions and legend link",
+          "status": "passed"
+        },
+        {
+          "title": "prints the canonical independently_reviewed label, all dimensions and legend link",
+          "status": "passed"
+        },
+        {
+          "title": "keeps the not-evaluated reason visible with neutral styling rather than inventing a score",
+          "status": "passed"
+        },
+        {
+          "title": "retains the legacy notice from the canonical server label",
+          "status": "passed"
+        },
+        {
+          "title": "escapes an untrusted enforcement boundary in the tooltip",
+          "status": "passed"
+        },
+        {
+          "title": "escapes malformed kind input rather than adding an HTML attribute",
+          "status": "passed"
+        },
+        {
+          "title": "shares the full canonical legend and retains every required legend page",
+          "status": "passed"
+        }
+      ],
+      "log": {
+        "path": "/private/tmp/p0-23-badge-component-contracts-20261014.log",
+        "sha256": "04d2daa49addf23850614167f7acab6470ce4d71d27be2e3e7d136513ef5688e",
+        "bytes": 376
+      },
+      "command": {
+        "name": "badge-component-contracts",
+        "cmd": "pnpm exec vitest run tests/claimBadge.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-badge-component-contracts-20261014.json",
+        "exit": 0,
+        "durationMs": 1084,
+        "startedUtc": "2026-10-14T17:09:46.569351+00:00",
+        "log": "/private/tmp/p0-23-badge-component-contracts-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    },
+    {
+      "scope": "actual shared-helper labels removed SDK RED",
+      "report": {
+        "path": "/private/tmp/p0-23-mcp-actual-labels-removed-mutant-20261014.json",
+        "sha256": "2ae4c001385041eb0650dae7f25052818eca7fcea2d5f91b7c4b5aaabe8071f0",
+        "bytes": 24140
+      },
+      "counts": {
+        "success": false,
+        "numTotalTests": 23,
+        "numPassedTests": 7,
+        "numFailedTests": 16,
+        "numPendingTests": 0,
+        "numTodoTests": 0
+      },
+      "cases": [
+        {
+          "title": "discovers the exact 11 default tools with A4 preview disabled",
+          "status": "passed"
+        },
+        {
+          "title": "a sealed 1.1.1 transparency JSON result keeps the same legacy claim in its MCP wrapper",
+          "status": "failed"
+        },
+        {
+          "title": "amc_list_agents returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_quickscore returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_get_guide returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_check_compliance returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_transparency_report returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_score_sector_pack returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_score_agent returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_list_evidence returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_query_diagnostic returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "amc_get_recommendations returns actual canonical claim fields",
+          "status": "failed"
+        },
+        {
+          "title": "a current transparency run with checked seal true preserves its own claim",
+          "status": "failed"
+        },
+        {
+          "title": "a current transparency run with checked seal false preserves its own claim",
+          "status": "failed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID __proto__",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID constructor",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID toString",
+          "status": "passed"
+        },
+        {
+          "title": "paid fixture refuses inherited pack ID hasOwnProperty",
+          "status": "passed"
+        },
+        {
+          "title": "an unpaid pack request remains an access refusal without an invented result",
+          "status": "passed"
+        },
+        {
+          "title": "amc_list_evidence keeps an empty workspace result not evaluated",
+          "status": "failed"
+        },
+        {
+          "title": "amc_query_diagnostic keeps an empty workspace result not evaluated",
+          "status": "failed"
+        },
+        {
+          "title": "a missing agent response is an error, not successful claim coverage",
+          "status": "passed"
+        },
+        {
+          "title": "the incident-clock extension returns a regulated not-evaluated claim separately",
+          "status": "failed"
+        }
+      ],
+      "log": {
+        "path": "/private/tmp/p0-23-mcp-actual-labels-removed-mutant-20261014.log",
+        "sha256": "28c6367f8e971940f5255572b1f1271166d4c04d24070eae4cd058c54e06bf0c",
+        "bytes": 7377
+      },
+      "command": {
+        "name": "mcp-actual-labels-removed-mutant",
+        "cmd": "pnpm exec vitest run tests/mcpClaimLabels.test.ts --reporter=default --reporter=json --outputFile.json=/private/tmp/p0-23-mcp-actual-labels-removed-mutant-20261014.json",
+        "exit": 1,
+        "durationMs": 7441,
+        "startedUtc": "2026-10-14T17:16:16.732610+00:00",
+        "log": "/private/tmp/p0-23-mcp-actual-labels-removed-mutant-20261014.log",
+        "sourceHead": "a4822f4a829b7724f1213f464d98ace6f6c978e5"
+      }
+    }
+  ],
+  "mutationSummary": {
+    "artifact": {
+      "path": "/private/tmp/p0-23-mcp-label-mutation-summary-20261014.json",
+      "sha256": "284e14b3b5b5d4b8ce6f08de3bae3b416a0b0fd330c6f3579893653dc95c7842",
+      "bytes": 792
+    },
+    "restoredExactly": true,
+    "currentSourceEqualsRestored": true,
+    "counts": {
+      "numTotalTests": 23,
+      "numPassedTests": 7,
+      "numFailedTests": 16,
+      "numPendingTests": 0,
+      "numTodoTests": 0,
+      "success": false
+    }
+  },
+  "limits": [
+    "This review ran no tests, builds, mutations, application imports, servers or dependency operations and edited no repository file. All observed pass/fail counts come from saved hashed reports, not a new execution.",
+    "The SDK fixtures are typed owned control inputs and real locally verified signatures/licenses. They do not prove observed live-agent or provider behavior, or independently reviewed production transcripts.",
+    "The latest SDK 23 cases do not include every malformed/tampered/cross-workspace stored-file path; fail-closed behavior for those follows from unchanged resolver/verifier/adapter source and inherited evidence, not a new SDK qualification claim.",
+    "The badge 9 cases are helper/component HTML projections only. They do not invoke installClaimStrip, browser DOM/events/subscriptions, page reloads, screenshots or accessibility tooling. They do not prove all 30 Studio routes or all 113 API handlers.",
+    "The badge test proves membership of six required legend pages while retaining source-byte equality for existing A4 extensions; it is not A4 handler or preview qualification.",
+    "API, access-policy, result-registry, Studio, OpenAPI and console production sources remain byte-identical to HEAD. Known API/OpenAPI/Studio REDs and the two unresolved P0-22 empty-array failures are not fixed by this MCP repair.",
+    "No full-suite, global coverage, source-quality, Node 24, hosted CI, source acceptance, release or completion inference follows."
+  ],
+  "gitStatusAtReview": [
+    " M docs/CLAIM_KINDS.md",
+    " M src/mcp/mcpClaimOutput.ts",
+    "?? .changeset/p0-23-mcp-stored-run-claims.md",
+    "?? tests/apiClaimLabels.test.ts",
+    "?? tests/claimBadge.test.ts",
+    "?? tests/industryPackCli.test.ts",
+    "?? tests/mcpClaimLabels.test.ts",
+    "?? tests/studioClaimLabels.test.ts"
+  ]
+}

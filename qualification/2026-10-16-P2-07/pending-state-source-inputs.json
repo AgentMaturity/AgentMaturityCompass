@@ -1,0 +1,3139 @@
+{
+  "sourceCandidate": {
+    "at": "2026-10-16T12:28:14.727612+00:00",
+    "commit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+    "parent": "5696f68c241e411e1d55e39319194ddd9a768988",
+    "branch": "codex/p2-07-pending-state-qualification",
+    "ordinaryStagingAndCommitExit": 0,
+    "paths": [
+      "CONTRIBUTING.md",
+      "README.md",
+      "docs/content/reddit-launch-drafts.md",
+      "docs/content/show-hn-draft.md",
+      "docs/internal/competitive-landscape.md",
+      "docs/internal/mirofish-simulation-council.md",
+      "tests/identity/pendingLoginStore.test.ts",
+      "website/i18n.js",
+      "website/index.html",
+      "website/lite.html",
+      "whitepaper/AMC_WHITEPAPER_v1.md"
+    ],
+    "Rclean": true,
+    "productionSourceChanged": false,
+    "R154Passed": true,
+    "freshQNotYetQualified": true,
+    "qualityStillRedUnwaived": true,
+    "formalDone": false
+  },
+  "freshSourceBinding": {
+    "at": "2026-10-16T12:35:18.457012+00:00",
+    "sourceCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+    "root": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+    "physicalRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+    "freshClean": true,
+    "sourceClean": true,
+    "independentCloneInstallBuild": true,
+    "installAndBuildCommand": {
+      "phase": "p207p-clean-source",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 48791,
+      "startedUtc": "2026-10-16T12:28:21.337761+00:00",
+      "endedUtc": "2026-10-16T12:29:10.154663+00:00",
+      "log": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-clean-source/stdout-stderr.log",
+      "head": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+      "headAfter": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+      "ownedProcess": {
+        "pid": 52135,
+        "ownedPgid": 52135,
+        "observedPgidAfterLaunch": 52135,
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "argv": [
+          "/opt/homebrew/opt/node@22/bin/node",
+          "scripts/clean-source-check.mjs",
+          "--keep"
+        ],
+        "startedUtc": "2026-10-16T12:28:21.337761+00:00",
+        "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+        "overriddenEnvironmentKeys": [
+          "PATH",
+          "HOME",
+          "GIT_NO_LAZY_FETCH"
+        ]
+      },
+      "groupAbsentByESRCH": true,
+      "signalsOtherThanZeroSent": false,
+      "observed": false,
+      "artifacts": {},
+      "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+    },
+    "closedInputPins": [
+      {
+        "path": "/private/tmp/p2-07-pending-state-qualification-20261016/source-commit-result.json",
+        "bytes": 815,
+        "sha256": "39ae2ad50f91d2165582bf08e31b3f37ec638e1486862d6acee63361103657f0"
+      },
+      {
+        "path": "/private/tmp/p2-07-oidc-qualification-20261016/fresh-source-binding.json",
+        "bytes": 26672,
+        "sha256": "0e0fa193dcece8cbaad11f981121e761196c5982117386b5498b4fc1fdd4015e"
+      },
+      {
+        "path": "/private/tmp/p1-37-qualification-20261016/fresh-source-binding.json",
+        "bytes": 19743,
+        "sha256": "58dd59d19da659aeaa7ac8b2b2897f8885f39a057ac8b2467b597370c395461c"
+      },
+      {
+        "path": "/private/tmp/p1-37-qualification-20261016/compiler-natural-closure.json",
+        "bytes": 4968,
+        "sha256": "a0d667b589c87a8237f40c820d82c8ae414235b2e7577c48a8c585b00537f3d4"
+      },
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/ACTIVE.json",
+        "bytes": 251,
+        "sha256": "90eb356b14c052743c5f405c514b52a1c3132b2c3d578bc7e2e70b573672ed13"
+      },
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/HALTED.json",
+        "bytes": 291,
+        "sha256": "8d778f747a485c094f78a74863ed7e6fb331b4ca6494b5dc35d3251327d6cfcf"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-clean-source/command.json",
+        "bytes": 1258,
+        "sha256": "ca9e61f1244ca16461fd0cfce03fbaf5e86a6b41ed26f47d6a4f721053150ec9"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-clean-source/owned-process.json",
+        "bytes": 456,
+        "sha256": "b326acd0d4159667a7d1dec2a82ae3ac94a4ff0089160bedcce2533bfae7ebde"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-clean-source/owned-group-after-exit.json",
+        "bytes": 262,
+        "sha256": "dc16f153db983b31ddfa6730c5e2b494a2747dab9d5b911d8c91af9bdb32496c"
+      },
+      {
+        "path": "/private/tmp/p1-37-post-typecheck-20261016/command-p207p-clean-source/stdout-stderr.log",
+        "bytes": 852,
+        "sha256": "ab53a8d703f45791d52a1b8b3179afb081510607032ef403565e1bb6b6260e1f"
+      }
+    ],
+    "corpus": [
+      "tests/identity/jwtVerify.test.ts",
+      "tests/enterpriseSsoScim.test.ts",
+      "tests/security/api-security.test.ts",
+      "tests/security/identityAccountBinding.test.ts",
+      "tests/identity/pendingLoginStore.test.ts"
+    ],
+    "corpusAndSource": [
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/.changeset/oidc-bounded-token-admission.md",
+        "bytes": 790,
+        "sha256": "895ff7860ea2644dccca8054da057c9b76dea4a37f254fd8aa65d6fa34e05988",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/.changeset/oidc-bounded-token-admission.md",
+        "dev": 16777231,
+        "inode": 542352691,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/.jscpd.json",
+        "bytes": 126,
+        "sha256": "b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/.jscpd.json",
+        "dev": 16777231,
+        "inode": 542352776,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/CONTRIBUTING.md",
+        "bytes": 16220,
+        "sha256": "6fc608a839029e49d21b49477e01ab91e6a26a41adf6130c62afe6c2c5a9f6e5",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/CONTRIBUTING.md",
+        "dev": 16777231,
+        "inode": 542353429,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/README.md",
+        "bytes": 59828,
+        "sha256": "61ed6ec9aae91864037b1b55f941c60ec8b1bbbaf05ac296e3ca412ad8bf9989",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/README.md",
+        "dev": 16777231,
+        "inode": 542353434,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/SSO_OIDC.md",
+        "bytes": 5349,
+        "sha256": "75b5bfcc6511a898a98719bacaa023a328a41927d7284a5463a6a169e612533f",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/SSO_OIDC.md",
+        "dev": 16777231,
+        "inode": 542353828,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/adr/014-saml-library.md",
+        "bytes": 6310,
+        "sha256": "b696c2cbca13324b68aeb25d6e9654107c20e1a0de25d88b5f372e3b0480414b",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/adr/014-saml-library.md",
+        "dev": 16777231,
+        "inode": 542353903,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/content/reddit-launch-drafts.md",
+        "bytes": 3075,
+        "sha256": "f56b451edf2ffdd65981d0cd5915d9eabbf5954f61492635af88a51745fd8936",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/content/reddit-launch-drafts.md",
+        "dev": 16777231,
+        "inode": 542353938,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/content/show-hn-draft.md",
+        "bytes": 1951,
+        "sha256": "677f1fecd2a38bbb23a3540c4b54a26a66cbb906bbb57065dbbb6f7546f1f6ff",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/content/show-hn-draft.md",
+        "dev": 16777231,
+        "inode": 542353939,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/internal/competitive-landscape.md",
+        "bytes": 3880,
+        "sha256": "3ee5ce3616de7f79700b8203efe7ba3bca44eafc5c178c67467cd3d4784139c5",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/internal/competitive-landscape.md",
+        "dev": 16777231,
+        "inode": 542354089,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/internal/mirofish-simulation-council.md",
+        "bytes": 2489,
+        "sha256": "6df6d517048d1b0c176d96a0c09991807f2b696f8180f727de155bc8ac70a342",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/internal/mirofish-simulation-council.md",
+        "dev": 16777231,
+        "inode": 542354093,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/knip.json",
+        "bytes": 1928,
+        "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/knip.json",
+        "dev": 16777231,
+        "inode": 542354898,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/package.json",
+        "bytes": 8631,
+        "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/package.json",
+        "dev": 16777231,
+        "inode": 542354904,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/pnpm-lock.yaml",
+        "bytes": 155432,
+        "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/pnpm-lock.yaml",
+        "dev": 16777231,
+        "inode": 542355345,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/pnpm-workspace.yaml",
+        "bytes": 1521,
+        "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/pnpm-workspace.yaml",
+        "dev": 16777231,
+        "inode": 542355346,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/clean-source-check.mjs",
+        "bytes": 7910,
+        "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/clean-source-check.mjs",
+        "dev": 16777231,
+        "inode": 542357022,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/freeze-baseline.json",
+        "bytes": 554,
+        "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/freeze-baseline.json",
+        "dev": 16777231,
+        "inode": 542357035,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/line-budgets.json",
+        "bytes": 2713,
+        "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/line-budgets.json",
+        "dev": 16777231,
+        "inode": 542357058,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/packed-evidence-verification.mjs",
+        "bytes": 2620,
+        "sha256": "213e134909c12922e1e959142003f8d94f4212a5849ccd2eb7e59bc5003a8bbd",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/packed-evidence-verification.mjs",
+        "dev": 16777231,
+        "inode": 542357063,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/quality/coverage-baseline.json",
+        "bytes": 636550,
+        "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/quality/coverage-baseline.json",
+        "dev": 16777231,
+        "inode": 542357074,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/source-quality.mjs",
+        "bytes": 5010,
+        "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/source-quality.mjs",
+        "dev": 16777231,
+        "inode": 542357082,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/apiKeyCli.ts",
+        "bytes": 3166,
+        "sha256": "97e20293ac2f4c14135f9419754e29905d76ad663fb9aae82bad4fa19722241f",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/apiKeyCli.ts",
+        "dev": 16777231,
+        "inode": 542357630,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/apiKeyManager.ts",
+        "bytes": 10525,
+        "sha256": "780858681b94ca714bd3d8b8eade27f06d8f128d38507eea2362cc60a88942ee",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/apiKeyManager.ts",
+        "dev": 16777231,
+        "inode": 542357631,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/authApi.ts",
+        "bytes": 15848,
+        "sha256": "bb0481156d7d5958910030f6183e498c29e65ddbc898e3197467e9198ee9f137",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/authApi.ts",
+        "dev": 16777231,
+        "inode": 542357632,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/authCli.ts",
+        "bytes": 2097,
+        "sha256": "7d5db88ddceec092f18c07860db44bdf7c7178a2b64ea6d2e638d2b09d179dd3",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/authCli.ts",
+        "dev": 16777231,
+        "inode": 542357633,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/enterpriseIam.ts",
+        "bytes": 13798,
+        "sha256": "2b544e3819103939985dafc35fe570555429afd4287e91cc8a60184e676b8233",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/enterpriseIam.ts",
+        "dev": 16777231,
+        "inode": 542357634,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/humanLog.ts",
+        "bytes": 5720,
+        "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/humanLog.ts",
+        "dev": 16777231,
+        "inode": 542357635,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/passwordHash.ts",
+        "bytes": 1936,
+        "sha256": "5c6778452bdc31e601773c7c6b0cc47f66aa3a4a7901bf5998401264361e8051",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/passwordHash.ts",
+        "dev": 16777231,
+        "inode": 542357636,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/rbac.ts",
+        "bytes": 1468,
+        "sha256": "a2bfad9168deba43e9e4ae539812ad29e58ce5ddc1b8812d2a34b9ca3020dbe8",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/rbac.ts",
+        "dev": 16777231,
+        "inode": 542357637,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/roles.ts",
+        "bytes": 629,
+        "sha256": "70bc95aa15d85a2f1f50e8af6acd8b697809f2fe4906c066809b3940fac23c75",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/roles.ts",
+        "dev": 16777231,
+        "inode": 542357638,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/sessionTokens.ts",
+        "bytes": 3213,
+        "sha256": "c0e42fd336bb67112a048773bb159cc40e57470a463d7043f3bbf7b3179126bb",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/sessionTokens.ts",
+        "dev": 16777231,
+        "inode": 542357639,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/ssoConfig.ts",
+        "bytes": 3647,
+        "sha256": "250eb99bc0db70e558d016b6f7915800a20200de7a5e087487a5d2cc5f3cc390",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/ssoConfig.ts",
+        "dev": 16777231,
+        "inode": 542357640,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/userSchema.ts",
+        "bytes": 1405,
+        "sha256": "6f6e8a900cbfbe62931bad5666ab46d121c98fb88adf022773311e5986885f3c",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/userSchema.ts",
+        "dev": 16777231,
+        "inode": 542357641,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/enforce/egressAllowlist.ts",
+        "bytes": 8093,
+        "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/enforce/egressAllowlist.ts",
+        "dev": 16777231,
+        "inode": 542358334,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/hostVault.ts",
+        "bytes": 10549,
+        "sha256": "cbae38554491659d7d71828c21c6d919a1433458f3bd84174e65fb9d0420935c",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/hostVault.ts",
+        "dev": 16777231,
+        "inode": 542358512,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityApi.ts",
+        "bytes": 4271,
+        "sha256": "90554d7fdb90e5fc7a9c9ab814d25431eed14b0f2786591cbab4b362b89b8979",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityApi.ts",
+        "dev": 16777231,
+        "inode": 542358513,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityCli.ts",
+        "bytes": 6825,
+        "sha256": "aebc3c4e4e79b359878fdf2efe41337ea183fe5df52632163d46ffff122e15f8",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityCli.ts",
+        "dev": 16777231,
+        "inode": 542358514,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityConfig.ts",
+        "bytes": 13501,
+        "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityConfig.ts",
+        "dev": 16777231,
+        "inode": 542358515,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/jwtVerify.ts",
+        "bytes": 12727,
+        "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/jwtVerify.ts",
+        "dev": 16777231,
+        "inode": 542358517,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/oidcClient.ts",
+        "bytes": 3790,
+        "sha256": "03c58431ef2607e2aa792d914306b68ddb9ca40059e9800c2da286aeccf091f4",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/oidcClient.ts",
+        "dev": 16777231,
+        "inode": 542358518,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/oidcRoutes.ts",
+        "bytes": 5987,
+        "sha256": "0016abef4cff9012c141656dff6b28b2b74c9a36c6e4efe9a5df43d40d18b9d6",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/oidcRoutes.ts",
+        "dev": 16777231,
+        "inode": 542358519,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/pkce.ts",
+        "bytes": 433,
+        "sha256": "e5e0e81dd3fa0d34eeea17e7d542e6db63d8be4e0d1e302fd6ddfc875b5826c0",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/pkce.ts",
+        "dev": 16777231,
+        "inode": 542358520,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+        "bytes": 4955,
+        "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+        "dev": 16777231,
+        "inode": 542358521,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/roleMapping.ts",
+        "bytes": 2396,
+        "sha256": "26d6611c75c9d2927d466c5f4ba2e611f56e7f186b8c8794a2d29128d24b56b9",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/roleMapping.ts",
+        "dev": 16777231,
+        "inode": 542358522,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/saml/samlRoutes.ts",
+        "bytes": 5628,
+        "sha256": "4e9c86478331076ddacc5c2f010eb03ea9bec4c56c9e2eeaf604be89cd2652af",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/saml/samlRoutes.ts",
+        "dev": 16777231,
+        "inode": 542358524,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/saml/samlVerify.ts",
+        "bytes": 2445,
+        "sha256": "3c8c84852b67678bcbecfbed8dd0612be1d721eefd5a02e96084d11f800778a6",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/saml/samlVerify.ts",
+        "dev": 16777231,
+        "inode": 542358525,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimAuth.ts",
+        "bytes": 1354,
+        "sha256": "b6a1d1af20fda1549e75151f33d88d905d3d8f0cb2914bf8c50abb6d8f64ebd9",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimAuth.ts",
+        "dev": 16777231,
+        "inode": 542358527,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimGroups.ts",
+        "bytes": 7267,
+        "sha256": "4167136fb7173ceac4a4168e64024d1b6fe3d1293f2c1d0a6b496d2da12ab154",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimGroups.ts",
+        "dev": 16777231,
+        "inode": 542358528,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimPatch.ts",
+        "bytes": 1038,
+        "sha256": "cb998c77e0a2517559adec8b0080eed8dac8a9c19d463ccc36bae267faa046ef",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimPatch.ts",
+        "dev": 16777231,
+        "inode": 542358529,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimRoutes.ts",
+        "bytes": 11533,
+        "sha256": "f811c43fd8f839a9264695d898e96cdbdc507c02054df0129686a1b37476b942",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimRoutes.ts",
+        "dev": 16777231,
+        "inode": 542358530,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimTypes.ts",
+        "bytes": 699,
+        "sha256": "e0f926957b040c2369c0b8d21df489f28774a05d083cd5c48405f8124b796ed4",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimTypes.ts",
+        "dev": 16777231,
+        "inode": 542358531,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimUsers.ts",
+        "bytes": 8785,
+        "sha256": "26a58e8b615cd199fbfd52770e13036c85c7808f9d652c95a57a11f540885a60",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimUsers.ts",
+        "dev": 16777231,
+        "inode": 542358532,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/session.ts",
+        "bytes": 2791,
+        "sha256": "b4e3cc72041b7e458bf783e02440cb40e3ce7cbd1d73e33f6c4c83cf956315c2",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/session.ts",
+        "dev": 16777231,
+        "inode": 542358533,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/sessionCookie.ts",
+        "bytes": 1540,
+        "sha256": "25334a5695b4c95884027b498b2483770556de15b9578abedc31e54b6ca20644",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/sessionCookie.ts",
+        "dev": 16777231,
+        "inode": 542358534,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/sessionStore.ts",
+        "bytes": 2640,
+        "sha256": "9036366d08ef77547babb93593847ef85cce6e9f03cb4b008ade70423fd0191d",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/sessionStore.ts",
+        "dev": 16777231,
+        "inode": 542358535,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/utils/controlHttpResponses.ts",
+        "bytes": 575,
+        "sha256": "30d9af5003d89592693c27b30717ea11e07ebfb0dad6a92a7a6486e88e9a6800",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/utils/controlHttpResponses.ts",
+        "dev": 16777231,
+        "inode": 542359648,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostAuth.ts",
+        "bytes": 5826,
+        "sha256": "d963f2199a75a83fc873360c1a181544d7f160c883a1be9dc12299a50b4e9033",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostAuth.ts",
+        "dev": 16777231,
+        "inode": 542359784,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostBootstrap.ts",
+        "bytes": 3722,
+        "sha256": "5e4aa5be3d52c833ec3472e8974d2d0e3832b1e6141ad9749d32ff3fcded7d4f",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostBootstrap.ts",
+        "dev": 16777231,
+        "inode": 542359785,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostCli.ts",
+        "bytes": 4824,
+        "sha256": "43316f6c495c90fd38648b1ab30c20e3bf0f5bb398ad23c6824f46f966917496",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostCli.ts",
+        "dev": 16777231,
+        "inode": 542359786,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostDb.ts",
+        "bytes": 40366,
+        "sha256": "cb414ae6ae93fccfbeddf7c7a3d0b9f8e16659f46d46de906b42b2dc3114edac",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostDb.ts",
+        "dev": 16777231,
+        "inode": 542359787,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostSchema.ts",
+        "bytes": 1133,
+        "sha256": "3deb82d724eeeff57658bed6a55a9e5e37375c1ca8cb8438d93d51be7e1e3acf",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostSchema.ts",
+        "dev": 16777231,
+        "inode": 542359788,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceContext.ts",
+        "bytes": 128,
+        "sha256": "dbadbe8275967e8876a0bdf99586e6643e39887e2f39aae3a51c1f3552132c10",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceContext.ts",
+        "dev": 16777231,
+        "inode": 542359789,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceId.ts",
+        "bytes": 1151,
+        "sha256": "507c07573b42279d672230063af0af48e356603c336598b4d3d462f8279ea016",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceId.ts",
+        "dev": 16777231,
+        "inode": 542359790,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceManager.ts",
+        "bytes": 9523,
+        "sha256": "df58ea36f30610d57c09bf395b2499a7bc4f9356c372f8da4d568dda41e574fe",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceManager.ts",
+        "dev": 16777231,
+        "inode": 542359791,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspacePaths.ts",
+        "bytes": 1750,
+        "sha256": "0911c9a5456b58ae648f3d103190fc02a0818ca0b72944795f386dde5d8238fd",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspacePaths.ts",
+        "dev": 16777231,
+        "inode": 542359792,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceResolver.ts",
+        "bytes": 1258,
+        "sha256": "ba0b13773a140e6b31e77967e6586e2f7660fc6dfe63c09665e00e24c60c34a7",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceResolver.ts",
+        "dev": 16777231,
+        "inode": 542359793,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceRouter.ts",
+        "bytes": 65262,
+        "sha256": "c06242bc22da1063a69649d6cdaf7e11d06e6c853df7845bb376a1ca8167560e",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceRouter.ts",
+        "dev": 16777231,
+        "inode": 542359794,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceRuntimeRegistry.ts",
+        "bytes": 1864,
+        "sha256": "2d816aca823345859a6f4e0a7bbf694a3e53dc87e0b8cc657bc9b7cce0501940",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceRuntimeRegistry.ts",
+        "dev": 16777231,
+        "inode": 542359795,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceStudioProxy.ts",
+        "bytes": 2577,
+        "sha256": "65137cbbdcf1ccc71f1549663526ccdf7258345d78dec0d11a9728bbe56dc260",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceStudioProxy.ts",
+        "dev": 16777231,
+        "inode": 542359796,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/enterpriseSsoScim.test.ts",
+        "bytes": 32492,
+        "sha256": "8458813ecb3596f66931306d3a7aabd76807d466274d1cdcfc2f1980336a4d1e",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/enterpriseSsoScim.test.ts",
+        "dev": 16777231,
+        "inode": 542360205,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/jwtVerify.test.ts",
+        "bytes": 40561,
+        "sha256": "293a99eb5e5f8b52e5fb7a1658eeb60b1b9826d6abf15d9524e35096bdca2db3",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/jwtVerify.test.ts",
+        "dev": 16777231,
+        "inode": 542361167,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+        "bytes": 27973,
+        "sha256": "2d3573f2c2d20d52f8e00b38d48ff39660eb6d28538ae48b140e387f4020f318",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+        "dev": 16777231,
+        "inode": 542361168,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/security/api-security.test.ts",
+        "bytes": 21008,
+        "sha256": "4e57d8cfa5e122ddad248e60438c94354b230ade8bc551972b80e91282421c1d",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/security/api-security.test.ts",
+        "dev": 16777231,
+        "inode": 542361637,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/security/identityAccountBinding.test.ts",
+        "bytes": 4736,
+        "sha256": "9fa26f1dd0c59eb14c45439e8d8a6fc06c5838d58168af91a2fda67c5c247948",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/security/identityAccountBinding.test.ts",
+        "dev": 16777231,
+        "inode": 542361641,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/guardWorkspace.ts",
+        "bytes": 1894,
+        "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/guardWorkspace.ts",
+        "dev": 16777231,
+        "inode": 542361673,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/repoWorkspaceGuard.global.ts",
+        "bytes": 3675,
+        "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/repoWorkspaceGuard.global.ts",
+        "dev": 16777231,
+        "inode": 542361676,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/repoWorkspaceGuard.ts",
+        "bytes": 1133,
+        "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/repoWorkspaceGuard.ts",
+        "dev": 16777231,
+        "inode": 542361677,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tsconfig.json",
+        "bytes": 504,
+        "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tsconfig.json",
+        "dev": 16777231,
+        "inode": 542361874,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tsconfig.tests.json",
+        "bytes": 300,
+        "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tsconfig.tests.json",
+        "dev": 16777231,
+        "inode": 542361875,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/vitest.config.ts",
+        "bytes": 1324,
+        "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/vitest.config.ts",
+        "dev": 16777231,
+        "inode": 542362835,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/i18n.js",
+        "bytes": 44169,
+        "sha256": "34b00de636de70560af566a817ddaa382d8e1f3c677311fbad4b6b7c9a7425d8",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/i18n.js",
+        "dev": 16777231,
+        "inode": 542362890,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/index.html",
+        "bytes": 43520,
+        "sha256": "06f0370cd4f81cc45e76b2871fa3e83cfb6427cfa90e320337b4807c15f6b3b1",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/index.html",
+        "dev": 16777231,
+        "inode": 542362891,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/lite.html",
+        "bytes": 11197,
+        "sha256": "b1d9f08780a73bdf9c691febbdb522611c1bbd6118c8fcf7f9f00c38d34f6f4f",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/lite.html",
+        "dev": 16777231,
+        "inode": 542362895,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+        "bytes": 107509,
+        "sha256": "43c5c4c533f0d3d25d8056e000b715d077afb7552f9b393525b1b7b20398adb3",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+        "dev": 16777231,
+        "inode": 542362927,
+        "nlink": 1
+      }
+    ],
+    "sourcePairs": [
+      {
+        "relativePath": ".changeset/oidc-bounded-token-admission.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/oidc-bounded-token-admission.md",
+          "bytes": 790,
+          "sha256": "895ff7860ea2644dccca8054da057c9b76dea4a37f254fd8aa65d6fa34e05988",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.changeset/oidc-bounded-token-admission.md",
+          "dev": 16777231,
+          "inode": 539129260,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/.changeset/oidc-bounded-token-admission.md",
+          "bytes": 790,
+          "sha256": "895ff7860ea2644dccca8054da057c9b76dea4a37f254fd8aa65d6fa34e05988",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/.changeset/oidc-bounded-token-admission.md",
+          "dev": 16777231,
+          "inode": 542352691,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": ".jscpd.json",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.jscpd.json",
+          "bytes": 126,
+          "sha256": "b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/.jscpd.json",
+          "dev": 16777231,
+          "inode": 539129341,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/.jscpd.json",
+          "bytes": 126,
+          "sha256": "b0b0290eb79f02e99c8e4c3e0fea8182d56903f2e2512643a783307dac64e209",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/.jscpd.json",
+          "dev": 16777231,
+          "inode": 542352776,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "CONTRIBUTING.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "6fc608a839029e49d21b49477e01ab91e6a26a41adf6130c62afe6c2c5a9f6e5",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/CONTRIBUTING.md",
+          "dev": 16777231,
+          "inode": 539129984,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/CONTRIBUTING.md",
+          "bytes": 16220,
+          "sha256": "6fc608a839029e49d21b49477e01ab91e6a26a41adf6130c62afe6c2c5a9f6e5",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/CONTRIBUTING.md",
+          "dev": 16777231,
+          "inode": 542353429,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "README.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+          "bytes": 59828,
+          "sha256": "61ed6ec9aae91864037b1b55f941c60ec8b1bbbaf05ac296e3ca412ad8bf9989",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/README.md",
+          "dev": 16777231,
+          "inode": 539129989,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/README.md",
+          "bytes": 59828,
+          "sha256": "61ed6ec9aae91864037b1b55f941c60ec8b1bbbaf05ac296e3ca412ad8bf9989",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/README.md",
+          "dev": 16777231,
+          "inode": 542353434,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "docs/SSO_OIDC.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+          "bytes": 5349,
+          "sha256": "75b5bfcc6511a898a98719bacaa023a328a41927d7284a5463a6a169e612533f",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/SSO_OIDC.md",
+          "dev": 16777231,
+          "inode": 539130383,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/SSO_OIDC.md",
+          "bytes": 5349,
+          "sha256": "75b5bfcc6511a898a98719bacaa023a328a41927d7284a5463a6a169e612533f",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/SSO_OIDC.md",
+          "dev": 16777231,
+          "inode": 542353828,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "docs/adr/014-saml-library.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/adr/014-saml-library.md",
+          "bytes": 6310,
+          "sha256": "b696c2cbca13324b68aeb25d6e9654107c20e1a0de25d88b5f372e3b0480414b",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/adr/014-saml-library.md",
+          "dev": 16777231,
+          "inode": 539130458,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/adr/014-saml-library.md",
+          "bytes": 6310,
+          "sha256": "b696c2cbca13324b68aeb25d6e9654107c20e1a0de25d88b5f372e3b0480414b",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/adr/014-saml-library.md",
+          "dev": 16777231,
+          "inode": 542353903,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "docs/content/reddit-launch-drafts.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "f56b451edf2ffdd65981d0cd5915d9eabbf5954f61492635af88a51745fd8936",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/reddit-launch-drafts.md",
+          "dev": 16777231,
+          "inode": 539130493,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/content/reddit-launch-drafts.md",
+          "bytes": 3075,
+          "sha256": "f56b451edf2ffdd65981d0cd5915d9eabbf5954f61492635af88a51745fd8936",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/content/reddit-launch-drafts.md",
+          "dev": 16777231,
+          "inode": 542353938,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "docs/content/show-hn-draft.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "677f1fecd2a38bbb23a3540c4b54a26a66cbb906bbb57065dbbb6f7546f1f6ff",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/content/show-hn-draft.md",
+          "dev": 16777231,
+          "inode": 539130494,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/content/show-hn-draft.md",
+          "bytes": 1951,
+          "sha256": "677f1fecd2a38bbb23a3540c4b54a26a66cbb906bbb57065dbbb6f7546f1f6ff",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/content/show-hn-draft.md",
+          "dev": 16777231,
+          "inode": 542353939,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "docs/internal/competitive-landscape.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "3ee5ce3616de7f79700b8203efe7ba3bca44eafc5c178c67467cd3d4784139c5",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/competitive-landscape.md",
+          "dev": 16777231,
+          "inode": 539130644,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/internal/competitive-landscape.md",
+          "bytes": 3880,
+          "sha256": "3ee5ce3616de7f79700b8203efe7ba3bca44eafc5c178c67467cd3d4784139c5",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/internal/competitive-landscape.md",
+          "dev": 16777231,
+          "inode": 542354089,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "docs/internal/mirofish-simulation-council.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "6df6d517048d1b0c176d96a0c09991807f2b696f8180f727de155bc8ac70a342",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/docs/internal/mirofish-simulation-council.md",
+          "dev": 16777231,
+          "inode": 539130648,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/internal/mirofish-simulation-council.md",
+          "bytes": 2489,
+          "sha256": "6df6d517048d1b0c176d96a0c09991807f2b696f8180f727de155bc8ac70a342",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/docs/internal/mirofish-simulation-council.md",
+          "dev": 16777231,
+          "inode": 542354093,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "knip.json",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/knip.json",
+          "bytes": 1928,
+          "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/knip.json",
+          "dev": 16777231,
+          "inode": 539131450,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/knip.json",
+          "bytes": 1928,
+          "sha256": "43edb97dc3e4d1fa55052249089e15dd6a6713d8480485d748e682be0ecd82c1",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/knip.json",
+          "dev": 16777231,
+          "inode": 542354898,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "package.json",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/package.json",
+          "bytes": 8631,
+          "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/package.json",
+          "dev": 16777231,
+          "inode": 539131456,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/package.json",
+          "bytes": 8631,
+          "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/package.json",
+          "dev": 16777231,
+          "inode": 542354904,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "pnpm-lock.yaml",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-lock.yaml",
+          "bytes": 155432,
+          "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-lock.yaml",
+          "dev": 16777231,
+          "inode": 539131896,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/pnpm-lock.yaml",
+          "bytes": 155432,
+          "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/pnpm-lock.yaml",
+          "dev": 16777231,
+          "inode": 542355345,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "pnpm-workspace.yaml",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-workspace.yaml",
+          "bytes": 1521,
+          "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/pnpm-workspace.yaml",
+          "dev": 16777231,
+          "inode": 539131897,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/pnpm-workspace.yaml",
+          "bytes": 1521,
+          "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/pnpm-workspace.yaml",
+          "dev": 16777231,
+          "inode": 542355346,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "scripts/clean-source-check.mjs",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/clean-source-check.mjs",
+          "bytes": 7910,
+          "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/clean-source-check.mjs",
+          "dev": 16777231,
+          "inode": 539133256,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/clean-source-check.mjs",
+          "bytes": 7910,
+          "sha256": "72d32a74985aa48dbcff6fa32af484379bc364705dc26fe63d1c6ceee9410c8b",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/clean-source-check.mjs",
+          "dev": 16777231,
+          "inode": 542357022,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "scripts/freeze-baseline.json",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/freeze-baseline.json",
+          "bytes": 554,
+          "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/freeze-baseline.json",
+          "dev": 16777231,
+          "inode": 539133269,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/freeze-baseline.json",
+          "bytes": 554,
+          "sha256": "2a1141ef9770306d2f927c26828decd9e1c03a8b593c72d3d4ce977665af3013",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/freeze-baseline.json",
+          "dev": 16777231,
+          "inode": 542357035,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "scripts/line-budgets.json",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/line-budgets.json",
+          "bytes": 2713,
+          "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/line-budgets.json",
+          "dev": 16777231,
+          "inode": 539133293,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/line-budgets.json",
+          "bytes": 2713,
+          "sha256": "6e27020a2c1aeafbbd55121f03e94c6af5654ce16ea15929d21bbcee68d94bfe",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/line-budgets.json",
+          "dev": 16777231,
+          "inode": 542357058,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "scripts/packed-evidence-verification.mjs",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/packed-evidence-verification.mjs",
+          "bytes": 2620,
+          "sha256": "213e134909c12922e1e959142003f8d94f4212a5849ccd2eb7e59bc5003a8bbd",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/packed-evidence-verification.mjs",
+          "dev": 16777231,
+          "inode": 539133298,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/packed-evidence-verification.mjs",
+          "bytes": 2620,
+          "sha256": "213e134909c12922e1e959142003f8d94f4212a5849ccd2eb7e59bc5003a8bbd",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/packed-evidence-verification.mjs",
+          "dev": 16777231,
+          "inode": 542357063,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "scripts/quality/coverage-baseline.json",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+          "bytes": 636550,
+          "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/quality/coverage-baseline.json",
+          "dev": 16777231,
+          "inode": 539133309,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/quality/coverage-baseline.json",
+          "bytes": 636550,
+          "sha256": "a70844ba9e1f234e3aaf5576ad511d3bc35bb6bc6657e20c13ba7e06cfb7c6da",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/quality/coverage-baseline.json",
+          "dev": 16777231,
+          "inode": 542357074,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "scripts/source-quality.mjs",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+          "bytes": 5010,
+          "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/scripts/source-quality.mjs",
+          "dev": 16777231,
+          "inode": 539133317,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/source-quality.mjs",
+          "bytes": 5010,
+          "sha256": "c37dabc753cd0ede0a1a93af7498d139d4f654ea03a630848baa00a6cef6a34f",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/scripts/source-quality.mjs",
+          "dev": 16777231,
+          "inode": 542357082,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/apiKeyCli.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/apiKeyCli.ts",
+          "bytes": 3166,
+          "sha256": "97e20293ac2f4c14135f9419754e29905d76ad663fb9aae82bad4fa19722241f",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/apiKeyCli.ts",
+          "dev": 16777231,
+          "inode": 539133864,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/apiKeyCli.ts",
+          "bytes": 3166,
+          "sha256": "97e20293ac2f4c14135f9419754e29905d76ad663fb9aae82bad4fa19722241f",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/apiKeyCli.ts",
+          "dev": 16777231,
+          "inode": 542357630,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/apiKeyManager.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/apiKeyManager.ts",
+          "bytes": 10525,
+          "sha256": "780858681b94ca714bd3d8b8eade27f06d8f128d38507eea2362cc60a88942ee",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/apiKeyManager.ts",
+          "dev": 16777231,
+          "inode": 539133865,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/apiKeyManager.ts",
+          "bytes": 10525,
+          "sha256": "780858681b94ca714bd3d8b8eade27f06d8f128d38507eea2362cc60a88942ee",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/apiKeyManager.ts",
+          "dev": 16777231,
+          "inode": 542357631,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/authApi.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/authApi.ts",
+          "bytes": 15848,
+          "sha256": "bb0481156d7d5958910030f6183e498c29e65ddbc898e3197467e9198ee9f137",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/authApi.ts",
+          "dev": 16777231,
+          "inode": 539133866,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/authApi.ts",
+          "bytes": 15848,
+          "sha256": "bb0481156d7d5958910030f6183e498c29e65ddbc898e3197467e9198ee9f137",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/authApi.ts",
+          "dev": 16777231,
+          "inode": 542357632,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/authCli.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/authCli.ts",
+          "bytes": 2097,
+          "sha256": "7d5db88ddceec092f18c07860db44bdf7c7178a2b64ea6d2e638d2b09d179dd3",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/authCli.ts",
+          "dev": 16777231,
+          "inode": 539133867,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/authCli.ts",
+          "bytes": 2097,
+          "sha256": "7d5db88ddceec092f18c07860db44bdf7c7178a2b64ea6d2e638d2b09d179dd3",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/authCli.ts",
+          "dev": 16777231,
+          "inode": 542357633,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/enterpriseIam.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/enterpriseIam.ts",
+          "bytes": 13798,
+          "sha256": "2b544e3819103939985dafc35fe570555429afd4287e91cc8a60184e676b8233",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/enterpriseIam.ts",
+          "dev": 16777231,
+          "inode": 539133868,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/enterpriseIam.ts",
+          "bytes": 13798,
+          "sha256": "2b544e3819103939985dafc35fe570555429afd4287e91cc8a60184e676b8233",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/enterpriseIam.ts",
+          "dev": 16777231,
+          "inode": 542357634,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/humanLog.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/humanLog.ts",
+          "bytes": 5720,
+          "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/humanLog.ts",
+          "dev": 16777231,
+          "inode": 539133869,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/humanLog.ts",
+          "bytes": 5720,
+          "sha256": "f89101f4d6afcecc1ed7631a6decdfd036657786b55f6bee2ba9b19c5e3199b5",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/humanLog.ts",
+          "dev": 16777231,
+          "inode": 542357635,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/passwordHash.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/passwordHash.ts",
+          "bytes": 1936,
+          "sha256": "5c6778452bdc31e601773c7c6b0cc47f66aa3a4a7901bf5998401264361e8051",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/passwordHash.ts",
+          "dev": 16777231,
+          "inode": 539133870,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/passwordHash.ts",
+          "bytes": 1936,
+          "sha256": "5c6778452bdc31e601773c7c6b0cc47f66aa3a4a7901bf5998401264361e8051",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/passwordHash.ts",
+          "dev": 16777231,
+          "inode": 542357636,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/rbac.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/rbac.ts",
+          "bytes": 1468,
+          "sha256": "a2bfad9168deba43e9e4ae539812ad29e58ce5ddc1b8812d2a34b9ca3020dbe8",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/rbac.ts",
+          "dev": 16777231,
+          "inode": 539133871,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/rbac.ts",
+          "bytes": 1468,
+          "sha256": "a2bfad9168deba43e9e4ae539812ad29e58ce5ddc1b8812d2a34b9ca3020dbe8",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/rbac.ts",
+          "dev": 16777231,
+          "inode": 542357637,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/roles.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/roles.ts",
+          "bytes": 629,
+          "sha256": "70bc95aa15d85a2f1f50e8af6acd8b697809f2fe4906c066809b3940fac23c75",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/roles.ts",
+          "dev": 16777231,
+          "inode": 539133872,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/roles.ts",
+          "bytes": 629,
+          "sha256": "70bc95aa15d85a2f1f50e8af6acd8b697809f2fe4906c066809b3940fac23c75",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/roles.ts",
+          "dev": 16777231,
+          "inode": 542357638,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/sessionTokens.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/sessionTokens.ts",
+          "bytes": 3213,
+          "sha256": "c0e42fd336bb67112a048773bb159cc40e57470a463d7043f3bbf7b3179126bb",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/sessionTokens.ts",
+          "dev": 16777231,
+          "inode": 539133873,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/sessionTokens.ts",
+          "bytes": 3213,
+          "sha256": "c0e42fd336bb67112a048773bb159cc40e57470a463d7043f3bbf7b3179126bb",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/sessionTokens.ts",
+          "dev": 16777231,
+          "inode": 542357639,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/ssoConfig.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/ssoConfig.ts",
+          "bytes": 3647,
+          "sha256": "250eb99bc0db70e558d016b6f7915800a20200de7a5e087487a5d2cc5f3cc390",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/ssoConfig.ts",
+          "dev": 16777231,
+          "inode": 539133874,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/ssoConfig.ts",
+          "bytes": 3647,
+          "sha256": "250eb99bc0db70e558d016b6f7915800a20200de7a5e087487a5d2cc5f3cc390",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/ssoConfig.ts",
+          "dev": 16777231,
+          "inode": 542357640,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/auth/userSchema.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/userSchema.ts",
+          "bytes": 1405,
+          "sha256": "6f6e8a900cbfbe62931bad5666ab46d121c98fb88adf022773311e5986885f3c",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/auth/userSchema.ts",
+          "dev": 16777231,
+          "inode": 539133875,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/userSchema.ts",
+          "bytes": 1405,
+          "sha256": "6f6e8a900cbfbe62931bad5666ab46d121c98fb88adf022773311e5986885f3c",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/auth/userSchema.ts",
+          "dev": 16777231,
+          "inode": 542357641,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/enforce/egressAllowlist.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/enforce/egressAllowlist.ts",
+          "bytes": 8093,
+          "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/enforce/egressAllowlist.ts",
+          "dev": 16777231,
+          "inode": 539134567,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/enforce/egressAllowlist.ts",
+          "bytes": 8093,
+          "sha256": "db66259630b75151ba90d87577a3f5afd56e4ea2d957b4fb7fd3a2434c4c7c99",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/enforce/egressAllowlist.ts",
+          "dev": 16777231,
+          "inode": 542358334,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/hostVault.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/hostVault.ts",
+          "bytes": 10549,
+          "sha256": "cbae38554491659d7d71828c21c6d919a1433458f3bd84174e65fb9d0420935c",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/hostVault.ts",
+          "dev": 16777231,
+          "inode": 539134745,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/hostVault.ts",
+          "bytes": 10549,
+          "sha256": "cbae38554491659d7d71828c21c6d919a1433458f3bd84174e65fb9d0420935c",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/hostVault.ts",
+          "dev": 16777231,
+          "inode": 542358512,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/identityApi.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityApi.ts",
+          "bytes": 4271,
+          "sha256": "90554d7fdb90e5fc7a9c9ab814d25431eed14b0f2786591cbab4b362b89b8979",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityApi.ts",
+          "dev": 16777231,
+          "inode": 539134746,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityApi.ts",
+          "bytes": 4271,
+          "sha256": "90554d7fdb90e5fc7a9c9ab814d25431eed14b0f2786591cbab4b362b89b8979",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityApi.ts",
+          "dev": 16777231,
+          "inode": 542358513,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/identityCli.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityCli.ts",
+          "bytes": 6825,
+          "sha256": "aebc3c4e4e79b359878fdf2efe41337ea183fe5df52632163d46ffff122e15f8",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityCli.ts",
+          "dev": 16777231,
+          "inode": 539134747,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityCli.ts",
+          "bytes": 6825,
+          "sha256": "aebc3c4e4e79b359878fdf2efe41337ea183fe5df52632163d46ffff122e15f8",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityCli.ts",
+          "dev": 16777231,
+          "inode": 542358514,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/identityConfig.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+          "bytes": 13501,
+          "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/identityConfig.ts",
+          "dev": 16777231,
+          "inode": 539134748,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityConfig.ts",
+          "bytes": 13501,
+          "sha256": "0ffce36a3bf6c7ed6ea81b4f3024314ec6f1ecbd10058bf73e16a3888820659c",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/identityConfig.ts",
+          "dev": 16777231,
+          "inode": 542358515,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/oidc/jwtVerify.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12727,
+          "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/jwtVerify.ts",
+          "dev": 16777231,
+          "inode": 539134750,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/jwtVerify.ts",
+          "bytes": 12727,
+          "sha256": "2d5dd9bc1533ff6a5bd1783d25cc1603c61bf5f2fb6990ea1a4937dde2051792",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/jwtVerify.ts",
+          "dev": 16777231,
+          "inode": 542358517,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/oidc/oidcClient.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcClient.ts",
+          "bytes": 3790,
+          "sha256": "03c58431ef2607e2aa792d914306b68ddb9ca40059e9800c2da286aeccf091f4",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcClient.ts",
+          "dev": 16777231,
+          "inode": 539134751,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/oidcClient.ts",
+          "bytes": 3790,
+          "sha256": "03c58431ef2607e2aa792d914306b68ddb9ca40059e9800c2da286aeccf091f4",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/oidcClient.ts",
+          "dev": 16777231,
+          "inode": 542358518,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/oidc/oidcRoutes.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+          "bytes": 5987,
+          "sha256": "0016abef4cff9012c141656dff6b28b2b74c9a36c6e4efe9a5df43d40d18b9d6",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/oidcRoutes.ts",
+          "dev": 16777231,
+          "inode": 539134752,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/oidcRoutes.ts",
+          "bytes": 5987,
+          "sha256": "0016abef4cff9012c141656dff6b28b2b74c9a36c6e4efe9a5df43d40d18b9d6",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/oidcRoutes.ts",
+          "dev": 16777231,
+          "inode": 542358519,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/oidc/pkce.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/pkce.ts",
+          "bytes": 433,
+          "sha256": "e5e0e81dd3fa0d34eeea17e7d542e6db63d8be4e0d1e302fd6ddfc875b5826c0",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/oidc/pkce.ts",
+          "dev": 16777231,
+          "inode": 539134753,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/pkce.ts",
+          "bytes": 433,
+          "sha256": "e5e0e81dd3fa0d34eeea17e7d542e6db63d8be4e0d1e302fd6ddfc875b5826c0",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/oidc/pkce.ts",
+          "dev": 16777231,
+          "inode": 542358520,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/pendingLoginStore.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/pendingLoginStore.ts",
+          "dev": 16777231,
+          "inode": 539134754,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "bytes": 4955,
+          "sha256": "77201a6607e8e105a3a9eb314abbdff07076334f0be538e2b207d56f3e4ac6fd",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/pendingLoginStore.ts",
+          "dev": 16777231,
+          "inode": 542358521,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/roleMapping.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/roleMapping.ts",
+          "bytes": 2396,
+          "sha256": "26d6611c75c9d2927d466c5f4ba2e611f56e7f186b8c8794a2d29128d24b56b9",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/roleMapping.ts",
+          "dev": 16777231,
+          "inode": 539134755,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/roleMapping.ts",
+          "bytes": 2396,
+          "sha256": "26d6611c75c9d2927d466c5f4ba2e611f56e7f186b8c8794a2d29128d24b56b9",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/roleMapping.ts",
+          "dev": 16777231,
+          "inode": 542358522,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/saml/samlRoutes.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/saml/samlRoutes.ts",
+          "bytes": 5628,
+          "sha256": "4e9c86478331076ddacc5c2f010eb03ea9bec4c56c9e2eeaf604be89cd2652af",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/saml/samlRoutes.ts",
+          "dev": 16777231,
+          "inode": 539134757,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/saml/samlRoutes.ts",
+          "bytes": 5628,
+          "sha256": "4e9c86478331076ddacc5c2f010eb03ea9bec4c56c9e2eeaf604be89cd2652af",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/saml/samlRoutes.ts",
+          "dev": 16777231,
+          "inode": 542358524,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/saml/samlVerify.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/saml/samlVerify.ts",
+          "bytes": 2445,
+          "sha256": "3c8c84852b67678bcbecfbed8dd0612be1d721eefd5a02e96084d11f800778a6",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/saml/samlVerify.ts",
+          "dev": 16777231,
+          "inode": 539134758,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/saml/samlVerify.ts",
+          "bytes": 2445,
+          "sha256": "3c8c84852b67678bcbecfbed8dd0612be1d721eefd5a02e96084d11f800778a6",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/saml/samlVerify.ts",
+          "dev": 16777231,
+          "inode": 542358525,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/scim/scimAuth.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimAuth.ts",
+          "bytes": 1354,
+          "sha256": "b6a1d1af20fda1549e75151f33d88d905d3d8f0cb2914bf8c50abb6d8f64ebd9",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimAuth.ts",
+          "dev": 16777231,
+          "inode": 539134760,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimAuth.ts",
+          "bytes": 1354,
+          "sha256": "b6a1d1af20fda1549e75151f33d88d905d3d8f0cb2914bf8c50abb6d8f64ebd9",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimAuth.ts",
+          "dev": 16777231,
+          "inode": 542358527,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/scim/scimGroups.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimGroups.ts",
+          "bytes": 7267,
+          "sha256": "4167136fb7173ceac4a4168e64024d1b6fe3d1293f2c1d0a6b496d2da12ab154",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimGroups.ts",
+          "dev": 16777231,
+          "inode": 539134761,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimGroups.ts",
+          "bytes": 7267,
+          "sha256": "4167136fb7173ceac4a4168e64024d1b6fe3d1293f2c1d0a6b496d2da12ab154",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimGroups.ts",
+          "dev": 16777231,
+          "inode": 542358528,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/scim/scimPatch.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimPatch.ts",
+          "bytes": 1038,
+          "sha256": "cb998c77e0a2517559adec8b0080eed8dac8a9c19d463ccc36bae267faa046ef",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimPatch.ts",
+          "dev": 16777231,
+          "inode": 539134762,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimPatch.ts",
+          "bytes": 1038,
+          "sha256": "cb998c77e0a2517559adec8b0080eed8dac8a9c19d463ccc36bae267faa046ef",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimPatch.ts",
+          "dev": 16777231,
+          "inode": 542358529,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/scim/scimRoutes.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimRoutes.ts",
+          "bytes": 11533,
+          "sha256": "f811c43fd8f839a9264695d898e96cdbdc507c02054df0129686a1b37476b942",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimRoutes.ts",
+          "dev": 16777231,
+          "inode": 539134763,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimRoutes.ts",
+          "bytes": 11533,
+          "sha256": "f811c43fd8f839a9264695d898e96cdbdc507c02054df0129686a1b37476b942",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimRoutes.ts",
+          "dev": 16777231,
+          "inode": 542358530,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/scim/scimTypes.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimTypes.ts",
+          "bytes": 699,
+          "sha256": "e0f926957b040c2369c0b8d21df489f28774a05d083cd5c48405f8124b796ed4",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimTypes.ts",
+          "dev": 16777231,
+          "inode": 539134764,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimTypes.ts",
+          "bytes": 699,
+          "sha256": "e0f926957b040c2369c0b8d21df489f28774a05d083cd5c48405f8124b796ed4",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimTypes.ts",
+          "dev": 16777231,
+          "inode": 542358531,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/scim/scimUsers.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimUsers.ts",
+          "bytes": 8785,
+          "sha256": "26a58e8b615cd199fbfd52770e13036c85c7808f9d652c95a57a11f540885a60",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/scim/scimUsers.ts",
+          "dev": 16777231,
+          "inode": 539134765,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimUsers.ts",
+          "bytes": 8785,
+          "sha256": "26a58e8b615cd199fbfd52770e13036c85c7808f9d652c95a57a11f540885a60",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/scim/scimUsers.ts",
+          "dev": 16777231,
+          "inode": 542358532,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/session.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/session.ts",
+          "bytes": 2791,
+          "sha256": "b4e3cc72041b7e458bf783e02440cb40e3ce7cbd1d73e33f6c4c83cf956315c2",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/session.ts",
+          "dev": 16777231,
+          "inode": 539134766,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/session.ts",
+          "bytes": 2791,
+          "sha256": "b4e3cc72041b7e458bf783e02440cb40e3ce7cbd1d73e33f6c4c83cf956315c2",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/session.ts",
+          "dev": 16777231,
+          "inode": 542358533,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/sessionCookie.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/sessionCookie.ts",
+          "bytes": 1540,
+          "sha256": "25334a5695b4c95884027b498b2483770556de15b9578abedc31e54b6ca20644",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/sessionCookie.ts",
+          "dev": 16777231,
+          "inode": 539134767,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/sessionCookie.ts",
+          "bytes": 1540,
+          "sha256": "25334a5695b4c95884027b498b2483770556de15b9578abedc31e54b6ca20644",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/sessionCookie.ts",
+          "dev": 16777231,
+          "inode": 542358534,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/identity/sessionStore.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/sessionStore.ts",
+          "bytes": 2640,
+          "sha256": "9036366d08ef77547babb93593847ef85cce6e9f03cb4b008ade70423fd0191d",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/identity/sessionStore.ts",
+          "dev": 16777231,
+          "inode": 539134768,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/sessionStore.ts",
+          "bytes": 2640,
+          "sha256": "9036366d08ef77547babb93593847ef85cce6e9f03cb4b008ade70423fd0191d",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/identity/sessionStore.ts",
+          "dev": 16777231,
+          "inode": 542358535,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/utils/controlHttpResponses.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/utils/controlHttpResponses.ts",
+          "bytes": 575,
+          "sha256": "30d9af5003d89592693c27b30717ea11e07ebfb0dad6a92a7a6486e88e9a6800",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/utils/controlHttpResponses.ts",
+          "dev": 16777231,
+          "inode": 539135875,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/utils/controlHttpResponses.ts",
+          "bytes": 575,
+          "sha256": "30d9af5003d89592693c27b30717ea11e07ebfb0dad6a92a7a6486e88e9a6800",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/utils/controlHttpResponses.ts",
+          "dev": 16777231,
+          "inode": 542359648,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/hostAuth.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostAuth.ts",
+          "bytes": 5826,
+          "sha256": "d963f2199a75a83fc873360c1a181544d7f160c883a1be9dc12299a50b4e9033",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostAuth.ts",
+          "dev": 16777231,
+          "inode": 539136010,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostAuth.ts",
+          "bytes": 5826,
+          "sha256": "d963f2199a75a83fc873360c1a181544d7f160c883a1be9dc12299a50b4e9033",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostAuth.ts",
+          "dev": 16777231,
+          "inode": 542359784,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/hostBootstrap.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostBootstrap.ts",
+          "bytes": 3722,
+          "sha256": "5e4aa5be3d52c833ec3472e8974d2d0e3832b1e6141ad9749d32ff3fcded7d4f",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostBootstrap.ts",
+          "dev": 16777231,
+          "inode": 539136011,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostBootstrap.ts",
+          "bytes": 3722,
+          "sha256": "5e4aa5be3d52c833ec3472e8974d2d0e3832b1e6141ad9749d32ff3fcded7d4f",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostBootstrap.ts",
+          "dev": 16777231,
+          "inode": 542359785,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/hostCli.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostCli.ts",
+          "bytes": 4824,
+          "sha256": "43316f6c495c90fd38648b1ab30c20e3bf0f5bb398ad23c6824f46f966917496",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostCli.ts",
+          "dev": 16777231,
+          "inode": 539136012,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostCli.ts",
+          "bytes": 4824,
+          "sha256": "43316f6c495c90fd38648b1ab30c20e3bf0f5bb398ad23c6824f46f966917496",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostCli.ts",
+          "dev": 16777231,
+          "inode": 542359786,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/hostDb.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostDb.ts",
+          "bytes": 40366,
+          "sha256": "cb414ae6ae93fccfbeddf7c7a3d0b9f8e16659f46d46de906b42b2dc3114edac",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostDb.ts",
+          "dev": 16777231,
+          "inode": 539136013,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostDb.ts",
+          "bytes": 40366,
+          "sha256": "cb414ae6ae93fccfbeddf7c7a3d0b9f8e16659f46d46de906b42b2dc3114edac",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostDb.ts",
+          "dev": 16777231,
+          "inode": 542359787,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/hostSchema.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostSchema.ts",
+          "bytes": 1133,
+          "sha256": "3deb82d724eeeff57658bed6a55a9e5e37375c1ca8cb8438d93d51be7e1e3acf",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/hostSchema.ts",
+          "dev": 16777231,
+          "inode": 539136014,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostSchema.ts",
+          "bytes": 1133,
+          "sha256": "3deb82d724eeeff57658bed6a55a9e5e37375c1ca8cb8438d93d51be7e1e3acf",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/hostSchema.ts",
+          "dev": 16777231,
+          "inode": 542359788,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/workspaceContext.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceContext.ts",
+          "bytes": 128,
+          "sha256": "dbadbe8275967e8876a0bdf99586e6643e39887e2f39aae3a51c1f3552132c10",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceContext.ts",
+          "dev": 16777231,
+          "inode": 539136015,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceContext.ts",
+          "bytes": 128,
+          "sha256": "dbadbe8275967e8876a0bdf99586e6643e39887e2f39aae3a51c1f3552132c10",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceContext.ts",
+          "dev": 16777231,
+          "inode": 542359789,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/workspaceId.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceId.ts",
+          "bytes": 1151,
+          "sha256": "507c07573b42279d672230063af0af48e356603c336598b4d3d462f8279ea016",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceId.ts",
+          "dev": 16777231,
+          "inode": 539136016,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceId.ts",
+          "bytes": 1151,
+          "sha256": "507c07573b42279d672230063af0af48e356603c336598b4d3d462f8279ea016",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceId.ts",
+          "dev": 16777231,
+          "inode": 542359790,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/workspaceManager.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceManager.ts",
+          "bytes": 9523,
+          "sha256": "df58ea36f30610d57c09bf395b2499a7bc4f9356c372f8da4d568dda41e574fe",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceManager.ts",
+          "dev": 16777231,
+          "inode": 539136017,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceManager.ts",
+          "bytes": 9523,
+          "sha256": "df58ea36f30610d57c09bf395b2499a7bc4f9356c372f8da4d568dda41e574fe",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceManager.ts",
+          "dev": 16777231,
+          "inode": 542359791,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/workspacePaths.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspacePaths.ts",
+          "bytes": 1750,
+          "sha256": "0911c9a5456b58ae648f3d103190fc02a0818ca0b72944795f386dde5d8238fd",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspacePaths.ts",
+          "dev": 16777231,
+          "inode": 539136018,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspacePaths.ts",
+          "bytes": 1750,
+          "sha256": "0911c9a5456b58ae648f3d103190fc02a0818ca0b72944795f386dde5d8238fd",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspacePaths.ts",
+          "dev": 16777231,
+          "inode": 542359792,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/workspaceResolver.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceResolver.ts",
+          "bytes": 1258,
+          "sha256": "ba0b13773a140e6b31e77967e6586e2f7660fc6dfe63c09665e00e24c60c34a7",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceResolver.ts",
+          "dev": 16777231,
+          "inode": 539136019,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceResolver.ts",
+          "bytes": 1258,
+          "sha256": "ba0b13773a140e6b31e77967e6586e2f7660fc6dfe63c09665e00e24c60c34a7",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceResolver.ts",
+          "dev": 16777231,
+          "inode": 542359793,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/workspaceRouter.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceRouter.ts",
+          "bytes": 65262,
+          "sha256": "c06242bc22da1063a69649d6cdaf7e11d06e6c853df7845bb376a1ca8167560e",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceRouter.ts",
+          "dev": 16777231,
+          "inode": 539136020,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceRouter.ts",
+          "bytes": 65262,
+          "sha256": "c06242bc22da1063a69649d6cdaf7e11d06e6c853df7845bb376a1ca8167560e",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceRouter.ts",
+          "dev": 16777231,
+          "inode": 542359794,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/workspaceRuntimeRegistry.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceRuntimeRegistry.ts",
+          "bytes": 1864,
+          "sha256": "2d816aca823345859a6f4e0a7bbf694a3e53dc87e0b8cc657bc9b7cce0501940",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceRuntimeRegistry.ts",
+          "dev": 16777231,
+          "inode": 539136021,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceRuntimeRegistry.ts",
+          "bytes": 1864,
+          "sha256": "2d816aca823345859a6f4e0a7bbf694a3e53dc87e0b8cc657bc9b7cce0501940",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceRuntimeRegistry.ts",
+          "dev": 16777231,
+          "inode": 542359795,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "src/workspaces/workspaceStudioProxy.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceStudioProxy.ts",
+          "bytes": 2577,
+          "sha256": "65137cbbdcf1ccc71f1549663526ccdf7258345d78dec0d11a9728bbe56dc260",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/src/workspaces/workspaceStudioProxy.ts",
+          "dev": 16777231,
+          "inode": 539136022,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceStudioProxy.ts",
+          "bytes": 2577,
+          "sha256": "65137cbbdcf1ccc71f1549663526ccdf7258345d78dec0d11a9728bbe56dc260",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/src/workspaces/workspaceStudioProxy.ts",
+          "dev": 16777231,
+          "inode": 542359796,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tests/enterpriseSsoScim.test.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/enterpriseSsoScim.test.ts",
+          "bytes": 32492,
+          "sha256": "8458813ecb3596f66931306d3a7aabd76807d466274d1cdcfc2f1980336a4d1e",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/enterpriseSsoScim.test.ts",
+          "dev": 16777231,
+          "inode": 539136399,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/enterpriseSsoScim.test.ts",
+          "bytes": 32492,
+          "sha256": "8458813ecb3596f66931306d3a7aabd76807d466274d1cdcfc2f1980336a4d1e",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/enterpriseSsoScim.test.ts",
+          "dev": 16777231,
+          "inode": 542360205,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tests/identity/jwtVerify.test.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+          "bytes": 40561,
+          "sha256": "293a99eb5e5f8b52e5fb7a1658eeb60b1b9826d6abf15d9524e35096bdca2db3",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/jwtVerify.test.ts",
+          "dev": 16777231,
+          "inode": 542232699,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/jwtVerify.test.ts",
+          "bytes": 40561,
+          "sha256": "293a99eb5e5f8b52e5fb7a1658eeb60b1b9826d6abf15d9524e35096bdca2db3",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/jwtVerify.test.ts",
+          "dev": 16777231,
+          "inode": 542361167,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tests/identity/pendingLoginStore.test.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/pendingLoginStore.test.ts",
+          "bytes": 27973,
+          "sha256": "2d3573f2c2d20d52f8e00b38d48ff39660eb6d28538ae48b140e387f4020f318",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/identity/pendingLoginStore.test.ts",
+          "dev": 16777231,
+          "inode": 542337000,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+          "bytes": 27973,
+          "sha256": "2d3573f2c2d20d52f8e00b38d48ff39660eb6d28538ae48b140e387f4020f318",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/identity/pendingLoginStore.test.ts",
+          "dev": 16777231,
+          "inode": 542361168,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tests/security/api-security.test.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/security/api-security.test.ts",
+          "bytes": 21008,
+          "sha256": "4e57d8cfa5e122ddad248e60438c94354b230ade8bc551972b80e91282421c1d",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/security/api-security.test.ts",
+          "dev": 16777231,
+          "inode": 539137737,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/security/api-security.test.ts",
+          "bytes": 21008,
+          "sha256": "4e57d8cfa5e122ddad248e60438c94354b230ade8bc551972b80e91282421c1d",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/security/api-security.test.ts",
+          "dev": 16777231,
+          "inode": 542361637,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tests/security/identityAccountBinding.test.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/security/identityAccountBinding.test.ts",
+          "bytes": 4736,
+          "sha256": "9fa26f1dd0c59eb14c45439e8d8a6fc06c5838d58168af91a2fda67c5c247948",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/security/identityAccountBinding.test.ts",
+          "dev": 16777231,
+          "inode": 539137741,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/security/identityAccountBinding.test.ts",
+          "bytes": 4736,
+          "sha256": "9fa26f1dd0c59eb14c45439e8d8a6fc06c5838d58168af91a2fda67c5c247948",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/security/identityAccountBinding.test.ts",
+          "dev": 16777231,
+          "inode": 542361641,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tests/setup/guardWorkspace.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+          "bytes": 1894,
+          "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/guardWorkspace.ts",
+          "dev": 16777231,
+          "inode": 539137773,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/guardWorkspace.ts",
+          "bytes": 1894,
+          "sha256": "be7ba196006d078f18e44a1148d517a588df71be7a56f42e855b90f7f83c4591",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/guardWorkspace.ts",
+          "dev": 16777231,
+          "inode": 542361673,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tests/setup/repoWorkspaceGuard.global.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+          "bytes": 3675,
+          "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.global.ts",
+          "dev": 16777231,
+          "inode": 539137776,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/repoWorkspaceGuard.global.ts",
+          "bytes": 3675,
+          "sha256": "ead592dbb4da747be8a1c675a13351d7d2a41117fced069f7276c9eb3b4c3179",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/repoWorkspaceGuard.global.ts",
+          "dev": 16777231,
+          "inode": 542361676,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tests/setup/repoWorkspaceGuard.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+          "bytes": 1133,
+          "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/setup/repoWorkspaceGuard.ts",
+          "dev": 16777231,
+          "inode": 539137777,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/repoWorkspaceGuard.ts",
+          "bytes": 1133,
+          "sha256": "1af9017a711b51984869aa1adb6ded4dae122b0da62cfeb6fb0b042ce3cdd5e4",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tests/setup/repoWorkspaceGuard.ts",
+          "dev": 16777231,
+          "inode": 542361677,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tsconfig.json",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tsconfig.json",
+          "bytes": 504,
+          "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tsconfig.json",
+          "dev": 16777231,
+          "inode": 539137974,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tsconfig.json",
+          "bytes": 504,
+          "sha256": "a16d19e875063ad0bf2ce77452693287bbe8057ac1ad9041c28181936c478f78",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tsconfig.json",
+          "dev": 16777231,
+          "inode": 542361874,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "tsconfig.tests.json",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tsconfig.tests.json",
+          "bytes": 300,
+          "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tsconfig.tests.json",
+          "dev": 16777231,
+          "inode": 539137975,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tsconfig.tests.json",
+          "bytes": 300,
+          "sha256": "ef265b3657c9af4999dd2bb1b30d3dbca349c9692337d20d718db17fc9530ffd",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/tsconfig.tests.json",
+          "dev": 16777231,
+          "inode": 542361875,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "vitest.config.ts",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+          "bytes": 1324,
+          "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/vitest.config.ts",
+          "dev": 16777231,
+          "inode": 539138935,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/vitest.config.ts",
+          "bytes": 1324,
+          "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/vitest.config.ts",
+          "dev": 16777231,
+          "inode": 542362835,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "website/i18n.js",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+          "bytes": 44169,
+          "sha256": "34b00de636de70560af566a817ddaa382d8e1f3c677311fbad4b6b7c9a7425d8",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/i18n.js",
+          "dev": 16777231,
+          "inode": 539138990,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/i18n.js",
+          "bytes": 44169,
+          "sha256": "34b00de636de70560af566a817ddaa382d8e1f3c677311fbad4b6b7c9a7425d8",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/i18n.js",
+          "dev": 16777231,
+          "inode": 542362890,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "website/index.html",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+          "bytes": 43520,
+          "sha256": "06f0370cd4f81cc45e76b2871fa3e83cfb6427cfa90e320337b4807c15f6b3b1",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/index.html",
+          "dev": 16777231,
+          "inode": 539138991,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/index.html",
+          "bytes": 43520,
+          "sha256": "06f0370cd4f81cc45e76b2871fa3e83cfb6427cfa90e320337b4807c15f6b3b1",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/index.html",
+          "dev": 16777231,
+          "inode": 542362891,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "website/lite.html",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+          "bytes": 11197,
+          "sha256": "b1d9f08780a73bdf9c691febbdb522611c1bbd6118c8fcf7f9f00c38d34f6f4f",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/website/lite.html",
+          "dev": 16777231,
+          "inode": 539138995,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/lite.html",
+          "bytes": 11197,
+          "sha256": "b1d9f08780a73bdf9c691febbdb522611c1bbd6118c8fcf7f9f00c38d34f6f4f",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/website/lite.html",
+          "dev": 16777231,
+          "inode": 542362895,
+          "nlink": 1
+        }
+      },
+      {
+        "relativePath": "whitepaper/AMC_WHITEPAPER_v1.md",
+        "source": {
+          "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "43c5c4c533f0d3d25d8056e000b715d077afb7552f9b393525b1b7b20398adb3",
+          "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/whitepaper/AMC_WHITEPAPER_v1.md",
+          "dev": 16777231,
+          "inode": 539139027,
+          "nlink": 1
+        },
+        "fresh": {
+          "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+          "bytes": 107509,
+          "sha256": "43c5c4c533f0d3d25d8056e000b715d077afb7552f9b393525b1b7b20398adb3",
+          "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/whitepaper/AMC_WHITEPAPER_v1.md",
+          "dev": 16777231,
+          "inode": 542362927,
+          "nlink": 1
+        }
+      }
+    ],
+    "nativeSource": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    },
+    "nativeFresh": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 542399330,
+      "nlink": 1
+    },
+    "nativeBorrowedCopiedOrLinked": false,
+    "compiledSelected": [
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/cli.js",
+        "bytes": 1054132,
+        "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/cli.js",
+        "dev": 16777231,
+        "inode": 542347682,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/cli.js",
+        "bytes": 1054132,
+        "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/cli.js",
+        "dev": 16777231,
+        "inode": 542403554,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/oidc/jwtVerify.js",
+        "bytes": 13142,
+        "sha256": "0007271d6a9435f343157a9f4bb090b86c3dbc7fb6aab61dd147205478bfa900",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/oidc/jwtVerify.js",
+        "dev": 16777231,
+        "inode": 542346407,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/oidc/jwtVerify.js",
+        "bytes": 13142,
+        "sha256": "0007271d6a9435f343157a9f4bb090b86c3dbc7fb6aab61dd147205478bfa900",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/oidc/jwtVerify.js",
+        "dev": 16777231,
+        "inode": 542402278,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/oidc/jwtVerify.d.ts",
+        "bytes": 1097,
+        "sha256": "3c7e967dbdbdf5466d3b2264f27c8243ca448deae864b324e94e7dbc5b889f10",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/oidc/jwtVerify.d.ts",
+        "dev": 16777231,
+        "inode": 542346408,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/oidc/jwtVerify.d.ts",
+        "bytes": 1097,
+        "sha256": "3c7e967dbdbdf5466d3b2264f27c8243ca448deae864b324e94e7dbc5b889f10",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/oidc/jwtVerify.d.ts",
+        "dev": 16777231,
+        "inode": 542402279,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/oidc/oidcClient.js",
+        "bytes": 3418,
+        "sha256": "6dd0637d098c1e2e88fc0aeac222cb57877b8bd2cef9a3f06fd6229d393fe8a8",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/oidc/oidcClient.js",
+        "dev": 16777231,
+        "inode": 542346411,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/oidc/oidcClient.js",
+        "bytes": 3418,
+        "sha256": "6dd0637d098c1e2e88fc0aeac222cb57877b8bd2cef9a3f06fd6229d393fe8a8",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/oidc/oidcClient.js",
+        "dev": 16777231,
+        "inode": 542402282,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/oidc/oidcRoutes.js",
+        "bytes": 6076,
+        "sha256": "ed1591870027f599f644c9d0b57429c5c14cd2f20e2bc019b2155d06c861b968",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/oidc/oidcRoutes.js",
+        "dev": 16777231,
+        "inode": 542346417,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/oidc/oidcRoutes.js",
+        "bytes": 6076,
+        "sha256": "ed1591870027f599f644c9d0b57429c5c14cd2f20e2bc019b2155d06c861b968",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/oidc/oidcRoutes.js",
+        "dev": 16777231,
+        "inode": 542402288,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/pendingLoginStore.js",
+        "bytes": 4888,
+        "sha256": "f8256d642764fc8011622ddfc22279814e23409d7e5c7d145b87512fc5594889",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/pendingLoginStore.js",
+        "dev": 16777231,
+        "inode": 542346415,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/pendingLoginStore.js",
+        "bytes": 4888,
+        "sha256": "f8256d642764fc8011622ddfc22279814e23409d7e5c7d145b87512fc5594889",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/pendingLoginStore.js",
+        "dev": 16777231,
+        "inode": 542402286,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/workspaces/workspaceRouter.js",
+        "bytes": 71819,
+        "sha256": "f2dd14642f4b8431548bae281b89c3159636146644141d835a1a01d43015bff3",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/workspaces/workspaceRouter.js",
+        "dev": 16777231,
+        "inode": 542346437,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/workspaces/workspaceRouter.js",
+        "bytes": 71819,
+        "sha256": "f2dd14642f4b8431548bae281b89c3159636146644141d835a1a01d43015bff3",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/workspaces/workspaceRouter.js",
+        "dev": 16777231,
+        "inode": 542402308,
+        "nlink": 1
+      },
+      {
+        "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/hostVault.js",
+        "bytes": 9541,
+        "sha256": "ae4114f9afdf47c9aac1c402f9fa2ac931579c75b033b83fe7c79fee83121b04",
+        "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/dist/identity/hostVault.js",
+        "dev": 16777231,
+        "inode": 542345890,
+        "nlink": 1
+      },
+      {
+        "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/hostVault.js",
+        "bytes": 9541,
+        "sha256": "ae4114f9afdf47c9aac1c402f9fa2ac931579c75b033b83fe7c79fee83121b04",
+        "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/dist/identity/hostVault.js",
+        "dev": 16777231,
+        "inode": 542401761,
+        "nlink": 1
+      }
+    ],
+    "compiledSelectedIncludesBothRAndQ": true,
+    "runnerPin": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "bytes": 43,
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "dev": 16777231,
+      "inode": 539152709,
+      "nlink": 1
+    },
+    "node": "/opt/homebrew/opt/node@22/bin/node 22.23.3 ABI127",
+    "preservedCompilerHaltPins": [
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/ACTIVE.json",
+        "bytes": 251,
+        "sha256": "90eb356b14c052743c5f405c514b52a1c3132b2c3d578bc7e2e70b573672ed13"
+      },
+      {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/HALTED.json",
+        "bytes": 291,
+        "sha256": "8d778f747a485c094f78a74863ed7e6fb331b4ca6494b5dc35d3251327d6cfcf"
+      }
+    ],
+    "selectedSourcePathCount": 83,
+    "selectedPhysicalFileCount": 185,
+    "runnerProvenance": "R-installed Vitest entry is explicitly borrowed with physical Q --root. The separate documented Q clone/frozen install/build supplies its selected source, compiled files and native addon. Wrapper cwd remains R; inherited environment/private HOME is not OS isolation. Finite selected hashes and distinct regular-file identities do not prove every transitive file or universal descendant exclusion.",
+    "formalDone": false
+  },
+  "finalRestoration": {
+    "kind": "Root actual finite pending-state controls and final original-source preservation review",
+    "at": "2026-10-16T12:47:46.783181+00:00",
+    "sourceCommit": "b3473a9ccdd41c5a7e453bc132d2cb2c59387a82",
+    "sourceCwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "physicalQ": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout",
+    "binding": {
+      "path": "/private/tmp/p2-07-pending-state-qualification-20261016/fresh-source-binding.json",
+      "bytes": 134531,
+      "sha256": "277f99a470aae674644bfcb76353c4f2e4aa4fa9193f367cbe5c1e88f76996a3"
+    },
+    "all185SelectedPhysicalFilesRestored": true,
+    "sourcePairs": 83,
+    "compiledRows": 16,
+    "nativeSource": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 539175547,
+      "nlink": 1
+    },
+    "nativeFresh": {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "bytes": 1931552,
+      "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+      "physicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-oMOWcf/checkout/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+      "dev": 16777231,
+      "inode": 542399330,
+      "nlink": 1
+    },
+    "runner": {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "bytes": 43,
+      "sha256": "39db22f579acf5639bbb17a261408debbde03f4692c0c439e77e7f13aeba74d6",
+      "physicalPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+      "dev": 16777231,
+      "inode": 539152709,
+      "nlink": 1
+    },
+    "R_QClean": true,
+    "noCurrentMarkers": true,
+    "oldCompilerHaltsPreserved": true,
+    "outcomes": [
+      {
+        "phase": "p207p-fresh-canonical",
+        "tests": {
+          "total": 154,
+          "passed": 154,
+          "failed": 0,
+          "skipped": 0
+        },
+        "commandExit": 0,
+        "pidAndPgid": 53370,
+        "outcome": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-fresh-canonical-outcome.json",
+          "bytes": 6094,
+          "sha256": "399825bd33150dde39f0ea279d696d5cafcf2bbaf641859f722f3314b33cdf43"
+        }
+      },
+      {
+        "phase": "p207p-mutant-consume",
+        "tests": {
+          "total": 154,
+          "passed": 151,
+          "failed": 3,
+          "skipped": 0
+        },
+        "commandExit": 1,
+        "pidAndPgid": 54254,
+        "outcome": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-mutant-consume-outcome.json",
+          "bytes": 10797,
+          "sha256": "411069748df61c03f11457f0cb3a0f49f0f408a8041f42dcfc481faa8778ecd5"
+        }
+      },
+      {
+        "phase": "p207p-restored-consume",
+        "tests": {
+          "total": 154,
+          "passed": 154,
+          "failed": 0,
+          "skipped": 0
+        },
+        "commandExit": 0,
+        "pidAndPgid": 54416,
+        "outcome": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-restored-consume-outcome.json",
+          "bytes": 6108,
+          "sha256": "937d295d3572b543f9b8bc7a6749476ca50fd9cb151390150644640303ca6aca"
+        }
+      },
+      {
+        "phase": "p207p-mutant-expiry",
+        "tests": {
+          "total": 154,
+          "passed": 152,
+          "failed": 2,
+          "skipped": 0
+        },
+        "commandExit": 1,
+        "pidAndPgid": 54471,
+        "outcome": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-mutant-expiry-outcome.json",
+          "bytes": 9181,
+          "sha256": "6ba18f321c3b012935d21a93e4d16efe3cbf9536799fe88cf28c18211457e75a"
+        }
+      },
+      {
+        "phase": "p207p-restored-expiry",
+        "tests": {
+          "total": 154,
+          "passed": 154,
+          "failed": 0,
+          "skipped": 0
+        },
+        "commandExit": 0,
+        "pidAndPgid": 54567,
+        "outcome": {
+          "path": "/private/tmp/p2-07-pending-state-qualification-20261016/p207p-restored-expiry-outcome.json",
+          "bytes": 6094,
+          "sha256": "44a6ac00f8fc594d4a192e6b4ba6525ac5209634bfff4fe26eaebb353f81a4c3"
+        }
+      }
+    ],
+    "allTwentyQPendingPublicRecordsRootRead": true,
+    "strictPendingCleanupAndEnvironmentPassed": true,
+    "publicPins": [
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-HlwCeG/child.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-HlwCeG/child.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-HlwCeG/observations/public-evidence.json",
+        "bytes": 5337,
+        "sha256": "6166d88608850a73d962e6bbbb5354d0cfe83593f448b9fe911385b6138ee1c4"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-IFn6UA/observations/public-evidence.json",
+        "bytes": 3004,
+        "sha256": "44a5583e2621e0dc50920d783cc767c09c52b025fec4b5d86f84da0729b45d04"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-yLDGZI/observations/public-evidence.json",
+        "bytes": 917,
+        "sha256": "25687672c3091875a602f6c8b82017dae1ef7b22fe16ce4cbb2ebac364880e3e"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-PnoaoS/observations/public-evidence.json",
+        "bytes": 1007,
+        "sha256": "128edd287296a9871c616bd1e885576a57da08d8024fe8769567bbd9ace2fbfc"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-aWGZ8Z/child.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-aWGZ8Z/child.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-aWGZ8Z/observations/public-evidence.json",
+        "bytes": 5337,
+        "sha256": "2c64e982dcf85ff6975574ff77ee728355f2ad7a8551aa38e081b686b8950216"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-YYQ1x0/observations/public-evidence.json",
+        "bytes": 3716,
+        "sha256": "34ca7092bcbdab749cf6e0a674b265b5ca76af0c468b5f399fbfdfc362d21cc6"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-5jMHeO/observations/public-evidence.json",
+        "bytes": 977,
+        "sha256": "22b42e65ed264d82637f08d830aa5bfc85b0c88db96cf9521f50584f9f5ce349"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-SIJFcu/observations/public-evidence.json",
+        "bytes": 1128,
+        "sha256": "f519fab62034b3ca5281e14f3c33c3db1ed5134650df31aee3dbdacee92c8c07"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-teG8Bk/child.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-teG8Bk/child.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-teG8Bk/observations/public-evidence.json",
+        "bytes": 5336,
+        "sha256": "f1459635d3a17880f5ef341198605475fbc33bee6f5bc2045c4a7317bea83e9a"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-tWPsJQ/observations/public-evidence.json",
+        "bytes": 3004,
+        "sha256": "d8010969467265813e4eb6f0da1c12c6634baba84655ff12bbbab655e43a4af0"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-R5qc5E/observations/public-evidence.json",
+        "bytes": 917,
+        "sha256": "2735e21c723084708e6792ba830ce06f0ecfd53bc882e836a5b6fe907f3ce790"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-N6Q6Cc/observations/public-evidence.json",
+        "bytes": 1007,
+        "sha256": "2b3fe1780f599eb9f5ccfd31e7ea4a0c6fca9e749068d5b447453d3bc61dfcba"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-7lt6xV/child.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-7lt6xV/child.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-7lt6xV/observations/public-evidence.json",
+        "bytes": 5337,
+        "sha256": "918a05b2510faed40347093d3b13fafe2b96b7a9de7d49e8243e9a1085d29e54"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-PzDV8H/observations/public-evidence.json",
+        "bytes": 3468,
+        "sha256": "66f4424412e455f34dc8a40319b78c24339f70ef60d890bbaa1c9b7b62c3d6cb"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-BvT0Uq/observations/public-evidence.json",
+        "bytes": 917,
+        "sha256": "8f540315e6c691f18d029c212997950128c966c0ecd0fbc62cd7ddadd34a8745"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-n6IcYm/observations/public-evidence.json",
+        "bytes": 983,
+        "sha256": "07be615496a4767b709b179a2368e1a66ceabc87efb1258183687a3629367d56"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-4vZcq8/child.stdout.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-4vZcq8/child.stderr.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-4vZcq8/observations/public-evidence.json",
+        "bytes": 5337,
+        "sha256": "34cbac2b3501f6a8448d5af809b07be5b90b217b250f0c44b3af13e9bcfeff22"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-KXAAPA/observations/public-evidence.json",
+        "bytes": 3004,
+        "sha256": "d92d6f34cd752c039e9b7fb5ec4ed88e41180d3e494286ad3017e73a13527b8f"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-VIgvIz/observations/public-evidence.json",
+        "bytes": 917,
+        "sha256": "40043c7539c9ab5759e7f7b30564d5bf8dfa3210de75d437bb6d20ef9bed787d"
+      },
+      {
+        "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-pending-6ReQx7/observations/public-evidence.json",
+        "bytes": 1007,
+        "sha256": "79fbb587e406df06be821e169272bbeeecb44893c8e13beb0b42888aeba196c0"
+      }
+    ],
+    "semanticReviews": [
+      {
+        "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M1-root-body-review.json",
+        "bytes": 4391,
+        "sha256": "e06072d5b72e02a57f026f9c3ac46922787ca4e83423f472cc8f7d14cdaebfae"
+      },
+      {
+        "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M2-root-body-review.json",
+        "bytes": 4052,
+        "sha256": "ccc47e7b517052546786440c9d1491c76ef6fb1de67512d55c45d609d86a725d"
+      }
+    ],
+    "controlRecords": [
+      {
+        "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M1-consume-does-not-delete-apply.json",
+        "bytes": 2165,
+        "sha256": "fc795cc3ef8ada908064ee5bd98fcf2b6402ce00767dca776f4a0ca8fefd01b5"
+      },
+      {
+        "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M1-consume-does-not-delete-restore.json",
+        "bytes": 2266,
+        "sha256": "df5b724bfece44dbb573b121121909eee109af307fb14cd8555295597bb5f16f"
+      },
+      {
+        "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M2-expiry-comparison-removed-apply.json",
+        "bytes": 2170,
+        "sha256": "6bed0b1c75f4c6c646ab462703d1817e243493467be02a0b13225e5683d276a7"
+      },
+      {
+        "path": "/private/tmp/p2-07-pending-state-qualification-20261016/M2-expiry-comparison-removed-restore.json",
+        "bytes": 2268,
+        "sha256": "3d19c25ce347a6544638d0c42a9969967d13ea4e15d473cb92c2669b2e2aeb6c"
+      }
+    ],
+    "compiledColdBranch": "Original source observation only; never TS-mutant sensitivity.",
+    "quality": "Previously observed duplicates1268 and deadcode2727 remain RED/unwaived; no baseline adoption.",
+    "boundary": "Finite selected-source and process evidence only; no universal transitive import/descendant proof, full suite, full P2-07, live provider, release or full-plan completion.",
+    "formalDone": false
+  },
+  "sourceAndNativeBodiesCopied": false
+}

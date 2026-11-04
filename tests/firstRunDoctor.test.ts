@@ -41,7 +41,7 @@ vi.mock("../src/workspaces/workspaceId.js", () => ({ workspaceIdFromDirectory: (
 vi.mock("../src/adapters/adapterCli.js", () => ({ adaptersDetectCli: () => [] }));
 vi.mock("../src/toolhub/toolhubValidators.js", () => ({ pathAllowedByPatterns: () => ({ ok: false }) }));
 vi.mock("../src/trust/trustConfig.js", () => ({ checkNotaryTrust: async () => ({ ok: true, reasons: [] }), loadTrustConfig: () => ({ trust: { mode: "LOCAL_VAULT" } }), verifyTrustConfigSignature: () => seam.signature }));
-vi.mock("../src/crypto/signing/signer.js", () => ({ signDigestWithPolicy: () => undefined }));
+vi.mock("../src/crypto/signing/signer.js", () => ({ signDigestWithPolicyAsync: async () => undefined }));
 vi.mock("../src/crypto/keys.js", () => ({ verifyKeyHistoryChain: () => ({ ok: true }) }));
 vi.mock("../src/doctor/nativeModuleProbe.js", () => ({ nativeModuleCheck: () => ({ id: "native-modules", status: "PASS", message: "seam" }) }));
 vi.mock("../src/runtime/firewall.js", () => ({

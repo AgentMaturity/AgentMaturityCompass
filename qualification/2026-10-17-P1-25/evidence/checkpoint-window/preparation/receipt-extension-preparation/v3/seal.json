@@ -1,0 +1,45 @@
+{
+  "schema": "p125-checkpoint-private-receipt-v3-skeleton-seal/1",
+  "at": "2026-10-16T23:43:29.700681+00:00",
+  "preferredHelper": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+  "preferredDelta": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v3/v2-to-v3.patch.txt",
+  "preservedV2Seal": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v2/seal.json",
+    "bytes": 2201,
+    "sha256": "4faded5f01c2ba609fefed140c5380dcaaabaf83cf46f7990c9404912fde2daf"
+  },
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v3/assemble-extension.py.source.txt",
+      "bytes": 32337,
+      "sha256": "e4f12fdca503265d09a42562d03b5c4c96da2f6ac71003ac6dffa0d399acb087"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v3/v2-to-v3.patch.txt",
+      "bytes": 7226,
+      "sha256": "d6a424f5eb9bc10f720979a2f375442ad7b5c7efe40255a0efacbd44d23bc311"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v3/input-template.json",
+      "bytes": 7653,
+      "sha256": "4b2e0965473e477325503bee9e079164380181b964c85d0a913c21f6b90c0c14"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v3/README.md",
+      "bytes": 2497,
+      "sha256": "bf18926e805092a96795e5e13bdc65bab04edf3e49dd0b8f9ecbbccfb8325b09"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v3/input-pins.json",
+      "bytes": 2057,
+      "sha256": "22caf7ba229e98934ec73e02f02d449cc736f1ddfe9535b28cb754d0bf3f9fac"
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/receipt-extension-preparation/v3/author-static-review.json",
+      "bytes": 655,
+      "sha256": "49bdd99a618c7cb5c06f7501b5fcaf42da9c328331307e3cce0ed328722adfb3"
+    }
+  ],
+  "rootFullReadIndependentReviewAndActualFinalFactsRequired": true,
+  "noHelperExecutionOrSourceIndexQaWrites": true
+}

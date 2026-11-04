@@ -1,0 +1,6 @@
+     × a planted pending generation has no write-ahead record: refused, the mark stays, and quarantine clears it 1451ms
+     × even with a write-ahead record, the vault must hold the keys the pending generation names 1103ms
+     × quarantine never moves the purpose files of a key set this machine adopted 1142ms
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  3 failed | 27 skipped (30)

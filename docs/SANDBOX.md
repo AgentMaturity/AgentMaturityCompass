@@ -1,6 +1,6 @@
 # Sandbox Mode
 
-Sandbox mode executes agent commands in Docker and writes explicit sandbox attestation evidence.
+Sandbox mode executes agent commands in Docker and records sandbox execution evidence (`SANDBOX_EXECUTION_ENABLED` audit events).
 
 ## Native shell by platform
 
@@ -27,8 +27,9 @@ On macOS, AMC confines the shell with Seatbelt (see
 the shell refused, and only then does an opt-in apply. An unconfined shell runs
 `/bin/sh` as you: it can read files outside the workspace, including `~/.ssh`,
 and it can reach the network. AMC's policy guards still evaluate each call and
-provider keys are stripped from its environment, but nothing confines the
-process. To accept that risk, use one of these opt-ins:
+the command gets an allow-listed environment (`PATH`, `HOME`, user, shell,
+terminal, temp, locale and timezone variables; no provider keys, `AMC_*`
+secrets or other tokens), but nothing confines the process. To accept that risk, use one of these opt-ins:
 
 - `--unsafe-unconfined-shell` on `amc agent-loop run`, `amc agent-loop chat` or
   `amc acp`.
@@ -54,9 +55,10 @@ it: a child of a refused parent is refused.
 
 Every opted-in session prints this warning on stderr (never on the ACP protocol
 stream). Studio returns the same text as `shell.reason` in the native-task
-options and shows it as a banner in task setup. `AMCNativeClient` discards the
-spawned `amc acp` process's stderr, so an SDK caller that opts in does not see
-the warning; the receipts below still record it.
+options and shows it as a banner in task setup. `AMCNativeClient` forwards only this exact native-shell warning from
+the spawned `amc acp` process to the operator's stderr. Other child diagnostics
+remain private. An unsafe option alone does not print a warning when Seatbelt
+confines the shell; the warning must actually come from the child.
 
 ```text
 WARNING: the native shell is UNCONFINED on darwin (opt-in: cli-flag). Commands run with your full user rights: files outside the workspace, ~/.ssh and the network are reachable. Receipts record enforcement: none.
@@ -203,10 +205,18 @@ probe in the launcher's own directory and succeed in writing a marker in the
 private temporary directory. Without both, the command never ran and the
 receipt says `confined: false`.
 
+The profile also denies creating or writing named POSIX shared memory, System
+V IPC and opening IOKit user clients (power management, displays, devices),
+because those are host state outside the write grants.
+
 Limits. Reads outside the deny-list stay open: the shell can read any other
-file your user can. POSIX shared memory and IOKit are not restricted. Tools
-that need another system service, such as the keychain or certificate trust
-through `trustd`, fail.
+file your user can, because a toolchain loads from all over the filesystem.
+The kernel still lets the shell create a System V shared memory segment; it
+stays empty, because attaching, writing or removing it is denied. POSIX
+semaphores and IOKit registry reads (`ioreg`) stay available. Tools that need
+another system service fail closed: keychain lookups (`security`, keychain
+credential helpers such as git's `osxkeychain`) and certificate trust through
+Security.framework and `trustd` (`security verify-cert`).
 `sandbox-exec` is deprecated by Apple; the profile was checked by hand on macOS
 26.6.2 (25G83, arm64) and no CI job runs it yet. RLIMIT_NPROC counts every
 process of your user, so the process cap is relative to your count at launch.
@@ -237,18 +247,28 @@ if any address is loopback, link-local (including 169.254.169.254), private,
 CGNAT, documentation, benchmarking, unique-local, multicast or reserved (IPv6
 forms that carry such an IPv4 address included; 6to4 and Teredo always) unless
 that exact IP literal is listed, and
-connects only to an address it checked. Denials answer HTTP 403. Every decision
+connects only to the addresses it checked, trying each in turn. Denials answer HTTP 403. Every decision
 writes a `NATIVE_SHELL_EGRESS` audit row (`callId`, `host`, `port`, `decision`,
 `reason`) before it takes effect; a row that cannot be written denies the
-connection.
+connection. A CONNECT tunnel writes one more row (`reason: "connected"`,
+`connectedAddress`) before it answers 200, and closes if that row cannot be written.
 
 curl and git over HTTPS read `http_proxy`/`HTTPS_PROXY`, npm and pip read
-`HTTPS_PROXY`, and Node's built-in `fetch` does not read them by default.
+`HTTPS_PROXY`. Node's built-in `fetch` reads them only with
+`NODE_USE_ENV_PROXY=1`, which the macOS shell sets with the proxy (measured
+with Node 22.23; a Node that does not know the variable ignores it, and its
+`fetch` connects directly and is denied).
 Check other tools' own proxy settings. A tool that ignores the variables, such as git over SSH, cannot
 reach the network. The gateway forward proxy uses the same host decision
 (`decideEgress`, through `resolveAndCheck`): it resolves a listed name for every
 connection and connects only to an address it checked. This is available on macOS; on Linux a signed `egress` is
 refused until the relay in ADR-008 is reviewed and built.
+
+### Windows runner prototype (P2-14)
+
+The native Windows shell remains refused, including unsafe opt-ins. The cut-first Windows runner prototype is standalone and unregistered; it does not add a native backend or Windows shell permission. Its fake token/launcher API exercises protocol and refusal logic only. Even a valid fake result reports `confined:false`, has no enforcement object, does not prove tree exit and carries no real command exit.
+
+Live Windows containment is **not measured: no Windows host**. The proposed research note and ADR017 require Sid review, read Microsoft primary sources and real Windows escape evidence before any enablement decision. This is a no-go for enablement on present evidence, not a conclusion that a Windows boundary is impossible. Existing Linux/macOS and platform qualification results do not qualify this prototype as a Windows boundary.
 
 ## Command
 
@@ -272,6 +292,12 @@ amc sandbox run --agent salesbot \
 - agentId
 - image name/hash (best effort)
 - command and args
+- `envKeys`: the names of the variables passed into the container (never their values) and, for `amc adapters run --mode SANDBOX`, the `leaseId` of the lease among them
+- `sandboxBackend` (`docker`) and `confinementReceiptSha256`, the sha256 of the canonical attestation fields above
+
+Readers (the governor's trust summary, `requireSandboxForExecute` and the high-risk level-5 cap) count only a `SANDBOX_EXECUTION_ENABLED` row that names its backend and receipt digest; a row without them reads as absent. `amc assurance run --mode sandbox` (the default mode) writes the row only when the assurance process is measured OS-confined (`sandboxBackend: process-confinement`, with the measurement and its digest); an unconfined run writes no row, prints that it ran unconfined, and is never labelled `OBSERVED_HARDENED`.
+
+The container receives only the variables named in `envKeys` plus the gateway route variables; values reach docker through its inherited environment, never its argv. `amc adapters run --mode SANDBOX` exits with the container's exit code.
 
 ## Network Behavior
 
@@ -283,4 +309,4 @@ amc sandbox run --agent salesbot \
 
 ## Why It Matters for Scoring
 
-For high-risk agents/questions, level 5 support requires sandbox attestation evidence in the selected window (otherwise capped).
+Level 5 is not evaluated in this version: it needs a scoped attestation from a registry under pinned trust (P0-09, P3-04), and no registry issues one yet (see [SCORING_METHODOLOGY](SCORING_METHODOLOGY.md)). The runner also keeps a cap for high-risk agents and questions: without `SANDBOX_EXECUTION_ENABLED` evidence in the window, a level-5 result is capped. While level 5 is not evaluated, that cap changes no result.

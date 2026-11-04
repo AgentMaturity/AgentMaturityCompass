@@ -317,5 +317,5 @@ This crosswalk aligns AMC's L1-L5 progression with CMMI while preserving AMC's s
 
 ---
 
-*Files created: `/Users/sid/.openclaw/workspace/AMC_OS/DOCS/STANDARDS_MAPPING.md`*
+*Files created: `docs/STANDARDS_MAPPING.md`*
 *Next actions: Cross-reference with EU AI Act Annex III (high-risk categories) for sector-specific mapping.*

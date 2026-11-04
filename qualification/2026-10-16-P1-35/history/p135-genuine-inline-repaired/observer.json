@@ -1,0 +1,186 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 92716,
+  "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+  "reason": "failed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts"
+  ],
+  "testCount": 10,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "1266807446",
+      "name": "tests/migration/legacyRelabel.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+      "state": "fail",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1266807446_0",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_0",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+      "fullName": "P1-35 synthetic migration source contracts R2 reads unmarked dogfood metadata conservatively and preserves current marked rows",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_1",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+      "fullName": "P1-35 synthetic migration source contracts R4 never promotes operator-chosen ATTESTED legacy provenance",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_2",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+      "fullName": "P1-35 synthetic migration source contracts current public claim envelopes bypass the legacy classifier",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_3",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+      "fullName": "P1-35 synthetic migration source contracts post-fix assurance without an envelope classifies as R5 self-reported",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_4",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+      "fullName": "P1-35 synthetic migration source contracts post-fix assurance lazy claim stays self-reported instead of using current observed fallback",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_5",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "fullName": "P1-35 synthetic migration source contracts dry-run and signed persistent relabel preserve synthetic originals and append no records on repeat",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_6",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "fullName": "P1-35 synthetic migration source contracts an edited signed log line refuses further relabelling without changing originals",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_0_7",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+      "fullName": "P1-35 synthetic migration source contracts a tampered migration receipt signature refuses its log and any further append",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "1266807446_1",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals",
+      "fullName": null,
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_1_0",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+      "fullName": "P1-35 genuine v1.1.1 generated originals actual old classifier inputs retain R1 to R5 labels and the genuine L3/certificate gaps",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "1266807446_1_1",
+      "name": "tests/migration/legacyRelabel.test.ts P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+      "fullName": "P1-35 genuine v1.1.1 generated originals real relabelling preserves every decoded file and old SQLite bytes with explicit owned trust enrollment",
+      "filepath": null,
+      "state": "fail",
+      "hooks": {},
+      "errors": [
+        {
+          "stack": "Error: legacy bundle public-key view member size exceeds the 3000000-byte limit\n    at inspectTarGzipArchive (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/security/safeTarArchive.ts:143:13)\n    at fixtureTrust (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:205:58)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:457:47\n    at owned (/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:65:11)\n    at /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts:456:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)",
+          "message": "legacy bundle public-key view member size exceeds the 3000000-byte limit",
+          "constructor": "Function<Error>",
+          "name": "Error",
+          "toString": "Function<toString>",
+          "stacks": [
+            {
+              "method": "inspectTarGzipArchive",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/security/safeTarArchive.ts",
+              "line": 143,
+              "column": 13
+            },
+            {
+              "method": "fixtureTrust",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 205,
+              "column": 58
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 457,
+              "column": 47
+            },
+            {
+              "method": "owned",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 65,
+              "column": 11
+            },
+            {
+              "method": "",
+              "file": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/migration/legacyRelabel.test.ts",
+              "line": 456,
+              "column": 11
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

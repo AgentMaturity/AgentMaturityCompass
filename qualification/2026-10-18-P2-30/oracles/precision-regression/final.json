@@ -1,0 +1,24 @@
+{
+  "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+  "committedProductFiles": [
+    "tests/catalog/stations/technology/fixtures.test.ts",
+    "tests/catalog/stations/technology/nis2Drill.ts"
+  ],
+  "sourceStatusOutsideQualification": "",
+  "red": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/red.json",
+  "greenBeforeCommit": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/green.json",
+  "restoredGreenAtCommit": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-governance-20261018T101140268794Z/restored-green.json",
+  "standardFreshMutationIndex": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/mutations-post-governance.json",
+  "standardFreshMutationIndexSha256": "d681c848b004da7199829b994d28efd148946372a24e5058b5155e6b4bde68ec",
+  "separatePrecisionMutation": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/nis2-precision-mutation.json",
+  "separatePrecisionMutationSha256": "964a13cc7bb6731d00ad35c500f71f9b973a8833873a31f8bfba663f9323e0f9",
+  "fixtureTable": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/fixture-results.json",
+  "fixtureTableSha256": "bc63d119740c98bb7dd1394d3c62ee73fab45c6db8e0e3703612de31c7b47451",
+  "fixtureCount": 82,
+  "localOracleCount": 26,
+  "exporterPreviousCopy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/refresh-fixture-results-before.mjs",
+  "exporterPreviousSha256": "53e97a5adc518071c06464bd6495f47b8e4cb4ff733391600ad5bbf499fbb610",
+  "exporterCurrentSha256": "ebdd476f11924a108049440ad0297394c6f37b5fcf66a7dc1dee935d0c0bf570",
+  "exporterChange": "Historical source comparison recognizes only the exact NIS2 precision refinement in addition to the prior visibility change. It explicitly marks historical NIS2 whole-file equality false; fresh exact-restoration checks and the 3-record index contract are unchanged.",
+  "fullSuiteOr21ChecksRunByAgent": false
+}

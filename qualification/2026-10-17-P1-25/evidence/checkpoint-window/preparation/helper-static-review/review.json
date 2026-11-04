@@ -1,0 +1,227 @@
+{
+  "schema": "p125k-independent-static-helper-review/1",
+  "at": "2026-10-16T23:33:37.712909+00:00",
+  "blockers": [],
+  "staticOnly": true,
+  "sealedOutputRowsVerified": 19,
+  "authorLogicalInputRowsVerified": 45,
+  "authorUniqueInputPaths": 23,
+  "runtimeAudit": {
+    "exactPinnedPriorObserverRetained": true,
+    "literalThreeFileOrderAndUnchangedVerifierOption": true,
+    "newGrantAndCheckpointMarkersRecordedWithoutDereference": true,
+    "zeroSkipRawObserverHookNaturalClosureRulesRetained": true,
+    "qualityDiagnosticIsNotGatePass": true
+  },
+  "sourceControl": {
+    "fullActiveSourceReadBytes": 19265,
+    "actualRuntimeProtectedSchemaDirectlyMatched": true,
+    "prechange142RecordUnchanged": true,
+    "onlyOwnGrantSuccessor": {
+      "old": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "bytes": 27505,
+        "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+        "dev": 16777231,
+        "inode": 543583997,
+        "nlink": 1
+      },
+      "new": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+        "bytes": 2964,
+        "sha256": "c8c8901449610883c5a7a73d6b8f38de65a833824deb912b67c6255d1973caca",
+        "dev": 16777231,
+        "inode": 543583997,
+        "nlink": 1
+      },
+      "privateOriginal": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/original-tsaGrant.test.ts.source.txt",
+        "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/original-tsaGrant.test.ts.source.txt",
+        "bytes": 27505,
+        "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+        "dev": 16777231,
+        "inode": 543658573,
+        "nlink": 1
+      },
+      "originalGitCommits": [
+        "188681b32dc472983404dce19e7833cd76ee7576",
+        "3468e29027c32209a5f794b7ffea3f1565de490e"
+      ],
+      "other141RowsExact": true,
+      "all142CurrentBytesRehashed": true
+    },
+    "oldNineNativePhysicalPinsRehashed": true,
+    "futureDistinctTenthRequiredNotClaimed": true,
+    "selectedNames94Prior73Retained": true,
+    "compiledPairs19PreservationOnly": true,
+    "fourInactiveMarkersNoGuardRelaxation": true,
+    "canonicalRegularSingleLinkAndSelectedNativeAliasRejection": true,
+    "noFollowFdAndPathIdentityBeforeSoleInPlaceWrite": true,
+    "exclusiveOriginalPreparedLivePatchAndResultRecords": true,
+    "actualClosedSame21ZeroSkipGreenPrerequisitesRequired": true,
+    "actualRedAllFailuresManualClassificationBeforeExplicitRestore": true,
+    "restore1Same21GreenBeforeOperator2": true,
+    "restore2GreenFinalSnapshotSeparateRootActions": true,
+    "noAutoRestoreRetryTimerSignalOrProductExecutionAdded": true,
+    "allInheritedPrechangeHeadStatusFieldsRemainHistoricalNotFutureCommitProof": true
+  },
+  "adaptations": [
+    {
+      "helper": "audit-observed.py",
+      "oldPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/audit-observed.py",
+        "bytes": 1799,
+        "sha256": "0671f636048bb159b449362c00ad1949174be12160421b3f0ed81eadc93db359"
+      },
+      "newPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-audit-preparation/audit-observed.py.source.txt",
+        "bytes": 2165,
+        "sha256": "3fa420420119af3654c1fe6e6c4ccccdae7c5a4e7f0e2d51a0bc1229cd2f3c3e"
+      },
+      "patchPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-audit-preparation/audit-observed.py.adaptation.patch.txt",
+        "bytes": 2237,
+        "sha256": "863dc8bf2e27aa2632507b6b00583b7cc2e52cac97d9d16727f777c7ea7fba1a"
+      },
+      "exactTextDelta": true
+    },
+    {
+      "helper": "capture-quality.mjs",
+      "oldPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/capture-quality.mjs",
+        "bytes": 913,
+        "sha256": "771f83b3dd6578c45791a556f2d4768b9b6eb74f7b515882588e99b6c2e43005"
+      },
+      "newPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-audit-preparation/capture-quality.mjs.source.txt",
+        "bytes": 918,
+        "sha256": "66cae1aaf6712d83b23a0b69f74d09edb97edcf264999576ac4dc488830e8dda"
+      },
+      "patchPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/runtime-audit-preparation/capture-quality.mjs.adaptation.patch.txt",
+        "bytes": 861,
+        "sha256": "86bbe9dd3cf0567690fbb1615991c75fadfd9149f45d549b78dfa84edad78c02"
+      },
+      "exactTextDelta": true
+    },
+    {
+      "helper": "source-control.py",
+      "oldPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/source-control.py",
+        "bytes": 15919,
+        "sha256": "8725ba26ae7d0fb7b8a66cba763c14caddc66b07ec6426008232a3e59f046147"
+      },
+      "newPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control.py.source.txt",
+        "bytes": 19265,
+        "sha256": "7aecaaa15175013ccf6b2c4d2f54b6a4ca7921a3af407cfed57e0fcbf2c37be0"
+      },
+      "patchPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control.py.adaptation.patch.txt",
+        "bytes": 13690,
+        "sha256": "0db855c28dda6225180663ca0b3b4512f13d0ac835ccc6d6c0e4b6c7e7548093"
+      },
+      "exactTextDelta": true
+    },
+    {
+      "helper": "check-preservation.py",
+      "oldPin": {
+        "path": "/private/tmp/p1-25-grant-qualification-20261017/fresh-control-preparation/check-preservation.py",
+        "bytes": 1457,
+        "sha256": "4255f6d908e3ce5cf8eda86ef301d6c92ccefb97793a09fe8a36beba92de274c"
+      },
+      "newPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/check-preservation.py.source.txt",
+        "bytes": 1462,
+        "sha256": "4f06779e8dad11811fc17976651b7d14938f1c093d4534a545f453241f404c7c"
+      },
+      "patchPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/check-preservation.py.adaptation.patch.txt",
+        "bytes": 1150,
+        "sha256": "1de7011d6af37c881410356490d8c446d037a48a966d7b1ef8df2c189931d043"
+      },
+      "exactTextDelta": true
+    }
+  ],
+  "recipes": [
+    {
+      "id": "OMIT-CHECKPOINT-EVENT",
+      "originalPin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+      },
+      "targetLine": 118,
+      "expectedFirstTestLine": 268,
+      "patchPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/OMIT-CHECKPOINT-EVENT.patch.txt",
+        "bytes": 692,
+        "sha256": "306cdbc514e272f0840850d28f82f2f9dff5c5c48311e596613292bbfbfea222"
+      },
+      "exactOnceMatchAndWholeMutantHashCheckedInMemory": true,
+      "mutantNotStoredExecutedParsedOrCompiled": true,
+      "futureRuntimeFailureCount": null
+    },
+    {
+      "id": "OMIT-REQUIRED-PENDING-REFUSAL",
+      "originalPin": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db"
+      },
+      "targetLine": 152,
+      "expectedFirstTestLine": 316,
+      "patchPin": {
+        "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/OMIT-REQUIRED-PENDING-REFUSAL.patch.txt",
+        "bytes": 656,
+        "sha256": "11d398c5b5ac9e64079e217bfb241be3ff0e5cb572405fe35a47cc6bb86b7b62"
+      },
+      "exactOnceMatchAndWholeMutantHashCheckedInMemory": true,
+      "mutantNotStoredExecutedParsedOrCompiled": true,
+      "futureRuntimeFailureCount": null
+    }
+  ],
+  "futureCommitFreshRootHooksAndFailureTotalsRemainUnfilled": true,
+  "gitOriginalReadRecords": [
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "188681b32dc472983404dce19e7833cd76ee7576:tests/time/tsaGrant.test.ts"
+      ],
+      "exit": 0,
+      "stdoutBytes": 27505,
+      "stdoutSha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "--no-optional-locks",
+        "-C",
+        "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass",
+        "show",
+        "3468e29027c32209a5f794b7ffea3f1565de490e:tests/time/tsaGrant.test.ts"
+      ],
+      "exit": 0,
+      "stdoutBytes": 27505,
+      "stdoutSha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+      "stderr": ""
+    }
+  ],
+  "noRuntimeOrSensitivityCredit": true,
+  "noSourceIndexQaOrReservationWritesOrProbes": true,
+  "noSigningKeysPrivateRunStreamsOrGeneratedSigningOutputRead": true,
+  "allHoldsF37FreezeQualityIntact": true,
+  "boundaries": [
+    "The fixed21 inventory is a required future cohort size, not a predicted control outcome.",
+    "Root must admit/copy the exact inert helpers and later bind actual source commit, built files, fresh root and physical identities.",
+    "Static recipe feasibility is not an observed failure or compiler/control result.",
+    "The historical closed B36 packet is preserved; this review neither reopens it nor requires its old own metadata successors to match live source."
+  ]
+}

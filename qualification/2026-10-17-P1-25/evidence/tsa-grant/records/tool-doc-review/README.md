@@ -1,0 +1,9 @@
+# OpenSSL4.0.3 installed documentation review
+
+No concrete documentation blocker was found for the unchanged two-case candidate. The read-only selection record identifies `/opt/homebrew/bin/openssl` as the path selected by the frozen environment, resolving to OpenSSL4.0.3. This differs from the originally reviewed3.6.5 docs and is recorded explicitly; this author did not execute either tool.
+
+The4.0.3 req/x509 manuals still document every candidate key/certificate option. OpenSSL4 removed automatic SKI/AKI generation, but the candidate explicitly requests the root SKI and leaf SKI/AKI. Its root CA:true/pathlen0/keyCertSign profile can issue an end-entity TSA leaf; the leaf explicitly requests critical sole timeStamping EKU and digitalSignature. Both extfile and extension section are supplied, so4.0's broader default-config extension lookup is not relied upon.
+
+The ts manual retains reply-from-query and original-query/root verification, SHA256 signer/digest settings, ESS SHA256, cert-request chain inclusion, critical timeStamping and serial semantics. The candidate uses none of4.0's removed engine/crypto_device features. Default-provider documentation lists RSA support and implicit activation when no provider is explicitly activated; the fixture's own config contains no provider activation/include.
+
+These are documented contracts, not observed token bytes, provider availability or successful OpenSSL/AMC interoperability. Query nonce/certReq handling, exact config, certificate generation, signature algorithm, actual verification and natural closure still require execution. No docs give a key-generation/signing/closure upper bound, so the existing10s client/30s body fit is unproven. The candidate and its five sealed outputs remain byte-exact. No source, environment, dependency, CI, key, socket, child or held decision was changed.

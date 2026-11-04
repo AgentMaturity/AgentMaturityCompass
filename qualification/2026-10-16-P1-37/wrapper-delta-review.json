@@ -1,0 +1,79 @@
+{
+  "schema": "p137-post-typecheck-wrapper-independent-delta/1",
+  "capturedUtc": "2026-10-16T10:52:20.893761+00:00",
+  "oldWrapper": {
+    "path": "/private/tmp/p1-03-journal-qualification-20261016/post-typecheck-halt-run-prepared.py",
+    "bytes": 12312,
+    "sha256": "90501440d5e16ff4584faa673e5c02bbae6a306a2052421fd2243dce062044fd"
+  },
+  "newWrapper": {
+    "path": "/private/tmp/p1-37-qualification-20261016/post-typecheck-run-prepared.py",
+    "bytes": 13593,
+    "sha256": "db4eedc8a92405a19fd1368e1a77ecaba713d668cb55456af81cbdb0c2832d01"
+  },
+  "retainedExactPatch": {
+    "path": "/private/tmp/p1-37-qualification-20261016/post-typecheck-wrapper.patch",
+    "bytes": 2535,
+    "sha256": "e8c5b928326c51c0de9ef14671e51aab33a7656269c0c4ff33b16555d30030bc"
+  },
+  "normalizedByteEqualityAfterOnlyApprovedChanges": true,
+  "patchExactlyMatchesActualDiff": true,
+  "changes": {
+    "base": [
+      "/private/tmp/p1-03-post-typecheck-20261016",
+      "/private/tmp/p1-37-post-typecheck-20261016"
+    ],
+    "journal": [
+      "/private/tmp/p1-03-post-typecheck-commands-20261016.jsonl",
+      "/private/tmp/p1-37-post-typecheck-commands-20261016.jsonl"
+    ],
+    "addedPrerequisite": "    # P1-37 test compiler exit2 remains preserved in the prior halted namespace.\n    p137_certificate = Path('/private/tmp/p1-37-qualification-20261016/compiler-natural-closure.json')\n    require(pin(p137_certificate)['sha256'] == 'a0d667b589c87a8237f40c820d82c8ae414235b2e7577c48a8c585b00537f3d4', 'P137 compiler closure certificate changed')\n    p137_closed = json.loads(p137_certificate.read_text())\n    require(p137_closed['childExit'] == 2 and p137_closed['wrapperExit'] == 70\n            and p137_closed['ownedGroupAbsentByESRCH'] and p137_closed['errno'] == errno.ESRCH\n            and not p137_closed['signalsOtherThanZeroSent'], 'P137 compiler natural closure unresolved')\n    require(len(p137_closed['freshOwnedProbes']) == 2 and\n            all(p['absentByESRCH'] and p['errno'] == errno.ESRCH and p['signal'] == 0\n                for p in p137_closed['freshOwnedProbes']), 'P137 fresh closure probes unresolved')\n    for closed_pin in p137_closed['pins']:\n        require(pin(Path(closed_pin['path'])) == closed_pin, 'Preserved P137 compiler halt evidence changed')\n    require(probe(p137_closed['ownedPgid'])['absentByESRCH'], 'P137 compiler owned group is present; stop')\n    # sourceAtClosure is historical evidence; only the admitted test typing is to be repaired.\n"
+  },
+  "preservedChecks": [
+    "Both existing historical closure-certificate hashes, artifact pins and fresh owned-group ESRCH prerequisites are byte-identical.",
+    "The normal child-exit whitelist remains [0,1]; positive exit2 still halts at70.",
+    "Popen start_new_session, unbounded natural child.wait and bounded5s/50ms owned PGID signal0 polling are unchanged.",
+    "Original reporters, raw producer argument validation and exclusive byte-identical snapshot semantics are unchanged.",
+    "Inherited environment and explicit private HOME/Node22 override policy are unchanged; no isolation claim.",
+    "ACTIVE/HALTED stop, write-once phase metadata, no automatic retry, source restoration or cleanup on uncertainty remain unchanged.",
+    "No original halted namespace or marker is rewritten or deleted."
+  ],
+  "newPrerequisite": {
+    "certificate": {
+      "path": "/private/tmp/p1-37-qualification-20261016/compiler-natural-closure.json",
+      "bytes": 4968,
+      "sha256": "a0d667b589c87a8237f40c820d82c8ae414235b2e7577c48a8c585b00537f3d4"
+    },
+    "currentPreservedPinsAllMatch": true,
+    "childExitRequired": 2,
+    "wrapperExitRequired": 70,
+    "signalZeroFreshCertificateObservationsRequired": 2,
+    "freshActualOwnedGroupProbeRequired": true,
+    "historicalSourceAtClosureNotEnforced": true,
+    "reason": "The frozen compiler source snapshot retains the defective test for historical evidence. It is not a mandate to restore that test after a separately admitted narrow typing correction. Product/guard preservation remains separately root-owned."
+  },
+  "frozenReporter": {
+    "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+    "bytes": 2110,
+    "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+  },
+  "priorIndependentAudit": {
+    "path": "/private/tmp/p1-37-qualification-20261016/compiler-closure-independent-audit/review.json",
+    "bytes": 7397,
+    "sha256": "f089f5a58d01062e03849460ae183dac6a0684fc94320ae15d6cc79b501361c9"
+  },
+  "newNamespaceExistsAtRead": false,
+  "newJournalExistsAtRead": false,
+  "admissionConclusion": "No static delta blocker found. Root may admit preparation and use of this separate namespace after reviewing the closed natural-closure audit and the separately authorized test typing repair. All immutable prerequisite pins and fresh owned-group probes must still pass when invoked. The old halted namespace remains preserved and cannot resume.",
+  "blockingFindings": [],
+  "allReadsFinished": true,
+  "sourceOrRepositoryWrites": false,
+  "wrapperExecuted": false,
+  "amcRuntimeExecuted": false,
+  "formalAcceptanceClosed": false,
+  "limits": [
+    "Static text comparison only; no syntax/import/compile/execution of either wrapper.",
+    "Admission is for the distinct namespace under unchanged lifecycle guards, not a green compiler result.",
+    "No universal detached-descendant absence claim."
+  ]
+}

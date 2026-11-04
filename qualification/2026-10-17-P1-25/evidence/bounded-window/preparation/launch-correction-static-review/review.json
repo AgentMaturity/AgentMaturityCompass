@@ -1,0 +1,139 @@
+{
+  "schema": "p125w-m1-launch-chronology-correction-independent-review/1",
+  "at": "2026-10-17T00:17:40.364731+00:00",
+  "blockers": [],
+  "bindingCorrection": {
+    "old": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.before-sequential-correction.json",
+      "bytes": 5670,
+      "sha256": "85a6ba5bad5918d06a6539248349076d7b7b735ca5bb83dfae916d14f449c8dc",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.before-sequential-correction.json",
+      "dev": 16777231,
+      "inode": 543813897,
+      "nlink": 1
+    },
+    "new": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.json",
+      "bytes": 5681,
+      "sha256": "17f3feea4252208ec67fbd6845a56fbac5aeb8a994fdc40cd693fe0687198a8f",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/control-root-bindings.json",
+      "dev": 16777231,
+      "inode": 543812594,
+      "nlink": 1
+    },
+    "singleExactTextReplacement": true,
+    "onlyJsonFieldChanged": "phases.mutants[0]",
+    "oldValue": "p125w-m1",
+    "newValue": "p125w-m1-sequential",
+    "sourceCommit": "f11a15ae06a318e0ce9a4c778269b2020af4eb7c",
+    "allOtherFieldsAndOriginalFormattingExact": true,
+    "existingActualSourceFreshHashesUnchanged": true,
+    "noNewFutureOutcomeHashAdopted": true,
+    "oldApplyRecordBindingHashMatchesPreservedOldBytes": true,
+    "historicalActiveBindingInodeNotConfusedWithArchivedCopy": true
+  },
+  "actualChronology": {
+    "applyStartedUtc": "2026-10-17T00:15:29.094163+00:00",
+    "originalTestStartedUtc": "2026-10-17T00:15:30.351354+00:00",
+    "applyClosedUtc": "2026-10-17T00:15:30.398453+00:00",
+    "originalTestClosedUtc": "2026-10-17T00:15:34.077553+00:00",
+    "testLaunchBeforeApplyClosureMicroseconds": 47099,
+    "testLaunchBeforeApplyClosureMs": "47.099",
+    "applyNaturalExitRecorded": 0,
+    "originalTestExit": 1,
+    "originalTestOwnedGroupAbsentByESRCH": true,
+    "originalTestSignalsOtherThanZeroSent": false,
+    "cannotInferWriteCompletionFromEarlyApplyRecordAtField": true
+  },
+  "originalDiagnosticRun": {
+    "phase": "p125w-m1",
+    "total": 22,
+    "passed": 21,
+    "failed": 1,
+    "skipped": 0,
+    "failure": {
+      "file": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts",
+      "fullName": "P1-25 real signed ledger checkpoint transitions derives a genuine two-checkpoint window and inclusive default and zero-tolerance reader boundaries",
+      "status": "failed",
+      "failureMessages": [
+        "AssertionError: expected 'attested-upper-bound' to be 'attested-window' // Object.is equality\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:445:41\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:184:7\n    at withCheckpointWorkspace (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:124:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:336:7\n    at withGrantFixture (/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/tsaTestFixture.ts:311:5)\n    at /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-8MW1gn/checkout/tests/time/checkpointWindow.test.ts:335:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+      ]
+    },
+    "fullRawObserverAndLogReadAndPinned": true,
+    "qualificationOrSensitivityCredit": false,
+    "notCountedAsCanonicalRequiredSequentialRed": true,
+    "whyExcluded": "The dependent test launched before the actual apply helper closure, violating the explicit sequential action protocol even though both subsequently closed and the expected failure was observed."
+  },
+  "retention": {
+    "diagnosis": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/m1-launch-order-diagnosis.json",
+      "bytes": 2314,
+      "sha256": "abb0b91b712e69491077266d607bd0e02c03526327a00c0fcd48884d4d3d8814",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/m1-launch-order-diagnosis.json",
+      "dev": 16777231,
+      "inode": 543813898,
+      "nlink": 1
+    },
+    "applyAction": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/control-action-apply1.json",
+      "bytes": 3845,
+      "sha256": "fe64b55095aa7a0142dccb2eec937b5c62d3a74cfc4f1c078af0659432f4cbe6",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-action-apply1.json",
+      "dev": 16777231,
+      "inode": 543812619,
+      "nlink": 1
+    },
+    "applyRecord": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/m1-apply.json",
+      "bytes": 3627,
+      "sha256": "56aef37660697ce450fcb36877fbe3f7089036d05555e12e6a0a86003a569cbf",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/m1-apply.json",
+      "dev": 16777231,
+      "inode": 543812618,
+      "nlink": 1
+    },
+    "preparedRecord": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/m1-apply-prepared.json",
+      "bytes": 4036,
+      "sha256": "c1b4518c8156a1d2c2f72f47c6e97cf205c6802ac11ef292b487a5f85240c0df",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/m1-apply-prepared.json",
+      "dev": 16777231,
+      "inode": 543812608,
+      "nlink": 1
+    },
+    "originalCommand": {
+      "path": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-m1/command.json",
+      "bytes": 2806,
+      "sha256": "f6a4d1eee6fd92bfb9767384871cf77320de2b556e08c0340a280675b3077923",
+      "physicalPath": "/private/tmp/p1-39-post-typecheck-20261016/command-p125w-m1/command.json",
+      "dev": 16777231,
+      "inode": 543813848,
+      "nlink": 1
+    },
+    "originalRawObserverLogRetained": true,
+    "sameAppliedMutantRecorded": "492cbca9163651bee10387953dba73420e81c31393a5292f68fa2f2f23c51335",
+    "rootPreservationAttestations": "Root diagnosis records exact expected live Q mutant, one Q dirty source path,151physical pins,11natives and94/19 selection. This narrow review verifies retained records and unchanged helper/runtime/fresh binding pins; it does not rerun that full preservation check.",
+    "unchangedActiveSourceControlHelper": {
+      "path": "/private/tmp/p1-25-window-qualification-20261017/source-control.py",
+      "bytes": 21942,
+      "sha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32",
+      "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-control.py",
+      "dev": 16777231,
+      "inode": 543812593,
+      "nlink": 1
+    }
+  },
+  "sequentialSuccessorBoundary": {
+    "phase": "p125w-m1-sequential",
+    "rootReportedExecSessionAtAssignment": 69121,
+    "successorCommandOutcomeRawObserverPublicFilesNotProbedOrRead": true,
+    "closureOrRuntimeCredit": false,
+    "mustLaterObserveNaturalClosureActualErrorsMaskingManualClassificationExactRestoreAndSameCohortGreen": true,
+    "notAProductTestOrGuardChange": true,
+    "correctionDoesNotReapplyRestoreRetryOrLaunchAnything": true
+  },
+  "noHelperRuntimeProductionSourceCompiledNativeDeadlineGuardOrReservationMutationByReview": true,
+  "noProductHelperTestOpenSslNativeSqlNetworkProcessProbeOrMissingReservationProbeExecution": true,
+  "sourceIndexQaOrClaudeWrites": false,
+  "verdict": "The one-field prospective phase correction is exact and preserves the original diagnostic history. The original run remains excluded from sequential control qualification; the successor requires separate actual closure and evidence review."
+}

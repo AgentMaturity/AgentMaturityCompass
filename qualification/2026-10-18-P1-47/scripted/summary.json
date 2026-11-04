@@ -1,0 +1,709 @@
+{
+  "schemaVersion": "2026-09-08",
+  "comparisonId": "p1-47-pilot-scripted",
+  "evidenceClass": "automated-command-and-oracle-observations",
+  "ranking": null,
+  "superiorityFactor": null,
+  "groups": [
+    {
+      "targetId": "amc-native",
+      "laneId": "scripted",
+      "laneKind": "keyless-conformance",
+      "requestedTrials": 20,
+      "commandsExecuted": 20,
+      "determinate": 20,
+      "passed": 8,
+      "failed": 12,
+      "unavailable": 0,
+      "inconclusive": 0,
+      "observedTaskOutcomes": {
+        "passed": 8,
+        "failed": 12,
+        "unknown": 0
+      },
+      "reportedModelCalls": {
+        "called": 20,
+        "notCalled": 0,
+        "unknown": 0,
+        "source": "adapter-observation"
+      },
+      "budgetUnknown": 0,
+      "oraclePassRate": 0.4,
+      "latencyMsIncludingFailedAndInconclusiveExecutions": {
+        "samples": 20,
+        "mean": 142268.35,
+        "median": 232177.5,
+        "p95": 232510,
+        "unknown": 0
+      },
+      "inputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "outputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheReadTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheWriteTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costUsd": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costSources": [],
+      "usageSources": [],
+      "humanInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedFixtureInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "humanEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "falsePositives": {
+        "recordedTrials": 20,
+        "unknownTrials": 0,
+        "count": 12,
+        "eligible": 34,
+        "rate": 0.35294117647058826
+      },
+      "scenarios": [
+        {
+          "scenario": "success",
+          "executed": 13,
+          "determinate": 13
+        },
+        {
+          "scenario": "refusal",
+          "executed": 3,
+          "determinate": 3
+        },
+        {
+          "scenario": "tool-error-attribution",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "crash-recovery",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "injection",
+          "executed": 2,
+          "determinate": 2
+        }
+      ],
+      "missingConformanceScenarios": [
+        "redaction",
+        "budget-exhaustion",
+        "cancellation",
+        "resume",
+        "tampering",
+        "child-identity",
+        "unsupported-capability"
+      ]
+    },
+    {
+      "targetId": "pi-contained",
+      "laneId": "scripted",
+      "laneKind": "keyless-conformance",
+      "requestedTrials": 20,
+      "commandsExecuted": 20,
+      "determinate": 20,
+      "passed": 20,
+      "failed": 0,
+      "unavailable": 0,
+      "inconclusive": 0,
+      "observedTaskOutcomes": {
+        "passed": 20,
+        "failed": 0,
+        "unknown": 0
+      },
+      "reportedModelCalls": {
+        "called": 20,
+        "notCalled": 0,
+        "unknown": 0,
+        "source": "adapter-observation"
+      },
+      "budgetUnknown": 0,
+      "oraclePassRate": 1,
+      "latencyMsIncludingFailedAndInconclusiveExecutions": {
+        "samples": 20,
+        "mean": 5351.4,
+        "median": 3903,
+        "p95": 8196,
+        "unknown": 0
+      },
+      "inputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "outputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheReadTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheWriteTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costUsd": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costSources": [],
+      "usageSources": [],
+      "humanInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedFixtureInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "humanEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "falsePositives": {
+        "recordedTrials": 20,
+        "unknownTrials": 0,
+        "count": 0,
+        "eligible": 54,
+        "rate": 0
+      },
+      "scenarios": [
+        {
+          "scenario": "success",
+          "executed": 13,
+          "determinate": 13
+        },
+        {
+          "scenario": "refusal",
+          "executed": 3,
+          "determinate": 3
+        },
+        {
+          "scenario": "tool-error-attribution",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "crash-recovery",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "injection",
+          "executed": 2,
+          "determinate": 2
+        }
+      ],
+      "missingConformanceScenarios": [
+        "redaction",
+        "budget-exhaustion",
+        "cancellation",
+        "resume",
+        "tampering",
+        "child-identity",
+        "unsupported-capability"
+      ]
+    },
+    {
+      "targetId": "pi-contained-amc",
+      "laneId": "scripted",
+      "laneKind": "keyless-conformance",
+      "requestedTrials": 20,
+      "commandsExecuted": 20,
+      "determinate": 20,
+      "passed": 0,
+      "failed": 20,
+      "unavailable": 0,
+      "inconclusive": 0,
+      "observedTaskOutcomes": {
+        "passed": 0,
+        "failed": 20,
+        "unknown": 0
+      },
+      "reportedModelCalls": {
+        "called": 20,
+        "notCalled": 0,
+        "unknown": 0,
+        "source": "adapter-observation"
+      },
+      "budgetUnknown": 0,
+      "oraclePassRate": 0,
+      "latencyMsIncludingFailedAndInconclusiveExecutions": {
+        "samples": 20,
+        "mean": 11299.3,
+        "median": 10574.5,
+        "p95": 15355,
+        "unknown": 0
+      },
+      "inputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "outputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheReadTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheWriteTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costUsd": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costSources": [],
+      "usageSources": [],
+      "humanInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedFixtureInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "humanEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "falsePositives": {
+        "recordedTrials": 20,
+        "unknownTrials": 0,
+        "count": 54,
+        "eligible": 54,
+        "rate": 1
+      },
+      "scenarios": [
+        {
+          "scenario": "success",
+          "executed": 13,
+          "determinate": 13
+        },
+        {
+          "scenario": "refusal",
+          "executed": 3,
+          "determinate": 3
+        },
+        {
+          "scenario": "tool-error-attribution",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "crash-recovery",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "injection",
+          "executed": 2,
+          "determinate": 2
+        }
+      ],
+      "missingConformanceScenarios": [
+        "redaction",
+        "budget-exhaustion",
+        "cancellation",
+        "resume",
+        "tampering",
+        "child-identity",
+        "unsupported-capability"
+      ]
+    },
+    {
+      "targetId": "pi-contained-tuned",
+      "laneId": "scripted",
+      "laneKind": "keyless-conformance",
+      "requestedTrials": 20,
+      "commandsExecuted": 20,
+      "determinate": 20,
+      "passed": 20,
+      "failed": 0,
+      "unavailable": 0,
+      "inconclusive": 0,
+      "observedTaskOutcomes": {
+        "passed": 20,
+        "failed": 0,
+        "unknown": 0
+      },
+      "reportedModelCalls": {
+        "called": 20,
+        "notCalled": 0,
+        "unknown": 0,
+        "source": "adapter-observation"
+      },
+      "budgetUnknown": 0,
+      "oraclePassRate": 1,
+      "latencyMsIncludingFailedAndInconclusiveExecutions": {
+        "samples": 20,
+        "mean": 4310.35,
+        "median": 3353,
+        "p95": 5622,
+        "unknown": 0
+      },
+      "inputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "outputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheReadTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheWriteTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costUsd": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costSources": [],
+      "usageSources": [],
+      "humanInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedFixtureInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "humanEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "falsePositives": {
+        "recordedTrials": 20,
+        "unknownTrials": 0,
+        "count": 0,
+        "eligible": 54,
+        "rate": 0
+      },
+      "scenarios": [
+        {
+          "scenario": "success",
+          "executed": 13,
+          "determinate": 13
+        },
+        {
+          "scenario": "refusal",
+          "executed": 3,
+          "determinate": 3
+        },
+        {
+          "scenario": "tool-error-attribution",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "crash-recovery",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "injection",
+          "executed": 2,
+          "determinate": 2
+        }
+      ],
+      "missingConformanceScenarios": [
+        "redaction",
+        "budget-exhaustion",
+        "cancellation",
+        "resume",
+        "tampering",
+        "child-identity",
+        "unsupported-capability"
+      ]
+    },
+    {
+      "targetId": "pi-contained-amc-tuned",
+      "laneId": "scripted",
+      "laneKind": "keyless-conformance",
+      "requestedTrials": 20,
+      "commandsExecuted": 20,
+      "determinate": 20,
+      "passed": 0,
+      "failed": 20,
+      "unavailable": 0,
+      "inconclusive": 0,
+      "observedTaskOutcomes": {
+        "passed": 0,
+        "failed": 20,
+        "unknown": 0
+      },
+      "reportedModelCalls": {
+        "called": 20,
+        "notCalled": 0,
+        "unknown": 0,
+        "source": "adapter-observation"
+      },
+      "budgetUnknown": 0,
+      "oraclePassRate": 0,
+      "latencyMsIncludingFailedAndInconclusiveExecutions": {
+        "samples": 20,
+        "mean": 13376.5,
+        "median": 13487.5,
+        "p95": 17874,
+        "unknown": 0
+      },
+      "inputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "outputTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheReadTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "cacheWriteTokens": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costUsd": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "costSources": [],
+      "usageSources": [],
+      "humanInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedFixtureInterventions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "humanEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "automatedEvidencePreparationActions": {
+        "samples": 0,
+        "mean": null,
+        "median": null,
+        "p95": null,
+        "unknown": 20
+      },
+      "falsePositives": {
+        "recordedTrials": 20,
+        "unknownTrials": 0,
+        "count": 54,
+        "eligible": 54,
+        "rate": 1
+      },
+      "scenarios": [
+        {
+          "scenario": "success",
+          "executed": 13,
+          "determinate": 13
+        },
+        {
+          "scenario": "refusal",
+          "executed": 3,
+          "determinate": 3
+        },
+        {
+          "scenario": "tool-error-attribution",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "crash-recovery",
+          "executed": 1,
+          "determinate": 1
+        },
+        {
+          "scenario": "injection",
+          "executed": 2,
+          "determinate": 2
+        }
+      ],
+      "missingConformanceScenarios": [
+        "redaction",
+        "budget-exhaustion",
+        "cancellation",
+        "resume",
+        "tampering",
+        "child-identity",
+        "unsupported-capability"
+      ]
+    }
+  ]
+}

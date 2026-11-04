@@ -1,0 +1,380 @@
+{
+  "kind": "P0-20 signing qualification independent read-only review",
+  "reviewedAt": "2026-10-14T20:05:04.757824+00:00",
+  "sourceAtCapturedQualification": "534460ab6d23ad28c15b1bfdbba3a6caac285ebe",
+  "worktree": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass",
+  "result": "No actionable findings in the assigned test and retained signing evidence.",
+  "actionableFindings": [],
+  "scope": [
+    "Only new tests/industryPackAuditSigningQualification.test.ts and retained signing evidence/private compiled copies.",
+    "No product execution, tests, builds, dependency operations, live dist reads, source edits, guard changes or source release."
+  ],
+  "test": {
+    "path": "/Users/sid/.codex/worktrees/p0-20-qualification/AgentMaturityCompass/tests/industryPackAuditSigningQualification.test.ts",
+    "sha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7",
+    "reportPath": "/private/tmp/p0-20-signing-first-20261015.json",
+    "reportSha256": "a3e92cc0b7ce53530c01a6cf1a6b7bc9119ec207faa3c3acd36b9ae59a277b13",
+    "counts": {
+      "numTotalTests": 21,
+      "numPassedTests": 21,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0
+    },
+    "success": true,
+    "all21AssertionsPassed": true
+  },
+  "fixtureControls": {
+    "pinsCapturedAt": "2026-10-14T19:58:27.534Z",
+    "signedAfterPinsAt": "2026-10-14T19:58:27.540Z",
+    "pinsBeforeSigningBySourceAndRecordedTime": true,
+    "publicPinFileSha256": "85b62b9a5f3046a4e110bd171df4406697cbdc6afeae648da803677ded62294b",
+    "locationPinHashMatches": true,
+    "auditorId": "207f46d9032e2970da8e184cdc6dfb6967356fe5e2f968f8d6df441b99553c69",
+    "foreignId": "ace69c5261cb1dd9a04f1236bda6dd61ba40e5e024e461ea63ad7a2d1e2a32b2",
+    "independentKeys": true,
+    "genuineSignatureControls": [
+      {
+        "name": "signed",
+        "envelopePublicKeyMatchesPreviouslyRecordedPin": true,
+        "envelopeFingerprintMatchesPin": true,
+        "auditFingerprintMatchesPin": true,
+        "envelopeSignatureMatchesBodySignature": true,
+        "signedTs": 1792007907538
+      },
+      {
+        "name": "foreign",
+        "envelopePublicKeyMatchesPreviouslyRecordedPin": true,
+        "envelopeFingerprintMatchesPin": true,
+        "auditFingerprintMatchesPin": true,
+        "envelopeSignatureMatchesBodySignature": true,
+        "signedTs": 1792007907539
+      },
+      {
+        "name": "attackerEnvelope",
+        "envelopePublicKeyMatchesPreviouslyRecordedPin": true,
+        "envelopeFingerprintMatchesPin": true,
+        "auditFingerprintMatchesPin": true,
+        "envelopeSignatureMatchesBodySignature": true,
+        "signedTs": 1792007907540
+      }
+    ],
+    "attackerRetainsExactUnsignedABody": true,
+    "tamper": {
+      "firstControlBefore": {
+        "level": 3,
+        "status": "ADEQUATE"
+      },
+      "firstControlAfter": {
+        "level": 5,
+        "status": "PASS"
+      },
+      "retainsOriginalSignature": true,
+      "changesReceiptHash": true,
+      "baselineRetainedResult": "checksum true; signature false; integrity fail; DIGEST_MISMATCH and SIGNATURE_INVALID; trusted false; verdictExitCode asserted 1"
+    }
+  },
+  "noPromotion": {
+    "all20RecordedClaims": "self_reported, eligibleLevel 1, result not_evaluated, evidence incomplete",
+    "all20VerifierDimensions": "scope, freshness, completeness and satisfaction remain not-evaluated",
+    "recordedObservations": 20,
+    "observedAuditFileHashesMatch": true,
+    "syntheticControl": "No-answer baseline is synthetic_example with no eligible level and no signature; signing refusal tested.",
+    "exitSemanticsAsserted": "A admitted: 0. Genuine B unpinned: 1 strict/allow-unanchored; 2 with allow-unpinned (including both). Signed B under independently captured B pin: 0. Unsigned: 1 under all four combinations. Rechecksummed tamper: 1."
+  },
+  "privateCausal": {
+    "metadataPath": "/private/tmp/p0-20-private-audit-causal-fixture-20261015.json",
+    "metadataSha256": "575206191668d81e523d1d8048494653dc311a6615b99aa546ee1a0028425aa6",
+    "privateRoot": "/private/tmp/p0-20-private-audit-causal-84cu5u5a",
+    "exactTenPinnedFileImports": true,
+    "noRelativeImports": true,
+    "sameRoutingInAllMutants": true,
+    "activeRestoredExactly": true,
+    "restoredSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+    "phases": [
+      {
+        "phase": "baseline",
+        "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/baseline.json",
+        "sha256": "ce12ecae31dff573066d28da2183adc524b2186f1f7bf2bb7975924a2fd0d625",
+        "counts": {
+          "total": 4,
+          "passed": 4,
+          "failed": 0
+        },
+        "moduleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "retainedModuleMatches": true,
+        "beforeAfterPinsEqual": true,
+        "originalInputsUnchangedCaptured": true,
+        "inputsMatchRetainedPublicFiles": true,
+        "exactPrivateMutation": null,
+        "failures": []
+      },
+      {
+        "phase": "digest-check-removed",
+        "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/digest-check-removed.json",
+        "sha256": "8b0745c66fe3416013f7bde878d4a2df4ea46f80814d9777bea08a34d90d28fe",
+        "counts": {
+          "total": 4,
+          "passed": 3,
+          "failed": 1
+        },
+        "moduleSha256": "5ad64ff756e6b8f52db2611e3e3d2e9eaca2aad3c0dd8c0fdb8c76c9ffab6529",
+        "retainedModuleMatches": true,
+        "beforeAfterPinsEqual": true,
+        "originalInputsUnchangedCaptured": true,
+        "inputsMatchRetainedPublicFiles": true,
+        "exactPrivateMutation": "Remove only the explicit digest comparison/error from the copied verifier; crypto still checks the freshly recomputed digest.",
+        "failures": [
+          {
+            "name": "tamper-rechecksum",
+            "constraints": {
+              "refused": true,
+              "checksumStillPasses": true,
+              "signatureFails": true,
+              "digestDiagnostic": false,
+              "signatureDiagnostic": true
+            },
+            "ok": false,
+            "signatureOk": false,
+            "codes": [
+              "SIGNATURE_INVALID"
+            ]
+          }
+        ]
+      },
+      {
+        "phase": "auto-pin",
+        "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/auto-pin.json",
+        "sha256": "9f02e54a5cd6ce24dac3713aa97f8add97de235298c8ec59677e873a2eda5249",
+        "counts": {
+          "total": 4,
+          "passed": 2,
+          "failed": 2
+        },
+        "moduleSha256": "d19214c00d6b3cff3eaab6f7b2e5dc4869c506a73ff2f21633ad42bbc8d88da9",
+        "retainedModuleMatches": true,
+        "beforeAfterPinsEqual": true,
+        "originalInputsUnchangedCaptured": true,
+        "inputsMatchRetainedPublicFiles": true,
+        "exactPrivateMutation": "Add the embedded envelope signer as an artifact-seal explicit pin only inside the copied verifier checkDigestSignature call.",
+        "failures": [
+          {
+            "name": "foreign-strict",
+            "constraints": {
+              "refused": false,
+              "genuineIntegrity": true,
+              "unadmittedOtherIssuer": false,
+              "onlyAdmissionError": false
+            },
+            "ok": true,
+            "signatureOk": true,
+            "codes": []
+          },
+          {
+            "name": "attacker-strict",
+            "constraints": {
+              "refused": false,
+              "genuineIntegrity": true,
+              "unadmittedOtherIssuer": false,
+              "onlyAdmissionError": false
+            },
+            "ok": true,
+            "signatureOk": true,
+            "codes": []
+          }
+        ]
+      },
+      {
+        "phase": "restored",
+        "path": "/private/tmp/p0-20-private-audit-causal-84cu5u5a/restored.json",
+        "sha256": "5887d6f6cbc5e95cbf5a8fe2fdf7b7cc3cac70df00d306d4e86b5ec2cfc3383d",
+        "counts": {
+          "total": 4,
+          "passed": 4,
+          "failed": 0
+        },
+        "moduleSha256": "925a9e6db74dcbb8df076766d6458fced863800dbd70a2fa348c884d6ef637af",
+        "retainedModuleMatches": true,
+        "beforeAfterPinsEqual": true,
+        "originalInputsUnchangedCaptured": true,
+        "inputsMatchRetainedPublicFiles": true,
+        "exactPrivateMutation": null,
+        "failures": []
+      }
+    ],
+    "interpretation": {
+      "digest-check-removed": "3/4 is diagnostic sensitivity only. The sole failing constraint is missing DIGEST_MISMATCH; the changed body is still refused with SIGNATURE_INVALID. It does not demonstrate wrong acceptance.",
+      "auto-pin": "2/4 genuinely exposes self-trust: foreign-strict and attacker-strict become trusted/ok true under A context because copied verifier adds embedded B to explicitPins. Untouched and tamper controls still satisfy their expected constraints."
+    }
+  },
+  "sourcePins": [
+    {
+      "path": "src/domains/industryPackAudit.ts",
+      "sha256": "7827d4ea083df9720f20afc725e046492dec230a6ec03d372cd78f86c1c84c9d",
+      "currentSourceMatch": true
+    },
+    {
+      "path": "src/audit/binderSigner.ts",
+      "sha256": "b08f4f95cb172def287cbb089539939394ba26d7433d610df7a2bef4608a610d",
+      "currentSourceMatch": true
+    },
+    {
+      "path": "src/org/orgSigner.ts",
+      "sha256": "bdaa0eca7235251e66e653a1d1dd4d7d16e383581c01a6bc14d049d95c7f75cf",
+      "currentSourceMatch": true
+    },
+    {
+      "path": "src/trust/admission.ts",
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+      "currentSourceMatch": true
+    },
+    {
+      "path": "src/trust/signatureCheck.ts",
+      "sha256": "460aea518cdf88b219e75696e0e5244008f4739b5cbeaea42a370a2062d2a3b6",
+      "currentSourceMatch": true
+    },
+    {
+      "path": "tests/helpers/trustContext.ts",
+      "sha256": "0676937bf703563170b50fd24abca48ce9fe71454ed250cce2d127ee6d3c4eec",
+      "currentSourceMatch": true
+    },
+    {
+      "path": "tests/industryPackAudit.test.ts",
+      "sha256": "beeb9caa35b55ae2543764cb77bc02506608767be77b607a67b4736c3a8784f6",
+      "currentSourceMatch": true
+    },
+    {
+      "path": "tests/industryPackAuditSigningQualification.test.ts",
+      "sha256": "b55127e971dfe2dc6abe896afacb842831e88750110e719413a0bb189725fed7",
+      "currentSourceMatch": true
+    }
+  ],
+  "publicEvidenceFiles": [
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-admitted-control.audit.json",
+      "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-allow-unanchored.audit.json",
+      "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-allow-unpinned.audit.json",
+      "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-both-allows.audit.json",
+      "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/attacker-strict.audit.json",
+      "sha256": "dcabe9041f4fe68ca43b8c3ee45b8ee79237e442e60703446b61301e74b5cccb",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/claim-cap-3.audit.json",
+      "sha256": "87881fffdd5c3f608f38b3aa03f8059be9f650af825ad7830d5d81f15efbd59e",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/claim-cap-5.audit.json",
+      "sha256": "13a703ebb298d2f128f3e445698aee439df5c83fe452ef44d82557b65173611e",
+      "bytes": 21321
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-admitted-control.audit.json",
+      "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-allow-unanchored.audit.json",
+      "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-allow-unpinned.audit.json",
+      "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-both-allows.audit.json",
+      "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/foreign-strict.audit.json",
+      "sha256": "089d669ad07bdf7767d4dff4251484f2a8550b3ca1817251db3d3225d6619c4f",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/locator-false.audit.json",
+      "sha256": "4bbfbb54e7dba0f49a07df0c31762c3bdfde7baebbbb6859168951f34dc44996",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/locator-true.audit.json",
+      "sha256": "4bbfbb54e7dba0f49a07df0c31762c3bdfde7baebbbb6859168951f34dc44996",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/pins-before-signing.json",
+      "sha256": "85b62b9a5f3046a4e110bd171df4406697cbdc6afeae648da803677ded62294b",
+      "bytes": 2650
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/signed-after-pins.json",
+      "sha256": "89d551c1595977b84f32d38e46e898327a8022118de7c6ec58176205011564df",
+      "bytes": 127100
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/synthetic-refused.audit.json",
+      "sha256": "62f1936187523ba694a0dae4cd6b635bd5d313899f73b645ca0a885f32e628d6",
+      "bytes": 39617
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/tamper-rechecksum.audit.json",
+      "sha256": "e318b79f0ae7b43fdb8b290e1219aca57a2992824f7a88b25963bc495cf5ec09",
+      "bytes": 40595
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/unsigned-allow-unanchored.audit.json",
+      "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d",
+      "bytes": 39691
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/unsigned-allow-unpinned.audit.json",
+      "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d",
+      "bytes": 39691
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/unsigned-both-allows.audit.json",
+      "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d",
+      "bytes": 39691
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/unsigned-strict.audit.json",
+      "sha256": "e84d1d4019c523d280848c5c41e34f3433b32400f8d322a7b013e80f3aae6e8d",
+      "bytes": 39691
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/untouched.audit.json",
+      "sha256": "4bbfbb54e7dba0f49a07df0c31762c3bdfde7baebbbb6859168951f34dc44996",
+      "bytes": 40599
+    },
+    {
+      "path": "/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p0-20-signing-evidence-z6peVa/verification-observations.json",
+      "sha256": "015aabcf48fe86f2e6cd0ab1a8b74ec61f740a0ddc2f37600d1cada86045dcd8",
+      "bytes": 57168
+    }
+  ],
+  "limits": [
+    "21 source-helper tests and four standalone compiled-module observer checks do not establish final CLI, whole-suite, coverage, Node24 or P0-20 Done qualification.",
+    "No independent cryptographic rerun was performed in this read-only review; genuine signatures are established by the actual producer calls, B-pin positive controls and retained passing cryptographic assertions.",
+    "Built dependency pin equality is captured before/after by the retained phases; live dist was deliberately not read.",
+    "Restoring the private copied module does not approve any production repair, ownership release, frozen-path edit or acceptance change."
+  ]
+}

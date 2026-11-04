@@ -1,0 +1,23 @@
+{
+  "sourceHead": "e4bbdb66c6ee99ab266a7aae86380665d270139f",
+  "sourceStatus": " M tests/catalog/stations/technology/fixtures.test.ts\n M tests/catalog/stations/technology/nis2Drill.ts\n?? qualification/2026-10-18-P2-30/catalog-governance-integration.json\n?? qualification/2026-10-18-P2-30/catalog-version-authorization.json\n?? qualification/2026-10-18-P2-30/checks/\n?? qualification/2026-10-18-P2-30/content/\n?? qualification/2026-10-18-P2-30/counts-before.log\n?? qualification/2026-10-18-P2-30/counts-generation.log\n?? qualification/2026-10-18-P2-30/crosswalk-check.json\n?? qualification/2026-10-18-P2-30/docs/\n?? qualification/2026-10-18-P2-30/final-scope-audit.json\n?? qualification/2026-10-18-P2-30/generate-technology-content.mjs\n?? qualification/2026-10-18-P2-30/generated-counts-state.json\n?? qualification/2026-10-18-P2-30/implementation-deviations.json\n?? qualification/2026-10-18-P2-30/oracles/\n?? qualification/2026-10-18-P2-30/overlay-red.log\n?? qualification/2026-10-18-P2-30/register-scope-red.log\n?? qualification/2026-10-18-P2-30/resume-install.log\n?? qualification/2026-10-18-P2-30/run-checks.mjs\n?? qualification/2026-10-18-P2-30/run-full-suite-final.py\n?? qualification/2026-10-18-P2-30/run-post-governance-checks.mjs\n?? qualification/2026-10-18-P2-30/source-git-log.txt\n?? qualification/2026-10-18-P2-30/technology-citations.json\n?? qualification/2026-10-18-P2-30/tested-source-state.json\n",
+  "sourceStatusOutsideQualification": " M tests/catalog/stations/technology/fixtures.test.ts\n M tests/catalog/stations/technology/nis2Drill.ts\n",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/catalog/stations/technology/fixtures.test.ts",
+    "--maxWorkers=1"
+  ],
+  "node": "v22.23.3",
+  "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30",
+  "startedAtUtc": "2026-10-18T10:10:35.920104+00:00",
+  "durationSeconds": 7.005,
+  "exitCode": 0,
+  "guardSha256": "a492e8fb6b6722a5fe051456172221da698b03288c0d5632c34d506846bd9078",
+  "testSha256": "2cb2c9152b12e225dd3a472beecdbd63a9efb8f84d5513fdf458704f9027c760",
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/green.log",
+  "logSha256": "e69bf287d720e0068754c5d91374852ada413395faab1ea99b0ae2e255a6c6b2",
+  "focused135Passed": true
+}

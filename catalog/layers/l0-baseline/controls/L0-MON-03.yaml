@@ -1,0 +1,67 @@
+# Draft (P1-14): experimental, agent-drafted and not independently reviewed. Expert sign-off waits for D-08;
+# citations are unverified until fetched and hashed. A result under this control is evidence of conformity, never proof of compliance.
+id: L0-MON-03
+version: "0.1.0"
+support: experimental
+layer: 0
+family: monitoring-incidents-and-resilience
+stations: [education, environment, health, wealth, technology, mobility, governance]
+title: Kill switch with manual fallback
+statement: >-
+  An operator can stop all new protected effects within the profile's bound, with a manual fallback,
+  and drills record the time to stop.
+riskRationale: >-
+  Without a tested stop, an agent that misbehaves keeps acting while people look for the off switch.
+mandatory: true
+applicability:
+  predicate: { always: true }
+  reasons: [Layer 0 applies to every agent deployment in every station.]
+  exclusions: []
+citations: []
+binding:
+  kind: enforcement_point
+  points: [tool_pipeline]
+  mechanism: >-
+    An operator stop refuses every new protected call at the pipeline; a manual fallback stops the
+    runtime when the stop path fails.
+  parameters: []
+  manualDuty: null
+tests:
+  - id: L0-MON-03-T1
+    type: drill
+    oracle:
+      kind: enforcement_receipt
+      observes: The first refused call after the stop and the measured time to stop.
+    fixtures:
+      positive: [L0-MON-03/positive/evidence-valid.json]
+      negative:
+        - L0-MON-03/negative/evidence-contradictory.json
+        - L0-MON-03/negative/evidence-cross-tenant.json
+        - L0-MON-03/negative/evidence-empty.json
+        - L0-MON-03/negative/evidence-replayed.json
+        - L0-MON-03/negative/evidence-stale.json
+        - L0-MON-03/negative/evidence-violation.json
+    passCriteria: >-
+      After the stop no protected call runs and the drill records the time to stop. Today freezes exist
+      only as drift responses and an operator cannot start one.
+    attempts: 1
+evidence:
+  - id: L0-MON-03-E1
+    producer: amc.killSwitch
+    bindingFields: [deploymentId, controlId]
+    freshness: { maxAgeDays: 90 }
+    sampling: { method: all, ratePercent: null, minItems: 1 }
+    retention: { mode: regime_max }
+    residency: { mode: inherit_deployment }
+invalidatedBy: [deployment_version, policy_version]
+owner: { role: ciso }
+clock: null
+levels: [L2]
+crosswalk:
+  - framework: amc-audit-map-v1
+    clause: INCIDENT_RESPONSE_PREPAREDNESS.FREEZE_CONTROLS
+    relation: partial
+    rationale: >-
+      Freeze controls are tracked; the audit map does not drill an operator stop.
+review: { status: pending, expert: null, credential: null, reviewedAt: null, nextReview: null }
+provenance: { draftedBy: ai, draftedAt: "2026-10-11", approvedBy: null }

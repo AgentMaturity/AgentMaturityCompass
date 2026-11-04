@@ -87,7 +87,7 @@ Agents that proactively pause and request human input when encountering uncertai
 | AMC Evidence | Module | Questions |
 |---|---|---|
 | Architecture documentation | `docs/ARCHITECTURE_MAP.md` | AMC-2.9 |
-| Master reference | `docs/AMC_MASTER_REFERENCE.md` | — |
+| CLI command inventory (generated) | `docs/CLI_COMMAND_INVENTORY.md` | — |
 | Agent passport (per-agent technical profile) | `src/passport/` | — |
 | Compliance mapping: `euai_art11_technical_documentation` | `src/compliance/builtInMappings.ts` | — |
 

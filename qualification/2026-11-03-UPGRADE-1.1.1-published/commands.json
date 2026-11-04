@@ -1,0 +1,233 @@
+[
+  {
+    "label": "c01-init",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc init --skip-vault",
+    "exit": 0,
+    "durationMs": 1160
+  },
+  {
+    "label": "c02-score",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc run --score-only --json",
+    "exit": 0,
+    "durationMs": 978
+  },
+  {
+    "label": "c03-collect",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc evidence collect --first-run --agent default --runtime any -- node -e 'console.log(\"hello from a 1.1.1 agent\")'",
+    "exit": 0,
+    "durationMs": 753
+  },
+  {
+    "label": "c04-budgets-init",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc budgets init --agent default",
+    "exit": 0,
+    "durationMs": 656
+  },
+  {
+    "label": "c05-policy-action-init",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc policy action init",
+    "exit": 0,
+    "durationMs": 606
+  },
+  {
+    "label": "c06-governor",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc governor check --agent default --action READ_ONLY --risk low --mode execute",
+    "exit": 0,
+    "durationMs": 642
+  },
+  {
+    "label": "c07-verify-all",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc verify all --json",
+    "exit": 0,
+    "durationMs": 629
+  },
+  {
+    "label": "b01-backup-create",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc backup create --out <scratch>/final/pre-upgrade.amcbackup",
+    "exit": 0,
+    "durationMs": 972
+  },
+  {
+    "label": "u01-doctor",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc doctor --json",
+    "exit": 1,
+    "durationMs": 1259
+  },
+  {
+    "label": "u02-verify-unpinned",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc verify",
+    "exit": 1,
+    "durationMs": 980
+  },
+  {
+    "label": "u03-verify",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc verify --expect-monitor 1ed41404b6827f214c8cb4ca5aa4679841cefcf412dbc13346c9a3ea3cd59945",
+    "exit": 0,
+    "durationMs": 1075
+  },
+  {
+    "label": "u04-session-verify",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc session verify --expect-monitor 1ed41404b6827f214c8cb4ca5aa4679841cefcf412dbc13346c9a3ea3cd59945",
+    "exit": 0,
+    "durationMs": 1031
+  },
+  {
+    "label": "u05-run-score",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc run --score-only --json",
+    "exit": 0,
+    "durationMs": 1717
+  },
+  {
+    "label": "u06-governor",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc governor check --agent default --action READ_ONLY --risk low --mode execute",
+    "exit": 0,
+    "durationMs": 1101
+  },
+  {
+    "label": "u07-agent-loop-stub",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc --agent default agent-loop run 'Check recording after the upgrade.' --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512",
+    "exit": 1,
+    "durationMs": 1087
+  },
+  {
+    "label": "m01-history-migrate-monitor",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc vault history migrate --role monitor --expected-sha256 3155f50ca25d39afba7ec65f2953105f511ca5e7da55ddde03dd7e0567ecd147",
+    "exit": 0,
+    "durationMs": 1076
+  },
+  {
+    "label": "m01-history-migrate-auditor",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc vault history migrate --role auditor --expected-sha256 ff086129f08e9cc7ea8eb09c507a34e64b33bf9410157f63a15dced8ebdcb79d",
+    "exit": 0,
+    "durationMs": 990
+  },
+  {
+    "label": "m01-history-migrate-lease",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc vault history migrate --role lease --expected-sha256 665ef0312e54ca3d2843624e04cd71312e7fe1cf405b7487fdb87ea70f98dde1",
+    "exit": 0,
+    "durationMs": 1013
+  },
+  {
+    "label": "m01-history-migrate-session",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc vault history migrate --role session --expected-sha256 6d3650c112f01ab78bc67197bf25ca56afe7dcb13773f8d29c8830c30d73eb89",
+    "exit": 0,
+    "durationMs": 1018
+  },
+  {
+    "label": "m02-doctor",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc doctor --json",
+    "exit": 0,
+    "durationMs": 1270
+  },
+  {
+    "label": "m03-relabel-dry-run",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc verify --expect-monitor 1ed41404b6827f214c8cb4ca5aa4679841cefcf412dbc13346c9a3ea3cd59945 --relabel-legacy --dry-run",
+    "exit": 0,
+    "durationMs": 1038
+  },
+  {
+    "label": "m04-relabel",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc verify --expect-monitor 1ed41404b6827f214c8cb4ca5aa4679841cefcf412dbc13346c9a3ea3cd59945 --relabel-legacy",
+    "exit": 0,
+    "durationMs": 2626
+  },
+  {
+    "label": "m05-budgets-sign",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc budgets sign",
+    "exit": 0,
+    "durationMs": 1040
+  },
+  {
+    "label": "m06-agent-loop-stub",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc --agent default agent-loop run 'Check recording after the upgrade.' --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512",
+    "exit": 0,
+    "durationMs": 1127
+  },
+  {
+    "label": "m07-agent-loop-verify",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc agent-loop verify 569f3d88-cec3-4cc7-977f-0aa40f8820c7 --expect-monitor 1ed41404b6827f214c8cb4ca5aa4679841cefcf412dbc13346c9a3ea3cd59945",
+    "exit": 0,
+    "durationMs": 1103
+  },
+  {
+    "label": "m08-session-verify",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc session verify --expect-monitor 1ed41404b6827f214c8cb4ca5aa4679841cefcf412dbc13346c9a3ea3cd59945",
+    "exit": 0,
+    "durationMs": 1055
+  },
+  {
+    "label": "m09-verify-all",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc verify all --expect-monitor 1ed41404b6827f214c8cb4ca5aa4679841cefcf412dbc13346c9a3ea3cd59945",
+    "exit": 1,
+    "durationMs": 1029
+  },
+  {
+    "label": "m10-backup-verify",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc backup verify <scratch>/final/pre-upgrade.amcbackup --pubkey <scratch>/final/ws/.amc/keys/auditor_ed25519.pub",
+    "exit": 0,
+    "durationMs": 1046
+  },
+  {
+    "label": "m11-budgets-verify",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc budgets verify",
+    "exit": 0,
+    "durationMs": 948
+  },
+  {
+    "label": "s03-status",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc status",
+    "exit": 0,
+    "durationMs": 1018
+  },
+  {
+    "label": "s01-studio-start",
+    "cli": "1.2.0 (this line)",
+    "cmd": "amc studio start --bind 127.0.0.1 --port 47811 --dashboard-port 47812",
+    "exit": 0,
+    "durationMs": 2674
+  },
+  {
+    "label": "x01-vault-unlock-after-upgrade",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc vault unlock",
+    "exit": 1,
+    "durationMs": 640
+  },
+  {
+    "label": "x02-backup-after-upgrade",
+    "cli": "1.1.1 (published)",
+    "cmd": "amc backup create --out <scratch>/x01.amcbackup",
+    "exit": 1,
+    "durationMs": 574
+  }
+]

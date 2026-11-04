@@ -1,0 +1,66 @@
+{
+  "source": "58e91dcef111bf02f773dcbfd1921d428cf75e34",
+  "artifactCommit": "2d552741d727aaf3a26759b9df9343f7804d157a",
+  "capturedUtc": "2026-10-15T04:29:34.278221+00:00",
+  "rootGitStatus": "clean",
+  "committedPathsOnlyQualification": 149,
+  "rootOriginalSourceAndDist12268Exact": true,
+  "nativeExact": {
+    "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "bytes": 1931552,
+    "sha256": "1946ab352978b5b3493f99080dc04ed6d0a4157c511c7139cbf50b3d44d8d560",
+    "resolvedPath": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/node_modules/better-sqlite3/build/Release/better_sqlite3.node",
+    "device": 16777231,
+    "inode": 537685380,
+    "nlink": 1
+  },
+  "primaryHeadUnchanged": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "heldPendingMainUnchanged": "3b4a673c8f6fc11a947279054979e977f95b34d1",
+  "reservation": {
+    "path": "/private/tmp/claude-501/-Users-sid-AgentMaturityCompass/442cd919-61e6-4923-8fc9-c2ffc9937ca1/scratchpad/RESERVATIONS.md",
+    "bytes": 275376,
+    "sha256": "9ac6ae7493c2bf579218c5bd075042f423e52727950090bb1e3f39dbadb133ca"
+  },
+  "canonicalReceipt": {
+    "path": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass/qualification/2026-10-15-P0-30/receipt.json",
+    "bytes": 174161,
+    "sha256": "2ed188212d3537634ee0af4bd4ea7e51e04587c21adcb672aede3323e06b2398"
+  },
+  "postcommitChecks": [
+    {
+      "phase": "postcommit-normal-freeze",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:freeze",
+      "exit": 0,
+      "durationMs": 1781,
+      "startedUtc": "2026-10-15T04:28:44.970437+00:00",
+      "log": "/private/tmp/p0-30-postcommit-normal-freeze-20261015.log",
+      "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+    },
+    {
+      "phase": "postcommit-qualification",
+      "major": "22",
+      "cwd": "/Users/sid/.codex/worktrees/p0-30-qualification/AgentMaturityCompass",
+      "cmd": "pnpm run check:qualification",
+      "exit": 0,
+      "durationMs": 310,
+      "startedUtc": "2026-10-15T04:28:50.986136+00:00",
+      "log": "/private/tmp/p0-30-postcommit-qualification-20261015.log",
+      "head": "2d552741d727aaf3a26759b9df9343f7804d157a"
+    }
+  ],
+  "inboxAppend": {
+    "path": "/Users/sid/AgentMaturityCompass/AMC_OS/INBOX/REV_QA_LEAD.md",
+    "prefixBytes": 867783,
+    "prefixSha256": "e5986b428a8b565a124b9dc28aed6e888f435d83452ae251266a17fd5388495c",
+    "appendBytes": 2023,
+    "appendSha256": "fe09fbd6a851ff07d6ae2a70d4be813ff35883f21f62b4556b83fb002c78428b",
+    "newBytes": 869806,
+    "newSha256": "d262c7c652d0b2791a8da350f5c999933fef11038e419939eae23244b69710f7",
+    "prefixPreservedExact": true
+  },
+  "priorReferenceBoundary": "Frozen private/canonical indices retain pre-append inbox hash as point-in-time evidence; this explicit authorized append is a later metadata delta. No old index or artifact is edited.",
+  "next": "P0-25 existing-source qualification, no held data/ownership adoption.",
+  "formalAcceptanceClosed": false
+}

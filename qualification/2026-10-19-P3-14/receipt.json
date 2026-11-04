@@ -1,0 +1,333 @@
+{
+  "schemaVersion": 1,
+  "key": "P3-14",
+  "date": "2026-10-19",
+  "commit": "386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+  "branch": "codex/p3-14-solo-final",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "macOS-26.6.2-arm64-arm-64bit; local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npx --no-install vitest run --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/own-final-source-green-report.json tests/catalog/stations/governance",
+      "exit": 0,
+      "durationMs": 3112
+    },
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 46085
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 28363
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 41631
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 4540
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 739
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 440
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "exit": 0,
+      "durationMs": 1696
+    },
+    {
+      "cmd": "npm run -s check:citations",
+      "exit": 0,
+      "durationMs": 331
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 1713
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 213
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 182
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 577
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 280
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 1522
+    },
+    {
+      "cmd": "npm run -s check:catalog-currency",
+      "exit": 0,
+      "durationMs": 379
+    },
+    {
+      "cmd": "npm run -s check:catalog-changelog -- --base-ref dc8c34d0403c7e4d7513ad546f202574e3e78af8",
+      "exit": 0,
+      "durationMs": 780
+    },
+    {
+      "cmd": "npm run -s check:catalog-admission",
+      "exit": 0,
+      "durationMs": 1378
+    },
+    {
+      "cmd": "npm run -s check:industry-guides",
+      "exit": 0,
+      "durationMs": 805
+    },
+    {
+      "cmd": "npm run -s check:regulatory-calendar",
+      "exit": 0,
+      "durationMs": 236
+    },
+    {
+      "cmd": "npm run -s check:clean-source",
+      "exit": 0,
+      "durationMs": 57752
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 738
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 3325
+    },
+    {
+      "cmd": "npm run -s release:notes -- --check",
+      "exit": 0,
+      "durationMs": 191
+    },
+    {
+      "cmd": "npx --no-install vitest run --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/focused-final-source-report.json tests/catalog/stations/governance tests/catalog/governance tests/catalog/admission tests/catalog/compiler tests/usRegister.test.ts tests/wealthOverlay.test.ts tests/stationTaxonomy.test.ts tests/industryGuides.test.ts tests/industryGuidesGenerator.test.ts tests/deepIndustryPacksStations.test.ts tests/compilerStationDefaults.test.ts tests/starterProfiles.test.ts",
+      "exit": 0,
+      "durationMs": 35127
+    },
+    {
+      "cmd": "npx --no-install vitest run --maxWorkers=2 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/full-suite/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-final-v1/report.json",
+      "exit": 1,
+      "durationMs": 3398547
+    },
+    {
+      "cmd": "npx --no-install vitest run tests/apiRouterResponseParity.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-api-router-v1/report.json",
+      "exit": 1,
+      "durationMs": 8241
+    },
+    {
+      "cmd": "npx --no-install vitest run tests/publicDocsGraph.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-public-docs-v1/report.json",
+      "exit": 1,
+      "durationMs": 1212
+    },
+    {
+      "cmd": "npx --no-install vitest run tests/time/checkpointWindow.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-checkpoint-v1/report.json",
+      "exit": 1,
+      "durationMs": 3795
+    },
+    {
+      "cmd": "npx --no-install vitest run tests/time/tsaGrant.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/file-alone/baseline-tsa-grant-v1/report.json",
+      "exit": 1,
+      "durationMs": 2415
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts tests/catalog/stations/governance/fixtures.test.ts tests/catalog/stations/governance/overlay.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/initial-green/report.json",
+      "exit": 0,
+      "durationMs": 3640
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts tests/catalog/stations/governance/fixtures.test.ts tests/catalog/stations/governance/overlay.test.ts --maxWorkers=1 --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/restored-green/report.json",
+      "exit": 0,
+      "durationMs": 2456
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ compares\\ every\\ subject/control/version/plan\\ binding\\ field|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ an\\ actual\\ same\\-case\\ authorized\\ decision,\\ not\\ the\\ prompt\\ or\\ agent\\ recommendation|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ captures\\ actual\\ seeded\\ body\\ bytes\\ only\\ for\\ contracted\\ inference,\\ atomically|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ uses\\ only\\ the\\ ten\\ explicitly\\ synthetic\\ registered\\ IDs\\ and\\ blocks\\ unknown\\ filing|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ classifies\\ CUI\\ from\\ the\\ source\\ store\\ despite\\ no\\ marking;\\ binds\\ document\\ and\\ boundary\\ before\\ capture)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/01-shared-binding/report.json",
+      "exit": 1,
+      "durationMs": 461
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ lossy/impossible\\ UTC\\ time\\ 2026\\-10\\-18T12:00:00\\.0001Z|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/02-utc-precision/report.json",
+      "exit": 1,
+      "durationMs": 467
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/03-nonblank-fields/report.json",
+      "exit": 1,
+      "durationMs": 503
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ http://inference\\.fixture\\.invalid/v1|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ https://u:p@inference\\.fixture\\.invalid/v1|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ https://inference\\.fixture\\.invalid/v1\\?training=1|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ https://inference\\.fixture\\.invalid/a/\\.\\./v1|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ rejects\\ a\\ malformed\\ endpoint\\ even\\ when\\ both\\ request\\ and\\ configured\\ endpoint\\ agree:\\ https://inference\\.fixture\\.invalid/v1\\#x)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/04-canonical-endpoint/report.json",
+      "exit": 1,
+      "durationMs": 484
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ an\\ actual\\ same\\-case\\ authorized\\ decision,\\ not\\ the\\ prompt\\ or\\ agent\\ recommendation|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ binds\\ the\\ disclosure\\ and\\ appeal\\ notice;\\ refuses\\ a\\ future\\ human\\ decision)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/05-case-human-record/report.json",
+      "exit": 1,
+      "durationMs": 480
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ binds\\ the\\ disclosure\\ and\\ appeal\\ notice;\\ refuses\\ a\\ future\\ human\\ decision|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 1/negative/oracle\\-missing\\-appeal\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/06-case-notice/report.json",
+      "exit": 1,
+      "durationMs": 479
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ verifies\\ activation\\ bytes\\ against\\ the\\ independently\\ pinned\\ fixture\\ authority)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/07-activation-signature/report.json",
+      "exit": 1,
+      "durationMs": 484
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/08-fria-assessor/report.json",
+      "exit": 1,
+      "durationMs": 481
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/09-fria-authority/report.json",
+      "exit": 1,
+      "durationMs": 469
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ all\\ six\\ local\\ draft\\ FRIA\\ fields,\\ an\\ authorized\\ approval,\\ notification\\ and\\ strict\\ pre\\-use\\ chronology|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 2/negative/oracle\\-fria\\-late\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/10-fria-dates-ignored/report.json",
+      "exit": 1,
+      "durationMs": 489
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ captures\\ actual\\ seeded\\ body\\ bytes\\ only\\ for\\ contracted\\ inference,\\ atomically)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/11-canary-observed/report.json",
+      "exit": 1,
+      "durationMs": 489
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ captures\\ actual\\ seeded\\ body\\ bytes\\ only\\ for\\ contracted\\ inference,\\ atomically|Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ refuses\\ endpoint\\ ambiguity\\ https://inference\\.fixture\\.invalid\\.evil/v1|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 3/negative/oracle\\-telemetry\\-purpose\\.json|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 3/negative/oracle\\-training\\-purpose\\.json|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 3/negative/oracle\\-unlisted\\-endpoint\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/12-canary-egress/report.json",
+      "exit": 1,
+      "durationMs": 477
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ classifies\\ CUI\\ from\\ the\\ source\\ store\\ despite\\ no\\ marking;\\ binds\\ document\\ and\\ boundary\\ before\\ capture)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/13-cui-classification/report.json",
+      "exit": 1,
+      "durationMs": 476
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ classifies\\ CUI\\ from\\ the\\ source\\ store\\ despite\\ no\\ marking;\\ binds\\ document\\ and\\ boundary\\ before\\ capture|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 6/negative/oracle\\-public\\-endpoint\\.json|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 6/negative/oracle\\-unmarked\\-cui\\-store\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/14-cui-boundary/report.json",
+      "exit": 1,
+      "durationMs": 482
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ uses\\ only\\ the\\ ten\\ explicitly\\ synthetic\\ registered\\ IDs\\ and\\ blocks\\ unknown\\ filing|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 4/negative/oracle\\-unknown\\-citation\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/15-unknown-citation-accepted/report.json",
+      "exit": 1,
+      "durationMs": 475
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 5/negative/oracle\\-auto\\-reply\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/16-explanation-human/report.json",
+      "exit": 1,
+      "durationMs": 481
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ a\\ same\\-request\\ human\\ route\\ by\\ an\\ authorized\\ reviewer\\ within\\ the\\ inclusive\\ synthetic\\ window)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/17-explanation-identity/report.json",
+      "exit": 1,
+      "durationMs": 467
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 5/negative/oracle\\-unauthorized\\-reviewer\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/18-explanation-reviewer/report.json",
+      "exit": 1,
+      "durationMs": 485
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ synthetic\\ reference\\ protocols\\ \\(not\\ production\\ enforcement\\ or\\ legal\\ review\\)\\ requires\\ a\\ same\\-request\\ human\\ route\\ by\\ an\\ authorized\\ reviewer\\ within\\ the\\ inclusive\\ synthetic\\ window|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ 5/negative/oracle\\-late\\-route\\.json)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/19-explanation-window/report.json",
+      "exit": 1,
+      "durationMs": 477
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ actual\\ compiled\\ policy\\ \\(P3\\-14\\)\\ refuses\\ a\\ fixture\\ subject\\ outside\\ the\\ actual\\ compiled\\ deployment)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/20-adapter-subject-binding/report.json",
+      "exit": 1,
+      "durationMs": 1918
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/fixtures.test.ts --maxWorkers=1 --testNamePattern '(?:Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ caseworker:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ fria:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ canary:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ citation:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ explanation:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control|Canonical\\ Governance\\ oracle\\ envelopes\\ remain\\ empty\\ production\\ evidence\\ cui:\\ rejects\\ a\\ consistently\\ rebound\\ foreign\\ expected\\ control)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/21-expected-control-context/report.json",
+      "exit": 1,
+      "durationMs": 491
+    },
+    {
+      "cmd": "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p3-14-solo-mutations-386a9/node_modules/vitest/vitest.mjs run tests/catalog/stations/governance/compiledPolicy.test.ts --maxWorkers=1 --testNamePattern '(?:Governance\\ actual\\ compiled\\ policy\\ \\(P3\\-14\\)\\ refuses\\ a\\ nonselected\\ requirement\\ with\\ a\\ matching\\ compiled\\ subject)' --reporter=dot --reporter=json --outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/isolated-mutations/386a9a993a9c0997dbbe8c7b74bad9bf84760c46/solo-22-v1/mutations/22-adapter-not-applicable-requirement/report.json",
+      "exit": 1,
+      "durationMs": 1915
+    },
+    {
+      "cmd": "npx --no-install tsx /Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p3-14/solo-20261019/probe-governance-386a9.ts 386a9a993a9c0997dbbe8c7b74bad9bf84760c46",
+      "exit": 0,
+      "durationMs": 2009
+    }
+  ],
+  "tests": {
+    "total": 28032,
+    "passed": 28015,
+    "failed": 10,
+    "skipped": 7
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "abe0e192db8d729a75894d933cffe263d55eaf64c8cf0ca22751e3322bf5bcb0"
+    },
+    {
+      "path": "case-command.json",
+      "sha256": "2d2300b76c8624e8f8362699918091d76e3cc3d9bef58116e8fc93c5b13c83d4"
+    },
+    {
+      "path": "case-results.json",
+      "sha256": "fd49a19294486f5e936ece64e69f72e99b1f8a4c73183ff5de79f5924e571049"
+    },
+    {
+      "path": "checks.json",
+      "sha256": "b7f179ed8524e713df8879a5d43a760d949a8eab8a88d8a8c505536a2df254bc"
+    },
+    {
+      "path": "failure-classifications.json",
+      "sha256": "1b4d0ed83ec7cf58a7bb7f52dc80cf50d286097184a389f2dfb23f9af2661632"
+    },
+    {
+      "path": "full-suite.json",
+      "sha256": "342cebd4e82c93ade7e43ce6eb8a4920e9ec0040a4242aab79555a13ae93883a"
+    },
+    {
+      "path": "git-state.json",
+      "sha256": "cb5f10be92e2bfdb8ea78b63d744132d81c7d9c4e84346e7fb26a751491b0604"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "fab75c8b9c8b64b02425b920f434bc92c63ac5e3b50dfbb3c801baf2d097159f"
+    },
+    {
+      "path": "source-audit.json",
+      "sha256": "1ed9893f1e90ec41ec6db207801d206bce245e5a6a5b05a8e126e31f49e60c60"
+    }
+  ],
+  "notes": "Actual full exit1 and measured totals retained; exact current classification coverage complete. Receipt binds product386; its future receipt-only Q commit requires exact-Q23/full recheck, not claimed here. Supporting commands are deduplicated by actual record path+hash, preserving intended mutation assertion RED exits1, baseline reproduction exits1 and the actual full failure separately; none is converted to pass. Current23 ordinary checks, focused469, own176,22 intended mutations and70-case probe remain scoped. Experimental/unreviewed/promotion none; human/real-case/accessibility/licence obligations remain open. HistoricalD7/int9D and originalOct18 packet unchanged. Native validation NOT_RUN_AT_ASSEMBLY; later actual command/result recorded off-tree and handoff."
+}

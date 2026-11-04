@@ -1,0 +1,66 @@
+{
+  "sourceHead": "83641bceb68659737d7678daeff3fbb2728e2301",
+  "sourceHeadAfter": "83641bceb68659737d7678daeff3fbb2728e2301",
+  "sourceStatusBefore": "",
+  "sourceStatusAfter": "",
+  "cwd": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/publicDocsGraph.test.ts",
+    "--maxWorkers=1",
+    "--reporter=default",
+    "--reporter=json",
+    "--outputFile=/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/publicDocsGraph-report.json"
+  ],
+  "nodeVersion": "v22.23.3",
+  "nodePath": "/opt/homebrew/opt/node@22/bin/node",
+  "pnpmVersion": "10.33.0",
+  "platform": "macOS-26.6.2-arm64-arm-64bit",
+  "TMPDIR": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/runtime/p2-30-baseline",
+  "defaultBudgetsAndAssertions": true,
+  "vitestConfigSha256": "abebaa7aafcbc9a8a6321e4a9c1ee00b7e489e860c8295c5964de3632cd9d119",
+  "startedAtUtc": "2026-10-18T09:58:06.049649+00:00",
+  "finishedAtUtc": "2026-10-18T09:58:08.236254+00:00",
+  "durationSeconds": 1.996,
+  "exitCode": 1,
+  "resultCounts": {
+    "numTotalTestSuites": 2,
+    "numPassedTestSuites": 0,
+    "numFailedTestSuites": 2,
+    "numPendingTestSuites": 0,
+    "numTotalTests": 6,
+    "numPassedTests": 5,
+    "numFailedTests": 1,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": false
+  },
+  "failedAssertions": [
+    {
+      "name": "AMC public Docs graph every local guide edge resolves to another promoted guide",
+      "failureMessages": [
+        "AssertionError: expected [ { source: 'MCP_SERVER', \u2026(2) } ] to deeply equal []\n    at /Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/tests/publicDocsGraph.test.ts:70:21\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30-baseline/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    }
+  ],
+  "loadAverageBefore": [
+    32.994140625,
+    25.88818359375,
+    22.1806640625
+  ],
+  "loadAverageAfter": [
+    32.994140625,
+    25.88818359375,
+    22.1806640625
+  ],
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/publicDocsGraph.log",
+  "logSha256": "b9b111c8319413814aced7e81c41c1680d79d39d3a8031a6b9e7b82ba7b1ac4c",
+  "report": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/publicDocsGraph-report.json",
+  "reportSha256": "57817a006c82e574940db57fb9ba38f58d79c5c8715a9c39c91b07908d791b02",
+  "sourceComparison": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/baseline-p1-10f/source-comparison.json",
+  "sourceComparisonSha256": "d174f50d212c699d7c36c956c52801a10011ab9f6267a7f774253527db132e38",
+  "scope": "Only this requested baseline file; no candidate or baseline full suite executed."
+}

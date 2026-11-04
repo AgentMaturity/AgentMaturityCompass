@@ -308,8 +308,12 @@ this runner.
 The [three-harness coding workflow](../examples/harness-comparison/codingREADME.md)
 materializes real installed AMC, DSH and Pi bindings, shared repository repair
 tasks and a target-neutral module-output oracle. AMC executes natively; comparator
-packages are optional study inputs. Materialization and scripted protocol checks
-do not establish real-model performance.
+packages are optional study inputs. The oracle evaluates the model-written module
+only in a pinned container (no network, read-only, the nobody user, no mounts)
+and Pi runs only in a container. Without a container runtime both refuse ("not
+measured: containment unavailable") and never run on the host; the reviewed
+configuration's `containment` block names the runtime and image. Materialization
+and scripted protocol checks do not establish real-model performance.
 
 Keyless conformance scenarios cover success, refusal, injection, redaction,
 budget exhaustion, cancellation, crash recovery, tool-error attribution, resume,
@@ -323,8 +327,26 @@ installation actions, first useful verified task, explanation, cancel, resume
 and repeat-use cohorts distinct where they measure different things. Existing
 source-only audits of DSH, Pi, OpenCode, OpenHands, Goose, Claude Code and Codex
 can guide corpus selection; they do not establish artifact execution or an
-all-market ranking. See the dated
-[September source audit](../AMC_OS/RESEARCH/2026-09-08-dsh-pi/september-harness-usability-audit.md).
+all-market ranking. The September 2026 source audit is not in this repository and
+is not evidence; the 20-task pilot's committed corpus, method and measured gates
+are in [BENCHMARK_PILOT.md](BENCHMARK_PILOT.md).
+
+## The 20-task benchmark pilot (P1-47)
+
+[`examples/harness-comparison/pilot/`](../examples/harness-comparison/pilot/PLAN.md)
+holds the pilot plan, 17 new tasks (5 coding, 6 regulated-document, 6 fin-ops on
+P1-19's synthetic provider) beside the 3 coding tasks above, independent oracles,
+the target adapter for `amc-native` and contained Pi with and without AMC's Pi
+extension, the container escape checks, the scripted overhead micro-benchmark
+and `analyze.mjs`. One command runs a lane:
+
+```sh
+node examples/harness-comparison/pilot/run.mjs --lane live --config <operator.json> --out <new directory>
+```
+
+Pi runs only inside its container. Scripted runs debug the bindings and are
+never results. See [BENCHMARK_PILOT.md](BENCHMARK_PILOT.md) for what was measured
+and what still needs credentials or a model.
 
 `report.json`, `report.md`, `summary.json` and per-trial captures/receipts retain
 manifest and artifact digests, exact requested/ran/determinate counts, oracle
@@ -358,5 +380,7 @@ Ordinary parent-directory errors remain errors, not fabricated run results.
 
 This fixes output-leaf ownership, not ongoing hostile ancestor replacement or
 an OS filesystem sandbox. `tests/harnessComparisonOutputOwnership.test.ts`
-contains synthetic actual-runner admission regressions, authored but not run.
+contains synthetic actual-runner admission regressions; they ran 12/12 on
+2026-10-18 on a local macOS arm64 machine, not in CI
+(`qualification/2026-10-18-P1-47/`).
 No adapter, oracle, model, provider or human execution is authorized here.

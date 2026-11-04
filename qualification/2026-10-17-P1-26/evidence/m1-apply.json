@@ -1,0 +1,18 @@
+{
+  "operator": "M1-prefix-swap",
+  "sourceBefore": "053b6ffe1edc13fe8d604a2cedeae4872b802c3ebdade7234e1fe1b3875e6e35",
+  "mutant": "4526ad7242fdd7846e6bc0e837dc8a023a18d71ea226cf0d74187279e7d5942c",
+  "patchSha256": "4090ebed933b1cd862dac9ed8705cdde76ce051210d48675b83c2f0beb6af5bf",
+  "patchCapturedFromLiveMutant": true,
+  "at": "2026-10-16T20:51:02.500878+00:00",
+  "target": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/src/transparency/rfc9162.ts",
+  "sourceCommit": "32435b41d59e651ad2b259a59703cd137e5c925a",
+  "mode": "apply",
+  "compiledMutation": false,
+  "nativeMutation": false,
+  "automaticRestoreOrRetry": false,
+  "targetPhysicalPath": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-tqkNm6/checkout/src/transparency/rfc9162.ts",
+  "targetInode": 543356676,
+  "targetNlink": 1,
+  "regularSingleLinkCheckedBeforeWrite": true
+}

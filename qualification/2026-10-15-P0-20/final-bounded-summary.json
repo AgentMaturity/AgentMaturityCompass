@@ -1,0 +1,24 @@
+{
+  "source": "1291b900f2c345a55ee5b1800ec9c44cceb2bce4",
+  "tests": {
+    "numTotalTests": 300,
+    "numPassedTests": 300,
+    "numFailedTests": 0,
+    "numPendingTests": 0,
+    "numTodoTests": 0,
+    "success": true
+  },
+  "components": {
+    "originalCases": 260,
+    "newSigning": 21,
+    "newReader": 19
+  },
+  "compiledCli": {
+    "total": 12,
+    "passed": 10,
+    "failed": 2,
+    "failingExit": 70
+  },
+  "rawSha256": "6f2be6ee05d0d91e8132f29a74689835984b87746438947566d0ea87cd737118",
+  "limits": "Private proposal12-control witness is separate from accepted-source10/12. No full suite, coverage, Node24, HTTP-auth, hardware/live or release acceptance."
+}

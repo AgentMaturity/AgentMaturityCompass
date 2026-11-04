@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-46",
+  "date": "2026-10-18",
+  "commit": "cb1ce3a1ac10da634c95cf7b3f90512f04a2eaba",
+  "branch": "rtd/p1-46-f2-blueprints",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2), local macOS arm64, not CI",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "npm run -s build",
+      "exit": 0,
+      "durationMs": 46790
+    },
+    {
+      "cmd": "npm run -s typecheck",
+      "exit": 0,
+      "durationMs": 41639
+    },
+    {
+      "cmd": "npm run -s typecheck:tests",
+      "exit": 0,
+      "durationMs": 313024
+    },
+    {
+      "cmd": "npm run -s lint",
+      "exit": 0,
+      "durationMs": 6775
+    },
+    {
+      "cmd": "npm run -s check:counts",
+      "exit": 0,
+      "durationMs": 1826
+    },
+    {
+      "cmd": "npm run -s check:docs-drift",
+      "exit": 0,
+      "durationMs": 898
+    },
+    {
+      "cmd": "npm run -s check:freeze -- --base-ref int",
+      "exit": 0,
+      "durationMs": 3379
+    },
+    {
+      "cmd": "npm run -s check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 3176
+    },
+    {
+      "cmd": "npm run -s check:gates",
+      "exit": 0,
+      "durationMs": 783
+    },
+    {
+      "cmd": "npm run -s check:schemas",
+      "exit": 0,
+      "durationMs": 1360
+    },
+    {
+      "cmd": "npm run -s check:api-ref",
+      "exit": 0,
+      "durationMs": 356
+    },
+    {
+      "cmd": "npm run -s check:threat-model",
+      "exit": 0,
+      "durationMs": 530
+    },
+    {
+      "cmd": "npm run -s check:duplicates",
+      "exit": 0,
+      "durationMs": 1375
+    },
+    {
+      "cmd": "npm run -s check:dead-code",
+      "exit": 0,
+      "durationMs": 8887
+    },
+    {
+      "cmd": "node scripts/program/landing-slice-map.mjs --candidate 37c1466b32ed878ed89877fdcae2e3145d82d546 --base 8f57ce63d8331f1bef1c2a18fde82a7e8f4511da --rules docs/program/landing/slice-rules.json --out docs/program/landing/slice-map.json --check",
+      "exit": 0,
+      "durationMs": 7814
+    },
+    {
+      "cmd": "node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs int",
+      "exit": 0,
+      "durationMs": 608
+    },
+    {
+      "cmd": "npx vitest run tests/amc1464ProviderControlDocs.test.ts tests/amc1465AdapterCapabilityDocs.test.ts tests/amc1466HookActionLifecycleDocs.test.ts tests/amc1469ControlProjection.test.ts tests/amc1470ControlSimulation.test.ts tests/amc1472OutcomeOnboarding.test.ts tests/amc1479PolicyFixturesCi.test.ts tests/amc1480HookHealthDiagnostics.test.ts tests/businessFairScenario.test.ts tests/businessGrcExport.test.ts tests/businessRiskQuantification.test.ts tests/catalog/l0/catalogLoads.test.ts tests/compilerStationDefaults.test.ts tests/complyRiskClassifyDocs.test.ts tests/crossSurfaceBrandIdentity.test.ts tests/demoProspect.test.ts tests/desktopAppThemePackaging.test.ts tests/docsTruthReset.test.ts tests/genCountsSemantics.test.ts tests/maturityTaxonomyConsistency.test.ts tests/minimalStartupInit.test.ts tests/programLandingSliceMap.test.ts tests/publicCommandCountMetadata.test.ts tests/publicDistributionTruth.test.ts tests/publicDocsGraph.test.ts tests/publicLeaderboardExport.test.ts tests/publicQuestionCountDrift.test.ts tests/publicStatsDrift.test.ts tests/publishedCountsAccuracy.test.ts tests/releaseGateExecution.test.ts tests/releaseNotes.test.ts tests/wealthOverlay.test.ts tests/websiteContentValidation.test.ts",
+      "exit": 1,
+      "durationMs": 108899
+    },
+    {
+      "cmd": "npm run -s check:qualification",
+      "exit": 0,
+      "durationMs": 522
+    }
+  ],
+  "tests": {
+    "total": 239,
+    "passed": 238,
+    "failed": 1,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "e8c491c9c943bccad98a8e35f5fb9e2e69ffd93a65551149a4d22cb61fbfb13a"
+    },
+    {
+      "path": "focused-tests.json",
+      "sha256": "be1410555a7c6a43727b65c99f628c28f5a23a04402d83765d15fa510efd5080"
+    },
+    {
+      "path": "mutations.json",
+      "sha256": "9aa47f4033e9165d45cb04104a7e19524b25d49be0f5fd8fc0d2163410d7d2aa"
+    },
+    {
+      "path": "plan-digests.json",
+      "sha256": "7c6b9c45ff020d38049c4c7060e1f72ab91e779ca6173831235cf88068b1fef7"
+    }
+  ],
+  "notes": "Focused tests only; the full suite was not run here. The one focused failure, tests/publicDocsGraph.test.ts (PRICING links TRUST_LIST.md), is on int from P1-51 and P1-46 touches neither file. The vitest row exits 1 for that test. See README.md."
+}

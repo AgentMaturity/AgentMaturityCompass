@@ -1,0 +1,28 @@
+{
+  "capturedUtc": "2026-10-15T22:51:00.357965+00:00",
+  "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+  "rootReview": "Full original bodies and exact v2-to-v3 plus v3-to-v4 deltas and closed README; independent peer accepts combined lifecycle changes",
+  "files": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracle.mjs",
+      "bytes": 21328,
+      "sha256": "cd745ddae7cce98a5285be95d4cce815f542d3c9f218e976be5c374d3b5f858f",
+      "beforeSha256": "90a24dd18f8695efb2bdcee5ece5605c507690d3fe940edb3e7a4911e3eb43a8"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracleEvidence.mjs",
+      "bytes": 29832,
+      "sha256": "92b25937b06aef01367007961944d479cf6febad3e8b3da5d52094d8741ae869",
+      "beforeSha256": "4df67b11e019797c5b485bc91ed428d7f8c3f38b9da3f3cad08ba7c8a9e6526b"
+    }
+  ],
+  "D15": "Exact two paths none",
+  "priorVersionsPreserved": true,
+  "sourceV3EverApplied": false,
+  "testsRemainExactV4": true,
+  "activeIntervalDbWalKeyEquality": "Unchanged exact identity/presence/bytes/hash checks",
+  "preparation": "Actual read transaction first, exact DB/key/history and unchanged or absent-to-verified-empty WAL before cold verifier",
+  "noCopyRestoreCheckpointSignalsRetries": true,
+  "runtimeExecutedForV4": false,
+  "formalAcceptance": false
+}

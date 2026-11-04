@@ -1,0 +1,180 @@
+{
+  "issue": "P0-51",
+  "status": "Unresolved normative precedence conflict; no changed precedence or waived refusal",
+  "recordedUtc": "2026-10-14T18:28:31.717045+00:00",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "finalCommittedSource": "d8e5168556aeea8e8c12cbc67848839824edbb48",
+  "requirements": {
+    "goal": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-09.md",
+      "line": 44,
+      "text": "A signature counts only when the verifier operator pinned its key for that purpose and the key is neither revoked nor distrusted."
+    },
+    "orderedStep6": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-09.md",
+      "lines": [
+        159,
+        161,
+        162,
+        163
+      ],
+      "text": "Distrust first; a matching purpose-scoped explicit pin is admitted second; trust-list revocation is evaluated third. key-compromise wording says every signature."
+    },
+    "documentation": "docs/TRUST_LIST.md:3 repeats the broad goal;126\u2013130 repeat the ordered rules;136 now records the conflict explicitly."
+  },
+  "existingImplementation": {
+    "path": "src/trust/admission.ts",
+    "lines": [
+      116,
+      120,
+      121,
+      122,
+      126,
+      127,
+      130
+    ],
+    "behavior": "A matching explicit pin returns admitted/explicit-key before compromiseOf. Distrust remains first and cannot be overridden by a pin or allow flag.",
+    "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989",
+    "matchesAcceptedMain": true
+  },
+  "acceptedTestCoverage": {
+    "purposeScopedPins": "tests/trust/admission.test.ts:23\u201332",
+    "distrustBeatsExplicitPin": "tests/trust/admission.test.ts:35\u201340,70\u201373",
+    "listRevocationWithoutExplicitPin": "tests/trust/admission.test.ts:45\u201353,63\u201369",
+    "matchingExplicitPinPlusCompromiseTestRecovered": false,
+    "workspaceSelfDistinction": "tests/trust/trustContext.test.ts:119\u2013130 passes because workspaceSelfTrust operatorDistrust converts key-compromise entries into distrust; it does not establish general portable explicit-pin revocation precedence."
+  },
+  "actualCliRun": {
+    "result": {
+      "numTotalTests": 84,
+      "numPassedTests": 81,
+      "numFailedTests": 3,
+      "numPendingTests": 0,
+      "numTodoTests": 0
+    },
+    "rawReport": {
+      "path": "/private/tmp/p0-51-portable-cli-repaired-candidate-20261014.raw.json",
+      "sha256": "ee1b79b6506e6de3a6a909119ad1646472afb9bca40d808a38e4c2880f1174b5"
+    },
+    "qualificationReceipt": {
+      "path": "/private/tmp/p0-51-portable-cli-rebuilt-candidate-20261014.json",
+      "sha256": "2e191277c1e4fa942d472b2e56e0bc8f7e59d8c4fe58226d2dc0be30d1a4eda1"
+    },
+    "witnesses": [
+      {
+        "name": "license-revoked-pinned",
+        "expectedExit": 1,
+        "actualExit": 0,
+        "integrity": "pass",
+        "issuerAdmission": {
+          "status": "pass",
+          "signatures": [
+            {
+              "signature": "license signature",
+              "purpose": "artifact-seal",
+              "keyId": "3d6121520e63f34027ba7277a8ad8e7530b05154fc0f62d65014cfa89ae23037",
+              "status": "admitted",
+              "source": "explicit-key",
+              "listId": null,
+              "timeBasis": null,
+              "detail": null
+            }
+          ]
+        },
+        "trusted": true,
+        "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/license-revoked-pinned.stdout",
+        "stdoutSha256": "18c079032d7f6d3e4109570dbc471f0d94974816c5634faea91f0701d032bbeb",
+        "stderrPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/license-revoked-pinned.stderr",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "streamsHashVerified": true
+      },
+      {
+        "name": "imports-revoked",
+        "expectedExit": 1,
+        "actualExit": 0,
+        "integrity": "pass",
+        "issuerAdmission": {
+          "status": "pass",
+          "signatures": [
+            {
+              "signature": "profile signature",
+              "purpose": "evidence-authority",
+              "keyId": "cf68896b9568f5bf018a765dff68d4eb65e02bb7db94f817a86b3367d3773060",
+              "status": "admitted",
+              "source": "explicit-key",
+              "listId": null,
+              "timeBasis": null,
+              "detail": null
+            }
+          ]
+        },
+        "trusted": true,
+        "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/imports-revoked.stdout",
+        "stdoutSha256": "d103cab3418e6a3fd9947431469d6ee8832ad034549546ce8e2b8f82972fd821",
+        "stderrPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/imports-revoked.stderr",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "streamsHashVerified": true
+      },
+      {
+        "name": "session-revoked",
+        "expectedExit": 1,
+        "actualExit": 0,
+        "integrity": "pass",
+        "issuerAdmission": {
+          "status": "pass",
+          "signatures": [
+            {
+              "signature": "signed merkle root",
+              "purpose": "artifact-seal",
+              "keyId": "b1b3325d23468a4bfa3bb82c81507559aa9ba31b6328c3e7a7d92a7c294383b8",
+              "status": "admitted",
+              "source": "explicit-key",
+              "listId": null,
+              "timeBasis": null,
+              "detail": null
+            }
+          ]
+        },
+        "trusted": true,
+        "stdoutPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/session-revoked.stdout",
+        "stdoutSha256": "38a8ea34abf9bb188ab613ef700d777f4be493f075daac2982d1ee9bc127268a",
+        "stderrPath": "/private/tmp/amc-p0-51-portable-cli-PF1gTT/logs/session-revoked.stderr",
+        "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "streamsHashVerified": true
+      }
+    ],
+    "interpretation": "All three strict revocation-first refusal expectations remain RED: actual exit0 versus expected1, integritypass, trustedtrue and admitted/explicit-key. The genuine independently pinned license, authority-file import and session fingerprint witnesses exercise the implemented precedence, not parser or signature failure."
+  },
+  "qualificationBoundary": "Current behavior may be qualified against the detailed step6 order with the broader goal conflict retained. Full goal+step6 acceptance cannot both be claimed. Authoritative clarification is required before reversing precedence or waiving the three strict cases; a passing preexisting test is not design approval.",
+  "sourcePins": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/src/trust/admission.ts",
+      "sha256": "a06877c8f8c4e478c1f6841316752e7ba98db732eee0b16608699cb1176cd989"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/src/trust/trustContext.ts",
+      "sha256": "5129676e1ad79072b37034a129a4a3a091f0f5be84d80e7047c4b353b9f8c991"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/trust/admission.test.ts",
+      "sha256": "592b18d0d54dec607d110dc30ecd933e452be549f380c1e0da97ab70902a9653"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/trust/trustContext.test.ts",
+      "sha256": "c7dfd3e4acf4a23de4494802ec33a451eec889014c1c26072b976ea377811368"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/docs/TRUST_LIST.md",
+      "sha256": "d89e7b76819582e66869a8f8fb5eeac7fc5605f3c965908a79689b783cade100"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p0-51-qualification/AgentMaturityCompass/tests/portableVerifierCliQualification.test.ts",
+      "sha256": "86f45ab5601d53ae0dc274a52a113d7bb2cbdc9451c74c0e68668f46ce8e286f"
+    },
+    {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-09.md",
+      "sha256": "196a3dcbbcbb3b8d3f49aae88c7559c390c5224c5096a574b835266a7a58e8fd"
+    }
+  ],
+  "noMutations": "Read-only source/report/stream comparisons and new private note only; no source, tests, specs, trackers, original reports, compiled modules or protected records changed."
+}

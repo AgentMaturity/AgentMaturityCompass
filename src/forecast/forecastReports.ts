@@ -40,7 +40,7 @@ export function renderForecastMarkdown(forecast: ForecastArtifact): string {
     "## Unified Clarity",
     `- Maturity (now): ${num(forecast.series.maturityOverall.points.at(-1)?.value ?? 0)}`,
     `- Integrity (now): ${num(forecast.series.integrityIndex.points.at(-1)?.value ?? 0)}`,
-    `- Correlation (now): ${num(forecast.series.correlationRatio.points.at(-1)?.value ?? 0)}`,
+    `- Correlation (now): ${forecast.series.correlationRatio.points.length > 0 ? num(forecast.series.correlationRatio.points.at(-1)!.value) : "not measured"}`,
     "",
     "## Maturity Forecast",
     projectionLine("Short", forecast.series.maturityOverall.forecast.short),
@@ -67,6 +67,9 @@ export function renderForecastMarkdown(forecast: ForecastArtifact): string {
       : ["- none"]),
     "",
     "## ETA To Target",
+    ...(forecast.transformPlanInput ? [
+      `- Transform plan input: ${forecast.transformPlanInput.outcome}${forecast.transformPlanInput.reason ? ` (${forecast.transformPlanInput.reason})` : ""}`
+    ] : []),
     `- Status: ${forecast.etaToTarget.status}`,
     ...(forecast.etaToTarget.status === "OK"
       ? [

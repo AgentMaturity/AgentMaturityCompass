@@ -1,0 +1,94 @@
+{
+  "schema": "p125c-natural-stage-stop/1",
+  "at": "2026-10-16T21:45:44.277625+00:00",
+  "ordinaryAddExit": 1,
+  "reason": "git add names docs/internal ignored ancestor",
+  "commitAttempted": false,
+  "forceNotUsed": true,
+  "indexRetained": true,
+  "observations": [
+    {
+      "argv": [
+        "git",
+        "status",
+        "--porcelain=v1",
+        "--untracked-files=all"
+      ],
+      "exit": 0,
+      "stdout": "M  CONTRIBUTING.md\nM  README.md\nM  docs/content/reddit-launch-drafts.md\nM  docs/content/show-hn-draft.md\nM  docs/internal/competitive-landscape.md\nM  docs/internal/mirofish-simulation-council.md\nA  tests/time/tsaClient.test.ts\nM  website/i18n.js\nM  website/index.html\nM  website/lite.html\nM  whitepaper/AMC_WHITEPAPER_v1.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "CONTRIBUTING.md\nREADME.md\ndocs/content/reddit-launch-drafts.md\ndocs/content/show-hn-draft.md\ndocs/internal/competitive-landscape.md\ndocs/internal/mirofish-simulation-council.md\ntests/time/tsaClient.test.ts\nwebsite/i18n.js\nwebsite/index.html\nwebsite/lite.html\nwhitepaper/AMC_WHITEPAPER_v1.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "ls-files",
+        "--stage",
+        "--",
+        "docs/internal/competitive-landscape.md",
+        "docs/internal/mirofish-simulation-council.md"
+      ],
+      "exit": 0,
+      "stdout": "100644 f8bf81cce7384e8ca6aee609102a9995e51a7899 0\tdocs/internal/competitive-landscape.md\n100644 2c42bfe4e3631b1f5f088da1b47bdda0d704580a 0\tdocs/internal/mirofish-simulation-council.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "ls-tree",
+        "-r",
+        "HEAD",
+        "--",
+        "docs/internal/competitive-landscape.md",
+        "docs/internal/mirofish-simulation-council.md"
+      ],
+      "exit": 0,
+      "stdout": "100644 blob 3b170a9710c4b4bcaff58ddca791542755afcf70\tdocs/internal/competitive-landscape.md\n100644 blob 9a8a0fc799473474d1b74ffb2db734e859750c06\tdocs/internal/mirofish-simulation-council.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "check-ignore",
+        "-v",
+        "--no-index",
+        "--",
+        "docs/internal/competitive-landscape.md",
+        "docs/internal/mirofish-simulation-council.md"
+      ],
+      "exit": 0,
+      "stdout": ".gitignore:144:internal/\tdocs/internal/competitive-landscape.md\n.gitignore:144:internal/\tdocs/internal/mirofish-simulation-council.md\n",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "diff",
+        "--name-only"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "stdout": "e2cbdb909ad2ff4cf0b97577a3be3e66a70241b7\n",
+      "stderr": ""
+    }
+  ]
+}

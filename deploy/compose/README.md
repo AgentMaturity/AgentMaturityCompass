@@ -1,6 +1,6 @@
 # AMC Compose Deployment
 
-Both HTTP and TLS builds use the root Dockerfile `studio` target. The old `deploy/compose/Dockerfile` was removed. See the [source container guide](../../docker/README.md) for build, non-root volume ownership, and Linux qualification requirements.
+Both HTTP and TLS builds use the root Dockerfile `studio` target. Every AMC service mounts a named volume at `/home/amc/.config/amc/state` (`<AMC home>/state`), next to the workspace volume, so this machine's anti-rollback marks and key-set recovery copies survive a restart (P1-08, `docs/KEY_LIFECYCLE.md`). Keep it with the workspace volume when you back up or roll back, and never mount it into the workspace. The old `deploy/compose/Dockerfile` was removed. See the [source container guide](../../docker/README.md) for build, non-root volume ownership, and Linux qualification requirements.
 
 ## Prerequisites
 
@@ -57,7 +57,7 @@ The TLS stack explicitly starts notary with `--bind 0.0.0.0` so Studio can reach
 
 Studio waits for the notary's bounded `/readyz` healthcheck to report `READY`, including signer, log and auth-secret initialization. Readiness alone does not prove Studio holds the matching secret or can obtain a valid signature. The shared image smoke runs Studio with notary disabled.
 
-The separate [2026-09-08 optional-stack acceptance](../../AMC_OS/RESEARCH/2026-09-08-dsh-pi/optional-notary-tls-acceptance/README.md) exercised the actual Linux ARM containers with notary enabled: policy-bound `MERKLE_ROOT` signing, independent signature verification, missing/wrong authentication and checksum/replay refusal, identity persistence and fresh signing after restart, and trusted TLS Studio access with anonymous refusal. Its exact source, immutable images and configuration hashes are recorded. The probe used an isolated internal network, unique disposable volumes, and the local `localhost` CA; it does not claim public deployment, other platforms, hardware attestation or external-provider connectivity.
+The separate [2026-09-08 optional-stack acceptance](../../docs/OPTIONAL_NOTARY_TLS_ACCEPTANCE.md) exercised the actual Linux ARM containers with notary enabled: policy-bound `MERKLE_ROOT` signing, independent signature verification, missing/wrong authentication and checksum/replay refusal, identity persistence and fresh signing after restart, and trusted TLS Studio access with anonymous refusal. Its exact source, immutable images and configuration hashes are recorded. The probe used an isolated internal network, unique disposable volumes, and the local `localhost` CA; it does not claim public deployment, other platforms, hardware attestation or external-provider connectivity.
 
 ## Notary Mode (Fail-Closed Signing Boundary)
 
@@ -93,3 +93,29 @@ Add `-f docker-compose.studio-api.yml` after `-f docker-compose.tls.yml` to both
 The API shares the workspace read-only for industry-pack entitlements. License issuance remains refused unless its existing administrator token is explicitly configured by the operator. Quickscore is self-reporting, not signed evidence; the badge is a labelled placeholder. `/__amc/proxy-health` identifies the proxy, `/api/health` checks the standalone API, and `/readyz` checks Studio readiness. Proxy or API health does not prove a governed Studio turn.
 
 The API image target is additive; the default Docker target remains Studio. Use both Compose files consistently for lifecycle and rollback commands. Roll back to previously recorded immutable images while retaining workspace and Caddy volumes; do not use `down -v`. Qualify rollback on a disposable deployment before public use.
+
+## A4 Forge releases (preview)
+
+With `AMC_A4_PREVIEW=1`, an A4 project's Activate stage signs an agent package and records the release; AMC never runs these commands. In v1 a deployment is a same-host restart with a pinned image: the Compose overlay restarts this hosted Studio, the one that built the agent, whose data volume holds the agent's resources. A deployment receipt is recordable only for an agent built in this hosted Studio; an agent built elsewhere has no v1 deployment path (`DEPLOYMENT_NOT_SAME_HOST`), and installing a package into another workspace is P2-40. The package under `a4-releases/<projectId>/<releaseId>/` is the signed provenance record of what the workspace held at the release, not an installable. Back up `a4-releases/` and `a4-projects/` with the data volume: list both in the ops policy's `backups.includePaths` before proposing a release.
+
+The package's `deploy/` directory holds the prepared overlay `docker-compose.a4-<releaseId>.yml` and `deploy/plan.json`, which lists the steps, the receipt form and the known gaps and is signed `a4-deployment-plan`. Run the steps from this directory on the host that runs the Studio:
+
+```bash
+docker compose -f docker-compose.yml cp studio:/data/amc/a4-releases/<projectId>/<releaseId>/deploy/docker-compose.a4-<releaseId>.yml ./
+# Write the lease token (shown once by AMC) to ./secrets/amc_a4_lease_<releaseId>.txt with mode 0600; never commit it.
+docker compose -f docker-compose.yml exec studio amc doctor --strict --json
+docker compose -f docker-compose.yml -f docker-compose.a4-<releaseId>.yml up -d
+sha256sum docker-compose.a4-<releaseId>.yml
+```
+
+The overlay has these known limits:
+
+- The image is pinned by tag (`IMAGE_TAG_ONLY`, a WAITING item, never a blocker): AMC's bootstrap report records no digest of the image the Studio runs.
+- Decision D-03 keeps Compose documented, but it is not qualified: its CI qualification is pending (`TOPOLOGY_NOT_QUALIFIED`, a WAITING item, never a blocker).
+- The overlay sets `AMC_A4_PREVIEW=1`.
+- It moves the signed-journal checkpoint root to its own named volume at `/workspace`, outside the `/data/amc` workspace.
+- It mounts the lease token file as a Compose secret. Nothing in the Studio reads it; it is for the agent's gateway client.
+
+Record what happened with `POST /api/v1/a4/projects/<projectId>/releases/<releaseId>/deployments` (owner): the release's `packageDigest`, the `overlayDigest` above, the `restartedAt` time, the lease id, the `destinationRef` and `operatorStated.status`. That receipt is the operator's statement. AMC's own check is `POST …/releases/<releaseId>/verify`. It runs token-less against the receipt's destination over TLS and establishes reachability only: release identity at the destination is not evaluated until P2-40. A destination that resolves to a private address is refused, and nothing is recorded. The two results stay in separate columns.
+
+To roll back, an owner previews the rollback and project approvers other than the confirming owner decide its DEPLOY engine request. Confirming it restores the Enforce snapshot of the release that ran in production when this one was built (the newest release with a succeeded production deploy row that was not rolled back), revokes the release's leases and returns the commands. The commands copy that release's overlay out and run `docker compose -f docker-compose.yml -f docker-compose.a4-<thatReleaseId>.yml up -d`, or the base file alone when no release ran in production. Never use `down -v`. Record the rollback row afterwards.

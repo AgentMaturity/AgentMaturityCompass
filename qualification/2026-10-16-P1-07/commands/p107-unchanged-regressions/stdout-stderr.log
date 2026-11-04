@@ -1,0 +1,24 @@
+
+ RUN  v4.1.11 /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass
+
+ ✓ tests/spineEvidenceProjection.test.ts (9 tests) 7ms
+ ✓ tests/liveEvidenceProjection.test.ts (16 tests) 10ms
+ ✓ tests/questionBank.test.ts (3 tests) 52ms
+stderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend another question's evidence at L0-L2
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L2).
+
+stderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > does not lend it at L3+ either, which was already true
+[diagnostic] untagged evidence counts toward no question at any level except through a question's evidence map; set meta.questionId when writing evidence (example question: AMC-1.1, seen at L4).
+
+stderr | tests/evidenceGatingCorrection.test.ts > evidence counts only toward its own question > cannot be turned off any more (P1-07)
+STRICT_EVIDENCE_BINDING is no longer supported: untagged evidence never counts toward a level
+
+ ✓ tests/evidenceGatingCorrection.test.ts (12 tests) 8ms
+ ✓ tests/antiGaming.test.ts (17 tests) 8ms
+
+ Test Files  5 passed (5)
+      Tests  57 passed (57)
+   Start at  23:02:29
+   Duration  2.53s (transform 3.90s, setup 107ms, import 5.23s, tests 85ms, environment 0ms)
+
+JSON report written to /private/tmp/p1-39-post-typecheck-20261016/p107-unchanged-regressions.raw.json

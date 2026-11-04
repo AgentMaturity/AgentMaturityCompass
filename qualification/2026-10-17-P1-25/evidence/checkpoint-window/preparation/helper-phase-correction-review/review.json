@@ -1,0 +1,50 @@
+{
+  "schema": "p125k-independent-helper-phase-reference-correction-review/1",
+  "at": "2026-10-16T23:42:04.866531+00:00",
+  "blockers": [],
+  "oldHelper": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control.py",
+    "bytes": 19265,
+    "sha256": "7aecaaa15175013ccf6b2c4d2f54b6a4ca7921a3af407cfed57e0fcbf2c37be0"
+  },
+  "newHelper": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.py",
+    "bytes": 19281,
+    "sha256": "585b761a615a4fed59c1961ccd15b353728b73ab8c583dc5d83cbc4df89f6f27"
+  },
+  "delta": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-control-preparation/source-control-v2.patch.txt",
+    "bytes": 926,
+    "sha256": "4bf775358ade747466f5292cfe3c62a4a6fb4f3e934a5e749eb3763b05acb0ce"
+  },
+  "exactTwoOnceMatchStringSubstitutions": [
+    {
+      "before": "green('p125k-source-combined', S)",
+      "after": "green('p125k-source-after-eof', S)"
+    },
+    {
+      "before": "green('p125k-fresh-canonical', q)",
+      "after": "green('p125k-fresh-canonical-corrected-path', q)"
+    }
+  ],
+  "allOther19265BaseBytesPreserved": true,
+  "oldHelperAndSealedHistoryUnchanged": true,
+  "unchangedBoundaries": [
+    "actual21zero-skip/raw-observer/manual-classification prerequisites",
+    "runtime142 grant-successor and141others",
+    "94selected/19compiledpairs/9oldplusfresh10native requirements",
+    "four inactive markers and canonical regular single-link distinct files",
+    "O_NOFOLLOW descriptor/path checks and exclusive originals/prepared/livepatch records",
+    "separate apply/restore and same21GREEN predecessor",
+    "source-only target recipes and no automatic retry/signal/product invocation"
+  ],
+  "checkPreservationContextUnaffectedBecauseOnlyMainPhaseReferencesChange": true,
+  "diagnosisPin": {
+    "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/fresh-launcher-path-diagnosis.json",
+    "bytes": 6985,
+    "sha256": "b988395576e96f525b6f9891dde570eda8128529c00468013863d22789822cbf"
+  },
+  "failedOriginalFreshRetainedWithZeroControlQualificationCredit": true,
+  "correctedFreshRuntimeOutcomeIndependentlyAuditedHere": false,
+  "boundary": "Static admission of phase references only. The actual final source and corrected fresh outcomes must still satisfy unchanged runtime guards before controls. No generated/public signing files, keys, streams, code execution or source/index/QA writes occurred."
+}

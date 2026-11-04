@@ -1,0 +1,20 @@
+{
+  "at": "2026-10-16T17:47:09.823555+00:00",
+  "sourceBase": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "privateAuthorAndPeerReviewed": true,
+  "finiteProposalPinsVerified": 41,
+  "written": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/levelCumulative.test.ts",
+      "bytes": 10722,
+      "sha256": "1265e5715bd3ceb3c342c44e3a65681f8d32d74dd962ede9e7f64c8227575c78"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/diagnostic/evidenceEmitterRegistry.test.ts",
+      "bytes": 10448,
+      "sha256": "01ba46f55bf1135306e8e55d9b8c41a4b106ced58aa3a9a5463557fede001061"
+    }
+  ],
+  "productionAndExistingTestsUntouched": true,
+  "sourceRunStillDirtyNotFresh": true
+}

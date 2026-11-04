@@ -14,6 +14,7 @@ import { sha256Hex } from "../src/utils/hash.js";
 import { imageInput, IMAGE_PNG_BASE64 } from "./fixtures/nativeAcpImageRuntime.js";
 import { orderedCleanup, orderedWorkspace, orderedHarness, openedOrdered, orderedBlocks,
   orderedRequest, expectedImageWire, firstUserWire, orderedCold, PROVIDERS } from "./fixtures/nativeOrderedImageHarness.js";
+import { paddedPng } from "./helpers/paddedPng.js";
 
 afterEach(orderedCleanup);
 describe("ordered image input through public ACP (unexecuted)", () => {
@@ -31,7 +32,10 @@ describe("ordered image input through public ACP (unexecuted)", () => {
     const parts = decodeNativeOrderedInput(payload.bytes);
     expect(parts.map(part => part.type)).toEqual(orderedBlocks().map(part => part.type));
     expect(parts.filter(part => part.type === "text").map(part => part.text)).toEqual(["  before\n", "", "after first", "after second  "]);
-    const projected = rows.filter(row => ["user/message", "user/attachment"].includes(row.event_type));
+    // GAP-WP39: one further user/message, the runtime-context snapshot, carries no source input.
+    const userRows = rows.filter(row => ["user/message", "user/attachment"].includes(row.event_type));
+    const projected = userRows.filter(row => JSON.parse(row.meta_json).sourceContentIndex !== undefined);
+    expect(userRows.length - projected.length).toBe(1);
     expect(projected.map(row => JSON.parse(row.meta_json).sourceContentIndex)).toEqual([0, 1, 2, 3, 4, 5]);
     for (const row of projected) {
       expect(JSON.parse(row.meta_json)).toMatchObject({ sourceInputEventId: input.id, sourceInputFormat: NATIVE_ORDERED_INPUT_FORMAT });
@@ -149,7 +153,7 @@ describe("ordered image input through public ACP (unexecuted)", () => {
     expect(next.frames.filter(frame => frame.method === "session/update")).toEqual([]); expect(next.sent).toEqual([]);
   }, 60_000);
   test("a legitimate local ordered session that outgrows the ACP aggregate replay bound refuses load before any partial replay", async () => {
-    const { h, root, sessionId } = await openedOrdered(); const bytes = Buffer.alloc(OUTGROW_BYTES); imageInput().bytes.copy(bytes);
+    const { h, root, sessionId } = await openedOrdered(); const bytes = paddedPng(imageInput().bytes, OUTGROW_BYTES);
     expect((await h.sessions.get(sessionId)!.promptParts!([{ type: "image", image: { filename: "first.png", mediaType: "image/png", bytes } },
       { type: "text", text: "after the first image" }])).ok).toBe(true);
     await h.call("_amc/session/release", { sessionId }); await h.close();

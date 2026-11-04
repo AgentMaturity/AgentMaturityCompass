@@ -1,0 +1,29 @@
+{
+  "source": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+  "raw": {
+    "path": "/private/tmp/p0-24-final-bounded-node22-20261015.json",
+    "sha256": "4ee5d9c38b1f3d0df45877828aa2718238520ca789359fa1165c51104170d8ae"
+  },
+  "counts": {
+    "numTotalTests": 91,
+    "numPassedTests": 90,
+    "numFailedTests": 1,
+    "numPendingTests": 0,
+    "numTodoTests": 0
+  },
+  "failure": [
+    {
+      "file": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts",
+      "name": "P0-24 bounded citation corrections strict correction criterion excludes ISO A.5 policy labels from actual audit anchors and collector",
+      "failureMessages": [
+        "AssertionError: expected { \u2026(2) } to deeply equal { invalidAnchors: [], \u2026(1) }\n    at /Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/tests/citationCorrections.test.ts:169:49\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:302:11\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:26\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2326:20\n    at new Promise (<anonymous>)\n    at runWithCancel (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2323:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2305:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2272:10)\n    at file:///Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:2956:64"
+      ]
+    }
+  ],
+  "additionalControls": {
+    "PythonExisting": 12,
+    "PythonActualConstructor": 5,
+    "actualColdCliCorrectedObserver": 3
+  },
+  "meaning": "Nine-file bounded Node 22 result, not whole suite or P0-24 expert acceptance. Additional Python/CLI controls are separate from these 91 Vitest cases."
+}

@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "scope": "Read-only P0-18 eval/import, CLI, development seeder and existing S7 guard readiness. Only this private design pair is written; no driver/test authoring or runtime.",
+  "observedSource": {
+    "root": "/Users/sid/.codex/worktrees/p0-24-qualification/AgentMaturityCompass",
+    "head": "072ccaaad2d4cd7890ed97dc830302d50ca91b31",
+    "production": "Unchanged from75cb; new P0-24 canonical packet staging is separate metadata, not a source transfer.",
+    "spec": {
+      "path": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/P0-18.md",
+      "sha256": "44892a201424c5271c9ebb936608c22d0ddca2f512fa5d840193118fa74590c4"
+    }
+  },
+  "operations": {
+    "performed": [
+      "Source/test/spec/compiled-byte reads",
+      "Static hashes and source-path tracing"
+    ],
+    "notPerformed": [
+      "New lane/test/driver authoring",
+      "Module imports/product CLI/runtime",
+      "Tests/build/install/ABI action",
+      "Source/old-test/helper/guard/baseline/archive/counter/canonical edits",
+      "Legal/expert/default approval",
+      "External requests/provider/model runs"
+    ]
+  },
+  "actualFunctions": {
+    "eval": {
+      "module": "src/eval/evalImporters.ts",
+      "functions": [
+        "parseEvalImport",
+        "parseOpenAIEvalResults",
+        "importEvalResults",
+        "evalImportCoverageStatus"
+      ],
+      "entry": "src/eval/evalImporters.ts:1506-1541",
+      "formatUnion": [
+        "openai",
+        "langsmith",
+        "deepeval",
+        "promptfoo",
+        "wandb",
+        "langfuse",
+        "langwatch"
+      ],
+      "formatCli": "parseEvalImportFormat trims/lowercases and rejects anything outside its exact seven-format set; evalImportCli forwards workspace,file,agentId,historical only.",
+      "parseRaw": "parseRawJsonOrJsonl reads/trims a real file; empty input throws; attempts whole JSON then parses nonblank JSONL lines, naming the first invalid line. No format producer or parser mock needed.",
+      "timestampParsing": "parseCaseTimestamp checks ts,timestamp,created_at,createdAt,completed_at,completedAt,updated_at,updatedAt across each format's actual sources. timestampFromUnknown accepts finite numeric values: >10,000,000,000 rounded milliseconds, otherwise rounded seconds*1,000; nonblank strings use Date.parse; invalid/missing returns null.",
+      "constants": {
+        "EVAL_IMPORT_MAX_FUTURE_SKEW_MS": 300000,
+        "EVAL_IMPORT_MAX_AGE_MS": 86400000,
+        "MAX_SNIPPET_CHARS": 2400,
+        "defaultQuestionIds": [
+          "AMC-1.7"
+        ]
+      },
+      "timePolicy": "One now=Date.now is captured after full parsing. Every parsed case is filtered with strict >now+5min or <now-24h. Any out-of-window case throws before resolveAgentId/session/start/openLedger unless historical===true. Constants remain source-labelled proposed defaults, not new approved policy.",
+      "timeError": "Refusing eval import: <n> case(s) are timestamped more than 5 minutes ahead or more than 24 hours ago (<IDs>). Events are recorded at import time; pass --historical to import them as historical, keeping each case's own time as meta.claimedTs.",
+      "writer": "const trustTier=SELF_REPORTED. Opens actual ledger, starts signed session, appends started audit, real case/test and mapped metric events (calibration/failure records when applicable), completed audit, seals session, closes in finally. No item.ts is passed as event ts. caseTime claimedTs/historical appears on per-case records; started/completed audit has no case timestamp.",
+      "atomicScope": "Whole-file time validation occurs before any ledger call. This is not general transaction rollback for IO failures after writing begins."
+    },
+    "cli": {
+      "source": "src/cli.ts:7029-7058",
+      "route": [
+        "eval",
+        "import"
+      ],
+      "requiredOptions": [
+        "--format <format>",
+        "--file <path>"
+      ],
+      "optional": [
+        "--agent <agentId>",
+        "--historical",
+        "--json"
+      ],
+      "hidden": "--trust-tier <tier> is declared with hideHelp, not removed from parsing. If provided, prints removal text and process.exit(2) before evalImportCli.",
+      "literal": "--trust-tier was removed in 2.0.0: trust tiers are derived from provenance, and imported results are SELF_REPORTED. See docs/EVIDENCE_TRUST.md.",
+      "output": "emitClaimResult uses unverifiedClaim with actual caseCount; imported results remain self-reported. This route is not proof of observed model behavior."
+    },
+    "seeder": {
+      "source": "src/dogfood/maturityEvidence.ts:156-191",
+      "functions": [
+        "assertDogfoodSeedingAllowed",
+        "generateDogfoodMaturityEvidence",
+        "scaffoldDogfoodAgent",
+        "ensureDogfoodFleet"
+      ],
+      "guard": "assertDogfoodSeedingAllowed(env=process.env,modulePath=fileURLToPath(import.meta.url)) throws when env.AMC_DEV_DOGFOOD !== '1' OR module's actual path contains /node_modules/ (Windows separators too). generateDogfoodMaturityEvidence calls it with no injected path before scaffolding.",
+      "error": "dogfood seeding is a development tool: set AMC_DEV_DOGFOOD=1 in a source checkout",
+      "defaults": {
+        "now": "Date.now()",
+        "questions": "actual questionBank",
+        "providerTemplate": "bedrock",
+        "configuredProviderURL": "http://localhost/amc-dogfood",
+        "sessionSpacingMs": 86400000
+      },
+      "sideEffects": "Allowed path scaffolds fleet/agent configuration, ledger sessions/seals/evidence and agent dogfood-artifact JSON. Target0 still scaffolds before returning zero events; never call that zero effects. Default provider URL is configuration, not a transport invocation in this path.",
+      "labels": "baseMeta and global-support meta set SELF_REPORTED/synthetic_example/dogfood/dogfood-maturity. Runtime names can say gateway/sandbox/mock but do not promote synthetic rows.",
+      "readerExclusion": "producerOfMeta recognizes provenance dogfood or claimKind synthetic_example. Diagnostic runner and evaluateGate and compliance subject rows drop synthetic evidence. Original real diagnostic case checks targets0/3/5: all average/final levels0, evidenceEventIds empty, coverage0/0/0; its deadline is120000ms."
+    },
+    "s7": {
+      "module": "src/standard/externalEvidenceProfile.ts",
+      "function": "verifyExternalEvidence",
+      "M11": {
+        "sourceLines": "221-224",
+        "compiledLines": "215-218",
+        "exactCompiledGuard": "if (signatureVerified && profile.provenance.captureMethod !== \"import\"\n                && authority.captureMethods.includes(profile.provenance.captureMethod)) {",
+        "privateMutation": "Remove only `profile.provenance.captureMethod !== \"import\" &&` while preserving authority capture-method gate and all signature/producer/digest checks.",
+        "decisiveOriginalCase": "an authority that a direct JS caller admits for imports still cannot promote an import",
+        "contract": "Genuine locally generated signature can verify true, but import cannot promote even if direct JS caller admits import; expected okfalse/SELF_REPORTED and exact declared-trust error. This is a synthetic direct-API adversarial control, not real issuer admission."
+      },
+      "M12": {
+        "sourceLines": "228-231",
+        "compiledLines": "222-228",
+        "exactCompiledClamp": "if (ranks[profile.provenance.trustTier] < ranks[trustTier])\n        trustTier = profile.provenance.trustTier;",
+        "privateMutation": "Remove only the lower-declaration clamp. Preserve higher-declaration refusal, errors resetting tier, signature checks and return.",
+        "decisiveOriginalCase": "the verifier never raises a producer's own lower declaration",
+        "contract": "Existing case checks declaredATTESTED governed capture remainsATTESTED (notOBSERVED) and declaredSELF_REPORTED callback remainsSELF_REPORTED. First assertion can fail before second runs: report actual scope/first mismatch rather than claiming both were independently killed."
+      },
+      "logicBoundary": "No live/source repair is allowed here. These original profile/export tests and private copied mutations cover exact guards; preserve original helpers/fixtures and never add a trust bypass."
+    }
+  },
+  "existingCorpora": [
+    {
+      "path": "tests/evalImportTrust.test.ts",
+      "contracts": "Seven actual importer fixtures, hiddenflag exit2, future and old refusal, historical and recent recorded-time cases.",
+      "limitations": "Current time-refusal cases contain only one invalid row. New private valid-first/invalid-second probe addresses whole-file ordering without permanent duplicate tests."
+    },
+    {
+      "path": "tests/evalImportersInterop.test.ts",
+      "contracts": "Actual seven parser/mapping interop, SELF_REPORTED writes, DeepEval calibration metadata and status/agent isolation. Existing line338 is already SELF_REPORTED."
+    },
+    {
+      "path": "tests/dogfoodMaturityEvidence.test.ts",
+      "contracts": "Absentoptin variants, string-path helper control, all seeded labels and actual full diagnostics targets0/3/5.",
+      "limitations": "Existing node_modules case injects helper path; a real regular copied module path is the additional private gap."
+    },
+    {
+      "path": "tests/externalEvidenceProfile.test.ts",
+      "contracts": "Real local Ed25519 fixtures, validation/digest/authority scope, original S7 import gate and lower-declaration controls."
+    },
+    {
+      "path": "tests/externalEvidenceExport.test.ts",
+      "contracts": "Actual neutral projection staysunsignedSELF_REPORTED/import, omits private content, no inferred edges, bounded time/duration strings/parts, cancellation versus failure and recorded losses.",
+      "limitations": "Synthetic projection/control contract only; no external producer or transport claim."
+    }
+  ],
+  "minimalPrivateProbePlan": [
+    {
+      "key": "seven-format-cold-imports",
+      "recipe": "Reuse byte-equivalent original seven fixtures through actual importEvalResults in separate finalized writer children. Cold readonly child returns raw actual rows/session/seals; parent never opens a pooled ledger.",
+      "assertions": "Nonempty imported rows, exact parsedcase/resultcasecount, all sourceeval_import rows SELF_REPORTED, metrics/failure behavior retained. Local seals prove integrity only; no independent trust."
+    },
+    {
+      "key": "valid-first-then-future",
+      "recipe": "First import the same genuinely valid case in a positive control. Then prepare one OpenAI file with valid-first row at current-1hour and invalid-second at current+1hour. Actual parser must show that order and both IDs before writer call.",
+      "assertions": "Actual whole-file refusal names second ID; existing nonempty rows/sessions/seals/payload/input/key bytes unchanged across writer interval. No case/start audit/session is appended. Preserve all raw filesystem sidecar changes, not merely a zero-row query."
+    },
+    {
+      "key": "valid-first-then-old",
+      "recipe": "Same genuine valid-first positive control; second rowcurrent-72hours with no historical flag.",
+      "assertions": "Actual error names old second row/--historical; same nonempty persisted state unchanged. Do not use invalid-first as atomicity evidence."
+    },
+    {
+      "key": "historical-recorded-time",
+      "recipe": "Prepare valid-first and old-second file, import with historicaltrue in an owned writer child; capture actual before/after wall times without mocked Date.",
+      "assertions": "Both actual cases admittedSELF_REPORTED. Per-case events have recordedts withinwriter range, exact claimedTs from parsed source, historicaltrue, not old/future ledger clock. Audit envelope rows have no fabricated case timestamp. Recent nonhistorical control has claimedTs and historical absent."
+    },
+    {
+      "key": "cold-hidden-flag",
+      "recipe": "Cold actualbuilt CLIargv: eval import --format openai --file <owned-relative-file> --trust-tier OBSERVED; use finalizedinitializerchild/private0700HOME/AMC_HOME.",
+      "assertions": "Status2; exact current2.0.0 message; no imported writes, compare prepared input/fullstore bytes/rows by separateintervals. Record oldspec1.2.0 discrepancy unresolved."
+    },
+    {
+      "key": "cold-help-hidden",
+      "recipe": "Actualbuilt CLIargv eval import --help and actual generated inventory command if root includesit; do not regenerate docs.",
+      "assertions": "Help omits trust-tier; existingrequiredformat/file/historical preserved. Runtimeinventoryhide proof separately, no text-only source assertion treatedasCLIhelp."
+    },
+    {
+      "key": "real-seeder-optin-refusal",
+      "recipe": "Call actual generateDogfoodMaturityEvidence export under missing/invalid optin with fixed original L5 agent/inputs in owned regular completecompiledcopy outside node_modules.",
+      "assertions": "Exact developmenttool refusal before scaffold/ledger/evidence writes; prepared workspace/store snapshotunchanged. Original full source tests provide allinvalidflag variants; private driver neednot duplicate every permanentcase."
+    },
+    {
+      "key": "real-installed-path-refusal",
+      "recipe": "Copy every current dist file and package.json as regular files into owned .../node_modules/agent-maturity-compass/. Use owned dependency resolver links only. Import its actual default-path generateDogfoodMaturityEvidence and setoptin1.",
+      "assertions": "ActualmoduleURL/physicalpath is node_modules-like; exactrefusal before effects. Do not inject a helper modulePath or symlink the tested module tosource. This is path-guard qualification, not npm installation/release acceptance."
+    },
+    {
+      "key": "optional-opted-in-local-control",
+      "recipe": "Only if explicitly authorized later, actual source/privatecopy outside node_modules withoptin1, originalL5/fullquestionBank; reuse original diagnostic corpus ratherthan reducing inputs.",
+      "assertions": "All real seeded rows syntheticSELF_REPORTED; original diagnostic comparisons remainlevel0. Record fleet/config/artifact/seal effects and target0scaffolding. Never invoke scripts/amc-dogfood-8-agents.mjs or a live provider."
+    }
+  ],
+  "causalDesign": [
+    {
+      "key": "eval-default",
+      "privateTarget": "dist/eval/evalImporters.js",
+      "byteChange": "const trustTier = \"SELF_REPORTED\"; -> const trustTier = \"ATTESTED\";",
+      "corpus": "Unchanged original importer/interop cases plus same private import driver ifauthorized.",
+      "expectedMeaning": "Existing seven import contract cases fail. Current ledger write guard may refuse elevated stamp ratherthan allow ATTESTED rows; retain the actualfailure/error/effects, never bypass that guard to force an expected tier mismatch."
+    },
+    {
+      "key": "seeder-optin",
+      "privateTarget": "dist/dogfood/maturityEvidence.js",
+      "byteChange": "Remove only env.AMC_DEV_DOGFOOD !== \"1\" || from guard.",
+      "corpus": "Unchanged original seeder test + same actual exported-function private refusal driver.",
+      "expectedMeaning": "Missingoptin expectedrefusal fails and actual effects retained; node_modules refusal stillprotected. Exactbaseline/mutant/restored modules, fullinputs/pins and samecorpus."
+    },
+    {
+      "key": "S7-M11",
+      "privateTarget": "dist/standard/externalEvidenceProfile.js",
+      "byteChange": "Only import-capture condition removal described above.",
+      "corpus": "Whole unchanged original externalEvidenceProfile + externalEvidenceExport files routed into completecopieddist; import-prefix adaptations only ifneeded.",
+      "expectedMeaning": "Actual direct-JS permissive-import negative becomesbadpromotion; record actualnames/counts/no pending, not historical S7totals."
+    },
+    {
+      "key": "S7-M12",
+      "privateTarget": "dist/standard/externalEvidenceProfile.js",
+      "byteChange": "Only lower-declaration clamp removal described above.",
+      "corpus": "Identical original two-file profile/export corpus.",
+      "expectedMeaning": "Original lower-declaration case fails; record firstactualtier mismatch and branchcoverage limit. Preserve highdeclaredtier refusal and no sourcefix."
+    }
+  ],
+  "runtimeProtocolAfterAssignment": [
+    "Root first assigns a fresh owned P0-18 lane, frozen Node22 deps, exact source and BUILDREADY. No existing P0-24/source/ABI operation by this design.",
+    "One owned private behavior driver reuses actual existing fixtures and childprocess initialization/import/read/CLI; no permanent duplicate tests.",
+    "Explicit process.execPath/scopedNode22PATH; minimal provider-credential-free env, own0700HOME/AMC_HOME/TMPDIR and fixture-only vaultpassphrase. Deny relevant transportcalls where needed; no universal syscall guarantee.",
+    "Initializer child closes and exits before writer/coldreader/CLI. Parent performs file/hash comparisons only and never opens pooled ledger. read-sideactual openLedger(readonlytrue) avoidspool/keys/migrations but maycreateWAL coordination sidecars; snapshot pre-open/post-close separately.",
+    "Prepare all inputfiles before before-effectsnapshot. Compare raw signed rows/sessions/seals/payload/key/list/input bytes; attribute inspection sidecars separately and retain any unexplained differences as failures/unqualified observations.",
+    "Copy completecompiledclosure/config/guards/scripts/fixtures for causalruns; retainregular testedmodule bodies. Only planned private target changes; no guard/global-config/baseline/oldhelper edits.",
+    "Record actualregisteredcounts/exits/pending/todo and rawerrors for each phase. Use meaningful corpus-level baseline/mutant/restored deltas, require exactbyte restorationofallcopiedinputs and livepinafterchecks. Never count boot/setup error as productmutation kill.",
+    "Restore only owned target bytes; keep allrawfixture/effect evidence. Root owns furthercode/metadata/archive/freeze/canonical/commit decisions."
+  ],
+  "proposedCommandsNotExecuted": [
+    "<scoped Node22> node_modules/vitest/vitest.mjs run tests/evalImportTrust.test.ts tests/evalImportersInterop.test.ts tests/dogfoodMaturityEvidence.test.ts tests/externalEvidenceProfile.test.ts tests/externalEvidenceExport.test.ts --reporter=json --outputFile=<owned-unique-raw-json>",
+    "<scoped Node22> <owned-driver> <exact-fresh-source-root> <owned-evidence-root>; actualevalimport/coldCLI/seeder cases use completecurrentcompiledclosure",
+    "<scoped Node22> <owned-fullcopy-runner> baseline / one-exact-mutant / restored; same profile+export corpus for M11/M12, original import/seeder corpus fortheircontrols"
+  ],
+  "sourcePins": {
+    "src/eval/evalImporters.ts": "cc6562686dfe39be17cd398b4c1f672fb2eef6a2f9043a19b207f91a1b3902c8",
+    "src/eval/evalCli.ts": "ef95b4fbfad07f30808e5765c8ada43678c5de26d00fd43182cc453067b42ac6",
+    "src/dogfood/maturityEvidence.ts": "e7d6b3361ca8742abbcf8b1a78831f3fac255c9ff714b22ba14c5b2bc4e9c779",
+    "src/cli.ts": "85e8f33f05dcc2ae3f170a941717f2a3cab47386edbc716681fc06101a1e5236",
+    "src/standard/externalEvidenceProfile.ts": "788099197b820732d8e19693e95dec5b8070494ec208bd55a963dc47362058d5",
+    "src/importers/externalEvidenceExport.ts": "a65b88a8dfb6885305c06d5f2ec0617f31fdeae299deddae8f094ec571d86392",
+    "src/diagnostic/gates.ts": "da7a91a496a801f1b199b625ca60a7a7bd2c844c6bb38a724690605cd4a94cae",
+    "src/ledger/trustTierValidation.ts": "fb2a00e5225ea7a7952e380d7780d2431a531b587bb700022a8a95ebeb72a00c",
+    "tests/evalImportTrust.test.ts": "f046a9565ef5925a19b22826337c94634c7eb525f7185f1e4a84bcd8664743f4",
+    "tests/evalImportersInterop.test.ts": "d9184a5cc7c826e7080979990903044f3944d8d9329ac60de733db3108173ab2",
+    "tests/dogfoodMaturityEvidence.test.ts": "e62f8b05c4a385a9535efeaa99373e6aeded460e9a0b9d319b0cfd4e549ce33c",
+    "tests/externalEvidenceProfile.test.ts": "9f05123febe5ce0bcc1b24c6f7974f70756db73f6af875681c872f021ebef903",
+    "tests/externalEvidenceExport.test.ts": "acf7099a51748dde913e77571e414573827db17387bc77713251aa23de07207f",
+    "docs/EVIDENCE_TRUST.md": "7067bd5b2f680bdac17abd8cdab4660b39e713564fdf7b6466cbf4cb4873c499",
+    "dist/eval/evalImporters.js": "3470db40154345922801f84c4db5f17f68c909240a4c18e3b036f9b5884130d8",
+    "dist/eval/evalCli.js": "d1ce0e7c951cebf11c361c4436b6cf501df412d7ea70105ce8aaa9905c0d8d58",
+    "dist/dogfood/maturityEvidence.js": "cc2ae2251acedaf3ee1a080eb615ac0b79cbc69d41cc25535bffc53a29fc08e3",
+    "dist/standard/externalEvidenceProfile.js": "a78855df54d8090b0fcb6f93d0c9d634c8dbf43bbad34853d18a5ee1ef28b9e2",
+    "dist/cli.js": "0040e8108d1df88bf377cdab98966ce6130f6d6931cbc6c5b7fd6e27475c3d5f"
+  },
+  "limits": [
+    "Old spec removaltext1.2.0 versus actual2.0.0 remains explicit; no releasewording choice/sourcefix.",
+    "Old purpose evidence-attestation versus current independent-attestation remains separate from this importer/seeder lane; no new purpose selected.",
+    "S7 historical mutation logs were not found in checked current/root paths; exactcurrentguards/tests were read instead. No historicalcount or freshmutation outcome asserted.",
+    "externalEvidenceProfile logic is expressly source-out-of-scope; only futureauthorizedprivatecausalcopies contemplated, no repairs.",
+    "No npm --ignore-scripts, releasegate bypass, fleet seeder invocation, native/race/P030 batch, A4/API/Studio/shared wiring, legal/expert/default approval.",
+    "P0-51 issuer-precedence failures and all earlier strict holds/decisions remainopen; reservation1496 and sharedCLI coordination1588 unchanged. Newproduction/touchscope requireslaterexactdecision.",
+    "No freshruntimeacceptance/fullP018/fullsuite/coverage/Node24/hosted/G0/release/Done/publication."
+  ],
+  "readOnlyObserverNotes": [
+    "One attempted additional read-only child review was unavailable because the agent thread limit was reached; source tracing was completed directly.",
+    "Some broad combined source reads were truncated and were narrowed to actual relevant functions. Historical S7 log paths were absent; no source/archive was changed or fabricated."
+  ]
+}

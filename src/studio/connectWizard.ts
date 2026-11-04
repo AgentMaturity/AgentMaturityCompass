@@ -35,6 +35,8 @@ export async function buildConnectInstructions(params: {
   agentId?: string;
   mode?: "supervise" | "sandbox";
   adapterId?: string;
+  /** The authenticated session's principal the lease names (P1-78; A4 Assemble connect); absent for the CLI, whose lease names no one. */
+  principalKey?: string | null;
 }): Promise<ConnectOutput> {
   const agentId = resolveAgentId(params.workspace, params.agentId);
   const gateway = loadGatewayConfig(params.workspace);
@@ -80,7 +82,8 @@ export async function buildConnectInstructions(params: {
     rpm: 60,
     tpm: 200000,
     maxCostUsdPerDay: null,
-    workOrderId: activeWorkOrder?.workOrderId
+    workOrderId: activeWorkOrder?.workOrderId,
+    ...(params.principalKey === undefined ? {} : { principalKey: params.principalKey })
   });
 
   const envLines = [

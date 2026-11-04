@@ -1,0 +1,684 @@
+{
+  "schemaVersion": 1,
+  "key": "P1-39",
+  "date": "2026-10-16",
+  "commit": "aa198eaf060a656628d4f78a2822ca17ce4df3ab",
+  "branch": "codex/p1-39-mcp-qualification",
+  "node": "22.23.3 (ABI127)",
+  "pnpm": "10.33.0",
+  "os": "macOS (darwin)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts tests/mcp/mcpLegacyFallback.test.ts qualification/2026-10-16-P1-39",
+      "exit": 0,
+      "durationMs": 351
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1484
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-unchanged-four-files.raw.json",
+      "exit": 0,
+      "durationMs": 10758
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcpLegacyFallback.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-legacy-two-cases.raw.json",
+      "exit": 0,
+      "durationMs": 1514
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcp20260728.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-stateless-three-cases.raw.json",
+      "exit": 1,
+      "durationMs": 3748
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcpLegacyFallback.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-legacy-five-cases.raw.json",
+      "exit": 0,
+      "durationMs": 3230
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcpOauth.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-oauth-first-five-cases.raw.json",
+      "exit": 0,
+      "durationMs": 560
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths src/mcp/nativeMcpClient.ts src/tools/toolTypes.ts src/tools/toolPipeline.ts src/agent/pipelineToolSeam.ts",
+      "exit": 0,
+      "durationMs": 405
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/check-freeze.mjs",
+      "exit": 0,
+      "durationMs": 1463
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcp20260728.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-typed-outcome-three-cases.raw.json",
+      "exit": 0,
+      "durationMs": 4227
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck",
+      "exit": 0,
+      "durationMs": 26022
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 36058
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run build",
+      "exit": 0,
+      "durationMs": 29731
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcp20260728.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-stateless-twelve-cases.raw.json",
+      "exit": 0,
+      "durationMs": 5649
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcpOauth.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-oauth-seven-cases.raw.json",
+      "exit": 0,
+      "durationMs": 671
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/toolPipeline.test.ts tests/approvalSeam.test.ts tests/agentToolsetSession.test.ts tests/agentToolsetWiring.test.ts tests/actions --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-mcp-pipeline-journal-regression.raw.json",
+      "exit": 1,
+      "durationMs": 23095
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcpOauth.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-oauth-nine-cases.raw.json",
+      "exit": 0,
+      "durationMs": 2139
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcp20260728.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-stateless-thirteen-cases.raw.json",
+      "exit": 0,
+      "durationMs": 6116
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcpOauth.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-37-post-typecheck-20261016/p139-oauth-twelve-cases.raw.json",
+      "exit": 0,
+      "durationMs": 4131
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/mcp/mcpOauth.test.ts",
+      "exit": 0,
+      "durationMs": 502
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1747
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 37050
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcpLegacyFallback.test.ts tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/toolEvidenceRecording.test.ts tests/workflowTool.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p139-final-nine-files.raw.json",
+      "exit": 0,
+      "durationMs": 12028
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run lint",
+      "exit": 0,
+      "durationMs": 2867
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:duplicates",
+      "exit": 1,
+      "durationMs": 609
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node /private/tmp/p1-39-mcp-qualification-20261016/deadcode-delta.mjs",
+      "exit": 1,
+      "durationMs": 2783
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:architecture-boundaries",
+      "exit": 0,
+      "durationMs": 2360
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:threat-model",
+      "exit": 0,
+      "durationMs": 262
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths docs/NATIVE_MCP.md docs/adr/010-mcp-2026-07-28.md .changeset/p1-39-typed-outcome-qualification.md README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 0,
+      "durationMs": 376
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/gen-counts.mjs --write",
+      "exit": 0,
+      "durationMs": 397
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:counts",
+      "exit": 0,
+      "durationMs": 370
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:docs-drift",
+      "exit": 0,
+      "durationMs": 308
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run check:freeze",
+      "exit": 0,
+      "durationMs": 1315
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths tests/mcp/mcpOauth.test.ts",
+      "exit": 0,
+      "durationMs": 333
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 0,
+      "durationMs": 34499
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass tests/mcp/mcpLegacyFallback.test.ts tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/toolEvidenceRecording.test.ts tests/workflowTool.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p139-real-flow-nine-files.raw.json",
+      "exit": 0,
+      "durationMs": 11732
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths src/agent/pipelineToolSeam.ts src/mcp/nativeMcpClient.ts src/tools/toolPipeline.ts src/tools/toolTypes.ts tests/mcp/mcpLegacyFallback.test.ts tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts docs/NATIVE_MCP.md docs/adr/010-mcp-2026-07-28.md .changeset/p1-39-typed-outcome-qualification.md README.md CONTRIBUTING.md website/index.html website/lite.html website/i18n.js docs/content/show-hn-draft.md docs/content/reddit-launch-drafts.md docs/internal/competitive-landscape.md docs/internal/mirofish-simulation-council.md whitepaper/AMC_WHITEPAPER_v1.md",
+      "exit": 0,
+      "durationMs": 330
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node scripts/clean-source-check.mjs --keep",
+      "exit": 0,
+      "durationMs": 56486
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout tests/mcp/mcpLegacyFallback.test.ts tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/toolEvidenceRecording.test.ts tests/workflowTool.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p139-fresh-nine-files.raw.json",
+      "exit": 0,
+      "durationMs": 12884
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths src/mcp/oauth/discovery.ts src/mcp/nativeMcpHttpTransport.ts",
+      "exit": 0,
+      "durationMs": 344
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout run check:freeze",
+      "exit": 0,
+      "durationMs": 1178
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout tests/mcp/mcpLegacyFallback.test.ts tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/toolEvidenceRecording.test.ts tests/workflowTool.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p139-issuer-control-nine-files.raw.json",
+      "exit": 1,
+      "durationMs": 11417
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout tests/mcp/mcpLegacyFallback.test.ts tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/toolEvidenceRecording.test.ts tests/workflowTool.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p139-issuer-restored-nine-files.raw.json",
+      "exit": 0,
+      "durationMs": 11395
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout tests/mcp/mcpLegacyFallback.test.ts tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/toolEvidenceRecording.test.ts tests/workflowTool.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p139-replay-control-nine-files.raw.json",
+      "exit": 1,
+      "durationMs": 11519
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node node_modules/vitest/vitest.mjs run --root /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout tests/mcp/mcpLegacyFallback.test.ts tests/mcp/mcp20260728.test.ts tests/mcp/mcpOauth.test.ts tests/reconciliationDefectsMcp.test.ts tests/reconciliationDefectsMcpHttp.test.ts tests/nativeMcpClient.test.ts tests/nativeMcpHttp.test.ts tests/toolEvidenceRecording.test.ts tests/workflowTool.test.ts --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile.json=/private/tmp/p1-39-post-typecheck-20261016/p139-replay-restored-nine-files.raw.json",
+      "exit": 0,
+      "durationMs": 11523
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass exec /opt/homebrew/opt/node@22/bin/node /Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/needs-snapshot.mjs --paths qualification/2026-10-16-P1-39",
+      "exit": 0,
+      "durationMs": 334
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-Y4x60y/checkout run check:freeze",
+      "exit": 0,
+      "durationMs": 1172
+    },
+    {
+      "cmd": "/opt/homebrew/opt/node@22/bin/node -p 'JSON.stringify({node:process.version,abi:process.versions.modules,platform:process.platform,arch:process.arch})'",
+      "exit": 0,
+      "durationMs": 42
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --version",
+      "exit": 0,
+      "durationMs": 213
+    },
+    {
+      "cmd": "/opt/homebrew/bin/pnpm --dir /Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass run typecheck:tests",
+      "exit": 2,
+      "durationMs": 37828
+    }
+  ],
+  "tests": {
+    "total": 81,
+    "passed": 81,
+    "failed": 0,
+    "skipped": 0
+  },
+  "notes": "Fresh canonical81/81;30 new cases,34 MCP regressions,17 evidence/workflow cases. Issuer control80/81 at220; exact restoration81/81. Replay control79/81 at358/375 proves two effects/POSTs; later UNKNOWN assertions masked; exact restoration81/81. All five phases60 hooks and32 public closure records, no unhandled errors. Source-only controls; no compiled-child sensitivity. Real PKCE-issued same grant reaches governed call and9 inspected committed payloads. Original strict2/3\u2192unchanged3/3 and failed compiler2/wrapper70 retained. Duplicates1268/deadcode2726 and broader425/428 remain RED/unwaived; old held decisions/F37/provider archive preserved. Fullnpmtest/globalcoverage/wholeP139/release/fullplan not newly accepted. Local only; no PR/push/merge. Next P1-35.",
+  "artifacts": [
+    {
+      "path": "canonical.raw.json",
+      "sha256": "c3ca193892909e6a0822193a4c80ad146e0edbcc8cf6263c521c80cef2efec08"
+    },
+    {
+      "path": "canonical.observer.json",
+      "sha256": "72465146b04ab31763ddb217704a21efa81c5e02d190a3a82768715fcabd08ac"
+    },
+    {
+      "path": "logs/canonical.log",
+      "sha256": "426cd8adcce966f56a1d80eb8c4df9108934296fd74ffda6b09daaa8a26e7d6d"
+    },
+    {
+      "path": "audits/canonical.json",
+      "sha256": "7e7f8e335af4eee61e8af0d9140a4d7ab8d120b695a0a467006530d0990a4234"
+    },
+    {
+      "path": "public/canonical-01-discovery-order.json",
+      "sha256": "91e38565a59b9034f09ada29a42e162003fdb14c7827cbb10c94d5d19c6abe24"
+    },
+    {
+      "path": "public/canonical-02-literal-issuer-mismatch.json",
+      "sha256": "5938b0caad26cc4570680cfd4aadd207581c8b437f748825fabf9a277d2dafd0"
+    },
+    {
+      "path": "public/canonical-03--256-required.json",
+      "sha256": "bc3be294f376131ee26fbc0cb0862567f5160955656d4fdaab1cf501b803dc3a"
+    },
+    {
+      "path": "public/canonical-04-state-and-iss-table.json",
+      "sha256": "87ee27672cdbababa4fe91fbb19e2d0b6e8942623a9c8893217ae7ca61fbf1d5"
+    },
+    {
+      "path": "public/canonical-05-real------token-store.json",
+      "sha256": "14aed3bad0cf79a1d77eec966c5e8bc54514582b8e457a5486643bc640603491"
+    },
+    {
+      "path": "public/canonical-06-unpinned-legacy-catalog.json",
+      "sha256": "ba1a6db9be6e255cddb55fb54db4f2e8ce9536c66a391a909ae45ef1f573d0d9"
+    },
+    {
+      "path": "public/canonical-07-modern-pin-refuses-legacy.json",
+      "sha256": "d6aa7364e47691dbdd3d4a67b91f60cf7806b727bcec7f453246d011bf256fe8"
+    },
+    {
+      "path": "public/canonical-08-exact-legacy-pin.json",
+      "sha256": "9a16a3fa014d1e2406849a7b5fb97fa5cb1edda9655dd140dc2690b5db940167"
+    },
+    {
+      "path": "public/canonical-09-legacy-pin-mismatch.json",
+      "sha256": "3c7e06f80435fc9bdbca9964901831416e279f5f6db6ed1a8746801fd1c38c80"
+    },
+    {
+      "path": "public/canonical-10-registration-priority-opt-in.json",
+      "sha256": "be17fb932f9fd3985475e938c3c9e93b0be412d9420204f0e1b2b5fdcf395305"
+    },
+    {
+      "path": "public/canonical-11-redirect-target.json",
+      "sha256": "3b0215b16b698d96d67ae489c4004c1f2f0e24a98b11ede1ed35847c47b9b285"
+    },
+    {
+      "path": "public/canonical-12-redirect-source.json",
+      "sha256": "c71d4ca7070343326dce623f811c835e1f9f4185f71cfb02995cd956d0f9c0bb"
+    },
+    {
+      "path": "public/canonical-13-real-store-refresh.json",
+      "sha256": "4a085984acbaf34a198f78b6e4e2fff6c3f77bb616f78437c558cec7c20e5889"
+    },
+    {
+      "path": "public/canonical-14-issuer-resource-binding--.json",
+      "sha256": "21242e93dad2fd1ce89c08c4f6fac0aebe6269f3cf05b2cce753914986a372aa"
+    },
+    {
+      "path": "public/canonical-15-issuer-resource-binding--.json",
+      "sha256": "16b211b274cb2247b85649a17926197b5734ebfbb848c9f0e39c392df2e9a490"
+    },
+    {
+      "path": "public/canonical-16-catalog-scope-union.json",
+      "sha256": "cf689fdb6049e0e65cc1c33458a77db968bd32ccf0d135e72af9d837e3a7a704"
+    },
+    {
+      "path": "public/canonical-17-catalog-step-up-limit.json",
+      "sha256": "fa4ce44b32ab2b4e5bff0d552389c556bfbe12765a04ec4ea60b0e0654a3efd4"
+    },
+    {
+      "path": "public/canonical-18-stateless-governed-call.json",
+      "sha256": "ce79e4555882dee1a6f09705cb791fae4d021ecca4ca6a06f85697c1959b5861"
+    },
+    {
+      "path": "public/canonical-19-legacy-receipt-version-review.json",
+      "sha256": "dd3f35634fbd6c895dfea210576f0641d4ee5568292a3432fe33bc2d4c14346c"
+    },
+    {
+      "path": "public/canonical-20-governed-token-redaction.json",
+      "sha256": "6282c7a794c73ee4a8f7d0449ea98e38dd2214405b2ffb18b65ee87b56e29bcd"
+    },
+    {
+      "path": "public/canonical-21-stateless-tool-no-replay.json",
+      "sha256": "fbd6a686a46b5e6fa5bb30b0d242f84c207842d31d184d5c4bf7a167cab8dbc4"
+    },
+    {
+      "path": "public/canonical-22-strict-typed-unknown-evidence.json",
+      "sha256": "5bac37cd5e60394c3feb5872e7f88106c545caf3d2a38a7abb2aca4884132bfd"
+    },
+    {
+      "path": "public/canonical-23-list-one-reissue.json",
+      "sha256": "444ad467e5859bdc21880a146d4f12d8e80e4060e846a3004033b5ff053af828"
+    },
+    {
+      "path": "public/canonical-24-list-reissue-exhausted.json",
+      "sha256": "85ac7383ec067968b49eccb8b7c56c1330222e1fdc6e345636db27b87df409c5"
+    },
+    {
+      "path": "public/canonical-25-digest-grant-and-fresh-catalog.json",
+      "sha256": "5ae1df1599117843506fb15564412d633cc404238ac8059f64c30ced1d7c1bc6"
+    },
+    {
+      "path": "public/canonical-26-missing-result-type.json",
+      "sha256": "7265e301e696f40933c50d9dcf7fe93facd257a8ff719f976b7d0fd6172426e7"
+    },
+    {
+      "path": "public/canonical-27-list-result-type-input_required.json",
+      "sha256": "49be87582bad914320a16d7f0db79ffbff1978f86cfc25b9e29693e65815e108"
+    },
+    {
+      "path": "public/canonical-28-list-result-type-invalid.json",
+      "sha256": "4b8f852fa3a7d7a0a2144e95870a47dcde34015feaf8441c84438d121f78bce2"
+    },
+    {
+      "path": "public/canonical-29-call-result-type-input_required.json",
+      "sha256": "9a2b3d3c8b784f50251afa1edaac8c2c1fc0ccf8eb3c2d78903e1b7452e359bf"
+    },
+    {
+      "path": "public/canonical-30-call-result-type-invalid.json",
+      "sha256": "068ab88a4b9fc4bfdee3078032efcc378d47cd9a482c663bec50aafeb89d24e2"
+    },
+    {
+      "path": "public/canonical-31-wrong-list-response-id.json",
+      "sha256": "cb4cff6c0151110928106b8d1140050ed8fc3227e15498998deb1ef16692cef2"
+    },
+    {
+      "path": "public/canonical-32-untrusted-error-marker-stays-error.json",
+      "sha256": "eb83774b39cde9518945bc74c7fd5c82c272396b575b811912c8df6dc3c7302f"
+    },
+    {
+      "path": "M1.raw.json",
+      "sha256": "03204bd3b6370df68a6c1699589a6b9c895c532624a2d2b30cf237f04e5ff1d7"
+    },
+    {
+      "path": "M1.observer.json",
+      "sha256": "e59ba25ef6d5898460aad92c667c286f9132728720b63a91e5a7a6f1e2c134e7"
+    },
+    {
+      "path": "logs/M1.log",
+      "sha256": "182f89dc9ce4808dd3defae00f0de17da4a7c8ec485a7909bf541a2c5caec5e7"
+    },
+    {
+      "path": "audits/M1.json",
+      "sha256": "997c5881b51e3daabdf31c21b372599a97c77163cc59b89a95be0c34230bb975"
+    },
+    {
+      "path": "public/M1-02-literal-issuer-mismatch.json",
+      "sha256": "b403e54852209ef347f932e153e9dfc5d7a764bfd99dde079f016434d5866883"
+    },
+    {
+      "path": "restored-M1.raw.json",
+      "sha256": "7657876c9e3ad77ea28e13758146372155e00afa5fd7bdbaa0b420176dfc102c"
+    },
+    {
+      "path": "restored-M1.observer.json",
+      "sha256": "b60d507064be881e2fb88bdb09ab68f24ea49903888355a94fd757842e6a2432"
+    },
+    {
+      "path": "logs/restored-M1.log",
+      "sha256": "a319a7d84f4684173315f84a9e00797b4173bf060b36e11b444a8fc8c9acf0f1"
+    },
+    {
+      "path": "audits/restored-M1.json",
+      "sha256": "ffac02058e8f397143f386201eae2018a166f7ce84e1d84ea85c3d00cb457204"
+    },
+    {
+      "path": "M2.raw.json",
+      "sha256": "d6eff0c24515920e061ed25d2bf7e5ca19851bfaadb37237902fc2b237d8372a"
+    },
+    {
+      "path": "M2.observer.json",
+      "sha256": "803c87174feab417c469e30fa135c7e54ce718488e60c9377089778ba348767d"
+    },
+    {
+      "path": "logs/M2.log",
+      "sha256": "3ee3fb18e259796d5c046f0ef1f1b4643868a77ce6cd0e663aa36ba5ca64b2de"
+    },
+    {
+      "path": "audits/M2.json",
+      "sha256": "8dfb94d9e21c56b2b66747fef27d2a9e282629047d1681f8bd4b6585028b74b3"
+    },
+    {
+      "path": "public/M2-20-stateless-tool-no-replay.json",
+      "sha256": "395db33129e0e32759ecc680c0c488dd49e6c13bfecea1114922080327a1aa12"
+    },
+    {
+      "path": "public/M2-22-strict-typed-unknown-evidence.json",
+      "sha256": "a98110bcc3e7977151a1b5f650dcbd10daf5f274c88bd1034f453317472e7e8c"
+    },
+    {
+      "path": "restored-M2.raw.json",
+      "sha256": "6a8a7b4f47a7f4850768a367e9ee451ee3b1777b4986c6454d2be3412e112da1"
+    },
+    {
+      "path": "restored-M2.observer.json",
+      "sha256": "73cf442dca9c5f2c444db155c0f0e7c22bb51589067740e18e6686e4b23afe67"
+    },
+    {
+      "path": "logs/restored-M2.log",
+      "sha256": "c711fcad861a3e5a46571bf59523d532f41596a5e89d957ac02b6ed40dd69700"
+    },
+    {
+      "path": "audits/restored-M2.json",
+      "sha256": "7868f0227db1547ae2d953a62026cd5ff958bf3b0160389975db2ff65eeb5e24"
+    },
+    {
+      "path": "history/initial-typed-red.raw.json",
+      "sha256": "156152f179f4c208fb69ef25544cf63364cb1ccb605452876f5e377caae3e30d"
+    },
+    {
+      "path": "history/initial-typed-red.observer.json",
+      "sha256": "ebd1323acd5c94ad8c3de3e83679c973762bdd11d843d7740c52db129b067833"
+    },
+    {
+      "path": "history/initial-typed-red.log",
+      "sha256": "7b2b91ae7c061b137c4eb98e0976a89e84dbc4154b04b41bc477e79cd9717ed5"
+    },
+    {
+      "path": "history/typed-repaired-original.raw.json",
+      "sha256": "719424e517db2fa0b67f4693edebffac7a280a07c2829be681e8a3ffacc3298a"
+    },
+    {
+      "path": "history/typed-repaired-original.observer.json",
+      "sha256": "a074b740811f133da5b575bed4e4ba886710706a10f8ea6dcfc74136a8e6b944"
+    },
+    {
+      "path": "history/typed-repaired-original.log",
+      "sha256": "76177ee066636bb5c33715faac4907a125fccdcef7d5d955a159e67495edd5d6"
+    },
+    {
+      "path": "history/broad-held-P102.raw.json",
+      "sha256": "f2c8bcf0eb57f803b5277c7686db48a144937d1e01007910295af05f29ad573c"
+    },
+    {
+      "path": "history/broad-held-P102.observer.json",
+      "sha256": "1d3359570794af022f13b9ad060a512b7242e28c774092b91ec062de1cb801f1"
+    },
+    {
+      "path": "history/broad-held-P102.log",
+      "sha256": "5c90e3b4c4b81c408654c24264e7bba3372b1043b57c7488a5e8d93bd1ad03b5"
+    },
+    {
+      "path": "source-commit.json",
+      "sha256": "b8c38866a4c487fb170a1fb7ee2516c5d21f8aaf9eed81b2ea7e7c2bf706211e"
+    },
+    {
+      "path": "source-inputs.json",
+      "sha256": "cf9ddced093ad0728dec17fde2bd1669f656e05e506d49c5a8ffc2a185794ae7"
+    },
+    {
+      "path": "fresh-binding.json",
+      "sha256": "7a92001a0a6e407cb4da6e6e356b16eda5f59c739bd06a7227c433226f054389"
+    },
+    {
+      "path": "control-chain.json",
+      "sha256": "d7b82488363148f06342cd961f7f5a484110e5759e0241195a27d5b31d1fbeac"
+    },
+    {
+      "path": "quality-and-freeze.json",
+      "sha256": "bc4c72619e06494921f768f4c9d17439d914d611012f3e545e919a9b1da3e68c"
+    },
+    {
+      "path": "held-preservation.json",
+      "sha256": "547fd78028e476e50cfa21c01910dfea5d48b76b21c0e88b7fbe97f1c6ff5ff6"
+    },
+    {
+      "path": "count-overlays.json",
+      "sha256": "3aeb9feb074f3e40abb60d824bf8216b2c2ba4f04cb1af94fdaaebc8db10d840"
+    },
+    {
+      "path": "metadata-admission.json",
+      "sha256": "0382f3be8d90db7800dd907e68d2ce5b46defcf8251a7c573df456a95bc5f9c1"
+    },
+    {
+      "path": "hosted-admission.json",
+      "sha256": "238b3918acefbe179089e1b87144bb69adec71ec13fb8396687f54d7dfd7a291"
+    },
+    {
+      "path": "broad-failure-classification.json",
+      "sha256": "09b6f187afe541f439384f9aaec2d7a81c60b06980f29c48a575eac19cc05606"
+    },
+    {
+      "path": "compiler-closure.json",
+      "sha256": "b59e89e7adc1d89bae1522bae6e8cc106c7c196374a49d35bbf7c4c1403e88f1"
+    },
+    {
+      "path": "compiler-independent-review.json",
+      "sha256": "ec6b3d74cc498c3d897a3409b8dd3610edcf220f70f41883509a8419ee426890"
+    },
+    {
+      "path": "real-flow-independent-review.json",
+      "sha256": "38dfce2dbbe6cd33f9a37e78b509dfac3f2b96493c7e60000d968c7c482737d1"
+    },
+    {
+      "path": "source-repair-independent-review.json",
+      "sha256": "5aa7aa03043afa512535935d858993510e48537a69965d6fa7868c30453b579a"
+    },
+    {
+      "path": "controls-independent-review.json",
+      "sha256": "50d410d2da0ac5fdd10727738c08f01de434c41586e2e7d97bc8280965ab767b"
+    },
+    {
+      "path": "ownership.json",
+      "sha256": "ad2db1f9b7d60640c93aba961bbeb4de7e012d65fb44bc6be0f440b37f0ba275"
+    },
+    {
+      "path": "source-allocation.json",
+      "sha256": "de42fcd6d74b98557a541ac264be0e91d79700c1efa6c9e6481ec9cbc6e2cb6c"
+    },
+    {
+      "path": "control-design.json",
+      "sha256": "0e4dd39090641446638258552073667f3e3bfef2adfcb1cffaf863cdc04170a8"
+    },
+    {
+      "path": "M1-classification.json",
+      "sha256": "929440bfd13501f1ad4345071aa8f9ee328625a94b479ebeb0d14c3972a5130b"
+    },
+    {
+      "path": "M2-classification.json",
+      "sha256": "a96ac2bcdd8dc22c15cb96066a397e1d2ba911f03dcbaff63b746bd40a3d8852"
+    },
+    {
+      "path": "M1-restore.json",
+      "sha256": "1a60ea45eaa6bc5dbc240e91b8c1fb9872796e815983b62ec35c86f3783d391a"
+    },
+    {
+      "path": "M2-restore.json",
+      "sha256": "13e2e197392ec2ac8deee7ea91332ec62848541ac90a8785514bd4a8b52758fa"
+    },
+    {
+      "path": "controls/skip-issuer-equality.patch",
+      "sha256": "2058910d17b99af6ababcebafb52f93f140623d4ba9525f8612dde0abb9c0ff5"
+    },
+    {
+      "path": "controls/allow-first-tools-call-reissue.patch",
+      "sha256": "87160f888e507af1c0781129fb6a3ad974f2392e0e41373b922a7d8b9b608c62"
+    },
+    {
+      "path": "history/failed-tests-compiler.log",
+      "sha256": "fb683360310af9ad793d0180a832bc5b2e532b62f64c9ba2520584aa99e25f8b"
+    },
+    {
+      "path": "logs/clean-source.log",
+      "sha256": "ef476bdc9912b103b89b3f2cde43642c61bbbe315833261e07393fbade269535"
+    },
+    {
+      "path": "logs/p139-lint.log",
+      "sha256": "22a03ddf6f49358fb4bcfe04bd56da9a1a9e26cc5aa8ffde1b5892abef468b95"
+    },
+    {
+      "path": "logs/p139-duplicates.log",
+      "sha256": "a93cc9682d38372e002a01e40db21fc85e1397b7324de2d0c7962dd044a260fa"
+    },
+    {
+      "path": "logs/p139-deadcode-delta.log",
+      "sha256": "30ee4eae95fc8684c8b48a5a503f23cf6a8d353c51b2952f910a1f31556bc620"
+    },
+    {
+      "path": "logs/p139-count-check.log",
+      "sha256": "82ac60039fcf8bc00dc663aabd78dcafc658cffc866e81929505bb199e8df7e4"
+    },
+    {
+      "path": "logs/p139-docs-drift.log",
+      "sha256": "ff57cb43abfed0a3cdba4ccb780bf3ee40b5fe7ddb1345e712cb8ca9a6e5461a"
+    },
+    {
+      "path": "logs/p139-architecture.log",
+      "sha256": "874b55d0b4dacb62e62d4ab86354b8f8c39927a8c235d1c6eb7ec16f43f09e66"
+    },
+    {
+      "path": "logs/p139-threat-model.log",
+      "sha256": "d8a37764ab52c8fe6a84b8aaf1de67c240c7f01698f2abf5b1a802764503d3f4"
+    },
+    {
+      "path": "logs/p139-q-final-freeze.log",
+      "sha256": "b4aa57b3587f183896ffcc1dd13b37dd1a6c7b102e71c3f51856018db8e66004"
+    },
+    {
+      "path": "commands.json",
+      "sha256": "d0adc4d1c9f8d7f64f80dddf63da1bca87f9425fdd4a7bd95c0d833fb621014f"
+    },
+    {
+      "path": "sample-mount-receipt.json",
+      "sha256": "467a74fbad11bcd6b9c098d43a0414902437cae1aaa365602b4e8b15b410a470"
+    },
+    {
+      "path": "private-references.json",
+      "sha256": "b5ca127368c72753eb09d7c896445159c1de518366c3d4c83dd9ef904d5e7b76"
+    },
+    {
+      "path": "evidence.json",
+      "sha256": "4769e6831921876ce3331118cd2873adc8ef6628c1d1885c88a264af4dfe2b35"
+    },
+    {
+      "path": "README.md",
+      "sha256": "cdefa31957258ff6184d71586c50d4d8c5cca1237266704862abdff1c243a5ed"
+    }
+  ]
+}

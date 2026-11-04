@@ -1,0 +1,70 @@
+{
+  "at": "2026-10-17T00:06:40.892329+00:00",
+  "sourceHead": "ac7759702ecbfda304b57e78eb1bd946340adc0f",
+  "paths": [
+    "tests/time/tsaTestFixture.ts",
+    "tests/time/checkpointWindow.test.ts"
+  ],
+  "old": [
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+      "bytes": 24967,
+      "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c",
+      "dev": 16777231,
+      "inode": 543658575,
+      "nlink": 1
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "bytes": 22649,
+      "sha256": "fc91661c759c7f46d1450d17cd237a1b848c7cc10ca9742e2b7e6b5ec272ade7",
+      "dev": 16777231,
+      "inode": 543658576,
+      "nlink": 1
+    }
+  ],
+  "candidates": [
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/tsaTestFixture.ts.source.txt",
+      "bytes": 25255,
+      "sha256": "72cff741f404bf83e49816be2141dad55042f037bf086b165381e344d47dddf1",
+      "dev": 16777231,
+      "inode": 543667802,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+      "bytes": 34549,
+      "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+      "dev": 16777231,
+      "inode": 543727816,
+      "nlink": 1
+    }
+  ],
+  "scopeReview": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/review.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/source-scope-preparation/review.json",
+    "bytes": 11407,
+    "sha256": "ab3f6e59d404fc613cd42005c6b433d9a41b224ce936e41fe1e73bb9f63f998e",
+    "dev": 16777231,
+    "inode": 543741593,
+    "nlink": 1
+  },
+  "hostedAdmission": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/hosted-source-admission.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/hosted-source-admission.json",
+    "bytes": 10590,
+    "sha256": "70f5bbcd8d10dee64c0f8d49b6c0066e3b4c7ecabd40048535836a1d9e83bf13",
+    "dev": 16777231,
+    "inode": 543741475,
+    "nlink": 1
+  },
+  "freezeAndD15NaturalZero": true,
+  "onlyTwoOwnTestSidePaths": true,
+  "allOther149ProtectedAndTenNativesExactBeforeWrite": true,
+  "noFreezeQualityDependencyProductionDeadlineOrHeldArchiveEdits": true
+}

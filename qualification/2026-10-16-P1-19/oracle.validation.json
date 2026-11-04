@@ -1,0 +1,134 @@
+{
+  "schema": "p119-oracle-post-materialization-validation/1",
+  "capturedUtc": "2026-10-15T23:05:33.017269+00:00",
+  "sourceCommit": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+  "receiptPath": "oracle.receipt.json",
+  "receiptSha256": "4c4cd81d1d2da652a94298363c1a5ef7fd9f67d28ffeb5ded705abd5bf499b10",
+  "oracleReceiptSchemaFields": 13,
+  "freshTests": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "skipped": 0
+  },
+  "byteExactMirrorCopies": 123,
+  "mirrorMap": {
+    "path": "/private/tmp/p1-19-oracle-implementation-20261016/supplement-materialized-mirror.json",
+    "sha256": "094bb479ca5ef529b94e89f6bafffc9252b6b313be650eed0c3258dc45e7d338"
+  },
+  "actualValidators": [
+    {
+      "phase": "p119-oracle-receipt-mirror-validation",
+      "command": {
+        "phase": "p119-oracle-receipt-mirror-validation",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-qualification-receipts.mjs --root /private/tmp/p1-19-oracle-implementation-20261016/qualification-validation-mirror",
+        "exit": 0,
+        "durationMs": 115,
+        "startedUtc": "2026-10-15T23:04:52.939968+00:00",
+        "endedUtc": "2026-10-15T23:04:53.066458+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-receipt-mirror-validation/stdout-stderr.log",
+        "head": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+        "headAfter": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+        "ownedProcess": {
+          "pid": 6370,
+          "ownedPgid": 6370,
+          "observedPgidAfterLaunch": 6370,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/check-qualification-receipts.mjs",
+            "--root",
+            "/private/tmp/p1-19-oracle-implementation-20261016/qualification-validation-mirror"
+          ],
+          "startedUtc": "2026-10-15T23:04:52.939968+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "actualOutput": "Qualification receipts valid: 1 receipt(s) under /private/tmp/p1-19-oracle-implementation-20261016/qualification-validation-mirror.\n",
+      "logSha256": "49154808841ab02dbbf5b4095de9223fd6cac4e61dfdc3a652351e3d8d2dcbc7"
+    },
+    {
+      "phase": "p119-oracle-whole-root-validation",
+      "command": {
+        "phase": "p119-oracle-whole-root-validation",
+        "major": "22",
+        "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+        "cmd": "/opt/homebrew/opt/node@22/bin/node scripts/check-qualification-receipts.mjs",
+        "exit": 0,
+        "durationMs": 292,
+        "startedUtc": "2026-10-15T23:04:53.180265+00:00",
+        "endedUtc": "2026-10-15T23:04:53.483700+00:00",
+        "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-whole-root-validation/stdout-stderr.log",
+        "head": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+        "headAfter": "2e136618b1b011a7269f37f8c2715b180b5b5a46",
+        "ownedProcess": {
+          "pid": 6378,
+          "ownedPgid": 6378,
+          "observedPgidAfterLaunch": 6378,
+          "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+          "argv": [
+            "/opt/homebrew/opt/node@22/bin/node",
+            "scripts/check-qualification-receipts.mjs"
+          ],
+          "startedUtc": "2026-10-15T23:04:53.180265+00:00",
+          "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+          "overriddenEnvironmentKeys": [
+            "PATH",
+            "HOME",
+            "GIT_NO_LAZY_FETCH"
+          ]
+        },
+        "groupAbsentByESRCH": true,
+        "signalsOtherThanZeroSent": false,
+        "observed": false,
+        "artifacts": {},
+        "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+      },
+      "actualOutput": "Qualification receipts valid: 18 receipt(s) under qualification.\n",
+      "logSha256": "002e8f327246df31050531af72c426a10f84ceb3c38bcc2bdbd6ac902738d6be"
+    }
+  ],
+  "discovery": "Normal whole-root validation schema-checks the sealed component receipt; the unchanged validator separately schema-checked this exact oracle receipt in the canonical private mirror.",
+  "sealedComponentFilesUnchanged": {
+    "evidence.json": {
+      "bytes": 164462,
+      "sha256": "d5083491b84693d0fc1ddc47b5d9108ed82cf913efd32a0b22eda42e3b4bdf46"
+    },
+    "fresh-components.observer.json": {
+      "bytes": 59827,
+      "sha256": "89c18a7c1a8a7a280110de96ba239b0cde0863219ecfe1e66d02e72479b93c18"
+    },
+    "fresh-components.raw.json": {
+      "bytes": 45656,
+      "sha256": "75648cf514242ed13cb3c504167439ba18194fc66551bddf85bd7049365d8e24"
+    },
+    "README.md": {
+      "bytes": 8496,
+      "sha256": "b25a234319ae2148ec794e27d9db426d6880879aef36ade0e1331cf07d31486e"
+    },
+    "original-components.raw.json": {
+      "bytes": 42304,
+      "sha256": "2c120b24d0281bca053e24b876f64548d88797ffd9a7973f08e8407d88397951"
+    },
+    "receipt.json": {
+      "bytes": 8265,
+      "sha256": "9525e5ce3be3759dbddf59e37fc40f0195333f5e1459c4ffd7de808a32ab55ba"
+    }
+  },
+  "evidenceReceiptRemainsImmutable": true,
+  "sidecarReason": "This subsequent validation record is independently Git-tracked outside the prevalidated receipt artifact list, avoiding self-referential receipt/result hashes.",
+  "formalP119Acceptance": false,
+  "completePlanGoal": "active"
+}

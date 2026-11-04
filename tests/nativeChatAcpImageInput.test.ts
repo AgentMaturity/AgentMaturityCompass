@@ -1,6 +1,7 @@
 /** AUTHORED UNEXECUTED. Real ACP/native session/driver/Chat runtime; only HTTP
  * scripted. Not installed-CLI, remote-model, platform or acceptance evidence.
  */
+import { withoutContextSnapshot } from "./helpers/contextSnapshot.js";
 import { spawnSync } from "node:child_process";
 import { mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -75,12 +76,13 @@ function cold(root: string, sessionId: string) {
 }
 
 describe("Chat images through the actual public ACP path (not executed)", () => {
-  test.each([1, 2, 3, 4, 5])("actual initialize pins image admission to Chat version4, not version%s by analogy", async encoderVersion => {
+  test.each([1, 2, 3, 4, 5, 6])("actual initialize pins image admission to Chat version4/5, not version%s by analogy", async encoderVersion => {
     const h = harness(workspace(), { adapter: { ...openaiAdapter, encoderVersion } });
-    // Unknown version5 is deliberately advertised as image=false: discovering
-    // metadata is not a dispatch or admission of an unregistered encoder.
+    // version5 is the registered cache-retention encoder (PXA-15), byte-equal to
+    // version4 without retention. Unknown version6 is deliberately advertised as
+    // image=false: discovering metadata is not admission of an unregistered encoder.
     const initial = await h.call("initialize", { protocolVersion: 1, clientCapabilities: {} });
-    expect(initial.result).toMatchObject({ agentCapabilities: { promptCapabilities: { image: encoderVersion === 4 } } });
+    expect(initial.result).toMatchObject({ agentCapabilities: { promptCapabilities: { image: encoderVersion === 4 || encoderVersion === 5 } } });
     expect(h.sent).toEqual([]);
   });
   test.each(["sqlite", "jsonl"])("%s: image-only wire input, signed immutable inbox, release/load and text continuation reconstruct after writer closure", async backend => {
@@ -90,7 +92,14 @@ describe("Chat images through the actual public ACP path (not executed)", () => 
     const reply = await call.result; expect(reply.error).toBeUndefined(); expect(await checkAcpDefinition("PromptResponse", reply.result)).toEqual({ ok: true });
     expect(h.sent).toHaveLength(1);
     const body = JSON.parse(h.sent[0]!.body.toString("utf8"));
-    expect(body.messages).toEqual([{ role: "system", content: "Native ACP image fixture" }, { role: "user", content: [imageWire()] }]);
+    // GAP-WP39: the system message is the composed prompt the session signed (identity, governance, persona), and the
+    // runtime-context snapshot follows the user's image.
+    const systemRow = h.sessions.get(sessionId)!.readEvents().find(row => row.event_type === "system/prompt")!;
+    const signedSystem = readEventPayload(root, systemRow);
+    if (signedSystem.status !== "ok") throw new Error("Expected the signed system prompt");
+    expect(signedSystem.bytes.toString("utf8")).toContain("Native ACP image fixture");
+    expect(body.messages).toEqual([{ role: "system", content: signedSystem.bytes.toString("utf8") }, { role: "user", content: expect.any(Array) }]);
+    expect(withoutContextSnapshot(body.messages[1].content)).toEqual([imageWire()]);
     expect(body.input).toBeUndefined();
     const rows = h.sessions.get(sessionId)!.readEvents();
     const inbox = rows.find(row => row.event_type === "loop/inbox" && JSON.parse(row.meta_json).payloadFormat === NATIVE_IMAGE_INPUT_FORMAT)!;
@@ -119,7 +128,7 @@ describe("Chat images through the actual public ACP path (not executed)", () => 
     const gif = { type: "image", mimeType: "image/gif", data: "R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" };
     const blocks = [{ type: "text", text: "Compare" }, { type: "resource_link", name: "reference", uri: "https://not-fetched.invalid" }, image(), gif];
     expect((await h.call("session/prompt", prompt(sessionId, blocks))).error).toBeUndefined();
-    expect(JSON.parse(h.sent[0]!.body.toString("utf8")).messages.find((item: { role: string }) => item.role === "user").content).toEqual([
+    expect(withoutContextSnapshot(JSON.parse(h.sent[0]!.body.toString("utf8")).messages.find((item: { role: string }) => item.role === "user").content)).toEqual([
       { type: "text", text: "Compare\n[linked resource: https://not-fetched.invalid]" }, imageWire(), imageWire(gif.data, gif.mimeType)
     ]);
     const before = h.sessions.get(sessionId)!.readEvents();

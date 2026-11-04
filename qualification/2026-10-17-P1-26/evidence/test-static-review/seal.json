@@ -1,0 +1,33 @@
+{
+  "schema": "p126-test-peer-seal/1",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/README.md",
+      "bytes": 1543,
+      "sha256": "9615301b238c05e8bdac36d9b84febaeb383ab5cf1a4bfdbef3c2cef6fa26810",
+      "readScope": "sealed peer output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/input-pins.json",
+      "bytes": 2783,
+      "sha256": "61b5afc577fa01451864d7adac66452da2e175f110c744d8f0dfe277b81ada58",
+      "readScope": "sealed peer output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/review.json",
+      "bytes": 14252,
+      "sha256": "a3d31bab8163244b35c3f24abdafa93b46c723321f06e73f10887474145ba064",
+      "readScope": "sealed peer output"
+    },
+    {
+      "path": "/private/tmp/p1-26-tree-qualification-20261017/test-static-review/verified-author-inputs.json",
+      "bytes": 11116,
+      "sha256": "c6ca6693bcc8a051dd28050c529e8f633b45c5732c815feb7511dd3f7d653955",
+      "readScope": "sealed peer output"
+    }
+  ],
+  "inputCount": 10,
+  "authorInputPinsVerified": 47,
+  "blockers": [],
+  "executed": false
+}

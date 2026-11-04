@@ -43,13 +43,14 @@ jobs:
 | `node-version` | `20` | Node.js version |
 | `amc-version` | `1.2.0` | Verified GitHub Release version; `local` builds the action checkout. npm is not a live channel. |
 | `working-directory` | `.` | Directory to run AMC in |
+| `answers-file` | (none) | JSON answers file: scores self-reported survey answers (`amc quickscore --rapid --answers`) instead of ledger evidence |
 
 ## Outputs
 
 | Output | Description |
 |--------|-------------|
-| `score` | AMC composite score (float) |
-| `level` | Maturity level string (L0–L5) |
+| `score` | AMC composite score (float); empty when there is no evidence yet |
+| `level` | Maturity level string (L0–L5); empty when there is no evidence yet |
 | `passed` | Whether the gate passed (`true`/`false`) |
 | `result-json` | Path to full AMC result JSON |
 
@@ -60,6 +61,19 @@ jobs:
 - **Badge** — Generates a shields.io badge in the step summary and as an artifact.
 - **Artifacts** — Uploads `amc-result.json` and `amc-badge.md` for downstream consumption.
 - **Configurable Gate** — Set `target-level` to enforce minimum maturity (e.g., L3 for production agents).
+
+## Workspace and "no evidence yet"
+
+When the working directory has no `.amc` workspace, the action creates one with `amc init --minimal --profile ci`. Its
+vault passphrase is generated for the job, masked in the log and passed to later steps in `AMC_VAULT_PASSPHRASE`; the
+workspace and its keys end with the job. A committed `.amc` workspace is used as it is: set `AMC_VAULT_PASSPHRASE` from a
+repository secret in the job's `env`.
+
+A fresh workspace has no evidence yet. The action reports that as a result, not as a crash and not as a score: the step
+summary and the PR comment say "AMC: no evidence yet", the badge reads "no evidence yet", `score` and `level` are empty,
+and the gate fails when `target-level` is above 0, naming that reason. With `fail-on-drop`, the base branch is still
+scored: a measured base with no evidence on this branch fails the gate as "evidence removed", and the comparison is skipped
+only when neither branch has evidence. Capture evidence first (`amc wrap <runtime> -- <your-agent-command>`), or score self-reported survey answers with `answers-file`.
 
 ## Advanced: Use Outputs in Downstream Steps
 

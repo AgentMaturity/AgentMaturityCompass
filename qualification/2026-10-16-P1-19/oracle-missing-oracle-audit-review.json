@@ -1,0 +1,974 @@
+{
+  "schema": "p119-missing-oracle-independent-audit/1",
+  "capturedUtc": "2026-10-15T22:42:40.815887+00:00",
+  "scope": "Read-only closed run, public markers, emitted producer text, file hashes and provider JSONL; no product execution, imports, parser, SQL, network, R writes or secret configuration reads.",
+  "conclusion": "Confirmed actual missing-oracle RED after the genuine completed producer and exactly one provider payment effect. No oracle checks ran; no qualification pass is claimed.",
+  "phase": "p119-oracle-missing-positive-v3",
+  "command": {
+    "phase": "p119-oracle-missing-positive-v3",
+    "major": "22",
+    "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "cmd": "/opt/homebrew/opt/node@22/bin/node /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs run tests/lighthouse/financeOracle.test.ts -t 'a real completed journaled payment passes every mandatory oracle check' --reporter=default --reporter=json --reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs --outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-missing-positive-v3.producer.json",
+    "exit": 1,
+    "durationMs": 2090,
+    "startedUtc": "2026-10-15T22:39:43.618100+00:00",
+    "endedUtc": "2026-10-15T22:39:45.720941+00:00",
+    "log": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/stdout-stderr.log",
+    "head": "335a3a9ae977f898391fdf2db186138e82d000ae",
+    "headAfter": "335a3a9ae977f898391fdf2db186138e82d000ae",
+    "ownedProcess": {
+      "pid": 2459,
+      "ownedPgid": 2459,
+      "observedPgidAfterLaunch": 2459,
+      "cwd": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+      "argv": [
+        "/opt/homebrew/opt/node@22/bin/node",
+        "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/vitest/vitest.mjs",
+        "run",
+        "tests/lighthouse/financeOracle.test.ts",
+        "-t",
+        "a real completed journaled payment passes every mandatory oracle check",
+        "--reporter=default",
+        "--reporter=json",
+        "--reporter=/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "--outputFile=/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-missing-positive-v3.producer.json"
+      ],
+      "startedUtc": "2026-10-15T22:39:43.618100+00:00",
+      "environmentPolicy": "Inherited environment; private HOME and Node22 PATH; no isolation claim.",
+      "overriddenEnvironmentKeys": [
+        "PATH",
+        "HOME",
+        "GIT_NO_LAZY_FETCH",
+        "AMC_P021_RUNTIME_OBSERVER_PATH"
+      ]
+    },
+    "groupAbsentByESRCH": true,
+    "signalsOtherThanZeroSent": false,
+    "observed": true,
+    "artifacts": {
+      "rawProducer": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/p119-oracle-missing-positive-v3.producer.json",
+        "bytes": 5161,
+        "sha256": "d7624fdce5f8db92ce22a71e4b5fd111629b17e1ed8476d9671e4f4cc4194e9c"
+      },
+      "rawSnapshot": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/raw.json",
+        "bytes": 5161,
+        "sha256": "d7624fdce5f8db92ce22a71e4b5fd111629b17e1ed8476d9671e4f4cc4194e9c"
+      },
+      "observer": {
+        "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/observer.json",
+        "bytes": 8722,
+        "sha256": "a03cd32777c6dea8f5f193b57ed79481bd9c46f2db652393099edd81aa5ead4d"
+      },
+      "reporter": {
+        "path": "/private/tmp/p0-21-qualification-20261015/observer-reporter.mjs",
+        "bytes": 2110,
+        "sha256": "4eddb7dd8e92bd4522c4b6a763f84630105dfc008efae6429786ccd2a229f447"
+      }
+    },
+    "boundary": "Process metadata only; raw/observer/late diagnostics require review. No universal descendant or filesystem-isolation proof."
+  },
+  "journalEntryExact": true,
+  "reports": {
+    "rawCaseCount": 8,
+    "rawStatuses": {
+      "failed": 1,
+      "skipped": 7
+    },
+    "observerTestCount": 8,
+    "uniqueIdentityMultiplicity": 1,
+    "exactIdentityOrderAndStatusAgreement": true,
+    "caseStates": [
+      {
+        "identity": "P1-19 finite independent oracle with genuine signed action producers a real completed journaled payment passes every mandatory oracle check",
+        "raw": "failed",
+        "observer": "fail",
+        "failureMessages": 1,
+        "observerErrors": 1
+      },
+      {
+        "identity": "P1-19 finite independent oracle with genuine signed action producers a second real payment under another key and the same reference specifically fails no-duplicate",
+        "raw": "skipped",
+        "observer": null,
+        "failureMessages": 0,
+        "observerErrors": 0
+      },
+      {
+        "identity": "P1-19 finite independent oracle with genuine signed action producers an actual post-authorization amount corruption specifically fails payload-bound",
+        "raw": "skipped",
+        "observer": null,
+        "failureMessages": 0,
+        "observerErrors": 0
+      },
+      {
+        "identity": "P1-19 finite independent oracle with genuine signed action producers a genuine provider-only commit has no matching completed AMC receipt",
+        "raw": "skipped",
+        "observer": null,
+        "failureMessages": 0,
+        "observerErrors": 0
+      },
+      {
+        "identity": "P1-19 finite independent oracle with genuine signed action producers a copied closed log with its final newline removed specifically fails txlog-chain",
+        "raw": "skipped",
+        "observer": null,
+        "failureMessages": 0,
+        "observerErrors": 0
+      },
+      {
+        "identity": "P1-19 finite independent oracle with genuine signed action producers adapter stdout pass and verified flags cannot manufacture a receipt or trust anchor",
+        "raw": "skipped",
+        "observer": null,
+        "failureMessages": 0,
+        "observerErrors": 0
+      },
+      {
+        "identity": "P1-19 finite independent oracle with genuine signed action producers changing a genuine pre-dispatch argument preimage cannot preserve authorization",
+        "raw": "skipped",
+        "observer": null,
+        "failureMessages": 0,
+        "observerErrors": 0
+      },
+      {
+        "identity": "P1-19 finite independent oracle with genuine signed action producers a corrupted genuine decision signature is refused without re-signing authority",
+        "raw": "skipped",
+        "observer": null,
+        "failureMessages": 0,
+        "observerErrors": 0
+      }
+    ],
+    "rawSummarySuiteCount": 2,
+    "rawSummarySuiteInterpretation": "Two raw summary suite nodes do not mean two physical test files; one testResults entry and one observer file node.",
+    "observerTaskKinds": {
+      "file": 1,
+      "suite": 1,
+      "test": 8
+    },
+    "fileHook": {
+      "afterAll": "pass"
+    },
+    "fileOrSuiteOwnedErrors": [],
+    "unhandledErrors": [],
+    "knownLateDiagnosticMatches": [],
+    "skips": "Seven cases were deliberately excluded by the -t filter; their observer state is null. No skipped case is counted as a pass.",
+    "snapshot": {
+      "added": 0,
+      "failure": false,
+      "filesAdded": 0,
+      "filesRemoved": 0,
+      "filesRemovedList": [],
+      "filesUnmatched": 0,
+      "filesUpdated": 0,
+      "matched": 0,
+      "total": 0,
+      "unchecked": 0,
+      "uncheckedKeysByFile": [],
+      "unmatched": 0,
+      "updated": 0,
+      "didUpdate": false
+    },
+    "failureStack": "Error: Owned oracle-1 failed: exit=1, signal=null, PID absent=true, captureError=false, truncated=false\n    at requireClosed (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:232:11)\n    at Object.runOracle (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:341:31)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:30:62\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:333:7\n    at withFinance (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeQualification.ts:214:9)\n    at withOracleFixture (/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts:277:5)\n    at /Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts:30:5\n    at file:///Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/node_modules/@vitest/runner/dist/chunk-artifact.js:1903:20"
+  },
+  "publicMarkers": {
+    "financeExactlyMatchesRetainedJson": true,
+    "oracleExactlyMatchesRetainedJson": true,
+    "financeCount": 1,
+    "oracleCount": 1,
+    "cleanupErrors": []
+  },
+  "producer": {
+    "children": [
+      {
+        "label": "initializer",
+        "pid": 2462,
+        "argv": [
+          "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "/private/tmp/lhfo-d11M9g/producer.mjs",
+          "init",
+          "/private/tmp/lhfo-d11M9g/producer-config.json"
+        ],
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "streamsClosed": true,
+        "absentByESRCH": true,
+        "probes": [
+          "ESRCH"
+        ],
+        "truncated": false,
+        "captureErrors": [],
+        "captured": {
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        "observedOutputBytes": {
+          "stdout": 0,
+          "stderr": 0
+        },
+        "environmentKeys": [
+          "AMC_CONTROL_CHECKPOINT_DIR",
+          "AMC_GUARD_EVENTS_DB_PATH",
+          "AMC_GUARD_RECEIPTS_WORKSPACE",
+          "AMC_HOME",
+          "AMC_LEDGER_SQLITE_SYNCHRONOUS",
+          "AMC_NO_SIGN",
+          "AMC_OTEL_ENABLED",
+          "AMC_VAULT_PASSPHRASE",
+          "AMC_VAULT_REMEMBER",
+          "GIT_NO_LAZY_FETCH",
+          "HOME",
+          "LANG",
+          "LC_ALL",
+          "NO_COLOR",
+          "PATH",
+          "TMPDIR",
+          "TZ"
+        ],
+        "processGroup": "Inherited guarded outer group; only PID absence checked here"
+      },
+      {
+        "label": "producer",
+        "pid": 2465,
+        "argv": [
+          "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "/private/tmp/lhfo-d11M9g/producer.mjs",
+          "produce",
+          "/private/tmp/lhfo-d11M9g/produce-config.json"
+        ],
+        "exit": 0,
+        "signal": null,
+        "spawnError": null,
+        "streamsClosed": true,
+        "absentByESRCH": true,
+        "probes": [
+          "ESRCH"
+        ],
+        "truncated": false,
+        "captureErrors": [],
+        "captured": {
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          }
+        },
+        "observedOutputBytes": {
+          "stdout": 0,
+          "stderr": 0
+        },
+        "environmentKeys": [
+          "AMC_CONTROL_CHECKPOINT_DIR",
+          "AMC_GUARD_EVENTS_DB_PATH",
+          "AMC_GUARD_RECEIPTS_WORKSPACE",
+          "AMC_HOME",
+          "AMC_LEDGER_SQLITE_SYNCHRONOUS",
+          "AMC_NO_SIGN",
+          "AMC_OTEL_ENABLED",
+          "AMC_VAULT_PASSPHRASE",
+          "AMC_VAULT_REMEMBER",
+          "GIT_NO_LAZY_FETCH",
+          "HOME",
+          "LANG",
+          "LC_ALL",
+          "NO_COLOR",
+          "PATH",
+          "TMPDIR",
+          "TZ"
+        ],
+        "processGroup": "Inherited guarded outer group; only PID absence checked here"
+      },
+      {
+        "label": "oracle-1",
+        "pid": 2466,
+        "argv": [
+          "/opt/homebrew/Cellar/node@22/22.23.3_2/bin/node",
+          "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracle.mjs",
+          "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/cli.js",
+          "/private/tmp/lhfo-d11M9g/workspaces/p119-oracle-de96ae92-5143-4fa9-8f6e-32fd90025929",
+          "/private/tmp/lhfo-d11M9g/case.json",
+          "/private/tmp/lhfo-d11M9g/provider-evidence"
+        ],
+        "exit": 1,
+        "signal": null,
+        "spawnError": null,
+        "streamsClosed": true,
+        "absentByESRCH": true,
+        "probes": [
+          "ESRCH"
+        ],
+        "truncated": false,
+        "captureErrors": [],
+        "captured": {
+          "stdout": {
+            "bytes": 0,
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+          },
+          "stderr": {
+            "bytes": 743,
+            "sha256": "4565a793719217df0b4d364536bc615384e55710bbaf41d703d6066ecec9fe63"
+          }
+        },
+        "observedOutputBytes": {
+          "stdout": 0,
+          "stderr": 743
+        },
+        "environmentKeys": [
+          "AMC_FINANCE_ORACLE_PINS_FILE",
+          "AMC_HOME",
+          "HOME",
+          "NO_COLOR",
+          "PATH",
+          "TMPDIR"
+        ],
+        "processGroup": "Inherited guarded outer group; only PID absence checked here"
+      }
+    ],
+    "scriptSha256": "8e661c83f486851dd375ca6891e092e9e789735fc6e078ecf7fe6467d7ad33b4",
+    "result": {
+      "schema": "finance-oracle-producer/1",
+      "mode": "completed",
+      "executionId": "exec_f27c1a30-627c-429c-9c13-c1440e9e25d0",
+      "paymentId": "pay_61fc1866500547d9b29f718919b2dbdb",
+      "idempotencyKey": "amc1_4Q20MWZH24PWSG5NB831R4D923",
+      "approvalRequestId": "apprreq_4d4e6bf614e041c3b3e1207a59d0bb70",
+      "sessionId": "finance-oracle-recorder-34e09268-95a5-41f4-bd76-b951348e447d",
+      "authorizationDigest": "42f08d840866384da21a417ce724bd38e9886eb0f4a73df91e2cc24a30d4f17e",
+      "genericArgumentsDigest": "c4e9b76ef0f9699a8c877a79a98f3e2e15467d37a9522fd1ab29c0d1055f8963",
+      "providerBodySha256": "d6a3109a07013ab02f5a62f8b46770137cb42dd22f2d7965b19ba68733cf3360",
+      "decisionIds": [
+        "apprdec_54457c642bfb44eebaba90d21678593a",
+        "apprdec_94e7bd4386ab4a968d8eb92a5a4468b7"
+      ]
+    },
+    "realApiEvidence": {
+      "defaultDistinctFinancialQuorumAssertions": "producer.mjs:74-88",
+      "durableExclusivePreimageAndFsync": "producer.mjs:18-22,100-105",
+      "realPipelineRecorderChainConsumptionAndSeal": "producer.mjs:109-139",
+      "naturalStoreAndVaultCleanupBeforeResult": "producer.mjs:143-149"
+    },
+    "preimageFile": {
+      "path": "/private/tmp/lhfo-d11M9g/workspaces/p119-oracle-de96ae92-5143-4fa9-8f6e-32fd90025929/.amc/finance-oracle-preimages/exec_f27c1a30-627c-429c-9c13-c1440e9e25d0.json",
+      "bytes": 2818,
+      "sha256": "966551e2c34d9ba3ae525d600785fa7644825014f6076973d69867d804b941a9",
+      "device": 16777231,
+      "inode": 541767227,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    "publicAnchorsMatchBeforeArtifactPins": true,
+    "directBuildInputCount": 24,
+    "directBuildPinsRechecked": true,
+    "appliedV3PinsRechecked": true,
+    "sourceRoot": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass",
+    "buildRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout"
+  },
+  "provider": {
+    "physicalRoot": "/private/tmp/lhf-ETIJH1",
+    "coldCopy": {
+      "actualProviderDir": "/private/tmp/lhf-ETIJH1/run",
+      "oracleInputDir": "/private/tmp/lhfo-d11M9g/provider-evidence",
+      "files": [
+        {
+          "name": "txlog.jsonl",
+          "original": "/private/tmp/lhf-ETIJH1/run/txlog.jsonl",
+          "copied": "/private/tmp/lhfo-d11M9g/provider-evidence/txlog.jsonl",
+          "bytes": 5415,
+          "sha256": "db58e765485dc8bc289060f7cc47608b2c3396e67ae5621ceff85e7b5f50bcbc",
+          "originalIdentity": {
+            "device": 16777231,
+            "inode": 541767056,
+            "nlink": 1,
+            "mode": 384,
+            "bytes": 5415
+          },
+          "copyIdentity": {
+            "device": 16777231,
+            "inode": 541767237,
+            "nlink": 1,
+            "mode": 384,
+            "bytes": 5415
+          }
+        },
+        {
+          "name": "txlog-head.json",
+          "original": "/private/tmp/lhf-ETIJH1/run/txlog-head.json",
+          "copied": "/private/tmp/lhfo-d11M9g/provider-evidence/txlog-head.json",
+          "bytes": 85,
+          "sha256": "21ff601bd1167ae3d1333b16fd024f656b4a425a71e01865e883fd91b861f53d",
+          "originalIdentity": {
+            "device": 16777231,
+            "inode": 541767236,
+            "nlink": 1,
+            "mode": 384,
+            "bytes": 85
+          },
+          "copyIdentity": {
+            "device": 16777231,
+            "inode": 541767238,
+            "nlink": 1,
+            "mode": 384,
+            "bytes": 85
+          }
+        }
+      ]
+    },
+    "rowCount": 11,
+    "kindCounts": {
+      "admin": 2,
+      "request": 4,
+      "response": 4,
+      "commit": 1
+    },
+    "canonicalRowDigestsIndependentlyRecomputed": true,
+    "checkpoint": {
+      "hash": "9d1f0424fdf9b2e498fa6d4ccae22d90d8e663b41a368600039880fc10e6fdaa",
+      "seq": 11
+    },
+    "originalAndCopyBytesExact": true,
+    "posts": 1,
+    "commits": 1,
+    "postSeq": 6,
+    "commitSeq": 7,
+    "responseSeq": 8,
+    "responseStatus": 201,
+    "keyPaymentAndBodyDigestMatchProducer": true,
+    "child": {
+      "pid": 2461,
+      "code": 0,
+      "signal": null,
+      "streamsClosed": true,
+      "probes": [
+        {
+          "absent": true,
+          "code": "ESRCH"
+        }
+      ]
+    },
+    "adminShutdownStatus": 200
+  },
+  "oracleFailure": {
+    "pid": 2466,
+    "exit": 1,
+    "signal": null,
+    "stdoutBytes": 0,
+    "stderrBytes": 743,
+    "stderrSha256": "4565a793719217df0b4d364536bc615384e55710bbaf41d703d6066ecec9fe63",
+    "code": "MODULE_NOT_FOUND",
+    "missingPath": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/examples/lighthouse-finance/oracle.mjs",
+    "oracleVerdictReached": false
+  },
+  "limits": [
+    "The successful cold producer used real built public APIs and asserted the genuine signed approval, durable preimage, action chain, recorder and consumed ID. This audit did not independently reopen its database or reverify all approval signatures.",
+    "Selected direct build files and manifest pins were rehashed; the complete transitive module closure was not independently reconstructed.",
+    "The outer test runner used R and inherited its environment. Nested processes enumerate finite environment keys; this is not same-UID or kernel credential isolation.",
+    "PID/PGID ESRCH and natural stream closure are recorded finite process checks, not universal absence proof.",
+    "Only the genuine positive case executed. The seven other cases were filtered; no independent oracle implementation or verdict was exercised.",
+    "Retained failure roots were preserved; no private keys, secret configs, token files, SQLite contents, product imports or runtime checks were read or run."
+  ],
+  "inputPins": [
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/command.json",
+      "bytes": 2938,
+      "sha256": "89145ea407724cd59442e924efcc13fd328712c53d3bcba4e07c8d1510ed41b6",
+      "device": 16777231,
+      "inode": 541767247,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/raw.json",
+      "bytes": 5161,
+      "sha256": "d7624fdce5f8db92ce22a71e4b5fd111629b17e1ed8476d9671e4f4cc4194e9c",
+      "device": 16777231,
+      "inode": 541767246,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/observer.json",
+      "bytes": 8722,
+      "sha256": "a03cd32777c6dea8f5f193b57ed79481bd9c46f2db652393099edd81aa5ead4d",
+      "device": 16777231,
+      "inode": 541767244,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/stdout-stderr.log",
+      "bytes": 22584,
+      "sha256": "0a5e3912c3c99311d65a064b4d57b01b00cf3850fc0d66a016b4107ee9395d11",
+      "device": 16777231,
+      "inode": 541767023,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/owned-process.json",
+      "bytes": 900,
+      "sha256": "cf420f1607ddd7d0bf0843eef81937efe19b578ab0a95a08206f12c23f548d2e",
+      "device": 16777231,
+      "inode": 541767024,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-03-post-typecheck-20261016/command-p119-oracle-missing-positive-v3/owned-group-after-exit.json",
+      "bytes": 260,
+      "sha256": "6dd04bbb76f46770e4bc34ad9a5491828da1cc842dbfc8cc52a89ffc0b106826",
+      "device": 16777231,
+      "inode": 541767245,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/public-observations.json",
+      "bytes": 10331,
+      "sha256": "9bdf88ff168512f046b96684cb653aee2ce58e16287a37445535b019c008a9ac",
+      "device": 16777231,
+      "inode": 541767242,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/oracle-1.stderr.log",
+      "bytes": 743,
+      "sha256": "4565a793719217df0b4d364536bc615384e55710bbaf41d703d6066ecec9fe63",
+      "device": 16777231,
+      "inode": 541767240,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/oracle-1.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767239,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/initializer.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767202,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/initializer.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767201,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/producer.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767233,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/producer.stdout.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767232,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/producer.mjs",
+      "bytes": 12144,
+      "sha256": "8e661c83f486851dd375ca6891e092e9e789735fc6e078ecf7fe6467d7ad33b4",
+      "device": 16777231,
+      "inode": 541767046,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/produced.json",
+      "bytes": 727,
+      "sha256": "3ef2df785fb5d45cd471447ce7ae5f326e7364a6bd733075badd1c45db9b6744",
+      "device": 16777231,
+      "inode": 541767231,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/initialized.json",
+      "bytes": 504,
+      "sha256": "04642d2e44606ed870d019648731aa8efe7ef3f69197cd40a1109c433eb2029c",
+      "device": 16777231,
+      "inode": 541767200,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/case.json",
+      "bytes": 280,
+      "sha256": "0d05b724e33ea975abe118e045a5be5a5dbab872fbab127033352e01753e780a",
+      "device": 16777231,
+      "inode": 541767047,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/operator/before-artifacts.json",
+      "bytes": 446,
+      "sha256": "7c7bb23bd32ab16cfc39e617777c7c6e89f40b4dcbc9e43ae5b9b2c7e2e00bcf",
+      "device": 16777231,
+      "inode": 541767045,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/operator/pins.json",
+      "bytes": 1597,
+      "sha256": "5dd421e7608f27a1d05d217668b56ccb6a5b51d23ab8fd629dfeb5fd49f682cc",
+      "device": 16777231,
+      "inode": 541767203,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/qualification-observations.json",
+      "bytes": 14350,
+      "sha256": "963fd07020872d98399ecc3c096428b31db9ebaffc6bf85cbdd3b4e6632b70cd",
+      "device": 16777231,
+      "inode": 541767241,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/child-1.stderr.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "device": 16777231,
+      "inode": 541767052,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/child-1.stdout.log",
+      "bytes": 173,
+      "sha256": "2283c9af42f7e3fc0fa6461b0db99bb13994c9a2712f11ed2ca1ef50fd831b4a",
+      "device": 16777231,
+      "inode": 541767051,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/tests-v3-application.json",
+      "bytes": 953,
+      "sha256": "a99cfcd91fe9f2e2f2bca65d3ef2ca5aa538119cca30c6be43a9e6c38715f05d",
+      "device": 16777231,
+      "inode": 541766983,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/tmp/p1-19-oracle-implementation-20261016/actual-missing-oracle-red.json",
+      "bytes": 6719,
+      "sha256": "a4ea0dfbafda9e805afa8418dd8c1681d8bcd32df3702d2cc8c7bf31a850256c",
+      "device": 16777231,
+      "inode": 541767335,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/helpers/financeOracleQualification.ts",
+      "bytes": 30699,
+      "sha256": "9ffa86ac0ba2fefc0d92b7f0553886c43d19bcc4bb1eb41716e5c339ed6f137b",
+      "device": 16777231,
+      "inode": 541766981,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/Users/sid/.codex/worktrees/p1-09-implementation/AgentMaturityCompass/tests/lighthouse/financeOracle.test.ts",
+      "bytes": 4470,
+      "sha256": "d6eb1814e0106dfc5773e6791a8c7856e43e717e3573cf3ced82029a18cf9ed5",
+      "device": 16777231,
+      "inode": 541766982,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/cli.js",
+      "bytes": 1054132,
+      "sha256": "ce387d2f113699e2399ecabfdba288cc45748c15c28efc24f2bf0d68e0e9261f",
+      "device": 16777231,
+      "inode": 541763565,
+      "nlink": 1,
+      "modeOctal": "0o755"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/vault/vault.js",
+      "bytes": 27868,
+      "sha256": "f1152e1ace9f772e01a9c3720c66f39fef60ba30f4e3269bba35dc4b2d0e6545",
+      "device": 16777231,
+      "inode": 541759530,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/storage/sqlitePool.js",
+      "bytes": 5308,
+      "sha256": "b30b74682cc61bd1d03d08cced571cfc7ee2fcd0f43105965346d4fff80be55e",
+      "device": 16777231,
+      "inode": 541759904,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/ledger/ledger.js",
+      "bytes": 40649,
+      "sha256": "b555d1a81c0033f2af9a5004e209eae0f11ceb46f665b9f52b17cf9978796da2",
+      "device": 16777231,
+      "inode": 541760079,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/fleet/paths.js",
+      "bytes": 4966,
+      "sha256": "4f2aac1a5368c51797e00ac554100ea25c14bf2ebd09dcc93094bd9f776cf961",
+      "device": 16777231,
+      "inode": 541759450,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/crypto/keys.js",
+      "bytes": 8403,
+      "sha256": "33c4b7aef14b5794cd59f7300c6672e499ae308e6f0ef2c9ab32e89acbe8b4ee",
+      "device": 16777231,
+      "inode": 541759532,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/utils/json.js",
+      "bytes": 496,
+      "sha256": "f2440acd31b7d86a041ec312d766116a389b90efba539d473ebb2116290052ba",
+      "device": 16777231,
+      "inode": 541759483,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/workspace.js",
+      "bytes": 28184,
+      "sha256": "5b50d81f0ba2619bc7a6b5651f0e6179d542d7febbbfa513a30e218ea2215c06",
+      "device": 16777231,
+      "inode": 541761270,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/governor/actionPolicyEngine.js",
+      "bytes": 33861,
+      "sha256": "402da40586bb5dcee9beadc4d840ffdc8460806d151ca7780f74789b04b4bf53",
+      "device": 16777231,
+      "inode": 541760085,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/budgets/budgets.js",
+      "bytes": 10569,
+      "sha256": "8db0137168bbd0c5dacb315a4f802e608a62de44758130af6c1cf1e8ab439017",
+      "device": 16777231,
+      "inode": 541760044,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/approvals/approvalPolicyEngine.js",
+      "bytes": 12271,
+      "sha256": "e06cd71aee239306352689b9c280ac86afcd079386881188187e57b49aa6af20",
+      "device": 16777231,
+      "inode": 541760010,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/toolhub/toolhubValidators.js",
+      "bytes": 14162,
+      "sha256": "a5b356bd5c0747445d1c2c157583aeb30686897716b743b371557a014c1f819c",
+      "device": 16777231,
+      "inode": 541759858,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/lighthouse/finance/paymentServiceClient.js",
+      "bytes": 11068,
+      "sha256": "4c9232628d7c4cfd70338a28cfaa7f4188c045ce271eab6e85a3349cf973e502",
+      "device": 16777231,
+      "inode": 541763952,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/lighthouse/finance/paymentAdapter.js",
+      "bytes": 6126,
+      "sha256": "be6f00d368636901b86bd6bd41fe735ffad5c7e1141f4dd5af4f6cd47b620704",
+      "device": 16777231,
+      "inode": 541763954,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/lighthouse/finance/paymentArgs.js",
+      "bytes": 1792,
+      "sha256": "59ae4986a498e0130b7ac8c794dc3d8b0d45b5c1a8a1df561c4a9a0e6aed939d",
+      "device": 16777231,
+      "inode": 541763950,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/actions/authorize.js",
+      "bytes": 17905,
+      "sha256": "3c078af911e6f4bf2e987bef21399247c9a9cc79d02ecc523a3ac6a125f0f0ea",
+      "device": 16777231,
+      "inode": 541759813,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/actions/authorizationRecord.js",
+      "bytes": 2718,
+      "sha256": "36e25d0388ac84c7c18f3d561031258dbf1e611f79313dfc44a70eea97ae3043",
+      "device": 16777231,
+      "inode": 541759785,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/approvals/approvalEngine.js",
+      "bytes": 18280,
+      "sha256": "d2d4d643e1769dac299e427c4b3ebe0fea5650ffa77d9fd1ba69668916a03268",
+      "device": 16777231,
+      "inode": 541760089,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/approvals/approvalChainStore.js",
+      "bytes": 24605,
+      "sha256": "f52d7e09969d571cd6c74fcb662329d4dfe98267f3df0f52f0250107fba46d17",
+      "device": 16777231,
+      "inode": 541759749,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/actions/actionJournal.js",
+      "bytes": 27971,
+      "sha256": "51dcef1e2aac552e92f2fadd55eba6101b9b128d7df0459118a97e622f3c0f1e",
+      "device": 16777231,
+      "inode": 541759787,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/tools/toolRegistry.js",
+      "bytes": 7054,
+      "sha256": "b5fa412d5fc5fac3612974a6366041a9794732218ec2150ec9429452691f35fc",
+      "device": 16777231,
+      "inode": 541759794,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/tools/toolPipeline.js",
+      "bytes": 26855,
+      "sha256": "d104405e18c44b14146b1a0f24035744315705bc8b28f553d0ec4e3569dc55af",
+      "device": 16777231,
+      "inode": 541759817,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/tools/toolEvidence.js",
+      "bytes": 5077,
+      "sha256": "d0339550d6d2a41ec59c9c317f115506b3497648a79cc5d391769cf7fd3ac26d",
+      "device": 16777231,
+      "inode": 541760237,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-OGf0wY/checkout/dist/tools/guards/policyGuards.js",
+      "bytes": 10115,
+      "sha256": "55ccd85f9c07e9bab72871ead7dbf977dfda80e302ece56a814fa9de4685107f",
+      "device": 16777231,
+      "inode": 541760226,
+      "nlink": 1,
+      "modeOctal": "0o644"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/workspaces/p119-oracle-de96ae92-5143-4fa9-8f6e-32fd90025929/.amc/finance-oracle-preimages/exec_f27c1a30-627c-429c-9c13-c1440e9e25d0.json",
+      "bytes": 2818,
+      "sha256": "966551e2c34d9ba3ae525d600785fa7644825014f6076973d69867d804b941a9",
+      "device": 16777231,
+      "inode": 541767227,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/run/txlog.jsonl",
+      "bytes": 5415,
+      "sha256": "db58e765485dc8bc289060f7cc47608b2c3396e67ae5621ceff85e7b5f50bcbc",
+      "device": 16777231,
+      "inode": 541767056,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/provider-evidence/txlog.jsonl",
+      "bytes": 5415,
+      "sha256": "db58e765485dc8bc289060f7cc47608b2c3396e67ae5621ceff85e7b5f50bcbc",
+      "device": 16777231,
+      "inode": 541767237,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhf-ETIJH1/run/txlog-head.json",
+      "bytes": 85,
+      "sha256": "21ff601bd1167ae3d1333b16fd024f656b4a425a71e01865e883fd91b861f53d",
+      "device": 16777231,
+      "inode": 541767236,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    },
+    {
+      "path": "/private/tmp/lhfo-d11M9g/provider-evidence/txlog-head.json",
+      "bytes": 85,
+      "sha256": "21ff601bd1167ae3d1333b16fd024f656b4a425a71e01865e883fd91b861f53d",
+      "device": 16777231,
+      "inode": 541767238,
+      "nlink": 1,
+      "modeOctal": "0o600"
+    }
+  ]
+}

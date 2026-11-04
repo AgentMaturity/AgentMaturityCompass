@@ -1,0 +1,64 @@
+{
+  "command": "npx vitest run <files> --maxWorkers=2",
+  "tests": {
+    "total": 58,
+    "passed": 58,
+    "failed": 0,
+    "skipped": 0
+  },
+  "files": [
+    {
+      "file": "tests/agentLoopToolPool.test.ts",
+      "status": "passed",
+      "passed": 7,
+      "total": 7
+    },
+    {
+      "file": "tests/execProcessTree.test.ts",
+      "status": "passed",
+      "passed": 13,
+      "total": 13
+    },
+    {
+      "file": "tests/sessionOwnership.test.ts",
+      "status": "passed",
+      "passed": 10,
+      "total": 10
+    },
+    {
+      "file": "tests/sessionRecovery.test.ts",
+      "status": "passed",
+      "passed": 5,
+      "total": 5
+    },
+    {
+      "file": "tests/sessionRecoveryRetry.test.ts",
+      "status": "passed",
+      "passed": 2,
+      "total": 2
+    },
+    {
+      "file": "tests/sessionResume.test.ts",
+      "status": "passed",
+      "passed": 11,
+      "total": 11
+    },
+    {
+      "file": "tests/sessionWriterFencing.test.ts",
+      "status": "passed",
+      "passed": 6,
+      "total": 6
+    },
+    {
+      "file": "tests/keys/actionJournalReceiptProcesses.test.ts",
+      "status": "passed",
+      "passed": 4,
+      "total": 4
+    }
+  ],
+  "leftovers": {
+    "ownedProcesses": 0,
+    "ownedListeners": 0,
+    "method": "ps -ax and lsof -iTCP -sTCP:LISTEN after the run: no process from the test, scratch or qualification directories; the only node listeners were two processes started on 2026-10-28 and 2026-10-29, before this run"
+  }
+}

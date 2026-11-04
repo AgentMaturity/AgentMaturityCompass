@@ -1,0 +1,28 @@
+{
+  "schema": "p125ec-independent-fresh-binder-static-review-seal/1",
+  "at": "2026-10-17T01:04:48.493575+00:00",
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-static-review/review.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-static-review/review.json",
+      "bytes": 5452,
+      "sha256": "250a6e6a9dea9f4da72e7551d673a96d0852ea641dd9b03b75a876ef327c5b91",
+      "dev": 16777231,
+      "inode": 543898597,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-static-review/input-pins.json",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/fresh-binding-static-review/input-pins.json",
+      "bytes": 11123,
+      "sha256": "5bcefccb2617d5c155f3d0390ad29b13aa9461233c24a1fff26c8c50e57cca3e",
+      "dev": 16777231,
+      "inode": 543898598,
+      "nlink": 1
+    }
+  ],
+  "inputPinCount": 27,
+  "allOutputsCompleteAndClosed": true,
+  "noPriorArtifactOrSourceWrites": true,
+  "rootMustReviewBeforeAdoptionExecution": true
+}

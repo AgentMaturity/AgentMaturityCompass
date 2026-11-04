@@ -1,0 +1,32 @@
+{
+  "schema": "p112-inert-metadata-repair-content-boundaries/1",
+  "at": "2026-10-16T20:34:27.350439+00:00",
+  "manifestChangedTopLevelKeys": [
+    "artifacts",
+    "at",
+    "readme",
+    "revisionBoundary",
+    "schema"
+  ],
+  "manifestArtifactTargetsAdded": [
+    "evidence/discovery-correction.json",
+    "evidence/test-design/compiledPolicyGuard.test.ts.source.txt"
+  ],
+  "manifestArtifactTargetsRemoved": [
+    "evidence/test-design/compiledPolicyGuard.test.ts"
+  ],
+  "commonProducerRowsChanged": [],
+  "receiptAllFieldsExceptIndexExact": true,
+  "activeAssemblyManifestsMatchTheirOwnV2V3Inputs": true,
+  "readmeExactToItsV3Manifest": true,
+  "allPacketFilesRegularAndNotSymlink": true,
+  "sourceMaterialization": {
+    "sourceRoot": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/qualification/2026-10-17-P1-12",
+    "sourceFiles": 279,
+    "v3Files": 279,
+    "exactPathSet": true,
+    "allBytesExact": true,
+    "mismatches": []
+  },
+  "initialProtectionUpdateBoundary": "The original B33 protected-inputs.json remains an unchanged historical snapshot. Only its two root-owned active P1-12 receipt/README pins have explicit successor V3 states. The other111initial input pins and five native physical/hash pins remain exact. No historical author/producer seal is retconned."
+}

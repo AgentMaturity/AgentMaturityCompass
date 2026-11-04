@@ -1,0 +1,261 @@
+{
+  "schema": "amc-p207-scim-hardening/1",
+  "label": "filtered-member-role-revocation",
+  "synthetic": true,
+  "checkout": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-clean-source-gDem9y/checkout",
+  "childProcessCreated": false,
+  "observations": [
+    {
+      "kind": "port-probe",
+      "started": true,
+      "closed": true,
+      "listening": false
+    },
+    {
+      "kind": "router",
+      "port": 55438,
+      "started": true,
+      "closed": true
+    },
+    {
+      "kind": "http",
+      "label": "auth-missing-bearer",
+      "path": "/host/scim/v2/ServiceProviderConfig",
+      "method": "GET",
+      "status": 401,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "auth-valid-bearer",
+      "path": "/host/scim/v2/ServiceProviderConfig",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "auth-controls",
+      "unauthenticated": {
+        "status": 401,
+        "contentType": "application/scim+json",
+        "body": {
+          "schemas": [
+            "urn:ietf:params:scim:api:messages:2.0:Error"
+          ],
+          "status": "401",
+          "detail": "missing SCIM bearer token"
+        }
+      },
+      "authenticated": {
+        "status": 200,
+        "contentType": "application/scim+json",
+        "body": {
+          "schemas": [
+            "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig"
+          ],
+          "patch": {
+            "supported": true
+          },
+          "bulk": {
+            "supported": false,
+            "maxOperations": 0,
+            "maxPayloadSize": 0
+          },
+          "filter": {
+            "supported": true,
+            "maxResults": 200
+          },
+          "changePassword": {
+            "supported": false
+          },
+          "sort": {
+            "supported": false
+          },
+          "etag": {
+            "supported": false
+          },
+          "authenticationSchemes": [
+            {
+              "name": "Bearer Token",
+              "description": "Authorization: Bearer <token>",
+              "type": "oauthbearertoken",
+              "primary": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "kind": "http",
+      "label": "create-user-target",
+      "path": "/host/scim/v2/Users",
+      "method": "POST",
+      "status": 201,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "create-user",
+      "label": "target",
+      "view": {
+        "status": 201,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "id": "c766e884-4ca2-4570-ba14-32723b7c2623",
+        "userName": "target@example.test",
+        "active": true,
+        "displayName": "Synthetic target",
+        "externalId": "ext-target"
+      }
+    },
+    {
+      "kind": "http",
+      "label": "create-user-survivor",
+      "path": "/host/scim/v2/Users",
+      "method": "POST",
+      "status": 201,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "create-user",
+      "label": "survivor",
+      "view": {
+        "status": 201,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:User"
+        ],
+        "id": "f246ee96-ea38-4fd0-b21f-eb083a7a240e",
+        "userName": "survivor@example.test",
+        "active": true,
+        "displayName": "Synthetic survivor",
+        "externalId": "ext-survivor"
+      }
+    },
+    {
+      "kind": "http",
+      "label": "create-mapped-group",
+      "path": "/host/scim/v2/Groups",
+      "method": "POST",
+      "status": 201,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "create-group",
+      "view": {
+        "status": 201,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:Group"
+        ],
+        "id": "grp_d51dadb7090d435587d5e50f2f8c60de",
+        "displayName": "synthetic-scim-viewers",
+        "externalId": "synthetic-group-external",
+        "members": [
+          "c766e884-4ca2-4570-ba14-32723b7c2623",
+          "f246ee96-ea38-4fd0-b21f-eb083a7a240e"
+        ]
+      }
+    },
+    {
+      "kind": "http",
+      "label": "filtered-target-remove",
+      "path": "/host/scim/v2/Groups/grp_d51dadb7090d435587d5e50f2f8c60de",
+      "method": "PATCH",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "http",
+      "label": "filtered-group-get",
+      "path": "/host/scim/v2/Groups/grp_d51dadb7090d435587d5e50f2f8c60de",
+      "method": "GET",
+      "status": 200,
+      "requestCreated": true,
+      "requestClosed": true,
+      "responseEnded": true,
+      "responseComplete": true,
+      "responseClosed": true,
+      "socketAssigned": true,
+      "socketClosed": true
+    },
+    {
+      "kind": "filtered-removal",
+      "target": "c766e884-4ca2-4570-ba14-32723b7c2623",
+      "survivor": "f246ee96-ea38-4fd0-b21f-eb083a7a240e",
+      "patched": {
+        "status": 200,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:Group"
+        ],
+        "id": "grp_d51dadb7090d435587d5e50f2f8c60de",
+        "displayName": "synthetic-scim-viewers",
+        "externalId": "synthetic-group-external",
+        "members": [
+          "f246ee96-ea38-4fd0-b21f-eb083a7a240e"
+        ]
+      },
+      "fetched": {
+        "status": 200,
+        "schemas": [
+          "urn:ietf:params:scim:schemas:core:2.0:Group"
+        ],
+        "id": "grp_d51dadb7090d435587d5e50f2f8c60de",
+        "displayName": "synthetic-scim-viewers",
+        "externalId": "synthetic-group-external",
+        "members": [
+          "f246ee96-ea38-4fd0-b21f-eb083a7a240e"
+        ]
+      },
+      "afterRoles": {
+        "target": [
+          "AUDITOR"
+        ],
+        "survivor": [
+          "VIEWER"
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "exactEnvironmentRestored": true,
+  "bodyFailed": false,
+  "bodyError": null,
+  "cleanupErrors": [],
+  "signalsSent": false,
+  "retainedRoot": "/private/var/folders/kt/r665rkj5159bw9zt4rp2n66c0000gn/T/amc-p207-scim-tZmuPZ"
+}

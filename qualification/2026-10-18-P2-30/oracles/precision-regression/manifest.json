@@ -1,0 +1,49 @@
+{
+  "recordedAtUtc": "2026-10-18T10:13:06.686149+00:00",
+  "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+  "scope": "Metadata-only archival copies of the existing precision TDD red/green evidence and final receipt. No tests or product changes. Original metadata bytes, paths, and hashes remain unchanged.",
+  "originalEvidenceDirectory": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z",
+  "originalFinalMetadata": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/final.json",
+  "d15Output": "none",
+  "d15Log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/qualification-copy-d15.log",
+  "primaryMutationIndex": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/mutations.json",
+  "primaryMutationIndexSha256": "f1d644b44bebfe11f3ab41ddfd2d6d1368e1d52f1653b9f7bd755744618feb50",
+  "primaryMutationIndexUnchanged": true,
+  "copies": [
+    {
+      "copy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/precision-regression/red.log",
+      "original": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/red.log",
+      "sha256": "f588c7ea6a5a60be612ed9ca34db42ec96924b92b4534eae3f532c01481320be",
+      "byteIdentical": true,
+      "originalPathsInsideMetadataPreserved": false
+    },
+    {
+      "copy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/precision-regression/red.json",
+      "original": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/red.json",
+      "sha256": "76c8598b935061ff77d3017b4c2041b5b512c636ca912b9c2c667d2924963c37",
+      "byteIdentical": true,
+      "originalPathsInsideMetadataPreserved": true
+    },
+    {
+      "copy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/precision-regression/green.log",
+      "original": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/green.log",
+      "sha256": "e69bf287d720e0068754c5d91374852ada413395faab1ea99b0ae2e255a6c6b2",
+      "byteIdentical": true,
+      "originalPathsInsideMetadataPreserved": false
+    },
+    {
+      "copy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/precision-regression/green.json",
+      "original": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/green.json",
+      "sha256": "9973682011da5c85a029b1478a76c2b5b77387481d5e5ac8fb44aeb03c0cc50b",
+      "byteIdentical": true,
+      "originalPathsInsideMetadataPreserved": true
+    },
+    {
+      "copy": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/precision-regression/final.json",
+      "original": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/nis2-precision-20261018T100954665339Z/final.json",
+      "sha256": "4964f1b2b3b006f2eff8bdbcb94fd238c9816e910831cc21b349cf6ba08cf119",
+      "byteIdentical": true,
+      "originalPathsInsideMetadataPreserved": true
+    }
+  ]
+}

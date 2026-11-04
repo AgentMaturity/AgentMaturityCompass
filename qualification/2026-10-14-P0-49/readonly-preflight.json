@@ -1,0 +1,424 @@
+{
+  "task": "P0-49 read-only next-priority preflight",
+  "createdAt": "2026-10-14T13:50:35.375523+00:00",
+  "scope": "Preparation only while root completes P0-47 broad qualification; P0-29 remains skipped",
+  "workspace": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+  "sourceSHA": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "acceptedMain": "5ea5e866a42acd5c8228a712e9b8c1d9f18c745c",
+  "node": "v24.21.0",
+  "pnpm": "10.33.0",
+  "sourceFiles": [
+    {
+      "path": "package.json",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/package.json",
+      "bytes": 8631,
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "gitBlob": "df32c3ae7f5f0ef1d21d590384f59e1aa6167fb8",
+      "acceptedMainByteEqual": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/pnpm-lock.yaml",
+      "bytes": 155432,
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "gitBlob": "97702e7ad5fc07b5d36a6f246a67f2394c25a13a",
+      "acceptedMainByteEqual": true
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/pnpm-workspace.yaml",
+      "bytes": 1521,
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+      "gitBlob": "d03bdcfad97c928e1f415057176f1b5ec6ea9c03",
+      "acceptedMainByteEqual": true
+    },
+    {
+      "path": ".changeset/proxy-addr-advisory.md",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/.changeset/proxy-addr-advisory.md",
+      "bytes": 272,
+      "sha256": "d1b8799a596e329bf4e1703f7a63fca879c071e4284a70cc73236e58c9d7e5dc",
+      "gitBlob": "fda1c7b3d70dd1d6e9e88857111125f7d4ad3454",
+      "acceptedMainByteEqual": true
+    },
+    {
+      "path": "scripts/release-gate.mjs",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/scripts/release-gate.mjs",
+      "bytes": 17338,
+      "sha256": "c85bf681d1ab9f8fef30e4ec702754910996ef2547c6d89edb66eae1018839fc",
+      "gitBlob": "63a0cecf10156a3b5d22a56a1cad8742494fafa0",
+      "acceptedMainByteEqual": true
+    },
+    {
+      "path": "tests/releaseReadinessScripts.test.ts",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/releaseReadinessScripts.test.ts",
+      "bytes": 3611,
+      "sha256": "0dfa4acb1beb2e76f648672f7186df159f66e90ea88454463565a3ac25219424",
+      "gitBlob": "2e0b494a501fa1d866bef1b2c335a2a1e0ce96e9",
+      "acceptedMainByteEqual": true
+    },
+    {
+      "path": "tests/planEditsManifest.test.ts",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/planEditsManifest.test.ts",
+      "bytes": 16099,
+      "sha256": "e86550ef5de6de0167fae124ac40019bd76381ef7cd71f51e3fd0df60e38b27d",
+      "gitBlob": "89093ca7a7eeecda5f50dd235655225a79720f5a",
+      "acceptedMainByteEqual": false
+    },
+    {
+      "path": "tests/explainabilityContractParity.test.ts",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/explainabilityContractParity.test.ts",
+      "bytes": 16610,
+      "sha256": "c53222bdc8afa8d90496ec7f7a1696640fa4487067e342eb3175adee5408e189",
+      "gitBlob": "916dacaf39e0f82733300b37f9fcd360a5602692",
+      "acceptedMainByteEqual": false
+    },
+    {
+      "path": "tests/helpers/landedSource.ts",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tests/helpers/landedSource.ts",
+      "bytes": 3498,
+      "sha256": "dd1f64f3e1358132f00252d9667baff83ddf47897c4824f56711239434e4e111",
+      "gitBlob": "4af907a9228f72a997edcb919038bada64dcc226",
+      "acceptedMainByteEqual": true
+    },
+    {
+      "path": "unused-code/plan-edits/manifest.json",
+      "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/unused-code/plan-edits/manifest.json",
+      "bytes": 18181,
+      "sha256": "7be034f9e3ba05cc36cf90e5c7bcd396dbb9244d8934a509dc8c247f8318bbe7",
+      "gitBlob": "1b7bef966de9d30e229cd6f8c762e0adde5a0dc3",
+      "acceptedMainByteEqual": false
+    }
+  ],
+  "mergedAcceptance": {
+    "url": "https://github.com/AgentMaturity/AgentMaturityCompass/pull/42",
+    "number": 42,
+    "title": "[P0-49] Pin proxy-addr 2.0.8 for critical advisory GHSA-jqcg-44mw-7w3h",
+    "state": "MERGED",
+    "mergedAt": "2026-10-06T14:56:03Z",
+    "mergeCommit": "3f647108f5a2ed7b3eb5418f77255ed7d49a3ddc",
+    "issueCommit": "7c1afe4930db1b0d7997eb7860645e59433e8e42",
+    "retrieval": "Read-only gh pr view 42 --repo AgentMaturity/AgentMaturityCompass, 14 October 2026",
+    "requiredBehavior": [
+      "pnpm override proxy-addr ^2.0.8",
+      "lock resolution proxy-addr 2.0.8 through SDK > express",
+      "D-15 preserve pre-edit pnpm-lock.yaml under P0-49",
+      "patch security changeset",
+      "current production runtime audit passes at moderate threshold"
+    ],
+    "historicalProofClaims": {
+      "beforeAuditExit": 1,
+      "beforeCritical": 1,
+      "afterAuditExit": 0,
+      "filesPassed": 1525,
+      "testsPassed": 21457,
+      "releaseGateExecutedPassed": 17,
+      "releaseGateExecutedTotal": 19,
+      "remainingFailureClaim": "D-11 source checks"
+    },
+    "historicalClaimsAreCurrentQualification": false
+  },
+  "advisoryPrimarySource": {
+    "url": "https://github.com/advisories/GHSA-jqcg-44mw-7w3h",
+    "retrievedDate": "2026-10-14",
+    "id": "GHSA-jqcg-44mw-7w3h",
+    "cve": "CVE-2026-90711",
+    "severity": "critical",
+    "affected": ">=1.1.0 <2.0.8",
+    "patched": "2.0.8",
+    "firstPublished": "2026-09-15",
+    "githubDatabasePublished": "2026-10-05",
+    "metadataNote": "PR/commit historical text says published 2026-10-06; current official advisory records earlier dates. The patch threshold matches."
+  },
+  "currentDependencyEvidence": {
+    "packageOverrides": {
+      "qs": ">=6.16.0",
+      "fast-uri": "^3.1.8",
+      "@modelcontextprotocol/sdk>hono": "^4.13.5",
+      "ip-address": "^10.7.1",
+      "proxy-addr": "^2.0.8"
+    },
+    "lockfileVersion": "9.0",
+    "overrides": {
+      "qs": ">=6.16.0",
+      "fast-uri": "^3.1.8",
+      "@modelcontextprotocol/sdk>hono": "^4.13.5",
+      "ip-address": "^10.7.1",
+      "proxy-addr": "^2.0.8"
+    },
+    "directRuntimeResolutions": {
+      "@modelcontextprotocol/sdk": {
+        "specifier": "^1.31.0",
+        "version": "1.32.1(zod@4.4.3)"
+      },
+      "better-sqlite3": {
+        "specifier": "^12.8.0",
+        "version": "12.11.1"
+      },
+      "chalk": {
+        "specifier": "^5.4.1",
+        "version": "5.6.2"
+      },
+      "commander": {
+        "specifier": "^14.0.3",
+        "version": "14.0.3"
+      },
+      "inquirer": {
+        "specifier": "^13.3.2",
+        "version": "13.4.3(@types/node@25.9.5)"
+      },
+      "semver": {
+        "specifier": "^7.7.4",
+        "version": "7.8.5"
+      },
+      "yaml": {
+        "specifier": "^2.8.3",
+        "version": "2.9.0"
+      },
+      "zod": {
+        "specifier": "^4.3.6",
+        "version": "4.4.3"
+      }
+    },
+    "overrideLockKeys": [
+      "fast-uri@3.1.8",
+      "hono@4.13.7",
+      "ip-address@10.7.2",
+      "proxy-addr@2.0.8",
+      "qs@6.16.0"
+    ],
+    "installedOverrideVersions": {
+      "proxy-addr": "2.0.8",
+      "qs": "6.16.0",
+      "fast-uri": "3.1.8",
+      "hono": "4.13.7",
+      "ip-address": "10.7.2"
+    },
+    "installedChain": [
+      {
+        "name": "@modelcontextprotocol/sdk",
+        "version": "1.32.1"
+      },
+      {
+        "name": "express",
+        "version": "5.2.1"
+      },
+      {
+        "name": "proxy-addr",
+        "version": "2.0.8"
+      }
+    ],
+    "proxyDependencies": {
+      "forwarded": "0.2.0",
+      "ipaddr.js": "1.9.1"
+    },
+    "historicalProxyKeys": [
+      "proxy-addr@2.0.7"
+    ],
+    "packageAndLockOverridesEqual": true,
+    "runtimeAuditScript": "pnpm audit --prod --audit-level moderate",
+    "noVulnerableProxyLockRecord": true
+  },
+  "d15": {
+    "decision": "D-15",
+    "authority": "/Users/sid/AgentMaturityCompass-worktrees/s7fccbbfa/specs/decisions.md:5-49",
+    "preservedArchives": [
+      {
+        "row": {
+          "path": "package.json",
+          "issue": "P0-09",
+          "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+          "archivePath": "unused-code/plan-edits/P0-09/package.json.landed",
+          "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc"
+        },
+        "actualSha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+        "manifestHashMatches": true,
+        "baseBlobMatches": true,
+        "baseAncestorExitCode": 0,
+        "archiveEvidence": {
+          "path": "unused-code/plan-edits/P0-09/package.json.landed",
+          "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/unused-code/plan-edits/P0-09/package.json.landed",
+          "bytes": 7886,
+          "sha256": "0e9569e7941cf15873f824020153ce3e0eb9e5b0c51ff38d7b16452716188cdc",
+          "gitBlob": "6c779f7e1d134fa34c68a6e190e1e4e6db3c7458",
+          "acceptedMainByteEqual": true
+        }
+      },
+      {
+        "row": {
+          "path": "pnpm-lock.yaml",
+          "issue": "P0-49",
+          "baseCommit": "b552b69cd220d7d73b63a58685f77bb2bbb26c8f",
+          "archivePath": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+          "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b"
+        },
+        "actualSha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+        "manifestHashMatches": true,
+        "baseBlobMatches": true,
+        "baseAncestorExitCode": 0,
+        "archiveEvidence": {
+          "path": "unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+          "absolutePath": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/unused-code/plan-edits/P0-49/pnpm-lock.yaml.landed",
+          "bytes": 155411,
+          "sha256": "6ee56db74a48240aca2a66072fd62ada30a468a73bd2fc839b98fe5ab325466b",
+          "gitBlob": "dcc0e0dac48087deae560f7122686b04a44daef2",
+          "acceptedMainByteEqual": true
+        }
+      }
+    ],
+    "note": "Current first-registration rule keeps P0-49 lock archive and P0-09 package archive; no archive replacement or reassignment is needed."
+  },
+  "currentAudit": {
+    "task": "P0-49 one read-only production audit",
+    "argv": [
+      "pnpm",
+      "audit",
+      "--prod",
+      "--audit-level",
+      "moderate",
+      "--json"
+    ],
+    "workspace": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass",
+    "sourceSHA": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+    "nodeVersion": "v24.21.0",
+    "pnpmVersion": "10.33.0",
+    "startedAt": "2026-10-14T13:47:05.919652+00:00",
+    "finishedAt": "2026-10-14T13:47:06.834739+00:00",
+    "elapsedSeconds": 0.915,
+    "exitCode": 0,
+    "stdout": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-readonly-preflight-20261014/production-audit.json",
+    "stderr": "/Users/sid/.codex/worktrees/p0-47-node24-qualification/AgentMaturityCompass/tmp/p0-49-readonly-preflight-20261014/production-audit.stderr.log",
+    "beforeSourceHashes": {
+      "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "pnpm-workspace.yaml": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23"
+    },
+    "afterSourceHashes": {
+      "package.json": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "pnpm-lock.yaml": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "pnpm-workspace.yaml": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23"
+    },
+    "statusAfter": "",
+    "stdoutSha256": "c30e0af322a954d2a84a0b344aa586a7c82f6b8b477eaff81df8ddc26cc2f5f9",
+    "stdoutBytes": 310,
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "stderrBytes": 0,
+    "parsedAuditSummary": {
+      "metadata": {
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "dependencies": 192,
+        "devDependencies": 0,
+        "optionalDependencies": 0,
+        "totalDependencies": 192
+      }
+    },
+    "advisoryCount": 0,
+    "topLevelKeys": [
+      "actions",
+      "advisories",
+      "muted",
+      "metadata"
+    ]
+  },
+  "existingTestCoverage": [
+    {
+      "file": "tests/releaseReadinessScripts.test.ts",
+      "lines": "24-40,54-66",
+      "proves": "Release gate registration and audit command uses production scope and moderate threshold",
+      "doesNotProve": "Installed proxy version, advisory catalog or fresh security verdict"
+    },
+    {
+      "file": "tests/planEditsManifest.test.ts",
+      "lines": "43-80",
+      "proves": "Archive SHA256, landed bytes, base ancestry and Git blob provenance"
+    },
+    {
+      "file": "tests/explainabilityContractParity.test.ts",
+      "lines": "154-158",
+      "proves": "D-15 pnpm-lock landed bytes satisfy historical immutable contract and package entry pin"
+    },
+    {
+      "finding": "No dedicated proxy-addr/version regression assertion found",
+      "search": "rg -l proxy-addr|GHSA-jqcg|audit:runtime|runtime-dependency-audit tests scripts .changeset",
+      "matches": [
+        "scripts/release-gate.mjs",
+        ".changeset/proxy-addr-advisory.md",
+        "tests/releaseReadinessScripts.test.ts"
+      ],
+      "interpretation": "Coverage limitation; no new test or source change is proposed by this read-only preparation."
+    }
+  ],
+  "existingSameSourceParityReceipt": {
+    "sourceSHA": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+    "receipt": "/private/tmp/p0-47-node24-repaired-results-20261014.json",
+    "success": true,
+    "files": 26,
+    "counts": {
+      "numTotalTestSuites": 382,
+      "numPassedTestSuites": 382,
+      "numFailedTestSuites": 0,
+      "numPendingTestSuites": 0,
+      "numTotalTests": 7118,
+      "numPassedTests": 7118,
+      "numFailedTests": 0,
+      "numPendingTests": 0,
+      "numTodoTests": 0
+    },
+    "helperManifest": [
+      {
+        "file": "tests/planEditsManifest.test.ts",
+        "status": "passed",
+        "assertionCounts": {
+          "passed": 16,
+          "failed": 0,
+          "pending": 0,
+          "skipped": 0,
+          "todo": 0
+        }
+      }
+    ],
+    "label": "Earlier P0-47 Node24 scoped parity evidence includes current D-15/archive tests; this preflight did not rerun tests and it is not full P0-49 qualification."
+  },
+  "historicalAuditReceipt": {
+    "path": "qualification/2026-10-05-P0-04/receipt.json",
+    "key": "P0-04",
+    "date": "2026-10-05",
+    "commit": "786d8abb2a12b82d0986c3a286864d7966d21166",
+    "node": "v25.5.0",
+    "pnpm": "10.33.0",
+    "laterRedAuditLog": "qualification/2026-10-05-P0-04/audit-runtime-2026-10-06.log",
+    "laterRedSummary": "1 critical proxy-addr advisory at the old source",
+    "label": "Historical before-fix evidence only"
+  },
+  "acceptanceDebt": [
+    "Root P0-47 broad current-source qualification remains active; this audit does not stand in for its full suite, global/per-file coverage, clean-source, packed install, e2e or complete release gate.",
+    "Merged PR42 has historical full-run claims, including only 17/19 release gate checks passed; retain them as historical evidence, not a current acceptance receipt.",
+    "No fresh installed-package proxy-address spoofing behavior test was run; installed resolution and current production advisory audit are the narrow live observations."
+  ],
+  "graphNavigation": {
+    "root": "/Users/sid/AgentMaturityCompass/graphify-out",
+    "nodes": 36459,
+    "terms": [
+      "runtime",
+      "dependency",
+      "audit"
+    ],
+    "sourceLocation": "package.json:L51 audit:runtime",
+    "manifestLastSeenUTC": "2026-09-08T07:09:48.592832+00:00",
+    "use": "Stale navigation only; verified actual package source is package.json:60. No graph refresh or mutation."
+  },
+  "mutations": [],
+  "statusAfter": "",
+  "sourceAfter": "7a81b5aa7316471e841f4ae0ea684a64c85ae4a1",
+  "limits": [
+    "No installs, updates, package or lock changes",
+    "No source edits, commits, trackers or publication",
+    "No broad tests or repeated audit",
+    "Only requested notes and retained audit artifacts written"
+  ]
+}

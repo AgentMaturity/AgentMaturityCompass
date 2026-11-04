@@ -1,0 +1,20 @@
+--- a/src/assurance/assuranceRunner.ts
++++ b/src/assurance/assuranceRunner.ts
+@@ -565,6 +565,8 @@
+         packResults.push(await executePack(packId));
+       }
+     }
++
++    ledger.sealSession(sessionId);
+ 
+     const verification = input.noSign
+       ? { ok: false, errors: ["unsigned assurance run"] }
+@@ -629,8 +631,6 @@
+       status: report.status
+     });
+ 
+-    ledger.sealSession(sessionId);
+-
+     // Persist the v1 artifacts the store, certificates and scheduler read.
+     persistV1Artifacts({
+       workspace,

@@ -25,7 +25,7 @@ artifact binding, a case manifest, evidence requirements and reviewer decisions;
 it does not introduce a replacement intake format or certify participants.
 
 The companion planning forms are under
-`AMC_OS/RESEARCH/2026-09-10-amc-1512-evidence-protocols/`:
+the evidence-protocols packet (an internal record that is not published):
 `provider-plan.template.json`, `human-plan.template.json` and
 `observation-review.template.json`. They are deliberately unfilled, not observed
 trials, not runnable configuration, and not input accepted by the existing CLI.
@@ -213,14 +213,14 @@ five-human-per-harness study nor AMC-1518 matched comparative outcomes.
 ## Dated evidence retained
 
 The September 8 installed identity receipt at
-`AMC_OS/RESEARCH/2026-09-08-dsh-pi/native-identity-installed-91b2ad3b/receipt.json`
+(an internal record that is not published)
 records 40 passed / 0 failed assertions at source
 `91b2ad3b1543370ceabd7236ce2823e51c6d3165`, Darwin ARM64 / Node v24.20.0.
 Its provider is explicitly scripted loopback OpenAI Responses HTTP/SSE; its own
 limitations exclude real-provider, human-usability and answer-quality claims.
 
 The September 8 local pilot disposition at
-`AMC_OS/RESEARCH/2026-09-08-dsh-pi/real-local-coding-pilot/pilot-9b60d86f-a1813776/disposition.json`
+(an internal record that is not published)
 records zero qualified passes, five qualified failures and four inconclusive
 trials, with six completed-response trials. Its runtime source is
 `9b60d86fd74a7bd3b294c893b506f6da32373623`, helper
@@ -231,7 +231,7 @@ not a new remote-provider result, human study or causal harness ranking.
 
 Task `amc-1512-evidence-transfer-v2-2026-09-11` authors the separate
 `amc-1512-evidence-transfer/2` review/mapping packet at
-`AMC_OS/RESEARCH/2026-09-11-amc-1512-evidence-transfer-v2/`.
+the evidence-transfer/2 packet (an internal record that is not published).
 Read `EVIDENCE_TRANSFER_PROTOCOL.v2.md`, `CAPTURE_INPUT_MAPPING.v2.md` and
 `evidence-transfer.v2.template.json` there. Applicability is explicit capture
 `2026-09-10.1`, intake `2026-09-10`, credentials `1`; it does not change this

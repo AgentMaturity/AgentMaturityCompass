@@ -1,0 +1,181 @@
+{
+  "schema": "p125w-preferred-v2-control-helper-independent-static-review/1",
+  "at": "2026-10-17T00:14:05.482177+00:00",
+  "blockers": [],
+  "preferredV2Seal": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/seal.json",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/seal.json",
+    "bytes": 2709,
+    "sha256": "672b18d7f71dd946a91ee0acd772cf70c99eac096dcc2a6477b8364095e103c0",
+    "dev": 16777231,
+    "inode": 543750109,
+    "nlink": 1
+  },
+  "preferredHelper": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/source-control.py.source.txt",
+    "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/v2/source-control.py.source.txt",
+    "bytes": 21942,
+    "sha256": "73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32",
+    "dev": 16777231,
+    "inode": 543750104,
+    "nlink": 1
+  },
+  "verification": {
+    "v2OutputRows": 5,
+    "v2InputRows": 5,
+    "v1OutputRows": 9,
+    "v1InputRows": 13,
+    "allByteHashPinsExact": true,
+    "completeB37ToB38V1UnifiedDiffExact": true,
+    "v1ToV2OnlyThreeInitial151FieldAccessReplacements": true,
+    "v1ToV2CompleteUnifiedDiffExact": true,
+    "v1AndActualRuntimePinsetUnchanged": true
+  },
+  "actualRuntimeMetadataFit": {
+    "initial151PinsetPinMatchesProtectedInputs": true,
+    "baseAndRuntimeRows": 151,
+    "exactOwnSuccessors": [
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/checkpointWindow.test.ts",
+      "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts"
+    ],
+    "other149RowObjectsExact": true,
+    "bothPrivateOriginalSourcePinsMatchOldBytesAndCurrentSuccessorsMatchNewBytes": true,
+    "retainedNativeRowsEqualOriginal10": true,
+    "rootBindingMapsOriginalFieldToOriginalPreservedPinAndAddsVerifiedOriginalGitCommits": true,
+    "rootBindingAbsentAtAuthorSealNotProbedByThisReview": true
+  },
+  "finiteBindingGuards": {
+    "samePrior94RelativeNamesAnd19CompiledPairs": true,
+    "allCompiledMembersIncludedIn94PhysicalSelection": true,
+    "requiresActualRootSourceFreshRuntimeObservedPhysicalPins": true,
+    "sourceMustBeOneNewCommitWithParentAc775AndOnlyTwoReviewedTestSuccessors": true,
+    "oldBothTestSourcesRequiredEqualE49AndAc775GitBlobs": true,
+    "actualCleanSourceHelperNaturalZeroExactArgvAndNoVitestCreditRequired": true,
+    "actualSAndQHeadAndEmptyIndexesAndCleanSRequired": true,
+    "heldRHeadStatusIndexAndReservationBindingPreserved": true,
+    "qPhysicalNewCheckoutDistinctFromSROldNativeRoots": true,
+    "selectedFilesRegularSingleLinkPhysicalAndGlobalSourceFreshInodeDistinct": true,
+    "protected151ByteHashesCheckedByHelperSelectedMembersAndAllNativesAlsoPhysical": "Full physical151 preservation remains the separate root binding/readmission protocol; the helper preserves the prior byte-check boundary for protected rows and physical-checks all selected pairs and natives.",
+    "tenOldPlusDistinctFreshEleventhNativeBytePhysicalPinsRequired": true,
+    "allFourActiveHaltedMarkersCheckedBeforeActionAndWrite": true
+  },
+  "mutationProtocol": {
+    "onlyFixedQSourceTargets": true,
+    "noCompiledOrNativeMutationOrRebuild": true,
+    "uniqueOriginalSpanAndWholeFileMutantHashRequired": true,
+    "exclusiveOriginalBackupPreparedAndLivePatchRecords": true,
+    "inPlaceONoFollowRecheckFstatInodeSingleLinkAndRootBindingThenFsync": true,
+    "sourceCanonicalGreenOrderedIdentityAndHookEqualityBeforeEveryAction": true,
+    "sourceFreshDynamicActualTotalNoPredictedFailHookCounts": true,
+    "restoreRequiresNaturalExit1ActualRedNoHookEnvFailureAndExactCohort": true,
+    "manualAllErrorsOrderedMessagesFirstFramesAndMaskingBeforeRestore": true,
+    "restoreOnlyExactAppliedMutantToOriginalEqualSBytes": true,
+    "m2ApplyRequiresM1ExplicitByteExactRestoreAndSameCohortGreen": true,
+    "postM2RestorationGreenAndFinalRootPreservationStillRequiredByOuterProtocol": true,
+    "noAutomaticRestoreRetrySignalKillCleanupOrProductLaunch": true
+  },
+  "operators": [
+    {
+      "id": "OMIT-LOWER-BOUND-SELECTION",
+      "target": "src/time/checkpoint.ts",
+      "uniqueOriginalSpan": true,
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/checkpoint.ts",
+        "bytes": 21005,
+        "sha256": "639a6eba0c67e543ec51439feb4f2528d4ca03ccc1e8b9320f1c55638a1942db",
+        "dev": 16777231,
+        "inode": 542461050,
+        "nlink": 1
+      },
+      "beforeLine": 339,
+      "proposedWholeFileHashAndSizeIndependentlyReconstructed": {
+        "bytes": 20936,
+        "sha256": "492cbca9163651bee10387953dba73420e81c31393a5292f68fa2f2f23c51335"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-LOWER-BOUND-SELECTION.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-LOWER-BOUND-SELECTION.patch.txt",
+        "bytes": 418,
+        "sha256": "3fb680e293fb0011ca12bd6b689f40163d585812b4cd66ce5d1fb0d114957e71",
+        "dev": 16777231,
+        "inode": 543742987,
+        "nlink": 1
+      },
+      "patchReconstructedExactly": true,
+      "witness": {
+        "candidateLines": [
+          445
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+          "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+          "bytes": 34549,
+          "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+          "dev": 16777231,
+          "inode": 543727816,
+          "nlink": 1
+        },
+        "masking": "Real independent grants, both checkpoint signatures/head links, stored tokens, checkpoint-event metadata and ledger positives precede the new middle attested-window basis assertion. Later exact window/default/zero findings are masked if that basis fails. No total or first actual failure is predicted.",
+        "actualFailureCount": null
+      },
+      "mutantStoredOrExecuted": false
+    },
+    {
+      "id": "OMIT-TOLERANCE-CONTRIBUTION",
+      "target": "src/time/timeEvidence.ts",
+      "uniqueOriginalSpan": true,
+      "original": {
+        "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "physicalPath": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/src/time/timeEvidence.ts",
+        "bytes": 3278,
+        "sha256": "7d2c2c5ef991525f84e621f869ad9974bf68f7650cec97f5ec8403cbae3460c8",
+        "dev": 16777231,
+        "inode": 542461052,
+        "nlink": 1
+      },
+      "beforeLine": 54,
+      "proposedWholeFileHashAndSizeIndependentlyReconstructed": {
+        "bytes": 3213,
+        "sha256": "cd890d24392ea5db9a6ed9747032036cf237db950c2eed209e17152725bccb01"
+      },
+      "patch": {
+        "path": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-TOLERANCE-CONTRIBUTION.patch.txt",
+        "physicalPath": "/private/tmp/p1-25-window-qualification-20261017/control-preparation/OMIT-TOLERANCE-CONTRIBUTION.patch.txt",
+        "bytes": 756,
+        "sha256": "ac8aae830ca233586d291e0bd3b0f636e8a0000ebdf8126a0f19070f1d5e94da",
+        "dev": 16777231,
+        "inode": 543742988,
+        "nlink": 1
+      },
+      "patchReconstructedExactly": true,
+      "witness": {
+        "candidateLines": [
+          452
+        ],
+        "candidatePin": {
+          "path": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+          "physicalPath": "/private/tmp/p1-25-checkpoint-qualification-20261017/next-window-test-proposal/checkpointWindow.test.ts.source.txt",
+          "bytes": 34549,
+          "sha256": "1b14338d3978f83cd6518f99f3f12aebbc4a3624fc0416464c84bf4868d82cd7",
+          "dev": 16777231,
+          "inode": 543727816,
+          "nlink": 1
+        },
+        "masking": "The new case collects all ten reader observations before the default-lower-inclusive finding assertion. Existing upper-bound cases may also fail because genuine timestamps can precede host claimed times. Root must read and classify every actual failure, including old cases, plus later masked assertions. No total or first actual failure is predicted.",
+        "actualFailureCount": null
+      },
+      "mutantStoredOrExecuted": false
+    }
+  ],
+  "limits": {
+    "sourceOnlySensitivityNotCompiledSensitivity": true,
+    "noFutureSourceCommitQNativeHashRuntimeCountOrOutcomeInvented": true,
+    "staticReviewDoesNotCreateRootBindingsApplyControlOrAdoptFutureResults": true,
+    "manualRootPublicReadAttestationsAreEvidenceProtocolNotAnIndependentCryptoVerifier": true,
+    "selectionFiniteNotFullTransitiveOrOsIsolation": true,
+    "allHoldsF37SkipFreezeQualityClaudeAndProviderArchiveRetained": true
+  },
+  "noHelperImportParseCompileExecuteProductTestNativeOpenSslSqlNetworkMissingReservationProbeOrSourceIndexQaWrite": true,
+  "nextOwner": "Root must fill and full-read actual binding after source/fresh qualification, then explicitly apply/run/classify/restore/retest each control under the unchanged harness."
+}

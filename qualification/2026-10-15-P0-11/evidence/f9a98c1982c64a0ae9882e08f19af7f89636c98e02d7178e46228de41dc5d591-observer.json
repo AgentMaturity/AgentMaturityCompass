@@ -1,0 +1,86 @@
+{
+  "schema": "amc-private-score-qualification-runtime-observer/1",
+  "pid": 22068,
+  "cwd": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass",
+  "reason": "passed",
+  "files": [
+    "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/observabilityOtelExporter.test.ts"
+  ],
+  "testCount": 5,
+  "unhandledErrors": [],
+  "tasks": [
+    {
+      "kind": "file",
+      "id": "2143279885",
+      "name": "tests/observabilityOtelExporter.test.ts",
+      "fullName": null,
+      "filepath": "/Users/sid/.codex/worktrees/p0-11-qualification/AgentMaturityCompass/tests/observabilityOtelExporter.test.ts",
+      "state": "pass",
+      "hooks": {
+        "afterAll": "pass"
+      },
+      "errors": []
+    },
+    {
+      "kind": "suite",
+      "id": "2143279885_0",
+      "name": "tests/observabilityOtelExporter.test.ts observability otel exporter",
+      "fullName": null,
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "2143279885_0_0",
+      "name": "tests/observabilityOtelExporter.test.ts observability otel exporter exports evidence events as OTLP spans",
+      "fullName": "observability otel exporter exports evidence events as OTLP spans",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "2143279885_0_1",
+      "name": "tests/observabilityOtelExporter.test.ts observability otel exporter exports score computations as OTLP metrics",
+      "fullName": "observability otel exporter exports score computations as OTLP metrics",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "2143279885_0_2",
+      "name": "tests/observabilityOtelExporter.test.ts observability otel exporter exports incidents as OTLP logs",
+      "fullName": "observability otel exporter exports incidents as OTLP logs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "2143279885_0_3",
+      "name": "tests/observabilityOtelExporter.test.ts observability otel exporter supports Zipkin exporter by converting all signals to spans",
+      "fullName": "observability otel exporter supports Zipkin exporter by converting all signals to spans",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    },
+    {
+      "kind": "test",
+      "id": "2143279885_0_4",
+      "name": "tests/observabilityOtelExporter.test.ts observability otel exporter supports Jaeger OTLP endpoints for traces, metrics, and logs",
+      "fullName": "observability otel exporter supports Jaeger OTLP endpoints for traces, metrics, and logs",
+      "filepath": null,
+      "state": "pass",
+      "hooks": {},
+      "errors": []
+    }
+  ],
+  "boundary": "Run-end records precede global teardown; post-exit outer streams are separately checked. Serialized test errors retain body/hook stacks for manual classification."
+}

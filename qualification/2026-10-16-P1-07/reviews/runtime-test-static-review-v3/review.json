@@ -1,0 +1,50 @@
+{
+  "schema": "p107-runtime-test-static-peer-review/3",
+  "at": "2026-10-16T18:03:17.182215+00:00",
+  "state": "STATIC_REVIEW_CLOSED_NO_BLOCKERS_UNEXECUTED",
+  "candidate": {
+    "path": "/private/tmp/p1-07-gate-qualification-20261016/runtime-test-proposal-v3/runtimeEvidenceEndToEnd.test.ts",
+    "bytes": 28819,
+    "sha256": "5eb353a14bdaebf8cef9d14c1dec266c0deeb239c696eb3e3ca32fc250434714",
+    "readScope": "Full static read."
+  },
+  "target": "tests/diagnostic/runtimeEvidenceEndToEnd.test.ts",
+  "sourceHead": "bf8836cd38d2879ccef11c6cfd1423edf0a96c0f",
+  "blockers": [],
+  "inputChecks": {
+    "preferredInputs": 82,
+    "preferredOutputs": 4,
+    "mismatches": [],
+    "exactUnifiedDeltaMatchesSealedPatch": true
+  },
+  "resolvedActualV2Gap": {
+    "retainedRun": "p107-runtime-v2 exit1/3188ms; original body and cleanup pin failures unchanged",
+    "cause": "Normal first encrypted payload initializes a real key; setVaultSecret persists the vault and atomically replaces equal-content public mirrors. This was independently diagnosed in runtime-v2-public-mirror-diagnosis.",
+    "v3Correction": "Call the public ensureBlobKey after owned initWorkspace/initBudgets and before trust/file/policy capture. Require actual keyVersion1 and valid current metadata signature. Add actual blob-key metadata and signature files to the same full physical pin array.",
+    "preservation": "No existing assertion, file/native physical field, pre-call monitor fingerprint, signature verification, default encryption/offload behavior, gate, clock, guard or deadline is removed or relaxed. V1/V2 sealed variants and actual failed evidence are retained."
+  },
+  "staticFindings": [
+    {
+      "area": "Public API/source fit",
+      "detail": "blobCurrentKeyPath/blobCurrentKeySigPath/ensureBlobKey/verifyBlobCurrentKeySignature are existing exports. ensureBlobKey selects initBlobKey only when owned current metadata is missing and normal signing is enabled; initBlobKey writes genuine keyVersion1 AES-256-GCM metadata via vault persistence and auditor signature. Signature verifier returns valid:boolean and reads only metadata/public history. The fresh fixture already has an unlocked vault. No raw key material, private field or dummy event/payload is required."
+    },
+    {
+      "area": "Capture order and physical identity",
+      "detail": "Initial vault-secret persistence finishes before monitorPem/fingerprint and beforePins/pre-call-public-pins.json. All ten selected owned inputs retain path/physicalPath/bytes/hash/dev/inode/nlink equality in body and final cleanup. Native pin is still captured before workspace setup and remains exactly compared in body and final cleanup. Later encrypted payload writes load existing key metadata, so the first-use secret setup has moved into explicit ordinary fixture setup; future actual execution must establish no later replacement."
+    },
+    {
+      "area": "No weakened causal assertions",
+      "detail": "The full prior native disposition, trust/ledger/session-root, projection, exact four audit ID mapping and actual UTC-day gate assertions remain byte-identical apart from line shift. First mapping assertion is now line364. Once-only end\u2192seal\u2192close flags and body/cleanup error preservation remain unchanged. Added setup fails closed for non-version1 or invalid signed metadata."
+    },
+    {
+      "area": "Boundaries and privacy",
+      "detail": "New public facts contain only key version, algorithm and signature-valid boolean. No blob key/passphrase/private key material is exposed. This remains a governed native seam fixture without model-loop, external identity attestation, L2 continuity or OS-isolation claim. Best-effort guard close and public-record/final-assertion timing limits remain the same."
+    }
+  ],
+  "readBoundary": "Full preferred candidate, README, exact delta and finite metadata read. Relevant existing blob/vault/atomic-write source spans were read during separate diagnosis and reused with exact current pins. All82 preferred inputs and4 declared outputs rehashed exact. No exhaustive whole-repository review implied.",
+  "execution": {
+    "parserCompilerHelperProductTestNativeSqlNetworkProbe": false
+  },
+  "checkoutIndexQaWrites": false,
+  "next": "Root alone owns materialization and actual qualification. No V3 runtime/type/fresh-source/control pass is claimed. The V2 failed run remains failed."
+}

@@ -1,0 +1,92 @@
+{
+  "qualificationSource": "07125b76cb17ecf063f19b914085a5bfc968df35",
+  "node24FixtureSource": "c4be164ea12d358ea30451391a6df29429fc6a7e",
+  "inputs": [
+    {
+      "path": "tests/nativeMcpHttp.test.ts",
+      "sha256": "20e91804c038935010788f95374607ee5fdcb8e7f57a9c089a00f9b2199f7eb6",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "tests/nativeMcpClient.test.ts",
+      "sha256": "258bd984c1bd4177501af51e6347dbedb11dfe9e4cab607c1e6325ae1ec23404",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "tests/reconciliationDefectsMcp.test.ts",
+      "sha256": "b666fe5f37a275b5ec8f452ada72467eeb4b3404709fd41fbe4215ff05d44b96",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "tests/reconciliationDefectsMcpHttp.test.ts",
+      "sha256": "f54e9b03d69b1df2788deb296616198982f28acef780d739f2bb1ee8a8e1948f",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "src/mcp/nativeMcpClient.ts",
+      "sha256": "d04eb8783176416a84f559c20d024a84823553888549d9f558a4347fadb50666",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "src/mcp/nativeMcpHttpTransport.ts",
+      "sha256": "a0807d999cd2f65a50397182bff1616204e600f3bb8a65c2697de520ad16462b",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "src/mcp/nativeMcpReconnect.ts",
+      "sha256": "fcd42ba8374d5571d45f788ef4f212ff42d96cec5efda5c33f3abf129cd255b6",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "src/mcp/nativeMcpReconnectStream.ts",
+      "sha256": "eb1acc7d1f7865490092e7e72b19e2353ba80e15db797a41db4bc25e492f35fc",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "src/setup/nativeMcpConfig.ts",
+      "sha256": "501c1076399b06878e14e7dabbcf3b0436648e0f1a9f9dc65c35151fc69a71a1",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "src/agent/agentToolset.ts",
+      "sha256": "baecf64f30bec5c04cfa2f51879909de1bff8880715a6f77d71f4d6f25a61546",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "src/toolhub/toolhubValidators.ts",
+      "sha256": "c391ddb71ae284fdde916561dcd31714b6b21142897d57f17cf54b11eb308e4f",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "src/session/sessionService.ts",
+      "sha256": "748ea18097b8fd2cbd5b5636d2e13ad78e98b8cd5b1e2a8e972c6cb407d5ee28",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "src/workspace.ts",
+      "sha256": "a6a535f1281483df5204df624bcba626708ddbcf04d3ba3bef5274bf143e2069",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "package.json",
+      "sha256": "d383a8929248b866bf9e2bff6556c0a4e02e432e9bcfa103636979a24e98e014",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "bc6dd91549e95f138769240a5650f7f3cf0586e2878dfd7d956f21d1c4d79c6e",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "pnpm-workspace.yaml",
+      "sha256": "fb6b23c507e6d97ecd5dac0a103f009ece6c0fcb35ff32373de92a81c8e2cf23",
+      "sameAsNode24ComponentExecution": true
+    },
+    {
+      "path": "vitest.config.ts",
+      "sha256": "15f840c794b6e85735d672d0d44fe6c32231b7117ca809327434057ce6eda16b",
+      "sameAsNode24ComponentExecution": true
+    }
+  ],
+  "scope": "Same-input focused components only; whole integration tested independently by full gate."
+}

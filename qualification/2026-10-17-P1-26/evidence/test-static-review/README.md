@@ -1,0 +1,7 @@
+Both sealed candidate bodies were fully read. No concrete static blocker was found for the13-body pure offline contract:11 RFC tests and2 legacy-adapter tests. All47 author input byte/hash pins and all6 sealed outputs match. Ten copied JSON objects and the8 raw leaf/9 known-root literals match the retained upstream data exactly.
+
+The node:crypto reference computes expected values without AMC helpers. External exact paths separately constrain proof generation. The candidate distinguishes raw leaf data, already hashed leaves and raw32-byte AMC entry digests, and uses relative imports that resolve within the actual future S/Q test root. No workspace, native handle, process, socket, environment, clock or cleanup helper is added.
+
+M1's first literal leaf witness is line241 after the unchanged empty-root positive. M2's dedicated size2 positive is line336 and the exact same leaf/path/root with size3 must refuse at337. No direct inclusionSides assertion masks that verifier witness. These are intended source-control witnesses only; actual failure identities, masking and pass counts are unobserved.
+
+The current metadata-discovery repair remains root-owned. Root must rebind the actual admitted commit, preserve these exact candidate/helper bytes, and retain copied test evidence under an inert filename or established lossless JSON representation. Compilation/runtime, frozen guards/quality checks and all whole-issue integration acceptance remain separate and unclaimed. No source, index or product execution occurred in this review.

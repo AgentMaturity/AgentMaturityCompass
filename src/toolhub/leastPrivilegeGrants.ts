@@ -1,5 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { getPrivateKeyPem, getPublicKeyHistory, signHexDigest, verifyHexDigestAny } from "../crypto/keys.js";
+import { resolve } from "node:path";
+import { getSigningKey, signHexDigest } from "../crypto/keys.js";
+import { captureConfigSignatureAuthority } from "../config/configSignaturePair.js";
+import { signWithPurposeKey } from "../keys/purposeProviders.js";
+import { assertPurposePublicationCurrent } from "../keys/purposePublication.js";
+import { verifyCurrentPurposeCredentialSignature } from "../keys/purposeCredentialSignature.js";
 import type { ActionClass } from "../types.js";
 import { sha256Hex } from "../utils/hash.js";
 import { canonicalize } from "../utils/json.js";
@@ -163,7 +168,7 @@ function verifyGrantSignature(workspace: string, grant: SignedLeastPrivilegeTool
   if (digest !== grant.grantDigestSha256) {
     return false;
   }
-  return verifyHexDigestAny(digest, grant.grantSignature, getPublicKeyHistory(workspace, "auditor"));
+  return verifyCurrentPurposeCredentialSignature(workspace, "config-signature", Buffer.from(digest, "hex"), Buffer.from(grant.grantSignature, "base64"));
 }
 
 function expirationFrom(requestedAt: string, requestedDurationMs: number): string {
@@ -254,7 +259,7 @@ export function createSignedLeastPrivilegeToolGrant(input: {
   return {
     ...payload,
     grantDigestSha256: digest,
-    grantSignature: signHexDigest(digest, getPrivateKeyPem(input.workspace, "auditor")),
+    grantSignature: signHexDigest(digest, getSigningKey(input.workspace, "config-signature")),
     signer: "auditor",
     signedTs: Date.now(),
     metadataOnlyAccepted: false

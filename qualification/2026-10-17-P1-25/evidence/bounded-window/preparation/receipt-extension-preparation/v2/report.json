@@ -1,0 +1,27 @@
+{
+  "schema": "p125w-private-extension-v2-skeleton-author-review/1",
+  "at": "2026-10-17T00:28:34.650328+00:00",
+  "blockers": [],
+  "preservedUnadoptedV1": {
+    "path": "/private/tmp/p1-25-window-qualification-20261017/receipt-extension-preparation/seal.json",
+    "bytes": 2187,
+    "sha256": "3d567d0b880166aefb17cffb460c9077221420e2c2de299883cfaff91b75fd1c"
+  },
+  "resolvedV1Findings": [
+    {
+      "finding": "Generic support-hash shape check was weaker than exact adopted helper binding.",
+      "correction": "Exact digest73203ebcbe63fcf8273510a79e5b4e72f78656c41c9ffd2c9228e8b266496b32 required."
+    },
+    {
+      "finding": "Diagnostic-command right side compared a potentially larger physical pin directly.",
+      "correction": "Both sides now project exactly path/bytes/SHA256."
+    }
+  ],
+  "exactlyTwoCodeLineChanges": true,
+  "allActualEvidenceAndPhaseFactsUnchanged": true,
+  "allV1DeclaredOutputPinsRehashedExact": true,
+  "templateUnready": true,
+  "helperImportedParsedCompiledExecuted": false,
+  "sourceIndexQaWrites": false,
+  "rootFullReadIndependentReviewAndActualManifestStillRequired": true
+}

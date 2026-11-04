@@ -1,0 +1,23 @@
+{
+  "sourceHead": "a7e6be69f149bfdeb2845077f3412092443ad6b2",
+  "node": "v22.23.3",
+  "command": [
+    "pnpm",
+    "exec",
+    "vitest",
+    "run",
+    "tests/catalog/stations/technology/fixtures.test.ts",
+    "--maxWorkers=1"
+  ],
+  "exitCode": 0,
+  "testsPassed": 135,
+  "elapsedSeconds": 4.358,
+  "log": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/post-governance-20261018T101140268794Z/restored-green.log",
+  "logSha256": "8d2b460e8dc13d6db3d72ffbdbf9f94495b1db964ed354f89bf4b127a040f73a",
+  "historicalPrimarySha256": "f1d644b44bebfe11f3ab41ddfd2d6d1368e1d52f1653b9f7bd755744618feb50",
+  "previousFreshProofArchive": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/evidence/p2-30/mutation-proof-history/20261018T101140268794Z-e4bbdb66c6ee99ab266a7aae86380665d270139f-3c3ea8917c3c.json",
+  "previousFreshProofSha256": "3c3ea8917c3cb0df64d67244ec6d748bf2dd24e267477d728e26c74dd69fe83f",
+  "newFreshProofSha256": "d681c848b004da7199829b994d28efd148946372a24e5058b5155e6b4bde68ec",
+  "precisionOnlyMutationProof": "/Users/sid/AgentMaturityCompass-worktrees/codex-7f/p2-30/qualification/2026-10-18-P2-30/oracles/nis2-precision-mutation.json",
+  "sourceClean": true
+}

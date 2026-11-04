@@ -1,0 +1,40 @@
+{
+  "at": "2026-10-16T20:20:49.343511+00:00",
+  "repository": "https://github.com/transparency-dev/merkle",
+  "commit": "c39fbf350a405f68571bf4c42a6a518eb0a46a4b",
+  "commitUrl": "https://github.com/transparency-dev/merkle/commit/c39fbf350a405f68571bf4c42a6a518eb0a46a4b",
+  "files": [
+    {
+      "name": "consistency",
+      "path": "testdata/consistency",
+      "type": "dir",
+      "gitBlobSha": "8b64a24d65f29eecc6521b1e8f0f2f3be0521e46",
+      "bytesReported": 0
+    },
+    {
+      "name": "inclusion",
+      "path": "testdata/inclusion",
+      "type": "dir",
+      "gitBlobSha": "5d22d12c8f783024de934d36aa8fc31627f0d0ab",
+      "bytesReported": 0
+    },
+    {
+      "name": "subtreeconsistency",
+      "path": "testdata/subtreeconsistency",
+      "type": "dir",
+      "gitBlobSha": "e3382d74f097870c05c9df0af7f5360de9a63e2e",
+      "bytesReported": 0
+    },
+    {
+      "name": "subtreeinclusion",
+      "path": "testdata/subtreeinclusion",
+      "type": "dir",
+      "gitBlobSha": "7e057e65c9569ac608a56eddca5a390488840eef",
+      "bytesReported": 0
+    }
+  ],
+  "licenceBlobSha": "d645695673349e3947e8e5ae42332d0ac3164cd7",
+  "sourceCopiedIntoProduct": false,
+  "dependencyAdopted": false,
+  "publicLogSubmission": false
+}

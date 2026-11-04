@@ -1,0 +1,45 @@
+{
+  "schema": "p125ec-independent-inert-receipt-helper-review-seal/1",
+  "at": "2026-10-17T01:16:34.916520+00:00",
+  "blockers": [],
+  "outputs": [
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/review.json",
+      "bytes": 4689,
+      "sha256": "d6207479fdf85d65e8bf92041bc06fdc4fae675e3e6b87a962216b49182015c9",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/review.json",
+      "dev": 16777231,
+      "inode": 543908998,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/README.md",
+      "bytes": 1524,
+      "sha256": "b9953ee87e146cc42feba880d630a00a5ddca87236b72b30572368393eb7e3a5",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/README.md",
+      "dev": 16777231,
+      "inode": 543908999,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/input-pins.json",
+      "bytes": 18400,
+      "sha256": "6609314d8930410c3007d6bf863122c2906077e81621c1bb2b78cc0b478eab51",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/input-pins.json",
+      "dev": 16777231,
+      "inode": 543909001,
+      "nlink": 1
+    },
+    {
+      "path": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/observations.json",
+      "bytes": 404687,
+      "sha256": "621439aeaf3743b5db6d1fd30ccab48cdb5a5eb196df771b76c1fbeec631f8d3",
+      "physicalPath": "/private/tmp/p1-25-cadence-qualification-20261017/receipt-helper-static-review/observations.json",
+      "dev": 16777231,
+      "inode": 543909000,
+      "nlink": 1
+    }
+  ],
+  "inputCount": 46,
+  "boundary": "Static bytes/schema review only; no helper execution or source/index/QA mutation."
+}

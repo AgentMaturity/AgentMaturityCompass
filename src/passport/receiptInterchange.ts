@@ -1,4 +1,5 @@
-import { sign, verify } from "node:crypto";
+import { sign } from "node:crypto";
+import { canonicalSigningKey, lowS, SIGNING_ALGORITHMS, verifyCanonical, type SigningAlgorithm } from "../keys/algorithmPolicy.js";
 import { canonicalize } from "../utils/json.js";
 import { sha256Hex } from "../utils/hash.js";
 
@@ -17,6 +18,7 @@ export interface InteroperableReceiptSourceCitation {
 export interface InteroperableReceiptIssuer {
   platform: string;
   workspaceId: string;
+  /** Signed issuer provenance; the signature.publicKeyFingerprint below identifies the actual signing key. */
   keyFingerprint: string;
 }
 
@@ -32,7 +34,7 @@ export interface InteroperableReceiptEventRef {
 }
 
 export interface InteroperableReceiptSignature {
-  algorithm: "ed25519";
+  algorithm: SigningAlgorithm;
   publicKeyFingerprint: string;
   value: string;
 }
@@ -133,7 +135,7 @@ export const interoperableReceiptJsonSchema = {
       type: "object",
       required: ["algorithm", "publicKeyFingerprint", "value"],
       properties: {
-        algorithm: { const: "ed25519" },
+        algorithm: { enum: [...SIGNING_ALGORITHMS] },
         publicKeyFingerprint: { type: "string" },
         value: { type: "string" }
       }
@@ -153,6 +155,8 @@ function payloadHash(payload: Record<string, unknown>): string {
   return sha256Hex(Buffer.from(canonicalize(payload), "utf8"));
 }
 
+// Interchange v1 fingerprints hash the supplied PEM bytes, truncated to 16 hexadecimal characters.
+// Keep this existing wire convention; issuer.keyFingerprint is separate signed provenance.
 function publicKeyFingerprint(publicKeyPem: string): string {
   return sha256Hex(Buffer.from(publicKeyPem, "utf8")).slice(0, 16);
 }
@@ -207,11 +211,20 @@ export function buildInteroperableReceipt(input: BuildInteroperableReceiptInput)
     evidenceRefs: input.evidenceRefs,
     sourceCitations: input.sourceCitations
   };
-  const signature = sign(null, signingBytes(withoutSignature), input.privateKeyPem).toString("base64");
+  const key = canonicalSigningKey(input.publicKeyPem);
+  if (key === null) throw new Error("receipt signing key uses an unsupported algorithm");
+  const bytes = signingBytes(withoutSignature);
+  const signatureBytes = key.algorithm === "ed25519"
+    ? sign(null, bytes, input.privateKeyPem)
+    : lowS(sign("sha256", bytes, { key: input.privateKeyPem, dsaEncoding: "ieee-p1363" }));
+  if (!verifyCanonical(key.algorithm, bytes, input.publicKeyPem, signatureBytes)) {
+    throw new Error("receipt signing key does not match its public key");
+  }
+  const signature = signatureBytes.toString("base64");
   return {
     ...withoutSignature,
     signature: {
-      algorithm: "ed25519",
+      algorithm: key.algorithm,
       publicKeyFingerprint: publicKeyFingerprint(input.publicKeyPem),
       value: signature
     }
@@ -264,7 +277,7 @@ export function verifyInteroperableReceipt(
   } else if (receipt.payloadHash !== payloadHash(receipt.payload ?? {})) {
     reasons.push("payloadHash:mismatch");
   }
-  if (receipt.signature?.algorithm !== "ed25519") {
+  if (!SIGNING_ALGORITHMS.some((algorithm) => algorithm === receipt.signature?.algorithm)) {
     reasons.push("signature.algorithm:unsupported");
   }
   if (!nonEmpty(receipt.signature?.publicKeyFingerprint)) {
@@ -278,7 +291,9 @@ export function verifyInteroperableReceipt(
     const { signature: _signature, ...withoutSignature } = receipt;
     const bytes = signingBytes(withoutSignature);
     const signatureBytes = signatureBytesFromBase64(receipt.signature.value);
-    const ok = publicKeysPem.some((publicKeyPem) => verify(null, bytes, publicKeyPem, signatureBytes));
+    const ok = publicKeysPem.some((publicKeyPem) =>
+      receipt.signature.publicKeyFingerprint === publicKeyFingerprint(publicKeyPem)
+      && verifyCanonical(receipt.signature.algorithm, bytes, publicKeyPem, signatureBytes));
     if (!ok) {
       reasons.push("signature:invalid");
     }

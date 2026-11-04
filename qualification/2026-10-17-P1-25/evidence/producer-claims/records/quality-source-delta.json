@@ -1,0 +1,10 @@
+{
+  "schema": "p125pc-source-quality-delta/1",
+  "at": "2026-10-17T01:53:45.527475+00:00",
+  "beforeDeadCode": 2712,
+  "afterDeadCode": 2712,
+  "allOrderedFindingsToolRootVersionExactIgnoringOnlySnapshotRole": true,
+  "duplicate1268EntirePublishedLogExact": true,
+  "globalGatesRedUnwaived": true,
+  "noBaselineAdoption": true
+}

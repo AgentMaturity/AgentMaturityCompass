@@ -1,0 +1,13 @@
+{
+  "at": "2026-10-16T22:47:23.987347+00:00",
+  "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaGrant.test.ts",
+  "bytes": 27505,
+  "sha256": "9f9bd30790094ea2c8172a31ff2f9de69a2212fe2e46fee133e123349e8b63fc",
+  "sourceParent": "da61205c0817267133451bac11e57bd0318fe44f",
+  "fixedBodies": 2,
+  "regularSingleLink": true,
+  "onlyNewFileWritten": true,
+  "all135ProtectedEightNativeBytesStillExact": true,
+  "sourceIndexUntouched": true,
+  "noRuntimeCredit": true
+}

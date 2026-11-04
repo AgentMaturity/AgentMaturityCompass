@@ -20,6 +20,8 @@ export const SHARED_OFFICIAL_HOSTS = [
   "etsi.org", "whitehouse.gov", "reginfo.gov", "ftc.gov", "fcc.gov", "cisa.gov", "epa.gov",
   "eeoc.gov", "ada.gov", "federalreserve.gov", "finra.org", "nyc.gov", "coag.gov",
   "calcivilrights.ca.gov", "nysed.gov", "ohio.gov", "illinois.gov", "ilga.gov", "utah.gov",
+  // Regulators the US register cites (P1-18), awaiting Sid's approval like the register's other additions
+  "consumerfinance.gov", "dfs.ny.gov", "cms.gov",
 ] as const;
 
 export function isSharedOfficialUrl(url: string): boolean {

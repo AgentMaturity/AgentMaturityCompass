@@ -1,0 +1,17 @@
+{
+  "at": "2026-10-16T23:35:56.219932+00:00",
+  "path": "/Users/sid/.codex/worktrees/p2-07-scim-qualification/AgentMaturityCompass/tests/time/tsaTestFixture.ts",
+  "old": {
+    "bytes": 24968,
+    "sha256": "8d46600e3559f4825806b04d43cc7e03cc346f6ec47513c3af673cbe4649f663"
+  },
+  "new": {
+    "bytes": 24967,
+    "sha256": "f6140366e2f7c4e28a03e5bc3ef6fe372cee81b985357b0921c3df245b5e250c"
+  },
+  "trigger": "git diff --cached --check: tests/time/tsaTestFixture.ts:394: new blank line at EOF.",
+  "onlyFinalExtraNewlineRemoved": true,
+  "allCodeAndTestBodiesExact": true,
+  "reviewedOriginalRetained": "/private/tmp/p1-25-checkpoint-qualification-20261017/helper-before-eof-repair.ts.source.txt",
+  "noProductionGuardDeadlineOrIgnoreChanges": true
+}

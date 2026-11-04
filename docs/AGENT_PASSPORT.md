@@ -38,6 +38,8 @@ Identifiers are hashed by policy defaults.
 
 Reasons are deterministic template IDs (no free-form claims).
 
+A trust signal that nothing measured is `null`, never 0: `trust.integrityIndex` without a trusted run, `trust.correlationRatio` when the run's window carried no receipted trace, and `trust.evidenceCoverage` when neither a run nor a signed forecast measured the evidence mix (a forecast built from no runs measured none). A gate with a minimum above 0 then adds `GATE_FAIL_INTEGRITY_NOT_MEASURED` or `GATE_FAIL_CORRELATION_NOT_MEASURED` instead of a low-value reason.
+
 ## Commands
 
 ```bash

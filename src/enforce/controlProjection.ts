@@ -10,7 +10,7 @@ import {
   actionPolicyPath,
   verifyActionPolicySignature,
 } from "../governor/actionPolicyEngine.js";
-import type { ActionPolicy, ActionPolicyRule } from "../governor/actionPolicySchema.js";
+import { DEFAULT_RUN_INTEGRITY_AT_LEAST, runIntegrityAtLeast, type ActionPolicy, type ActionPolicyRule } from "../governor/actionPolicySchema.js";
 import { ACTION_CLASSES, ACTION_CLASS_TITLES } from "../governor/actionCatalog.js";
 import type { ActionClass } from "../types.js";
 import {
@@ -288,9 +288,11 @@ function runtimeFamily(workspace: string): ControlFamilyProjection {
 
 function actionConditions(rule: ActionPolicyRule | undefined, defaultMode: ActionPolicy["defaultMode"]): string[] {
   if (!rule) return [`no explicit rule; default mode ${defaultMode}`];
+  const threshold = runIntegrityAtLeast(rule);
   const conditions = [
     `mandatory: signed and trusted Action Policy`,
     `mandatory: trust tier at least ${rule.requireTrustTierAtLeast}`,
+    `mandatory: trusted-run integrity at least ${threshold}${threshold < DEFAULT_RUN_INTEGRITY_AT_LEAST ? ` (owner waiver below the ${DEFAULT_RUN_INTEGRITY_AT_LEAST} default)` : ""}`,
     "mandatory: sandbox when the selected risk-tier default requires it",
     "mandatory: active budget, incident-freeze, and work-order gates",
   ];

@@ -1,0 +1,204 @@
+{
+  "schemaVersion": 1,
+  "key": "UPGRADE-1.1.1",
+  "date": "2026-11-01",
+  "commit": "0fe34af0ed97131c0671c4357618dd99a285b9be",
+  "branch": "rtd/gap-upgrade",
+  "node": "v22.23.3",
+  "pnpm": "10.33.0",
+  "os": "darwin 25.6.0 (macOS 26.6.2)",
+  "arch": "arm64",
+  "commands": [
+    {
+      "cmd": "git archive v1.1.1 | tar -x -C <scratch>/src111 && npx tsc -p tsconfig.json && npm run -s copy-assets && npm pack --ignore-scripts --pack-destination <scratch>",
+      "exit": 0,
+      "durationMs": 60000
+    },
+    {
+      "cmd": "npm run -s build && npm pack --ignore-scripts --pack-destination <scratch>/pack2",
+      "exit": 0,
+      "durationMs": 90000
+    },
+    {
+      "cmd": "[1.1.1] amc init --skip-vault",
+      "exit": 0,
+      "durationMs": 1069
+    },
+    {
+      "cmd": "[1.1.1] amc run --score-only --json",
+      "exit": 0,
+      "durationMs": 1186
+    },
+    {
+      "cmd": "[1.1.1] amc evidence collect --first-run --agent default --runtime any -- node -e 'console.log(\"hello from a 1.1.1 agent\")'",
+      "exit": 0,
+      "durationMs": 884
+    },
+    {
+      "cmd": "[1.1.1] amc budgets init --agent default",
+      "exit": 0,
+      "durationMs": 701
+    },
+    {
+      "cmd": "[1.1.1] amc policy action init",
+      "exit": 0,
+      "durationMs": 644
+    },
+    {
+      "cmd": "[1.1.1] amc governor check --agent default --action READ_ONLY --risk low --mode execute",
+      "exit": 0,
+      "durationMs": 829
+    },
+    {
+      "cmd": "[1.1.1] amc verify all --json",
+      "exit": 1,
+      "durationMs": 687
+    },
+    {
+      "cmd": "[1.1.1] amc backup create --out <scratch>/final/pre-upgrade.amcbackup",
+      "exit": 0,
+      "durationMs": 1346
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc doctor --json",
+      "exit": 1,
+      "durationMs": 1399
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc verify",
+      "exit": 1,
+      "durationMs": 1232
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc verify --expect-monitor 848a1291103458db853cf1fc1225049cfa56c2759b88a60dd0fb3306ed9e19d2",
+      "exit": 0,
+      "durationMs": 1154
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc session verify --expect-monitor 848a1291103458db853cf1fc1225049cfa56c2759b88a60dd0fb3306ed9e19d2",
+      "exit": 0,
+      "durationMs": 1236
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc run --score-only --json",
+      "exit": 0,
+      "durationMs": 2586
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc governor check --agent default --action READ_ONLY --risk low --mode execute",
+      "exit": 0,
+      "durationMs": 1190
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc --agent default agent-loop run 'Check recording after the upgrade.' --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512",
+      "exit": 1,
+      "durationMs": 1553
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc vault history migrate --role monitor --expected-sha256 77f369c1a7015c62c18cdcfe672e028dad3bc90964f5838dea0026f24cce6b37",
+      "exit": 0,
+      "durationMs": 1233
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc vault history migrate --role auditor --expected-sha256 ae87e4ff84ed8cb2bd1fad1e7cf7ebe77d171a48901840e65da95bd38598dc3e",
+      "exit": 0,
+      "durationMs": 1183
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc vault history migrate --role lease --expected-sha256 73951f794800ef3786052cf7544cc90972b011d7262a170f0a878c8a34dbfb08",
+      "exit": 0,
+      "durationMs": 1314
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc vault history migrate --role session --expected-sha256 3f5a02ff3a4eee409d3d93358b90ba582e6a9bb4cf541cdcb720ebc51ea35122",
+      "exit": 0,
+      "durationMs": 1238
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc doctor --json",
+      "exit": 0,
+      "durationMs": 1452
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc verify --expect-monitor 848a1291103458db853cf1fc1225049cfa56c2759b88a60dd0fb3306ed9e19d2 --relabel-legacy --dry-run",
+      "exit": 0,
+      "durationMs": 1340
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc verify --expect-monitor 848a1291103458db853cf1fc1225049cfa56c2759b88a60dd0fb3306ed9e19d2 --relabel-legacy",
+      "exit": 0,
+      "durationMs": 3355
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc budgets sign",
+      "exit": 0,
+      "durationMs": 1211
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc --agent default agent-loop run 'Check recording after the upgrade.' --provider stub --model amc-stub-1 --tools echo --max-steps 2 --max-tokens 512",
+      "exit": 0,
+      "durationMs": 1662
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc agent-loop verify 900e8084-c3a1-48b0-9d36-61a5c188da25 --expect-monitor 848a1291103458db853cf1fc1225049cfa56c2759b88a60dd0fb3306ed9e19d2",
+      "exit": 0,
+      "durationMs": 1411
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc session verify --expect-monitor 848a1291103458db853cf1fc1225049cfa56c2759b88a60dd0fb3306ed9e19d2",
+      "exit": 0,
+      "durationMs": 1313
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc verify all --expect-monitor 848a1291103458db853cf1fc1225049cfa56c2759b88a60dd0fb3306ed9e19d2",
+      "exit": 1,
+      "durationMs": 1389
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc backup verify <scratch>/final/pre-upgrade.amcbackup --pubkey <scratch>/final/ws/.amc/keys/auditor_ed25519.pub",
+      "exit": 0,
+      "durationMs": 1572
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc budgets verify",
+      "exit": 0,
+      "durationMs": 1377
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc status",
+      "exit": 0,
+      "durationMs": 1303
+    },
+    {
+      "cmd": "[1.2.0 (this line)] amc studio start --bind 127.0.0.1 --port 47811 --dashboard-port 47812",
+      "exit": 0,
+      "durationMs": 3563
+    },
+    {
+      "cmd": "npx vitest run tests/qualificationReceipts.test.ts --maxWorkers=2",
+      "exit": 0,
+      "durationMs": 3000
+    }
+  ],
+  "tests": {
+    "total": 23,
+    "passed": 23,
+    "failed": 0,
+    "skipped": 0
+  },
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "c0b8aa124641e1a3b0abf2fca2c790af2212d148bca2f2f2123f00dcfa258088"
+    },
+    {
+      "path": "commands.json",
+      "sha256": "32291d8e40e6c2b00991fceb2c04021915dc0e87240a5f6d0d27cb27b396d526"
+    },
+    {
+      "path": "reproduce.sh",
+      "sha256": "a79c47df8b6953580d91eb94e7ac644cea37ceaea58c7446e8b9078d57844e74"
+    }
+  ],
+  "notes": "A 1.1.1 workspace (built from tag v1.1.1, tarball sha256 8ce09962afe5686a12480ef9eb34212d0a721ffda6a3796101a62e8caefdad94, not compared with the npm registry because this lane makes no network fetch) was upgraded with this line's pack (sha256 10e0409f9c67bc60957b1a436d0a4911982c251ecf2ea88b41524f29f737c415). Snapshot <scratch>/final/ws111-snapshot.tgz sha256 eaa541355b0b9c878f432de50ca7f99acd327b010f862156b7e6a28218e97e12 (holds the encrypted vault, not committed). Non-zero exits, each expected and explained in README.md: 1.1.1 verify all (passport policy missing, the 1.1.1 baseline); doctor before key-history migration (four key-history FAILs); verify without a monitor pin (UNANCHORED); the stub turn under the 1.1.1 USD budget (AMC_NATIVE_BUDGET_REFUSED); verify all after the upgrade (INCOMPLETE: passport-policy-signature and a4-projects skipped, same on a fresh workspace). After the documented migration steps doctor is ok, verify, session verify, agent-loop verify, backup verify and budgets verify pass, the stub turn completes and Studio starts and stops. No 1.1.1 signature failed, no migration threw. Seven Migration-section gaps were fixed in docs/releases/2.0.0.md. The two build durations are rounded estimates; the others are measured. The tests block counts tests/qualificationReceipts.test.ts."
+}

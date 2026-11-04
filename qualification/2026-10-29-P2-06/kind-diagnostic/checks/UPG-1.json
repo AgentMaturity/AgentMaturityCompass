@@ -1,0 +1,128 @@
+{
+  "id": "UPG-1",
+  "scenario": "Upgrade with data",
+  "status": "passed",
+  "criteria": [
+    {
+      "name": "workload fixture seeded on N-1",
+      "ok": true,
+      "detail": {
+        "ok": true,
+        "status": "verified-prefix",
+        "taskId": "00ac59154f7e8925addd868fbfaec9a8495b0e168c914909a6442bbe313d292e",
+        "exit": 0
+      }
+    },
+    {
+      "name": "pre-upgrade ledger snapshot",
+      "ok": true,
+      "detail": {
+        "count": 47,
+        "head": "0b4de213ef0060e25d25cea0a5ee7754003616f185c1b4669dad89173043d3e5",
+        "linked": true,
+        "migrations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "integrity": "ok"
+      }
+    },
+    {
+      "name": "pre-upgrade backup created",
+      "ok": true,
+      "detail": {
+        "backupId": "bkp_28568d62-da4f-4a18-877f-99fc1d824f5d",
+        "sha256": "43c91ca994a2f45c76c92ba4dc243203ee9d3efe25eb941d356d04e29189a273"
+      }
+    },
+    {
+      "name": "helm upgrade to N",
+      "ok": true,
+      "detail": {
+        "exit": 0,
+        "downtimeUpperBoundMs": 11841
+      }
+    },
+    {
+      "name": "pre-upgrade chain prefix byte-identical",
+      "ok": true,
+      "detail": {
+        "before": 47,
+        "after": 54
+      }
+    },
+    {
+      "name": "new migrations applied once",
+      "ok": true,
+      "detail": {
+        "added": [
+          15,
+          16
+        ]
+      }
+    },
+    {
+      "name": "ledger chain links and PRAGMA integrity_check",
+      "ok": true,
+      "detail": {
+        "count": 54,
+        "head": "509f71d5a4239f9b530c91394f5be44855fd89cf8997a78d221cafaac0269f9c",
+        "linked": true,
+        "migrations": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16
+        ],
+        "integrity": "ok"
+      }
+    },
+    {
+      "name": "helm test passes on N",
+      "ok": true,
+      "detail": {
+        "ok": true,
+        "status": "verified-prefix",
+        "taskId": "92645179bda8db3c7943d0687fbc10754ec6c26677d1ac2ed0bae3bf87b92ea7",
+        "exit": 0
+      }
+    },
+    {
+      "name": "deploy-verify passes on N",
+      "ok": true,
+      "detail": [
+        "health:PASS",
+        "readiness:PASS",
+        "governed-turn:PASS",
+        "receipt-signature:PASS",
+        "receipt-binding:PASS"
+      ]
+    }
+  ],
+  "downtimeMs": 11841,
+  "durationMs": 29637
+}
